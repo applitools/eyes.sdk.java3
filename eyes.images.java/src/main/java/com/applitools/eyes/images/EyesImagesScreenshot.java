@@ -16,6 +16,8 @@ public class EyesImagesScreenshot extends EyesScreenshot {
     protected Region bounds;
 
     /**
+     * Ctor.
+     *
      * @param image The screenshot image.
      * @param location The top/left coordinates of the screenshot in context
      *                 relative coordinates type.
@@ -37,6 +39,16 @@ public class EyesImagesScreenshot extends EyesScreenshot {
         this(image, new Location(0, 0));
     }
 
+    /**
+     * Get sub screenshot.
+     *
+     * @param region          The region for which we should get the sub screenshot.
+     * @param coordinatesType How should the region be calculated on the
+     *                        screenshot image.
+     * @param throwIfClipped  Throw an EyesException if the region is not
+     *                        fully contained in the screenshot.
+     * @return Sub screenshot.
+     */
     @Override
     public EyesScreenshot getSubScreenshot(Region region,
                                            CoordinatesType coordinatesType, boolean throwIfClipped) {
@@ -70,6 +82,14 @@ public class EyesImagesScreenshot extends EyesScreenshot {
                 relativeSubScreenshotRegion.getLocation());
     }
 
+    /**
+     * Convert the location.
+     *
+     * @param location The location which coordinates needs to be converted.
+     * @param from The current coordinates type for {@code location}.
+     * @param to The target coordinates type for {@code location}.
+     * @return The converted location.
+     */
     @Override
     public Location convertLocation(Location location, CoordinatesType from,
                                        CoordinatesType to) {
@@ -107,6 +127,14 @@ public class EyesImagesScreenshot extends EyesScreenshot {
         return result;
     }
 
+    /**
+     * Get the location in the screenshot.
+     *
+     * @param location The location as coordinates inside the current frame.
+     * @param coordinatesType The coordinates type of {@code location}.
+     * @return The location in the screenshot.
+     * @throws OutOfBoundsException
+     */
     @Override
     public Location getLocationInScreenshot(Location location,
             CoordinatesType coordinatesType) throws OutOfBoundsException {
@@ -126,6 +154,15 @@ public class EyesImagesScreenshot extends EyesScreenshot {
                 CoordinatesType.SCREENSHOT_AS_IS);
     }
 
+    /**
+     * Get the intersected region.
+     *
+     * @param region The region to intersect.
+     * @param originalCoordinatesType The coordinates type of {@code region}.
+     * @param resultCoordinatesType The coordinates type of the resulting
+     *                              region.
+     * @return The region of the intersected region.
+     */
     @Override
     public Region getIntersectedRegion(Region region,
             CoordinatesType originalCoordinatesType,

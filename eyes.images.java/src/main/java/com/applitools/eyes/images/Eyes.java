@@ -34,11 +34,17 @@ public class Eyes extends EyesBase {
         this(getDefaultServerUrl());
     }
 
+    /**
+     * Get the base agent id.
+     *
+     * @return Base agent id.
+     */
     @Override
     public String getBaseAgentId() {
         return "eyes.images.java/3.11";
     }
 
+    @SuppressWarnings("UnusedDeclaration")
     /**
      * Starts a test.
      *
@@ -48,7 +54,6 @@ public class Eyes extends EyesBase {
      *                       {@code null} will automatically grab the
      *                       resolution from the image.
      */
-    @SuppressWarnings("UnusedDeclaration")
     public void open(String appName, String testName,
             RectangleSize dimensions) {
         openBase(appName, testName, dimensions, null);
@@ -58,6 +63,8 @@ public class Eyes extends EyesBase {
     /**
      * ﻿Starts a new test without setting the viewport size of the AUT.
      *
+     * @param appName        The name of the application under test.
+     * @param testName       The test name.
      * @see #open(String, String, RectangleSize)
      */
     public void open(String appName, String testName) {
@@ -177,6 +184,7 @@ public class Eyes extends EyesBase {
 
     /**
      * Matches the image stored in the input file with the next expected image.
+     *
      * See {@link #checkImage(BufferedImage, String, boolean)}.
      *
      * @param path The base64 representation of the image's raw bytes.
@@ -226,8 +234,6 @@ public class Eyes extends EyesBase {
      *              for.
      * @param tag An optional tag to be associated with the validation
      *            checkpoint.
-     * @param ignoreMismatch True if the server should ignore a negative
-     *                       result for the visual validation.
      * @return Whether or not the image matched the baseline.
      */
     public boolean checkImage(byte[] image, String tag,
@@ -335,11 +341,19 @@ public class Eyes extends EyesBase {
         addTextTriggerBase(control, text);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public RectangleSize getViewportSize() {
         return viewportSize;
     }
 
+    /**
+     * Set the viewport size.
+     *
+     * @param size The required viewport size.
+     */
     @Override
     public void setViewportSize(RectangleSize size) {
         ArgumentGuard.notNull(size, "size");
@@ -347,6 +361,11 @@ public class Eyes extends EyesBase {
                 size.getHeight());
     }
 
+    /**
+     * Get the inferred environment.
+     *
+     * @return Inferred environment.
+     */
     @Override
     protected String getInferredEnvironment() {
         return inferred != null ? inferred : "";
@@ -355,17 +374,28 @@ public class Eyes extends EyesBase {
     @SuppressWarnings("UnusedDeclaration")
     /**
      * Sets the inferred environment for the test.
+     *
      * @param inferred The inferred environment string.
      */
     public void setInferredEnvironment(String inferred) {
         this.inferred = inferred;
     }
 
+    /**
+     * Get the screenshot.
+     *
+     * @return The screenshot.
+     */
     @Override
     public EyesScreenshot getScreenshot() {
         return screenshot;
     }
 
+    /**
+     * Get the title.
+     *
+     * @return The title.
+     */
     @Override
     protected String getTitle() {
 

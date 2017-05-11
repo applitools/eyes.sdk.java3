@@ -16,6 +16,8 @@ public class EyesImagesScreenshot extends EyesScreenshot {
     protected Region bounds;
 
     /**
+     * Ctor.
+     *
      * @param image The screenshot image.
      * @param location The top/left coordinates of the screenshot in context
      *                 relative coordinates type.
@@ -70,6 +72,10 @@ public class EyesImagesScreenshot extends EyesScreenshot {
                 relativeSubScreenshotRegion.getLocation());
     }
 
+    /**
+     * {@inheritDoc}
+     *
+     */
     @Override
     public Location convertLocation(Location location, CoordinatesType from,
                                        CoordinatesType to) {
@@ -107,6 +113,10 @@ public class EyesImagesScreenshot extends EyesScreenshot {
         return result;
     }
 
+    /**
+     * {@inheritDoc}
+     *
+     */
     @Override
     public Location getLocationInScreenshot(Location location,
             CoordinatesType coordinatesType) throws OutOfBoundsException {
@@ -126,6 +136,10 @@ public class EyesImagesScreenshot extends EyesScreenshot {
                 CoordinatesType.SCREENSHOT_AS_IS);
     }
 
+    /**
+     * {@inheritDoc}
+     *
+     */
     @Override
     public Region getIntersectedRegion(Region region,
             CoordinatesType originalCoordinatesType,

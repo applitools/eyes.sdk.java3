@@ -10,6 +10,9 @@ import com.applitools.utils.ImageUtils;
 import java.awt.image.BufferedImage;
 import java.net.URI;
 
+/**
+ * The main API for the eyes images SDK.
+ */
 public class Eyes extends EyesBase {
 
     private String title;
@@ -34,11 +37,15 @@ public class Eyes extends EyesBase {
         this(getDefaultServerUrl());
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public String getBaseAgentId() {
         return "eyes.images.java/3.11";
     }
 
+    @SuppressWarnings("UnusedDeclaration")
     /**
      * Starts a test.
      *
@@ -48,7 +55,6 @@ public class Eyes extends EyesBase {
      *                       {@code null} will automatically grab the
      *                       resolution from the image.
      */
-    @SuppressWarnings("UnusedDeclaration")
     public void open(String appName, String testName,
             RectangleSize dimensions) {
         openBase(appName, testName, dimensions, null);
@@ -237,7 +243,7 @@ public class Eyes extends EyesBase {
     }
 
     /**
-     * Perform visual validation for the current image.
+     * Perform visual validation of a certain region in the current image.
      *
      * @param image The image to perform visual validation for.
      * @param region The region to validate within the image.
@@ -282,7 +288,7 @@ public class Eyes extends EyesBase {
 
     @SuppressWarnings("UnusedDeclaration")
     /**
-     * Perform visual validation for a region in a given image. Does not
+     * Perform visual validation of a region for a given image. Does not
      * ignore mismatches.
      *
      * @param image The image to perform visual validation for.
@@ -336,11 +342,21 @@ public class Eyes extends EyesBase {
     }
 
     @Override
+    /**
+     * Get the viewport size.
+     *
+     * @return The viewport size.
+     */
     public RectangleSize getViewportSize() {
         return viewportSize;
     }
 
     @Override
+    /**
+     * Set the viewport size.
+     *
+     * @param size The size to set to.
+     */
     public void setViewportSize(RectangleSize size) {
         ArgumentGuard.notNull(size, "size");
         this.viewportSize = new RectangleSize(size.getWidth(),
@@ -355,6 +371,7 @@ public class Eyes extends EyesBase {
     @SuppressWarnings("UnusedDeclaration")
     /**
      * Sets the inferred environment for the test.
+     *
      * @param inferred The inferred environment string.
      */
     public void setInferredEnvironment(String inferred) {
@@ -362,6 +379,11 @@ public class Eyes extends EyesBase {
     }
 
     @Override
+    /**
+     * Get screenshot;
+     *
+     * @param screenshot The saved screenshot.
+     */
     public EyesScreenshot getScreenshot() {
         return screenshot;
     }
