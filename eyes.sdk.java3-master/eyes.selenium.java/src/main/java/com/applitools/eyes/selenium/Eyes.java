@@ -122,7 +122,6 @@ public class Eyes extends EyesBase {
 
     @SuppressWarnings("unused")
     /**
-     * Get amount of time to wait before screenshots.
      *
      * @return The time to wait just before taking a screenshot.
      */
@@ -178,7 +177,6 @@ public class Eyes extends EyesBase {
     }
 
     /**
-     * Get the stitch mode.
      *
      * @return The current stitch mode settings.
      */
@@ -189,7 +187,6 @@ public class Eyes extends EyesBase {
     @SuppressWarnings("UnusedDeclaration")
     /**
      * Hide the scrollbars when taking screenshots.
-     *
      * @param shouldHide Whether to hide the scrollbars or not.
      */
     public void setHideScrollbars(boolean shouldHide) {
@@ -216,7 +213,6 @@ public class Eyes extends EyesBase {
 
     @SuppressWarnings("unused")
     /**
-     * Set the rotation.
      *
      * @param rotation The image rotation data.
      */
@@ -229,7 +225,6 @@ public class Eyes extends EyesBase {
 
     @SuppressWarnings("unused")
     /**
-     * Get the pixel ratio.
      *
      * @return The device pixel ratio, or {@link #UNKNOWN_DEVICE_PIXEL_RATIO}
      * if the DPR is not known yet or if it wasn't possible to extract it.
@@ -404,28 +399,17 @@ public class Eyes extends EyesBase {
 
     @SuppressWarnings("unused")
     /**
-     * Runs a test on the current window.
-     *
-     * @param driver         The web driver that controls the browser hosting
-     *                       the application under test.
-     * @param appName        The name of the application under test.
-     * @param testName       The test name (will also be used as the tag name
-     * for the step).
+     * See {@link #testWindow(WebDriver, String, String, RectangleSize)}.
+     * {@code viewportSize} defaults to {@code null}.
      */
     public void testWindow(WebDriver driver, String appName, String testName) {
         testWindow(driver, appName, testName, null);
     }
 
     /**
-     * Runs a test on the current window.
-     *
-     * @param driver         The web driver that controls the browser hosting
-     *                       the application under test.
-     * @param testName       The test name (will also be used as the tag name
-     * for the step).
-     * @param viewportSize   The required browser's viewport size
-     * (i.e., the visible part of the document's body) or
-     * {@code null} to use the current window's viewport.
+     * See {@link #testWindow(WebDriver, String, String, RectangleSize)}.
+     * {@code appName} defaults to {@code null} (which means the name set in
+     * {@link #setAppName(String)} would be used.
      */
     public void testWindow(WebDriver driver, String testName,
                            RectangleSize viewportSize) {
@@ -444,7 +428,6 @@ public class Eyes extends EyesBase {
     @SuppressWarnings("unused")
     /**
      * Run a visual performance test.
-     *
      * @param driver The driver to use.
      * @param appName The name of the application being tested.
      * @param testName The test name.
@@ -1413,7 +1396,6 @@ public class Eyes extends EyesBase {
     /**
      * Matches the frame given by the frames path, by switching into the frame
      * and using stitching to get an image of the frame.
-     *
      * @param framePath The path to the frame to check. This is a list of
      *                  frame names/IDs (where each frame is nested in the
      *                  previous frame).
@@ -1809,13 +1791,13 @@ public class Eyes extends EyesBase {
         addTextTrigger(elementRegion, text);
     }
 
+    @Override
     /**
      * Use this method only if you made a previous call to {@link #open
      * (WebDriver, String, String)} or one of its variants.
      *
      * {@inheritDoc}
      */
-    @Override
     protected RectangleSize getViewportSize() {
         ArgumentGuard.isValidState(getIsOpen(), "Eyes not open");
 
@@ -1875,9 +1857,6 @@ public class Eyes extends EyesBase {
         EyesSeleniumUtils.setViewportSize(new Logger(), driver, size);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected EyesScreenshot getScreenshot() {
 
