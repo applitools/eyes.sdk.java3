@@ -1500,7 +1500,7 @@ public abstract class EyesBase {
 
         // Cropping by region if necessary
         if (!region.isEmpty()) {
-            screenshot = screenshot.getSubScreenshot(region, region.getCoordinatesType(), false);
+            screenshot = screenshot.getSubScreenshot(region, false);
         }
 
         logger.verbose("Compressing screenshot...");

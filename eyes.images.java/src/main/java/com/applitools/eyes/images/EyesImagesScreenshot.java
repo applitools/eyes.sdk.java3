@@ -41,31 +41,23 @@ public class EyesImagesScreenshot extends EyesScreenshot {
 
     /**
      * Get sub screenshot.
-     *
      * @param region          The region for which we should get the sub screenshot.
-     * @param coordinatesType How should the region be calculated on the
-     *                        screenshot image.
-     * @param throwIfClipped  Throw an EyesException if the region is not
-     *                        fully contained in the screenshot.
+     * @param throwIfClipped  Throw an EyesException if the region is not fully contained in the screenshot.
      * @return Sub screenshot.
      */
     @Override
-    public EyesScreenshot getSubScreenshot(Region region,
-                                           CoordinatesType coordinatesType, boolean throwIfClipped) {
+    public EyesScreenshot getSubScreenshot(Region region, boolean throwIfClipped) {
 
         ArgumentGuard.notNull(region, "region");
-        ArgumentGuard.notNull(coordinatesType, "coordinatesType");
 
         // We want to get the sub-screenshot in as-is coordinates type.
         Region subScreenshotRegion = getIntersectedRegion(region,
-                coordinatesType, CoordinatesType.SCREENSHOT_AS_IS);
+                region.getCoordinatesType(), CoordinatesType.SCREENSHOT_AS_IS);
 
         if (subScreenshotRegion.isEmpty() ||
                 (throwIfClipped &&
                         !subScreenshotRegion.getSize().equals(region.getSize()))) {
-            throw new OutOfBoundsException(String.format(
-                    "Region [%s, (%s)] is out of screenshot bounds [%s]",
-                    region, coordinatesType, bounds));
+            throw new OutOfBoundsException(String.format( "Region [%s] is out of screenshot bounds [%s]", region, bounds));
         }
 
         BufferedImage subScreenshotImage =
