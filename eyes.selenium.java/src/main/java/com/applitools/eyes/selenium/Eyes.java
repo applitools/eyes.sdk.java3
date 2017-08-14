@@ -838,11 +838,13 @@ public class Eyes extends EyesBase {
      * behaves the same as {@link #checkElement(WebElement)}.
      */
     public void checkRegion(WebElement element, boolean stitchContent) {
+        this.stitchContent = stitchContent;
         if (stitchContent) {
             checkElement(element);
         } else {
             checkRegion(element);
         }
+        this.stitchContent = false;
     }
 
     /**
@@ -858,13 +860,14 @@ public class Eyes extends EyesBase {
      * #checkRegion(org.openqa.selenium.WebElement, String)}. Otherwise
      * behaves the same as {@link #checkElement(WebElement, String)}.
      */
-    public void checkRegion(WebElement element, String tag,
-                            boolean stitchContent) {
+    public void checkRegion(WebElement element, String tag, boolean stitchContent) {
+        this.stitchContent = stitchContent;
         if (stitchContent) {
             checkElement(element, tag);
         } else {
             checkRegion(element, tag);
         }
+        this.stitchContent = false;
     }
 
     /**
@@ -916,13 +919,14 @@ public class Eyes extends EyesBase {
      * #checkRegion(org.openqa.selenium.WebElement, int, String)}. Otherwise
      * behaves the same as {@link #checkElement(WebElement, String)}.
      */
-    public void checkRegion(WebElement element, int matchTimeout,
-                            String tag, boolean stitchContent) {
+    public void checkRegion(WebElement element, int matchTimeout, String tag, boolean stitchContent) {
+        this.stitchContent = stitchContent;
         if (stitchContent) {
             checkElement(element, matchTimeout, tag);
         } else {
             checkRegion(element, matchTimeout, tag);
         }
+        this.stitchContent = false;
     }
 
     /**
@@ -939,11 +943,13 @@ public class Eyes extends EyesBase {
      * same as {@code #checkElement(org.openqa.selenium.By)}
      */
     public void checkRegion(By selector, boolean stitchContent) {
+        this.stitchContent = stitchContent;
         if (stitchContent) {
             checkElement(selector);
         } else {
             checkRegion(selector);
         }
+        this.stitchContent = false;
     }
 
     /**
@@ -960,11 +966,13 @@ public class Eyes extends EyesBase {
      * behaves the same as {@link #checkElement(By, String)}.
      */
     public void checkRegion(By selector, String tag, boolean stitchContent) {
+        this.stitchContent = stitchContent;
         if (stitchContent) {
             checkElement(selector, tag);
         } else {
             checkRegion(selector, tag);
         }
+        this.stitchContent = false;
     }
 
     /**
@@ -992,13 +1000,14 @@ public class Eyes extends EyesBase {
      * {@link #checkRegion(org.openqa.selenium.By, int, String)}. Otherwise,
      * behaves the same as {@link #checkElement(By, int, String)}.
      */
-    public void checkRegion(By selector, int matchTimeout, String tag,
-                            boolean stitchContent) {
+    public void checkRegion(By selector, int matchTimeout, String tag, boolean stitchContent) {
+        this.stitchContent = stitchContent;
         if (stitchContent) {
             checkElement(selector, matchTimeout, tag);
         } else {
             checkRegion(selector, matchTimeout, tag);
         }
+        this.stitchContent = false;
     }
 
     /**
@@ -1066,11 +1075,13 @@ public class Eyes extends EyesBase {
             return;
         }
         driver.switchTo().frame(frameIndex);
+        this.stitchContent = stitchContent;
         if (stitchContent) {
             checkElement(selector, matchTimeout, tag);
         } else {
             checkRegion(selector, matchTimeout, tag);
         }
+        this.stitchContent = false;
         driver.switchTo().parentFrame();
     }
 
@@ -1219,11 +1230,13 @@ public class Eyes extends EyesBase {
             return;
         }
         driver.switchTo().frame(frameReference);
+        this.stitchContent = stitchContent;
         if (stitchContent) {
             checkElement(selector, matchTimeout, tag);
         } else {
             checkRegion(selector, matchTimeout, tag);
         }
+        this.stitchContent = false;
         driver.switchTo().parentFrame();
     }
 
