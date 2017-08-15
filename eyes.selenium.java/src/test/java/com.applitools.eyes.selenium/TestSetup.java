@@ -1,9 +1,6 @@
 package com.applitools.eyes.selenium;
 
-import com.applitools.eyes.BatchInfo;
-import com.applitools.eyes.FileLogger;
-import com.applitools.eyes.LogHandler;
-import com.applitools.eyes.RectangleSize;
+import com.applitools.eyes.*;
 import org.junit.*;
 import org.junit.rules.ExternalResource;
 import org.junit.rules.TestRule;
@@ -28,18 +25,19 @@ public class TestSetup {
 
         // Initialize the eyes SDK and set your private API key.
         eyes = new Eyes();
-        eyes.setServerUrl(URI.create("https://localhost.applitools.com"));
+//        eyes.setServerUrl(URI.create("https://localhost.applitools.com"));
         eyes.setApiKey(System.getenv("APPLITOOLS_API_KEY"));
 
-        logHandler = new FileLogger("c:\\temp\\logs\\Java\\TestElement.log", true, true);
+//        logHandler = new FileLogger("c:\\temp\\logs\\Java\\TestElement.log", true, true);
+        logHandler = new StdoutLogHandler(true);
         eyes.setLogHandler(logHandler);
         eyes.setForceFullPageScreenshot(true);
         eyes.setStitchMode(StitchMode.CSS);
 
         eyes.setHideScrollbars(true);
 
-        eyes.setDebugScreenshotsPath("c:\\temp\\logs");
-        eyes.setSaveDebugScreenshots(true);
+//        eyes.setDebugScreenshotsPath("c:\\temp\\logs");
+//        eyes.setSaveDebugScreenshots(true);
         eyes.setBatch(new BatchInfo(testSuitName));
     }
 

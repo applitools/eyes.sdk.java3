@@ -1,0 +1,14 @@
+language: 
+- java
+matrix:
+    include:
+        - os: linux
+          language: java
+          jdk: oraclejdk8
+          env: DISPLAY=':0.0'   
+          script: cd eyes.selenium.java/;mvn test
+        - os: osx
+          language: java
+          osx_image: xcode8
+          env: DISPLAY=':0.0'  
+          script: cd eyes.selenium.java/;mvn test
