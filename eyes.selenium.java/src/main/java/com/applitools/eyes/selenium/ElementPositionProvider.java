@@ -10,16 +10,17 @@ public class ElementPositionProvider implements PositionProvider {
     private final EyesWebDriver driver;
     private final EyesRemoteWebElement element;
 
-    public ElementPositionProvider(Logger logger, EyesWebDriver driver,
-                                   WebElement element) {
+    public ElementPositionProvider(Logger logger, EyesWebDriver driver, WebElement element) {
         ArgumentGuard.notNull(logger, "logger");
         ArgumentGuard.notNull(driver, "driver");
         ArgumentGuard.notNull(element, "element");
 
         this.logger = logger;
         this.driver = driver;
-        this.element = new EyesRemoteWebElement(logger, driver,
-                (RemoteWebElement)element);
+        this.element = (element instanceof  EyesRemoteWebElement) ?
+                (EyesRemoteWebElement)element : new EyesRemoteWebElement(logger, driver, element);
+
+        logger.verbose("creating ElementPositionProvider");
     }
 
     /**
@@ -28,8 +29,7 @@ public class ElementPositionProvider implements PositionProvider {
     public Location getCurrentPosition() {
         logger.verbose("getCurrentScrollPosition()");
 
-        Location result = new Location(element.getScrollLeft(),
-                element.getScrollTop());
+        Location result = new Location(element.getScrollLeft(), element.getScrollTop());
 
         logger.verbose(String.format("Current position: %s", result));
 
@@ -54,12 +54,11 @@ public class ElementPositionProvider implements PositionProvider {
      * to.
      */
     public RectangleSize getEntireSize() {
-        logger.verbose("getEntireSize()");
+        logger.verbose("ElementPositionProvider - getEntireSize()");
 
-        RectangleSize result = new RectangleSize(element.getScrollWidth(),
-                element.getScrollHeight());
+        RectangleSize result = new RectangleSize(element.getScrollWidth(), element.getScrollHeight());
 
-        logger.verbose(String.format("Entire size: %s", result));
+        logger.verbose("ElementPositionProvider - Entire size: " + result);
         return result;
     }
 

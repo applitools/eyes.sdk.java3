@@ -281,8 +281,7 @@ public class Eyes extends EyesBase {
 
     private void initDriver(WebDriver driver) {
         if (driver instanceof RemoteWebDriver) {
-            this.driver = new EyesWebDriver(logger, this,
-                    (RemoteWebDriver) driver);
+            this.driver = new EyesWebDriver(logger, this, (RemoteWebDriver) driver);
         } else if (driver instanceof EyesWebDriver) {
             this.driver = (EyesWebDriver) driver;
         } else {
@@ -1840,7 +1839,7 @@ public class Eyes extends EyesBase {
     @Override
     protected void setViewportSize(RectangleSize size) {
         if (viewportSizeHandler instanceof ReadOnlyPropertyHandler) {
-            logger.verbose("Ignored (explicitly viewport size given)");
+            logger.verbose("Ignored (viewport size given explicitly)");
             return;
         }
 
