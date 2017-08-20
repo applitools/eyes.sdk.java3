@@ -17,13 +17,15 @@ public class ScrollPositionProvider implements PositionProvider {
 
         this.logger = logger;
         this.executor = executor;
+
+        logger.verbose("creating ScrollPositionProvider");
     }
 
     /**
      * @return The scroll position of the current frame.
      */
     public Location getCurrentPosition() {
-        logger.verbose("getCurrentScrollPosition()");
+        logger.verbose("ScrollPositionProvider - getCurrentScrollPosition()");
         Location result;
         try {
             result = EyesSeleniumUtils.getCurrentScrollPosition(executor);
@@ -40,9 +42,9 @@ public class ScrollPositionProvider implements PositionProvider {
      * @param location The position to scroll to.
      */
     public void setPosition(Location location) {
-        logger.verbose(String.format("Scrolling to %s", location));
+        logger.verbose("ScrollPositionProvider - Scrolling to " + location);
         EyesSeleniumUtils.setCurrentScrollPosition(executor, location);
-        logger.verbose("Done scrolling!");
+        logger.verbose("ScrollPositionProvider - Done scrolling!");
     }
 
     /**
@@ -51,9 +53,8 @@ public class ScrollPositionProvider implements PositionProvider {
      * to.
      */
     public RectangleSize getEntireSize() {
-        RectangleSize result =
-                EyesSeleniumUtils.getCurrentFrameContentEntireSize(executor);
-        logger.verbose(String.format("Entire size: %s", result));
+        RectangleSize result = EyesSeleniumUtils.getCurrentFrameContentEntireSize(executor);
+        logger.verbose("ScrollPositionProvider - Entire size: " + result);
         return result;
     }
 

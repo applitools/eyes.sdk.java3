@@ -48,7 +48,7 @@ public class EyesWebDriverScreenshot extends EyesScreenshot {
                     -defaultContentScroll.getY());
         }
 
-        logger.verbose("Iterating over frames..");
+        logger.verbose("Iterating over frames...");
         Frame frame;
         while (frameIterator.hasNext()) {
             logger.verbose("Getting next frame...");
@@ -93,7 +93,7 @@ public class EyesWebDriverScreenshot extends EyesScreenshot {
 
         this.frameLocationInScreenshot = frameLocationInScreenshot;
 
-        logger.verbose("Calculating frame window..");
+        logger.verbose("Calculating frame window...");
         this.frameWindow = new Region(frameLocationInScreenshot, frameSize);
         this.frameWindow.intersect(new Region(0, 0, image.getWidth(), image.getHeight()));
         if (this.frameWindow.getWidth() <= 0 || this.frameWindow.getHeight() <= 0) {
@@ -145,8 +145,14 @@ public class EyesWebDriverScreenshot extends EyesScreenshot {
     private ScreenshotType updateScreenshotType(ScreenshotType screenshotType, BufferedImage image) {
         if (screenshotType == null) {
             RectangleSize viewportSize = driver.getDefaultContentViewportSize();
-            double pixelRatio = driver.getEyes().getDevicePixelRatio();
-            viewportSize = viewportSize.scale(pixelRatio);
+
+            boolean scaleViewport = driver.getEyes().shouldStitchContent();
+
+            if (scaleViewport) {
+                double pixelRatio = driver.getEyes().getDevicePixelRatio();
+                viewportSize = viewportSize.scale(pixelRatio);
+            }
+
             if (image.getWidth() <= viewportSize.getWidth() && image.getHeight() <= viewportSize.getHeight()) {
                 screenshotType = ScreenshotType.VIEWPORT;
             } else {
@@ -212,26 +218,23 @@ public class EyesWebDriverScreenshot extends EyesScreenshot {
     }
 
     @Override
-    public EyesWebDriverScreenshot getSubScreenshot(Region region,
-            CoordinatesType coordinatesType, boolean throwIfClipped) {
+    public EyesWebDriverScreenshot getSubScreenshot(Region region, boolean throwIfClipped) {
 
-        logger.verbose(String.format("getSubScreenshot([%s], %s, %b)",
-                region, coordinatesType, throwIfClipped));
+        logger.verbose(String.format("getSubScreenshot([%s], %b)", region, throwIfClipped));
 
         ArgumentGuard.notNull(region, "region");
-        ArgumentGuard.notNull(coordinatesType, "coordinatesType");
 
         // We calculate intersection based on as-is coordinates.
         Region asIsSubScreenshotRegion = getIntersectedRegion(region,
-                coordinatesType, CoordinatesType.SCREENSHOT_AS_IS);
+                region.getCoordinatesType(), CoordinatesType.SCREENSHOT_AS_IS);
 
         if (asIsSubScreenshotRegion.isEmpty() ||
                 (throwIfClipped &&
                         !asIsSubScreenshotRegion.getSize().equals(
                                 region.getSize()))) {
             throw new OutOfBoundsException(String.format(
-                    "Region [%s, (%s)] is out of screenshot bounds [%s]",
-                    region, coordinatesType, frameWindow));
+                    "Region [%s] is out of screenshot bounds [%s]",
+                    region, frameWindow));
         }
 
         BufferedImage subScreenshotImage =
@@ -251,6 +254,7 @@ public class EyesWebDriverScreenshot extends EyesScreenshot {
         EyesWebDriverScreenshot result = new EyesWebDriverScreenshot(logger,
                 driver, subScreenshotImage, screenshotType,
                 frameLocationInSubScreenshot);
+
         logger.verbose("Done!");
         return result;
     }
@@ -292,6 +296,10 @@ public class EyesWebDriverScreenshot extends EyesScreenshot {
             }
             return result;
         }
+
+        //if (driver.getEyes().getForceFullPageScreenshot()) {
+        //    return result;
+        //}
 
         switch (from) {
             case CONTEXT_AS_IS:

@@ -28,13 +28,11 @@ public abstract class EyesScreenshot {
     /**
      * Returns a part of the screenshot based on the given region.
      * @param region          The region for which we should get the sub screenshot.
-     * @param coordinatesType How should the region be calculated on the screenshot image.
      * @param throwIfClipped  Throw an EyesException if the region is not
      *                        fully contained in the screenshot.
      * @return A screenshot instance containing the given region.
      */
-    public abstract EyesScreenshot getSubScreenshot(Region region,
-                                                    CoordinatesType coordinatesType, boolean throwIfClipped);
+    public abstract EyesScreenshot getSubScreenshot(Region region, boolean throwIfClipped);
 
     /**
      * Converts a location's coordinates with the {@code from} coordinates type
