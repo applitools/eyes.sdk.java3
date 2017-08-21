@@ -98,8 +98,10 @@ public class FrameChain implements Iterable<Frame>{
      * Removes the last inserted frame element. Practically means we switched
      * back to the parent of the current frame
      */
-    public void pop() {
+    public Frame pop() {
+        Frame frame = peek();
         frames.remove(frames.size() - 1);
+        return frame;
     }
 
     /**

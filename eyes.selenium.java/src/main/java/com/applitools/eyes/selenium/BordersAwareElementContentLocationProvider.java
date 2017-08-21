@@ -15,13 +15,11 @@ public class BordersAwareElementContentLocationProvider {
     /**
      * Returns a location based on the given location.
      * @param logger The logger to use.
-     * @param element The element for which we want to find the content's
-     *                location.
+     * @param element The element for which we want to find the content's location.
      * @param location The location of the element.
      * @return The location of the content of the element.
      */
-    public Location getLocation(Logger logger, WebElement element,
-                                Location location) {
+    public static Location getLocation(Logger logger, WebElement element, Location location) {
         ArgumentGuard.notNull(logger, "logger");
         ArgumentGuard.notNull(element, "element");
         ArgumentGuard.notNull(location, "location");
@@ -37,9 +35,7 @@ public class BordersAwareElementContentLocationProvider {
         try {
             logger.verbose("Get element border left width...");
             if (element instanceof EyesRemoteWebElement) {
-                logger.verbose(
-                        "Element is an EyesWebElement, " +
-                                "using 'getComputedStyle'.");
+                logger.verbose("Element is an EyesWebElement, using 'getComputedStyle'.");
                 try {
                     propValue = ((EyesRemoteWebElement) element)
                             .getComputedStyle("border-left-width");
