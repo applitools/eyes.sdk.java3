@@ -1212,11 +1212,10 @@ public class Eyes extends EyesBase {
             try {
                 devicePixelRatio = EyesSeleniumUtils.getDevicePixelRatio(this.jsExecutor);
             } catch (Exception e) {
-                logger.verbose(
-                        "Failed to extract device pixel ratio! Using default.");
+                logger.verbose("Failed to extract device pixel ratio! Using default.");
                 devicePixelRatio = DEFAULT_DEVICE_PIXEL_RATIO;
             }
-            logger.verbose(String.format("Device pixel ratio: %f", devicePixelRatio));
+            logger.verbose("Device pixel ratio: " + devicePixelRatio);
 
             logger.verbose("Setting scale provider...");
             try {
@@ -1227,8 +1226,7 @@ public class Eyes extends EyesBase {
                 // This can happen in Appium for example.
                 logger.verbose("Failed to set ContextBasedScaleProvider.");
                 logger.verbose("Using FixedScaleProvider instead...");
-                factory = new FixedScaleProviderFactory(1 / devicePixelRatio,
-                        scaleProviderHandler);
+                factory = new FixedScaleProviderFactory(1 / devicePixelRatio, scaleProviderHandler);
             }
             logger.verbose("Done!");
             return factory;
@@ -1288,18 +1286,15 @@ public class Eyes extends EyesBase {
      */
     public void checkFrame(String frameNameOrId, int matchTimeout, String tag) {
         if (getIsDisabled()) {
-            logger.log(String.format("CheckFrame(%s, %d, '%s'): Ignored",
-                    frameNameOrId, matchTimeout, tag));
+            logger.log(String.format("CheckFrame(%s, %d, '%s'): Ignored", frameNameOrId, matchTimeout, tag));
             return;
         }
 
         ArgumentGuard.notNull(frameNameOrId, "frameNameOrId");
 
-        logger.log(String.format("CheckFrame(%s, %d, '%s')",
-                frameNameOrId, matchTimeout, tag));
+        logger.log(String.format("CheckFrame(%s, %d, '%s')", frameNameOrId, matchTimeout, tag));
 
-        logger.verbose("Switching to frame with name/id: " + frameNameOrId +
-                " ...");
+        logger.verbose("Switching to frame with name/id: " + frameNameOrId + " ...");
         driver.switchTo().frame(frameNameOrId);
         logger.verbose("Done.");
 
@@ -1432,16 +1427,16 @@ public class Eyes extends EyesBase {
         FrameChain originalFrameChain = driver.getFrameChain();
         // We'll switch into the PARENT frame of the frame we want to check,
         // and call check frame.
-        logger.verbose("Switching to parent frame according to frames path..");
+        logger.verbose("Switching to parent frame according to frames path...");
         String[] parentFramePath = new String[framePath.length - 1];
         System.arraycopy(framePath, 0, parentFramePath, 0,
                 parentFramePath.length);
         ((EyesTargetLocator) (driver.switchTo())).frames(parentFramePath);
-        logger.verbose("Done! Calling checkFrame..");
+        logger.verbose("Done! Calling checkFrame...");
         checkFrame(framePath[framePath.length - 1], matchTimeout, tag);
-        logger.verbose("Done! switching to default content..");
+        logger.verbose("Done! switching to default content...");
         driver.switchTo().defaultContent();
-        logger.verbose("Done! Switching back into the original frame..");
+        logger.verbose("Done! Switching back into the original frame...");
         ((EyesTargetLocator) (driver.switchTo())).frames(originalFrameChain);
         logger.verbose("Done!");
     }
@@ -1483,20 +1478,19 @@ public class Eyes extends EyesBase {
         }
         ArgumentGuard.notNull(framePath, "framePath");
         ArgumentGuard.greaterThanZero(framePath.length, "framePath.length");
-        logger.log(String.format(
-                "checkFrame(framePath, %d, '%s')", matchTimeout, tag));
+        logger.log(String.format("checkFrame(framePath, %d, '%s')", matchTimeout, tag));
         FrameChain originalFrameChain = driver.getFrameChain();
         // We'll switch into the PARENT frame of the frame we want to check,
         // and call check frame.
-        logger.verbose("Switching to parent frame according to frames path..");
+        logger.verbose("Switching to parent frame according to frames path...");
         String[] parentFramePath = new String[framePath.length - 1];
         System.arraycopy(framePath, 0, parentFramePath, 0, parentFramePath.length);
         ((EyesTargetLocator) (driver.switchTo())).frames(parentFramePath);
         logger.verbose("Done! Calling checkRegionInFrame..");
         checkRegionInFrame(framePath[framePath.length - 1], selector, matchTimeout, tag, stitchContent);
-        logger.verbose("Done! switching back to default content..");
+        logger.verbose("Done! switching back to default content...");
         driver.switchTo().defaultContent();
-        logger.verbose("Done! Switching into the original frame..");
+        logger.verbose("Done! Switching into the original frame...");
         ((EyesTargetLocator) (driver.switchTo())).frames(originalFrameChain);
         logger.verbose("Done!");
     }

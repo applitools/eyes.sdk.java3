@@ -157,6 +157,7 @@ public class MatchWindowTask {
 
         // if we're here because we haven't found a match yet, try once more
         if (!matchResult.getAsExpected()) {
+            logger.verbose("trying once more.");
             screenshot = tryTakeScreenshot(userInputs, region, tag, ignoreMismatch, imageMatchSettings);
         }
         return screenshot;
@@ -164,6 +165,7 @@ public class MatchWindowTask {
 
     private EyesScreenshot tryTakeScreenshot(Trigger[] userInputs, Region region, String tag,
                                              boolean ignoreMismatch, ImageMatchSettings imageMatchSettings) {
+        logger.verbose("trying to take a screenshot");
         AppOutputWithScreenshot appOutput = appOutputProvider.getAppOutput(region, lastScreenshot);
         EyesScreenshot screenshot = appOutput.getScreenshot();
         matchResult = performMatch(userInputs, appOutput, tag, ignoreMismatch, imageMatchSettings);
