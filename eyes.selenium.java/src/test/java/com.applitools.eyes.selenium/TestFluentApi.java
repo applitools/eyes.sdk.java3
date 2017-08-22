@@ -125,14 +125,14 @@ public class TestFluentApi extends TestSetup {
     @Test
     public void TestCheckElementFully_Fluent()
     {
-        WebElement element = chromeDriver.findElement(By.id("overflowing-div-image"));
+        WebElement element = webDriver.findElement(By.id("overflowing-div-image"));
         eyes.check("Fluent - Region by element - fully", Target.region(element).fully());
     }
 
     @Test
     public void TestCheckElement_Fluent()
     {
-        WebElement element = chromeDriver.findElement(By.id("overflowing-div-image"));
+        WebElement element = webDriver.findElement(By.id("overflowing-div-image"));
         eyes.check("Fluent - Region by element", Target.region(element));
     }
 }

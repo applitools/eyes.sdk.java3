@@ -9,14 +9,21 @@ import org.junit.runner.Description;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
+import org.openqa.selenium.remote.DesiredCapabilities;
+import org.openqa.selenium.remote.RemoteWebDriver;
 
+import java.io.IOException;
+import java.net.MalformedURLException;
 import java.net.URI;
+import java.net.URL;
 
 public class TestSetup {
 
-    protected static Eyes eyes;
-    private static WebDriver driver;
     private static LogHandler logHandler;
+
+    protected static Eyes eyes;
+    protected static WebDriver driver;
+    protected static WebDriver webDriver;
 
     protected static String testSuitName;
 
@@ -46,15 +53,27 @@ public class TestSetup {
         protected void starting(Description description) {
             ChromeOptions options = new ChromeOptions();
             options.addArguments("disable-infobars");
-            ChromeDriver chromeDriver = new ChromeDriver(options);
+            webDriver = new ChromeDriver(options);
 
-            driver = eyes.open(chromeDriver,
-                    "Eyes Selenium SDK",
-                    description.getMethodName(),
-                    new RectangleSize(800, 599)
-            );
+            DesiredCapabilities caps = DesiredCapabilities.chrome();
+            caps.setCapability(ChromeOptions.CAPABILITY, options);
 
-            driver.navigate().to("http://applitools.github.io/demo/TestPages/FramesTestPage/");
+            try {
+                //webDriver = new RemoteWebDriver(new URL("http://192.168.1.11:4444/wd/hub"), caps);
+
+                driver = eyes.open(webDriver,
+                        testSuitName,
+                        description.getMethodName(),
+                        new RectangleSize(800, 599)
+                );
+
+                driver.navigate().to("http://applitools.github.io/demo/TestPages/FramesTestPage/");
+
+                //eyes.getPositionProvider().setPosition(new Location(100,200));
+
+            } catch (Exception ex) {
+
+            }
         }
 
         protected void finished(Description description) {
