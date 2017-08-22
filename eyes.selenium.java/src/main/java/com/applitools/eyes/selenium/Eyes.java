@@ -1889,8 +1889,7 @@ public class Eyes extends EyesBase {
 
         ((EyesTargetLocator) driver.switchTo()).frames(originalFrame);
 
-        result = new EyesWebDriverScreenshot(logger, driver, fullPageImage,
-                new RectangleSize(fullPageImage.getWidth(), fullPageImage.getHeight()));
+        result = new EyesWebDriverScreenshot(logger, driver, fullPageImage,null);
         return result;
     }
 
@@ -1904,9 +1903,9 @@ public class Eyes extends EyesBase {
                         scaleProviderFactory,
                         cutProviderHandler.get(),
                         getWaitBeforeScreenshots(), debugScreenshotsProvider, screenshotFactory);
+
         logger.verbose("Building screenshot object...");
-        result = new EyesWebDriverScreenshot(logger, driver, entireFrameOrElement,
-                new RectangleSize(entireFrameOrElement.getWidth(), entireFrameOrElement.getHeight()));
+        result = new EyesWebDriverScreenshot(logger, driver, entireFrameOrElement, null);
         return result;
     }
 

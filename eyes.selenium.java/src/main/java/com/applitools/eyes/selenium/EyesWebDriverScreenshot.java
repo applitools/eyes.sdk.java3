@@ -189,7 +189,11 @@ public class EyesWebDriverScreenshot extends EyesScreenshot {
         super(image);
         ArgumentGuard.notNull(driver, "logger");
         ArgumentGuard.notNull(driver, "driver");
-        ArgumentGuard.notNull(entireFrameSize, "entireFrameSize");
+
+        if (entireFrameSize == null) {
+            entireFrameSize = new RectangleSize(image.getWidth(), image.getHeight());
+        }
+
         this.logger = logger;
         this.driver = driver;
         frameChain = driver.getFrameChain();
