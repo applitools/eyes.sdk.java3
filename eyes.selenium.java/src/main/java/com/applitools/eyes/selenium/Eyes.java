@@ -609,29 +609,9 @@ public class Eyes extends EyesBase {
                 targetElement = this.driver.findElement(targetSelector);
             }
             if (targetElement != null) {
-                if (stitchContent) {
-                    this.checkElement(targetElement, name, checkSettings);
-                } else {
-                    this.checkRegion(targetElement, name, checkSettings);
-                }
+                checkElementFluent(name, checkSettings, targetElement);
             } else if (seleniumCheckTarget.getFrameChain().size() > 0) {
-                if (stitchContent) {
-                    this.checkFullFrameOrElement(name, checkSettings);
-                } else {
-                    Frame frame = this.driver.getFrameChain().peek();
-                    final WebElement element = frame.getReference();
-                    this.driver.switchTo().parentFrame();
-                    switchedToFrameCount--;
-
-                    this.checkWindowBase(new RegionProvider() {
-                        @Override
-                        public Region getRegion() {
-                            Point p = element.getLocation();
-                            Dimension d = element.getSize();
-                            return new Region(p.getX(), p.getY(), d.getWidth(), d.getHeight(), CoordinatesType.CONTEXT_RELATIVE);
-                        }
-                    }, name, false, checkSettings);
-                }
+                switchedToFrameCount = this.checkFrameFluent(name, checkSettings, switchedToFrameCount);
             } else {
                 this.checkWindowBase(NullRegionProvider.INSTANCE, name, false, checkSettings);
             }
@@ -645,6 +625,35 @@ public class Eyes extends EyesBase {
         this.stitchContent = false;
 
         logger.verbose("check - done!");
+    }
+
+    private void checkElementFluent(String name, ICheckSettings checkSettings, WebElement targetElement) {
+        if (stitchContent) {
+            this.checkElement(targetElement, name, checkSettings);
+        } else {
+            this.checkRegion(targetElement, name, checkSettings);
+        }
+    }
+
+    private int checkFrameFluent(String name, ICheckSettings checkSettings, int switchedToFrameCount) {
+        if (stitchContent) {
+            this.checkFullFrameOrElement(name, checkSettings);
+        } else {
+            Frame frame = this.driver.getFrameChain().peek();
+            final WebElement element = frame.getReference();
+            this.driver.switchTo().parentFrame();
+            switchedToFrameCount--;
+
+            this.checkWindowBase(new RegionProvider() {
+                @Override
+                public Region getRegion() {
+                    Point p = element.getLocation();
+                    Dimension d = element.getSize();
+                    return new Region(p.getX(), p.getY(), d.getWidth(), d.getHeight(), CoordinatesType.CONTEXT_RELATIVE);
+                }
+            }, name, false, checkSettings);
+        }
+        return switchedToFrameCount;
     }
 
     private int switchToFrame(ISeleniumCheckTarget checkTarget) {
@@ -730,7 +739,7 @@ public class Eyes extends EyesBase {
             }
         }, name, false, checkSettings);
 
-        logger.verbose("Done! trying to scroll back to original position..");
+        logger.verbose("Done!");
     }
 
     /**

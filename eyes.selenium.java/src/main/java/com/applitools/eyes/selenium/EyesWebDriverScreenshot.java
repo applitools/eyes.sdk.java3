@@ -146,12 +146,12 @@ public class EyesWebDriverScreenshot extends EyesScreenshot {
         if (screenshotType == null) {
             RectangleSize viewportSize = driver.getDefaultContentViewportSize();
 
-            boolean scaleViewport = driver.getEyes().shouldStitchContent();
+            /*boolean scaleViewport = driver.getEyes().shouldStitchContent();
 
             if (scaleViewport) {
                 double pixelRatio = driver.getEyes().getDevicePixelRatio();
                 viewportSize = viewportSize.scale(pixelRatio);
-            }
+            }*/
 
             if (image.getWidth() <= viewportSize.getWidth() && image.getHeight() <= viewportSize.getHeight()) {
                 screenshotType = ScreenshotType.VIEWPORT;
@@ -172,7 +172,7 @@ public class EyesWebDriverScreenshot extends EyesScreenshot {
      * @param image The actual screenshot image.
      */
     public EyesWebDriverScreenshot(Logger logger, EyesWebDriver driver, BufferedImage image) {
-        this(logger, driver, image, null, null);
+        this(logger, driver, image, ScreenshotType.VIEWPORT, null);
     }
 
     // TODO replace "entireFrameSize" as frame window ctor identifier
