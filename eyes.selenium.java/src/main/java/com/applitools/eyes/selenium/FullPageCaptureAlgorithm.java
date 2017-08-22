@@ -53,30 +53,14 @@ public class FullPageCaptureAlgorithm {
         logger.verbose(String.format("getStitchedRegion: originProvider: %s ; positionProvider: %s ; cutProvider: %s",
                 originProvider.getClass(), positionProvider.getClass(), cutProvider.getClass()));
 
-        logger.verbose(String.format("Region to check: %s", region));
-        logger.verbose(String.format("Coordinates type: %s", region.getCoordinatesType()));
+        logger.verbose("Region to check: " + region);
 
         // TODO use scaling overlap offset.
         final int SCALE_MARGIN_PX = 5;
 
         // Saving the original position (in case we were already in the outermost frame).
         PositionMemento originalPosition = originProvider.getState();
-        Location currentPosition;
-
-        int setPositionRetries = 3;
-        do {
-            originProvider.setPosition(new Location(0, 0));
-            // Give the scroll time to stabilize
-            GeneralUtils.sleep(waitBeforeScreenshots);
-            currentPosition = originProvider.getCurrentPosition();
-        } while (currentPosition.getX() != 0
-                && currentPosition.getY() != 0
-                && (--setPositionRetries > 0));
-
-        if (currentPosition.getX() != 0 || currentPosition.getY() != 0) {
-            originProvider.restoreState(originalPosition);
-            throw new EyesException("Couldn't set position to the top/left corner!");
-        }
+        scrollToTopLeft(originProvider, waitBeforeScreenshots, originalPosition);
 
         logger.verbose("Getting top/left image...");
         BufferedImage image = imageProvider.getImage();
@@ -177,8 +161,8 @@ public class FullPageCaptureAlgorithm {
             // Giving it time to stabilize.
             GeneralUtils.sleep(waitBeforeScreenshots);
             // Screen size may cause the scroll to only reach part of the way.
-            currentPosition = positionProvider.getCurrentPosition();
-            logger.verbose(String.format("Set position to %s", currentPosition));
+            Location currentPosition = positionProvider.getCurrentPosition();
+            logger.verbose("Set position to " + currentPosition);
 
             // Actually taking the screenshot.
             logger.verbose("Getting image...");
@@ -237,6 +221,24 @@ public class FullPageCaptureAlgorithm {
 
         debugScreenshotsProvider.save(stitchedImage, "stitched");
         return stitchedImage;
+    }
+
+    private void scrollToTopLeft(PositionProvider originProvider, int waitBeforeScreenshots, PositionMemento originalPosition) {
+        Location currentPosition;
+        int setPositionRetries = 3;
+        do {
+            originProvider.setPosition(new Location(0, 0));
+            // Give the scroll time to stabilize
+            GeneralUtils.sleep(waitBeforeScreenshots);
+            currentPosition = originProvider.getCurrentPosition();
+        } while (currentPosition.getX() != 0
+                && currentPosition.getY() != 0
+                && (--setPositionRetries > 0));
+
+        if (currentPosition.getX() != 0 || currentPosition.getY() != 0) {
+            originProvider.restoreState(originalPosition);
+            throw new EyesException("Couldn't set position to the top/left corner!");
+        }
     }
 
     private Region getRegionInScreenshot(Region region, BufferedImage image, double pixelRatio, EyesScreenshot screenshot) {
