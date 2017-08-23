@@ -3,6 +3,9 @@
  */
 package com.applitools.eyes;
 
+import com.applitools.eyes.capture.AppOutputProvider;
+import com.applitools.eyes.capture.AppOutputWithScreenshot;
+import com.applitools.eyes.input.Trigger;
 import com.applitools.utils.ArgumentGuard;
 import com.applitools.utils.GeneralUtils;
 

@@ -5,10 +5,9 @@ package com.applitools.eyes.selenium.wrappers;
 
 import com.applitools.eyes.Location;
 import com.applitools.eyes.Logger;
-import com.applitools.eyes.MouseAction;
+import com.applitools.eyes.input.MouseAction;
 import com.applitools.eyes.Region;
 import com.applitools.eyes.selenium.EyesSeleniumUtils;
-import com.applitools.eyes.selenium.wrappers.EyesWebDriver;
 import com.applitools.utils.ArgumentGuard;
 import org.openqa.selenium.interactions.TouchScreen;
 import org.openqa.selenium.interactions.internal.Coordinates;

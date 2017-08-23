@@ -1,6 +1,8 @@
 package com.applitools.eyes.selenium.positioning;
 
 import com.applitools.eyes.*;
+import com.applitools.eyes.positioning.PositionMemento;
+import com.applitools.eyes.positioning.PositionProvider;
 import com.applitools.eyes.selenium.EyesSeleniumUtils;
 import com.applitools.utils.ArgumentGuard;
 

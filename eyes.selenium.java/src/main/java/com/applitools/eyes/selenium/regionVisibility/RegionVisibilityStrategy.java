@@ -1,7 +1,7 @@
 package com.applitools.eyes.selenium.regionVisibility;
 
 import com.applitools.eyes.Location;
-import com.applitools.eyes.PositionProvider;
+import com.applitools.eyes.positioning.PositionProvider;
 
 /**
  * Encapsulates implementations for providing region visibility during

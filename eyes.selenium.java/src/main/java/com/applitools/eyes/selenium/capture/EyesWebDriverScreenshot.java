@@ -4,6 +4,7 @@
 package com.applitools.eyes.selenium.capture;
 
 import com.applitools.eyes.*;
+import com.applitools.eyes.exceptions.CoordinatesTypeConversionException;
 import com.applitools.eyes.selenium.wrappers.EyesWebDriver;
 import com.applitools.eyes.selenium.SeleniumJavaScriptExecutor;
 import com.applitools.eyes.selenium.exceptions.EyesDriverOperationException;

@@ -1,6 +1,8 @@
 package com.applitools.eyes.selenium.wrappers;
 
 import com.applitools.eyes.*;
+import com.applitools.eyes.input.MouseTrigger;
+import com.applitools.eyes.input.Trigger;
 import com.applitools.eyes.selenium.*;
 import com.applitools.eyes.selenium.frames.FrameChain;
 import com.applitools.eyes.selenium.input.EyesKeyboard;

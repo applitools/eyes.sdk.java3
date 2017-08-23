@@ -4,6 +4,9 @@
 package com.applitools.eyes.selenium;
 
 import com.applitools.eyes.*;
+import com.applitools.eyes.input.MouseAction;
+import com.applitools.eyes.input.MouseTrigger;
+import com.applitools.eyes.input.Trigger;
 import org.openqa.selenium.Dimension;
 import org.openqa.selenium.Point;
 import org.openqa.selenium.WebElement;

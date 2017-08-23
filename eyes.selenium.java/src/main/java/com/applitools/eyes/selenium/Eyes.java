@@ -4,8 +4,18 @@
 package com.applitools.eyes.selenium;
 
 import com.applitools.eyes.*;
+import com.applitools.eyes.capture.EyesScreenshotFactory;
+import com.applitools.eyes.capture.ImageProvider;
+import com.applitools.eyes.diagnostics.TimedAppOutput;
+import com.applitools.eyes.exceptions.TestFailedException;
 import com.applitools.eyes.fluent.ICheckSettings;
 import com.applitools.eyes.fluent.ICheckSettingsInternal;
+import com.applitools.eyes.input.MouseAction;
+import com.applitools.eyes.positioning.NullRegionProvider;
+import com.applitools.eyes.positioning.PositionProvider;
+import com.applitools.eyes.positioning.RegionProvider;
+import com.applitools.eyes.scaling.FixedScaleProviderFactory;
+import com.applitools.eyes.scaling.NullScaleProvider;
 import com.applitools.eyes.selenium.capture.EyesWebDriverScreenshot;
 import com.applitools.eyes.selenium.capture.EyesWebDriverScreenshotFactory;
 import com.applitools.eyes.selenium.capture.FullPageCaptureAlgorithm;

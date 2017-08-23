@@ -1,6 +1,7 @@
 package com.applitools.eyes.images;
 
 import com.applitools.eyes.*;
+import com.applitools.eyes.exceptions.CoordinatesTypeConversionException;
 import com.applitools.utils.ArgumentGuard;
 import com.applitools.utils.ImageUtils;
 

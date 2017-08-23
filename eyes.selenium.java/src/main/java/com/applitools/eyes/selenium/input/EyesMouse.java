@@ -2,7 +2,7 @@ package com.applitools.eyes.selenium.input;
 
 import com.applitools.eyes.Location;
 import com.applitools.eyes.Logger;
-import com.applitools.eyes.MouseAction;
+import com.applitools.eyes.input.MouseAction;
 import com.applitools.eyes.Region;
 import com.applitools.eyes.selenium.EyesSeleniumUtils;
 import com.applitools.eyes.selenium.wrappers.EyesWebDriver;

@@ -1,6 +1,6 @@
 package com.applitools.eyes.selenium.positioning;
 
-import com.applitools.eyes.PositionMemento;
+import com.applitools.eyes.positioning.PositionMemento;
 
 import java.util.Map;
 

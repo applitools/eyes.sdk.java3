@@ -1,7 +1,7 @@
 package com.applitools.eyes.selenium.capture;
 
 import com.applitools.eyes.EyesScreenshot;
-import com.applitools.eyes.EyesScreenshotFactory;
+import com.applitools.eyes.capture.EyesScreenshotFactory;
 import com.applitools.eyes.Logger;
 import com.applitools.eyes.selenium.wrappers.EyesWebDriver;
 

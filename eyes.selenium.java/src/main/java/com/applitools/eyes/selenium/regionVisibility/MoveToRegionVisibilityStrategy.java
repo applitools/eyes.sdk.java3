@@ -2,8 +2,8 @@ package com.applitools.eyes.selenium.regionVisibility;
 
 import com.applitools.eyes.Location;
 import com.applitools.eyes.Logger;
-import com.applitools.eyes.PositionMemento;
-import com.applitools.eyes.PositionProvider;
+import com.applitools.eyes.positioning.PositionMemento;
+import com.applitools.eyes.positioning.PositionProvider;
 
 /**
  * An implementation of {@link RegionVisibilityStrategy}, which tries to move

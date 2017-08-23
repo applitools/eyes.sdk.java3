@@ -4,6 +4,10 @@
 package com.applitools.eyes.images;
 
 import com.applitools.eyes.*;
+import com.applitools.eyes.exceptions.TestFailedException;
+import com.applitools.eyes.input.MouseAction;
+import com.applitools.eyes.positioning.NullRegionProvider;
+import com.applitools.eyes.positioning.RegionProvider;
 import com.applitools.utils.ArgumentGuard;
 import com.applitools.utils.ImageUtils;
 
