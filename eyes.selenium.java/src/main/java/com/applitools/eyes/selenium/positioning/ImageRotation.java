@@ -1,4 +1,4 @@
-package com.applitools.eyes.selenium;
+package com.applitools.eyes.selenium.positioning;
 
 /**
  * Encapsulates rotation data for images.

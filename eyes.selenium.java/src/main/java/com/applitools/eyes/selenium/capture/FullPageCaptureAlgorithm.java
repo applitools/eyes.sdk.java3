@@ -1,13 +1,13 @@
-package com.applitools.eyes.selenium;
+package com.applitools.eyes.selenium.capture;
 
 import com.applitools.eyes.*;
+import com.applitools.eyes.selenium.exceptions.EyesDriverOperationException;
 import com.applitools.utils.ArgumentGuard;
 import com.applitools.utils.GeneralUtils;
 import com.applitools.utils.ImageUtils;
 
 import java.awt.image.BufferedImage;
 import java.awt.image.Raster;
-import java.util.Calendar;
 
 public class FullPageCaptureAlgorithm {
     // This should pretty much cover all scroll bars (and some fixed position footer elements :).

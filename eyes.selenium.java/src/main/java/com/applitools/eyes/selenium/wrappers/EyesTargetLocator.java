@@ -1,12 +1,17 @@
 /*
  * Applitools SDK for Selenium integration.
  */
-package com.applitools.eyes.selenium;
+package com.applitools.eyes.selenium.wrappers;
 
 import com.applitools.eyes.EyesException;
 import com.applitools.eyes.Location;
 import com.applitools.eyes.Logger;
 import com.applitools.eyes.RectangleSize;
+import com.applitools.eyes.selenium.BordersAwareElementContentLocationProvider;
+import com.applitools.eyes.selenium.SeleniumJavaScriptExecutor;
+import com.applitools.eyes.selenium.frames.Frame;
+import com.applitools.eyes.selenium.frames.FrameChain;
+import com.applitools.eyes.selenium.positioning.ScrollPositionProvider;
 import com.applitools.utils.ArgumentGuard;
 import org.openqa.selenium.*;
 import org.openqa.selenium.remote.RemoteWebElement;

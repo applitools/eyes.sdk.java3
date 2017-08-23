@@ -1,4 +1,4 @@
-package com.applitools.eyes.selenium;
+package com.applitools.eyes.selenium.wrappers;
 
 import com.applitools.eyes.*;
 import com.applitools.utils.ArgumentGuard;

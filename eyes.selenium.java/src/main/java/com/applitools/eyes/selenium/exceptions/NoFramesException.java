@@ -1,7 +1,7 @@
 /*
  * Applitools SDK for Selenium integration.
  */
-package com.applitools.eyes.selenium;
+package com.applitools.eyes.selenium.exceptions;
 
 import com.applitools.eyes.EyesException;
 

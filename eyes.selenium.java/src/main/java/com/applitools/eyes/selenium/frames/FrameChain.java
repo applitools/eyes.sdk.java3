@@ -1,12 +1,13 @@
 /*
  * Applitools software.
  */
-package com.applitools.eyes.selenium;
+package com.applitools.eyes.selenium.frames;
 
 import com.applitools.eyes.EyesException;
 import com.applitools.eyes.Location;
 import com.applitools.eyes.Logger;
 import com.applitools.eyes.RectangleSize;
+import com.applitools.eyes.selenium.exceptions.NoFramesException;
 import com.applitools.utils.ArgumentGuard;
 
 import java.util.Iterator;

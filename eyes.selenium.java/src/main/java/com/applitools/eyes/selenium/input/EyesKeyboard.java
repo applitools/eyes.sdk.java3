@@ -1,10 +1,12 @@
 /*
  * Applitools SDK for Selenium integration.
  */
-package com.applitools.eyes.selenium;
+package com.applitools.eyes.selenium.input;
 
 import com.applitools.eyes.Logger;
 import com.applitools.eyes.Region;
+import com.applitools.eyes.selenium.wrappers.EyesRemoteWebElement;
+import com.applitools.eyes.selenium.wrappers.EyesWebDriver;
 import com.applitools.utils.ArgumentGuard;
 import org.openqa.selenium.interactions.Keyboard;
 import org.openqa.selenium.WebElement;
@@ -20,8 +22,7 @@ public class EyesKeyboard implements Keyboard {
     private final EyesWebDriver eyesDriver;
     private final Keyboard keyboard;
 
-    public EyesKeyboard(Logger logger, EyesWebDriver eyesDriver,
-                        Keyboard keyboard) {
+    public EyesKeyboard(Logger logger, EyesWebDriver eyesDriver, Keyboard keyboard) {
         ArgumentGuard.notNull(logger, "logger");
         ArgumentGuard.notNull(eyesDriver, "eyesDriver");
         ArgumentGuard.notNull(keyboard, "keyboard");
@@ -39,8 +40,7 @@ public class EyesKeyboard implements Keyboard {
         WebElement activeElement = eyesDriver.switchTo().activeElement();
 
         if (activeElement instanceof RemoteWebElement) {
-            activeElement = new EyesRemoteWebElement(logger, eyesDriver,
-                    (RemoteWebElement) activeElement);
+            activeElement = new EyesRemoteWebElement(logger, eyesDriver, activeElement);
 
             control = ((EyesRemoteWebElement)activeElement).getBounds();
         }

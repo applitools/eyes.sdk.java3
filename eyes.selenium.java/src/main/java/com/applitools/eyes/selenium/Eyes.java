@@ -6,10 +6,27 @@ package com.applitools.eyes.selenium;
 import com.applitools.eyes.*;
 import com.applitools.eyes.fluent.ICheckSettings;
 import com.applitools.eyes.fluent.ICheckSettingsInternal;
+import com.applitools.eyes.selenium.capture.EyesWebDriverScreenshot;
+import com.applitools.eyes.selenium.capture.EyesWebDriverScreenshotFactory;
+import com.applitools.eyes.selenium.capture.FullPageCaptureAlgorithm;
+import com.applitools.eyes.selenium.capture.TakesScreenshotImageProvider;
+import com.applitools.eyes.selenium.exceptions.EyesDriverOperationException;
 import com.applitools.eyes.selenium.fluent.FrameLocator;
 import com.applitools.eyes.selenium.fluent.ISeleniumCheckTarget;
 import com.applitools.eyes.selenium.fluent.ISeleniumFrameCheckTarget;
 import com.applitools.eyes.selenium.fluent.Target;
+import com.applitools.eyes.selenium.frames.Frame;
+import com.applitools.eyes.selenium.frames.FrameChain;
+import com.applitools.eyes.selenium.positioning.CssTranslatePositionProvider;
+import com.applitools.eyes.selenium.positioning.ElementPositionProvider;
+import com.applitools.eyes.selenium.positioning.ImageRotation;
+import com.applitools.eyes.selenium.positioning.ScrollPositionProvider;
+import com.applitools.eyes.selenium.regionVisibility.MoveToRegionVisibilityStrategy;
+import com.applitools.eyes.selenium.regionVisibility.NopRegionVisibilityStrategy;
+import com.applitools.eyes.selenium.regionVisibility.RegionVisibilityStrategy;
+import com.applitools.eyes.selenium.wrappers.EyesRemoteWebElement;
+import com.applitools.eyes.selenium.wrappers.EyesTargetLocator;
+import com.applitools.eyes.selenium.wrappers.EyesWebDriver;
 import com.applitools.utils.*;
 import org.openqa.selenium.*;
 import org.openqa.selenium.Dimension;
@@ -1645,7 +1662,7 @@ public class Eyes extends EyesBase {
      * @param control The control on which the trigger is activated (context relative coordinates).
      * @param cursor  The cursor's position relative to the control.
      */
-    protected void addMouseTrigger(MouseAction action, Region control, Location cursor) {
+    public void addMouseTrigger(MouseAction action, Region control, Location cursor) {
         if (getIsDisabled()) {
             logger.verbose(String.format("Ignoring %s (disabled)", action));
             return;
@@ -1671,7 +1688,7 @@ public class Eyes extends EyesBase {
      * @param action  Mouse action.
      * @param element The WebElement on which the click was called.
      */
-    protected void addMouseTrigger(MouseAction action, WebElement element) {
+    public void addMouseTrigger(MouseAction action, WebElement element) {
         if (getIsDisabled()) {
             logger.verbose(String.format("Ignoring %s (disabled)", action));
             return;
@@ -1711,7 +1728,7 @@ public class Eyes extends EyesBase {
      * @param control The control's context-relative region.
      * @param text    The trigger's text.
      */
-    protected void addTextTrigger(Region control, String text) {
+    public void addTextTrigger(Region control, String text) {
         if (getIsDisabled()) {
             logger.verbose(String.format("Ignoring '%s' (disabled)", text));
             return;
@@ -1736,7 +1753,7 @@ public class Eyes extends EyesBase {
      * @param element The element for which we sent keys.
      * @param text    The trigger's text.
      */
-    protected void addTextTrigger(WebElement element, String text) {
+    public void addTextTrigger(WebElement element, String text) {
         if (getIsDisabled()) {
             logger.verbose(String.format("Ignoring '%s' (disabled)", text));
             return;

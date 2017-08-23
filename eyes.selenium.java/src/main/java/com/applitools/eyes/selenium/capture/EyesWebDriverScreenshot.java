@@ -1,9 +1,15 @@
 /*
  * Applitools software.
  */
-package com.applitools.eyes.selenium;
+package com.applitools.eyes.selenium.capture;
 
 import com.applitools.eyes.*;
+import com.applitools.eyes.selenium.wrappers.EyesWebDriver;
+import com.applitools.eyes.selenium.SeleniumJavaScriptExecutor;
+import com.applitools.eyes.selenium.exceptions.EyesDriverOperationException;
+import com.applitools.eyes.selenium.frames.Frame;
+import com.applitools.eyes.selenium.frames.FrameChain;
+import com.applitools.eyes.selenium.positioning.ScrollPositionProvider;
 import com.applitools.utils.ArgumentGuard;
 import com.applitools.utils.ImageUtils;
 import org.openqa.selenium.Dimension;
@@ -73,7 +79,7 @@ public class EyesWebDriverScreenshot extends EyesScreenshot {
      * @param screenshotType             (Optional) The screenshot's type (e.g., viewport/full page).
      * @param frameLocationInScreenshot  (Optional) The current frame's location in the screenshot.
      */
-    public EyesWebDriverScreenshot(Logger logger, EyesWebDriver driver, BufferedImage image,
+    private EyesWebDriverScreenshot(Logger logger, EyesWebDriver driver, BufferedImage image,
                                    ScreenshotType screenshotType, Location frameLocationInScreenshot) {
         super(image);
         ArgumentGuard.notNull(logger, "logger");
@@ -81,7 +87,8 @@ public class EyesWebDriverScreenshot extends EyesScreenshot {
         this.logger = logger;
         this.driver = driver;
 
-        this.screenshotType = updateScreenshotType(screenshotType, image);
+        //this.screenshotType = updateScreenshotType(screenshotType, image);
+        this.screenshotType = screenshotType;
 
         IEyesJsExecutor jsExecutor = new SeleniumJavaScriptExecutor(this.driver);
         ScrollPositionProvider positionProvider = new ScrollPositionProvider(logger, jsExecutor);
@@ -142,25 +149,25 @@ public class EyesWebDriverScreenshot extends EyesScreenshot {
         return frameSize;
     }
 
-    private ScreenshotType updateScreenshotType(ScreenshotType screenshotType, BufferedImage image) {
-        if (screenshotType == null) {
-            RectangleSize viewportSize = driver.getDefaultContentViewportSize();
-
-            /*boolean scaleViewport = driver.getEyes().shouldStitchContent();
-
-            if (scaleViewport) {
-                double pixelRatio = driver.getEyes().getDevicePixelRatio();
-                viewportSize = viewportSize.scale(pixelRatio);
-            }*/
-
-            if (image.getWidth() <= viewportSize.getWidth() && image.getHeight() <= viewportSize.getHeight()) {
-                screenshotType = ScreenshotType.VIEWPORT;
-            } else {
-                screenshotType = ScreenshotType.ENTIRE_FRAME;
-            }
-        }
-        return screenshotType;
-    }
+//    private ScreenshotType updateScreenshotType(ScreenshotType screenshotType, BufferedImage image) {
+//        if (screenshotType == null) {
+//            RectangleSize viewportSize = driver.getDefaultContentViewportSize();
+//
+//            /*boolean scaleViewport = driver.getEyes().shouldStitchContent();
+//
+//            if (scaleViewport) {
+//                double pixelRatio = driver.getEyes().getDevicePixelRatio();
+//                viewportSize = viewportSize.scale(pixelRatio);
+//            }*/
+//
+//            if (image.getWidth() <= viewportSize.getWidth() && image.getHeight() <= viewportSize.getHeight()) {
+//                screenshotType = ScreenshotType.VIEWPORT;
+//            } else {
+//                screenshotType = ScreenshotType.ENTIRE_FRAME;
+//            }
+//        }
+//        return screenshotType;
+//    }
 
     /**
      * See {@link #EyesWebDriverScreenshot(Logger, EyesWebDriver, BufferedImage, ScreenshotType, Location)}.

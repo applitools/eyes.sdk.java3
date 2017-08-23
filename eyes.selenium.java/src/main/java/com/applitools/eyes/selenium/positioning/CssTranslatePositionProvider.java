@@ -1,8 +1,8 @@
-package com.applitools.eyes.selenium;
+package com.applitools.eyes.selenium.positioning;
 
 import com.applitools.eyes.*;
+import com.applitools.eyes.selenium.EyesSeleniumUtils;
 import com.applitools.utils.ArgumentGuard;
-import org.openqa.selenium.JavascriptExecutor;
 
 /**
  * A {@link PositionProvider} which is based on CSS translates. This is

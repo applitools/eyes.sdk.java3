@@ -1,4 +1,4 @@
-package com.applitools.eyes.selenium;
+package com.applitools.eyes.selenium.regionVisibility;
 
 import com.applitools.eyes.Location;
 import com.applitools.eyes.Logger;
@@ -11,7 +11,7 @@ public class NopRegionVisibilityStrategy implements RegionVisibilityStrategy {
 
     private final Logger logger;
 
-    NopRegionVisibilityStrategy(Logger logger) {
+    public NopRegionVisibilityStrategy(Logger logger) {
         this.logger = logger;
     }
 

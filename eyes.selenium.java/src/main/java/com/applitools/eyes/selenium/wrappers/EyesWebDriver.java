@@ -1,6 +1,11 @@
-package com.applitools.eyes.selenium;
+package com.applitools.eyes.selenium.wrappers;
 
 import com.applitools.eyes.*;
+import com.applitools.eyes.selenium.*;
+import com.applitools.eyes.selenium.frames.FrameChain;
+import com.applitools.eyes.selenium.input.EyesKeyboard;
+import com.applitools.eyes.selenium.input.EyesMouse;
+import com.applitools.eyes.selenium.positioning.ImageRotation;
 import com.applitools.utils.ArgumentGuard;
 import com.applitools.utils.ImageUtils;
 import org.openqa.selenium.*;

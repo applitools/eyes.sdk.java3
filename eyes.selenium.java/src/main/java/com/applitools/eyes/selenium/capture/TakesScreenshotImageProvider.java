@@ -1,4 +1,4 @@
-package com.applitools.eyes.selenium;
+package com.applitools.eyes.selenium.capture;
 
 import com.applitools.eyes.ImageProvider;
 import com.applitools.eyes.Logger;

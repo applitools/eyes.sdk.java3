@@ -2,6 +2,7 @@ package com.applitools.eyes.selenium;
 
 import com.applitools.eyes.Location;
 import com.applitools.eyes.Logger;
+import com.applitools.eyes.selenium.wrappers.EyesRemoteWebElement;
 import com.applitools.utils.ArgumentGuard;
 import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.WebElement;

@@ -1,4 +1,4 @@
-package com.applitools.eyes.selenium;
+package com.applitools.eyes.selenium.regionVisibility;
 
 import com.applitools.eyes.Location;
 import com.applitools.eyes.Logger;

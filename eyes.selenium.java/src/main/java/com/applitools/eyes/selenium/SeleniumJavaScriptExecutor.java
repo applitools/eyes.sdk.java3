@@ -1,6 +1,7 @@
 package com.applitools.eyes.selenium;
 
 import com.applitools.eyes.IEyesJsExecutor;
+import com.applitools.eyes.selenium.wrappers.EyesWebDriver;
 
 public class SeleniumJavaScriptExecutor implements IEyesJsExecutor {
 

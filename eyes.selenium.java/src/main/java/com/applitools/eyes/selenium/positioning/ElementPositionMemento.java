@@ -1,4 +1,4 @@
-package com.applitools.eyes.selenium;
+package com.applitools.eyes.selenium.positioning;
 
 import com.applitools.eyes.Location;
 import com.applitools.eyes.PositionMemento;

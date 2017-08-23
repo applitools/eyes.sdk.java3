@@ -1,8 +1,9 @@
-package com.applitools.eyes.selenium;
+package com.applitools.eyes.selenium.capture;
 
 import com.applitools.eyes.EyesScreenshot;
 import com.applitools.eyes.EyesScreenshotFactory;
 import com.applitools.eyes.Logger;
+import com.applitools.eyes.selenium.wrappers.EyesWebDriver;
 
 import java.awt.image.BufferedImage;
 
