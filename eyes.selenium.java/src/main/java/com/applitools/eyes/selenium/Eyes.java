@@ -63,7 +63,7 @@ public class Eyes extends EyesBase {
     // Milliseconds
     private static final int DEFAULT_WAIT_BEFORE_SCREENSHOTS = 100;
 
-    private EyesWebDriver driver;
+    protected EyesWebDriver driver;
     private boolean dontGetTitle;
 
     private boolean forceFullPageScreenshot;
@@ -1246,9 +1246,7 @@ public class Eyes extends EyesBase {
 
             logger.verbose("Setting scale provider...");
             try {
-                factory = new ContextBasedScaleProviderFactory(logger, positionProvider.getEntireSize(),
-                        viewportSizeHandler.get(), devicePixelRatio, EyesSeleniumUtils.isMobileDevice(driver),
-                        scaleProviderHandler);
+                factory = getScaleProviderFactory();
             } catch (Exception e) {
                 // This can happen in Appium for example.
                 logger.verbose("Failed to set ContextBasedScaleProvider.");
@@ -1262,6 +1260,12 @@ public class Eyes extends EyesBase {
         // If we already have a scale provider set, we'll just use it, and pass a mock as provider handler.
         PropertyHandler<ScaleProvider> nullProvider = new SimplePropertyHandler<>();
         return new ScaleProviderIdentityFactory(scaleProviderHandler.get(), nullProvider);
+    }
+
+    protected ScaleProviderFactory getScaleProviderFactory() {
+        return new ContextBasedScaleProviderFactory(logger, positionProvider.getEntireSize(),
+                viewportSizeHandler.get(), devicePixelRatio, false,
+                scaleProviderHandler);
     }
 
     /**
@@ -1945,60 +1949,9 @@ public class Eyes extends EyesBase {
     }
 
     /**
-     * {@inheritDoc}
-     * <p>
-     * This override also checks for mobile operating system.
-     */
-    @Override
-    protected AppEnvironment getAppEnvironment() {
-
-        AppEnvironment appEnv = super.getAppEnvironment();
-        RemoteWebDriver underlyingDriver = driver.getRemoteWebDriver();
-        // If hostOs isn't set, we'll try and extract and OS ourselves.
-        if (appEnv.getOs() == null) {
-            logger.log("No OS set, checking for mobile OS...");
-            if (EyesSeleniumUtils.isMobileDevice(underlyingDriver)) {
-                String platformName = null;
-                logger.log("Mobile device detected! Checking device type..");
-                if (EyesSeleniumUtils.isAndroid(underlyingDriver)) {
-                    logger.log("Android detected.");
-                    platformName = "Android";
-                } else if (EyesSeleniumUtils.isIOS(underlyingDriver)) {
-                    logger.log("iOS detected.");
-                    platformName = "iOS";
-                } else {
-                    logger.log("Unknown device type.");
-                }
-                // We only set the OS if we identified the device type.
-                if (platformName != null) {
-                    String os = platformName;
-                    String platformVersion =
-                            EyesSeleniumUtils.getPlatformVersion(underlyingDriver);
-                    if (platformVersion != null) {
-                        String majorVersion =
-                                platformVersion.split("\\.", 2)[0];
-
-                        if (!majorVersion.isEmpty()) {
-                            os += " " + majorVersion;
-                        }
-                    }
-
-                    logger.verbose("Setting OS: " + os);
-                    appEnv.setOs(os);
-                }
-            } else {
-                logger.log("No mobile OS detected.");
-            }
-        }
-        logger.log("Done!");
-        return appEnv;
-    }
-
-    /**
      * @return The currently set position provider.
      */
     public PositionProvider getElementPositionProvider() {
         return  elementPositionProvider == null ? positionProvider : elementPositionProvider;
     }
-
 }

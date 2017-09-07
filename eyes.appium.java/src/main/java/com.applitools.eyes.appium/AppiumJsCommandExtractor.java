@@ -1,7 +1,7 @@
 /*
- * Applitools SDK for Selenium integration.
+ * Applitools SDK for Appium integration.
  */
-package com.applitools.eyes.selenium;
+package com.applitools.eyes.appium;
 
 import com.applitools.eyes.*;
 import com.applitools.eyes.triggers.MouseAction;
