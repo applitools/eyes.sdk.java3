@@ -297,7 +297,10 @@ public class Eyes extends EyesBase {
 
         initDriver(driver);
 
-        userAgent = UserAgent.ParseUserAgentString(this.driver.getUserAgent(), true);
+        String uaString = this.driver.getUserAgent();
+        if (uaString != null) {
+            userAgent = UserAgent.ParseUserAgentString(uaString, true);
+        }
         imageProvider = ImageProviderFactory.getImageProvider(userAgent, this, logger, this.driver);
         regionPositionCompensation = RegionPositionCompensationFactory.getRegionPositionCompensation(userAgent, this, logger);
 
