@@ -18,7 +18,7 @@ public class FirefoxRegionPositionCompensation implements RegionPositionCompensa
 
     @Override
     public Region compensateRegionPosition(Region region, double pixelRatio) {
-        if (pixelRatio == 1) {
+        if (pixelRatio == 1.0) {
             return region;
         }
 
@@ -28,6 +28,12 @@ public class FirefoxRegionPositionCompensation implements RegionPositionCompensa
             return region;
         }
 
-        return region.offset(0, -(int) Math.ceil(pixelRatio / 2));
+        region = region.offset(0, -(int) Math.ceil(pixelRatio / 2));
+
+        if (region.getWidth() <= 0 || region.getHeight() <= 0) {
+            return Region.EMPTY;
+        }
+
+        return region;
     }
 }
