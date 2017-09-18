@@ -8,13 +8,10 @@ import com.applitools.eyes.selenium.exceptions.EyesDriverOperationException;
 import com.applitools.eyes.selenium.wrappers.EyesWebDriver;
 import com.applitools.utils.ArgumentGuard;
 import com.applitools.utils.GeneralUtils;
-import io.appium.java_client.AppiumDriver;
-import io.appium.java_client.android.AndroidDriver;
-import io.appium.java_client.ios.IOSDriver;
-import io.appium.java_client.remote.MobileCapabilityType;
 import org.openqa.selenium.*;
 import org.openqa.selenium.interactions.internal.Coordinates;
 
+import java.awt.image.BufferedImage;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -24,8 +21,6 @@ import java.util.Map;
  * class, and it caused collision.
  */
 public class EyesSeleniumUtils {
-
-    private static final String NATIVE_APP = "NATIVE_APP";
 
     // See Applitools WiKi for explanation.
     private static final String JS_GET_VIEWPORT_SIZE =
@@ -75,7 +70,7 @@ public class EyesSeleniumUtils {
                     + "var totalHeight = Math.max(maxDocElementHeight, maxBodyHeight); "
                     + "return [totalWidth, totalHeight];";
 
-    private static final String[] JS_TRANSFORM_KEYS = { "transform",
+    private static final String[] JS_TRANSFORM_KEYS = {"transform",
             "-webkit-transform"
     };
 
@@ -112,7 +107,6 @@ public class EyesSeleniumUtils {
     /**
      * For EyesWebDriver instances, returns the underlying WebDriver. For all other types - return the driver received
      * as parameter.
-     *
      * @param driver The driver instance for which to get the underlying WebDriver.
      * @return The underlying WebDriver
      */
@@ -124,75 +118,74 @@ public class EyesSeleniumUtils {
         return driver;
     }
 
-    /**
-     *
-     * @param driver The driver for which to check if it represents a mobile
-     *               device.
-     * @return {@code true} if the platform running the test is a mobile
-     * platform. {@code false} otherwise.
-     */
-    public static boolean isMobileDevice(WebDriver driver) {
-        driver = getUnderlyingDriver(driver);
-        return driver instanceof AppiumDriver;
-    }
-
-    /**
-     * @param driver The driver for which to check the orientation.
-     * @return {@code true} if this is a mobile device and is in landscape
-     * orientation. {@code false} otherwise.
-     */
-    public static boolean isLandscapeOrientation(WebDriver driver) {
-        // We can only find orientation for mobile devices.
-        if (isMobileDevice(driver)) {
-            AppiumDriver<?> appiumDriver = (AppiumDriver<?>) getUnderlyingDriver(driver);
-
-            String originalContext = null;
-            try {
-                // We must be in native context in order to ask for orientation,
-                // because of an Appium bug.
-                originalContext = appiumDriver.getContext();
-                if (appiumDriver.getContextHandles().size() > 1 &&
-                        !originalContext.equalsIgnoreCase(NATIVE_APP)) {
-                    appiumDriver.context(NATIVE_APP);
-                } else {
-                    originalContext = null;
-                }
-                ScreenOrientation orientation = appiumDriver.getOrientation();
-                return orientation == ScreenOrientation.LANDSCAPE;
-            } catch (Exception e) {
-                throw new EyesDriverOperationException(
-                        "Failed to get orientation!", e);
-            }
-            finally {
-                if (originalContext != null) {
-                    appiumDriver.context(originalContext);
+    private static ImageOrientationHandler imageOrientationHandlerHandler = new ImageOrientationHandler() {
+        @Override
+        public boolean isLandscapeOrientation(WebDriver driver) {
+            if (driver instanceof Rotatable) {
+                Rotatable rotatable = (Rotatable) driver;
+                try {
+                    ScreenOrientation orientation = rotatable.getOrientation();
+                    return orientation == ScreenOrientation.LANDSCAPE;
+                } catch (Exception e) {
+                    throw new EyesDriverOperationException("Failed to get orientation!", e);
                 }
             }
+            return false;
         }
 
-        return false;
+        @Override
+        public int tryAutomaticRotation(Logger logger, WebDriver driver, BufferedImage image) {
+            return 0;
+        }
+    };
+
+    public static void setImageOrientationHandlerHandler(ImageOrientationHandler imageOrientationHandler) {
+        imageOrientationHandlerHandler = imageOrientationHandler;
+    }
+
+    public static boolean isLandscapeOrientation(WebDriver driver) {
+        return imageOrientationHandlerHandler.isLandscapeOrientation(driver);
+    }
+
+    public static int tryAutomaticRotation(Logger logger, WebDriver driver, BufferedImage image){
+        return imageOrientationHandlerHandler.tryAutomaticRotation(logger, driver, image);
+    }
+
+
+    private static JavascriptHandler javascriptHandler = new JavascriptHandler() {
+        @Override
+        public void handle(String script, Object[] args) {
+            // do nothing
+        }
+    };
+
+    public static void setJavascriptHandler(JavascriptHandler handler) {
+        javascriptHandler = handler;
+    }
+
+    public static void handleSpecialCommands(String script, Object[] args) {
+        javascriptHandler.handle(script, args);
     }
 
     /**
      * Sets the overflow of the current context's document element.
      * @param executor The executor to use for setting the overflow.
-     * @param value The overflow value to set.
+     * @param value    The overflow value to set.
      * @return The previous overflow value (could be {@code null} if undefined).
      */
-    public static String setOverflow(JavascriptExecutor executor,
-                                     String value) {
+    public static String setOverflow(JavascriptExecutor executor, String value) {
         String script;
         if (value == null) {
             script =
-                "var origOverflow = document.documentElement.style.overflow; "
-                        + "document.documentElement.style.overflow = undefined;"
-                        + " return origOverflow";
+                    "var origOverflow = document.documentElement.style.overflow; "
+                            + "document.documentElement.style.overflow = undefined;"
+                            + " return origOverflow";
         } else {
             script = String.format(
-                "var origOverflow = document.documentElement.style.overflow; " +
-                        "document.documentElement.style.overflow = \"%s\"; " +
-                        "return origOverflow",
-                value);
+                    "var origOverflow = document.documentElement.style.overflow; " +
+                            "document.documentElement.style.overflow = \"%s\"; " +
+                            "return origOverflow",
+                    value);
         }
         try {
             return (String) executor.executeScript(script);
@@ -203,14 +196,13 @@ public class EyesSeleniumUtils {
 
     /**
      * Hides the scrollbars of the current context's document element.
-     *
-     * @param executor The executor to use for hiding the scrollbars.
+     * @param executor             The executor to use for hiding the scrollbars.
      * @param stabilizationTimeout The amount of time to wait for the "hide
      *                             scrollbars" action to take effect
      *                             (Milliseconds). Zero/negative values are
      *                             ignored.
      * @return The previous value of the overflow property (could be
-     *          {@code null}).
+     * {@code null}).
      */
     public static String hideScrollbars(JavascriptExecutor executor, int
             stabilizationTimeout) {
@@ -226,16 +218,15 @@ public class EyesSeleniumUtils {
     }
 
     /**
-     *
      * @param executor The executor to use.
      * @return The current scroll position of the current frame.
      */
     public static Location getCurrentScrollPosition(
             IEyesJsExecutor executor) {
         //noinspection unchecked
-        List<Number> positionAsList = (List<Number>)executor.executeScript(JS_GET_CURRENT_SCROLL_POSITION);
-        return new Location((int)Math.ceil(positionAsList.get(0).doubleValue()),
-                (int)Math.ceil(positionAsList.get(1).doubleValue()));
+        List<Number> positionAsList = (List<Number>) executor.executeScript(JS_GET_CURRENT_SCROLL_POSITION);
+        return new Location((int) Math.ceil(positionAsList.get(0).doubleValue()),
+                (int) Math.ceil(positionAsList.get(1).doubleValue()));
     }
 
     /**
@@ -250,7 +241,6 @@ public class EyesSeleniumUtils {
     }
 
     /**
-     *
      * @param executor The executor to use.
      * @return The size of the entire content.
      */
@@ -260,7 +250,7 @@ public class EyesSeleniumUtils {
         try {
             //noinspection unchecked
             List<Long> esAsList =
-                (List<Long>) executor.executeScript(JS_GET_CONTENT_ENTIRE_SIZE);
+                    (List<Long>) executor.executeScript(JS_GET_CONTENT_ENTIRE_SIZE);
             result = new RectangleSize(esAsList.get(0).intValue(),
                     esAsList.get(1).intValue());
         } catch (WebDriverException e) {
@@ -271,7 +261,6 @@ public class EyesSeleniumUtils {
     }
 
     /**
-     *
      * @param executor The executor to use.
      * @return The viewport size.
      */
@@ -285,11 +274,10 @@ public class EyesSeleniumUtils {
     }
 
     /**
-     *
      * @param logger The logger to use.
      * @param driver The web driver to use.
      * @return The viewport size of the current context, or the display size
-     *          if the viewport size cannot be retrieved.
+     * if the viewport size cannot be retrieved.
      */
     public static RectangleSize getViewportSizeOrDisplaySize(Logger logger, WebDriver driver) {
         logger.verbose("getViewportSizeOrDisplaySize()");
@@ -346,8 +334,8 @@ public class EyesSeleniumUtils {
     }
 
     public static boolean setBrowserSizeByViewportSize(Logger logger, WebDriver driver,
-                                                    RectangleSize actualViewportSize,
-                                                    RectangleSize requiredViewportSize) {
+                                                       RectangleSize actualViewportSize,
+                                                       RectangleSize requiredViewportSize) {
         Dimension browserSize = driver.manage().window().getSize();
         logger.verbose("Current browser size: " + browserSize);
         RectangleSize requiredBrowserSize = new RectangleSize(
@@ -360,10 +348,9 @@ public class EyesSeleniumUtils {
     }
 
     /**
-     *
      * @param logger The logger to use.
      * @param driver The web driver to use.
-     * @param size The size to set as the viewport size.
+     * @param size   The size to set as the viewport size.
      */
     public static void setViewportSize(Logger logger, WebDriver driver, RectangleSize size) {
 
@@ -441,7 +428,7 @@ public class EyesSeleniumUtils {
                     currHeightChange += heightStep;
                 }
 
-                RectangleSize requiredBrowserSize = new RectangleSize(browserSize.getWidth()+ currWidthChange,
+                RectangleSize requiredBrowserSize = new RectangleSize(browserSize.getWidth() + currWidthChange,
                         browserSize.getHeight() + currHeightChange);
                 if (requiredBrowserSize.equals(lastRequiredBrowserSize)) {
                     logger.verbose("Browser size is as required but viewport size does not match!");
@@ -470,43 +457,6 @@ public class EyesSeleniumUtils {
     }
 
     /**
-     *
-     * @param driver The driver to test.
-     * @return {@code true} if the driver is an Android driver.
-     * {@code false} otherwise.
-     */
-    public static boolean isAndroid(WebDriver driver) {
-        driver = getUnderlyingDriver(driver);
-        return driver instanceof AndroidDriver;
-    }
-
-    /**
-     *
-     * @param driver The driver to test.
-     * @return {@code true} if the driver is an iOS driver.
-     * {@code false} otherwise.
-     */
-    public static boolean isIOS(WebDriver driver) {
-        driver = getUnderlyingDriver(driver);
-        return driver instanceof IOSDriver;
-    }
-
-    /**
-     *
-     * @param driver The driver to get the platform version from.
-     * @return The platform version or {@code null} if it is undefined.
-     */
-    public static String getPlatformVersion(HasCapabilities driver) {
-        Capabilities capabilities = driver.getCapabilities();
-        Object platformVersionObj =
-                capabilities.getCapability
-                        (MobileCapabilityType.PLATFORM_VERSION);
-
-        return platformVersionObj == null ?
-                null : String.valueOf(platformVersionObj);
-    }
-
-    /**
      * @param executor The executor to use.
      * @return The device pixel ratio.
      */
@@ -517,7 +467,6 @@ public class EyesSeleniumUtils {
     }
 
     /**
-     *
      * @param executor The executor to use.
      * @return The current documentElement transform values, according to
      * {@link #JS_TRANSFORM_KEYS}.
@@ -526,7 +475,7 @@ public class EyesSeleniumUtils {
 
         String script = "return { ";
 
-        for (String key: JS_TRANSFORM_KEYS) {
+        for (String key : JS_TRANSFORM_KEYS) {
             script += "'" + key + "'" +
                     ": document.documentElement.style['" + key + "'],";
         }
@@ -542,13 +491,12 @@ public class EyesSeleniumUtils {
     /**
      * Sets transforms for document.documentElement according to the given
      * map of style keys and values.
-     *
-     * @param executor The executor to use.
+     * @param executor   The executor to use.
      * @param transforms The transforms to set. Keys are used as style keys,
      *                   and values are the values for those styles.
      */
     public static void setTransforms(IEyesJsExecutor executor,
-                                    Map<String, String> transforms) {
+                                     Map<String, String> transforms) {
 
         String script = "";
 
@@ -563,16 +511,15 @@ public class EyesSeleniumUtils {
     /**
      * Set the given transform to document.documentElement for all style keys
      * defined in {@link #JS_TRANSFORM_KEYS} .
-     *
-     * @param executor The executor to use.
+     * @param executor  The executor to use.
      * @param transform The transform value to set.
      */
     public static void setTransform(IEyesJsExecutor executor,
-                                      String transform) {
+                                    String transform) {
         Map<String, String> transforms =
                 new HashMap<String, String>(JS_TRANSFORM_KEYS.length);
 
-        for (String key: JS_TRANSFORM_KEYS) {
+        for (String key : JS_TRANSFORM_KEYS) {
             transforms.put(key, transform);
         }
 
@@ -585,7 +532,7 @@ public class EyesSeleniumUtils {
      * @param position The position to translate to.
      */
     public static void translateTo(IEyesJsExecutor executor,
-                                     Location position) {
+                                   Location position) {
         setTransform(executor, String.format("translate(-%spx, -%spx)",
                 position.getX(), position.getY()));
     }

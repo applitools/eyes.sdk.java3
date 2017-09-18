@@ -1,7 +1,6 @@
 package com.applitools.eyes.selenium.wrappers;
 
 import com.applitools.eyes.*;
-import com.applitools.eyes.selenium.AppiumJsCommandExtractor;
 import com.applitools.eyes.selenium.Eyes;
 import com.applitools.eyes.selenium.EyesSeleniumUtils;
 import com.applitools.eyes.selenium.frames.FrameChain;
@@ -47,39 +46,22 @@ public class EyesWebDriver implements HasCapabilities, HasInputDevices,
      * @param rotation The degrees by which to rotate the image:
      *                 positive values = clockwise rotation,
      *                 negative values = counter-clockwise,
-     *                 0 = force no rotation, null = rotate automatically
-     *                 when needed.
+     *                 0 = force no rotation,
+     *                 null = rotate automatically as needed.
      * @return A normalized image.
      */
-    public static BufferedImage normalizeRotation(Logger logger,
-                                                  WebDriver driver,
-                                                  BufferedImage image,
-                                                  ImageRotation rotation) {
+    public BufferedImage normalizeRotation(Logger logger, WebDriver driver,
+                                           BufferedImage image, ImageRotation rotation) {
         ArgumentGuard.notNull(driver, "driver");
         ArgumentGuard.notNull(image, "image");
-        BufferedImage normalizedImage = image;
+        int degrees;
         if (rotation != null) {
-            if (rotation.getRotation() != 0) {
-                normalizedImage = ImageUtils.rotateImage(image,
-                        rotation.getRotation());
-            }
-        } else { // Do automatic rotation if necessary
-            try {
-                logger.verbose("Trying to automatically normalize rotation...");
-                if (EyesSeleniumUtils.isMobileDevice(driver) &&
-                        EyesSeleniumUtils.isLandscapeOrientation(driver)
-                        && image.getHeight() > image.getWidth()) {
-                    // For Android, we need to rotate images to the right, and
-                    // for iOS to the left.
-                    int degrees =
-                            EyesSeleniumUtils.isAndroid(driver) ? 90 : -90;
-                    normalizedImage = ImageUtils.rotateImage(image, degrees);
-                }
-            } catch (Exception e) {
-                logger.verbose("Got exception: " + e.getMessage());
-                logger.verbose("Skipped automatic rotation handling.");
-            }
+            degrees = rotation.getRotation();
+        } else {
+            degrees = EyesSeleniumUtils.tryAutomaticRotation(logger, driver, image);
         }
+
+        BufferedImage normalizedImage = ImageUtils.rotateImage(image, degrees);
 
         return normalizedImage;
     }
@@ -204,7 +186,6 @@ public class EyesWebDriver implements HasCapabilities, HasInputDevices,
      * element in Appium).
      * @return Maps of IDs for found elements.
      */
-    @SuppressWarnings("UnusedDeclaration")
     public Map<String, WebElement> getElementIds() {
         return elementsIds;
     }
@@ -319,48 +300,16 @@ public class EyesWebDriver implements HasCapabilities, HasInputDevices,
     }
 
     public Object executeScript(String script, Object... args) {
-
-        // Appium commands are sometimes sent as Javascript
-        if (AppiumJsCommandExtractor.isAppiumJsCommand(script)) {
-            Trigger trigger =
-                    AppiumJsCommandExtractor.extractTrigger(elementsIds,
-                            driver.manage().window().getSize(), script, args);
-
-            if (trigger != null) {
-                // TODO - Daniel, additional types of triggers
-                if (trigger instanceof MouseTrigger) {
-                    MouseTrigger mt = (MouseTrigger) trigger;
-                    eyes.addMouseTrigger(mt.getMouseAction(), mt.getControl(), mt.getLocation());
-                }
-            }
-        }
-        logger.verbose("Execute script...");
+        EyesSeleniumUtils.handleSpecialCommands(script, args);
         Object result = driver.executeScript(script, args);
-        logger.verbose("Done!");
         return result;
     }
 
     public Object executeAsyncScript(String script, Object... args) {
-
-        // Appium commands are sometimes sent as Javascript
-        if (AppiumJsCommandExtractor.isAppiumJsCommand(script)) {
-            Trigger trigger =
-                    AppiumJsCommandExtractor.extractTrigger(elementsIds,
-                            driver.manage().window().getSize(), script, args);
-
-            if (trigger != null) {
-                // TODO - Daniel, additional type of triggers
-                if (trigger instanceof MouseTrigger) {
-                    MouseTrigger mt = (MouseTrigger) trigger;
-                    eyes.addMouseTrigger(mt.getMouseAction(),
-                            mt.getControl(), mt.getLocation());
-                }
-            }
-        }
-
-        return driver.executeAsyncScript(script, args);
+        EyesSeleniumUtils.handleSpecialCommands(script, args);
+        Object result = driver.executeAsyncScript(script, args);
+        return result;
     }
-
 
     /**
      * @param forceQuery If true, we will perform the query even if we have a cached viewport size.

@@ -200,6 +200,8 @@ public class ImageUtils {
     public static BufferedImage rotateImage(BufferedImage image, double deg) {
         ArgumentGuard.notNull(image, "image");
 
+        if (deg == 0) return image;
+
         double radians = Math.toRadians(deg);
 
         // We need this to calculate the width/height of the rotated image.
