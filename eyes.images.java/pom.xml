@@ -4,7 +4,7 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>eyes-images-java3-jboss</artifactId>
+    <artifactId>eyes-images-java3</artifactId>
     <name>eyes-images-java3</name>
     <url>http://www.applitools.com</url>
 
@@ -12,21 +12,21 @@
 
     <parent>
         <groupId>com.applitools</groupId>
-        <artifactId>eyes-sdk-java3-jboss-parent</artifactId>
-        <version>3.13</version>
+        <artifactId>eyes-sdk-java3-parent</artifactId>
+        <version>3.24</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
 
     <dependencies>
         <dependency>
             <groupId>com.applitools</groupId>
-            <artifactId>eyes-common-java3-jboss</artifactId>
-            <version>3.13</version>
+            <artifactId>eyes-common-java3</artifactId>
+            <version>3.24</version>
         </dependency>
         <dependency>
             <groupId>com.applitools</groupId>
-            <artifactId>eyes-sdk-core-java3-jboss</artifactId>
-            <version>3.13</version>
+            <artifactId>eyes-sdk-core-java3</artifactId>
+            <version>3.24</version>
         </dependency>
     </dependencies>
 </project>

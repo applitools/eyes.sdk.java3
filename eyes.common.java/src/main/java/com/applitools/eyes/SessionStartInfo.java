@@ -6,6 +6,8 @@ package com.applitools.eyes;
 import com.applitools.utils.ArgumentGuard;
 import com.fasterxml.jackson.annotation.JsonRootName;
 
+import java.util.List;
+
 /**
  * Encapsulates data required to start session using the Session API.
  */
@@ -29,6 +31,7 @@ public class SessionStartInfo {
     private String branchName;
     private String parentBranchName;
     private ImageMatchSettings defaultMatchSettings;
+    private List<PropertyData> properties;
 
     public SessionStartInfo(String agentId, SessionType sessionType,
                             String appIdOrName, String verId,
@@ -36,7 +39,8 @@ public class SessionStartInfo {
                             String baselineEnvName, String environmentName,
                             AppEnvironment environment,
                             ImageMatchSettings defaultMatchSettings,
-                            String branchName, String parentBranchName) {
+                            String branchName, String parentBranchName,
+                            List<PropertyData> properties) {
         ArgumentGuard.notNullOrEmpty(agentId, "agentId");
         ArgumentGuard.notNullOrEmpty(appIdOrName, "appIdOrName");
         ArgumentGuard.notNullOrEmpty(scenarioIdOrName, "scenarioIdOrName");
@@ -55,6 +59,7 @@ public class SessionStartInfo {
         this.defaultMatchSettings = defaultMatchSettings;
         this.branchName = branchName;
         this.parentBranchName = parentBranchName;
+        this.properties = properties;
     }
 
     public String getAgentId() {
@@ -104,4 +109,6 @@ public class SessionStartInfo {
     public ImageMatchSettings getDefaultMatchSettings() {
         return defaultMatchSettings;
     }
+
+    public List<PropertyData> getProperties() { return properties; }
 }

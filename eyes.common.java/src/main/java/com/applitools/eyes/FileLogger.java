@@ -59,8 +59,7 @@ public class FileLogger implements LogHandler {
                     file.close();
                 } catch (Exception e) {}
             }
-            file = new BufferedWriter(new FileWriter(new File(filename),
-                    append));
+            file = new BufferedWriter(new FileWriter(new File(filename), append));
         } catch (IOException e) {
             throw new EyesException("Failed to create log file!", e);
         }

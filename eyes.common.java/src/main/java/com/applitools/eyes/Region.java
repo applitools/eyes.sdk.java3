@@ -12,21 +12,32 @@ import java.util.List;
 @JsonIgnoreProperties({"location" , "empty", "middleOffset", "size",
         "subRegions"})
 public class Region {
+    private static Logger logger;
     private int left;
     private int top;
     private int width;
     private int height;
+    private CoordinatesType coordinatesType;
 
-    public static final Region EMPTY = new Region(0, 0, 0, 0);
+    public static final Region EMPTY = new Region(0, 0, 0, 0, CoordinatesType.SCREENSHOT_AS_IS);
+
+    public static void initLogger(Logger logger){
+        Region.logger = logger;
+    }
 
     protected void makeEmpty() {
         left = EMPTY.getLeft();
         top = EMPTY.getTop();
         width = EMPTY.getWidth();
         height = EMPTY.getHeight();
+        this.coordinatesType = EMPTY.getCoordinatesType();
     }
 
     public Region(int left, int top, int width, int height) {
+        this(left, top, width, height, CoordinatesType.SCREENSHOT_AS_IS);
+    }
+
+    public Region(int left, int top, int width, int height, CoordinatesType coordinatesType) {
         ArgumentGuard.greaterThanOrEqualToZero(width, "width");
         ArgumentGuard.greaterThanOrEqualToZero(height, "height");
 
@@ -34,6 +45,7 @@ public class Region {
         this.top = top;
         this.width = width;
         this.height = height;
+        this.coordinatesType = coordinatesType;
     }
 
     /**
@@ -70,13 +82,18 @@ public class Region {
     }
 
     public Region(Location location, RectangleSize size) {
+        this(location, size, CoordinatesType.SCREENSHOT_AS_IS);
+    }
+
+    public Region(Location location, RectangleSize size, CoordinatesType coordinatesType) {
         ArgumentGuard.notNull(location, "location");
         ArgumentGuard.notNull(size, "size");
 
-        left = location.getX();
-        top = location.getY();
-        width = size.getWidth();
-        height = size.getHeight();
+        this.left = location.getX();
+        this.top = location.getY();
+        this.width = size.getWidth();
+        this.height = size.getHeight();
+        this.coordinatesType = coordinatesType;
     }
 
     public Region(Region other) {
@@ -86,6 +103,7 @@ public class Region {
         top = other.getTop();
         width = other.getWidth();
         height = other.getHeight();
+        coordinatesType = other.getCoordinatesType();
     }
 
     /**
@@ -119,7 +137,6 @@ public class Region {
     }
 
     /**
-     *
      * @return The size of the region.
      */
     public RectangleSize getSize() {
@@ -127,7 +144,11 @@ public class Region {
     }
 
     /**
-     *
+     * @return The region's coordinate type.
+     */
+    public CoordinatesType getCoordinatesType() { return this.coordinatesType; }
+
+    /**
      * @param size The updated size of the region.
      */
     public void setSize(RectangleSize size) {
@@ -344,6 +365,8 @@ public class Region {
      */
     public void intersect(Region other) {
 
+        logger.verbose(String.format("intersecting this region (%s) with %s ...", this, other));
+
         // If there's no intersection set this as the Empty region.
         if (!isIntersected(other)) {
             makeEmpty();
@@ -401,6 +424,6 @@ public class Region {
 
     @Override
     public String toString() {
-        return "(" + left + ", " + top + ") " + width + "x" + height;
+        return "(" + left + ", " + top + ") " + width + "x" + height + ", " + coordinatesType;
     }
 }

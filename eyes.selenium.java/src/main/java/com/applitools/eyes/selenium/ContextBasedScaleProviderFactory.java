@@ -1,5 +1,6 @@
 package com.applitools.eyes.selenium;
 
+import com.applitools.eyes.Logger;
 import com.applitools.eyes.RectangleSize;
 import com.applitools.eyes.ScaleProvider;
 import com.applitools.eyes.ScaleProviderFactory;
@@ -10,9 +11,11 @@ import com.applitools.utils.PropertyHandler;
  */
 public class ContextBasedScaleProviderFactory extends ScaleProviderFactory {
 
+    private final Logger logger;
     private final RectangleSize topLevelContextEntireSize;
     private final RectangleSize viewportSize;
     private final double devicePixelRatio;
+    private final boolean isMobileDevice;
 
     /**
      *
@@ -26,19 +29,21 @@ public class ContextBasedScaleProviderFactory extends ScaleProviderFactory {
      *                                  platform on which the application is
      *                                  running.
      */
-    public ContextBasedScaleProviderFactory(RectangleSize topLevelContextEntireSize, RectangleSize viewportSize,
-                                            double devicePixelRatio,
+    public ContextBasedScaleProviderFactory(Logger logger, RectangleSize topLevelContextEntireSize,
+                                            RectangleSize viewportSize, double devicePixelRatio, boolean isMobileDevice,
                                             PropertyHandler<ScaleProvider> scaleProviderHandler) {
         super(scaleProviderHandler);
+        this.logger = logger;
         this.topLevelContextEntireSize = topLevelContextEntireSize;
         this.viewportSize = viewportSize;
         this.devicePixelRatio = devicePixelRatio;
+        this.isMobileDevice = isMobileDevice;
     }
 
     @Override
     protected ScaleProvider getScaleProviderImpl(int imageToScaleWidth) {
-        ContextBasedScaleProvider scaleProvider = new ContextBasedScaleProvider(topLevelContextEntireSize, viewportSize,
-                devicePixelRatio);
+        ContextBasedScaleProvider scaleProvider = new ContextBasedScaleProvider(logger, topLevelContextEntireSize,
+                viewportSize, devicePixelRatio, isMobileDevice);
         scaleProvider.updateScaleRatio(imageToScaleWidth);
         return scaleProvider;
     }

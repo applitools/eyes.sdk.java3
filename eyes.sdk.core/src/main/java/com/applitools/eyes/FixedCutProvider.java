@@ -4,10 +4,10 @@ import com.applitools.utils.ImageUtils;
 
 import java.awt.image.BufferedImage;
 
-@SuppressWarnings("WeakerAccess")
 /**
- * Cut provider based on fixed cut values.
+ * Cut provider based on fixed cut values, run AFTER scaling (so coordinates should be normalized).
  */
+@SuppressWarnings("WeakerAccess")
 public class FixedCutProvider implements CutProvider {
 
     private final int header;

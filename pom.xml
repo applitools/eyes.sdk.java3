@@ -5,8 +5,8 @@
 
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.applitools</groupId>
-    <artifactId>eyes-sdk-java3-jboss-parent</artifactId>
-    <version>3.13</version>
+    <artifactId>eyes-sdk-java3-parent</artifactId>
+    <version>3.24</version>
     <packaging>pom</packaging>
     <name>eyes-sdk-java3-parent</name>
     <url>http://www.applitools.com</url>
@@ -70,8 +70,8 @@
     <modules>
         <module>eyes.common.java</module>
         <!--<module>eyes.connectivity.java.jersey1x</module>-->
-        <!--<module>eyes.connectivity.java.jersey2x</module>-->
-        <module>eyes.connectivity.java.jboss</module>
+        <module>eyes.connectivity.java.jersey2x</module>
+        <!--<module>eyes.connectivity.java.jboss</module>-->
         <module>eyes.sdk.core</module>
         <module>eyes.images.java</module>
         <module>eyes.selenium.java</module>

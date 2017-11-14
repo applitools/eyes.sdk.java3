@@ -9,7 +9,7 @@ package com.applitools.eyes;
 public abstract class Trigger {
 
     @SuppressWarnings("UnusedDeclaration")
-    enum TriggerType {Unknown, Mouse, Text, Keyboard}
+    public enum TriggerType {Unknown, Mouse, Text, Keyboard}
 
     @SuppressWarnings("UnusedDeclaration")
     public abstract TriggerType getTriggerType();

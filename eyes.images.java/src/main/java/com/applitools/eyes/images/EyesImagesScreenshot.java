@@ -1,6 +1,7 @@
 package com.applitools.eyes.images;
 
 import com.applitools.eyes.*;
+import com.applitools.eyes.exceptions.CoordinatesTypeConversionException;
 import com.applitools.utils.ArgumentGuard;
 import com.applitools.utils.ImageUtils;
 
@@ -41,31 +42,22 @@ public class EyesImagesScreenshot extends EyesScreenshot {
 
     /**
      * Get sub screenshot.
-     *
      * @param region          The region for which we should get the sub screenshot.
-     * @param coordinatesType How should the region be calculated on the
-     *                        screenshot image.
-     * @param throwIfClipped  Throw an EyesException if the region is not
-     *                        fully contained in the screenshot.
+     * @param throwIfClipped  Throw an EyesException if the region is not fully contained in the screenshot.
      * @return Sub screenshot.
      */
     @Override
-    public EyesScreenshot getSubScreenshot(Region region,
-                                           CoordinatesType coordinatesType, boolean throwIfClipped) {
+    public EyesScreenshot getSubScreenshot(Region region, boolean throwIfClipped) {
 
         ArgumentGuard.notNull(region, "region");
-        ArgumentGuard.notNull(coordinatesType, "coordinatesType");
 
         // We want to get the sub-screenshot in as-is coordinates type.
-        Region subScreenshotRegion = getIntersectedRegion(region,
-                coordinatesType, CoordinatesType.SCREENSHOT_AS_IS);
+        Region subScreenshotRegion = getIntersectedRegion(region, CoordinatesType.SCREENSHOT_AS_IS);
 
         if (subScreenshotRegion.isEmpty() ||
                 (throwIfClipped &&
                         !subScreenshotRegion.getSize().equals(region.getSize()))) {
-            throw new OutOfBoundsException(String.format(
-                    "Region [%s, (%s)] is out of screenshot bounds [%s]",
-                    region, coordinatesType, bounds));
+            throw new OutOfBoundsException(String.format( "Region [%s] is out of screenshot bounds [%s]", region, bounds));
         }
 
         BufferedImage subScreenshotImage =
@@ -158,25 +150,22 @@ public class EyesImagesScreenshot extends EyesScreenshot {
      * Get the intersected region.
      *
      * @param region The region to intersect.
-     * @param originalCoordinatesType The coordinates type of {@code region}.
      * @param resultCoordinatesType The coordinates type of the resulting
      *                              region.
      * @return The region of the intersected region.
      */
     @Override
     public Region getIntersectedRegion(Region region,
-            CoordinatesType originalCoordinatesType,
             CoordinatesType resultCoordinatesType) {
 
         ArgumentGuard.notNull(region, "region");
-        ArgumentGuard.notNull(originalCoordinatesType, "coordinatesType");
 
         if (region.isEmpty()) {
             return new Region(region);
         }
 
         Region intersectedRegion = convertRegionLocation(region,
-                originalCoordinatesType, CoordinatesType.CONTEXT_RELATIVE);
+                region.getCoordinatesType(), CoordinatesType.CONTEXT_RELATIVE);
 
         intersectedRegion.intersect(bounds);
 

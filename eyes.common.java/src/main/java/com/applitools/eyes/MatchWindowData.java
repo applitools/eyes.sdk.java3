@@ -13,13 +13,14 @@ public class MatchWindowData {
     /**
      * Encapsulates the "Options" section of the MatchExpectedOutput body data.
      */
-    static class Options {
+    public static class Options {
         private final Trigger[] userInputs;
         private final String name;
         private final boolean ignoreMismatch;
         private final boolean ignoreMatch;
         private final boolean forceMismatch;
         private final boolean forceMatch;
+        private final ImageMatchSettings imageMatchSettings;
 
 
         /**
@@ -42,7 +43,8 @@ public class MatchWindowData {
          */
         public Options(String name, Trigger[] userInputs,
                        boolean ignoreMismatch, boolean ignoreMatch,
-                       boolean forceMismatch, boolean forceMatch) {
+                       boolean forceMismatch, boolean forceMatch,
+                       ImageMatchSettings imageMatchSettings) {
             ArgumentGuard.notNull(userInputs, "userInputs");
 
             this.name = name;
@@ -51,6 +53,7 @@ public class MatchWindowData {
             this.ignoreMatch = ignoreMatch;
             this.forceMismatch = forceMismatch;
             this.forceMatch = forceMatch;
+            this.imageMatchSettings = imageMatchSettings;
         }
 
         @SuppressWarnings("unused")
@@ -82,6 +85,9 @@ public class MatchWindowData {
         public boolean getForceMatch() {
             return forceMatch;
         }
+
+        @SuppressWarnings("unused")
+        public ImageMatchSettings getImageMatchSettings() { return imageMatchSettings; }
     }
 
 
