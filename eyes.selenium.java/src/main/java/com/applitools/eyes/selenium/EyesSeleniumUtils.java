@@ -63,9 +63,19 @@ public class EyesSeleniumUtils {
     // smaller (!) than the clientHeight, which is why we take the
     // maximum between them.
     private static final String JS_GET_CONTENT_ENTIRE_SIZE =
-            "var scrollWidth = document.documentElement.scrollWidth; " +
+            "var documentScrollWidth = document.documentElement.scrollWidth; " +
                     "var bodyScrollWidth = document.body.scrollWidth; " +
-                    "var totalWidth = Math.max(scrollWidth, bodyScrollWidth); " +
+                    "var bodyOverflowX = window.getComputedStyle(document.body).overflowX;" +
+                    "var documentOverflowX = window.getComputedStyle(document.documentElement).overflowX;" +
+                    "var totalWidth = undefined;" +
+                    "if (bodyOverflowX !== 'hidden' && documentOverflowX !== 'hidden')" +
+                    "{ totalWidth = Math.max(documentScrollWidth, bodyScrollWidth); }" +
+                    "else if (bodyOverflowX !== 'hidden' && documentOverflowX === 'hidden')" +
+                    "{ totalWidth = bodyScrollWidth; }" +
+                    "else if (bodyOverflowX === 'hidden' && documentOverflowX !== 'hidden')" +
+                    "{ totalWidth = documentScrollWidth; }" +
+                    "else if (bodyOverflowX === 'hidden' && documentOverflowX === 'hidden')" +
+                    "{ totalWidth = window.innerWidth; }" +
                     "var clientHeight = document.documentElement.clientHeight; " +
                     "var bodyClientHeight = document.body.clientHeight; " +
                     "var scrollHeight = document.documentElement.scrollHeight; " +
