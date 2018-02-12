@@ -6,11 +6,11 @@ import com.applitools.eyes.fluent.ICheckSettings;
 import com.applitools.eyes.selenium.fluent.Target;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.junit.runners.JUnit4;
+import org.junit.runners.Parameterized;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 
-@RunWith(JUnit4.class)
+@RunWith(Parameterized.class)
 public abstract class TestFluentApi extends TestSetup {
 
     @Test

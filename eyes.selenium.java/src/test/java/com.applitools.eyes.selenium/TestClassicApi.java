@@ -1,11 +1,13 @@
 package com.applitools.eyes.selenium;
 
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 import org.junit.runner.RunWith;
-import org.junit.runners.JUnit4;
+import org.junit.runners.Parameterized;
 import org.openqa.selenium.By;
 
-@RunWith(JUnit4.class)
+@RunWith(Parameterized.class)
+@Category(CI.class)
 public abstract class TestClassicApi extends TestSetup {
 
     @Test

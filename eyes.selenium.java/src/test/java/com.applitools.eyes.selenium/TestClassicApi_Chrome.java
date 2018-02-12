@@ -2,17 +2,18 @@ package com.applitools.eyes.selenium;
 
 import org.junit.ClassRule;
 import org.junit.Rule;
+import org.junit.experimental.categories.Category;
 import org.junit.rules.ExternalResource;
 import org.junit.rules.TestRule;
 import org.junit.rules.TestWatcher;
 import org.junit.runner.Description;
 import org.junit.runner.RunWith;
-import org.junit.runners.JUnit4;
+import org.junit.runners.Parameterized;
 import org.junit.runners.model.Statement;
 import org.openqa.selenium.chrome.ChromeOptions;
-import org.openqa.selenium.remote.DesiredCapabilities;
 
-@RunWith(JUnit4.class)
+@RunWith(Parameterized.class)
+@Category(CI.class)
 public class TestClassicApi_Chrome extends TestClassicApi {
 
     @ClassRule
@@ -30,12 +31,11 @@ public class TestClassicApi_Chrome extends TestClassicApi {
         @Override
         public Statement apply(Statement statement, Description description) {
             ChromeOptions options = new ChromeOptions();
-            options.addArguments("disable-infobars", "headless");
-
-            //Run Remotely
-            //------------
-            caps = DesiredCapabilities.chrome();
-            caps.setCapability(ChromeOptions.CAPABILITY, options);
+            if (!System.getenv("SELENIUM_SERVER_URL").contains("ondemand.saucelabs.com")) {
+                options.setHeadless(true);
+            }
+            options.addArguments("disable-infobars");
+            caps = options;
 
             return statement;
         }

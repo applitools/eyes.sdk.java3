@@ -28,8 +28,9 @@ public class TestClassicApi_IE11_ForceFullPageScreenshot extends TestClassicApi 
     public final TestRule beforeTest = new TestWatcher() {
         @Override
         public Statement apply(Statement statement, Description description) {
-            caps = DesiredCapabilities.internetExplorer();
-            caps.setVersion("11");
+            DesiredCapabilities ieCaps = DesiredCapabilities.internetExplorer();
+            ieCaps.setVersion("11");
+            caps = ieCaps;
             return statement;
         }
     };

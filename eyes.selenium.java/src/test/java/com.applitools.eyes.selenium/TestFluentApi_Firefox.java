@@ -2,17 +2,18 @@ package com.applitools.eyes.selenium;
 
 import org.junit.ClassRule;
 import org.junit.Rule;
+import org.junit.experimental.categories.Category;
 import org.junit.rules.ExternalResource;
 import org.junit.rules.TestRule;
 import org.junit.rules.TestWatcher;
 import org.junit.runner.Description;
 import org.junit.runner.RunWith;
-import org.junit.runners.JUnit4;
+import org.junit.runners.Parameterized;
 import org.junit.runners.model.Statement;
-import org.openqa.selenium.firefox.FirefoxDriver;
-import org.openqa.selenium.remote.DesiredCapabilities;
+import org.openqa.selenium.firefox.FirefoxOptions;
 
-@RunWith(JUnit4.class)
+@RunWith(Parameterized.class)
+@Category(CI.class)
 public class TestFluentApi_Firefox extends TestFluentApi {
 
     @ClassRule
@@ -29,13 +30,12 @@ public class TestFluentApi_Firefox extends TestFluentApi {
     public final TestRule beforeTest = new TestWatcher() {
         @Override
         public Statement apply(Statement statement, Description description) {
-            //Run locally
-            //-----------
-            //webDriver = new FirefoxDriver();
 
-            //Run Remotely
-            //------------
-            caps = DesiredCapabilities.firefox();
+            FirefoxOptions options = new FirefoxOptions();
+            if (!System.getenv("SELENIUM_SERVER_URL").contains("ondemand.saucelabs.com")) {
+                options.setHeadless(true);
+            }
+            caps = options;
 
             return statement;
         }

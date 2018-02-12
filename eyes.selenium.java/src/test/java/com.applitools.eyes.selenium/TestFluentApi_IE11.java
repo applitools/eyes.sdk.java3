@@ -28,8 +28,9 @@ public class TestFluentApi_IE11 extends TestFluentApi {
     public final TestRule beforeTest = new TestWatcher() {
         @Override
         public Statement apply(Statement statement, Description description) {
-            caps = DesiredCapabilities.internetExplorer();
-            caps.setVersion("11");
+            DesiredCapabilities ieCaps = DesiredCapabilities.internetExplorer();
+            ieCaps.setVersion("11");
+            caps = ieCaps;
             return statement;
         }
     };

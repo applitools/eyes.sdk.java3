@@ -4,8 +4,6 @@ jdk: oraclejdk8
 
 script:
   - cd eyes.selenium.java
-  - mvn compile
-  - cd src/test/java/com.applitools.eyes.selenium
-  - docker-compose up -d
-  - java org.junit.runner.JUnitCore SeleniumTestsSuite.java
-  - docker-compose down
+  - export APPLITOOLS_BATCH_ID=`uuidgen -t`
+  - echo $APPLITOOLS_BATCH_ID
+  - mvn test
