@@ -16,6 +16,7 @@ import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
 import org.junit.runners.Parameterized;
 import org.openqa.selenium.Capabilities;
+import org.openqa.selenium.Platform;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.remote.RemoteWebDriver;
@@ -31,6 +32,8 @@ import java.net.URL;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
+
+import static org.junit.Assert.fail;
 
 @RunWith(Parameterized.class)
 public abstract class TestSetup {
@@ -55,7 +58,7 @@ public abstract class TestSetup {
 
     @Parameterized.Parameters(name="{0}")
     public static Collection<String> data() {
-        return Arrays.asList("Windows 10", "Linux", "macOS 10.13");
+        return Arrays.asList("Windows 10", "Linux", "macOS 10.12");
     }
 
     @BeforeClass
@@ -99,35 +102,45 @@ public abstract class TestSetup {
     @Rule
     public TestRule watcher = new TestWatcher() {
         protected void starting(Description description) {
+            try {
+                String seleniumServerUrl = System.getenv("SELENIUM_SERVER_URL");
+                if (seleniumServerUrl.equalsIgnoreCase("http://ondemand.saucelabs.com/wd/hub")) {
+                    desiredCaps.setCapability("username", System.getenv("SAUCE_USERNAME"));
+                    desiredCaps.setCapability("accesskey", System.getenv("SAUCE_ACCESS_KEY"));
+                }
 
-            String seleniumServerUrl = System.getenv("SELENIUM_SERVER_URL");
-            if (seleniumServerUrl.equalsIgnoreCase("http://ondemand.saucelabs.com/wd/hub")) {
-                desiredCaps.setCapability("username", System.getenv("SAUCE_USERNAME"));
-                desiredCaps.setCapability("accesskey", System.getenv("SAUCE_ACCESS_KEY"));
                 desiredCaps.setCapability("platform", platform);
                 caps.merge(desiredCaps);
+                Platform desiredPlatform = caps.getPlatform();
+
+                try {
+                    webDriver = new RemoteWebDriver(new URL(seleniumServerUrl), caps);
+                } catch (MalformedURLException ex) {
+                }
+
+                Platform actualPlatform = ((RemoteWebDriver)webDriver).getCapabilities().getPlatform();
+                Assert.assertEquals(desiredPlatform, actualPlatform);
+
+                String fps = eyes.getForceFullPageScreenshot() ? "_FPS" : "";
+                String testName = description.getMethodName() + fps;
+                testName = testName.replace('[','_')
+                        .replace(' ','_')
+                        .replace("]","");
+
+                driver = eyes.open(webDriver,
+                        testSuitName,
+                        testName,
+                        new RectangleSize(800, 600)
+                );
+
+                driver.get(testedPageUrl);
+
+                eyes.setDebugScreenshotsPrefix("Java_" + testName + "_");
+
             }
-
-            try {
-                webDriver = new RemoteWebDriver(new URL(seleniumServerUrl), caps);
-            } catch (MalformedURLException ex) {
+            catch (Exception ex) {
+                fail(ex.getLocalizedMessage());
             }
-
-            String fps = eyes.getForceFullPageScreenshot() ? "_FPS" : "";
-            String testName = description.getMethodName() + fps;
-            testName = testName.replace('[','_')
-                               .replace(' ','_')
-                               .replace("]","");
-
-            driver = eyes.open(webDriver,
-                    testSuitName,
-                    testName,
-                    new RectangleSize(800, 600)
-            );
-
-            driver.get(testedPageUrl);
-
-            eyes.setDebugScreenshotsPrefix("Java_" + testName + "_");
         }
 
         protected void finished(Description description) {
@@ -161,7 +174,9 @@ public abstract class TestSetup {
                 e.printStackTrace();
             } finally {
                 eyes.abortIfNotClosed();
-                driver.quit();
+                if (driver != null) {
+                    driver.quit();
+                }
             }
         }
     };
