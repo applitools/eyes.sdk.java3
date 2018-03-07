@@ -113,10 +113,8 @@ public abstract class TestSetup {
                 caps.merge(desiredCaps);
                 Platform desiredPlatform = caps.getPlatform();
 
-                try {
-                    webDriver = new RemoteWebDriver(new URL(seleniumServerUrl), caps);
-                } catch (MalformedURLException ex) {
-                }
+
+                webDriver = new RemoteWebDriver(new URL(seleniumServerUrl), caps);
 
                 Platform actualPlatform = ((RemoteWebDriver)webDriver).getCapabilities().getPlatform();
                 Assert.assertEquals(desiredPlatform, actualPlatform);
