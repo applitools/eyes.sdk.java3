@@ -14,10 +14,10 @@ import org.testng.annotations.*;
 public class TestFluentApi extends TestSetup {
 
     @Factory(dataProvider = "dp", dataProviderClass = TestsDataProvider.class)
-    public TestFluentApi(Capabilities caps, String platform, boolean forceFPS) {
+    public TestFluentApi(Capabilities caps, String platform) {
         super.caps = caps;
         super.platform = platform;
-        super.forceFPS = forceFPS;
+        super.forceFPS = false;
 
         super.compareExpectedRegions = caps.getBrowserName().equalsIgnoreCase("chrome");
         testSuitName = "Eyes Selenium SDK - Fluent API";

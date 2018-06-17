@@ -39,7 +39,6 @@ public class TestsDataProvider {
         List<List<Object>> lists = new ArrayList<>();
         lists.add(Arrays.asList(new Object[]{chromeOptions, firefoxOptions/*, ie11Options, safariOptions*/}));
         lists.add(Arrays.asList(platforms));
-        lists.add(Arrays.asList(new Object[]{false, true})); // force fps
 
         Object[][] basicPermutations = TestUtils.generatePermutations(lists);
 
@@ -50,11 +49,9 @@ public class TestsDataProvider {
         for (Object platform : platforms) {
             System.out.println(platform);
             if (((String) platform).startsWith("Windows")) {
-                extraPermutations.add(new Object[]{ie11Options, platform, false});
-                extraPermutations.add(new Object[]{ie11Options, platform, true});
+                //extraPermutations.add(new Object[]{ie11Options, platform});
             } else if (((String) platform).startsWith("Mac")) {
-                extraPermutations.add(new Object[]{safariOptions, platform, false});
-                extraPermutations.add(new Object[]{safariOptions, platform, true});
+                extraPermutations.add(new Object[]{safariOptions, platform});
             }
         }
         System.out.println();

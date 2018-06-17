@@ -11,10 +11,10 @@ import org.testng.annotations.*;
 public class TestSpecialCases extends TestSetup {
 
     @Factory(dataProvider = "dp", dataProviderClass = TestsDataProvider.class)
-    public TestSpecialCases(Capabilities caps, String platform, boolean forceFPS) {
+    public TestSpecialCases(Capabilities caps, String platform) {
         super.caps = caps;
         super.platform = platform;
-        super.forceFPS = forceFPS;
+        super.forceFPS = false;
 
         testSuitName = "Eyes Selenium SDK - Special Cases";
         testedPageUrl = "http://applitools.github.io/demo/TestPages/WixLikeTestPage/index.html";

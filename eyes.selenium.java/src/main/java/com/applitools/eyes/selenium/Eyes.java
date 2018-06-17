@@ -8,6 +8,7 @@ import com.applitools.eyes.capture.AppOutputWithScreenshot;
 import com.applitools.eyes.capture.EyesScreenshotFactory;
 import com.applitools.eyes.capture.ImageProvider;
 import com.applitools.eyes.diagnostics.TimedAppOutput;
+import com.applitools.eyes.events.ValidationInfo;
 import com.applitools.eyes.exceptions.TestFailedException;
 import com.applitools.eyes.fluent.GetRegion;
 import com.applitools.eyes.fluent.ICheckSettings;
@@ -2109,8 +2110,7 @@ public class Eyes extends EyesBase {
         EyesWebDriverScreenshot result;
 
         Object activeElement = null;
-        if (getHideCaret())
-        {
+        if (getHideCaret()) {
             try {
                 activeElement = driver.executeScript("var activeElement = document.activeElement; activeElement && activeElement.blur(); return activeElement;");
             } catch (WebDriverException e) {
@@ -2168,8 +2168,7 @@ public class Eyes extends EyesBase {
             result = new EyesWebDriverScreenshot(logger, driver, screenshotImage);
         }
 
-        if (getHideCaret() && activeElement != null)
-        {
+        if (getHideCaret() && activeElement != null) {
             try {
                 driver.executeScript("arguments[0].focus();", activeElement);
             } catch (WebDriverException e) {
@@ -2272,4 +2271,8 @@ public class Eyes extends EyesBase {
         return elementPositionProvider == null ? positionProvider : elementPositionProvider;
     }
 
+    @Override
+    protected String getAUTSessionId() {
+        return driver.getRemoteWebDriver().getSessionId().toString();
+    }
 }

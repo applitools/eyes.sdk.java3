@@ -11,7 +11,6 @@ import java.util.TimeZone;
 public class StdoutLogHandler implements LogHandler {
 
     private final boolean isVerbose;
-    private String sessionId = "";
 
     /**
      * Creates a new StdoutLogHandler instance.

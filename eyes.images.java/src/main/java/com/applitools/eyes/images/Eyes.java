@@ -340,6 +340,11 @@ public class Eyes extends EyesBase {
         return title;
     }
 
+    @Override
+    protected String getAUTSessionId() {
+        return "";
+    }
+
     /**
      * See {@link #checkImage_(RegionProvider, String, boolean, ICheckSettings)}.
      * @param regionProvider The region for which verification will be
