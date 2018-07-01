@@ -11,10 +11,10 @@ import org.testng.annotations.Test;
 public class OrbisTest extends TestSetup {
 
     @Factory(dataProvider = "dp", dataProviderClass = TestsDataProvider.class)
-    public OrbisTest(Capabilities caps, String platform, boolean forceFPS) {
+    public OrbisTest(Capabilities caps, String platform) {
         super.caps = caps;
         super.platform = platform;
-        super.forceFPS = forceFPS;
+        super.forceFPS = false;
 
         testSuitName = "Test Orbis";
         testedPageUrl = "https://www.orbis.com/jp/institutional/about-us/press-room";

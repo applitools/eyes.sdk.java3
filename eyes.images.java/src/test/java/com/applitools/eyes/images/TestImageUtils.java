@@ -20,7 +20,7 @@ public class TestImageUtils {
 
         @Override
         public void onMessage(boolean verbose, String logString) {
-            messages.add(verbose ? "[V] " : "[I] " + logString);
+            messages.add(logString);
         }
 
         @Override
@@ -47,7 +47,7 @@ public class TestImageUtils {
         BufferedImage cropped = ImageUtils.cropImage(image, new Region(600, 350, 300, 300));
         Assert.assertEquals(cropped.getWidth(), 200, "widths differ");
         Assert.assertEquals(cropped.getHeight(), 150, "heights differ");
-        Assert.assertTrue(testLogHandler.contains("[I] cropImage(): WARNING - requested cropped area overflows image boundaries."));
+        Assert.assertTrue(testLogHandler.contains("[LOG    ] {} com.applitools.utils.ImageUtils.cropImage(): WARNING - requested cropped area overflows image boundaries."));
     }
 
     @Test
@@ -58,6 +58,6 @@ public class TestImageUtils {
         BufferedImage cropped = ImageUtils.cropImage(image, new Region(850, 100, 300, 200));
         Assert.assertEquals(cropped.getWidth(), 800, "widths differ");
         Assert.assertEquals(cropped.getHeight(), 500, "heights differ");
-        Assert.assertTrue(testLogHandler.contains("[I] cropImage(): WARNING - requested cropped area results in zero-size image! Cropped not performed. Returning original image."));
+        Assert.assertTrue(testLogHandler.contains("[LOG    ] {} com.applitools.utils.ImageUtils.cropImage(): WARNING - requested cropped area results in zero-size image! Cropped not performed. Returning original image."));
     }
 }

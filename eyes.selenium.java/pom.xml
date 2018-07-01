@@ -12,7 +12,7 @@
     <parent>
         <groupId>com.applitools</groupId>
         <artifactId>eyes-sdk-java3-parent</artifactId>
-        <version>3.32.1</version>
+        <version>3.34</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
 
@@ -20,12 +20,12 @@
         <dependency>
             <groupId>com.applitools</groupId>
             <artifactId>eyes-common-java3</artifactId>
-            <version>3.32.1</version>
+            <version>3.34</version>
         </dependency>
         <dependency>
             <groupId>com.applitools</groupId>
             <artifactId>eyes-sdk-core-java3</artifactId>
-            <version>3.32.1</version>
+            <version>3.34</version>
         </dependency>
         <dependency>
             <groupId>org.seleniumhq.selenium</groupId>
@@ -44,11 +44,13 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
-                <version>2.21.0</version>
+                <version>2.22.0</version>
                 <configuration>
                     <suiteXmlFiles>
                         <suiteXmlFile>testng.xml</suiteXmlFile>
                     </suiteXmlFiles>
+                    <useFile>false</useFile>
+                    <trimStackTrace>false</trimStackTrace>
                 </configuration>
             </plugin>
         </plugins>

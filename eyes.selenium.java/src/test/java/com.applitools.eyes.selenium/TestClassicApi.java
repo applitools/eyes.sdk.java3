@@ -10,10 +10,10 @@ import org.testng.annotations.Test;
 public class TestClassicApi extends TestSetup {
 
     @Factory(dataProvider = "dp", dataProviderClass = TestsDataProvider.class)
-    public TestClassicApi(Capabilities caps, String platform, boolean forceFPS) {
+    public TestClassicApi(Capabilities caps, String platform) {
         super.caps = caps;
         super.platform = platform;
-        super.forceFPS = forceFPS;
+        super.forceFPS = false;
 
         testSuitName = "Eyes Selenium SDK - Classic API";
         testedPageUrl = "http://applitools.github.io/demo/TestPages/FramesTestPage/";

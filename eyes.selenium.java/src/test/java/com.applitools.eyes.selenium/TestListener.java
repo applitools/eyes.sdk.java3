@@ -29,7 +29,7 @@ public class TestListener implements ITestListener {
         //System.out.println("onTestStart");
         Object instance = result.getInstance();
         if (instance instanceof TestSetup) {
-            TestSetup testSetup = ((TestSetup) instance);
+            TestSetup testSetup = (TestSetup) instance;
             Method method = result.getMethod().getConstructorOrMethod().getMethod();
             testSetup.beforeMethod(method.getName());
         }

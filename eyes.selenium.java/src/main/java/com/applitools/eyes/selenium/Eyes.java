@@ -8,6 +8,8 @@ import com.applitools.eyes.capture.AppOutputWithScreenshot;
 import com.applitools.eyes.capture.EyesScreenshotFactory;
 import com.applitools.eyes.capture.ImageProvider;
 import com.applitools.eyes.diagnostics.TimedAppOutput;
+import com.applitools.eyes.events.ValidationInfo;
+import com.applitools.eyes.events.ValidationResult;
 import com.applitools.eyes.exceptions.TestFailedException;
 import com.applitools.eyes.fluent.GetRegion;
 import com.applitools.eyes.fluent.ICheckSettings;
@@ -107,6 +109,8 @@ public class Eyes extends EyesBase {
 
     private boolean stitchContent = false;
     private boolean hideCaret = true;
+    private String rootElementForHidingScrollbars = null;
+
 
     public boolean getHideCaret() {
         return hideCaret;
@@ -149,7 +153,7 @@ public class Eyes extends EyesBase {
 
     @Override
     public String getBaseAgentId() {
-        return "eyes.selenium.java/3.32.1";
+        return "eyes.selenium.java/3.34";
     }
 
     public WebDriver getDriver() {
@@ -320,6 +324,8 @@ public class Eyes extends EyesBase {
 
         screenshotFactory = new EyesWebDriverScreenshotFactory(logger, this.driver);
 
+        openBase(appName, testName, viewportSize, sessionType);
+
         String uaString = this.driver.getUserAgent();
         if (uaString != null) {
             userAgent = UserAgent.ParseUserAgentString(uaString, true);
@@ -328,7 +334,6 @@ public class Eyes extends EyesBase {
         imageProvider = ImageProviderFactory.getImageProvider(userAgent, this, logger, this.driver);
         regionPositionCompensation = RegionPositionCompensationFactory.getRegionPositionCompensation(userAgent, this, logger);
 
-        openBase(appName, testName, viewportSize, sessionType);
         ArgumentGuard.notNull(driver, "driver");
 
         devicePixelRatio = UNKNOWN_DEVICE_PIXEL_RATIO;
@@ -813,14 +818,15 @@ public class Eyes extends EyesBase {
     public void check(ICheckSettings checkSettings) {
         ArgumentGuard.notNull(checkSettings, "checkSettings");
 
+        ICheckSettingsInternal checkSettingsInternal = (ICheckSettingsInternal) checkSettings;
+        ISeleniumCheckTarget seleniumCheckTarget = (checkSettings instanceof ISeleniumCheckTarget) ? (ISeleniumCheckTarget) checkSettings : null;
+        String name = checkSettingsInternal.getName();
+
+        ValidationInfo validationInfo = this.fireValidationWillStartEvent(name);
+
         if (!EyesSeleniumUtils.isMobileDevice(driver)) {
             logger.verbose("URL: " + driver.getCurrentUrl());
         }
-
-
-        ICheckSettingsInternal checkSettingsInternal = (ICheckSettingsInternal) checkSettings;
-        SeleniumCheckTarget seleniumCheckTarget = (checkSettings instanceof SeleniumCheckTarget) ? (SeleniumCheckTarget) checkSettings : null;
-        String name = checkSettingsInternal.getName();
 
         logger.verbose(String.format("check(\"%s\", checkSettings) - begin", name));
 
@@ -835,11 +841,13 @@ public class Eyes extends EyesBase {
         this.rootElementForHidingScrollbars = null;
         this.regionToCheck = null;
 
+        MatchResult result = null;
+
         EyesTargetLocator switchTo = (EyesTargetLocator) driver.switchTo();
         FrameChain originalFC = null;
         if (targetRegion != null) {
             originalFC = tryHideScrollbars();
-            this.checkWindowBase(new RegionProvider() {
+            result = this.checkWindowBase(new RegionProvider() {
                 @Override
                 public Region getRegion() {
                     return new Region(targetRegion.getLocation(), targetRegion.getSize(), CoordinatesType.CONTEXT_RELATIVE);
@@ -851,17 +859,17 @@ public class Eyes extends EyesBase {
                 originalFC = tryHideScrollbars();
                 this.targetElement = targetElement;
                 if (this.stitchContent) {
-                    this.checkElement(name, checkSettings);
+                    result = this.checkElement(name, checkSettings);
                 } else {
-                    this.checkRegion(name, checkSettings);
+                    result = this.checkRegion(name, checkSettings);
                 }
                 this.targetElement = null;
             } else if (seleniumCheckTarget.getFrameChain().size() > 0) {
                 originalFC = tryHideScrollbars();
                 if (this.stitchContent) {
-                    this.checkFullFrameOrElement(name, checkSettings);
+                    result = this.checkFullFrameOrElement(name, checkSettings);
                 } else {
-                    this.checkFrameFluent(name, checkSettings);
+                    result = this.checkFrameFluent(name, checkSettings);
                 }
             } else {
                 if (!EyesSeleniumUtils.isMobileDevice(driver)) {
@@ -869,8 +877,12 @@ public class Eyes extends EyesBase {
                     switchTo.defaultContent();
                     originalFC = tryHideScrollbars();
                 }
-                this.checkWindowBase(NullRegionProvider.INSTANCE, name, false, checkSettings);
+                result = this.checkWindowBase(NullRegionProvider.INSTANCE, name, false, checkSettings);
             }
+        }
+
+        if (result == null) {
+            result = new MatchResult();
         }
 
         while (switchedToFrameCount > 0) {
@@ -889,14 +901,18 @@ public class Eyes extends EyesBase {
             tryRestoreScrollbars(originalFC);
         }
 
-        switchTo.frames(this.originalFC);
+        trySwitchToFrames(driver, switchTo, this.originalFC);
 
         this.stitchContent = false;
+
+        ValidationResult validationResult = new ValidationResult();
+        validationResult.setAsExpected(result.getAsExpected());
+        getSessionEventHandlers().validationEnded(getAUTSessionId(), validationInfo.getValidationId(), validationResult);
 
         logger.verbose("check - done!");
     }
 
-    protected void checkFrameFluent(String name, ICheckSettings checkSettings) {
+    protected MatchResult checkFrameFluent(String name, ICheckSettings checkSettings) {
         FrameChain frameChain = driver.getFrameChain().clone();
         Frame targetFrame = frameChain.pop();
         this.targetElement = targetFrame.getReference();
@@ -904,9 +920,10 @@ public class Eyes extends EyesBase {
         EyesTargetLocator switchTo = (EyesTargetLocator) driver.switchTo();
         switchTo.framesDoScroll(frameChain);
 
-        this.checkRegion(name, checkSettings);
+        MatchResult result = this.checkRegion(name, checkSettings);
 
         this.targetElement = null;
+        return result;
     }
 
     private int switchToFrame(SeleniumCheckTarget checkTarget) {
@@ -956,12 +973,12 @@ public class Eyes extends EyesBase {
         return false;
     }
 
-    private void checkFullFrameOrElement(String name, ICheckSettings checkSettings) {
+    private MatchResult checkFullFrameOrElement(String name, ICheckSettings checkSettings) {
         checkFrameOrElement = true;
 
         logger.verbose("checkFullFrameOrElement()");
 
-        checkWindowBase(new RegionProvider() {
+        MatchResult result = checkWindowBase(new RegionProvider() {
             @Override
             public Region getRegion() {
                 return getFullFrameOrElementRegion();
@@ -969,6 +986,7 @@ public class Eyes extends EyesBase {
         }, name, false, checkSettings);
 
         checkFrameOrElement = false;
+        return result;
     }
 
     private Region getFullFrameOrElementRegion() {
@@ -1072,7 +1090,7 @@ public class Eyes extends EyesBase {
         return viewportBounds;
     }
 
-    private void checkRegion(String name, ICheckSettings checkSettings) {
+    private MatchResult checkRegion(String name, ICheckSettings checkSettings) {
 //        // If needed, scroll to the top/left of the element (additional help
 //        // to make sure it's visible).
 //        Point locationAsPoint = targetElement.getLocation();
@@ -1081,7 +1099,7 @@ public class Eyes extends EyesBase {
 //        regionVisibilityStrategy.moveToRegion(positionProvider,
 //                new Location(locationAsPoint.getX(), locationAsPoint.getY()));
 
-        checkWindowBase(new RegionProvider() {
+        MatchResult result = checkWindowBase(new RegionProvider() {
             @Override
             public Region getRegion() {
                 Point p = targetElement.getLocation();
@@ -1092,6 +1110,7 @@ public class Eyes extends EyesBase {
         logger.verbose("Done! trying to scroll back to original position.");
 
         //regionVisibilityStrategy.returnToOriginalPosition(positionProvider);
+        return result;
     }
 
     /**
@@ -1705,11 +1724,11 @@ public class Eyes extends EyesBase {
         checkElement(element, USE_DEFAULT_MATCH_TIMEOUT, tag);
     }
 
-    private void checkElement(String name, ICheckSettings checkSettings) {
-        this.checkElement(this.targetElement, name, checkSettings);
+    private MatchResult checkElement(String name, ICheckSettings checkSettings) {
+        return this.checkElement(this.targetElement, name, checkSettings);
     }
 
-    private void checkElement(WebElement element, String name, ICheckSettings checkSettings) {
+    private MatchResult checkElement(WebElement element, String name, ICheckSettings checkSettings) {
 
         // Since the element might already have been found using EyesWebDriver.
         final EyesRemoteWebElement eyesElement = (element instanceof EyesRemoteWebElement) ?
@@ -1727,7 +1746,7 @@ public class Eyes extends EyesBase {
         String originalOverflow = null;
 
         Point pl = eyesElement.getLocation();
-
+        MatchResult result;
         try {
             checkFrameOrElement = true;
 
@@ -1762,7 +1781,7 @@ public class Eyes extends EyesBase {
                 regionToCheck.intersect(effectiveViewport);
             }
 
-            checkWindowBase(NullRegionProvider.INSTANCE, name, false, checkSettings);
+            result = checkWindowBase(NullRegionProvider.INSTANCE, name, false, checkSettings);
         } finally {
             if (originalOverflow != null) {
                 eyesElement.setOverflow(originalOverflow);
@@ -1776,6 +1795,8 @@ public class Eyes extends EyesBase {
             regionToCheck = null;
             elementPositionProvider = null;
         }
+
+        return result;
     }
 
     /**
@@ -2012,7 +2033,18 @@ public class Eyes extends EyesBase {
         tryHideScrollbars();
     }
 
-    private String rootElementForHidingScrollbars = null;
+
+    private WebDriver trySwitchToFrames(WebDriver driver, EyesTargetLocator switchTo, FrameChain frames) {
+        if (EyesSeleniumUtils.isMobileDevice(driver)) {
+            return driver;
+        }
+        try {
+            return switchTo.frames(frames);
+        } catch (WebDriverException e) {
+            logger.log("WARNING: Failed to swtich to original frame chain! " + e.getMessage());
+            return driver;
+        }
+    }
 
     private FrameChain tryHideScrollbars() {
         if (EyesSeleniumUtils.isMobileDevice(driver)) {
@@ -2097,9 +2129,12 @@ public class Eyes extends EyesBase {
         EyesWebDriverScreenshot result;
 
         Object activeElement = null;
-        if (getHideCaret())
-        {
-            activeElement = driver.executeScript("var activeElement = document.activeElement; activeElement && activeElement.blur(); return activeElement;");
+        if (getHideCaret()) {
+            try {
+                activeElement = driver.executeScript("var activeElement = document.activeElement; activeElement && activeElement.blur(); return activeElement;");
+            } catch (WebDriverException e) {
+                logger.verbose("WARNING: Cannot hide caret! " + e.getMessage());
+            }
         }
 
         if (checkFrameOrElement) {
@@ -2152,9 +2187,12 @@ public class Eyes extends EyesBase {
             result = new EyesWebDriverScreenshot(logger, driver, screenshotImage);
         }
 
-        if (getHideCaret() && activeElement != null)
-        {
-            driver.executeScript("arguments[0].focus();", activeElement);
+        if (getHideCaret() && activeElement != null) {
+            try {
+                driver.executeScript("arguments[0].focus();", activeElement);
+            } catch (WebDriverException e) {
+                logger.verbose("WARNING: Could not return focus to active element! " + e.getMessage());
+            }
         }
 
         logger.verbose("Done!");
@@ -2252,4 +2290,8 @@ public class Eyes extends EyesBase {
         return elementPositionProvider == null ? positionProvider : elementPositionProvider;
     }
 
+    @Override
+    protected String getAUTSessionId() {
+        return driver.getRemoteWebDriver().getSessionId().toString();
+    }
 }

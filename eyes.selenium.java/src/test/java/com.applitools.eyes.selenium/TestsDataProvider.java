@@ -1,5 +1,6 @@
 package com.applitools.eyes.selenium;
 
+import org.openqa.selenium.Capabilities;
 import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.firefox.FirefoxOptions;
 import org.openqa.selenium.remote.CapabilityType;
@@ -24,7 +25,8 @@ public class TestsDataProvider {
 
         SafariOptions safariOptions = new SafariOptions();
 
-        if (!System.getenv("SELENIUM_SERVER_URL").contains("ondemand.saucelabs.com")) {
+        String runHeadless = System.getenv("APPLITOOLS_RUN_HEADLESS");
+        if (runHeadless != null && runHeadless.equalsIgnoreCase("true")) {
             chromeOptions.setHeadless(true);
             firefoxOptions.setHeadless(true);
         }
@@ -37,31 +39,22 @@ public class TestsDataProvider {
         Object[] platforms = testPlatforms.split(";");
 
         List<List<Object>> lists = new ArrayList<>();
-        lists.add(Arrays.asList(new Object[]{chromeOptions, firefoxOptions/*, ie11Options, safariOptions*/}));
+        lists.add(Arrays.asList(new Object[]{chromeOptions, firefoxOptions, ie11Options, safariOptions}));
         lists.add(Arrays.asList(platforms));
-        lists.add(Arrays.asList(new Object[]{false, true})); // force fps
 
-        Object[][] basicPermutations = TestUtils.generatePermutations(lists);
-
-        List<Object[]> extraPermutations = new ArrayList<>();
-
-        System.out.println();
-        System.out.println("Tests will run on the following platforms:");
-        for (Object platform : platforms) {
-            System.out.println(platform);
-            if (((String) platform).startsWith("Windows")) {
-                extraPermutations.add(new Object[]{ie11Options, platform, false});
-                extraPermutations.add(new Object[]{ie11Options, platform, true});
-            } else if (((String) platform).startsWith("Mac")) {
-                extraPermutations.add(new Object[]{safariOptions, platform, false});
-                extraPermutations.add(new Object[]{safariOptions, platform, true});
+        List<Object[]> permutations = TestUtils.generatePermutationsList(lists);
+        int i=0;
+        while (permutations.size() > 0 && i < permutations.size()){
+            Object[] perm = permutations.get(i);
+            String browser = ((Capabilities)perm[0]).getBrowserName().toUpperCase().trim();
+            String platform = ((String)perm[1]).toUpperCase().trim();
+            if ((platform.startsWith("WIN") && browser.equals("SAFARI")) ||
+                (platform.startsWith("MAC") && browser.equals("INTERNET EXPLORER"))) {
+                permutations.remove(i);
+            } else {
+                i++;
             }
         }
-        System.out.println();
-
-        ArrayList<Object[]> permutations = new ArrayList<>();
-        permutations.addAll(Arrays.asList(basicPermutations));
-        permutations.addAll(extraPermutations);
 
         return permutations.toArray(new Object[0][]);
     }

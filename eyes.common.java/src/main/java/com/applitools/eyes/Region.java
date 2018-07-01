@@ -11,7 +11,7 @@ import java.util.List;
 /**
  * Represents a region.
  */
-@JsonIgnoreProperties({"location", "empty", "middleOffset", "size", "subRegions"})
+@JsonIgnoreProperties({"location", "empty", "middleOffset", "size", "sizeEmpty", "subRegions"})
 public class Region {
     private static Logger logger = new Logger();
     @JsonProperty("left")

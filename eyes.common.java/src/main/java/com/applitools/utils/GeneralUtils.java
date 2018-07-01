@@ -9,6 +9,7 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
+import java.util.TimeZone;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -62,7 +63,7 @@ public class GeneralUtils {
         ArgumentGuard.notNull(calendar, "calendar");
 
         SimpleDateFormat formatter =
-                new SimpleDateFormat(DATE_FORMAT_ISO8601_FOR_OUTPUT, Locale.ENGLISH);
+                new SimpleDateFormat(DATE_FORMAT_ISO8601_FOR_INPUT, Locale.ENGLISH);
 
         // For the string to be formatted correctly you MUST also set
         // the time zone in the formatter! See:
@@ -106,10 +107,21 @@ public class GeneralUtils {
     public static Calendar fromISO8601DateTime(String dateTime)
             throws ParseException {
         ArgumentGuard.notNull(dateTime, "dateTime");
+        String timezoneId = "UTC";
         // Remove second fractions
-        dateTime = dateTime.replaceAll("\\.(\\d+)\\+", "+");
+        if (dateTime.contains("T")) {
+            if (dateTime.endsWith("Z")) {
+                dateTime = dateTime.replaceAll("\\.(\\d+)Z", "Z");
+            } else if (dateTime.contains("+")) {
+                dateTime = dateTime.replaceAll("\\.(\\d+)\\+", "+");
+                timezoneId += "+" + dateTime.split("\\+")[1];
+            } else if (dateTime.contains("-")) {
+                dateTime = dateTime.replaceAll("\\.(\\d+)\\+", "+");
+                timezoneId += "-" + dateTime.split("-")[1];
+            }
+        }
         SimpleDateFormat formatter = new SimpleDateFormat(DATE_FORMAT_ISO8601_FOR_INPUT);
-        Calendar cal = Calendar.getInstance();
+        Calendar cal = Calendar.getInstance(TimeZone.getTimeZone(timezoneId));
         cal.setTime(formatter.parse(dateTime));
         return cal;
     }

@@ -6,12 +6,14 @@ import java.util.List;
 
 public class TestUtils {
 
-    public static Object[][] generatePermutations(List<List<Object>> lists) {
-
+    public static List<Object[]> generatePermutationsList(List<List<Object>> lists) {
         List<Object[]> result = new ArrayList<>();
-
         generatePermutations(lists, result, 0, null);
+        return result;
+    }
 
+    public static Object[][] generatePermutations(List<List<Object>> lists) {
+        List<Object[]> result = generatePermutationsList(lists);
         return result.toArray(new Object[0][0]);
     }
 

@@ -208,14 +208,14 @@ public class TestRegion {
         Region r = new Region(left, top, width, height);
         String actualSerialization = jsonMapper.writeValueAsString(r);
 
-        Assert.assertEquals("Region serialization does not match!",
-                expectedSerialization, actualSerialization);
+        Assert.assertEquals(actualSerialization,
+                expectedSerialization, "Region serialization does not match!");
 
         r = new Region(new Location(left, top),
                 new RectangleSize(width, height));
         actualSerialization = jsonMapper.writeValueAsString(r);
-        Assert.assertEquals("Region serialization does not match for location/size constructor!",
-                expectedSerialization, actualSerialization);
+        Assert.assertEquals(actualSerialization,
+                expectedSerialization, "Region serialization does not match for location/size constructor!");
     }
 
     @Test
@@ -224,19 +224,19 @@ public class TestRegion {
 
         String actualSerialization = jsonMapper.writeValueAsString(ims);
 
-        String expectedSerialization = "{\"matchLevel\":\"STRICT\",\"exact\":null,\"ignoreCaret\":null,\"Ignore\":null,\"Floating\":null}";
+        String expectedSerialization = "{\"matchLevel\":\"STRICT\",\"exact\":null,\"ignoreCaret\":null,\"Ignore\":null,\"Layout\":null,\"Strict\":null,\"Content\":null,\"Floating\":null}";
 
-        Assert.assertEquals("ImageMatchSettings serialization does not match!",
-                expectedSerialization, actualSerialization);
+        Assert.assertEquals(actualSerialization,
+                expectedSerialization, "ImageMatchSettings serialization does not match!");
 
         ims.setIgnoreCaret(true);
 
         actualSerialization = jsonMapper.writeValueAsString(ims);
 
-        expectedSerialization = "{\"matchLevel\":\"STRICT\",\"exact\":null,\"ignoreCaret\":true,\"Ignore\":null,\"Floating\":null}";
+        expectedSerialization = "{\"matchLevel\":\"STRICT\",\"exact\":null,\"ignoreCaret\":true,\"Ignore\":null,\"Layout\":null,\"Strict\":null,\"Content\":null,\"Floating\":null}";
 
-        Assert.assertEquals("ImageMatchSettings serialization does not match!",
-                expectedSerialization, actualSerialization);
+        Assert.assertEquals(actualSerialization,
+                expectedSerialization, "ImageMatchSettings serialization does not match!");
 
     }
 
@@ -265,10 +265,10 @@ public class TestRegion {
 
         String actualSerialization = jsonMapper.writeValueAsString(ssi);
 
-        String expectedSerialization = "{\"agentId\":\"some agent\",\"sessionType\":\"SEQUENTIAL\",\"appIdOrName\":\"my app\",\"verId\":\"1.0.0\",\"scenarioIdOrName\":\"some scenario\",\"batchInfo\":{\"id\":\"37a587aa-17d0-4e86-bf0e-566656a84dda\",\"name\":\"batch name\",\"startedAt\":\"2017-07-02T11:22:21Z\"},\"baselineEnvName\":\"some baseline name\",\"environmentName\":\"env name\",\"environment\":{\"inferred\":null,\"os\":null,\"hostingApp\":null,\"displaySize\":null},\"branchName\":\"some branch name\",\"parentBranchName\":\"some parent branch name\",\"defaultMatchSettings\":{\"matchLevel\":\"STRICT\",\"exact\":null,\"ignoreCaret\":null,\"Ignore\":null,\"Floating\":null},\"properties\":[{\"name\":\"property name\",\"value\":\"property value\"},{\"name\":null,\"value\":null}]}";
+        String expectedSerialization = "{\"agentId\":\"some agent\",\"sessionType\":\"SEQUENTIAL\",\"appIdOrName\":\"my app\",\"verId\":\"1.0.0\",\"scenarioIdOrName\":\"some scenario\",\"batchInfo\":{\"id\":\"37a587aa-17d0-4e86-bf0e-566656a84dda\",\"name\":\"batch name\",\"startedAt\":\"2017-07-02T05:22:21Z\"},\"baselineEnvName\":\"some baseline name\",\"environmentName\":\"env name\",\"environment\":{\"inferred\":null,\"os\":null,\"hostingApp\":null,\"displaySize\":null},\"branchName\":\"some branch name\",\"parentBranchName\":\"some parent branch name\",\"baselineBranchName\":\"some baseline branch name\",\"saveDiffs\":false,\"defaultMatchSettings\":{\"matchLevel\":\"STRICT\",\"exact\":null,\"ignoreCaret\":null,\"Ignore\":null,\"Layout\":null,\"Strict\":null,\"Content\":null,\"Floating\":null},\"properties\":[{\"name\":\"property name\",\"value\":\"property value\"},{\"name\":null,\"value\":null}]}";
 
-        Assert.assertEquals("SessionStartInfo serialization does not match!",
-                expectedSerialization, actualSerialization);
+        Assert.assertEquals(actualSerialization,
+                expectedSerialization, "SessionStartInfo serialization does not match!");
     }
 
     @Test

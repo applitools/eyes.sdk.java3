@@ -46,7 +46,7 @@ public class Eyes extends EyesBase {
      */
     @Override
     public String getBaseAgentId() {
-        return "eyes.images.java/3.32.1";
+        return "eyes.images.java/3.34";
     }
 
     /**
@@ -338,6 +338,11 @@ public class Eyes extends EyesBase {
     @Override
     protected String getTitle() {
         return title;
+    }
+
+    @Override
+    protected String getAUTSessionId() {
+        return "";
     }
 
     /**

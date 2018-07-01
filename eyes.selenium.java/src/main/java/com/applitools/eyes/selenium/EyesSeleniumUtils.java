@@ -174,19 +174,23 @@ public class EyesSeleniumUtils {
     }
 
     public static String selectRootElement(JavascriptExecutor executor){
-        String script =
-                "var docElemScrollHeightBefore = document.documentElement.scrollHeight; " +
-                "var originalBodyOverflow = document.body.style.overflow; " +
-                "document.body.style.overflow = 'hidden'; " +
-                "var docElemScrollHeightAfter = document.documentElement.scrollHeight; " +
-                "if (docElemScrollHeightBefore != docElemScrollHeightAfter) " +
-                "var retval = 'documentElement'; " +
-                "else " +
-                "var retval = 'body'; " +
-                "document.body.style.overflow = originalBodyOverflow; " +
-                "return retval;";
+        // FIXME: 16/06/2018 HOTFIX for returning using documentElement as default for "hideScrollbars"
+        //  (selection logic does not work).
 
-        return (String)executor.executeScript(script);
+//        String script =
+//                "var docElemScrollHeightBefore = document.documentElement.scrollHeight; " +
+//                "var originalBodyOverflow = document.body.style.overflow; " +
+//                "document.body.style.overflow = 'hidden'; " +
+//                "var docElemScrollHeightAfter = document.documentElement.scrollHeight; " +
+//                "if (docElemScrollHeightBefore != docElemScrollHeightAfter) " +
+//                "var retval = 'documentElement'; " +
+//                "else " +
+//                "var retval = 'body'; " +
+//                "document.body.style.overflow = originalBodyOverflow; " +
+//                "return retval;";
+//
+//        return (String)executor.executeScript(script);
+        return "documentElement";
     }
 
     /**

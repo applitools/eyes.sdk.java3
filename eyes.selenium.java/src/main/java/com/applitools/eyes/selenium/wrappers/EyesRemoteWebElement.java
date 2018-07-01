@@ -532,19 +532,18 @@ public class EyesRemoteWebElement extends RemoteWebElement {
     @SuppressWarnings({"unchecked"})
     public Point getLocation() {
         // This is workaround: Selenium currently just removes the value
-        // after the decimal dot (instead of rounding up), which causes
-        // incorrect locations to be returned when using ChromeDriver (with
-        // FF it seems that the coordinates are already rounded up, so
-        // there's no problem). So, we copied the code from the Selenium
+        // after the decimal dot (instead of rounding), which causes
+        // incorrect locations to be returned when using FF.
+        // So, we copied the code from the Selenium
         // client and instead of using "rawPoint.get(...).intValue()" we
-        // return the double value, and use "ceil".
+        // return the double value and use "round".
         String elementId = getId();
         Response response = execute(DriverCommand.GET_ELEMENT_LOCATION,
                 ImmutableMap.of("id", elementId));
         Map<String, Object> rawPoint =
                 (Map<String, Object>) response.getValue();
-        int x = (int) Math.ceil(((Number) rawPoint.get("x")).doubleValue());
-        int y = (int) Math.ceil(((Number) rawPoint.get("y")).doubleValue());
+        int x = (int) Math.round(((Number) rawPoint.get("x")).doubleValue());
+        int y = (int) Math.round(((Number) rawPoint.get("y")).doubleValue());
         return new Point(x, y);
 
         // TODO: Use the command delegation instead. (once the bug is fixed).

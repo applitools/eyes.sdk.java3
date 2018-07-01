@@ -10,6 +10,7 @@ import org.testng.annotations.BeforeClass;
 
 import java.io.File;
 import java.net.MalformedURLException;
+import java.net.URI;
 import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
@@ -125,7 +126,7 @@ public abstract class TestSetup implements ITest {
             eyes.setDebugScreenshotsPrefix(testName + "_");
             eyes.setSaveDebugScreenshots(true);
         } else {
-            logHandler = new StdoutLogHandler(true);
+            logHandler = new StdoutLogHandler(false);
         }
 
         eyes.setLogHandler(logHandler);
@@ -133,6 +134,11 @@ public abstract class TestSetup implements ITest {
         eyes.addProperty("ForceFPS", forceFPS ? "true" : "false");
         eyes.addProperty("ScaleRatio", "" + eyes.getScaleRatio());
         eyes.addProperty("Agent ID", eyes.getFullAgentId());
+
+        RemoteSessionEventHandler remoteSessionEventHandler = new RemoteSessionEventHandler(
+                eyes.getLogger(), URI.create("http://localhost:3000/"), "MyAccessKey");
+        remoteSessionEventHandler.setThrowExceptions(false);
+        eyes.addSessionEventHandler(remoteSessionEventHandler);
 
         driver = eyes.open(webDriver,
                 testSuitName,
