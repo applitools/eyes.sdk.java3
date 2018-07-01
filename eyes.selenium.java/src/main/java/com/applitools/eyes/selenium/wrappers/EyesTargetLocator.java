@@ -3,10 +3,7 @@
  */
 package com.applitools.eyes.selenium.wrappers;
 
-import com.applitools.eyes.EyesException;
-import com.applitools.eyes.Location;
-import com.applitools.eyes.Logger;
-import com.applitools.eyes.RectangleSize;
+import com.applitools.eyes.*;
 import com.applitools.eyes.positioning.PositionMemento;
 import com.applitools.eyes.selenium.SeleniumJavaScriptExecutor;
 import com.applitools.eyes.selenium.frames.Frame;
@@ -46,13 +43,12 @@ public class EyesTargetLocator implements WebDriver.TargetLocator {
         Point pl = targetFrame.getLocation();
         Dimension ds = targetFrame.getSize();
 
-        int clientWidth = eyesFrame.getClientWidth();
-        int clientHeight = eyesFrame.getClientHeight();
+        SizeAndBorders clientSizeAndBorders = eyesFrame.getSizeAndBorders();
+        RectangularMargins borderWidths = clientSizeAndBorders.getBorders();
+        RectangleSize clientSize = clientSizeAndBorders.getSize();
 
-        int borderLeftWidth = eyesFrame.getComputedStyleInteger("border-left-width");
-        int borderTopWidth = eyesFrame.getComputedStyleInteger("border-top-width");
 
-        Location contentLocation = new Location(pl.getX() + borderLeftWidth, pl.getY() + borderTopWidth);
+        Location contentLocation = new Location(pl.getX() + borderWidths.getLeft(), pl.getY() + borderWidths.getTop());
 
         Location originalLocation = scrollPosition.getCurrentPosition();
 
@@ -61,7 +57,7 @@ public class EyesTargetLocator implements WebDriver.TargetLocator {
         Frame frame = new Frame(logger, targetFrame,
                 contentLocation,
                 new RectangleSize(ds.getWidth(), ds.getHeight()),
-                new RectangleSize(clientWidth, clientHeight),
+                clientSize,
                 originalLocation,
                 frameOverflow, this.driver);
 
@@ -142,13 +138,33 @@ public class EyesTargetLocator implements WebDriver.TargetLocator {
     public WebDriver parentFrame() {
         logger.verbose("EyesTargetLocator.parentFrame()");
         if (driver.getFrameChain().size() != 0) {
-            logger.verbose("Making preparations..");
+            logger.verbose("Making preparations...");
             driver.getFrameChain().pop();
-            logger.verbose("Done! Switching to parent frame..");
-            targetLocator.parentFrame();
+            logger.verbose("Done! Switching to parent frame...");
+            try {
+                throw new WebDriverException();
+                //targetLocator.parentFrame();
+            } catch (Exception WebDriverException) {
+                targetLocator.defaultContent();
+                for (Frame frame : driver.getFrameChain()) {
+                    targetLocator.frame(frame.getReference());
+                }
+            }
         }
         logger.verbose("Done!");
         return driver;
+    }
+
+    public static void parentFrame(WebDriver.TargetLocator targetLocator, FrameChain frameChainToParent) {
+        try {
+            //throw new WebDriverException();
+            targetLocator.parentFrame();
+        } catch (Exception WebDriverException) {
+            targetLocator.defaultContent();
+            for (Frame frame : frameChainToParent) {
+                targetLocator.frame(frame.getReference());
+            }
+        }
     }
 
     /**
@@ -251,8 +267,7 @@ public class EyesTargetLocator implements WebDriver.TargetLocator {
     }
 
     public void resetScroll() {
-        if (defaultContentPositionMemento != null)
-        {
+        if (defaultContentPositionMemento != null) {
             scrollPosition.restoreState(defaultContentPositionMemento);
         }
     }

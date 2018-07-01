@@ -656,8 +656,8 @@ public class Eyes extends EyesBase {
             if (targetRegion != null) {
                 getRegions.put(i, new IgnoreRegionByRectangle(targetRegion));
             } else {
-                ISeleniumCheckTarget seleniumCheckTarget =
-                        (settings instanceof ISeleniumCheckTarget) ? (ISeleniumCheckTarget) settings : null;
+                SeleniumCheckTarget seleniumCheckTarget =
+                        (settings instanceof SeleniumCheckTarget) ? (SeleniumCheckTarget) settings : null;
 
                 if (seleniumCheckTarget != null) {
                     WebElement targetElement = getTargetElement(seleniumCheckTarget);
@@ -799,7 +799,7 @@ public class Eyes extends EyesBase {
         return frameReference;
     }
 
-    private WebElement getTargetElement(ISeleniumCheckTarget seleniumCheckTarget) {
+    private WebElement getTargetElement(SeleniumCheckTarget seleniumCheckTarget) {
         assert seleniumCheckTarget != null;
         By targetSelector = seleniumCheckTarget.getTargetSelector();
         WebElement targetElement = seleniumCheckTarget.getTargetElement();
@@ -926,7 +926,7 @@ public class Eyes extends EyesBase {
         return result;
     }
 
-    private int switchToFrame(ISeleniumCheckTarget checkTarget) {
+    private int switchToFrame(SeleniumCheckTarget checkTarget) {
         if (checkTarget == null) {
             return 0;
         }
@@ -941,7 +941,7 @@ public class Eyes extends EyesBase {
         return switchedToFrameCount;
     }
 
-    private boolean switchToFrame(ISeleniumFrameCheckTarget frameTarget) {
+    private boolean switchToFrame(SeleniumFrameCheckTarget frameTarget) {
         WebDriver.TargetLocator switchTo = this.driver.switchTo();
 
         if (frameTarget.getFrameIndex() != null) {
@@ -1019,8 +1019,9 @@ public class Eyes extends EyesBase {
         FrameChain originalFC = driver.getFrameChain().clone();
         FrameChain fc = driver.getFrameChain().clone();
         while (fc.size() > 0) {
-            driver.getRemoteWebDriver().switchTo().parentFrame();
+            //driver.getRemoteWebDriver().switchTo().parentFrame();
             Frame frame = fc.pop();
+            EyesTargetLocator.parentFrame(driver.getRemoteWebDriver().switchTo(), fc);
             if (fc.size() == 0) {
                 positionMemento = positionProvider.getState();
             }
@@ -2065,8 +2066,9 @@ public class Eyes extends EyesBase {
                         EyesSeleniumUtils.hideScrollbars(this.driver, 200, rootElementForHidingScrollbars);
                     }
                 }
-                driver.getRemoteWebDriver().switchTo().parentFrame();
+                //driver.getRemoteWebDriver().switchTo().parentFrame();
                 fc.pop();
+                EyesTargetLocator.parentFrame(driver.getRemoteWebDriver().switchTo(), fc);
             }
             this.originalOverflow = EyesSeleniumUtils.hideScrollbars(this.driver, 200, rootElementForHidingScrollbars);
             ((EyesTargetLocator) driver.switchTo()).frames(originalFC);
@@ -2089,7 +2091,8 @@ public class Eyes extends EyesBase {
             while (fc.size() > 0) {
                 Frame frame = fc.pop();
                 frame.returnToOriginalOverflow();
-                driver.getRemoteWebDriver().switchTo().parentFrame();
+                //driver.getRemoteWebDriver().switchTo().parentFrame();
+                EyesTargetLocator.parentFrame(driver.getRemoteWebDriver().switchTo(), fc);
             }
             EyesSeleniumUtils.setOverflow(this.driver, originalOverflow, rootElementForHidingScrollbars);
             ((EyesTargetLocator) driver.switchTo()).frames(originalFC);
@@ -2099,7 +2102,7 @@ public class Eyes extends EyesBase {
 
     @Override
     protected EyesScreenshot getSubScreenshot(EyesScreenshot screenshot, Region region, ICheckSettingsInternal checkSettingsInternal) {
-        ISeleniumCheckTarget seleniumCheckTarget = (checkSettingsInternal instanceof ISeleniumCheckTarget) ? (ISeleniumCheckTarget) checkSettingsInternal : null;
+        SeleniumCheckTarget seleniumCheckTarget = (checkSettingsInternal instanceof SeleniumCheckTarget) ? (SeleniumCheckTarget) checkSettingsInternal : null;
 
         if (seleniumCheckTarget == null) {
             // we should't get here, but just in case

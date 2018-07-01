@@ -14,7 +14,7 @@ public class InvalidPositionProvider implements PositionProvider {
                 "This class does not implement methods!");
     }
 
-    public void setPosition(Location location) {
+    public Location setPosition(Location location) {
         throw new IllegalStateException(
                 "This class does not implement methods!");
     }

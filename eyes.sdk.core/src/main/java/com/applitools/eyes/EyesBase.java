@@ -1387,6 +1387,7 @@ public abstract class EyesBase {
                 serverConnector,
                 runningSession,
                 matchTimeout,
+                this,
                 // A callback which will call getAppOutput
                 new AppOutputProvider() {
                     @Override
@@ -1751,6 +1752,14 @@ public abstract class EyesBase {
 
     public void addSessionEventHandler(ISessionEventHandler eventHandler) {
         this.sessionEventHandlers.addEventHandler(eventHandler);
+    }
+
+    public void removeSessionEventHandler(ISessionEventHandler eventHandler) {
+        this.sessionEventHandlers.removeEventHandler(eventHandler);
+    }
+
+    public void clearSessionEventHandlers(){
+        this.sessionEventHandlers.clearEventHandlers();
     }
 
     protected abstract String getAUTSessionId();

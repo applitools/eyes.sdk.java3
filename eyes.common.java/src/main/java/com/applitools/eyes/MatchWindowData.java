@@ -92,39 +92,23 @@ public class MatchWindowData {
 
 
     // TODO Remove redundancy: userInputs and ignoreMismatch should only be inside Options. (requires server version update).
-    private final Trigger[] userInputs;
     private AppOutput appOutput;
     private String tag;
-    private boolean ignoreMismatch;
     private Options options;
 
     /**
-     * @param userInputs     A list of triggers between the previous matchWindow
-     *                       call and the current matchWindow call. Can be array
-     *                       of size 0, but MUST NOT be null.
      * @param appOutput      The appOutput for the current matchWindow call.
      * @param tag            The tag of the window to be matched.
+     * @param options        The options to match by.
      */
-    public MatchWindowData(Trigger[] userInputs, AppOutput appOutput,
-                           String tag, boolean ignoreMismatch,
-                           Options options) {
-
-        ArgumentGuard.notNull(userInputs, "userInputs");
-
-        this.userInputs = userInputs;
+    public MatchWindowData(AppOutput appOutput, String tag, Options options) {
         this.appOutput = appOutput;
         this.tag = tag;
-        this.ignoreMismatch = ignoreMismatch;
         this.options = options;
     }
 
     public AppOutput getAppOutput() {
         return appOutput;
-    }
-
-    @SuppressWarnings("unused")
-    public Trigger[] getUserInputs() {
-        return userInputs;
     }
 
     @SuppressWarnings("unused")
@@ -135,10 +119,5 @@ public class MatchWindowData {
     @SuppressWarnings("unused")
     public Options getOptions() {
         return options;
-    }
-
-    @SuppressWarnings("unused")
-    public boolean getIgnoreMismatch() {
-        return ignoreMismatch;
     }
 }

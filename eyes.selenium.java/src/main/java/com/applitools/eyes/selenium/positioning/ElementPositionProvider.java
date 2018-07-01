@@ -41,12 +41,9 @@ public class ElementPositionProvider implements PositionProvider {
      * Go to the specified location.
      * @param location The position to scroll to.
      */
-    public void setPosition(Location location) {
+    public Location setPosition(Location location) {
         logger.verbose(String.format("Scrolling element to %s", location));
-
-        element.scrollTo(location);
-
-        logger.verbose("Done scrolling element!");
+        return element.scrollTo(location);
     }
 
     /**

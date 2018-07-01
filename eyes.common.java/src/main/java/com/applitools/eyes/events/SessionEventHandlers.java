@@ -14,6 +14,15 @@ public class SessionEventHandlers implements ISessionEventHandler {
         eventHandlers.add(handler);
     }
 
+    public void removeEventHandler(ISessionEventHandler handler) {
+        if (handler == this) { return; }
+        eventHandlers.remove(handler);
+    }
+
+    public void clearEventHandlers() {
+        eventHandlers.clear();
+    }
+
     @Override
     public void initStarted() {
         for (ISessionEventHandler currentHandler : eventHandlers) currentHandler.initStarted();
@@ -53,4 +62,5 @@ public class SessionEventHandlers implements ISessionEventHandler {
     public void validationEnded(String autSessionId, String validationId, ValidationResult validationResult) {
         for (ISessionEventHandler currentHandler : eventHandlers) currentHandler.validationEnded(autSessionId, validationId, validationResult);
     }
+
 }

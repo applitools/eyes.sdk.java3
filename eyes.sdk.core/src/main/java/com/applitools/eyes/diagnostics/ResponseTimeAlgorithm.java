@@ -65,10 +65,8 @@ public class ResponseTimeAlgorithm {
                 currentAppOutput.getElapsed(),
                 updatePrimary);
         MatchWindowData updatedMwd = new MatchWindowData(
-                currentMwd.getUserInputs(),
                 updatedAppOutput,
                 currentMwd.getTag(),
-                currentMwd.getIgnoreMismatch(),
                 currentMwd.getOptions());
 
         return new MatchWindowDataWithScreenshot(updatedMwd,
@@ -120,10 +118,8 @@ public class ResponseTimeAlgorithm {
         String tag = appOutput.getTitle();
         Trigger[] noUserInputs = new Trigger[0];
         MatchWindowData mwd = new MatchWindowData(
-                noUserInputs,
                 timedAppOutput,
                 tag,
-                true,
                 new MatchWindowData.Options(tag, noUserInputs, false,
                         false, false, false, null)
         );
@@ -268,10 +264,8 @@ public class ResponseTimeAlgorithm {
             String tag = createTagForDeadline(deadline, elapsedSeconds);
             Trigger[] noUserInputs = new Trigger[0];
             currentWindowData = new MatchWindowData(
-                    noUserInputs,
                     timedAppOutput,
                     tag,
-                    true,
                     new MatchWindowData.Options(tag, noUserInputs, true,
                             true, false, false, null)
             );
@@ -596,10 +590,8 @@ public class ResponseTimeAlgorithm {
                 continue;
             }
             mwdToSend = new MatchWindowData(
-                    currentMwd.getUserInputs(),
                     currentMwd.getAppOutput(),
                     currentMwd.getTag(),
-                    false,
                     new MatchWindowData.Options(
                             currentOptions.getName(),
                             currentOptions.getUserInputs(),
@@ -621,10 +613,8 @@ public class ResponseTimeAlgorithm {
         currentMwd = currentMwdws.getMatchWindowData();
         currentOptions = currentMwd.getOptions();
         mwdToSend = new MatchWindowData(
-                currentMwd.getUserInputs(),
                 currentMwd.getAppOutput(),
                 currentMwd.getTag(),
-                false,
                 new MatchWindowData.Options(
                         currentOptions.getName(),
                         currentOptions.getUserInputs(),

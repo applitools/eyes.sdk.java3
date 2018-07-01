@@ -1,6 +1,7 @@
 package com.applitools.eyes.selenium.wrappers;
 
 import com.applitools.eyes.*;
+import com.applitools.eyes.positioning.PositionProvider;
 import com.applitools.eyes.triggers.MouseAction;
 import com.applitools.utils.ArgumentGuard;
 import com.google.common.collect.ImmutableMap;
@@ -17,6 +18,7 @@ public class EyesRemoteWebElement extends RemoteWebElement {
     private final Logger logger;
     private final EyesWebDriver eyesDriver;
     private final RemoteWebElement webElement;
+    private PositionProvider positionProvider;
     private Method executeMethod;
 
     private final String JS_GET_COMPUTED_STYLE_FORMATTED_STR =
@@ -37,6 +39,9 @@ public class EyesRemoteWebElement extends RemoteWebElement {
     private final String JS_GET_SCROLL_TOP =
             "return arguments[0].scrollTop;";
 
+    private final String JS_GET_SCROLL_POSITION =
+            "return [arguments[0].scrollLeft, arguments[0].scrollTop];";
+
     private final String JS_GET_SCROLL_WIDTH =
             "return arguments[0].scrollWidth;";
 
@@ -55,6 +60,28 @@ public class EyesRemoteWebElement extends RemoteWebElement {
 
     private final String JS_GET_CLIENT_WIDTH = "return arguments[0].clientWidth;";
     private final String JS_GET_CLIENT_HEIGHT = "return arguments[0].clientHeight;";
+
+    private final String JS_GET_BORDER_WIDTHS =
+            "var retval = retval || []; " +
+            "if (window.getComputedStyle) { " +
+                "var computedStyle = window.getComputedStyle(arguments[0], null);" +
+                "retval.push(" +
+                    "computedStyle.getPropertyValue('border-left-width')," +
+                    "computedStyle.getPropertyValue('border-top-width')," +
+                    "computedStyle.getPropertyValue('border-right-width')," +
+                    "computedStyle.getPropertyValue('border-bottom-width'));" +
+            "} else if (arguments[0].currentStyle) { " +
+                "retval.push(" +
+                    "arguments[0].currentStyle['border-left-width'], " +
+                    "arguments[0].currentStyle['border-top-width'], " +
+                    "arguments[0].currentStyle['border-right-width'], " +
+                    "arguments[0].currentStyle['border-bottom-width']);" +
+            "} else { retval.push(0,0,0,0); }";
+
+    private final String JS_GET_SIZE_AND_BORDER_WIDTHS =
+            "var retval = [arguments[0].clientWidth, arguments[0].clientHeight]; "
+                    + JS_GET_BORDER_WIDTHS +
+            "return retval;";
 
     public EyesRemoteWebElement(Logger logger, EyesWebDriver eyesDriver, WebElement webElement) {
         super();
@@ -153,6 +180,18 @@ public class EyesRemoteWebElement extends RemoteWebElement {
     }
 
     /**
+     * @return The value of the scrollTop property of the element.
+     */
+    public Location getScrollPosition() {
+        Object retVal = eyesDriver.executeScript(JS_GET_SCROLL_POSITION, this);
+        List<Long> esAsList = (List<Long>) retVal;
+        Location location = new Location(
+                esAsList.get(0).intValue(),
+                esAsList.get(1).intValue());
+        return location;
+    }
+
+    /**
      * @return The value of the scrollWidth property of the element.
      */
     public int getScrollWidth() {
@@ -174,6 +213,24 @@ public class EyesRemoteWebElement extends RemoteWebElement {
 
     public int getClientHeight() {
         return (int) Math.ceil(Double.parseDouble(eyesDriver.executeScript(JS_GET_CLIENT_HEIGHT, this).toString()));
+    }
+
+    public SizeAndBorders getSizeAndBorders() {
+        SizeAndBorders retVal;
+        Object sizeAndBordersData = eyesDriver.executeScript(JS_GET_SIZE_AND_BORDER_WIDTHS, this);
+        if (sizeAndBordersData != null) {
+            List<Integer> data = (List<Integer>) sizeAndBordersData;
+            retVal = new SizeAndBorders(
+                    new RectangleSize(data.get(0), data.get(1)),
+                    new RectangularMargins(data.get(2), data.get(3), data.get(4), data.get(5))
+            );
+        }
+        else
+        {
+            retVal = new SizeAndBorders(RectangleSize.EMPTY, RectangularMargins.EMPTY);
+        }
+
+        return retVal;
     }
 
     /**
@@ -207,10 +264,16 @@ public class EyesRemoteWebElement extends RemoteWebElement {
     /**
      * Scrolls to the specified location inside the element.
      * @param location The location to scroll to.
+     * @return The actual location the element had scrolled to.
      */
-    public void scrollTo(Location location) {
-        eyesDriver.executeScript(String.format(JS_SCROLL_TO_FORMATTED_STR,
-                location.getX(), location.getY()), this);
+    public Location scrollTo(Location location) {
+        Object retVal = eyesDriver.executeScript(String.format(JS_SCROLL_TO_FORMATTED_STR,
+                location.getX(), location.getY()) + JS_GET_SCROLL_POSITION, this);
+        List<Long> esAsList = (List<Long>) retVal;
+        Location actualLocation = new Location(
+                esAsList.get(0).intValue(),
+                esAsList.get(1).intValue());
+        return actualLocation;
     }
 
     /**
@@ -333,9 +396,8 @@ public class EyesRemoteWebElement extends RemoteWebElement {
      */
     private WebElement wrapElement(WebElement elementToWrap) {
         WebElement resultElement = elementToWrap;
-        if (elementToWrap instanceof RemoteWebElement) {
-            resultElement = new EyesRemoteWebElement(logger, eyesDriver,
-                    (RemoteWebElement) elementToWrap);
+        if ((elementToWrap instanceof RemoteWebElement) && !(elementToWrap instanceof  EyesRemoteWebElement)) {
+            resultElement = new EyesRemoteWebElement(logger, eyesDriver, elementToWrap);
         }
         return resultElement;
     }
@@ -345,16 +407,14 @@ public class EyesRemoteWebElement extends RemoteWebElement {
      * EyesRemoteWebElement object. For all other types of WebElement,
      * the function returns the original object.
      */
-    private List<WebElement> wrapElements(List<WebElement>
-                                                  elementsToWrap) {
+    private List<WebElement> wrapElements(List<WebElement> elementsToWrap) {
         // This list will contain the found elements wrapped with our class.
         List<WebElement> wrappedElementsList =
                 new ArrayList<WebElement>(elementsToWrap.size());
 
         for (WebElement currentElement : elementsToWrap) {
             if (currentElement instanceof RemoteWebElement) {
-                wrappedElementsList.add(new EyesRemoteWebElement(logger,
-                        eyesDriver, (RemoteWebElement) currentElement));
+                wrappedElementsList.add(new EyesRemoteWebElement(logger, eyesDriver, currentElement));
             } else {
                 wrappedElementsList.add(currentElement);
             }
@@ -519,6 +579,14 @@ public class EyesRemoteWebElement extends RemoteWebElement {
 
     @Override
     public String toString() {
-        return "EyesRemoteWebElement:" + webElement.toString();
+        return String.format("EyesRemoteWebElement: %s (%s)", webElement.getTagName(), webElement.getId());
+    }
+
+    public PositionProvider getPositionProvider() {
+        return positionProvider;
+    }
+
+    public void setPositionProvider(PositionProvider positionProvider) {
+        this.positionProvider = positionProvider;
     }
 }
