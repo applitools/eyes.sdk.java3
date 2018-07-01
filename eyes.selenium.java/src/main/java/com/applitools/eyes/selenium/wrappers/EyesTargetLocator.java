@@ -138,13 +138,33 @@ public class EyesTargetLocator implements WebDriver.TargetLocator {
     public WebDriver parentFrame() {
         logger.verbose("EyesTargetLocator.parentFrame()");
         if (driver.getFrameChain().size() != 0) {
-            logger.verbose("Making preparations..");
+            logger.verbose("Making preparations...");
             driver.getFrameChain().pop();
-            logger.verbose("Done! Switching to parent frame..");
-            targetLocator.parentFrame();
+            logger.verbose("Done! Switching to parent frame...");
+            try {
+                throw new WebDriverException();
+                //targetLocator.parentFrame();
+            } catch (Exception WebDriverException) {
+                targetLocator.defaultContent();
+                for (Frame frame : driver.getFrameChain()) {
+                    targetLocator.frame(frame.getReference());
+                }
+            }
         }
         logger.verbose("Done!");
         return driver;
+    }
+
+    public static void parentFrame(WebDriver.TargetLocator targetLocator, FrameChain frameChainToParent) {
+        try {
+            //throw new WebDriverException();
+            targetLocator.parentFrame();
+        } catch (Exception WebDriverException) {
+            targetLocator.defaultContent();
+            for (Frame frame : frameChainToParent) {
+                targetLocator.frame(frame.getReference());
+            }
+        }
     }
 
     /**
@@ -247,8 +267,7 @@ public class EyesTargetLocator implements WebDriver.TargetLocator {
     }
 
     public void resetScroll() {
-        if (defaultContentPositionMemento != null)
-        {
+        if (defaultContentPositionMemento != null) {
             scrollPosition.restoreState(defaultContentPositionMemento);
         }
     }

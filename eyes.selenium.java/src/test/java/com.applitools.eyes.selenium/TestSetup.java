@@ -51,6 +51,11 @@ public abstract class TestSetup implements ITest {
         // Initialize the eyes SDK and set your private API key.
         eyes = new Eyes();
 
+        RemoteSessionEventHandler remoteSessionEventHandler = new RemoteSessionEventHandler(
+                eyes.getLogger(), URI.create("http://localhost:3000/"), "MyAccessKey");
+        remoteSessionEventHandler.setThrowExceptions(false);
+        eyes.addSessionEventHandler(remoteSessionEventHandler);
+
         LogHandler logHandler = new StdoutLogHandler(false);
 
         eyes.setLogHandler(logHandler);
@@ -100,6 +105,10 @@ public abstract class TestSetup implements ITest {
             desiredCaps.setCapability("name", testName + " (" + eyes.getFullAgentId() + ")");
 
             caps.merge(desiredCaps);
+        } else if (seleniumServerUrl.equalsIgnoreCase("http://hub-cloud.browserstack.com/wd/hub")) {
+            seleniumServerUrl = "http://" + System.getenv("BROWSERSTACK_USERNAME") + ":" + System.getenv("BROWSERSTACK_ACCESS_KEY") + "@hub-cloud.browserstack.com/wd/hub";
+            desiredCaps.setCapability("platform", platform);
+            desiredCaps.setCapability("name", testName + " (" + eyes.getFullAgentId() + ")");
         }
 
         this.testName = testName + " " + caps.getBrowserName() + " " + platform;
@@ -134,11 +143,6 @@ public abstract class TestSetup implements ITest {
         eyes.addProperty("ForceFPS", forceFPS ? "true" : "false");
         eyes.addProperty("ScaleRatio", "" + eyes.getScaleRatio());
         eyes.addProperty("Agent ID", eyes.getFullAgentId());
-
-        RemoteSessionEventHandler remoteSessionEventHandler = new RemoteSessionEventHandler(
-                eyes.getLogger(), URI.create("http://localhost:3000/"), "MyAccessKey");
-        remoteSessionEventHandler.setThrowExceptions(false);
-        eyes.addSessionEventHandler(remoteSessionEventHandler);
 
         driver = eyes.open(webDriver,
                 testSuitName,

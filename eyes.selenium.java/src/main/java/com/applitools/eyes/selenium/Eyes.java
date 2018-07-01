@@ -1019,8 +1019,9 @@ public class Eyes extends EyesBase {
         FrameChain originalFC = driver.getFrameChain().clone();
         FrameChain fc = driver.getFrameChain().clone();
         while (fc.size() > 0) {
-            driver.getRemoteWebDriver().switchTo().parentFrame();
+            //driver.getRemoteWebDriver().switchTo().parentFrame();
             Frame frame = fc.pop();
+            EyesTargetLocator.parentFrame(driver.getRemoteWebDriver().switchTo(), fc);
             if (fc.size() == 0) {
                 positionMemento = positionProvider.getState();
             }
@@ -2065,8 +2066,9 @@ public class Eyes extends EyesBase {
                         EyesSeleniumUtils.hideScrollbars(this.driver, 200, rootElementForHidingScrollbars);
                     }
                 }
-                driver.getRemoteWebDriver().switchTo().parentFrame();
+                //driver.getRemoteWebDriver().switchTo().parentFrame();
                 fc.pop();
+                EyesTargetLocator.parentFrame(driver.getRemoteWebDriver().switchTo(), fc);
             }
             this.originalOverflow = EyesSeleniumUtils.hideScrollbars(this.driver, 200, rootElementForHidingScrollbars);
             ((EyesTargetLocator) driver.switchTo()).frames(originalFC);
@@ -2089,7 +2091,8 @@ public class Eyes extends EyesBase {
             while (fc.size() > 0) {
                 Frame frame = fc.pop();
                 frame.returnToOriginalOverflow();
-                driver.getRemoteWebDriver().switchTo().parentFrame();
+                //driver.getRemoteWebDriver().switchTo().parentFrame();
+                EyesTargetLocator.parentFrame(driver.getRemoteWebDriver().switchTo(), fc);
             }
             EyesSeleniumUtils.setOverflow(this.driver, originalOverflow, rootElementForHidingScrollbars);
             ((EyesTargetLocator) driver.switchTo()).frames(originalFC);
