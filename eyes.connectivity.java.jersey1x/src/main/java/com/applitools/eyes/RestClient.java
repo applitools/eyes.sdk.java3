@@ -99,12 +99,10 @@ public class RestClient {
      */
     @SuppressWarnings("UnusedDeclaration")
     public void setProxyBase(ProxySettings proxySettings) {
-        throw new EyesException(
-                "Proxy not implemented in this version!");
-//        this.proxySettings = proxySettings;
-//
-//        restClient = buildRestClient(timeout, proxySettings);
-//        endPoint = restClient.resource(serverUrl);
+        this.proxySettings = proxySettings;
+
+        restClient = buildRestClient(timeout, proxySettings);
+        endPoint = restClient.resource(serverUrl);
     }
 
     /**

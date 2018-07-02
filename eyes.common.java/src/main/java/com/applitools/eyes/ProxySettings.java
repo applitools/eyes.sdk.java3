@@ -30,6 +30,14 @@ public class ProxySettings {
 
     /**
      * @param uri      The proxy's URI.
+     * @param port     The proxy's port
+     */
+    public ProxySettings(String uri, int port) {
+        this(uri, port, null, null);
+    }
+
+    /**
+     * @param uri      The proxy's URI.
      * @param username The username to be sent to the proxy.
      * @param password The password to be sent to the proxy.
      */
