@@ -3,7 +3,6 @@ language: java
 jdk: oraclejdk8
 
 script:
-  - cd eyes.selenium.java
   - export APPLITOOLS_BATCH_ID=`uuidgen -t`
   - echo $APPLITOOLS_BATCH_ID
   - mvn test

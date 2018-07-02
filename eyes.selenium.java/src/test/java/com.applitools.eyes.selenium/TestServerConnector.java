@@ -7,13 +7,12 @@ import org.testng.annotations.Test;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
 
-import java.net.MalformedURLException;
 import java.net.URI;
 
 public class TestServerConnector {
 
     @Test
-    public void TestDelete() throws MalformedURLException {
+    public void TestDelete() {
         Eyes eyes = new Eyes(URI.create("https://localhost.applitools.com"));
         WebDriver webDriver = new ChromeDriver();
         try {

@@ -1,12 +1,17 @@
 <!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd" >
 
-<suite name="Suite1" verbose="1"  parallel="instances">
-    <test name="Test_API">
+<suite name="Suite1" verbose="1" parallel="tests">
+    <test name="Test_WEB" parallel="instances">
         <classes>
             <class name="com.applitools.eyes.selenium.TestClassicApi" />
             <class name="com.applitools.eyes.selenium.TestFluentApi" />
             <class name="com.applitools.eyes.selenium.TestSpecialCases" />
             <class name="com.applitools.eyes.selenium.IOSTest"/>
+        </classes>
+    </test>
+    <test name="Test_Mobile" parallel="methods">
+        <classes>
+            <class name="com.applitools.eyes.selenium.MobileNativeTests"/>
         </classes>
     </test>
 </suite>

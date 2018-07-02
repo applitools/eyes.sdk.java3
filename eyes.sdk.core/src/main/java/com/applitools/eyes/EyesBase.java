@@ -2,6 +2,7 @@ package com.applitools.eyes;
 
 import com.applitools.eyes.capture.AppOutputProvider;
 import com.applitools.eyes.capture.AppOutputWithScreenshot;
+import com.applitools.eyes.config.Configuration;
 import com.applitools.eyes.debug.DebugScreenshotsProvider;
 import com.applitools.eyes.debug.FileDebugScreenshotsProvider;
 import com.applitools.eyes.debug.NullDebugScreenshotProvider;
@@ -60,30 +61,14 @@ public abstract class EyesBase {
     protected Logger logger;
     private boolean isOpen;
     private String agentId;
-    /**
-     * Will be set for separately for each test.
-     */
-    private String currentAppName;
 
-    /**
-     * The default app name if no current name was provided. If this is
-     * {@code null} then there is no default appName.
-     */
-    private String appName;
-
-    private SessionType sessionType;
-    private String testName;
     private ImageMatchSettings defaultMatchSettings;
     private int matchTimeout;
-    private BatchInfo batch;
     private String hostApp;
     private String hostOS;
-    private String baselineEnvName;
-    private String environmentName;
-    private String branchName;
-    private String parentBranchName;
-    private String baselineBranchName;
-    private Boolean saveDiffs;
+
+    protected Configuration config;
+
     private FailureReports failureReports;
     private final Queue<Trigger> userInputs;
     private final List<PropertyData> properties = new ArrayList<>();
@@ -119,6 +104,8 @@ public abstract class EyesBase {
             return;
         }
 
+        ensureConfiguration();
+
         ArgumentGuard.notNull(serverUrl, "serverUrl");
 
         logger = new Logger();
@@ -139,10 +126,13 @@ public abstract class EyesBase {
         // New tests are automatically saved by default.
         saveNewTests = true;
         saveFailedTests = false;
-        saveDiffs = null;
         agentId = null;
         lastScreenshot = null;
         debugScreenshotsProvider = new NullDebugScreenshotProvider();
+    }
+
+    protected void ensureConfiguration() {
+        config = new Configuration();
     }
 
     /**
@@ -287,14 +277,14 @@ public abstract class EyesBase {
      * @param appName The name of the application under test.
      */
     public void setAppName(String appName) {
-        this.appName = appName;
+        this.config.setAppName(appName);
     }
 
     /**
      * @return The name of the application under test.
      */
     public String getAppName() {
-        return currentAppName != null ? currentAppName : appName;
+        return config.getAppName();
     }
 
     /**
@@ -306,14 +296,14 @@ public abstract class EyesBase {
      * @param branchName Branch name or {@code null} to specify the default branch.
      */
     public void setBranchName(String branchName) {
-        this.branchName = branchName;
+        this.config.setBranchName(branchName);
     }
 
     /**
      * @return The current branch (see {@link #setBranchName(String)}).
      */
     public String getBranchName() {
-        return branchName;
+        return config.getBranchName();
     }
 
     /**
@@ -322,7 +312,7 @@ public abstract class EyesBase {
      * @param branchName Branch name or {@code null} to specify the default branch.
      */
     public void setParentBranchName(String branchName) {
-        this.parentBranchName = branchName;
+        this.config.setParentBranchName(branchName);
     }
 
     /**
@@ -330,7 +320,7 @@ public abstract class EyesBase {
      * will be created. (see {@link #setParentBranchName(String)}).
      */
     public String getParentBranchName() {
-        return parentBranchName;
+        return config.getParentBranchName();
     }
 
     /**
@@ -339,7 +329,7 @@ public abstract class EyesBase {
      * @param branchName Branch name or {@code null} to specify the default branch.
      */
     public void setBaselineBranchName(String branchName) {
-        this.baselineBranchName = branchName;
+        this.config.setBaselineBranchName(branchName);
     }
 
     /**
@@ -347,7 +337,7 @@ public abstract class EyesBase {
      * will be created. (see {@link #setBaselineBranchName(String)}).
      */
     public String getBaselineBranchName() {
-        return baselineBranchName;
+        return config.getBaselineBranchName();
     }
 
     /**
@@ -355,7 +345,7 @@ public abstract class EyesBase {
      * @param saveDiffs Sets whether to automatically save differences as baseline.
      */
     public void setSaveDiffs(Boolean saveDiffs) {
-        this.saveDiffs = saveDiffs;
+        this.config.setSaveDiffs(saveDiffs);
     }
 
     /**
@@ -363,7 +353,7 @@ public abstract class EyesBase {
      * @return Whether to automatically save differences as baseline.
      */
     public Boolean getSaveDiffs() {
-        return this.saveDiffs;
+        return this.config.getSaveDiffs();
     }
 
     /**
@@ -458,14 +448,14 @@ public abstract class EyesBase {
 
         logger.verbose("setBatch(" + batch + ")");
 
-        this.batch = batch;
+        this.config.setBatch(batch);
     }
 
     /**
      * @return The currently set batch info.
      */
     public BatchInfo getBatch() {
-        return batch;
+        return config.getBatch();
     }
 
     /**
@@ -746,8 +736,7 @@ public abstract class EyesBase {
             initProviders(true);
 
             if (runningSession == null) {
-                logger.verbose("Server session was not started");
-                logger.log("--- Empty test ended.");
+                logger.log("Server session was not started --- Empty test ended.");
                 return new TestResults();
             }
 
@@ -797,7 +786,6 @@ public abstract class EyesBase {
             // Making sure that we reset the running session even if an
             // exception was thrown during close.
             runningSession = null;
-            currentAppName = null;
             logger.getLogHandler().close();
         }
     }
@@ -877,7 +865,6 @@ public abstract class EyesBase {
             // Making sure that we reset the running session even if an
             // exception was thrown during close.
             runningSession = null;
-            currentAppName = null;
             logger.getLogHandler().close();
         }
     }
@@ -965,14 +952,7 @@ public abstract class EyesBase {
      * @deprecated Only available for backward compatibility. See {@link #setBaselineEnvName(String)}.
      */
     public void setBaselineName(String baselineName) {
-
-        logger.log("Baseline environment name: " + baselineName);
-
-        if (baselineName == null || baselineName.isEmpty()) {
-            this.baselineEnvName = null;
-        } else {
-            this.baselineEnvName = baselineName.trim();
-        }
+        setBaselineEnvName(baselineName);
     }
 
     /**
@@ -981,7 +961,7 @@ public abstract class EyesBase {
      */
     @SuppressWarnings("UnusedDeclaration")
     public String getBaselineName() {
-        return baselineEnvName;
+        return getBaselineEnvName();
     }
 
     /**
@@ -993,9 +973,9 @@ public abstract class EyesBase {
         logger.log("Baseline environment name: " + baselineEnvName);
 
         if (baselineEnvName == null || baselineEnvName.isEmpty()) {
-            this.baselineEnvName = null;
+            this.config.setBaselineEnvName(null);
         } else {
-            this.baselineEnvName = baselineEnvName.trim();
+            this.config.setBaselineEnvName(baselineEnvName.trim());
         }
     }
 
@@ -1004,7 +984,7 @@ public abstract class EyesBase {
      * @return The name of the baseline's environment, or {@code null} if no such name was set.
      */
     public String getBaselineEnvName() {
-        return baselineEnvName;
+        return config.getBaselineEnvName();
     }
 
 
@@ -1017,9 +997,9 @@ public abstract class EyesBase {
         logger.log("Environment name: " + envName);
 
         if (envName == null || envName.isEmpty()) {
-            this.environmentName = null;
+            this.config.setEnvironmentName(null);
         } else {
-            this.environmentName = envName.trim();
+            this.config.setEnvironmentName(envName.trim());
         }
     }
 
@@ -1028,7 +1008,7 @@ public abstract class EyesBase {
      * @return The name of the environment of the baseline, or {@code null} if no such name was set.
      */
     public String getEnvName() {
-        return environmentName;
+        return config.getEnvironmentName();
     }
 
 
@@ -1318,7 +1298,30 @@ public abstract class EyesBase {
      */
     protected void openBase(String appName, String testName,
                             RectangleSize viewportSize, SessionType sessionType) {
+        if (isDisabled) {
+            logger.verbose("Ignored");
+            return;
+        }
 
+        // If there's no default application name, one must be provided for the current test.
+        if (this.config.getAppName() == null) {
+            ArgumentGuard.notNull(appName, "appName");
+            this.config.setAppName(appName);
+        }
+
+        ArgumentGuard.notNull(testName, "testName");
+        this.config.setTestName(testName);
+
+        logger.log("Agent = " + getFullAgentId());
+        logger.verbose(String.format("openBase('%s', '%s', '%s')", appName,
+                testName, viewportSize));
+
+        config.setSessionType(sessionType != null ? sessionType : SessionType.SEQUENTIAL);
+
+        openBase();
+    }
+
+    protected void openBase() {
         logger.getLogHandler().open();
 
         try {
@@ -1326,18 +1329,6 @@ public abstract class EyesBase {
                 logger.verbose("Ignored");
                 return;
             }
-
-            // If there's no default application name, one must be provided
-            // for the current test.
-            if (this.appName == null) {
-                ArgumentGuard.notNull(appName, "appName");
-            }
-
-            ArgumentGuard.notNull(testName, "testName");
-
-            logger.log("Agent = " + getFullAgentId());
-            logger.verbose(String.format("openBase('%s', '%s', '%s')", appName,
-                    testName, viewportSize));
 
             sessionEventHandlers.testStarted(getAUTSessionId());
 
@@ -1351,12 +1342,9 @@ public abstract class EyesBase {
 
             beforeOpen();
 
-            this.currentAppName = appName != null ? appName : this.appName;
-            this.testName = testName;
-            viewportSizeHandler.set(viewportSize);
-            this.sessionType = sessionType != null ? sessionType : SessionType.SEQUENTIAL;
+            viewportSizeHandler.set(config.getViewportSize());
 
-            if (viewportSize != null) {
+            if (config.getViewportSize() != null) {
                 ensureRunningSession();
             }
 
@@ -1614,13 +1602,12 @@ public abstract class EyesBase {
 
         ensureViewportSize();
 
-        BatchInfo testBatch;
-        if (batch == null) {
+        BatchInfo testBatch = config.getBatch();
+        if (testBatch == null) {
             logger.verbose("No batch set");
             testBatch = new BatchInfo(null);
         } else {
-            logger.verbose("Batch is " + batch);
-            testBatch = batch;
+            logger.verbose("Batch is " + testBatch);
         }
 
         sessionEventHandlers.initStarted();
@@ -1631,21 +1618,15 @@ public abstract class EyesBase {
 
         logger.verbose("Application environment is " + appEnv);
 
-        sessionStartInfo = new SessionStartInfo(getBaseAgentId(), sessionType,
-                getAppName(), null, testName, testBatch, baselineEnvName, environmentName, appEnv,
-                defaultMatchSettings,
-                branchName != null ? branchName : System.getenv("APPLITOOLS_BRANCH"),
-                parentBranchName != null ? parentBranchName : System.getenv("APPLITOOLS_PARENT_BRANCH"),
-                baselineBranchName != null ? baselineBranchName : System.getenv("APPLITOOLS_BASELINE_BRANCH"),
-                saveDiffs,
-                properties);
+        sessionStartInfo = new SessionStartInfo(config, getFullAgentId(), null,
+                appEnv, defaultMatchSettings, properties);
 
         logger.verbose("Starting server session...");
         runningSession = serverConnector.startSession(sessionStartInfo);
 
         logger.verbose("Server session ID is " + runningSession.getId());
 
-        String testInfo = "'" + testName + "' of '" + getAppName() + "' " + appEnv;
+        String testInfo = "'" + config.getTestName() + "' of '" + getAppName() + "' " + appEnv;
         if (runningSession.getIsNewSession()) {
             logger.log("--- New test started - " + testInfo);
             shouldMatchWindowRunOnceOnTimeout = true;

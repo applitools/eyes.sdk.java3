@@ -26,6 +26,7 @@ public class TestImagesApi {
         eyes.setLogHandler(logHandler);
 
         eyes.setBatch(batchInfo);
+        eyes.setAgentId("My Custom Agent ID");
 
         String testName = method.getName();
         eyes.open(TEST_SUITE_NAME, testName);

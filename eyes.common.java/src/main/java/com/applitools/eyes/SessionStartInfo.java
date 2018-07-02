@@ -3,6 +3,7 @@
  */
 package com.applitools.eyes;
 
+import com.applitools.eyes.config.Configuration;
 import com.applitools.utils.ArgumentGuard;
 import com.fasterxml.jackson.annotation.JsonRootName;
 
@@ -67,6 +68,34 @@ public class SessionStartInfo {
         this.properties = properties;
     }
 
+
+    public SessionStartInfo(Configuration config,
+                            String agentId,
+                            String verId,
+                            AppEnvironment environment,
+                            ImageMatchSettings defaultMatchSettings,
+                            List<PropertyData> properties) {
+        ArgumentGuard.notNull(config, "config");
+        ArgumentGuard.notNullOrEmpty(agentId, "agentId");
+        ArgumentGuard.notNull(environment, "environment");
+        ArgumentGuard.notNull(defaultMatchSettings, "defaultMatchSettings");
+        this.agentId = agentId;
+        this.sessionType = config.getSessionType();
+        this.appIdOrName = config.getAppName();
+        this.verId = verId;
+        this.scenarioIdOrName = config.getTestName();
+        this.batchInfo = config.getBatch();
+        this.baselineEnvName = config.getBaselineEnvName();
+        this.environmentName = config.getEnvironmentName();
+        this.environment = environment;
+        this.defaultMatchSettings = defaultMatchSettings;
+        this.branchName = config.getBranchName();
+        this.parentBranchName = config.getParentBranchName();
+        this.baselineBranchName = config.getBaselineBranchName();
+        this.saveDiffs = config.getSaveDiffs();
+        this.properties = properties;
+    }
+
     public String getAgentId() {
         return agentId;
     }
@@ -123,5 +152,7 @@ public class SessionStartInfo {
         return defaultMatchSettings;
     }
 
-    public List<PropertyData> getProperties() { return properties; }
+    public List<PropertyData> getProperties() {
+        return properties;
+    }
 }

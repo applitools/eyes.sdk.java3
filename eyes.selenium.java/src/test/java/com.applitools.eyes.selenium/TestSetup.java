@@ -139,6 +139,7 @@ public abstract class TestSetup implements ITest {
         }
 
         eyes.setLogHandler(logHandler);
+        eyes.clearProperties();
         eyes.addProperty("Selenium Session ID", webDriver.getSessionId().toString());
         eyes.addProperty("ForceFPS", forceFPS ? "true" : "false");
         eyes.addProperty("ScaleRatio", "" + eyes.getScaleRatio());
