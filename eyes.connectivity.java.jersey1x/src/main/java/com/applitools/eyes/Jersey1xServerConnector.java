@@ -71,10 +71,14 @@ public class Jersey1xServerConnector extends RestClient
      */
     @SuppressWarnings("UnusedDeclaration")
     public void setProxy(ProxySettings proxySettings) {
-        setProxyBase(proxySettings);
-        // After the server is updated we must make sure the endpoint refers
-        // to the correct path.
-        endPoint = endPoint.path(API_PATH);
+        try {
+            setProxyBase(proxySettings);
+            // After the server is updated we must make sure the endpoint refers
+            // to the correct path.
+            endPoint = endPoint.path(API_PATH);
+        } catch (EyesException proxyError) {
+            logger.log("WARNING: " + proxyError.getMessage());
+        }
     }
 
     /**
@@ -217,6 +221,23 @@ public class Jersey1xServerConnector extends RestClient
         result = parseResponseWithJsonData(response, validStatusCodes,
                 TestResults.class);
         return result;
+    }
+
+    @Override
+    public void deleteSession(TestResults testResults) {
+        ArgumentGuard.notNull(testResults, "testResults");
+
+        WebResource sessionsResources = restClient.resource(serverUrl);
+        WebResource.Builder builder = sessionsResources
+                .path("/api/sessions/batches/")
+                .path(testResults.getBatchId())
+                .path("/")
+                .path(testResults.getId())
+                .queryParam("apiKey", getApiKey())
+                .queryParam("AccessToken", testResults.getSecretToken())
+                .accept(MediaType.APPLICATION_JSON);
+
+        builder.delete();
     }
 
     /**

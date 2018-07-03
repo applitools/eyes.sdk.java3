@@ -3,7 +3,7 @@ package com.applitools.eyes;
 import java.net.URI;
 
 /**
- * Encapsulates creation of a conenctivity provider.
+ * Encapsulates creation of a connectivity provider.
  */
 public class ServerConnectorFactory {
     /***

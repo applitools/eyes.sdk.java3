@@ -4,15 +4,15 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>eyes-images-java3</artifactId>
-    <name>eyes-images-java3</name>
+    <artifactId>eyes-images-java3-jersey1x</artifactId>
+    <name>eyes-images-java3-jersey1x</name>
     <url>http://www.applitools.com</url>
 
     <description>Applitools Eyes SDK Rest API wrapper for Java</description>
 
     <parent>
         <groupId>com.applitools</groupId>
-        <artifactId>eyes-sdk-java3-parent</artifactId>
+        <artifactId>eyes-sdk-java3-parent-jersey1x</artifactId>
         <version>3.35</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
@@ -20,12 +20,12 @@
     <dependencies>
         <dependency>
             <groupId>com.applitools</groupId>
-            <artifactId>eyes-common-java3</artifactId>
+            <artifactId>eyes-common-java3-jersey1x</artifactId>
             <version>3.35</version>
         </dependency>
         <dependency>
             <groupId>com.applitools</groupId>
-            <artifactId>eyes-sdk-core-java3</artifactId>
+            <artifactId>eyes-sdk-core-java3-jersey1x</artifactId>
             <version>3.35</version>
         </dependency>
     </dependencies>
