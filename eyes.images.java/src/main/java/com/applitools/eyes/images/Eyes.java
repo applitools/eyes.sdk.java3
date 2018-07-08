@@ -371,7 +371,7 @@ public class Eyes extends EyesBase {
         }
 
         // Set the screenshot to be verified.
-        screenshot = new EyesImagesScreenshot(image);
+        screenshot = new EyesImagesScreenshot(logger, image);
 
         return checkImage_(regionProvider, tag, ignoreMismatch, checkSettings);
     }

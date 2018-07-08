@@ -12,7 +12,7 @@ public class RegionPositionCompensationFactory {
             if (userAgent.getBrowser().equals(BrowserNames.Firefox)) {
                 try {
                     if (Integer.parseInt(userAgent.getBrowserMajorVersion()) >= 48) {
-                        return new FirefoxRegionPositionCompensation(eyes, logger);
+                        return new FirefoxRegionPositionCompensation(eyes, userAgent, logger);
                     }
                 } catch (NumberFormatException e) {
                     return new NullRegionPositionCompensation();

@@ -14,8 +14,10 @@ import org.testng.annotations.Test;
 
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Calendar;
 import java.util.concurrent.TimeUnit;
 
 public class IOSTest {
@@ -35,7 +37,7 @@ public class IOSTest {
         Object[][] iPhoneXPermutations = TestUtils.generatePermutations(
                 Arrays.asList(new Object[]{"iPhone X Simulator"}), // device
                 Arrays.asList(new Object[]{"portrait", "landscape"}), // orientation
-                Arrays.asList(new Object[]{"11.0"}), // OS Version
+                Arrays.asList(new Object[]{"11.2"}), // OS Version
                 Arrays.asList(new Object[]{false, true}) // fully
         );
 
@@ -46,9 +48,45 @@ public class IOSTest {
                 Arrays.asList(new Object[]{false, true}) // fully
         );
 
+        Object[][] iPhone5Permutations = TestUtils.generatePermutations(
+                Arrays.asList(new Object[]{"iPhone 5s Simulator"}), // device
+                Arrays.asList(new Object[]{"portrait", "landscape"}), // orientation
+                Arrays.asList(new Object[]{"10.0"}), // OS Version
+                Arrays.asList(new Object[]{false, true}) // fully
+        );
+
+        Object[][] iPadPermutations = TestUtils.generatePermutations(
+                Arrays.asList(new Object[]{
+                        "iPad Simulator",
+                        "iPad Pro (9.7 inch) Simulator",
+                        "iPad Pro (12.9 inch) Simulator",
+                        "iPad Pro (12.9 inch) (2nd generation) Simulator",
+                        "iPad Pro (10.5 inch) Simulator",
+                        "iPad (5th generation) Simulator",
+                        "iPad Air Simulator",
+                        "iPad Air 2 Simulator"}), // device
+                Arrays.asList(new Object[]{"portrait", "landscape"}), // orientation
+                Arrays.asList(new Object[]{"11.0"}), // OS Version
+                Arrays.asList(new Object[]{false, true}) // fully
+        );
+
+        Object[][] iPadLegacyPermutations = TestUtils.generatePermutations(
+                Arrays.asList(new Object[]{
+                        "iPad Simulator",
+                        "iPad Pro (9.7 inch) Simulator",
+                        "iPad Air Simulator",
+                        "iPad Air 2 Simulator"}), // device
+                Arrays.asList(new Object[]{"portrait", "landscape"}), // orientation
+                Arrays.asList(new Object[]{"10.0"}), // OS Version
+                Arrays.asList(new Object[]{false, true}) // fully
+        );
+
         ArrayList<Object[]> returnValue = new ArrayList<>();
         returnValue.addAll(Arrays.asList(iPhoneXPermutations));
         returnValue.addAll(Arrays.asList(iPhonePermutations));
+        returnValue.addAll(Arrays.asList(iPhone5Permutations));
+        returnValue.addAll(Arrays.asList(iPadPermutations));
+        returnValue.addAll(Arrays.asList(iPadLegacyPermutations));
 
         return returnValue.toArray(new Object[0][]);
     }
@@ -72,10 +110,11 @@ public class IOSTest {
         caps.setCapability("username", System.getenv("SAUCE_USERNAME"));
         caps.setCapability("accesskey", System.getenv("SAUCE_ACCESS_KEY"));
 
+        caps.setCapability("name", deviceName + " " + platformVersion + " " + deviceOrientation);
+
         String sauceUrl = "http://ondemand.saucelabs.com/wd/hub";
         WebDriver driver = new RemoteWebDriver(new URL(sauceUrl), caps);
         driver.manage().timeouts().implicitlyWait(3, TimeUnit.SECONDS);
-        eyes.setLogHandler(new StdoutLogHandler(true));
 
         String testName = String.format("%s %s %s", deviceName, platformVersion, deviceOrientation);
         if (fully) {
@@ -83,13 +122,12 @@ public class IOSTest {
         }
 
         if (System.getenv("CI") == null) {
-            //String logFilename = String.format("c:\\temp\\logs\\iostest_%s.log", testName);
-            //eyes.setLogHandler(new FileLogger(logFilename, false, true));
-            //eyes.setImageCut(new FixedCutProvider(30, 12, 8, 5));
-            //eyes.setForceFullPageScreenshot(true);
-            //eyes.setSaveDebugScreenshots(true);
-            //eyes.setDebugScreenshotsPath("C:\\temp\\logs");
-            //eyes.setDebugScreenshotsPrefix("iostest_" + testName);
+            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy_MM_dd HH_mm_ss_SSS");
+            String logPath = String.format("c:\\temp\\logs\\java\\IOSTest %s %s", testName, dateFormat.format(Calendar.getInstance().getTime()));
+            String logFilename = logPath + "\\log.log";
+            eyes.setLogHandler(new FileLogger(logFilename, false, true));
+            eyes.setSaveDebugScreenshots(true);
+            eyes.setDebugScreenshotsPath(logPath);
         } else {
             eyes.setLogHandler(new StdoutLogHandler(true));
         }

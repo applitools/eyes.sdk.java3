@@ -8,6 +8,7 @@ import com.applitools.eyes.capture.ImageProvider;
 import com.applitools.eyes.selenium.Eyes;
 import com.applitools.eyes.selenium.frames.Frame;
 import com.applitools.eyes.selenium.frames.FrameChain;
+import com.applitools.eyes.selenium.wrappers.EyesTargetLocator;
 import com.applitools.eyes.selenium.wrappers.EyesWebDriver;
 import com.applitools.utils.ImageUtils;
 import org.openqa.selenium.OutputType;
@@ -35,43 +36,21 @@ public class FirefoxScreenshotImageProvider implements ImageProvider {
 
     @Override
     public BufferedImage getImage() {
-        logger.verbose("Getting screenshot as base64...");
+        EyesWebDriver eyesWebDriver = (EyesWebDriver) eyes.getDriver();
+        FrameChain frameChain = eyesWebDriver.getFrameChain().clone();
+        logger.verbose("frameChain size: " + frameChain.size());
+        logger.verbose("Switching temporarily to default content.");
+        eyesWebDriver.switchTo().defaultContent();
+
+        logger.verbose("Getting screenshot as base64.");
         String screenshot64 = tsInstance.getScreenshotAs(OutputType.BASE64);
         logger.verbose("Done getting base64! Creating BufferedImage...");
+
         BufferedImage image = ImageUtils.imageFromBase64(screenshot64);
+        eyes.getDebugScreenshotsProvider().save(image, "FIREFOX");
 
-        eyes.getDebugScreenshotsProvider().save(image, "FIREFOX_FRAME");
-
-        EyesWebDriver eyesWebDriver = (EyesWebDriver) eyes.getDriver();
-        FrameChain frameChain = eyesWebDriver.getFrameChain();
-        if (frameChain.size() > 0) {
-
-            //Frame frame = frameChain.peek();
-            //Region region = eyes.getRegionToCheck();
-
-            EyesWebDriverScreenshot screenshot = new EyesWebDriverScreenshot(logger, eyesWebDriver, image);
-
-            Location loc = screenshot.getFrameWindow().getLocation();
-            logger.verbose("frame.getLocation(): " + loc);
-
-            double scaleRatio = eyes.getDevicePixelRatio();
-            RectangleSize viewportSize = eyes.getViewportSize();
-            viewportSize = viewportSize.scale(scaleRatio);
-            loc = loc.scale(scaleRatio);
-
-            BufferedImage fullImage;
-            fullImage = new BufferedImage(
-                    viewportSize.getWidth(),
-                    viewportSize.getHeight(),
-                    image.getType());
-
-            fullImage.getRaster().setRect(
-                    loc.getX(),
-                    loc.getY(),
-                    image.getData());
-
-            return fullImage;
-        }
+        logger.verbose("Done. Switching back to original frame.");
+        ((EyesTargetLocator)eyesWebDriver.switchTo()).frames(frameChain);
 
         return image;
     }

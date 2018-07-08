@@ -11,11 +11,14 @@ import java.awt.image.BufferedImage;
  * Base class for handling screenshots.
  */
 public abstract class EyesScreenshot {
-    protected BufferedImage image;
+    protected final BufferedImage image;
+    protected final Logger logger;
 
-    public EyesScreenshot(BufferedImage image) {
+    public EyesScreenshot(Logger logger, BufferedImage image) {
+        ArgumentGuard.notNull(logger, "logger");
         ArgumentGuard.notNull(image, "image");
         this.image = image;
+        this.logger = logger;
     }
 
     /**
@@ -89,7 +92,10 @@ public abstract class EyesScreenshot {
         ArgumentGuard.notNull(from, "from");
         ArgumentGuard.notNull(to, "to");
 
-        Location updatedLocation = convertLocation(region.getLocation(), from, to);
+        Location originalLocation = region.getLocation();
+        logger.verbose("original location: " + originalLocation);
+        Location updatedLocation = convertLocation(originalLocation, from, to);
+        logger.verbose("updated location: " + updatedLocation);
 
         return new Region(updatedLocation, region.getSize());
     }

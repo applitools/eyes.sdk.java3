@@ -217,5 +217,8 @@ public class UserAgent {
         return OSMinorVersion;
     }
 
-
+    @Override
+    public String toString() {
+        return String.format("%s %s.%s / %s %s.%s", OS, OSMajorVersion, OSMinorVersion, Browser, BrowserMajorVersion, BrowserMinorVersion);
+    }
 }

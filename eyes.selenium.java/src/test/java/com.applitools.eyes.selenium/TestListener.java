@@ -72,6 +72,13 @@ public class TestListener implements ITestListener {
         try {
             if (eyes.getIsOpen()) {
                 TestResults results = eyes.close();
+                if (eyes.getIsDisabled()){
+                    eyes.getLogger().log("eyes is disabled.");
+                    return;
+                } else if (results == null) {
+                    eyes.getLogger().verbose("no results returned from eyes.close()");
+                    return;
+                }
                 String apiSessionUrl = results.getApiUrls().getSession();
                 URI apiSessionUri = UriBuilder.fromUri(apiSessionUrl)
                         .queryParam("format", "json")

@@ -23,21 +23,21 @@ public class EyesImagesScreenshot extends EyesScreenshot {
      * @param location The top/left coordinates of the screenshot in context
      *                 relative coordinates type.
      */
-    public EyesImagesScreenshot(BufferedImage image, Location location) {
-        super(image);
+    public EyesImagesScreenshot(Logger logger, BufferedImage image, Location location) {
+        super(logger, image);
         ArgumentGuard.notNull(location, "location");
         this.bounds = new Region(location,
                 new RectangleSize(image.getWidth(), image.getHeight()));
     }
 
     /**
-     * See {@link #EyesImagesScreenshot(BufferedImage, Location)}.
+     * See {@link #EyesImagesScreenshot(Logger, BufferedImage, Location)}.
      * {@code location} defaults to {@code (0, 0)}.
      *
      * @param image The screenshot image.
      */
-    public EyesImagesScreenshot(BufferedImage image) {
-        this(image, new Location(0, 0));
+    public EyesImagesScreenshot(Logger logger, BufferedImage image) {
+        this(logger, image, new Location(0, 0));
     }
 
     /**
@@ -70,7 +70,7 @@ public class EyesImagesScreenshot extends EyesScreenshot {
                         CoordinatesType.SCREENSHOT_AS_IS,
                         CoordinatesType.CONTEXT_RELATIVE);
 
-        return new EyesImagesScreenshot(subScreenshotImage,
+        return new EyesImagesScreenshot(logger, subScreenshotImage,
                 relativeSubScreenshotRegion.getLocation());
     }
 
