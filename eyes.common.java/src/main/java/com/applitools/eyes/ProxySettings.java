@@ -12,18 +12,37 @@ public class ProxySettings {
     private String uri;
     private String username;
     private String password;
+    private int port;
 
     /**
-     *
-     * @param uri The proxy's URI.
+     * @param uri      The proxy's URI.
+     * @param port     The proxy's port
+     * @param username The username to be sent to the proxy.
+     * @param password The password to be sent to the proxy.
+     */
+    public ProxySettings(String uri, int port, String username, String password) {
+        ArgumentGuard.notNull(uri, "uri");
+        this.uri = uri;
+        this.port = port;
+        this.username = username;
+        this.password = password;
+    }
+
+    /**
+     * @param uri      The proxy's URI.
+     * @param port     The proxy's port
+     */
+    public ProxySettings(String uri, int port) {
+        this(uri, port, null, null);
+    }
+
+    /**
+     * @param uri      The proxy's URI.
      * @param username The username to be sent to the proxy.
      * @param password The password to be sent to the proxy.
      */
     public ProxySettings(String uri, String username, String password) {
-        ArgumentGuard.notNull(uri, "uri");
-        this.uri = uri;
-        this.username = username;
-        this.password = password;
+        this(uri, 8888, username, password);
     }
 
     /**
@@ -32,7 +51,7 @@ public class ProxySettings {
      */
     @SuppressWarnings("UnusedDeclaration")
     public ProxySettings(String uri) {
-        this(uri, null, null);
+        this(uri, 8888, null, null);
     }
 
     public String getUri() {
@@ -45,5 +64,9 @@ public class ProxySettings {
 
     public String getPassword() {
         return password;
+    }
+
+    public int getPort() {
+        return port;
     }
 }

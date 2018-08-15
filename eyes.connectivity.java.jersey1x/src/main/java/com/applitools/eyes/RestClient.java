@@ -8,6 +8,7 @@ import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.client.WebResource;
 import com.sun.jersey.api.client.config.ClientConfig;
 import com.sun.jersey.api.client.config.DefaultClientConfig;
+import com.sun.jersey.client.urlconnection.URLConnectionClientHandler;
 
 import java.io.IOException;
 import java.net.URI;
@@ -26,6 +27,8 @@ public class RestClient {
         ClientResponse call();
     }
 
+    public static final int DEFAULT_APPLITOOLS_TIMEOUT = 1000 * 60 * 5; // ms
+
     private ProxySettings proxySettings;
     private int timeout; // seconds
 
@@ -42,16 +45,21 @@ public class RestClient {
      * @param timeout Connect/Read timeout in milliseconds. 0 equals infinity.
      * @param proxySettings (optional) Setting for communicating via proxy.
      */
-    private static Client buildRestClient(int timeout,
+    public static Client buildRestClient(int timeout,
                                           ProxySettings proxySettings) {
+
         // Creating the client configuration
         ClientConfig cc = new DefaultClientConfig();
         cc.getProperties().put(ClientConfig.PROPERTY_CONNECT_TIMEOUT, timeout);
         cc.getProperties().put(ClientConfig.PROPERTY_READ_TIMEOUT, timeout);
 
-        // We ignore the proxy settings
-
-        return Client.create(cc);
+        if (proxySettings != null) {
+            URLConnectionClientHandler ch = new URLConnectionClientHandler(new ConnectionFactory(proxySettings));
+            return new Client(ch, cc);
+        } else {
+            // We ignore the proxy settings
+            return Client.create(cc);
+        }
     }
 
     /***
@@ -82,7 +90,7 @@ public class RestClient {
      * @param serverUrl The URI of the rest server.
      */
     public RestClient(Logger logger, URI serverUrl) {
-        this(logger, serverUrl, 1000*60*5);
+        this(logger, serverUrl, DEFAULT_APPLITOOLS_TIMEOUT);
     }
 
 
@@ -93,12 +101,10 @@ public class RestClient {
      */
     @SuppressWarnings("UnusedDeclaration")
     public void setProxyBase(ProxySettings proxySettings) {
-        throw new EyesException(
-                "Proxy not implemented in this version!");
-//        this.proxySettings = proxySettings;
-//
-//        restClient = buildRestClient(timeout, proxySettings);
-//        endPoint = restClient.resource(serverUrl);
+        this.proxySettings = proxySettings;
+
+        restClient = buildRestClient(timeout, proxySettings);
+        endPoint = restClient.resource(serverUrl);
     }
 
     /**
@@ -238,7 +244,7 @@ public class RestClient {
         T resultObject;
         int statusCode = response.getStatus();
         String statusPhrase =
-                response.getClientResponseStatus().getReasonPhrase();
+                ClientResponse.Status.fromStatusCode(response.getStatus()).getReasonPhrase();
         String data = response.getEntity(String.class);
         response.close();
         // Validate the status code.

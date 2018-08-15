@@ -2,19 +2,19 @@ package com.applitools.eyes.selenium;
 
 import com.applitools.eyes.FloatingMatchSettings;
 import com.applitools.eyes.Region;
+import com.applitools.eyes.RestClient;
 import com.applitools.eyes.TestResults;
 import com.applitools.eyes.metadata.ActualAppOutput;
 import com.applitools.eyes.metadata.ImageMatchSettings;
 import com.applitools.eyes.metadata.SessionResults;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.sun.jersey.api.client.Client;
 import org.testng.Assert;
 import org.testng.ITestContext;
 import org.testng.ITestListener;
 import org.testng.ITestResult;
 
-import javax.ws.rs.client.Client;
-import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.UriBuilder;
 import java.lang.reflect.Method;
@@ -79,9 +79,9 @@ public class TestListener implements ITestListener {
                         .queryParam("apiKey", eyes.getApiKey())
                         .build();
 
-                Client client = ClientBuilder.newClient();
-                String srStr = client.target(apiSessionUri)
-                        .request(MediaType.APPLICATION_JSON)
+                // FIXME: 02/07/2018 Replace with an abstraction compatible with Jersery2x to avoid merge problems.
+                Client client = RestClient.buildRestClient(RestClient.DEFAULT_APPLITOOLS_TIMEOUT, null);
+                String srStr = client.resource(apiSessionUri).accept(MediaType.APPLICATION_JSON)
                         .get(String.class);
 
                 ObjectMapper jsonMapper = new ObjectMapper();
