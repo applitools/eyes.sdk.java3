@@ -41,13 +41,13 @@ public class SendTestResultsListener implements ISuiteListener {
         Map<String, ISuiteResult> suiteResultMap = iSuite.getResults();
         Iterator<ISuiteResult> suiteResultIterator = suiteResultMap.values().iterator();
         while (suiteResultIterator.hasNext()) {
-            ISuiteResult suiteResult = suiteResultIterator.next();
-            allTestResults.addAll(suiteResult.getTestContext().getPassedTests().getAllResults());
-            allTestResults.addAll(suiteResult.getTestContext().getFailedButWithinSuccessPercentageTests().getAllResults());
-            allTestResults.addAll(suiteResult.getTestContext().getFailedConfigurations().getAllResults());
-            allTestResults.addAll(suiteResult.getTestContext().getFailedTests().getAllResults());
-            allTestResults.addAll(suiteResult.getTestContext().getSkippedConfigurations().getAllResults());
-            allTestResults.addAll(suiteResult.getTestContext().getSkippedTests().getAllResults());
+            ITestContext testContext = suiteResultIterator.next().getTestContext();
+            allTestResults.addAll(testContext.getPassedTests().getAllResults());
+            allTestResults.addAll(testContext.getFailedButWithinSuccessPercentageTests().getAllResults());
+            allTestResults.addAll(testContext.getFailedConfigurations().getAllResults());
+            allTestResults.addAll(testContext.getFailedTests().getAllResults());
+            allTestResults.addAll(testContext.getSkippedConfigurations().getAllResults());
+            allTestResults.addAll(testContext.getSkippedTests().getAllResults());
         }
     }
 
