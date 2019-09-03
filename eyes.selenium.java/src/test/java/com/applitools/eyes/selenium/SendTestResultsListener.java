@@ -36,7 +36,7 @@ public class SendTestResultsListener implements ISuiteListener {
         }
     }
 
-    public void collectTestResultsIntoSet(ISuite iSuite){
+    private void collectTestResultsIntoSet(ISuite iSuite){
         Map<String, ISuiteResult> suiteResultMap = iSuite.getResults();
         Iterator<ISuiteResult> suiteResultIterator = suiteResultMap.values().iterator();
         while (suiteResultIterator.hasNext()) {
@@ -50,7 +50,7 @@ public class SendTestResultsListener implements ISuiteListener {
         }
     }
 
-    public JsonObject getResultJsonAsString(){
+    private JsonObject getResultJsonAsString(){
         Iterator<ITestResult> resultsIterator = allTestResults.iterator();
         JsonObject finalJsonObject = new JsonObject();
         JsonObject innerResultsJsonObject = new JsonObject();
@@ -65,7 +65,7 @@ public class SendTestResultsListener implements ISuiteListener {
         return finalJsonObject;
     }
 
-    public static Retrofit getClient(String baseUrl) {
+    private static Retrofit getClient(String baseUrl) {
         if (retrofit==null) {
             retrofit = new Retrofit.Builder()
                     .baseUrl(baseUrl)
