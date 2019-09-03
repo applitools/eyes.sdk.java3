@@ -34,7 +34,6 @@ public class SendTestResultsListener implements ISuiteListener {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        System.out.println();
     }
 
     public void collectTestResultsIntoSet(ISuite iSuite){
