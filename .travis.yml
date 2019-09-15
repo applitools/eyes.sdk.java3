@@ -10,7 +10,7 @@ addons:
 before_script:
   - latestChromeDriverURL=$(wget http://chromedriver.storage.googleapis.com/LATEST_RELEASE -q -O -)
   - wget http://chromedriver.storage.googleapis.com/${latestChromeDriverURL}/chromedriver_linux64.zip
-  - unzip chromedriver_linux64.zip -d 1/home/travis/build/
+  - unzip chromedriver_linux64.zip -d /home/travis/build/
   - env webdriver.chrome.driver=/home/travis/build/
 
 script:
