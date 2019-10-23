@@ -1,7 +1,7 @@
 package com.applitools.eyes.selenium;
 
 import com.applitools.eyes.TestResults;
-import org.openqa.selenium.WebDriver;
+import com.applitools.eyes.utils.SeleniumUtils;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.testng.annotations.*;
 
@@ -15,7 +15,8 @@ public class TestSeleniumEyesWithNullRunner {
     @BeforeClass
     public void beforeClass(){
         eyes = new Eyes(null);
-        driver = new ChromeDriver();
+        eyes.setBatch(TestDataProvider.batchInfo);
+        driver = SeleniumUtils.createChromeDriver();
         driver.get(testedPageUrl);
     }
     @BeforeMethod
@@ -27,20 +28,18 @@ public class TestSeleniumEyesWithNullRunner {
     @Test
     public void testCloseTrue(){
         close = eyes.close(true);
-
     }
 
     @Test
     public void testCloseFalse(){
         close = eyes.close(false);
-
     }
 
     @Test
     public void testClose(){
         close = eyes.close();
-
     }
+
     @AfterMethod
     public void afterMethod(){
         System.out.println(close);

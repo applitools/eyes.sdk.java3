@@ -13,34 +13,31 @@ import org.testng.annotations.Test;
 @SuppressWarnings("SpellCheckingInspection")
 public class TestAcme extends TestSetup {
 
-    @Factory(dataProvider = "dp", dataProviderClass = TestsDataProvider.class)
-    public TestAcme(Capabilities caps, String platform) {
-        super.caps = caps;
-        super.platform = platform;
-
-        testSuitName = "Test Acme";
-        testedPageUrl = "file:///C:/temp/fluentexample/Account%20-%20ACME.html";
-        testedPageSize = new RectangleSize(1024, 768);
+    @Factory(dataProvider = "dp", dataProviderClass = TestDataProvider.class)
+    public TestAcme(Capabilities caps, String mode) {
+        super("Eyes Selenium SDK - Test Acme", caps, mode);
+        testedPageSize = new RectangleSize(1024,768);
     }
 
-    @Test
-    public void Test(){
-        getEyes().check("main window with table",
-                Target.window()
-                        .fully()
-                        .ignore(By.className("toolbar"))
-                        .layout(By.id("orders-list-desktop"), By.className("snapshot-topic"), By.id("results-count"))
-                        .strict()
-        );
-    }
+//    @Test
+//    public void Test(){
+//        getDriver().get("file:///C:/temp/fluentexample/Account%20-%20ACME.html");
+//        getEyes().check("main window with table",
+//                Target.window()
+//                        .fully()
+//                        .ignore(By.className("toolbar"))
+//                        .layout(By.id("orders-list-desktop"), By.className("snapshot-topic"), By.id("results-count"))
+//                        .strict()
+//        );
+//    }
 
     @Test
     public void TestAcmeLogin() {
-        driver.get("https://afternoon-savannah-68940.herokuapp.com/#");
-        WebElement username = driver.findElement(By.id("username"));
+        getDriver().get("https://afternoon-savannah-68940.herokuapp.com/#");
+        WebElement username = getDriver().findElement(By.id("username"));
         username.click();
         username.sendKeys("adamC");
-        WebElement password = driver.findElement(By.id("password"));
+        WebElement password = getDriver().findElement(By.id("password"));
         username.click();
         password.sendKeys("MySecret123?");
         (getEyes()).check(

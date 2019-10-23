@@ -5,8 +5,9 @@ import com.applitools.eyes.ProxySettings;
 import com.applitools.eyes.RectangleSize;
 import com.applitools.eyes.StdoutLogHandler;
 import com.applitools.eyes.selenium.fluent.Target;
+import com.applitools.eyes.utils.SeleniumUtils;
+import com.applitools.eyes.utils.TestUtils;
 import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.chrome.ChromeDriver;
 import org.testng.annotations.Test;
 
 public class TestIgnoreDisplacements {
@@ -15,7 +16,7 @@ public class TestIgnoreDisplacements {
     public void test(){
 
         // Open a Chrome browser.
-        WebDriver driver = new ChromeDriver();
+        WebDriver driver = SeleniumUtils.createChromeDriver();
 
         // Initialize the VisualGridEyes SDK and set your private API key.
         Eyes eyes = new Eyes();
@@ -26,7 +27,7 @@ public class TestIgnoreDisplacements {
 
         eyes.setConfiguration(configuration);
 
-        eyes.setLogHandler(new StdoutLogHandler(true));
+        eyes.setLogHandler(new StdoutLogHandler(TestUtils.verboseLogs));
         // Navigate the browser to the "hello world!" web-site.
         driver.get("https://applitools.com/helloworld");
 

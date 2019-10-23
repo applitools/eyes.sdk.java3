@@ -1,7 +1,9 @@
 package com.applitools.eyes.selenium;
 
-import com.applitools.eyes.*;
-import com.applitools.eyes.selenium.fluent.Target;
+import com.applitools.eyes.BatchInfo;
+import com.applitools.eyes.EyesRunner;
+import com.applitools.eyes.FileLogger;
+import com.applitools.eyes.RectangleSize;
 import com.applitools.eyes.utils.CommUtils;
 import com.applitools.eyes.utils.SeleniumUtils;
 import org.openqa.selenium.WebDriver;

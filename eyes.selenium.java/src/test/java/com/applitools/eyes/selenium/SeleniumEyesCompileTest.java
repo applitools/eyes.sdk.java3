@@ -4,10 +4,11 @@ import com.applitools.eyes.*;
 import com.applitools.eyes.selenium.fluent.SeleniumCheckSettings;
 import com.applitools.eyes.selenium.positioning.ImageRotation;
 import com.applitools.eyes.triggers.MouseAction;
+import com.applitools.eyes.utils.SeleniumUtils;
+import com.applitools.eyes.utils.TestUtils;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
-import org.openqa.selenium.chrome.ChromeDriver;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Listeners;
 import org.testng.annotations.Test;
@@ -18,7 +19,6 @@ public class SeleniumEyesCompileTest {
     private Region region = new Region(10, 10, 10, 10);
     private WebElement webElement = null;
     private String tag = "tag";
-    ;
     private By selector = null;
     private String[] strs = new String[1];
     private MouseAction action = null;
@@ -42,7 +42,7 @@ public class SeleniumEyesCompileTest {
 //        remoteSessionEventHandler.setThrowExceptions(false);
 //        eyes.addSessionEventHandler(remoteSessionEventHandler);
 
-        LogHandler logHandler = new StdoutLogHandler(false);
+        LogHandler logHandler = new StdoutLogHandler(TestUtils.verboseLogs);
 
         eyes.setLogHandler(logHandler);
         eyes.setStitchMode(StitchMode.CSS);
@@ -53,7 +53,7 @@ public class SeleniumEyesCompileTest {
 
         eyes.setIsDisabled(true);
 
-        WebDriver webDriver = new ChromeDriver();
+        WebDriver webDriver = SeleniumUtils.createChromeDriver();
 
         eyes.setConfiguration( new Configuration(new RectangleSize(100, 100)));
         driver = eyes.open(webDriver);
@@ -478,11 +478,6 @@ public class SeleniumEyesCompileTest {
     @Test
     public void testGetDriver() {
         eyes.getDriver();
-    }
-
-    @Test
-    public void testGetOriginalFC() {
-        eyes.getOriginalFC();
     }
 
     @Test

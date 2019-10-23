@@ -2,9 +2,7 @@ package com.applitools.eyes.selenium;
 
 import com.applitools.eyes.FixedCutProvider;
 import com.applitools.eyes.StdoutLogHandler;
-import java.awt.AWTException;
-import java.net.MalformedURLException;
-import java.net.URL;
+import com.applitools.eyes.utils.TestUtils;
 import org.openqa.selenium.By;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebDriver;
@@ -12,15 +10,18 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.remote.RemoteWebDriver;
 
+import java.awt.*;
+import java.net.MalformedURLException;
+import java.net.URL;
+
+import static com.applitools.eyes.selenium.TestDataProvider.*;
+
 /**
  *
  * @author mohamedabdulkadar.m
  */
 public class FinalApplication_Android {
-    public static final String USERNAME =  System.getenv("SAUCE_USERNAME");
-    public static final String ACCESS_KEY = System.getenv("SAUCE_ACCESS_KEY");
     static WebDriver driver;
-    public static final String URL = "http://" + USERNAME + ":" + ACCESS_KEY + "@ondemand.saucelabs.com:80/wd/hub";
     static WebElement wb;
     static long start = System.currentTimeMillis();
     static long stop;
@@ -46,7 +47,10 @@ public class FinalApplication_Android {
         caps.setCapability("browserName", "Browser");
         caps.setCapability("platformVersion", "4.4");
         caps.setCapability("platformName", "Android");
-        driver = new RemoteWebDriver(new URL(URL), caps);
+        caps.setCapability("username", SAUCE_USERNAME);
+        caps.setCapability("accessKey", SAUCE_ACCESS_KEY);
+
+        driver = new RemoteWebDriver(new URL(SAUCE_SELENIUM_URL), caps);
         System.out.println("caps finished");
         function();
     }
@@ -55,7 +59,7 @@ public class FinalApplication_Android {
         eyes.setSaveNewTests(false);
         eyes.setForceFullPageScreenshot(true);
         eyes.setImageCut(new FixedCutProvider(URL_BAR_SIZE, NAVIGATION_BAR_SIZE, 0, 0));
-        eyes.setLogHandler(new StdoutLogHandler(true));
+        eyes.setLogHandler(new StdoutLogHandler(TestUtils.verboseLogs));
 
         driver = eyes.open(driver, "sample2", "titleicon5");
         try {

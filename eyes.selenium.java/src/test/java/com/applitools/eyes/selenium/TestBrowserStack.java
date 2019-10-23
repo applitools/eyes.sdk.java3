@@ -13,9 +13,7 @@ import org.testng.annotations.Test;
 import java.net.MalformedURLException;
 import java.net.URL;
 
-import static com.applitools.eyes.selenium.TestsDataProvider.BROWSERSTACK_ACCESS_KEY;
-import static com.applitools.eyes.selenium.TestsDataProvider.BROWSERSTACK_SELENIUM_URL;
-import static com.applitools.eyes.selenium.TestsDataProvider.BROWSERSTACK_USERNAME;
+import static com.applitools.eyes.selenium.TestDataProvider.*;
 
 public class TestBrowserStack {
 
@@ -44,7 +42,7 @@ public class TestBrowserStack {
             driver = new RemoteWebDriver(new URL(BROWSERSTACK_SELENIUM_URL), caps);
             driver.get("https://applitools.github.io/demo/TestPages/FramesTestPage/");
             eyes.setStitchMode(stitchMode);
-            eyes.setBatch(TestsDataProvider.batchInfo);
+            eyes.setBatch(TestDataProvider.batchInfo);
             eyes.open(driver, "TestBrowserStack", "TesIE11_" + stitchMode, new RectangleSize(800, 600));
             eyes.check("viewport", Target.window().fully(false).sendDom(false));
             eyes.check("full page", Target.window().fully(true).sendDom(false));

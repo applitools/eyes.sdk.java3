@@ -3,14 +3,14 @@ package com.applitools.eyes.demo;
 import com.applitools.ICheckSettings;
 import com.applitools.eyes.BatchInfo;
 import com.applitools.eyes.StdoutLogHandler;
-import com.applitools.eyes.config.IConfigurationSetter;
 import com.applitools.eyes.selenium.BrowserType;
 import com.applitools.eyes.selenium.Configuration;
 import com.applitools.eyes.selenium.Eyes;
 import com.applitools.eyes.selenium.fluent.Target;
+import com.applitools.eyes.utils.SeleniumUtils;
+import com.applitools.eyes.utils.TestUtils;
 import com.applitools.eyes.visualgrid.services.VisualGridRunner;
 import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.chrome.ChromeDriver;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeClass;
@@ -24,13 +24,13 @@ public class TestSuite {
     private VisualGridRunner visualGridManager;
 
     public TestSuite() {
-        this.webDriver = new ChromeDriver();
+        this.webDriver = SeleniumUtils.createChromeDriver();
     }
 
     @BeforeClass
     public void before_VisualGrid() {
         visualGridManager = new VisualGridRunner(4);
-        visualGridManager.setLogHandler(new StdoutLogHandler(true));
+        visualGridManager.setLogHandler(new StdoutLogHandler(TestUtils.verboseLogs));
 
         visualGridManager.setServerUrl("https://fabricdemoeyes.applitools.com/");
         visualGridManager.setApiKey(System.getenv("FABRICAM_DEMO_EYES_API_KEY"));
@@ -55,7 +55,7 @@ public class TestSuite {
         this.checkSettings = Target.window();
     }
 
-    private void initConfig(IConfigurationSetter configuration) {
+    private void initConfig(Configuration configuration) {
         configuration.setAppName("Applitools Java3 Demo");
     }
 

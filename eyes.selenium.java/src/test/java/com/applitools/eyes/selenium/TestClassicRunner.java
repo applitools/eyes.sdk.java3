@@ -2,11 +2,10 @@ package com.applitools.eyes.selenium;
 
 import com.applitools.eyes.*;
 import com.applitools.eyes.selenium.fluent.Target;
-import com.applitools.eyes.TestResultsSummary;
+import com.applitools.eyes.utils.SeleniumUtils;
 import com.applitools.eyes.visualgrid.services.VisualGridRunner;
 import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.chrome.ChromeDriver;
-import org.openqa.selenium.chrome.ChromeOptions;
+import org.testng.Assert;
 import org.testng.annotations.Test;
 
 public final class TestClassicRunner {
@@ -19,16 +18,30 @@ public final class TestClassicRunner {
         eyesTest(VGRunner);
 
     }
+    @Test
+    public void testClassicRunnerThrowException(){
+        WebDriver driver = SeleniumUtils.createChromeDriver();
+        final EyesRunner runner = new ClassicRunner();
+        Eyes eyes = new Eyes(runner);
+        driver.get("http://applitools.github.io/demo/TestPages/VisualGridTestPage/index.html");
 
+        eyes.open(driver, "Applitools Eyes Java SDK", "Classic Runner Test",
+                new RectangleSize(1200, 800));
+
+        eyes.check(Target.window().withName("Step 1"));
+
+        System.out.println(eyes.close(false));
+
+        Assert.assertThrows(Throwable.class, new Assert.ThrowingRunnable() {
+            @Override
+            public void run() throws Throwable {
+                runner.getAllTestResults();
+            }
+        });
+    }
     private void eyesTest(EyesRunner runner) {
 
-        ChromeOptions chromeOptions = new ChromeOptions();
-        if (TestsDataProvider.runHeadless) {
-            chromeOptions.setHeadless(true);
-        }
-
-        // Open a Chrome browser.
-        WebDriver driver = new ChromeDriver(chromeOptions);
+        WebDriver driver = SeleniumUtils.createChromeDriver();
 
         // Initialize the VisualGridEyes SDK and set your private API key.
         Eyes eyes = new Eyes(runner);

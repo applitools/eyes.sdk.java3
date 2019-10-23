@@ -1,17 +1,11 @@
 package com.applitools.eyes.selenium;
 
 import com.applitools.eyes.BatchInfo;
-import com.applitools.eyes.ProxySettings;
-import com.applitools.eyes.StdoutLogHandler;
 import com.applitools.eyes.selenium.fluent.Target;
-import com.applitools.eyes.selenium.rendering.VisualGridEyes;
+import com.applitools.eyes.utils.SeleniumUtils;
 import com.applitools.utils.GeneralUtils;
-import com.applitools.utils.Iso8610CalendarDeserializer;
-import com.applitools.utils.Iso8610CalendarSerializer;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.chrome.ChromeDriver;
 import org.testng.annotations.Test;
 
 import java.io.IOException;
@@ -51,7 +45,7 @@ public class TestBatchSequenceName {
         eyes.setBatch(batch);
         String batchSequenceName = eyes.getBatch().getSequenceName();
         if (batchSequenceName == null) throw new Error();
-        WebDriver driver = new ChromeDriver();
+        WebDriver driver = SeleniumUtils.createChromeDriver();
         try {
             eyes.open(driver, "Java Eyes SDK", "BatchSequnceName Batch");
 

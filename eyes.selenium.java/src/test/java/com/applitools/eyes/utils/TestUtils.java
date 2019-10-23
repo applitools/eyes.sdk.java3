@@ -1,11 +1,13 @@
 package com.applitools.eyes.utils;
 
-import com.applitools.eyes.*;
+import com.applitools.eyes.FileLogger;
+import com.applitools.eyes.LogHandler;
+import com.applitools.eyes.StdoutLogHandler;
+import com.applitools.eyes.TestResults;
 import com.applitools.eyes.metadata.SessionResults;
 import com.applitools.eyes.selenium.Eyes;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.openqa.selenium.remote.DesiredCapabilities;
 
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
@@ -26,10 +28,55 @@ public class TestUtils {
     public final static boolean runHeadless = runOnCI || "true".equalsIgnoreCase(System.getenv("APPLITOOLS_RUN_HEADLESS"));
     public final static String logsPath = System.getenv("APPLITOOLS_LOGS_PATH");
     public final static SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy_MM_dd_HH_mm_ss_SSS");
+    public final static boolean verboseLogs = !runOnCI || "true".equalsIgnoreCase(System.getenv("APPLITOOLS_VERBOSE_LOGS"));
 
     public static String initLogPath() {
         return initLogPath(Thread.currentThread().getStackTrace()[2].getMethodName());
     }
+
+    public static String initLogPath(String methodName) {
+        return initLogPath(methodName, logsPath);
+    }
+
+    public static String initLogPath(String methodName, String logsPath) {
+        String dateTimeString = dateFormat.format(Calendar.getInstance().getTime());
+        return logsPath + File.separator + "java" + File.separator + methodName + "_" + dateTimeString;
+    }
+
+    public static LogHandler initLogger() {
+        return initLogger(Thread.currentThread().getStackTrace()[2].getMethodName());
+    }
+    public static LogHandler initLogger(String testName, String logPath) {
+        if (!TestUtils.runOnCI)
+        {
+            String path = logPath != null ? logPath : initLogPath(testName);
+            return new FileLogger(path + File.separator + "log.log", false, true);
+        }
+        return new StdoutLogHandler(verboseLogs);
+    }
+
+    public static LogHandler initLogger(String methodName) {
+        return initLogger(methodName, null);
+    }
+
+    public static void setupLogging(Eyes eyes) {
+        setupLogging(eyes, Thread.currentThread().getStackTrace()[2].getMethodName());
+    }
+
+    public static void setupLogging(Eyes eyes, String methodName) {
+        LogHandler logHandler;
+        if (!TestUtils.runOnCI && logsPath != null) {
+            String path = initLogPath(methodName);
+            logHandler = new FileLogger(path + File.separator + methodName + ".log", false, true);
+            eyes.setDebugScreenshotsPath(path);
+            eyes.setDebugScreenshotsPrefix(methodName + "_");
+            eyes.setSaveDebugScreenshots(true);
+        } else {
+            logHandler = new StdoutLogHandler(verboseLogs);
+        }
+        eyes.setLogHandler(logHandler);
+    }
+
     public static SessionResults getSessionResults(String apiKey, TestResults results) throws java.io.IOException {
         String apiSessionUrl = results.getApiUrls().getSession();
         URI apiSessionUri = UriBuilder.fromUri(apiSessionUrl)
@@ -49,57 +96,45 @@ public class TestUtils {
         return jsonMapper.readValue(srStr, SessionResults.class);
     }
 
-    public static String initLogPath(String methodName) {
-        String dateTimeString = dateFormat.format(Calendar.getInstance().getTime());
-        return logsPath + File.separator + "java" + File.separator + methodName + "_" + dateTimeString;
+    public static Object getFinalStatic(Class klass, String fieldName) throws Exception {
+        return getFieldValue(klass, null, fieldName);
     }
 
-    public static LogHandler initLogger() {
-        return initLogger(Thread.currentThread().getStackTrace()[2].getMethodName());
+    public static Object getFinalStatic(Field field) throws Exception {
+        return getFieldValue(field, (Object)null);
     }
 
-    public static LogHandler initLogger(String methodName) {
-        LogHandler logHandler;
-        if (!TestUtils.runOnCI && logsPath != null) {
-            String path = initLogPath(methodName);
-            logHandler = new FileLogger(path + File.separator + "log.log", false, true);
-        } else {
-            logHandler = new StdoutLogHandler(true);
-        }
-        return logHandler;
+    public static Object getFieldValue(Object instance, String fieldName) throws Exception {
+        Field field = instance.getClass().getDeclaredField(fieldName);
+        return getFieldValue(field, instance);
     }
 
-    public static void setupLogging(Eyes eyes) {
-        setupLogging(eyes, Thread.currentThread().getStackTrace()[2].getMethodName());
+    public static Object getFieldValue(Class klass, Object instance, String fieldName) throws Exception {
+        Field field = klass.getDeclaredField(fieldName);
+        return getFieldValue(field, instance);
     }
 
-    public static void setupLogging(Eyes eyes, String methodName) {
-        LogHandler logHandler;
-        if (!TestUtils.runOnCI && logsPath != null) {
-            String path = initLogPath(methodName);
-            logHandler = new FileLogger(path + File.separator + methodName + ".log", false, true);
-            eyes.setDebugScreenshotsPath(path);
-            eyes.setDebugScreenshotsPrefix(methodName + "_");
-            eyes.setSaveDebugScreenshots(true);
-        } else {
-            logHandler = new StdoutLogHandler(true);
-        }
-        eyes.setLogHandler(logHandler);
+    public static Object getFieldValue(Field field, Object instance) throws Exception {
+        makeFieldAccessible(field);
+        return field.get(instance);
     }
 
-    public static void setFinalStatic(java.lang.Class klass, String fieldName, Object newValue) throws Exception {
+    public static void setFinalStatic(Class klass, String fieldName, Object newValue) throws Exception {
         Field field = klass.getDeclaredField(fieldName);
         setFinalStatic(field, newValue);
     }
 
     public static void setFinalStatic(Field field, Object newValue) throws Exception {
+        makeFieldAccessible(field);
+        field.set(null, newValue);
+    }
+
+    private static void makeFieldAccessible(Field field) throws NoSuchFieldException, IllegalAccessException {
         field.setAccessible(true);
 
         Field modifiersField = Field.class.getDeclaredField("modifiers");
         modifiersField.setAccessible(true);
         modifiersField.setInt(field, field.getModifiers() & ~Modifier.FINAL);
-
-        field.set(null, newValue);
     }
 
     public static List<Object[]> generatePermutationsList(List<List<Object>> lists) {

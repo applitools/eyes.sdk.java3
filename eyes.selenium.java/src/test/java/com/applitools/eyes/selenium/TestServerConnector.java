@@ -1,29 +1,27 @@
 package com.applitools.eyes.selenium;
 
-import com.applitools.eyes.EyesBase;
 import com.applitools.eyes.RectangleSize;
-import com.applitools.eyes.ServerConnector;
 import com.applitools.eyes.TestResults;
 import com.applitools.eyes.selenium.fluent.Target;
-import org.testng.annotations.Test;
+import com.applitools.eyes.utils.SeleniumUtils;
 import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.chrome.ChromeDriver;
+import org.testng.annotations.Test;
 
 public class TestServerConnector {
 
     @Test
     public void TestDelete() {
+        WebDriver webDriver = SeleniumUtils.createChromeDriver();
         Eyes eyes = new Eyes();
-        eyes.setServerConnector(new ServerConnector(eyes.getLogger(), EyesBase.getDefaultServerUrl()));
-        WebDriver webDriver = new ChromeDriver();
+        eyes.setBatch(TestDataProvider.batchInfo);
         try {
             WebDriver driver = eyes.open(webDriver,
-                    TestServerConnector.class.getSimpleName(),
-                    TestServerConnector.class.getSimpleName(), new RectangleSize(800, 599));
+                    "TestSessionConnector", "TestSessionConnector",
+                    new RectangleSize(800, 600));
 
             driver.get("https://applitools.com/helloworld");
 
-            eyes.check("Hello", Target.window());
+            eyes.check("Hello!", Target.window());
 
             TestResults results = eyes.close();
 
@@ -31,7 +29,7 @@ public class TestServerConnector {
         }
         finally {
             webDriver.quit();
-            eyes.abortIfNotClosed();
+            eyes.abort();
         }
     }
 

@@ -1,13 +1,12 @@
 package com.applitools.eyes.selenium;
 
-import com.applitools.eyes.BatchInfo;
 import com.applitools.eyes.StdoutLogHandler;
 import com.applitools.eyes.selenium.fluent.Target;
+import com.applitools.eyes.utils.TestUtils;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.remote.RemoteWebDriver;
-import org.testng.annotations.BeforeClass;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
@@ -17,18 +16,9 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.concurrent.TimeUnit;
 
+import static com.applitools.eyes.selenium.TestDataProvider.*;
+
 public class AndroidTest {
-
-    private static BatchInfo batchInfo = new BatchInfo("Java3 Tests");
-
-    @BeforeClass
-    public static void classSetup() {
-        String batchId = System.getenv("APPLITOOLS_BATCH_ID");
-        if (batchId != null) {
-            batchInfo.setId(batchId);
-        }
-    }
-
     @DataProvider(parallel = true)
     public static Object[][] data() {
         Object[][] googlePixelPermutations = TestUtils.generatePermutations(
@@ -48,7 +38,7 @@ public class AndroidTest {
     public void TestAndroidChromeCrop(String deviceName, String deviceOrientation, String platformVersion, boolean fully) throws MalformedURLException {
         Eyes eyes = new Eyes();
 
-        eyes.setBatch(batchInfo);
+        eyes.setBatch(TestDataProvider.batchInfo);
 
         // This is your api key, make sure you use it in all your tests.
         DesiredCapabilities caps = DesiredCapabilities.iphone();
@@ -59,30 +49,19 @@ public class AndroidTest {
         caps.setCapability("platformName", "Android");
         caps.setCapability("browserName", "Chrome");
 
-        caps.setCapability("username", System.getenv("SAUCE_USERNAME"));
-        caps.setCapability("accesskey", System.getenv("SAUCE_ACCESS_KEY"));
+        caps.setCapability("username",  SAUCE_USERNAME);
+        caps.setCapability("accesskey", SAUCE_ACCESS_KEY);
 
-        String sauceUrl = "http://ondemand.saucelabs.com/wd/hub";
-        WebDriver driver = new RemoteWebDriver(new URL(sauceUrl), caps);
+        WebDriver driver = new RemoteWebDriver(new URL(SAUCE_SELENIUM_URL), caps);
         driver.manage().timeouts().implicitlyWait(3, TimeUnit.SECONDS);
-        eyes.setLogHandler(new StdoutLogHandler(true));
+        eyes.setLogHandler(new StdoutLogHandler(TestUtils.verboseLogs));
 
         String testName = String.format("%s %s %s", deviceName, platformVersion, deviceOrientation);
         if (fully) {
             testName += " fully";
         }
 
-        if (!TestsDataProvider.runOnCI) {
-            //String logFilename = String.format("c:\\temp\\logs\\iostest_%s.log", testName);
-            //VisualGridEyes.setLogHandler(new FileLogger(logFilename, false, true));
-            //VisualGridEyes.setImageCut(new FixedCutProvider(30, 12, 8, 5));
-            //VisualGridEyes.setForceFullPageScreenshot(true);
-            //VisualGridEyes.setSaveDebugScreenshots(true);
-            //VisualGridEyes.setDebugScreenshotsPath("C:\\temp\\logs");
-            //VisualGridEyes.setDebugScreenshotsPrefix("iostest_" + testName);
-        } else {
-            eyes.setLogHandler(new StdoutLogHandler(true));
-        }
+        TestUtils.setupLogging(eyes, testName);
 
         eyes.setStitchMode(StitchMode.SCROLL);
 
@@ -91,7 +70,7 @@ public class AndroidTest {
 
         try {
             driver.get("https://www.applitools.com/customers");
-            eyes.open(driver, "SeleniumEyes Selenium SDK - Android Chrome Cropping", testName);
+            eyes.open(driver, "Eyes Selenium SDK - Android Chrome Cropping", testName);
             eyes.check("Initial view", Target.region(By.cssSelector("body")).fully(fully));
             eyes.close();
         } finally {

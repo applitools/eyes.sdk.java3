@@ -4,16 +4,16 @@ import com.applitools.eyes.*;
 import com.applitools.eyes.selenium.BrowserType;
 import com.applitools.eyes.selenium.Configuration;
 import com.applitools.eyes.selenium.Eyes;
+import com.applitools.eyes.selenium.TestDataProvider;
 import com.applitools.eyes.selenium.fluent.Target;
+import com.applitools.eyes.utils.SeleniumUtils;
+import com.applitools.eyes.utils.TestUtils;
 import com.applitools.eyes.visualgrid.model.ChromeEmulationInfo;
 import com.applitools.eyes.visualgrid.model.DeviceName;
 import com.applitools.eyes.visualgrid.model.ScreenOrientation;
-import com.applitools.eyes.TestResultsSummary;
-import com.applitools.eyes.EyesRunner;
 import com.applitools.eyes.visualgrid.services.VisualGridRunner;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.chrome.ChromeDriver;
 
 class TestVGDemo
 {
@@ -40,7 +40,7 @@ class TestVGDemo
     private void Init()
     {
         // Create a new webdriver
-        webDriver = new ChromeDriver();
+        webDriver = SeleniumUtils.createChromeDriver();
 
         // Navigate to the url we want to test
         webDriver.get("https://demo.applitools.com");
@@ -52,7 +52,7 @@ class TestVGDemo
         runner = new VisualGridRunner(10);
 
         // Set StdOut log handler with regular verbosity.
-        runner.setLogHandler(new StdoutLogHandler(false));
+        runner.setLogHandler(new StdoutLogHandler(TestUtils.verboseLogs));
 
         // Create Eyes object with the runner, meaning it'll be a Visual Grid eyes.
         eyes = new Eyes(runner);
@@ -64,6 +64,7 @@ class TestVGDemo
         conf.setTestName("Java VisualGrid demo")   // Set test name
                 .setAppName("Demo app");             // Set app name
 
+        conf.setBatch(TestDataProvider.batchInfo);
         // Add browsers with different viewports
         conf.addBrowser(800, 600, BrowserType.CHROME);
         conf.addBrowser(700, 500, BrowserType.FIREFOX);

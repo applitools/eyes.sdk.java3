@@ -151,8 +151,6 @@ public class CommUtils {
                     String s = new String(bytes, "UTF-8");
                     System.out.println(s);
                 } catch (IOException e) {
-                    e.printStackTrace();
-
                 }
                 batchInfo = objectMapper.readValue(bytes, BatchInfo.class);
             }

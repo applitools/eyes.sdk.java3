@@ -5,19 +5,18 @@ import com.applitools.eyes.selenium.BrowserType;
 import com.applitools.eyes.selenium.Configuration;
 import com.applitools.eyes.selenium.Eyes;
 import com.applitools.eyes.selenium.fluent.Target;
-import com.applitools.eyes.TestResultsSummary;
-import com.applitools.eyes.EyesRunner;
+import com.applitools.eyes.utils.SeleniumUtils;
+import com.applitools.eyes.utils.TestUtils;
 import com.applitools.eyes.visualgrid.services.VisualGridRunner;
 import com.applitools.utils.GeneralUtils;
 import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.chrome.ChromeDriver;
 
 public class SerialTest {
 
     public static void main(String[] args) {
 
         EyesRunner visualGridRunner = new VisualGridRunner(10);
-        visualGridRunner.setLogHandler(new StdoutLogHandler(true));
+        visualGridRunner.setLogHandler(new StdoutLogHandler(TestUtils.verboseLogs));
         visualGridRunner.getLogger().log("enter");
         String testedUrl = "https://github.com/";
         Eyes eyes = new Eyes(visualGridRunner);
@@ -25,7 +24,7 @@ public class SerialTest {
         eyes.setBatch(batchInfo);
         Logger logger = eyes.getLogger();
         visualGridRunner.getLogger().log("entering with url " + testedUrl);
-        WebDriver webDriver = new ChromeDriver();
+        WebDriver webDriver = SeleniumUtils.createChromeDriver();
         webDriver.get(testedUrl);
         try {
             Configuration configuration = new Configuration();

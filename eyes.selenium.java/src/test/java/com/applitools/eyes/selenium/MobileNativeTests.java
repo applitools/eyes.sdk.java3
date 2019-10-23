@@ -1,10 +1,7 @@
 package com.applitools.eyes.selenium;
 
-import com.applitools.eyes.BatchInfo;
-import com.applitools.eyes.FileLogger;
-import com.applitools.eyes.LogHandler;
-import com.applitools.eyes.StdoutLogHandler;
 import com.applitools.eyes.selenium.fluent.Target;
+import com.applitools.eyes.utils.TestUtils;
 import io.appium.java_client.MobileBy;
 import io.appium.java_client.MobileElement;
 import io.appium.java_client.android.AndroidDriver;
@@ -14,35 +11,27 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.remote.DesiredCapabilities;
 import org.testng.annotations.Test;
 
-import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URL;
 
-@org.testng.annotations.Test()
+import static com.applitools.eyes.selenium.TestDataProvider.*;
+
+@Test()
 public class MobileNativeTests {
 
-    private String logsPath = System.getenv("APPLITOOLS_LOGS_PATH");
-    private String appiumServerUrl = "http://ondemand.saucelabs.com/wd/hub";
-    private static BatchInfo batchInfo = new BatchInfo("Mobile Native Tests");
-
-    private void setupLogging(Eyes eyes, DesiredCapabilities capabilities, String methodName) {
-        LogHandler logHandler;
-        if (!TestsDataProvider.runOnCI && logsPath != null) {
-            String path = logsPath + File.separator + "java" + File.separator + methodName;
-            logHandler = new FileLogger(path + File.separator + methodName + "_" + capabilities.getPlatform() + ".log", true, true);
-            eyes.setDebugScreenshotsPath(path);
-            eyes.setDebugScreenshotsPrefix(methodName + "_");
-            eyes.setSaveDebugScreenshots(true);
-        } else {
-            logHandler = new StdoutLogHandler(true);
-        }
-
-        capabilities.setCapability("username", System.getenv("SAUCE_USERNAME"));
-        capabilities.setCapability("accesskey", System.getenv("SAUCE_ACCESS_KEY"));
+    private void setCapabilities(Eyes eyes, DesiredCapabilities capabilities, String methodName) {
+        capabilities.setCapability("username",  SAUCE_USERNAME);
+        capabilities.setCapability("accesskey", SAUCE_ACCESS_KEY);
         capabilities.setCapability("name", methodName);
+    }
 
-        eyes.setLogHandler(logHandler);
-        eyes.setBatch(batchInfo);
+    private Eyes initEyes(DesiredCapabilities capabilities) {
+        Eyes eyes = new Eyes();
+        String testName = Thread.currentThread().getStackTrace()[2].getMethodName();
+        TestUtils.setupLogging(eyes, testName);
+        setCapabilities(eyes, capabilities, testName);
+        eyes.setBatch(TestDataProvider.batchInfo);
+        return eyes;
     }
 
     @Test
@@ -57,10 +46,9 @@ public class MobileNativeTests {
         capabilities.setCapability("clearSystemFiles", true);
         capabilities.setCapability("noReset", true);
 
-        Eyes eyes = new Eyes();
-        setupLogging(eyes, capabilities, "AndroidNativeAppTest1");
+        Eyes eyes = initEyes(capabilities);
 
-        WebDriver driver = new AndroidDriver(new URL(appiumServerUrl), capabilities);
+        WebDriver driver = new AndroidDriver(new URL(SAUCE_SELENIUM_URL), capabilities);
 
         try {
             eyes.open(driver, "Mobile Native Tests", "Android Native App 1");
@@ -88,10 +76,9 @@ public class MobileNativeTests {
         capabilities.setCapability("appActivity", "com.applitoolstest.ScrollActivity");
         capabilities.setCapability("newCommandTimeout", 600);
 
-        Eyes eyes = new Eyes();
-        setupLogging(eyes, capabilities,"AndroidNativeAppTest2");
+        Eyes eyes = initEyes(capabilities);
 
-        AndroidDriver<AndroidElement> driver = new AndroidDriver<>(new URL(appiumServerUrl), capabilities);
+        AndroidDriver<AndroidElement> driver = new AndroidDriver<>(new URL(SAUCE_SELENIUM_URL), capabilities);
 
         try {
             eyes.open(driver, "Mobile Native Tests", "Android Native App 2");
@@ -112,9 +99,9 @@ public class MobileNativeTests {
 
         DesiredCapabilities caps = DesiredCapabilities.iphone();
         caps.setCapability("appiumVersion", "1.13.0");
-        caps.setCapability("deviceName","iPhone XS Simulator");
+        caps.setCapability("deviceName", "iPhone XS Simulator");
         caps.setCapability("deviceOrientation", "portrait");
-        caps.setCapability("platformVersion","12.2");
+        caps.setCapability("platformVersion", "12.2");
         caps.setCapability("platformName", "iOS");
         caps.setCapability("browserName", "");
         caps.setCapability("app", "https://applitools.bintray.com/Examples/HelloWorldiOS_1_0.zip");
@@ -122,10 +109,11 @@ public class MobileNativeTests {
 //        caps.setCapability("noReset", true);
 
         Eyes eyes = new Eyes();
-        setupLogging(eyes, caps,"iOSNativeAppTest");
-        eyes.setLogHandler(new StdoutLogHandler());
+        setCapabilities(eyes, caps, "iOSNativeAppTest");
+        TestUtils.setupLogging(eyes);
+        eyes.setBatch(TestDataProvider.batchInfo);
 
-        WebDriver driver = new IOSDriver(new URL(appiumServerUrl), caps);
+        WebDriver driver = new IOSDriver(new URL(SAUCE_SELENIUM_URL), caps);
 
         try {
             eyes.open(driver, "Mobile Native Tests", "iOS Native App");

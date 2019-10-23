@@ -3,20 +3,16 @@ package com.applitools.eyes.selenium;
 import com.applitools.eyes.selenium.fluent.Target;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Capabilities;
-import org.openqa.selenium.JavascriptExecutor;
-import org.openqa.selenium.WebElement;
-import org.testng.annotations.*;
+import org.testng.annotations.Factory;
+import org.testng.annotations.Listeners;
+import org.testng.annotations.Test;
 
 @Listeners(TestListener.class)
 public class TestSpecialCases extends TestSetup {
 
-    @Factory(dataProvider = "dp", dataProviderClass = TestsDataProvider.class)
-    public TestSpecialCases(Capabilities caps, String platform) {
-        super.caps = caps;
-        super.platform = platform;
-        super.forceFPS = false;
-
-        testSuitName = "SeleniumEyes Selenium SDK - Special Cases";
+    @Factory(dataProvider = "dp", dataProviderClass = TestDataProvider.class)
+    public TestSpecialCases(Capabilities caps, String mode) {
+        super("Eyes Selenium SDK - Special Cases", caps, mode);
         testedPageUrl = "http://applitools.github.io/demo/TestPages/WixLikeTestPage/index.html";
     }
 
@@ -26,12 +22,8 @@ public class TestSpecialCases extends TestSetup {
     }
 
     @Test
-    public void TestCheckRegionInAVeryBigFrameAfterManualSwitchToFrame(){
-        driver.switchTo().frame("frame1");
-
-        WebElement element = driver.findElement(By.cssSelector("img"));
-        ((JavascriptExecutor) driver).executeScript("arguments[0].scrollIntoView(true);", element);
-
+    public void TestCheckRegionInAVeryBigFrameAfterManualSwitchToFrame() {
+        getDriver().switchTo().frame("frame1");
         getEyes().check("", Target.region(By.cssSelector("img")));
     }
 }

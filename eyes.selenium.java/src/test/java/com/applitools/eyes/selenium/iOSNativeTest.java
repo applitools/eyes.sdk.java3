@@ -3,11 +3,14 @@ package com.applitools.eyes.selenium;
 import com.applitools.eyes.LogHandler;
 import com.applitools.eyes.ServerConnector;
 import com.applitools.eyes.StdoutLogHandler;
+import com.applitools.eyes.utils.TestUtils;
 import io.appium.java_client.ios.IOSDriver;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.remote.DesiredCapabilities;
 
 import java.net.URL;
+
+import static com.applitools.eyes.selenium.TestDataProvider.*;
 
 public class iOSNativeTest {
 
@@ -23,18 +26,15 @@ public class iOSNativeTest {
         capabilities.setCapability("clearSystemFiles", true);
         capabilities.setCapability("noReset", true);
 
-        final String SAUCE_USERNAME = System.getenv("SAUCE_USERNAME");
-        final String SAUCE_ACCESS_KEY = System.getenv("SAUCE_ACCESS_KEY");
         capabilities.setCapability("username", SAUCE_USERNAME);
         capabilities.setCapability("accesskey", SAUCE_ACCESS_KEY);
 
-        final String url = "https://ondemand.saucelabs.com:443/wd/hub";
-        WebDriver driver = new IOSDriver(new URL(url), capabilities);
+        WebDriver driver = new IOSDriver(new URL(SAUCE_SELENIUM_URL), capabilities);
 
         // Initialize the VisualGridEyes SDK and set your private API key.
         Eyes eyes = new Eyes();
         eyes.setServerConnector(new ServerConnector());
-        LogHandler logHandler = new StdoutLogHandler(true);
+        LogHandler logHandler = new StdoutLogHandler(TestUtils.verboseLogs);
         eyes.setLogHandler(logHandler);
         eyes.setSaveDebugScreenshots(true);
 //        VisualGridEyes.setForceFullPageScreenshot(true);

@@ -5,33 +5,24 @@ import com.applitools.eyes.selenium.BrowserType;
 import com.applitools.eyes.selenium.Configuration;
 import com.applitools.eyes.selenium.Eyes;
 import com.applitools.eyes.selenium.fluent.Target;
+import com.applitools.eyes.utils.SeleniumUtils;
+import com.applitools.eyes.utils.TestUtils;
 import com.applitools.eyes.visualgrid.model.DeviceName;
 import com.applitools.eyes.visualgrid.model.ScreenOrientation;
-import com.applitools.eyes.TestResultsSummary;
-import com.applitools.eyes.EyesRunner;
 import com.applitools.eyes.visualgrid.services.VisualGridRunner;
 import com.applitools.utils.GeneralUtils;
 import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.chrome.ChromeDriver;
 import org.testng.Assert;
 import org.testng.ITestContext;
 import org.testng.annotations.*;
 
-import java.io.File;
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
-
 public class TestVGWithFailedRenders {
     private EyesRunner visualGridRunner;
-
-    private String logsPath = System.getenv("APPLITOOLS_LOGS_PATH");
-    private SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy_MM_dd_HH_mm_ss_SSS");
-    private String dateTimeString = dateFormat.format(Calendar.getInstance().getTime());
 
     @BeforeClass
     public void beforeClass() {
         visualGridRunner = new VisualGridRunner(10);
-//        visualGridRunner.setLogHandler(new StdoutLogHandler(true));
+//        visualGridRunner.setLogHandler(new StdoutLogHandler(TestUtils.verboseLogs));
         FileLogger logHandler = new FileLogger("eyes.log", false, true);
         visualGridRunner.setLogHandler(logHandler);
         visualGridRunner.getLogger().log("enter");
@@ -58,7 +49,7 @@ public class TestVGWithFailedRenders {
         batchInfo.setId("Target2");
         eyes.setBatch(batchInfo);
         eyes.setEnvName("TTS - migel");
-        initLogging(testedUrl, eyes);
+        TestUtils.setupLogging(eyes, testedUrl);
 
         Logger logger = eyes.getLogger();
         logger.log("creating WebDriver: " + testedUrl);
@@ -67,7 +58,7 @@ public class TestVGWithFailedRenders {
             Configuration configuration = new Configuration();
             configuration.setTestName("Top 10 websites - " + testedUrl);
             configuration.setAppName("Top Ten Sites");
-            configuration.setBatch(new BatchInfo("TTS - config batch"));
+            configuration.setBatch(TestTopSites.batch);
             configuration.setBranchName("TTS - config branch");
             configuration.setBaselineEnvName("My Other Env Name");
             String environment = "My env name";
@@ -92,9 +83,9 @@ public class TestVGWithFailedRenders {
     @Test(dataProvider = "dp")
     public void test(String testedUrl) {
         visualGridRunner.getLogger().log("entering with url " + testedUrl);
-        WebDriver webDriver = new ChromeDriver();
+        WebDriver webDriver = SeleniumUtils.createChromeDriver();
         webDriver.get(testedUrl);
-        Eyes eyes = (Eyes) initEyes(webDriver, testedUrl);
+        Eyes eyes = initEyes(webDriver, testedUrl);
         Logger logger = eyes.getLogger();
         logger.log("navigated to " + testedUrl);
 
@@ -119,16 +110,6 @@ public class TestVGWithFailedRenders {
             logger.log("url " + testedUrl + " - done with browser.");
             // End the test.
         }
-    }
-
-    private void initLogging(String testedUrl, Eyes eyes) {
-        String testName = testedUrl.substring(8);
-        String path = logsPath + File.separator + "java" + File.separator + "TestTopSites_" + dateTimeString;
-//        FileDebugResourceWriter fileDebugResourceWriter = new FileDebugResourceWriter(visualGridRunner.getLogger(), path, null, null);
-//        VisualGridEyes.setDebugResourceWriter(fileDebugResourceWriter);
-
-//        FileLogger eyesLogger = new FileLogger("TopTenSites.log", true, true);
-//        eyes.setLogHandler(eyesLogger);
     }
 
     @AfterMethod

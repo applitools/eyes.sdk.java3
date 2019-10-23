@@ -4,7 +4,9 @@ import com.applitools.eyes.FileLogger;
 import com.applitools.eyes.selenium.BrowserType;
 import com.applitools.eyes.selenium.Configuration;
 import com.applitools.eyes.selenium.Eyes;
+import com.applitools.eyes.selenium.TestDataProvider;
 import com.applitools.eyes.selenium.fluent.Target;
+import com.applitools.eyes.utils.SeleniumUtils;
 import com.applitools.eyes.visualgrid.services.VisualGridRunner;
 import org.junit.After;
 import org.junit.Before;
@@ -12,7 +14,6 @@ import org.junit.Test;
 import org.openqa.selenium.By;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.chrome.ChromeDriver;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -29,7 +30,7 @@ public class TestVGWithJunit {
     private String preRenderHook;
     @Before
     public void setUp() {
-        driver = new ChromeDriver();
+        driver = SeleniumUtils.createChromeDriver();
         js = (JavascriptExecutor) driver;
         vars = new HashMap<String, Object>();
         preRenderHook = "";
@@ -38,6 +39,7 @@ public class TestVGWithJunit {
         Configuration config = eyes.getConfiguration();
         eyes = new Eyes(runner);
         config.addBrowser(1920, 1080, BrowserType.CHROME);
+        config.setBatch(TestDataProvider.batchInfo);
         eyes.setConfiguration(config);
         eyes.setLogHandler(new FileLogger("daves.log", true ,true));
         eyes.open(driver, "d", "Untitled");

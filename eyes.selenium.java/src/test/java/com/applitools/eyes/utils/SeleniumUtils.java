@@ -16,6 +16,10 @@ import org.openqa.selenium.safari.SafariOptions;
 public class SeleniumUtils {
     public static ChromeDriver createChromeDriver() {
         ChromeOptions options = new ChromeOptions();
+        return createChromeDriver(options);
+    }
+
+    public static ChromeDriver createChromeDriver(ChromeOptions options) {
         if (TestUtils.runHeadless) {
             options.setHeadless(true);
         }

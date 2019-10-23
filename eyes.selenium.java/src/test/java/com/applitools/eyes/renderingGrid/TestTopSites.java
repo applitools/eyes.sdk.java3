@@ -5,31 +5,25 @@ import com.applitools.eyes.selenium.BrowserType;
 import com.applitools.eyes.selenium.Configuration;
 import com.applitools.eyes.selenium.Eyes;
 import com.applitools.eyes.selenium.fluent.Target;
-import com.applitools.eyes.visualgrid.model.*;
-import com.applitools.eyes.EyesRunner;
+import com.applitools.eyes.utils.SeleniumUtils;
+import com.applitools.eyes.utils.TestUtils;
 import com.applitools.eyes.visualgrid.services.VisualGridRunner;
 import com.applitools.utils.GeneralUtils;
 import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.chrome.ChromeDriver;
 import org.testng.ITestContext;
 import org.testng.annotations.*;
 
-import java.io.File;
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
+import java.net.MalformedURLException;
+import java.net.URL;
 
 public class TestTopSites {
+    public static BatchInfo batch = new BatchInfo("TTS");
     private EyesRunner visualGridRunner;
-
-    private String logsPath = System.getenv("APPLITOOLS_LOGS_PATH");
-    private SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy_MM_dd_HH_mm_ss_SSS");
-    private String dateTimeString = dateFormat.format(Calendar.getInstance().getTime());
 
     @BeforeClass
     public void beforeClass() {
         visualGridRunner = new VisualGridRunner(10);
-//        visualGridRunner.setLogHandler(new StdoutLogHandler(true));
-        FileLogger logHandler = new FileLogger("eyes.log", false, true);
+        LogHandler logHandler = new FileLogger("eyes.log", false, true);//TestUtils.initLogger("TestTopSites");
         visualGridRunner.setLogHandler(logHandler);
         visualGridRunner.getLogger().log("enter");
     }
@@ -37,7 +31,7 @@ public class TestTopSites {
     @DataProvider(name = "dp", parallel = true)
     public static Object[][] dp() {
         return new Object[][]{
-                {"https://wix.com"},
+                {"https://amazon.com"},
 //                {"https://ebay.com"},
                 {"https://twitter.com"},
                 {"https://wikipedia.org"},
@@ -48,21 +42,23 @@ public class TestTopSites {
 
     private Eyes initEyes(WebDriver webDriver, String testedUrl) {
         Eyes eyes = new Eyes(visualGridRunner);
-        BatchInfo batchInfo = new BatchInfo("Top Ten Sites2");
-        batchInfo.setId("Target22");
-        eyes.setBatch(batchInfo);
-        eyes.setEnvName("TTS - migel");
         eyes.setMatchLevel(MatchLevel.LAYOUT);
-        initLogging(testedUrl, eyes);
-
         Logger logger = eyes.getLogger();
+
+        try {
+            URL url = new URL(testedUrl);
+            TestUtils.setupLogging(eyes, url.getHost());
+        } catch (MalformedURLException e) {
+            GeneralUtils.logExceptionStackTrace(logger, e);
+        }
+
         logger.log("creating WebDriver: " + testedUrl);
 
         try {
             Configuration configuration = new Configuration();
-            configuration.setTestName("Top 10 websites - " + testedUrl);
-            configuration.setAppName("Top Ten Sites");
-            configuration.setBatch(new BatchInfo("TTS - config batch"));
+            configuration.setTestName("Top 5 websites - " + testedUrl);
+            configuration.setAppName("Top Five Sites");
+            configuration.setBatch(TestTopSites.batch);
             configuration.setBranchName("TTS - config branch");
             configuration.setIgnoreDisplacements(true);
             configuration.addBrowser(800, 600, BrowserType.CHROME);
@@ -86,7 +82,7 @@ public class TestTopSites {
     @Test(dataProvider = "dp")
     public void test(String testedUrl) {
         visualGridRunner.getLogger().log("entering with url " + testedUrl);
-        WebDriver webDriver = new ChromeDriver();
+        WebDriver webDriver = SeleniumUtils.createChromeDriver();
         webDriver.get(testedUrl);
         Eyes eyes = initEyes(webDriver, testedUrl);
         Logger logger = eyes.getLogger();
@@ -115,16 +111,6 @@ public class TestTopSites {
             logger.log("url " + testedUrl + " - done with browser.");
             // End the test.
         }
-    }
-
-    private void initLogging(String testedUrl, Eyes eyes) {
-        String testName = testedUrl.substring(8);
-        String path = logsPath + File.separator + "java" + File.separator + "TestTopSites_" + dateTimeString;
-//        FileDebugResourceWriter fileDebugResourceWriter = new FileDebugResourceWriter(visualGridRunner.getLogger(), path, null, null);
-//        VisualGridEyes.setDebugResourceWriter(fileDebugResourceWriter);
-
-//        FileLogger eyesLogger = new FileLogger("TopTenSites.log", true, true);
-//        eyes.setLogHandler(eyesLogger);
     }
 
     @AfterMethod

@@ -1,12 +1,14 @@
 package com.applitools.eyes.selenium;
 
-import com.applitools.eyes.*;
+import com.applitools.eyes.FileLogger;
+import com.applitools.eyes.ServerConnector;
+import com.applitools.eyes.StdoutLogHandler;
 import com.applitools.eyes.selenium.fluent.Target;
+import com.applitools.eyes.utils.TestUtils;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.remote.RemoteWebDriver;
-import org.testng.annotations.BeforeClass;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
@@ -17,18 +19,9 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.concurrent.TimeUnit;
 
+import static com.applitools.eyes.selenium.TestDataProvider.*;
+
 public class IOSTest {
-
-    private static BatchInfo batchInfo = new BatchInfo("Java3 Tests");
-    private String logsPath = System.getenv("APPLITOOLS_LOGS_PATH");
-
-    @BeforeClass
-    public static void classSetup() {
-        String batchId = System.getenv("APPLITOOLS_BATCH_ID");
-        if (batchId != null) {
-            batchInfo.setId(batchId);
-        }
-    }
 
     @DataProvider(parallel = true)
     public static Object[][] data() {
@@ -88,7 +81,8 @@ public class IOSTest {
 
 
         //return returnValue.toArray(new Object[0][]);
-        return new Object[][]{{"iPhone 5s Simulator", "landscape", "10.0", true}};
+        //return new Object[][]{{"iPhone 5s Simulator", "landscape", "10.0", true}};
+        return new Object[][]{{"iPhone XR Simulator", "portrait", "12.2", true}};
     }
 
     @Test(dataProvider = "data")
@@ -96,19 +90,18 @@ public class IOSTest {
         Eyes eyes = new Eyes();
         eyes.setServerConnector(new ServerConnector());
 
-        eyes.setBatch(batchInfo);
+        eyes.setBatch(TestDataProvider.batchInfo);
 
         DesiredCapabilities caps = DesiredCapabilities.iphone();
 
-        caps.setCapability("appiumVersion", "1.7.2");
         caps.setCapability("deviceName", deviceName);
         caps.setCapability("deviceOrientation", deviceOrientation);
         caps.setCapability("platformVersion", platformVersion);
         caps.setCapability("platformName", "iOS");
         caps.setCapability("browserName", "Safari");
 
-        caps.setCapability("username", System.getenv("SAUCE_USERNAME"));
-        caps.setCapability("accesskey", System.getenv("SAUCE_ACCESS_KEY"));
+        caps.setCapability("username",  SAUCE_USERNAME);
+        caps.setCapability("accesskey", SAUCE_ACCESS_KEY);
 
         String testName = String.format("%s %s %s", deviceName, platformVersion, deviceOrientation);
         if (fully) {
@@ -117,19 +110,18 @@ public class IOSTest {
 
         caps.setCapability("name", testName + " (" + eyes.getFullAgentId() + ")");
 
-        String sauceUrl = "http://ondemand.saucelabs.com/wd/hub";
-        WebDriver driver = new RemoteWebDriver(new URL(sauceUrl), caps);
+        WebDriver driver = new RemoteWebDriver(new URL(SAUCE_SELENIUM_URL), caps);
         driver.manage().timeouts().implicitlyWait(3, TimeUnit.SECONDS);
 
-        if (!TestsDataProvider.runOnCI) {
+        if (!TestUtils.runOnCI) {
             SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy_MM_dd HH_mm_ss_SSS");
-            String logPath = logsPath + File.separator + "java" + File.separator + String.format("IOSTest %s %s", testName, dateFormat.format(Calendar.getInstance().getTime()));
+            String logPath = TestUtils.logsPath + File.separator + "java" + File.separator + String.format("IOSTest %s %s", testName, dateFormat.format(Calendar.getInstance().getTime()));
             String logFilename = logPath + File.separator + "log.log";
             eyes.setLogHandler(new FileLogger(logFilename, false, true));
             eyes.setSaveDebugScreenshots(true);
             eyes.setDebugScreenshotsPath(logPath);
         } else {
-            eyes.setLogHandler(new StdoutLogHandler(true));
+            eyes.setLogHandler(new StdoutLogHandler(TestUtils.verboseLogs));
         }
 
         eyes.setStitchMode(StitchMode.SCROLL);
@@ -138,8 +130,8 @@ public class IOSTest {
         eyes.addProperty("Stitched", fully ? "True" : "False");
 
         try {
-            driver.get("https://www.applitools.com/customers");
-            eyes.open(driver, "SeleniumEyes Selenium SDK - iOS Safari Cropping", testName);
+            driver.get("https://applitools.github.io/demo/TestPages/PageWithHeader/index.html");
+            eyes.open(driver, "Eyes Selenium SDK - iOS Safari Cropping", testName);
             eyes.check("Initial view", Target.region(By.cssSelector("body")).fully(fully));
             eyes.close();
         } finally {

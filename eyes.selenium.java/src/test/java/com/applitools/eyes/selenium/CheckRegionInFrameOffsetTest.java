@@ -4,9 +4,10 @@ import com.applitools.eyes.LogHandler;
 import com.applitools.eyes.RectangleSize;
 import com.applitools.eyes.StdoutLogHandler;
 import com.applitools.eyes.selenium.fluent.Target;
+import com.applitools.eyes.utils.SeleniumUtils;
+import com.applitools.eyes.utils.TestUtils;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.chrome.ChromeDriver;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
@@ -19,7 +20,7 @@ public class CheckRegionInFrameOffsetTest {
     public static void main(String[] args) throws URISyntaxException, IOException, InterruptedException {
 
         // Test 1
-        WebDriver driver = new ChromeDriver();
+        WebDriver driver = SeleniumUtils.createChromeDriver();
 
         Eyes eyes = new Eyes();
 
@@ -28,7 +29,7 @@ public class CheckRegionInFrameOffsetTest {
 
         LogHandler logHandler;
         //logHandler = new FileLogger("c:\\temp\\logs\\Java\\TestElement.log", true, true);
-        logHandler = new StdoutLogHandler(true);
+        logHandler = new StdoutLogHandler(TestUtils.verboseLogs);
         eyes.setLogHandler(logHandler);
 
 //        VisualGridEyes.setDebugScreenshotsPath("c:\\temp\\logs");

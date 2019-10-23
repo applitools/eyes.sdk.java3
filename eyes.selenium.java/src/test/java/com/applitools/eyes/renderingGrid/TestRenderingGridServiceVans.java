@@ -1,35 +1,30 @@
 package com.applitools.eyes.renderingGrid;
 
-import com.applitools.eyes.*;
+import com.applitools.eyes.BatchInfo;
+import com.applitools.eyes.FileLogger;
+import com.applitools.eyes.Logger;
+import com.applitools.eyes.TestResultsSummary;
 import com.applitools.eyes.selenium.BrowserType;
 import com.applitools.eyes.selenium.Configuration;
 import com.applitools.eyes.selenium.Eyes;
 import com.applitools.eyes.selenium.fluent.Target;
-import com.applitools.eyes.visualgrid.model.*;
+import com.applitools.eyes.utils.SeleniumUtils;
+import com.applitools.eyes.utils.TestUtils;
+import com.applitools.eyes.visualgrid.model.DeviceName;
+import com.applitools.eyes.visualgrid.model.ScreenOrientation;
 import com.applitools.eyes.visualgrid.services.VisualGridRunner;
 import com.applitools.utils.GeneralUtils;
 import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.chrome.ChromeDriver;
 import org.testng.ITestContext;
 import org.testng.annotations.*;
-
-import java.io.File;
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
 
 public class TestRenderingGridServiceVans {
     private VisualGridRunner renderingManager;
 
-    private String logsPath = System.getenv("APPLITOOLS_LOGS_PATH");
-    private SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy_MM_dd_HH_mm_ss_SSS");
-    private String dateTimeString = dateFormat.format(Calendar.getInstance().getTime());
-
     @BeforeClass
     public void beforeClass() {
         renderingManager = new VisualGridRunner(40);
-        renderingManager.setLogHandler(new StdoutLogHandler(true));
-        FileLogger logHandler = new FileLogger("eyes.log", false, true);
-        renderingManager.setLogHandler(logHandler);
+        renderingManager.setLogHandler(TestUtils.initLogger("vans"));
         renderingManager.getLogger().log("enter");
         renderingManager.setServerUrl("https://eyes.applitools.com/");
     }
@@ -91,7 +86,7 @@ public class TestRenderingGridServiceVans {
     @Test(dataProvider = "Kids")
     public void test(String testedUrl, BatchInfo batch) {
         renderingManager.getLogger().log("entering with url " + testedUrl);
-        WebDriver webDriver = new ChromeDriver();
+        WebDriver webDriver = SeleniumUtils.createChromeDriver();
         webDriver.get(testedUrl);
         Eyes eyes = initEyes(webDriver, testedUrl, batch);
 
@@ -127,7 +122,7 @@ public class TestRenderingGridServiceVans {
     private Eyes initEyes(WebDriver webDriver, String testedUrl, BatchInfo batch) {
         Eyes eyes = new Eyes(renderingManager);
         eyes.setBatch(batch);
-        initLogging(testedUrl, eyes);
+        initLogging();
 
         Logger logger = eyes.getLogger();
         logger.log("creating WebDriver: " + testedUrl);
@@ -138,7 +133,7 @@ public class TestRenderingGridServiceVans {
             configuration.setAppName("RenderingGridIntegration");
             configuration.addBrowser(800, 600, BrowserType.CHROME);
             configuration.addBrowser(1600, 1200, BrowserType.CHROME);
-            configuration.addDeviceEmulation(DeviceName.iPhone6_7_8_Plus, ScreenOrientation.LANDSCAPE);
+            configuration.addDeviceEmulation(DeviceName.iPhone_6_7_8_Plus, ScreenOrientation.LANDSCAPE);
             logger.log("created configurations for url " + testedUrl);
             eyes.setConfiguration(configuration);
             eyes.open(webDriver);
@@ -148,12 +143,7 @@ public class TestRenderingGridServiceVans {
         return eyes;
     }
 
-    private void initLogging(String testedUrl, Eyes eyes) {
-        String testName = testedUrl.substring(8);
-        String path = logsPath + File.separator + "java" + File.separator + "TestTopSites_" + dateTimeString;
-//        FileDebugResourceWriter fileDebugResourceWriter = new FileDebugResourceWriter(renderingManager.getLogger(), path, null, null);
-//        VisualGridEyes.setDebugResourceWriter(fileDebugResourceWriter);
-
+    private void initLogging() {
         FileLogger eyesLogger = new FileLogger("TopTenSites.log", true, true);
         renderingManager.setLogHandler(eyesLogger);
     }

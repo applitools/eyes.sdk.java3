@@ -1,34 +1,28 @@
 package com.applitools.eyes.selenium;
 
 import com.applitools.ICheckSettings;
-import com.applitools.eyes.CoordinatesType;
-import com.applitools.eyes.FloatingMatchSettings;
-import com.applitools.eyes.Region;
+import com.applitools.eyes.*;
 import com.applitools.eyes.selenium.fluent.Target;
-
-import org.openqa.selenium.*;
-import org.testng.annotations.*;
-
-import java.util.ArrayList;
-import java.util.List;
+import org.openqa.selenium.By;
+import org.openqa.selenium.Capabilities;
+import org.openqa.selenium.JavascriptExecutor;
+import org.openqa.selenium.WebElement;
+import org.testng.annotations.Factory;
+import org.testng.annotations.Listeners;
+import org.testng.annotations.Test;
 
 @Listeners(TestListener.class)
 public class TestFluentApi extends TestSetup {
 
-    @Factory(dataProvider = "dp", dataProviderClass = TestsDataProvider.class)
-    public TestFluentApi(Capabilities caps, String platform) {
-        super.caps = caps;
-        super.platform = platform;
-        super.forceFPS = false;
-
-        super.compareExpectedRegions = caps.getBrowserName().equalsIgnoreCase("chrome");
-        testSuitName = "Eyes Selenium SDK - Fluent API";
+    @Factory(dataProvider = "dp", dataProviderClass = TestDataProvider.class)
+    public TestFluentApi(Capabilities caps, String mode) {
+        super("Eyes Selenium SDK - Fluent API", caps, mode);
         testedPageUrl = "https://applitools.github.io/demo/TestPages/FramesTestPage/";
     }
 
     @Test
     public void TestCheckWindowWithIgnoreRegion_Fluent() {
-        webDriver.findElement(By.tagName("input")).sendKeys("My Input");
+        super.getWebDriver().findElement(By.tagName("input")).sendKeys("My Input");
         getEyes().check("Fluent - Window with Ignore region", Target.window()
                 .fully()
                 .timeout(5000)
@@ -55,24 +49,32 @@ public class TestFluentApi extends TestSetup {
     public void TestCheckWindowWithIgnoreBySelector_Fluent() {
         getEyes().check("Fluent - Window with ignore region by selector", Target.window()
                 .ignore(By.id("overflowing-div")));
+
+        setExpectedIgnoreRegions(new Region(8, 80, 304, 184));
     }
 
     @Test
     public void TestCheckWindowWithIgnoreBySelector_Centered_Fluent() {
         getEyes().check("Fluent - Window with ignore region by selector centered", Target.window()
                 .ignore(By.id("centered")));
+
+        setExpectedIgnoreRegions(new Region(122, 928, 456, 306));
     }
 
     @Test
     public void TestCheckWindowWithIgnoreBySelector_Stretched_Fluent() {
         getEyes().check("Fluent - Window with ignore region by selector stretched", Target.window()
                 .ignore(By.id("stretched")));
+
+        setExpectedIgnoreRegions(new Region(8, 1270, 690, 206));
     }
 
     @Test
     public void TestCheckWindowWithFloatingBySelector_Fluent() {
         getEyes().check("Fluent - Window with floating region by selector", Target.window()
                 .floating(By.id("overflowing-div"), 3, 3, 20, 30));
+
+        setExpectedFloatingRegions(new FloatingMatchSettings(8, 80, 304, 184, 3, 3, 20, 30));
     }
 
     @Test
@@ -87,15 +89,15 @@ public class TestFluentApi extends TestSetup {
 
     @Test
     public void TestCheckElementWithIgnoreRegionByElementOutsideTheViewport_Fluent() {
-        WebElement element = webDriver.findElement(By.id("overflowing-div-image"));
-        WebElement ignoreElement = webDriver.findElement(By.id("overflowing-div"));
+        WebElement element = getWebDriver().findElement(By.id("overflowing-div-image"));
+        WebElement ignoreElement = getWebDriver().findElement(By.id("overflowing-div"));
         setExpectedIgnoreRegions();
         getEyes().check("Fluent - Region by element", Target.region(element).ignore(ignoreElement));
     }
 
     @Test
     public void TestCheckElementWithIgnoreRegionBySameElement_Fluent() {
-        WebElement element = webDriver.findElement(By.id("overflowing-div-image"));
+        WebElement element = getWebDriver().findElement(By.id("overflowing-div-image"));
         getEyes().check("Fluent - Region by element", Target.region(element).ignore(element));
         setExpectedIgnoreRegions(new Region(0, 0, 304, 184));
     }
@@ -134,14 +136,10 @@ public class TestFluentApi extends TestSetup {
 
     @Test
     public void TestCheckScrollableModal() {
-        Eyes eyes = getEyes();
-        driver.findElement(By.id("centered")).click();
-        StitchMode originalStitchMode = eyes.getStitchMode();
-        eyes.setStitchMode(StitchMode.SCROLL);
-        eyes.check("Scrollable Modal", Target.region(By.id("modal-content")).fully().scrollRootElement(By.id("modal1")));
-        eyes.setStitchMode(originalStitchMode);
+        getDriver().findElement(By.id("centered")).click();
+        By scrollRootSelector = (stitchMode == StitchMode.CSS) ? By.id("modal-content") : By.id("modal1");
+        getEyes().check("Scrollable Modal", Target.region(By.id("modal-content")).fully().scrollRootElement(scrollRootSelector));
     }
-
 
     @Test
     public void TestCheckWindowWithFloatingByRegion_Fluent() {
@@ -149,15 +147,20 @@ public class TestFluentApi extends TestSetup {
                 .floating(new Region(10, 10, 20, 20), 3, 3, 20, 30);
         getEyes().check("Fluent - Window with floating region by region", settings);
 
-        setExpectedFloatingsRegions(new FloatingMatchSettings(10, 10, 20, 20, 3, 3, 20, 30));
+        setExpectedFloatingRegions(new FloatingMatchSettings(10, 10, 20, 20, 3, 3, 20, 30));
     }
 
     @Test
     public void TestCheckElementFully_Fluent() {
-        WebElement element = webDriver.findElement(By.id("overflowing-div-image"));
+        WebElement element = getWebDriver().findElement(By.id("overflowing-div-image"));
         getEyes().check("Fluent - Region by element - fully", Target.region(element).fully());
     }
 
+    @Test
+    public void TestCheckRegionBySelectorAfterManualScroll_Fluent() {
+        ((JavascriptExecutor) getDriver()).executeScript("window.scrollBy(0,900)");
+        getEyes().check("Fluent - Region by selector after manual scroll", Target.region(By.id("centered")));
+    }
 
     @Test
     public void TestSimpleRegion() {
@@ -165,15 +168,29 @@ public class TestFluentApi extends TestSetup {
     }
 
 
-//
-//    public static boolean[] booleanDP() {
-//        return new boolean[]{true, false};
-//    }
-//
-//    @Test(dataProvider = "booleanDP")
-//    public void TestIgnoreDisplacements(boolean ignoreDisplacements) {
-//        getEyes().check("Fluent - Ignore Displacements = " + ignoreDisplacements, Target.window().ignoreDisplacements(ignoreDisplacements).fully());
-//        addExpectedProperty("IgnoreDisplacements", ignoreDisplacements);
-//    }
+    @Test(dataProvider = "booleanDP", dataProviderClass = TestDataProvider.class)
+    public void TestIgnoreDisplacements(boolean ignoreDisplacements) {
+        getEyes().check("Fluent - Ignore Displacements = " + ignoreDisplacements, Target.window().ignoreDisplacements(ignoreDisplacements).fully());
+        addExpectedProperty("IgnoreDisplacements", ignoreDisplacements);
+    }
+
+    @Test
+    public void TestAccessibilityRegions() {
+        Configuration config = getEyes().getConfiguration();
+        config.setAccessibilityValidation(AccessibilityLevel.AAA);
+        getEyes().setConfiguration(config);
+        getEyes().check(Target.window().accessibility(By.className("ignore"), AccessibilityRegionType.LargeText));
+        setExpectedAccessibilityRegions(new AccessibilityRegionByRectangle[]{
+                new AccessibilityRegionByRectangle(122, 928, 456, 306, AccessibilityRegionType.LargeText),
+                new AccessibilityRegionByRectangle(8, 1270, 690, 206, AccessibilityRegionType.LargeText),
+                new AccessibilityRegionByRectangle(10, 284, 800, 500, AccessibilityRegionType.LargeText)}
+        );
+        addExpectedProperty("AccessibilityLevel", AccessibilityLevel.AAA);
+    }
+
+    @Override
+    protected void beforeOpen(Eyes eyes) {
+        eyes.getDefaultMatchSettings().setAccessibilityLevel(AccessibilityLevel.AAA);
+    }
 
 }

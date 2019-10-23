@@ -1,226 +1,251 @@
 package com.applitools.eyes.selenium;
 
 import com.applitools.eyes.*;
-import com.applitools.utils.GeneralUtils;
+import com.applitools.eyes.utils.SeleniumUtils;
+import com.applitools.eyes.utils.TestUtils;
+import com.applitools.eyes.visualgrid.services.VisualGridRunner;
 import org.openqa.selenium.Capabilities;
 import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.chrome.ChromeDriver;
-import org.openqa.selenium.chrome.ChromeOptions;
-import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.remote.RemoteWebDriver;
 import org.testng.ITest;
 import org.testng.annotations.BeforeClass;
 
-import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.text.SimpleDateFormat;
 import java.util.Arrays;
-import java.util.Calendar;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 public abstract class TestSetup implements ITest {
 
-    private Eyes seleniumEyes;
+    private static String testNameSuffix = System.getenv("TEST_NAME_SUFFIX");
+    private final String mode;
 
-    private Eyes eyes;
-    protected WebDriver driver;
-    protected RemoteWebDriver webDriver;
+    private boolean useVisualGrid = false;
+    StitchMode stitchMode = StitchMode.SCROLL;
+
+    private EyesRunner runner = new ClassicRunner();
+    private Capabilities options;
+    private String testName;
+
+    public TestSetup(String testSuitName, Capabilities options, String mode) {
+        if (testNameSuffix == null) testNameSuffix = "";
+        this.testSuitName = testSuitName + testNameSuffix;
+        this.options = options;
+        this.mode = mode;
+        switch (mode) {
+            case "VG":
+                this.useVisualGrid = true;
+                break;
+            case "CSS":
+                this.stitchMode = StitchMode.CSS;
+                break;
+            case "SCROLL":
+                this.stitchMode = StitchMode.SCROLL;
+                break;
+        }
+    }
+
+    class SpecificTestContextRequirements {
+
+        private Eyes eyes;
+        private WebDriver driver;
+        private WebDriver webDriver;
+
+        public HashSet<FloatingMatchSettings> expectedFloatingRegions = new HashSet<>();
+        public HashSet<Region> expectedIgnoreRegions = new HashSet<>();
+        public HashSet<Region> expectedLayoutRegions = new HashSet<>();
+        public HashSet<Region> expectedStrictRegions = new HashSet<>();
+        public HashSet<Region> expectedContentRegions = new HashSet<>();
+        public Map<String, Object> expectedProperties = new HashMap<>();
+        public HashSet<AccessibilityRegionByRectangle> expectedAccessibilityRegions = new HashSet<AccessibilityRegionByRectangle>();
+
+        public SpecificTestContextRequirements(Eyes eyes) {
+            this.eyes = eyes;
+        }
+
+        public Eyes getEyes() {
+            return this.eyes;
+        }
+
+        public WebDriver getWrappedDriver() {
+            return this.driver;
+        }
+
+        public void setWrappedDriver(WebDriver driver) {
+            this.driver = driver;
+        }
+
+        public WebDriver getWebDriver() {
+            return this.webDriver;
+        }
+
+        public void setDriver(WebDriver driver) {
+            this.webDriver = driver;
+        }
+    }
+
+    private Map<Object, SpecificTestContextRequirements> testDataByTestId = new ConcurrentHashMap<>();
 
     protected String testSuitName;
 
-    protected String testedPageUrl = "http://applitools.github.io/demo/TestPages/FramesTestPage/";
+    protected String testedPageUrl = "https://applitools.github.io/demo/TestPages/FramesTestPage/";
     //protected RectangleSize testedPageSize = new RectangleSize(1200, 800);
     protected RectangleSize testedPageSize = new RectangleSize(700, 460);
-
-    private String logsPath = GeneralUtils.getEnvString("APPLITOOLS_LOGS_PATH");
-
-    protected Capabilities caps;
-    private DesiredCapabilities desiredCaps = new DesiredCapabilities();
-
-    protected HashSet<FloatingMatchSettings> expectedFloatingRegions = new HashSet<>();
-    protected HashSet<Region> expectedIgnoreRegions = new HashSet<>();
-    protected HashSet<Region> expectedLayoutRegions = new HashSet<>();
-    protected HashSet<Region> expectedStrictRegions = new HashSet<>();
-    protected HashSet<Region> expectedContentRegions = new HashSet<>();
 
     protected boolean compareExpectedRegions = false;
 
     protected String platform;
     protected boolean forceFPS;
 
-    private String testName;
-
     @BeforeClass(alwaysRun = true)
     public void OneTimeSetUp() {
-        if (TestsDataProvider.runOnCI && System.getenv("TRAVIS") != null) {
+        if (TestUtils.runOnCI && System.getenv("TRAVIS") != null) {
             System.setProperty("webdriver.chrome.driver", "/home/travis/build/chromedriver"); // for travis build.
         }
-        // Initialize the seleniumEyes SDK and set your private API key.
-        seleniumEyes = new Eyes();
-        //seleniumEyes.setServerConnector(new ServerConnector());
-
-//        RemoteSessionEventHandler remoteSessionEventHandler = new RemoteSessionEventHandler(
-//                seleniumEyes.getLogger(), URI.create("http://localhost:3000/"), "MyAccessKey");
-//        remoteSessionEventHandler.setThrowExceptions(false);
-//        seleniumEyes.addSessionEventHandler(remoteSessionEventHandler);
-
-        LogHandler logHandler = new StdoutLogHandler(false);
-
-        seleniumEyes.setLogHandler(logHandler);
-        seleniumEyes.setStitchMode(StitchMode.CSS);
-
-        seleniumEyes.setHideScrollbars(true);
-
-//        seleniumEyes.setProxy(new ProxySettings("http://127.0.0.1", 8888));
 
         String batchId = System.getenv("APPLITOOLS_BATCH_ID");
         if (batchId != null) {
-            TestsDataProvider.batchInfo.setId(batchId);
+            TestDataProvider.batchInfo.setId(batchId);
         }
 
-        seleniumEyes.setBatch(TestsDataProvider.batchInfo);
-        this.setEyes(seleniumEyes);
+        this.runner = this.useVisualGrid ? new VisualGridRunner(10) : new ClassicRunner();
     }
 
-    protected void setEyes(Eyes eyes) {
-        this.eyes = eyes;
+    public SpecificTestContextRequirements getTestData() {
+        return this.testDataByTestId.get(Thread.currentThread().getId());
+    }
+
+    public WebDriver getDriver() {
+        return getTestData().getWrappedDriver();
+    }
+
+    protected WebDriver getWebDriver() {
+        return getTestData().getWebDriver();
     }
 
     public Eyes getEyes() {
-        return this.eyes;
+        return getTestData().getEyes();
     }
 
     protected void setExpectedIgnoreRegions(Region... expectedIgnoreRegions) {
-        this.expectedIgnoreRegions = new HashSet<>(Arrays.asList(expectedIgnoreRegions));
+        getTestData().expectedIgnoreRegions = new HashSet<>(Arrays.asList(expectedIgnoreRegions));
     }
 
     protected void setExpectedLayoutRegions(Region... expectedLayoutRegions) {
-        this.expectedLayoutRegions = new HashSet<>(Arrays.asList(expectedLayoutRegions));
+        getTestData().expectedLayoutRegions = new HashSet<>(Arrays.asList(expectedLayoutRegions));
     }
 
     protected void setExpectedStrictRegions(Region... expectedStrictRegions) {
-        this.expectedStrictRegions = new HashSet<>(Arrays.asList(expectedStrictRegions));
+        getTestData().expectedStrictRegions = new HashSet<>(Arrays.asList(expectedStrictRegions));
     }
 
     protected void setExpectedContentRegions(Region... expectedContentRegions) {
-        this.expectedContentRegions = new HashSet<>(Arrays.asList(expectedContentRegions));
+        getTestData().expectedContentRegions = new HashSet<>(Arrays.asList(expectedContentRegions));
     }
 
-    protected void setExpectedFloatingsRegions(FloatingMatchSettings... expectedFloatingsRegions) {
-        this.expectedFloatingRegions = new HashSet<>(Arrays.asList(expectedFloatingsRegions));
+    protected void setExpectedFloatingRegions(FloatingMatchSettings... expectedFloatingsRegions) {
+        getTestData().expectedFloatingRegions = new HashSet<>(Arrays.asList(expectedFloatingsRegions));
     }
 
-    public void beforeMethod(String methodName) {
-        System.out.println();
-        System.out.println("==== Starting Test ====");
-        System.out.println(this);
-        System.out.println();
+    public void addExpectedProperty(String propertyName, Object expectedValue)
+    {
+        Map<String, Object> expectedProps = getTestData().expectedProperties;
+        expectedProps.put(propertyName, expectedValue);
+    }
+    
+    void beforeMethod(String testName) {
+        // Initialize the eyes SDK and set your private API key.
+        this.testName = testName + " " + options.getBrowserName() + " (" + this.mode + ")";
+        Eyes eyes = initEyes();
+        SpecificTestContextRequirements testData = new SpecificTestContextRequirements(eyes);
+        testDataByTestId.put(Thread.currentThread().getId(), testData);
 
-        String fps = forceFPS ? "_FPS" : "";
-        String testName = methodName + fps;
-        testName = testName.replace('[', '_')
-                .replace(' ', '_')
-                .replace("]", "");
+        if (this.runner instanceof VisualGridRunner) {
+            testName += "_VG";
+        }
+        else if (this.stitchMode == StitchMode.SCROLL) {
+            testName += "_Scroll";
+        }
 
+        RemoteWebDriver webDriver = null;
         String seleniumServerUrl = System.getenv("SELENIUM_SERVER_URL");
-        if ("http://ondemand.saucelabs.com/wd/hub".equalsIgnoreCase(seleniumServerUrl)) {
-            desiredCaps.setCapability("username", System.getenv("SAUCE_USERNAME"));
-            desiredCaps.setCapability("accesskey", System.getenv("SAUCE_ACCESS_KEY"));
-            //desiredCaps.setCapability("seleniumVersion", "3.11.0");
-
-            if (caps.getBrowserName().equals("chrome")) {
-                desiredCaps.setCapability("chromedriverVersion", "2.37");
-            }
-
-            desiredCaps.setCapability("platform", platform);
-            desiredCaps.setCapability("name", testName + " (" + seleniumEyes.getFullAgentId() + ")");
-
-        } else if ("http://hub-cloud.browserstack.com/wd/hub".equalsIgnoreCase(seleniumServerUrl)) {
-            seleniumServerUrl = "http://" + System.getenv("BROWSERSTACK_USERNAME") + ":" + System.getenv("BROWSERSTACK_ACCESS_KEY") + "@hub-cloud.browserstack.com/wd/hub";
-            desiredCaps.setCapability("platform", platform);
-            desiredCaps.setCapability("name", testName + " (" + seleniumEyes.getFullAgentId() + ")");
-        }
-
-        caps.merge(desiredCaps);
-
-        this.testName = testName + " " + caps.getBrowserName() + " " + platform;
-
-        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy_MM_dd_HH_mm_ss_SSS");
-
-        String extendedTestName =
-                testName + "_" +
-                        caps.getBrowserName() + "_" +
-                        platform + "_" +
-                        dateFormat.format(Calendar.getInstance().getTime());
-
-        if (seleniumServerUrl != null) {
-            try {
-                webDriver = new RemoteWebDriver(new URL(seleniumServerUrl), caps);
-            } catch (MalformedURLException ignored) {
-            }
-        } else {
-            switch (caps.getBrowserName()) {
-                case "chrome":
-                    webDriver = new ChromeDriver((ChromeOptions) caps);
-                    break;
-                default:
-                    return;
-            }
-        }
-
-        LogHandler logHandler;
-
-        if (!TestsDataProvider.runOnCI && logsPath != null) {
-            String path = logsPath + File.separator + "java" + File.separator + extendedTestName.replaceAll("\\s", "_");
-            logHandler = new FileLogger(path + File.separator + testName + "_" + platform + ".log", true, true);
-            seleniumEyes.setDebugScreenshotsPath(path);
-            seleniumEyes.setDebugScreenshotsPrefix(testName + "_");
-            seleniumEyes.setSaveDebugScreenshots(true);
-        } else {
-            logHandler = new StdoutLogHandler(false);
-        }
-
-        seleniumEyes.setLogHandler(logHandler);
-        seleniumEyes.clearProperties();
-        seleniumEyes.addProperty("Selenium Session ID", webDriver.getSessionId().toString());
-        seleniumEyes.addProperty("ForceFPS", forceFPS ? "true" : "false");
-        seleniumEyes.addProperty("ScaleRatio", "" + seleniumEyes.getScaleRatio());
-        seleniumEyes.addProperty("Agent ID", seleniumEyes.getFullAgentId());
         try {
-            driver = seleniumEyes.open(webDriver,
-                    testSuitName,
-                    testName,
-                    testedPageSize
-            );
-
-            if (testedPageUrl != null) {
-                driver.get(testedPageUrl);
+            if (seleniumServerUrl != null) {
+                webDriver = new RemoteWebDriver(new URL(seleniumServerUrl), this.options);
             }
-
-            seleniumEyes.setForceFullPageScreenshot(forceFPS);
-
-            this.expectedIgnoreRegions.clear();
-            this.expectedLayoutRegions.clear();
-            this.expectedStrictRegions.clear();
-            this.expectedContentRegions.clear();
-            this.expectedFloatingRegions.clear();
-        } catch (Exception ex) {
-            seleniumEyes.abortIfNotClosed();
-            webDriver.quit();
+        } catch (MalformedURLException ignored) {
         }
+
+        if (webDriver == null) {
+            webDriver = (RemoteWebDriver) SeleniumUtils.createWebDriver(this.options);
+        }
+
+        eyes.addProperty("Selenium Session ID", webDriver.getSessionId().toString());
+
+        eyes.addProperty("ForceFPS", eyes.getForceFullPageScreenshot() ? "true" : "false");
+        eyes.addProperty("Agent ID", eyes.getFullAgentId());
+
+        //IWebDriver webDriver = new RemoteWebDriver(new Uri("http://localhost:4444/wd/hub"), capabilities_);
+
+        TestUtils.setupLogging(eyes, testName + "_" + options.getPlatform());
+
+        eyes.getLogger().log("navigating to URL: " + testedPageUrl);
+
+        beforeOpen(eyes);
+
+        WebDriver driver;
+        try {
+            driver = eyes.open(webDriver, this.testSuitName, testName, testedPageSize);
+        } catch (Throwable e) {
+            webDriver.quit();
+            throw e;
+        }
+        //string userProfile = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
+        driver.get(testedPageUrl);
+        eyes.getLogger().log(testName + ": " + TestDataProvider.batchInfo.getName());
+
+        testData.setWrappedDriver(driver);
+        testData.setDriver(webDriver);
     }
+
+    private Eyes initEyes() {
+        Eyes eyes = new Eyes(this.runner);
+
+        String serverUrl = System.getenv("APPLITOOLS_SERVER_URL");
+        if (serverUrl != null && serverUrl.length() > 0) {
+            eyes.setServerUrl(serverUrl);
+        }
+
+        eyes.setHideScrollbars(true);
+        eyes.setStitchMode(this.stitchMode);
+        eyes.setSaveNewTests(false);
+        eyes.setBatch(TestDataProvider.batchInfo);
+        if (System.getenv("APPLITOOLS_USE_PROXY") != null) {
+            eyes.setProxy(new ProxySettings("http://127.0.0.1", 8888));
+        }
+        return eyes;
+    }
+
+    protected void beforeOpen(Eyes eyes){};
 
     @Override
     public String getTestName() {
         return testName;
     }
 
+    protected void setExpectedAccessibilityRegions(AccessibilityRegionByRectangle[] accessibilityRegions)
+    {
+        this.getTestData().expectedAccessibilityRegions = new HashSet<>(Arrays.asList(accessibilityRegions));
+    }
+
     @Override
     public String toString() {
         return String.format("%s (%s, %s, force FPS: %s)",
                 this.getClass().getSimpleName(),
-                this.caps.getBrowserName(),
+                this.options.getBrowserName(),
                 this.platform,
                 this.forceFPS);
     }

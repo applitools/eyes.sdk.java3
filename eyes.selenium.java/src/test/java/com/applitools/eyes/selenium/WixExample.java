@@ -3,6 +3,7 @@ package com.applitools.eyes.selenium;
 import com.applitools.eyes.LogHandler;
 import com.applitools.eyes.StdoutLogHandler;
 import com.applitools.eyes.selenium.fluent.Target;
+import com.applitools.eyes.utils.TestUtils;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
@@ -24,7 +25,7 @@ public final class WixExample {
 //        VisualGridEyes.setServerUrl(URI.create("https://localhost.applitools.com"));
         eyes.setMatchTimeout(0);
 
-        LogHandler logHandler = new StdoutLogHandler(true);
+        LogHandler logHandler = new StdoutLogHandler(TestUtils.verboseLogs);
         eyes.setLogHandler(logHandler);
 
         eyes.setDebugScreenshotsPath("c:\\temp\\logs");
