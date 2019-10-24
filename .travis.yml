@@ -7,11 +7,21 @@ dist: trusty
 addons:
   chrome: stable
 
-before_script:
-  - latestChromeDriverURL=$(wget http://chromedriver.storage.googleapis.com/LATEST_RELEASE -q -O -)
-  - wget "http://chromedriver.storage.googleapis.com/${latestChromeDriverURL}/chromedriver_linux64.zip"
-  - unzip chromedriver_linux64.zip -d /home/travis/build/
-  - env webdriver.chrome.driver=/home/travis/build/
-
-script:
-  - mvn test -e -X
+jobs:
+  include:
+    - stage: before_test
+      script:
+        - latestChromeDriverURL=$(wget http://chromedriver.storage.googleapis.com/LATEST_RELEASE -q -O -)
+        - wget "http://chromedriver.storage.googleapis.com/${latestChromeDriverURL}/chromedriver_linux64.zip"
+        - unzip chromedriver_linux64.zip -d /home/travis/build/
+        - env webdriver.chrome.driver=/home/travis/build/
+    - stage: test
+      script:
+        - mvn test -e -X
+    - stage: deploy
+      if: tag =~ ^RELEASE_CANDIDATE- AND fork == false
+      script:
+        - COMMITTER_EMAIL="$(git log -1 $TRAVIS_COMMIT --pretty="%cE")"
+        - if [[ $COMMITTER_EMAIL =~ $ALLOWED_COMMITERS ]]; then
+          echo "DEPLOY";
+          fi
