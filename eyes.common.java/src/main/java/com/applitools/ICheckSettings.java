@@ -171,6 +171,8 @@ public interface ICheckSettings {
 
     ICheckSettings scriptHook(String scriptHook);
 
+    ICheckSettings beforeRenderScreenshotHook(String scriptHook);
+
     ICheckSettings ignoreDisplacements(boolean ignoreDisplacements);
 
     ICheckSettings ignoreDisplacements();

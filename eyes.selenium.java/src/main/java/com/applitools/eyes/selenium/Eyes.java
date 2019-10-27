@@ -30,7 +30,7 @@ import java.util.concurrent.Future;
 /**
  * The type Eyes.
  */
-public class Eyes implements ISeleniumConfigurationProvider {
+public class Eyes implements ISeleniumConfigurationProvider, IEyesBase {
 
     private static final int USE_DEFAULT_MATCH_TIMEOUT = -1;
 

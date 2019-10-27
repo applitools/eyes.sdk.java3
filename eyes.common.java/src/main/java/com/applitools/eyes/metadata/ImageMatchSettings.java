@@ -1,23 +1,27 @@
 package com.applitools.eyes.metadata;
 
-import com.applitools.eyes.*;
+import com.applitools.eyes.AccessibilityLevel;
+import com.applitools.eyes.AccessibilityRegionByRectangle;
+import com.applitools.eyes.FloatingMatchSettings;
+import com.applitools.eyes.MatchLevel;
+import com.applitools.eyes.Region;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonPropertyOrder({
-    "matchLevel",
-    "ignore",
-    "strict",
-    "content",
-    "layout",
-    "floating",
-    "splitTopHeight",
-    "splitBottomHeight",
-    "ignoreCaret",
-    "scale",
-    "remainder"
+        "matchLevel",
+        "ignore",
+        "strict",
+        "content",
+        "layout",
+        "floating",
+        "splitTopHeight",
+        "splitBottomHeight",
+        "ignoreCaret",
+        "scale",
+        "remainder"
 })
 public class ImageMatchSettings {
 
@@ -43,6 +47,8 @@ public class ImageMatchSettings {
     private Integer scale;
     @JsonProperty("remainder")
     private Integer remainder;
+    @JsonProperty("ignoreDisplacements")
+    private Boolean ignoreDisplacements;
     @JsonProperty("accessibility")
     private AccessibilityRegionByRectangle[] accessibility = new AccessibilityRegionByRectangle[0];
     @JsonProperty("accessibilityLevel")
@@ -157,6 +163,17 @@ public class ImageMatchSettings {
     public void setRemainder(Integer remainder) {
         this.remainder = remainder;
     }
+
+    @JsonProperty("ignoreDisplacements")
+    public Boolean getIgnoreDisplacements() {
+        return ignoreDisplacements;
+    }
+
+    @JsonProperty("ignoreDisplacements")
+    public void setIgnoreDisplacements(Boolean ignoreDisplacements) {
+        this.ignoreDisplacements = ignoreDisplacements;
+    }
+
     @JsonProperty("accessibilityLevel")
     public AccessibilityLevel getAccessibilityLevel() {
         return accessibilityLevel;

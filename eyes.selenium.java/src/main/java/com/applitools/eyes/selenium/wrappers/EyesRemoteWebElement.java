@@ -47,6 +47,9 @@ public class EyesRemoteWebElement extends RemoteWebElement {
     private final String JS_GET_SCROLL_HEIGHT =
             "return arguments[0].scrollHeight;";
 
+    private final String JS_GET_SCROLL_SIZE =
+            "return arguments[0].scrollWidth+ ';' + arguments[0].scrollHeight;";
+
     private final String JS_SCROLL_TO_FORMATTED_STR =
             "arguments[0].scrollLeft = %d;" +
                     "arguments[0].scrollTop = %d;";
@@ -618,5 +621,21 @@ public class EyesRemoteWebElement extends RemoteWebElement {
                 Math.round(Float.parseFloat(parts[3])),
                 Math.round(Float.parseFloat(parts[2])));
         return rect;
+    }
+
+    /**
+     * @return The value of the scrollHeight property of the element.
+     */
+    public RectangleSize getScrollSize() {
+        Object retVal = eyesDriver.executeScript(JS_GET_SCROLL_SIZE, this);
+        if (retVal == null) {
+            return null;
+        }
+        @SuppressWarnings("unchecked") String sizeStr = (String) retVal;
+        sizeStr = sizeStr.replace("px", "");
+        String[] parts = sizeStr.split(";");
+        return new RectangleSize(
+                Math.round(Float.parseFloat(parts[0])),
+                Math.round(Float.parseFloat(parts[1])));
     }
 }

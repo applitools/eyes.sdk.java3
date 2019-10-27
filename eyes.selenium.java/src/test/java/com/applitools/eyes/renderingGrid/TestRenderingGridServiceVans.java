@@ -133,7 +133,7 @@ public class TestRenderingGridServiceVans {
             configuration.setAppName("RenderingGridIntegration");
             configuration.addBrowser(800, 600, BrowserType.CHROME);
             configuration.addBrowser(1600, 1200, BrowserType.CHROME);
-            configuration.addDeviceEmulation(DeviceName.iPhone_6_7_8_Plus, ScreenOrientation.LANDSCAPE);
+            configuration.addDeviceEmulation(DeviceName.iPhone6_7_8_Plus, ScreenOrientation.LANDSCAPE);
             logger.log("created configurations for url " + testedUrl);
             eyes.setConfiguration(configuration);
             eyes.open(webDriver);

@@ -13,6 +13,7 @@ public class TestIEyesVGWithWebhook extends TestIEyesVG{
     protected ICheckSettings getCheckSettings()
     {
         String jshook = "document.body.style='background-color: red'";
+        ICheckSettings checkSettings = super.getCheckSettings();
         return super.getCheckSettings().beforeRenderScreenshotHook(jshook);
     }
 }

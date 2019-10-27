@@ -17,6 +17,8 @@ public class Image {
     private String id;
     @JsonProperty("size")
     private RectangleSize size;
+    @JsonProperty("hasDom")
+    private boolean hasDom;
 
     @JsonProperty("id")
     public String getId() {
@@ -38,4 +40,13 @@ public class Image {
         this.size = size;
     }
 
+    @JsonProperty("hasDom")
+    public boolean getHasDom() {
+        return hasDom;
+    }
+
+    @JsonProperty("hasDom")
+    public void setHasDom(boolean hasDom) {
+        this.hasDom = hasDom;
+    }
 }

@@ -83,7 +83,7 @@ public class TestTimeouts {
             configuration.addBrowser(900, 700, BrowserType.IE_10);
             configuration.addBrowser(1000, 800, BrowserType.IE_11);
             configuration.addDeviceEmulation(DeviceName.Galaxy_S5);
-            configuration.addDeviceEmulation(DeviceName.iPhone_6_7_8_Plus);
+            configuration.addDeviceEmulation(DeviceName.iPhone6_7_8_Plus);
             configuration.addDeviceEmulation(DeviceName.Laptop_with_HiDPI_screen);
             eyes.setConfiguration(configuration);
             eyes.open(driver);

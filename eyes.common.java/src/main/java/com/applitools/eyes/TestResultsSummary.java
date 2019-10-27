@@ -64,4 +64,8 @@ public class TestResultsSummary implements Iterable<TestResultContainer>{
     public Iterator<TestResultContainer> iterator() {
         return this.allResults.iterator();
     }
+
+    public int size() {
+        return this.allResults.size();
+    }
 }

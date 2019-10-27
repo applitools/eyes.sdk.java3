@@ -38,7 +38,7 @@ import java.util.Queue;
 /**
  * Applitools Eyes Base for Java API .
  */
-public abstract class EyesBase{
+public abstract class EyesBase implements IEyesBase{
 
     protected static final int USE_DEFAULT_TIMEOUT = -1;
     private static final int MAX_ITERATION = 10;
@@ -654,6 +654,10 @@ public abstract class EyesBase{
         return null;
     }
 
+    public TestResults abort() {
+        return abortIfNotClosed();
+    }
+
     protected void openLogger() {
         logger.getLogHandler().open();
     }
@@ -854,6 +858,11 @@ public abstract class EyesBase{
                     sessionStartInfo.getAppIdOrName()));
         }
     }
+
+    public void setIsDisabled(Boolean isDisabled) {
+        this.isDisabled = isDisabled;
+    }
+
 
     /**
      * Runs a timing test.

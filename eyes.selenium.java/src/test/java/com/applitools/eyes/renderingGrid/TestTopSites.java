@@ -4,12 +4,15 @@ import com.applitools.eyes.*;
 import com.applitools.eyes.selenium.BrowserType;
 import com.applitools.eyes.selenium.Configuration;
 import com.applitools.eyes.selenium.Eyes;
+import com.applitools.eyes.selenium.StitchMode;
 import com.applitools.eyes.selenium.fluent.Target;
 import com.applitools.eyes.utils.SeleniumUtils;
 import com.applitools.eyes.utils.TestUtils;
 import com.applitools.eyes.visualgrid.services.VisualGridRunner;
 import com.applitools.utils.GeneralUtils;
+import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.chrome.ChromeDriver;
 import org.testng.ITestContext;
 import org.testng.annotations.*;
 
@@ -20,110 +23,59 @@ public class TestTopSites {
     public static BatchInfo batch = new BatchInfo("TTS");
     private EyesRunner visualGridRunner;
 
-    @BeforeClass
-    public void beforeClass() {
-        visualGridRunner = new VisualGridRunner(10);
-        LogHandler logHandler = new FileLogger("eyes.log", false, true);//TestUtils.initLogger("TestTopSites");
-        visualGridRunner.setLogHandler(logHandler);
-        visualGridRunner.getLogger().log("enter");
-    }
 
-    @DataProvider(name = "dp", parallel = true)
-    public static Object[][] dp() {
-        return new Object[][]{
-                {"https://amazon.com"},
-//                {"https://ebay.com"},
-                {"https://twitter.com"},
-                {"https://wikipedia.org"},
-                {"https://instagram.com"},
-                {"https://www.target.com/c/blankets-throws/-/N-d6wsb?lnk=ThrowsBlankets%E2%80%9C,tc"},
-        };
-    }
+    public static Eyes initializeEyes(VisualGridRunner runner) {
+        // Create Eyes object with the runner, meaning it'll be a Visual Grid eyes.
+        Eyes eyes = new Eyes(runner);
 
-    private Eyes initEyes(WebDriver webDriver, String testedUrl) {
-        Eyes eyes = new Eyes(visualGridRunner);
-        eyes.setMatchLevel(MatchLevel.LAYOUT);
-        Logger logger = eyes.getLogger();
+        eyes.setLogHandler(new FileLogger("eyes.log", true, true));
 
-        try {
-            URL url = new URL(testedUrl);
-            TestUtils.setupLogging(eyes, url.getHost());
-        } catch (MalformedURLException e) {
-            GeneralUtils.logExceptionStackTrace(logger, e);
-        }
+        eyes.setApiKey(System.getenv("APPLITOOLS_API_KEY"));
 
-        logger.log("creating WebDriver: " + testedUrl);
+        Configuration sconf = new Configuration();
 
-        try {
-            Configuration configuration = new Configuration();
-            configuration.setTestName("Top 5 websites - " + testedUrl);
-            configuration.setAppName("Top Five Sites");
-            configuration.setBatch(TestTopSites.batch);
-            configuration.setBranchName("TTS - config branch");
-            configuration.setIgnoreDisplacements(true);
-            configuration.addBrowser(800, 600, BrowserType.CHROME);
-            configuration.addBrowser(700, 500, BrowserType.FIREFOX);
-            configuration.addBrowser(700, 500, BrowserType.IE_10);
-            configuration.addBrowser(700, 500, BrowserType.IE_11);
-            configuration.addBrowser(1600, 1200, BrowserType.CHROME);
-            configuration.addBrowser(1200, 800, BrowserType.EDGE);
-//            configuration.addDeviceEmulation(emulation);
-            logger.log("created configurations for url " + testedUrl);
-            //VisualGridEyes.setServerUrl("https://eyes.applitools.com/");
-//            configuration.setProxy(new ProxySettings("http://127.0.0.1", 8888, null, null));
-            eyes.setConfiguration(configuration);
-            eyes.open(webDriver);
-        } catch (Exception e) {
-            GeneralUtils.logExceptionStackTrace(logger, e);
-        }
+        sconf.setAppName("Test");
+
+        sconf.setTestName("Test Name");
+
+        sconf.setBatch(new BatchInfo("VIP Browser combo batch"));
+
+        sconf.setStitchMode(StitchMode.CSS);
+
+        sconf.addBrowser(800, 600, BrowserType.CHROME);
+
+        sconf.addBrowser(1200, 800, BrowserType.FIREFOX);
+
+        // Add iPhone 4 device emulation
+        // sconf.addDeviceEmulation(DeviceName.iPhone_4);
+
+        eyes.setConfiguration(sconf);
+
         return eyes;
     }
+    @Test
+    public void runTest() {
 
-    @Test(dataProvider = "dp")
-    public void test(String testedUrl) {
-        visualGridRunner.getLogger().log("entering with url " + testedUrl);
-        WebDriver webDriver = SeleniumUtils.createChromeDriver();
-        webDriver.get(testedUrl);
-        Eyes eyes = initEyes(webDriver, testedUrl);
-        Logger logger = eyes.getLogger();
-        logger.log("navigated to " + testedUrl);
+        // Create a runner with concurrency of 10
+        VisualGridRunner runner = new VisualGridRunner(10);
 
-        try {
-            //CheckRGSettings setting = new CheckRGSettings(CheckRGSettings.SizeMode.FULL_PAGE, null, null, false);
-            logger.log("running check for url " + testedUrl);
-            try {
-                eyes.check(Target.window().withName("Step1 - " + testedUrl).sendDom(true).useDom(true));
-                eyes.check(Target.window().fully(false).withName("Step2 - " + testedUrl).sendDom(true).useDom(true));
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-            eyes.getLogger().log("calling VisualGridEyes.close() for url " + testedUrl);
-//            VisualGridEyes.close();
-//            TestResults close = eyes.close(true);
-//            Assert.assertNotNull(close);
-            eyes.closeAsync();
-            logger.log("end of `try` block for url " + testedUrl);
-        } catch (Exception e) {
-            GeneralUtils.logExceptionStackTrace(logger, e);
-        } finally {
-            logger.log("closing WebDriver for url " + testedUrl);
-            webDriver.quit();
-            logger.log("url " + testedUrl + " - done with browser.");
-            // End the test.
-        }
-    }
+        Eyes eyes = initializeEyes(runner);
 
-    @AfterMethod
-    public void afterMethod(ITestContext testContext) {
-        visualGridRunner.getLogger().log("enter");
-    }
+        WebDriver webDriver = new ChromeDriver();
+        webDriver.get("https://www.delhaize.be");
+        webDriver.findElement(By.cssSelector("body > div.Modal.LanguageSelector > div > div > div > div > div.options > div:nth-child(1) > button")).click();
 
-    @AfterClass
-    public void afterClass(ITestContext testContext) {
-        TestResultsSummary allTestResults = visualGridRunner.getAllTestResults();
-        for (TestResultContainer allTestResult : allTestResults) {
-            System.out.println(allTestResult.toString());
-        }
-        visualGridRunner.getLogger().log(allTestResults.toString());
+        eyes.open(webDriver);
+        eyes.check(Target.window().fully().withName("Step 1 - Login page"));
+
+        webDriver.quit();
+
+        System.out.println(
+                "Please wait... we are now: \n1. Uploading resources, \n2. Rendering in Visual Grid, and \n3. Using Applitools A.I. to validate the checkpoints. \nIt'll take about 30 secs to a minute...");
+
+        eyes.close();
+        TestResultsSummary allTestResults = runner.getAllTestResults();
+        System.out.println(allTestResults);
+
     }
 }

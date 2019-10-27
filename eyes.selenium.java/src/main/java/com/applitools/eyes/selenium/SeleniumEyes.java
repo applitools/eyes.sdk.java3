@@ -1967,6 +1967,11 @@ public class SeleniumEyes extends EyesBase implements IDriverProvider ,IBatchClo
         return appEnv;
     }
 
+    @Override
+    public void setIsDisabled(Boolean disabled) {
+        super.setIsDisabled(disabled);
+    }
+
     private WebElement getScrollRootElement(IScrollRootElementContainer scrollRootElementContainer) {
         WebElement scrollRootElement = null;
         if (!EyesSeleniumUtils.isMobileDevice(driver)) {

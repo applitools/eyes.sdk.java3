@@ -4,6 +4,7 @@ import com.applitools.eyes.AccessibilityLevel;
 import com.applitools.eyes.FileLogger;
 import com.applitools.eyes.MatchLevel;
 import com.applitools.eyes.TestResults;
+import com.applitools.eyes.metadata.ImageMatchSettings;
 import com.applitools.eyes.metadata.SessionResults;
 import com.applitools.eyes.selenium.BrowserType;
 import com.applitools.eyes.selenium.Configuration;
@@ -86,7 +87,8 @@ public class TestVGServerConfigs {
             }
 
             Assert.assertEquals(AccessibilityLevel.None, sessionResults.getStartInfo().getDefaultMatchSettings().getAccessibilityLevel());
-            Assert.assertFalse(sessionResults.getStartInfo().getDefaultMatchSettings().getIgnoreDisplacements());
+            final ImageMatchSettings defaultMatchSettings = sessionResults.getStartInfo().getDefaultMatchSettings();
+            Assert.assertFalse(defaultMatchSettings.getIgnoreDisplacements());
             Assert.assertEquals(MatchLevel.STRICT, sessionResults.getStartInfo().getDefaultMatchSettings().getMatchLevel());
 
             Assert.assertEquals(2, sessionResults.getActualAppOutput().length);
