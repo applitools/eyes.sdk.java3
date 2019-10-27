@@ -15,6 +15,11 @@
             <class name="com.applitools.eyes.selenium.TestBatchSequenceName" />
             <class name="com.applitools.eyes.selenium.TestBatchAPI" />
             <class name="com.applitools.eyes.selenium.TestSeleniumEyesWithNullRunner" />
+            <class name="com.applitools.eyes.selenium.TestAcme" />
+            <class name="com.applitools.eyes.selenium.TestDuplicates" />
+            <class name="com.applitools.eyes.selenium.TestPageWithHeader" />
+            <class name="com.applitools.eyes.selenium.TestScrollRootElement" />
+            <class name="com.applitools.eyes.selenium.TestScrollRootElementOnSimplePage" />
         </classes>
     </test>
     <test name="Test_VG" parallel="instances">
