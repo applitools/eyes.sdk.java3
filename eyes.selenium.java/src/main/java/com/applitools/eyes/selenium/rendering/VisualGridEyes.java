@@ -16,6 +16,7 @@ import com.applitools.eyes.visualgrid.model.*;
 import com.applitools.eyes.visualgrid.services.*;
 import com.applitools.utils.ArgumentGuard;
 import com.applitools.utils.GeneralUtils;
+import javafx.util.Pair;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
@@ -533,7 +534,7 @@ public class VisualGridEyes implements IRenderingEyes {
 
             logger.verbose("Dom extracted  (" + checkSettingsInternal.toString() + ")");
 
-            List<VisualGridSelector[]> regionsXPaths = getRegionsXPaths(checkSettingsInternal);
+            List<VisualGridSelector[]> regionsXPaths = getRegionsXPaths((ICheckSettings) checkSettingsInternal);
 
             logger.verbose("regionXPaths : " + regionsXPaths);
 
@@ -573,7 +574,7 @@ public class VisualGridEyes implements IRenderingEyes {
                             GeneralUtils.logExceptionStackTrace(logger, e);
                         }
                     }, regionsXPaths, userAgent);
-            logger.verbose("created renderTask  (" + checkSettings.toString() + ")");
+            logger.verbose("created renderTask (" + checkSettings.toString() + ")");
             switchTo.frames(originalFC);
         } catch (IllegalArgumentException | EyesException | InterruptedException e) {
             Error error = new Error(e);
@@ -800,70 +801,78 @@ public class VisualGridEyes implements IRenderingEyes {
         this.getConfigSetter().setBatch(batch);
     }
 
-    private List<VisualGridSelector[]> getRegionsXPaths(ICheckSettingsInternal csInternal) {
+    private List<VisualGridSelector[]> getRegionsXPaths(ICheckSettings checkSettings) {
         List<VisualGridSelector[]> result = new ArrayList<>();
-        FrameChain frameChain = webDriver.getFrameChain().clone();
-        EyesTargetLocator switchTo = (EyesTargetLocator) webDriver.switchTo();
-        switchToFrame((ISeleniumCheckTarget) csInternal);
-        List<WebElementRegion>[] elementLists = collectSeleniumRegions(csInternal);
-        for (List<WebElementRegion> elementList : elementLists) {
-            //noinspection SpellCheckingInspection
+        ICheckSettingsInternal csInternal = (ICheckSettingsInternal)checkSettings;
+        List<List<Pair<WebElement, Object>>> elementLists = collectSeleniumRegions(csInternal);
+        for (List<Pair<WebElement, Object>> elementsList : elementLists)
+        {
             List<VisualGridSelector> xpaths = new ArrayList<>();
-            for (WebElementRegion webElementRegion : elementList) {
-                if (webElementRegion.getElement() == null) continue;
-                String xpath = (String) webDriver.executeScript(GET_ELEMENT_XPATH_JS, webElementRegion.getElement());
-                xpaths.add(new VisualGridSelector(xpath, webElementRegion.getRegion()));
+            for (Pair<WebElement, Object> element : elementsList)
+            {
+                if (element.getKey() == null) continue;
+                String xpath = (String)this.webDriver.executeScript(GET_ELEMENT_XPATH_JS, element.getKey());
+                xpaths.add(new VisualGridSelector(xpath, element.getValue()));
             }
             result.add(xpaths.toArray(new VisualGridSelector[0]));
         }
-        switchTo.frames(frameChain);
+
         return result;
     }
 
-    private List<WebElementRegion>[] collectSeleniumRegions(ICheckSettingsInternal csInternal) {
-        CheckSettings settings = (CheckSettings) csInternal;
-        GetRegion[] ignoreRegions = settings.getIgnoreRegions();
-        GetRegion[] layoutRegions = settings.getLayoutRegions();
-        GetRegion[] strictRegions = settings.getStrictRegions();
-        GetRegion[] contentRegions = settings.getContentRegions();
-        GetFloatingRegion[] floatingRegions = settings.getFloatingRegions();
-        IGetAccessibilityRegion[] accessibilityRegions = settings.getAccessibilityRegions();
+    private List<List<Pair<WebElement, Object>>> collectSeleniumRegions(ICheckSettingsInternal csInternal) {
+        CheckSettings checkSettings = (CheckSettings) csInternal;
+        GetRegion[] ignoreRegions = checkSettings.getIgnoreRegions();
+        GetRegion[] layoutRegions = checkSettings.getLayoutRegions();
+        GetRegion[] strictRegions = checkSettings.getStrictRegions();
+        GetRegion[] contentRegions = checkSettings.getContentRegions();
+        GetFloatingRegion[] floatingRegions = checkSettings.getFloatingRegions();
+        IGetAccessibilityRegion[] accessibilityRegions = checkSettings.getAccessibilityRegions();
 
-        List<WebElementRegion> ignoreElements = getElementsFromRegions(Arrays.asList(ignoreRegions));
-        List<WebElementRegion> layoutElements = getElementsFromRegions(Arrays.asList(layoutRegions));
-        List<WebElementRegion> strictElements = getElementsFromRegions(Arrays.asList(strictRegions));
-        List<WebElementRegion> contentElements = getElementsFromRegions(Arrays.asList(contentRegions));
-        List<WebElementRegion> floatingElements = getElementsFromRegions(Arrays.asList(floatingRegions));
-        List<WebElementRegion> accessibilityElements = getElementsFromRegions(Arrays.asList(accessibilityRegions));
+        List<Pair<WebElement, Object>> ignoreElements = getElementsFromRegions(Arrays.asList(ignoreRegions));
+        List<Pair<WebElement, Object>> layoutElements = getElementsFromRegions(Arrays.asList(layoutRegions));
+        List<Pair<WebElement, Object>> strictElements = getElementsFromRegions(Arrays.asList(strictRegions));
+        List<Pair<WebElement, Object>> contentElements = getElementsFromRegions(Arrays.asList(contentRegions));
+        List<Pair<WebElement, Object>> floatingElements = getElementsFromRegions(Arrays.asList(floatingRegions));
+        List<Pair<WebElement, Object>> accessibilityElements = getElementsFromRegions(Arrays.asList(accessibilityRegions));
 
-
-        ISeleniumCheckTarget iSeleniumCheckTarget = (ISeleniumCheckTarget) csInternal;
-        WebElement targetElement = iSeleniumCheckTarget.getTargetElement();
-
+        WebElement targetElement = ((ISeleniumCheckTarget) csInternal).getTargetElement();
         if (targetElement == null) {
-            By targetSelector = iSeleniumCheckTarget.getTargetSelector();
+            By targetSelector = ((ISeleniumCheckTarget) csInternal).getTargetSelector();
             if (targetSelector != null) {
                 targetElement = webDriver.findElement(targetSelector);
             }
         }
+        Pair<WebElement, Object> targetTuple = new Pair(targetElement, "target");
+        List<Pair<WebElement, Object>> targetElementList = new ArrayList<>();
+        targetElementList.add(targetTuple);
 
-        WebElementRegion target = new WebElementRegion(targetElement, "target");
-        List<WebElementRegion> targetElementList = new ArrayList<>();
-        targetElementList.add(target);
-        //noinspection UnnecessaryLocalVariable,unchecked
-        List<WebElementRegion>[] lists = new List[]{ignoreElements, layoutElements, strictElements, contentElements, floatingElements, accessibilityElements, targetElementList};
+        List<List<Pair<WebElement, Object>>> lists = new ArrayList<>();
+        lists.add(ignoreElements);
+        lists.add(layoutElements);
+        lists.add(contentElements);
+        lists.add(strictElements);
+        lists.add(floatingElements);
+        lists.add(accessibilityElements);
+        lists.add(targetElementList);
         return lists;
     }
 
 
-    private List<WebElementRegion> getElementsFromRegions(List regionsProvider) {
-        List<WebElementRegion> elements = new ArrayList<>();
-        for (Object getRegion : regionsProvider) {
-            if (getRegion instanceof IGetSeleniumRegion) {
-                IGetSeleniumRegion getSeleniumRegion = (IGetSeleniumRegion) getRegion;
+
+    private List<Pair<WebElement, Object>> getElementsFromRegions(List regionsProvider)
+    {
+        List<Pair<WebElement, Object>> elements = new ArrayList<>();
+        for (Object getRegions : regionsProvider)
+        {
+
+            if (getRegions instanceof IGetSeleniumRegion )
+            {
+                IGetSeleniumRegion getSeleniumRegion = (IGetSeleniumRegion) getRegions;
                 List<WebElement> webElements = getSeleniumRegion.getElements(webDriver);
-                for (WebElement webElement : webElements) {
-                    elements.add(new WebElementRegion(webElement, getRegion));
+                for (WebElement element : webElements)
+                {
+                    elements.add(new Pair<>(element, getRegions));
                 }
             }
         }
