@@ -213,7 +213,7 @@ public abstract class TestSetup implements ITest {
 
     private Eyes initEyes() {
         Eyes eyes = new Eyes(this.runner);
-
+        eyes.setLogHandler(TestUtils.initLogger());
         String serverUrl = System.getenv("APPLITOOLS_SERVER_URL");
         if (serverUrl != null && serverUrl.length() > 0) {
             eyes.setServerUrl(serverUrl);
