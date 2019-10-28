@@ -758,6 +758,10 @@ public class SeleniumEyes extends EyesBase implements IDriverProvider ,IBatchClo
         this.serverConnector.closeBatch(batchId);
     }
 
+    public StitchMode getStitchMode() {
+        return getConfigGetter().getStitchMode();
+    }
+
     /**
      * Check frame fluent match result.
      * @param name          the name
