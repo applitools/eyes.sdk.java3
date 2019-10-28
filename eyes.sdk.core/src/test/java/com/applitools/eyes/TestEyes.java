@@ -1,9 +1,7 @@
 package com.applitools.eyes;
 
-import com.applitools.eyes.config.IConfigurationSetter;
-import com.applitools.eyes.fluent.ICheckSettingsInternal;
 import com.applitools.eyes.config.Configuration;
-import com.applitools.eyes.config.IConfigurationGetter;
+import com.applitools.eyes.fluent.ICheckSettingsInternal;
 
 public class TestEyes extends EyesBase {
     private Configuration configuration = new Configuration();
@@ -21,7 +19,7 @@ public class TestEyes extends EyesBase {
         return null;
     }
 
-    public IConfigurationGetter getConfigurationGetter() {
+    public Configuration getConfigurationGetter() {
         return this.configuration;
     }
 
@@ -49,15 +47,6 @@ public class TestEyes extends EyesBase {
         return null;
     }
 
-    @Override
-    protected <T extends IConfigurationGetter> T getConfigGetter() {
-        return (T)this.configuration;
-    }
-
-    @Override
-    protected <T extends IConfigurationSetter> T getConfigSetter() {
-        return (T)this.configuration;
-    }
 
     @Override
     protected RectangleSize getViewportSize() {
@@ -65,10 +54,19 @@ public class TestEyes extends EyesBase {
     }
 
     @Override
-    protected IConfigurationSetter setViewportSize(RectangleSize size) {
+    protected Configuration setViewportSize(RectangleSize size) {
         return this.configuration;
     }
 
+    @Override
+    public void setIsDisabled(Boolean isDisabled) {
+        this.setIsDisabled(isDisabled);
+    }
+
+    @Override
+    protected Configuration getConfiguration() {
+        return configuration;
+    }
 }
 
 

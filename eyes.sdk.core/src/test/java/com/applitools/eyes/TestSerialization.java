@@ -2,18 +2,14 @@ package com.applitools.eyes;
 
 import com.applitools.ICheckSettings;
 import com.applitools.eyes.config.Configuration;
-import com.applitools.eyes.config.IConfigurationGetter;
-import com.applitools.eyes.config.IConfigurationSetter;
 import com.applitools.eyes.fluent.ICheckSettingsInternal;
 import com.applitools.eyes.fluent.Target;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.testng.Assert;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.DataProvider;
-import org.testng.annotations.Parameters;
 import org.testng.annotations.Test;
-import org.testng.Assert;
-import org.testng.internal.IConfiguration;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -259,7 +255,7 @@ public class TestSerialization {
         String actualSerialization = jsonMapper.writeValueAsString(ims);
 
         String expectedSerialization = String.format(
-                "{\"matchLevel\":\"STRICT\",\"exact\":null,\"ignoreCaret\":%s,\"useDom\":%s,\"enablePatterns\":%s,\"ignoreDisplacements\":%s,\"Ignore\":null,\"Layout\":null,\"Strict\":null,\"Content\":null,\"Floating\":null}",
+                "{\"matchLevel\":\"STRICT\",\"exact\":null,\"ignoreCaret\":%s,\"useDom\":%s,\"enablePatterns\":%s,\"ignoreDisplacements\":%s,\"accessibility\":[],\"accessibilityLevel\":\"None\",\"Ignore\":null,\"Layout\":null,\"Strict\":null,\"Content\":null,\"Floating\":null}",
                 ignoreCaret, useDom, enablePatterns, ignoreDisplacements);
 
         Assert.assertEquals(actualSerialization,
@@ -270,7 +266,7 @@ public class TestSerialization {
     public void test_ImageMatchSettings_Serialization_Global(boolean ignoreCaret, boolean useDom, boolean enablePatterns, boolean ignoreDisplacements) throws JsonProcessingException {
         ICheckSettings settings = Target.window().fully().useDom(useDom).enablePatterns(enablePatterns).ignoreCaret(ignoreCaret);
         TestEyes eyes = new TestEyes();
-        Configuration configuration = eyes.getConfigSetter();
+        Configuration configuration = eyes.getConfiguration();
         configuration.setIgnoreDisplacements(ignoreDisplacements);
         eyes.setConfiguration(configuration);
         ImageMatchSettings imageMatchSettings = MatchWindowTask.createImageMatchSettings((ICheckSettingsInternal)settings, eyes);
@@ -278,7 +274,7 @@ public class TestSerialization {
         String actualSerialization = jsonMapper.writeValueAsString(imageMatchSettings);
 
         String expectedSerialization = String.format(
-                "{\"matchLevel\":\"STRICT\",\"exact\":null,\"ignoreCaret\":%s,\"useDom\":%s,\"enablePatterns\":%s,\"ignoreDisplacements\":%s,\"Ignore\":null,\"Layout\":null,\"Strict\":null,\"Content\":null,\"Floating\":null}",
+                "{\"matchLevel\":\"STRICT\",\"exact\":null,\"ignoreCaret\":%s,\"useDom\":%s,\"enablePatterns\":%s,\"ignoreDisplacements\":%s,\"accessibility\":[],\"accessibilityLevel\":\"None\",\"Ignore\":null,\"Layout\":null,\"Strict\":null,\"Content\":null,\"Floating\":null}",
                 ignoreCaret, useDom, enablePatterns, ignoreDisplacements);
 
         Assert.assertEquals(actualSerialization,
@@ -310,7 +306,7 @@ public class TestSerialization {
 
         String actualSerialization = jsonMapper.writeValueAsString(ssi);
 
-        String expectedSerialization = "{\"agentId\":\"some agent\",\"sessionType\":\"SEQUENTIAL\",\"appIdOrName\":\"my app\",\"verId\":\"1.0.0\",\"scenarioIdOrName\":\"some scenario\",\"batchInfo\":{\"id\":\"37a587aa-17d0-4e86-bf0e-566656a84dda\",\"batchSequenceName\":null,\"name\":\"batch name\",\"startedAt\":\"2017-07-02T05:22:21Z\"},\"baselineEnvName\":\"some baseline name\",\"environmentName\":\"env name\",\"environment\":{\"inferred\":null,\"os\":null,\"hostingApp\":null,\"displaySize\":null,\"deviceInfo\":null,\"osInfo\":null,\"hostingAppInfo\":null},\"branchName\":\"some branch name\",\"parentBranchName\":\"some parent branch name\",\"baselineBranchName\":\"some baseline branch name\",\"saveDiffs\":false,\"defaultMatchSettings\":{\"matchLevel\":\"STRICT\",\"exact\":null,\"ignoreCaret\":false,\"useDom\":false,\"enablePatterns\":false,\"ignoreDisplacements\":false,\"Ignore\":null,\"Layout\":null,\"Strict\":null,\"Content\":null,\"Floating\":null},\"properties\":[{\"name\":\"property name\",\"value\":\"property value\"},{\"name\":null,\"value\":null}]}";
+        String expectedSerialization = "{\"agentId\":\"some agent\",\"sessionType\":\"SEQUENTIAL\",\"appIdOrName\":\"my app\",\"verId\":\"1.0.0\",\"scenarioIdOrName\":\"some scenario\",\"batchInfo\":{\"id\":\"37a587aa-17d0-4e86-bf0e-566656a84dda\",\"batchSequenceName\":null,\"name\":\"batch name\",\"startedAt\":\"2017-07-02T05:22:21Z\",\"notifyOnCompletion\":false,\"isCompleted\":false},\"baselineEnvName\":\"some baseline name\",\"environmentName\":\"env name\",\"environment\":{\"inferred\":null,\"os\":null,\"hostingApp\":null,\"displaySize\":null,\"deviceInfo\":null,\"osInfo\":null,\"hostingAppInfo\":null},\"branchName\":\"some branch name\",\"parentBranchName\":\"some parent branch name\",\"baselineBranchName\":\"some baseline branch name\",\"saveDiffs\":false,\"defaultMatchSettings\":{\"matchLevel\":\"STRICT\",\"exact\":null,\"ignoreCaret\":false,\"useDom\":false,\"enablePatterns\":false,\"ignoreDisplacements\":false,\"accessibility\":[],\"accessibilityLevel\":\"None\",\"Ignore\":null,\"Layout\":null,\"Strict\":null,\"Content\":null,\"Floating\":null},\"properties\":[{\"name\":\"property name\",\"value\":\"property value\"},{\"name\":null,\"value\":null}]}";
 
         Assert.assertEquals(actualSerialization,
                 expectedSerialization, "SessionStartInfo serialization does not match!");
