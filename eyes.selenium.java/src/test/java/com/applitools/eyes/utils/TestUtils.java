@@ -47,12 +47,13 @@ public class TestUtils {
         return initLogger(Thread.currentThread().getStackTrace()[2].getMethodName());
     }
     public static LogHandler initLogger(String testName, String logPath) {
-        if (!TestUtils.runOnCI)
-        {
-            String path = logPath != null ? logPath : initLogPath(testName);
-            return new FileLogger(path + File.separator + "log.log", false, true);
-        }
-        return new StdoutLogHandler(verboseLogs);
+//FIXME - 
+        //        if (!TestUtils.runOnCI)
+//        {
+//            String path = logPath != null ? logPath : initLogPath(testName);
+//            return new FileLogger(path + File.separator + "log.log", false, true);
+//        }
+        return new StdoutLogHandler(true);
     }
 
     public static LogHandler initLogger(String methodName) {

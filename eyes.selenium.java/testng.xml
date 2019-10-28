@@ -22,17 +22,17 @@
             <class name="com.applitools.eyes.selenium.TestScrollRootElementOnSimplePage" />
         </classes>
     </test>
-    <test name="Test_VG" parallel="instances">
-        <classes>
-            <class name="com.applitools.eyes.renderingGrid.TestVGDemo" />
-            <class name="com.applitools.eyes.renderingGrid.TestTopSites" />
-            <class name="com.applitools.eyes.renderingGrid.TestRenderingGridServiceWithJsHook" />
-            <class name="com.applitools.eyes.renderingGrid.TestVGWithJunit"/>
-            <class name="com.applitools.eyes.renderingGrid.TestAbortVG"/>
-            <class name="com.applitools.eyes.renderingGrid.TestVGExceptionInRegion"/>
+<!--    <test name="Test_VG" parallel="instances">-->
+<!--        <classes>-->
+<!--            <class name="com.applitools.eyes.renderingGrid.TestVGDemo" />-->
+<!--            <class name="com.applitools.eyes.renderingGrid.TestTopSites" />-->
+<!--            <class name="com.applitools.eyes.renderingGrid.TestRenderingGridServiceWithJsHook" />-->
+<!--            <class name="com.applitools.eyes.renderingGrid.TestVGWithJunit"/>-->
+<!--            <class name="com.applitools.eyes.renderingGrid.TestAbortVG"/>-->
+<!--            <class name="com.applitools.eyes.renderingGrid.TestVGExceptionInRegion"/>-->
 
-        </classes>
-    </test>
+<!--        </classes>-->
+<!--    </test>-->
     <test name="Test_Mobile" parallel="methods">
         <classes>
             <class name="com.applitools.eyes.selenium.MobileNativeTests"/>
