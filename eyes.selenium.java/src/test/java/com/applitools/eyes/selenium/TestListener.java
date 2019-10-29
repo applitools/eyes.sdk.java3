@@ -1,14 +1,16 @@
 package com.applitools.eyes.selenium;
 
-import com.applitools.eyes.AccessibilityRegionByRectangle;
-import com.applitools.eyes.FloatingMatchSettings;
-import com.applitools.eyes.Region;
-import com.applitools.eyes.TestResults;
+import com.applitools.eyes.*;
+import com.applitools.eyes.exceptions.TestFailedException;
 import com.applitools.eyes.metadata.ActualAppOutput;
 import com.applitools.eyes.metadata.ImageMatchSettings;
 import com.applitools.eyes.metadata.SessionResults;
+import com.applitools.eyes.utils.CommUtils;
 import com.applitools.eyes.utils.TestUtils;
 import com.applitools.utils.GeneralUtils;
+import com.google.gson.Gson;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
 import org.testng.Assert;
 import org.testng.ITestContext;
 import org.testng.ITestListener;
@@ -19,11 +21,25 @@ import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Map;
+import java.util.UUID;
+import java.util.concurrent.atomic.AtomicReference;
 
 public class TestListener implements ITestListener {
 
+    private static AtomicReference<String> suiteId = new AtomicReference<>();
+
     @Override
     public void onTestStart(ITestResult result) {
+        if (suiteId.get() == null) {
+            String travisCommit = System.getenv("TRAVIS_COMMIT");
+            System.out.println("Unified report: travis commit is " + travisCommit);
+            if (travisCommit == null || travisCommit.isEmpty()) {
+                suiteId.set(UUID.randomUUID().toString().substring(0, 12));
+            } else {
+                suiteId.set(travisCommit.substring(0, 12));
+            }
+        }
+
         //System.out.println("onTestStart");
         Object instance = result.getInstance();
         if (instance instanceof TestSetup) {
@@ -38,7 +54,7 @@ public class TestListener implements ITestListener {
         //System.out.println("onTestSuccess");
         Object instance = result.getInstance();
         if (instance instanceof TestSetup) {
-            if (!afterMethodSuccess((TestSetup) instance)) {
+            if (!afterMethodSuccess((TestSetup) instance, result.getMethod().getMethodName(), result)) {
                 result.setStatus(ITestResult.FAILURE);
             }
         }
@@ -51,7 +67,7 @@ public class TestListener implements ITestListener {
         if (instance instanceof TestSetup) {
             TestSetup testSetup = (TestSetup) instance;
             GeneralUtils.logExceptionStackTrace(testSetup.getEyes().getLogger(), result.getThrowable());
-            afterMethodFailure(testSetup);
+            afterMethodFailure(testSetup, result);
         }
     }
 
@@ -65,15 +81,15 @@ public class TestListener implements ITestListener {
         //System.out.println("onTestFailedButWithinSuccessPercentage");
         Object instance = result.getInstance();
         if (instance instanceof TestSetup) {
-            afterMethodFailure((TestSetup) instance);
+            afterMethodFailure((TestSetup) instance, result);
         }
     }
 
-    private void afterMethodFailure(TestSetup testSetup) {
+    private void afterMethodFailure(TestSetup testSetup, ITestResult iTestResult) {
         Eyes eyes = testSetup.getEyes();
         try {
             if (eyes.getIsOpen()) {
-                eyes.close(false);
+                TestResults close = eyes.close(false);
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -82,14 +98,38 @@ public class TestListener implements ITestListener {
             if (testSetup.getDriver() != null) {
                 testSetup.getDriver().quit();
             }
+            sendTestResluts(iTestResult, iTestResult.isSuccess());
         }
     }
 
-    private boolean afterMethodSuccess(TestSetup testSetup) {
+    private void sendTestResluts(ITestResult iTestResult, boolean success) {
+        JsonObject resultJson = getResultJson(iTestResult, success);
+        System.out.println("Unified report: sending JSON to report " + resultJson.toString());
+        try {
+            CommUtils.postJson("http://sdk-test-results.herokuapp.com/result", new Gson().fromJson(resultJson, Map.class), null);
+        } catch (Throwable t) {
+            CommUtils.postJson("http://sdk-test-results.herokuapp.com/result", new Gson().fromJson(resultJson, Map.class), null);
+        }
+    }
+
+    private boolean afterMethodSuccess(TestSetup testSetup, String methodName, ITestResult iTestResult) {
         Eyes eyes = testSetup.getEyes();
         try {
             if (eyes.getIsOpen()) {
-                TestResults results = eyes.close();
+
+                TestResults results = null;
+                try {
+                    results = eyes.close();
+                } catch (Throwable e) {
+                    if (e instanceof TestFailedException) {
+                        TestFailedException testException = (TestFailedException) e;
+                        JsonObject json = createExtraDataJson(methodName, testException.getTestResults());
+                        CommUtils.postJson("http://sdk-test-results.herokuapp.com/extra_test_data", new Gson().fromJson(json, Map.class), null);
+                    }
+                    sendTestResluts(iTestResult, false);
+                    throw e;
+                }
+                sendTestResluts(iTestResult, iTestResult.isSuccess());
                 if (eyes.getIsDisabled()) {
                     eyes.getLogger().log("eyes is disabled.");
                     return true;
@@ -97,6 +137,7 @@ public class TestListener implements ITestListener {
                     eyes.getLogger().verbose("no results returned from eyes.close()");
                     return true;
                 }
+
                 SessionResults resultObject = TestUtils.getSessionResults(eyes.getApiKey(), results);
 
                 ActualAppOutput[] actualAppOutput = resultObject.getActualAppOutput();
@@ -117,6 +158,18 @@ public class TestListener implements ITestListener {
                 testSetup.getDriver().quit();
             }
         }
+    }
+
+    private JsonObject createExtraDataJson(String methodName, TestResults results) {
+        JsonObject finalJsonObject = new JsonObject();
+        finalJsonObject.addProperty("sdk", "java");
+        JsonArray extraDataJsonArr = new JsonArray();
+        finalJsonObject.add("extra_data", extraDataJsonArr);
+        JsonObject innerResultsJsonObject = new JsonObject();
+        innerResultsJsonObject.addProperty("test_name", methodName);
+        innerResultsJsonObject.addProperty("data", results.getUrl());
+        extraDataJsonArr.add(innerResultsJsonObject);
+        return finalJsonObject;
     }
 
     private void compareRegions(TestSetup testSetup, ImageMatchSettings imageMatchSettings) {
@@ -197,4 +250,20 @@ public class TestListener implements ITestListener {
         //System.out.println("onFinish");
     }
 
+    private JsonObject getResultJson(ITestResult testResult, boolean success){
+        JsonArray resultsJsonArray = new JsonArray();
+        JsonObject innerResultsJsonObject = new JsonObject();
+        innerResultsJsonObject.addProperty("test_name", testResult.getMethod().getMethodName());
+        innerResultsJsonObject.addProperty("passed", success);
+        resultsJsonArray.add(innerResultsJsonObject);
+        JsonObject finalJsonObject = new JsonObject();
+        finalJsonObject.addProperty("sdk", "java");
+        finalJsonObject.addProperty("id", suiteId.get());
+        String travisGitTag = System.getenv("TRAVIS_TAG");
+        if (travisGitTag == null || !travisGitTag.contains("RELEASE_CANDIDATE-")){
+            finalJsonObject.addProperty("sandbox", true);
+        }
+        finalJsonObject.add("results", resultsJsonArray);
+        return finalJsonObject;
+    }
 }

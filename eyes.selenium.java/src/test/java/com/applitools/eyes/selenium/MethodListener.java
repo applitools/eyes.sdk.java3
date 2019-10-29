@@ -32,7 +32,7 @@ public class MethodListener implements IInvokedMethodListener2 {
 
     @Override
     public void afterInvocation(IInvokedMethod iInvokedMethod, ITestResult iTestResult, ITestContext iTestContext) {
-        if (iInvokedMethod.isTestMethod()) {
+        if (iInvokedMethod.isConfigurationMethod()) {
             JsonObject resultJson = getResultJson(iTestResult);
             System.out.println("Unified report: sending JSON to report " + resultJson.toString());
             try {
