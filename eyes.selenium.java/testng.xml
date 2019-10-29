@@ -22,6 +22,8 @@
             <class name="com.applitools.eyes.selenium.TestScrollRootElementOnSimplePage" />
             <class name="com.applitools.eyes.selenium.TestSendDom" />
             <class name="com.applitools.eyes.selenium.TestSimpleCases" />
+            <class name="com.applitools.eyes.renderingGrid.TestVGServerConfigs" />
+
         </classes>
     </test>
 <!--    <test name="Test_VG" parallel="instances">-->
