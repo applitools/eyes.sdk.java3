@@ -20,6 +20,8 @@
             <class name="com.applitools.eyes.selenium.TestPageWithHeader" />
             <class name="com.applitools.eyes.selenium.TestScrollRootElement" />
             <class name="com.applitools.eyes.selenium.TestScrollRootElementOnSimplePage" />
+            <class name="com.applitools.eyes.selenium.TestSendDom" />
+            <class name="com.applitools.eyes.selenium.TestSimpleCases" />
         </classes>
     </test>
 <!--    <test name="Test_VG" parallel="instances">-->
