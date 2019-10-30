@@ -17,12 +17,18 @@ jobs:
         - env webdriver.chrome.driver=/home/travis/build/
     - stage: test
       script:
+#       replace the devTestsSuite.xml testng xml with the stable regressionTestsSuite.xml
+        - sed -i 's/devTestsSuite.xml/regressionTestsSuite.xml/g' ./eyes/selenium/java/pom.xml
         - mvn test -e -X
     - stage: deploy
       if: tag =~ ^RELEASE_CANDIDATE- AND fork == false
       script:
+#       save the email of the person who did the this commit in COMMITTER_EMAIL
         - COMMITTER_EMAIL="$(git log -1 $TRAVIS_COMMIT --pretty="%cE")"
-        - if [[ $COMMITTER_EMAIL =~ $ALLOWED_COMMITERS ]]; then
-          echo "DEPLOY";
-          ./send_mail_report.sh java $TRAVIS_TAG;
-          fi
+        - echo "DEPLOY"
+#       run script to send mail report with two parametes: sdk and RELEASE_CANDIDATE-version tag
+        - ./send_mail_report.sh java $TRAVIS_TAG
+#        - if [[ $COMMITTER_EMAIL =~ $ALLOWED_COMMITERS ]]; then
+#          echo "DEPLOY";
+#          ./send_mail_report.sh java $TRAVIS_TAG;
+#          fi

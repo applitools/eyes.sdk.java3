@@ -1,11 +1,11 @@
 <!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd" >
 
-<suite name="Suite1" verbose="1" parallel="tests">
+<suite name="passed tests" verbose="1" parallel="tests">
     <listeners>
         <listener class-name="com.applitools.eyes.selenium.MethodListener"/>
     </listeners>
 
-    <test name="Test_WEB" parallel="instances">
+    <test name="Test_WEB">
         <classes>
             <class name="com.applitools.eyes.selenium.TestClassicApi" />
             <class name="com.applitools.eyes.selenium.TestFluentApi" />
@@ -17,7 +17,7 @@
             <class name="com.applitools.eyes.selenium.TestSeleniumEyesWithNullRunner" />
         </classes>
     </test>
-    <test name="Test_VG" parallel="instances">
+    <test name="Test_VG">
         <classes>
             <class name="com.applitools.eyes.renderingGrid.TestVGDemo" />
             <class name="com.applitools.eyes.renderingGrid.TestTopSites" />
