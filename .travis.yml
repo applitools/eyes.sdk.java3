@@ -18,7 +18,10 @@ jobs:
     - stage: test
       script:
 #       replace the devTestsSuite.xml testng xml with the stable regressionTestsSuite.xml
-        - sed -i 's/devTestsSuite.xml/regressionTestsSuite.xml/g' ./eyes/selenium/java/pom.xml
+        - pwd
+        - if [[ $TRAVIS_TAG =~ ^RELEASE_CANDIDATE- ]]; then
+            sed -i 's/devTestsSuite.xml/regressionTestsSuite.xml/g' ./eyes/selenium/java/pom.xml;
+          fi
         - mvn test -e -X
     - stage: deploy
       if: tag =~ ^RELEASE_CANDIDATE- AND fork == false
