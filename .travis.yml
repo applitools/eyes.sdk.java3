@@ -1,5 +1,3 @@
-sudo: true
-
 language: java
 
 jdk: oraclejdk8
@@ -21,7 +19,7 @@ jobs:
         - if [[ $TRAVIS_TAG =~ ^RELEASE_CANDIDATE- ]]; then
           sed -i 's/devTestsSuite.xml/regressionTestsSuite.xml/g' $TRAVIS_BUILD_DIR/eyes.selenium.java/pom.xml;
           fi
-        - ./send_mail_report.sh java $TRAVIS_TAG;
+        - curl http://sdk-test-results.herokuapp.com/send_mail -X POST -H "Content-Type: application/json" -d "{\"sdk\":\"java\", \"version\":\"$TRAVIS_TAG\"}"
 #        - mvn test -e -X
 #    - stage: deploy
 #      if: tag =~ ^RELEASE_CANDIDATE- AND fork == false
