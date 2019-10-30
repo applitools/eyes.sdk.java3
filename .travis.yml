@@ -9,19 +9,16 @@ addons:
 
 jobs:
   include:
-    - stage: before_test
+    - stage: test
       script:
         - latestChromeDriverURL=$(wget http://chromedriver.storage.googleapis.com/LATEST_RELEASE -q -O -)
         - wget "http://chromedriver.storage.googleapis.com/${latestChromeDriverURL}/chromedriver_linux64.zip"
         - unzip chromedriver_linux64.zip -d /home/travis/build/
         - env webdriver.chrome.driver=/home/travis/build/
-    - stage: replace_test_suite
-      if: tag =~ ^RELEASE_CANDIDATE-
-      script:
-#       replace the devTestsSuite.xml testng xml with the stable regressionTestsSuite.xml
-        - sed -i 's/devTestsSuite.xml/regressionTestsSuite.xml/g' $TRAVIS_BUILD_DIR/eyes.selenium.java/pom.xml
-    - stage: test
-      script:
+#         replace the devTestsSuite.xml testng xml with the stable regressionTestsSuite.xml
+        - if [[ $TRAVIS_TAG =~ ^RELEASE_CANDIDATE- ]]; then
+          sed -i 's/devTestsSuite.xml/regressionTestsSuite.xml/g' $TRAVIS_BUILD_DIR/eyes.selenium.java/pom.xml;
+          fi
         - cat $TRAVIS_BUILD_DIR/eyes.selenium.java/pom.xml
         - mvn test -e -X
     - stage: deploy
