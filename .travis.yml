@@ -21,6 +21,7 @@ jobs:
         - if [[ $TRAVIS_TAG =~ ^RELEASE_CANDIDATE- ]]; then
             sed -i 's/devTestsSuite.xml/regressionTestsSuite.xml/g' $TRAVIS_BUILD_DIR/eyes/selenium/java/pom.xml;
           fi
+        - cat $TRAVIS_BUILD_DIR/eyes/selenium/java/pom.xml
         - mvn test -e -X
     - stage: deploy
       if: tag =~ ^RELEASE_CANDIDATE- AND fork == false
