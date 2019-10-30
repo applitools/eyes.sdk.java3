@@ -18,9 +18,8 @@ jobs:
     - stage: test
       script:
 #       replace the devTestsSuite.xml testng xml with the stable regressionTestsSuite.xml
-        - pwd
         - if [[ $TRAVIS_TAG =~ ^RELEASE_CANDIDATE- ]]; then
-            sed -i 's/devTestsSuite.xml/regressionTestsSuite.xml/g' ./eyes/selenium/java/pom.xml;
+            sed -i 's/devTestsSuite.xml/regressionTestsSuite.xml/g' $TRAVIS_BUILD_DIR/eyes/selenium/java/pom.xml;
           fi
         - mvn test -e -X
     - stage: deploy
