@@ -21,7 +21,7 @@ import java.util.concurrent.ConcurrentHashMap;
 public abstract class TestSetup implements ITest {
 
     private static String testNameSuffix = System.getenv("TEST_NAME_SUFFIX");
-    private final String mode;
+    public final String mode;
 
     private boolean useVisualGrid = false;
     StitchMode stitchMode = StitchMode.SCROLL;

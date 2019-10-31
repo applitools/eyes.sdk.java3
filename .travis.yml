@@ -7,11 +7,28 @@ dist: trusty
 addons:
   chrome: stable
 
-before_script:
-  - latestChromeDriverURL=$(wget http://chromedriver.storage.googleapis.com/LATEST_RELEASE -q -O -)
-  - wget "http://chromedriver.storage.googleapis.com/${latestChromeDriverURL}/chromedriver_linux64.zip"
-  - unzip chromedriver_linux64.zip -d /home/travis/build/
-  - env webdriver.chrome.driver=/home/travis/build/
-
-script:
-  - mvn test -e -X
+jobs:
+  include:
+    - stage: test
+      script:
+        - latestChromeDriverURL=$(wget http://chromedriver.storage.googleapis.com/LATEST_RELEASE -q -O -)
+        - wget "http://chromedriver.storage.googleapis.com/${latestChromeDriverURL}/chromedriver_linux64.zip"
+        - unzip chromedriver_linux64.zip -d /home/travis/build/
+        - env webdriver.chrome.driver=/home/travis/build/
+#         replace the devTestsSuite.xml testng xml with the stable regressionTestsSuite.xml
+        - if [[ $TRAVIS_TAG =~ ^RELEASE_CANDIDATE- ]]; then
+          sed -i 's/devTestsSuite.xml/regressionTestsSuite.xml/g' $TRAVIS_BUILD_DIR/eyes.selenium.java/pom.xml;
+          fi
+        - mvn test -e -X
+    - stage: deploy
+      env:
+        - SDK = java
+      if: tag =~ ^RELEASE_CANDIDATE- AND fork == false
+      script:
+#         save the email of the person who did the this commit in COMMITTER_EMAIL
+        - COMMITTER_EMAIL="$(git log -1 $TRAVIS_COMMIT --pretty="%cE")"
+        - if [[ $COMMITTER_EMAIL =~ $ALLOWED_COMMITERS ]]; then
+          echo "DEPLOY";
+#         run script to send mail report with two parametes: sdk and RELEASE_CANDIDATE-version tag
+          "curl http://sdk-test-results.herokuapp.com/send_mail -X POST -H \"Content-Type: application/json\" -d \"{'sdk':'$SDK', 'version':'$TRAVIS_TAG'}\"";
+          fi
