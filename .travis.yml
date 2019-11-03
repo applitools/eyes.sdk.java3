@@ -29,7 +29,7 @@ jobs:
         - cat $TRAVIS_BUILD_DIR/eyes.selenium.java/pom.xml
 #        - mvn test -e -X
     - stage: deploy
-      env:
+#      env:
 #        - SDK = "java"
       if: tag =~ ^RELEASE_CANDIDATE- AND fork == false
       script:
