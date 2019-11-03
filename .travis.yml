@@ -30,7 +30,7 @@ jobs:
 #        - mvn test -e -X
     - stage: deploy
       env:
-        - SDK = "java"
+#        - SDK = "java"
       if: tag =~ ^RELEASE_CANDIDATE- AND fork == false
       script:
 #         save the email of the person who did the this commit in COMMITTER_EMAIL
@@ -38,5 +38,5 @@ jobs:
         - if [[ $COMMITTER_EMAIL =~ $ALLOWED_COMMITERS ]]; then
           echo "DEPLOY";
 #         run script to send mail report with two parametes: sdk and RELEASE_CANDIDATE-version tag
-          "curl http://sdk-test-results.herokuapp.com/send_mail -X POST -H \"Content-Type: application/json\" -d \"{'sdk':'$SDK', 'version':'$TRAVIS_TAG'}\"";
+#          "curl http://sdk-test-results.herokuapp.com/send_mail -X POST -H \"Content-Type: application/json\" -d \"{'sdk':'$SDK', 'version':'$TRAVIS_TAG'}\"";
           fi
