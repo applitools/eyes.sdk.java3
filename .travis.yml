@@ -22,7 +22,7 @@ jobs:
           git checkout develop;
           git add --all;
           git commit -m 'update pom version';
-          git push;
+          git push origin HEAD:develop;
           sed -i 's/devTestsSuite.xml/regressionTestsSuite.xml/g' $TRAVIS_BUILD_DIR/eyes.selenium.java/pom.xml;
           fi
         - cat $TRAVIS_BUILD_DIR/eyes.selenium.java/pom.xml
