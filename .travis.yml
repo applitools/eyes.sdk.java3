@@ -15,27 +15,26 @@ jobs:
         - wget "http://chromedriver.storage.googleapis.com/${latestChromeDriverURL}/chromedriver_linux64.zip"
         - unzip chromedriver_linux64.zip -d /home/travis/build/
         - env webdriver.chrome.driver=/home/travis/build/
-#        - sdkVersion = $(echo $TRAVIS_TAG | sed 's/[^.0-9]*//g')
-#        - if [[ $TRAVIS_TAG =~ ^RELEASE_CANDIDATE- ]]; then
-#          mvn versions:set -DnewVersion=$sdkVersion;
-#          mvn versions:commit;
-#          git checkout develop;
-#          git add --all;
-#          git commit -m 'update pom version';
-#          git push;
-#         replace the devTestsSuite.xml testng xml with the stable regressionTestsSuite.xml
-#          sed -i 's/devTestsSuite.xml/regressionTestsSuite.xml/g' $TRAVIS_BUILD_DIR/eyes.selenium.java/pom.xml;
-#          fi
-#        - cat $TRAVIS_BUILD_DIR/eyes.selenium.java/pom.xml
+        - sdkVersion = $(echo $TRAVIS_TAG | sed 's/[^.0-9]*//g')
+        - if [[ $TRAVIS_TAG =~ ^RELEASE_CANDIDATE- ]]; then
+          mvn versions:set -DnewVersion=$sdkVersion;
+          mvn versions:commit;
+          git checkout develop;
+          git add --all;
+          git commit -m 'update pom version';
+          git push;
+          sed -i 's/devTestsSuite.xml/regressionTestsSuite.xml/g' $TRAVIS_BUILD_DIR/eyes.selenium.java/pom.xml;
+          fi
+        - cat $TRAVIS_BUILD_DIR/eyes.selenium.java/pom.xml
 #        - mvn test -e -X
     - stage: deploy
-#      env:
-#        - SDK = "java"
-#      if: tag =~ ^RELEASE_CANDIDATE- AND fork == false
+      env:
+        - SDK = "java"
+      if: tag =~ ^RELEASE_CANDIDATE- AND fork == false
       script:
 #         save the email of the person who did the this commit in COMMITTER_EMAIL
         - COMMITTER_EMAIL="$(git log -1 $TRAVIS_COMMIT --pretty="%cE")"
         - if [[ $COMMITTER_EMAIL =~ $ALLOWED_COMMITERS ]]; then
           echo "DEPLOY";
+          "curl http://sdk-test-results.herokuapp.com/send_mail -X POST -H \"Content-Type: application/json\" -d \"{'sdk':'$SDK', 'version':'$TRAVIS_TAG'}\"";
           fi
-        - "curl http://sdk-test-results.herokuapp.com/send_mail -X POST -H \"Content-Type: application/json\" -d \"{'sdk':'$SDK', 'version':'$TRAVIS_TAG'}\""
