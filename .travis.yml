@@ -21,6 +21,7 @@ jobs:
           mvn versions:commit;
           git add --all;
           git commit -m 'update pom version';
+          git remote add origin https://${GH_TOKEN}@github.com/Yarden-Ingber/eyes.sdk.java3.git
           git push origin HEAD:develop;
           sed -i 's/devTestsSuite.xml/regressionTestsSuite.xml/g' $TRAVIS_BUILD_DIR/eyes.selenium.java/pom.xml;
           fi
