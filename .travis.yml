@@ -15,9 +15,9 @@ jobs:
         - wget "http://chromedriver.storage.googleapis.com/${latestChromeDriverURL}/chromedriver_linux64.zip"
         - unzip chromedriver_linux64.zip -d /home/travis/build/
         - env webdriver.chrome.driver=/home/travis/build/
-        - sdkVersion = $(echo $TRAVIS_TAG | sed 's/[^.0-9]*//g')
+        - SDK_VERSION=$(echo $TRAVIS_TAG | sed 's/[^.0-9]*//g')
         - if [[ $TRAVIS_TAG =~ ^RELEASE_CANDIDATE- ]]; then
-          mvn versions:set -DnewVersion=$sdkVersion;
+          mvn versions:set -DnewVersion=$SDK_VERSION;
           mvn versions:commit;
           git checkout develop;
           git add --all;
