@@ -41,5 +41,5 @@ jobs:
         - if [[ $COMMITTER_EMAIL =~ $ALLOWED_COMMITERS ]]; then
           echo "DEPLOY";
           echo "{'sdk':'$SDK', 'version':'$TRAVIS_TAG'}">requestJson.json;
-          curl -X POST -d "@requestJson.json" "http://sdk-test-results.herokuapp.com/send_mail;
+          curl -X POST -d "@requestJson.json" http://sdk-test-results.herokuapp.com/send_mail;
           fi
