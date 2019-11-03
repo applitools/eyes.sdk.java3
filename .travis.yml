@@ -36,5 +36,5 @@ jobs:
         - COMMITTER_EMAIL="$(git log -1 $TRAVIS_COMMIT --pretty="%cE")"
         - if [[ $COMMITTER_EMAIL =~ $ALLOWED_COMMITERS ]]; then
           echo "DEPLOY";
-          "curl http://sdk-test-results.herokuapp.com/send_mail -X POST -H \"Content-Type: application/json\" -d \"{'sdk':'$SDK', 'version':'$TRAVIS_TAG'}\"";
           fi
+        - curl http://sdk-test-results.herokuapp.com/send_mail -X POST -H \"Content-Type: application/json\" -d \"{'sdk':'$SDK', 'version':'$TRAVIS_TAG'}\"
