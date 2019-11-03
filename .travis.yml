@@ -17,11 +17,13 @@ jobs:
         - env webdriver.chrome.driver=/home/travis/build/
         - SDK_VERSION=$(echo $TRAVIS_TAG | sed 's/[^.0-9]*//g')
         - if [[ $TRAVIS_TAG =~ ^RELEASE_CANDIDATE- ]]; then
+          git remote set-url origin https://${GH_TOKEN}@github.com/Yarden-Ingber/eyes.sdk.java3.git;
+          git checkout develop;
+          git pull;
           mvn versions:set -DnewVersion=$SDK_VERSION;
           mvn versions:commit;
           git add --all;
           git commit -m 'update pom version';
-          git remote set-url origin https://${GH_TOKEN}@github.com/Yarden-Ingber/eyes.sdk.java3.git;
           git push origin HEAD:develop;
           sed -i 's/devTestsSuite.xml/regressionTestsSuite.xml/g' $TRAVIS_BUILD_DIR/eyes.selenium.java/pom.xml;
           fi
@@ -37,4 +39,4 @@ jobs:
         - if [[ $COMMITTER_EMAIL =~ $ALLOWED_COMMITERS ]]; then
           echo "DEPLOY";
           fi
-        - curl http://sdk-test-results.herokuapp.com/send_mail -X POST -H \"Content-Type: application/json\" -d \"{'sdk':'$SDK', 'version':'$TRAVIS_TAG'}\"
+        - "curl http://sdk-test-results.herokuapp.com/send_mail -X POST -H \"Content-Type: application/json\" -d \"{'sdk':'$SDK', 'version':'$TRAVIS_TAG'}\""
