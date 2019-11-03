@@ -16,7 +16,7 @@ jobs:
         - unzip chromedriver_linux64.zip -d /home/travis/build/
         - env webdriver.chrome.driver=/home/travis/build/
 #        - sdkVersion = $(echo $TRAVIS_TAG | sed 's/[^.0-9]*//g')
-        - if [[ $TRAVIS_TAG =~ ^RELEASE_CANDIDATE- ]]; then
+#        - if [[ $TRAVIS_TAG =~ ^RELEASE_CANDIDATE- ]]; then
 #          mvn versions:set -DnewVersion=$sdkVersion;
 #          mvn versions:commit;
 #          git checkout develop;
@@ -24,8 +24,8 @@ jobs:
 #          git commit -m 'update pom version';
 #          git push;
 #         replace the devTestsSuite.xml testng xml with the stable regressionTestsSuite.xml
-          sed -i 's/devTestsSuite.xml/regressionTestsSuite.xml/g' $TRAVIS_BUILD_DIR/eyes.selenium.java/pom.xml;
-          fi
+#          sed -i 's/devTestsSuite.xml/regressionTestsSuite.xml/g' $TRAVIS_BUILD_DIR/eyes.selenium.java/pom.xml;
+#          fi
         - cat $TRAVIS_BUILD_DIR/eyes.selenium.java/pom.xml
 #        - mvn test -e -X
     - stage: deploy
