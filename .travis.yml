@@ -7,6 +7,9 @@ dist: trusty
 addons:
   chrome: stable
 
+# $RELEASE_BRANCH
+# $GH_TOKEN
+# $ALLOWED_COMMITERS
 jobs:
   include:
     - stage: test
@@ -16,25 +19,24 @@ jobs:
         - unzip chromedriver_linux64.zip -d /home/travis/build/
         - env webdriver.chrome.driver=/home/travis/build/
         - SDK_VERSION=$(echo $TRAVIS_TAG | sed 's/[^.0-9]*//g')
-        - git remote set-url origin https://${GH_TOKEN}@github.com/Yarden-Ingber/eyes.sdk.java3.git
-        - mvn versions:set -DnewVersion=$SDK_VERSION
-        - mvn versions:commit
-        - git add --all
-        - git commit -m 'update pom version'
-        - git push origin HEAD:Switching_to_develop_Tests
         - if [[ $TRAVIS_TAG =~ ^RELEASE_CANDIDATE- ]]; then
+          git remote set-url origin https://${GH_TOKEN}@github.com/Yarden-Ingber/eyes.sdk.java3.git;
+          mvn versions:set -DnewVersion=$SDK_VERSION;
+          mvn versions:commit;
+          git add --all;
+          git commit -m 'update pom version';
+          git push origin HEAD:$RELEASE_BRANCH;
           sed -i 's/devTestsSuite.xml/regressionTestsSuite.xml/g' $TRAVIS_BUILD_DIR/eyes.selenium.java/pom.xml;
           fi
         - cat $TRAVIS_BUILD_DIR/eyes.selenium.java/pom.xml
 #        - mvn test -e -X
     - stage: deploy
-      env:
-        - SDK = "java"
       if: tag =~ ^RELEASE_CANDIDATE- AND fork == false
       script:
 #         save the email of the person who did the this commit in COMMITTER_EMAIL
         - COMMITTER_EMAIL="$(git log -1 $TRAVIS_COMMIT --pretty="%cE")"
         - if [[ $COMMITTER_EMAIL =~ $ALLOWED_COMMITERS ]]; then
           echo "DEPLOY";
+#         run script to send mail report with two parametes: sdk and RELEASE_CANDIDATE-version tag
+          "curl http://sdk-test-results.herokuapp.com/send_mail -X POST -H \"Content-Type: application/json\" -d \"{'sdk':'java', 'version':'$TRAVIS_TAG'}\"";
           fi
-        - "curl http://sdk-test-results.herokuapp.com/send_mail -X POST -H \"Content-Type: application/json\" -d \"{'sdk':'$SDK', 'version':'$TRAVIS_TAG'}\""
