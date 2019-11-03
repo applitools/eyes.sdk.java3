@@ -7,8 +7,9 @@ dist: trusty
 addons:
   chrome: stable
 
+# env variables
 # $RELEASE_BRANCH
-# $GH_TOKEN
+# $GITHUB_TOKEN
 # $ALLOWED_COMMITERS
 jobs:
   include:
@@ -20,7 +21,7 @@ jobs:
         - env webdriver.chrome.driver=/home/travis/build/
         - SDK_VERSION=$(echo $TRAVIS_TAG | sed 's/[^.0-9]*//g')
         - if [[ $TRAVIS_TAG =~ ^RELEASE_CANDIDATE- ]]; then
-          git remote set-url origin https://${GH_TOKEN}@github.com/Yarden-Ingber/eyes.sdk.java3.git;
+          git remote set-url origin https://${GITHUB_TOKEN}@github.com/${TRAVIS_REPO_SLUG};
           mvn versions:set -DnewVersion=$SDK_VERSION;
           mvn versions:commit;
           git add --all;
@@ -31,12 +32,14 @@ jobs:
         - cat $TRAVIS_BUILD_DIR/eyes.selenium.java/pom.xml
 #        - mvn test -e -X
     - stage: deploy
+      env:
+        - SDK="java"
       if: tag =~ ^RELEASE_CANDIDATE- AND fork == false
       script:
 #         save the email of the person who did the this commit in COMMITTER_EMAIL
         - COMMITTER_EMAIL="$(git log -1 $TRAVIS_COMMIT --pretty="%cE")"
         - if [[ $COMMITTER_EMAIL =~ $ALLOWED_COMMITERS ]]; then
           echo "DEPLOY";
-#         run script to send mail report with two parametes: sdk and RELEASE_CANDIDATE-version tag
-          "curl http://sdk-test-results.herokuapp.com/send_mail -X POST -H \"Content-Type: application/json\" -d \"{'sdk':'java', 'version':'$TRAVIS_TAG'}\"";
+          "{'sdk':'$SDK', 'version':'$TRAVIS_TAG'}">requestJson.json;
+          curl -X POST -d "@requestJson.json" "http://sdk-test-results.herokuapp.com/send_mail;
           fi
