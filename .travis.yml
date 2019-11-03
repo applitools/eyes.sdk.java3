@@ -19,7 +19,6 @@ jobs:
         - if [[ $TRAVIS_TAG =~ ^RELEASE_CANDIDATE- ]]; then
           mvn versions:set -DnewVersion=$SDK_VERSION;
           mvn versions:commit;
-          git checkout develop;
           git add --all;
           git commit -m 'update pom version';
           git push origin HEAD:develop;
