@@ -40,6 +40,6 @@ jobs:
         - COMMITTER_EMAIL="$(git log -1 $TRAVIS_COMMIT --pretty="%cE")"
         - if [[ $COMMITTER_EMAIL =~ $ALLOWED_COMMITERS ]]; then
           echo "DEPLOY";
-          chmod +x ./sendMail.sh
-          ./sendMail.sh $SDK $TRAVIS_TAG
+          chmod +x ./sendMail.sh;
+          ./sendMail.sh $SDK $TRAVIS_TAG;
           fi
