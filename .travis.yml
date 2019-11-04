@@ -30,14 +30,17 @@ jobs:
           git push origin HEAD:$RELEASE_BRANCH;
           sed -i 's/devTestsSuite.xml/regressionTestsSuite.xml/g' $TRAVIS_BUILD_DIR/eyes.selenium.java/pom.xml;
           fi
-        - mvn test -e -X
+#        - mvn test -e -X
     - stage: deploy
       if: tag =~ ^RELEASE_CANDIDATE- AND fork == false
       script:
         #         save the email of the person who did this commit in COMMITTER_EMAIL
         - COMMITTER_EMAIL="$(git log -1 $TRAVIS_COMMIT --pretty="%cE")"
+        - SDK_VERSION=$(echo $TRAVIS_TAG | sed 's/[^.0-9]*//g')
         - if [[ $COMMITTER_EMAIL =~ $ALLOWED_RELEASE_COMMITERS ]]; then
           echo "DEPLOY";
+          chmod +x ./extractChangeLog.sh;
+          CHANGELOG=$(./extractChangeLog.sh $SDK_VERSION CHANGELOG.md);
           chmod +x ./sendMail.sh;
-          ./sendMail.sh $SDK $TRAVIS_TAG;
+          ./sendMail.sh $SDK $TRAVIS_TAG $CHANGELOG;
           fi
