@@ -1,0 +1,12 @@
+<!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd" >
+
+<suite name="regression suite">
+
+    <listeners>
+        <listener class-name="com.applitools.eyes.selenium.ExcludeFailingTestsListener"/>
+    </listeners>
+
+    <suite-files>
+        <suite-file path="passedTestsSuite.xml" />
+    </suite-files>
+</suite>

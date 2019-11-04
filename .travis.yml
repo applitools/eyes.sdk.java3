@@ -7,11 +7,37 @@ dist: trusty
 addons:
   chrome: stable
 
-before_script:
-  - latestChromeDriverURL=$(wget http://chromedriver.storage.googleapis.com/LATEST_RELEASE -q -O -)
-  - wget "http://chromedriver.storage.googleapis.com/${latestChromeDriverURL}/chromedriver_linux64.zip"
-  - unzip chromedriver_linux64.zip -d /home/travis/build/
-  - env webdriver.chrome.driver=/home/travis/build/
-
-script:
-  - mvn test -e -X
+# env variables
+# $RELEASE_BRANCH
+# $GITHUB_TOKEN
+# $ALLOWED_RELEASE_COMMITERS
+# $SDK
+jobs:
+  include:
+    - stage: test
+      script:
+        - latestChromeDriverURL=$(wget http://chromedriver.storage.googleapis.com/LATEST_RELEASE -q -O -)
+        - wget "http://chromedriver.storage.googleapis.com/${latestChromeDriverURL}/chromedriver_linux64.zip"
+        - unzip chromedriver_linux64.zip -d /home/travis/build/
+        - env webdriver.chrome.driver=/home/travis/build/
+        - SDK_VERSION=$(echo $TRAVIS_TAG | sed 's/[^.0-9]*//g')
+        - if [[ $TRAVIS_TAG =~ ^RELEASE_CANDIDATE- ]]; then
+          git remote set-url origin https://${GITHUB_TOKEN}@github.com/${TRAVIS_REPO_SLUG};
+          mvn versions:set -DnewVersion=$SDK_VERSION;
+          mvn versions:commit;
+          git add --all;
+          git commit -m 'update pom version';
+          git push origin HEAD:$RELEASE_BRANCH;
+          sed -i 's/devTestsSuite.xml/regressionTestsSuite.xml/g' $TRAVIS_BUILD_DIR/eyes.selenium.java/pom.xml;
+          fi
+        - mvn test -e -X
+    - stage: deploy
+      if: tag =~ ^RELEASE_CANDIDATE- AND fork == false
+      script:
+        #         save the email of the person who did this commit in COMMITTER_EMAIL
+        - COMMITTER_EMAIL="$(git log -1 $TRAVIS_COMMIT --pretty="%cE")"
+        - if [[ $COMMITTER_EMAIL =~ $ALLOWED_RELEASE_COMMITERS ]]; then
+          echo "DEPLOY";
+          chmod +x ./sendMail.sh;
+          ./sendMail.sh $SDK $TRAVIS_TAG;
+          fi
