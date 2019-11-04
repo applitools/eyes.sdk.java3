@@ -40,7 +40,7 @@ jobs:
         - if [[ $COMMITTER_EMAIL =~ $ALLOWED_RELEASE_COMMITERS ]]; then
           echo "DEPLOY";
           chmod +x ./extractChangeLog.sh;
-          CHANGELOG=$(./extractChangeLog.sh $SDK_VERSION CHANGELOG.md);
+          CHANGELOG=$(./extractChangeLog.sh "$SDK_VERSION" "CHANGELOG.md");
           chmod +x ./sendMail.sh;
-          ./sendMail.sh $SDK $TRAVIS_TAG $CHANGELOG;
+          ./sendMail.sh "$SDK" "$TRAVIS_TAG" "$CHANGELOG";
           fi
