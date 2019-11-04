@@ -10,7 +10,8 @@ addons:
 # env variables
 # $RELEASE_BRANCH
 # $GITHUB_TOKEN
-# $ALLOWED_COMMITERS
+# $ALLOWED_RELEASE_COMMITERS
+# $SDK
 jobs:
   include:
     - stage: test
@@ -29,16 +30,13 @@ jobs:
           git push origin HEAD:$RELEASE_BRANCH;
           sed -i 's/devTestsSuite.xml/regressionTestsSuite.xml/g' $TRAVIS_BUILD_DIR/eyes.selenium.java/pom.xml;
           fi
-        - cat $TRAVIS_BUILD_DIR/eyes.selenium.java/pom.xml
-#        - mvn test -e -X
+        - mvn test -e -X
     - stage: deploy
-      env:
-        - SDK="java"
       if: tag =~ ^RELEASE_CANDIDATE- AND fork == false
       script:
-#         save the email of the person who did the this commit in COMMITTER_EMAIL
+#         save the email of the person who did this commit in COMMITTER_EMAIL
         - COMMITTER_EMAIL="$(git log -1 $TRAVIS_COMMIT --pretty="%cE")"
-        - if [[ $COMMITTER_EMAIL =~ $ALLOWED_COMMITERS ]]; then
+        - if [[ $COMMITTER_EMAIL =~ $ALLOWED_RELEASE_COMMITERS ]]; then
           echo "DEPLOY";
           chmod +x ./sendMail.sh;
           ./sendMail.sh $SDK $TRAVIS_TAG;
