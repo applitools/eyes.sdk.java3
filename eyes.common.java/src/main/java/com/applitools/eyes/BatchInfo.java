@@ -46,6 +46,8 @@ public class BatchInfo {
         String envSequenceName = GeneralUtils.getEnvString("APPLITOOLS_BATCH_SEQUENCE");
         this.id = envVarBatchId != null ? envVarBatchId : UUID.randomUUID().toString();
         this.name = name != null ? name : GeneralUtils.getEnvString("APPLITOOLS_BATCH_NAME");
+        String env_batch_notify = GeneralUtils.getEnvString("APPLITOOLS_BATCH_NOTIFY");
+        this.notifyOnCompletion = Boolean.parseBoolean(env_batch_notify);
         this.sequenceName = envSequenceName;
         this.startedAt = GeneralUtils.toISO8601DateTime(startedAt);
     }

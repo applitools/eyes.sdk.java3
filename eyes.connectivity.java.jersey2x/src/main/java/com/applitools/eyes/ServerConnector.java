@@ -56,7 +56,7 @@ public class ServerConnector extends RestClient
      * @param logger A logger instance.
      */
     public ServerConnector(Logger logger) {
-        this(logger, GeneralUtils.getDefaultServerUrl());
+        this(logger, GeneralUtils.geServerUrl());
     }
 
     /***
@@ -710,8 +710,9 @@ public class ServerConnector extends RestClient
 
     @Override
     public void closeBatch(String batchId) {
-        boolean dontCloseBatchesStr = GeneralUtils.getDontCloseBatches();
-        if (dontCloseBatchesStr){
+        String dontCloseBatchesStr = GeneralUtils.getEnvString("APPLITOOLS_DONT_CLOSE_BATCHES");
+        if (Boolean.parseBoolean(dontCloseBatchesStr))
+        {
             logger.log("APPLITOOLS_DONT_CLOSE_BATCHES environment variable set to true. Skipping batch close.");
             return;
         }

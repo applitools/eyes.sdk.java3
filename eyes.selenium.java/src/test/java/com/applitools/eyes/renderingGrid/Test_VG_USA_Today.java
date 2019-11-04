@@ -19,8 +19,6 @@ public class Test_VG_USA_Today {
     private VisualGridRunner renderingManager;
 
     private String defaultServerUrl = "https://eyes.applitools.com";
-    private String defaultApiKey = System.getenv("APPLITOOLS_API_KEY");
-    private String fabricDemoServerUrl = "https://fabricdemoeyes.applitools.com";
 
     @BeforeClass
     public void beforeClass() {

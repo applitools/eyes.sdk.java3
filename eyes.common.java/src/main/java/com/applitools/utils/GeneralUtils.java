@@ -224,9 +224,13 @@ public class GeneralUtils {
      * Gets default server url.
      * @return the default server url
      */
-    public static URI getDefaultServerUrl() {
+    public static URI geServerUrl() {
+        String serverURL;
         try {
-            return new URI("https://eyesapi.applitools.com");
+            serverURL = GeneralUtils.getEnvString("APPLITOOLS_API_KEY");
+            if(serverURL == null) serverURL = "https://eyesapi.applitools.com";
+            URI uri = new URI(serverURL);
+            return uri;
         } catch (URISyntaxException ex) {
             throw new EyesException(ex.getMessage(), ex);
         }

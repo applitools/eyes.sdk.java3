@@ -39,7 +39,7 @@ public class VisualGridRunner extends EyesRunner {
     private IDebugResourceWriter debugResourceWriter;
 
     private RateLimiter rateLimiter;
-    private String serverUrl;
+    private String serverUrl = GeneralUtils.getEnvString("APPLITOOLS_SERVER_URL");;
     private static final String DEFAULT_API_KEY = GeneralUtils.getEnvString("APPLITOOLS_API_KEY");
     private String apiKey = DEFAULT_API_KEY;
     private boolean isDisabled;
