@@ -29,7 +29,7 @@ public class BatchInfo {
     @JsonProperty("startedAt")
     private String startedAt;
     @JsonProperty("notifyOnCompletion")
-    private boolean notifyOnCompletion = false;
+    private boolean notifyOnCompletion;
 
     @JsonProperty("isCompleted")
     private boolean isCompleted = false;

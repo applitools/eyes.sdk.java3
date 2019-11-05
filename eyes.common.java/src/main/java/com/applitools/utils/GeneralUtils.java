@@ -227,7 +227,7 @@ public class GeneralUtils {
     public static URI geServerUrl() {
         String serverURL;
         try {
-            serverURL = GeneralUtils.getEnvString("APPLITOOLS_API_KEY");
+            serverURL = GeneralUtils.getEnvString("APPLITOOLS_SERVER_URL");
             if(serverURL == null) serverURL = "https://eyesapi.applitools.com";
             URI uri = new URI(serverURL);
             return uri;

@@ -16,32 +16,7 @@ import java.lang.reflect.Field;
 import java.util.Calendar;
 import java.util.Map;
 
-public class TestConfigurationSentCorrectlyToServer {
-
-    private static Map<String, String> unmodEnvMap = null;
-//    private static Map<String, String> environmentMap;
-
-
-    static {
-        try {
-            Class<?> processEnvironment = Class.forName("java.lang.ProcessEnvironment");
-
-            Field unmodifiableMapField = getAccessibleField(processEnvironment, "theUnmodifiableEnvironment");
-
-            Object unmodifiableMap = unmodifiableMapField.get(null);
-
-            Class unmodifiableMapClass = Class.forName("java.util.Collections$UnmodifiableMap");
-            Field field = getAccessibleField(unmodifiableMapClass, "m");
-            Object obj = field.get(unmodifiableMap);
-            unmodEnvMap = (Map<String, String>) obj;
-
-//            Field mapField = getAccessibleField(processEnvironment, "theEnvironment");
-//            environmentMap = (Map<String, String>) mapField.get(null);
-
-        } catch (ClassNotFoundException | NoSuchFieldException | IllegalAccessException e) {
-            e.printStackTrace();
-        }
-    }
+public class TestConfigurationSentCorrectlyToServer extends EnivironmentModifier {
 
     @DataProvider(name = "dp")
     public static Object[][] dp() {
@@ -135,26 +110,6 @@ public class TestConfigurationSentCorrectlyToServer {
         eyes.abortIfNotClosed();
     }
 
-
-    private static void setEnvironmentVariable(String key, String value) {
-        if (value != null) {
-            unmodEnvMap.put(key, value);
-        }
-        else{
-            unmodEnvMap.remove(key);
-        }
-
-        //environmentMap.put(key, value);
-    }
-
-    private static Field getAccessibleField(Class<?> clazz, String fieldName)
-            throws NoSuchFieldException {
-
-        Field field = clazz.getDeclaredField(fieldName);
-        field.setAccessible(true);
-        return field;
-    }
-
     @Test
     public void testSetEnv() {
         String mockKey = "mockKey";
@@ -169,13 +124,6 @@ public class TestConfigurationSentCorrectlyToServer {
 
         Assert.assertEquals(newEnvVar, mockValue);
 
-    }
-
-    private void printEnv() {
-        Map<String, String> getenv = System.getenv();
-        for (Map.Entry entry : getenv.entrySet()) {
-            System.out.println(entry.getKey() + " = " + entry.getValue());
-        }
     }
 
 }
