@@ -361,18 +361,12 @@ public class ServerConnector extends RestClient
     @Override
     public void downloadString(final URL uri, final boolean isSecondRetry, final IDownloadListener<String> listener) {
 
-//        Client client = ClientBuilder.newBuilder().build();4
-
         WebTarget target = this.restClient.target(uri.toString());
 
         Invocation.Builder request = target.request(MediaType.WILDCARD);
 
         logger.verbose("Firing async GET");
 
-//        Response response = request.get();
-//        byte[] file = downloadFile(response);
-//        response.close();
-//        listener.onDownloadComplete(new String(file), null);
         request.async().get(new InvocationCallback<Response>() {
             @Override
             public void completed(Response response) {
@@ -655,6 +649,7 @@ public class ServerConnector extends RestClient
     @Override
     public List<RenderStatusResults> renderStatusById(String... renderIds) {
 
+        Response response = null;
         try {
             ArgumentGuard.notNull(renderIds, "renderIds");
             this.logger.verbose("called for render: " + Arrays.toString(renderIds));
@@ -674,7 +669,7 @@ public class ServerConnector extends RestClient
             try {
                 String json = objectMapper.writeValueAsString(renderIds);
                 Entity<String> entity = Entity.entity(json, MediaType.APPLICATION_JSON);
-                Response response = request.post(entity);
+                response = request.post(entity);
                 if (validStatusCodes.contains(response.getStatus())) {
                     this.logger.verbose("request succeeded");
                     RenderStatusResults[] renderStatusResults = parseResponseWithJsonData(response, validStatusCodes, RenderStatusResults[].class);
@@ -693,6 +688,10 @@ public class ServerConnector extends RestClient
             return null;
         } catch (Exception e) {
             GeneralUtils.logExceptionStackTrace(logger, e);
+        } finally {
+            if (response != null) {
+                response.close();
+            }
         }
         return null;
 
