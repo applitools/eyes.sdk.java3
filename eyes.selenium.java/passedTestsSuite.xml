@@ -16,6 +16,14 @@
         </classes>
     </test>
 
+    <test name="TestSimpleCases">
+        <parameter name="dont_run" value="TestCheckDivOverflowingThePage+SCROLL" />
+        <classes>
+            <class name="com.applitools.eyes.selenium.TestSimpleCases" />
+        </classes>
+    </test>
+
+
     <test name="Test_WEB" parallel="instances">
         <classes>
             <class name="com.applitools.eyes.selenium.TestFluentApi" />
@@ -30,7 +38,6 @@
             <class name="com.applitools.eyes.selenium.TestScrollRootElement" />
             <class name="com.applitools.eyes.selenium.TestScrollRootElementOnSimplePage" />
             <class name="com.applitools.eyes.selenium.TestSendDom" />
-            <class name="com.applitools.eyes.selenium.TestSimpleCases" />
             <class name="com.applitools.eyes.renderingGrid.TestVGServerConfigs" />
 
         </classes>
