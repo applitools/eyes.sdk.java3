@@ -2028,6 +2028,7 @@ public class SeleniumEyes extends EyesBase implements IDriverProvider ,IBatchClo
             this.runner.aggregateResult(results);
         }
         this.cachedAUTSessionId = null;
+        this.serverConnector.closeConnector();
         return results;
     }
 

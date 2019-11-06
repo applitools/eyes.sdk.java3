@@ -706,6 +706,16 @@ public class ServerConnector extends RestClient
         logger.verbose("delete batch is done with "+delete.getStatus() + " status");
     }
 
+    @Override
+    public boolean getDontCloseBatches() {
+        return "true".equalsIgnoreCase(GeneralUtils.getEnvString("APPLITOOLS_DONT_CLOSE_BATCHES"));
+    }
+
+    @Override
+    public void closeConnector() {
+        this.restClient.close();
+    }
+
     private byte[] downloadFile(Response response) {
 
         InputStream inputStream = response.readEntity(InputStream.class);

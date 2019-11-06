@@ -72,6 +72,7 @@ public class ServerConnector extends RestClient
 
     /**
      * Sets the API key of your applitools Eyes account.
+     *
      * @param apiKey The api key to set.
      */
     public void setApiKey(String apiKey) {
@@ -90,6 +91,7 @@ public class ServerConnector extends RestClient
 
     /**
      * Sets the proxy settings to be used by the rest client.
+     *
      * @param proxySettings The proxy settings to be used by the rest client.
      *                      If {@code null} then no proxy is set.
      */
@@ -112,6 +114,7 @@ public class ServerConnector extends RestClient
 
     /**
      * Sets the current server URL used by the rest client.
+     *
      * @param serverUrl The URI of the rest server.
      */
     @SuppressWarnings("UnusedDeclaration")
@@ -134,6 +137,7 @@ public class ServerConnector extends RestClient
      * Starts a new running session in the agent. Based on the given parameters,
      * this running session will either be linked to an existing session, or to
      * a completely new session.
+     *
      * @param sessionStartInfo The start parameters for the session.
      * @return RunningSession object which represents the current running
      * session
@@ -146,6 +150,10 @@ public class ServerConnector extends RestClient
         ArgumentGuard.notNull(sessionStartInfo, "sessionStartInfo");
 
         logger.verbose("Using Jersey2 for REST API calls.");
+
+        restClient = buildRestClient(getTimeout(), getProxy());
+        endPoint = restClient.target(serverUrl);
+        endPoint = endPoint.path(API_PATH);
 
         String postData;
         Response response;
@@ -193,6 +201,7 @@ public class ServerConnector extends RestClient
 
     /**
      * Stops the running session.
+     *
      * @param runningSession The running session to be stopped.
      * @return TestResults object for the stopped running session
      * @throws EyesException For invalid status codes, or if response parsing
@@ -260,6 +269,7 @@ public class ServerConnector extends RestClient
     /**
      * Matches the current window (held by the WebDriver) to the expected
      * window.
+     *
      * @param runningSession The current agent's running session.
      * @param matchData      Encapsulation of a capture taken from the application.
      * @return The results of the window matching.
@@ -351,18 +361,30 @@ public class ServerConnector extends RestClient
     @Override
     public void downloadString(final URL uri, final boolean isSecondRetry, final IDownloadListener<String> listener) {
 
-        Client client = ClientBuilder.newBuilder().build();
+//        Client client = ClientBuilder.newBuilder().build();4
 
-        WebTarget target = client.target(uri.toString());
+        WebTarget target = this.restClient.target(uri.toString());
 
         Invocation.Builder request = target.request(MediaType.WILDCARD);
 
         logger.verbose("Firing async GET");
 
-        request.async().get(new InvocationCallback<String>() {
+//        Response response = request.get();
+//        byte[] file = downloadFile(response);
+//        response.close();
+//        listener.onDownloadComplete(new String(file), null);
+        request.async().get(new InvocationCallback<Response>() {
             @Override
-            public void completed(String response) {
-                listener.onDownloadComplete(response, null);
+            public void completed(Response response) {
+                try {
+                    byte[] resource = downloadFile(response);
+                    listener.onDownloadComplete(new String(resource), null);
+                    logger.verbose("response finished");
+                } catch (Throwable e) {
+                    logger.verbose(e.getMessage());
+                } finally {
+                    response.close();
+                }
             }
 
             @Override
@@ -381,9 +403,8 @@ public class ServerConnector extends RestClient
 
     @Override
     public IResourceFuture downloadResource(final URL url, String userAgent) {
-        Client client = RestClient.buildRestClient(getTimeout(), getProxy());
 
-        WebTarget target = client.target(url.toString());
+        WebTarget target = restClient.target(url.toString());
 
         Invocation.Builder request = target.request(MediaType.WILDCARD);
 
@@ -659,8 +680,8 @@ public class ServerConnector extends RestClient
                     RenderStatusResults[] renderStatusResults = parseResponseWithJsonData(response, validStatusCodes, RenderStatusResults[].class);
                     for (int i = 0; i < renderStatusResults.length; i++) {
                         RenderStatusResults renderStatusResult = renderStatusResults[i];
-                        if(renderStatusResult != null && renderStatusResult.getStatus() == RenderStatus.ERROR){
-                            logger.verbose("error on render id - "+renderStatusResult);
+                        if (renderStatusResult != null && renderStatusResult.getStatus() == RenderStatus.ERROR) {
+                            logger.verbose("error on render id - " + renderStatusResult);
                         }
                     }
                     return Arrays.asList(renderStatusResults);
@@ -691,9 +712,7 @@ public class ServerConnector extends RestClient
     @Override
     public void closeBatch(String batchId) {
         String dontCloseBatchesStr = GeneralUtils.getEnvString("APPLITOOLS_DONT_CLOSE_BATCHES");
-        dontCloseBatchesStr = dontCloseBatchesStr != null ? dontCloseBatchesStr : GeneralUtils.getEnvString("bamboo_APPLITOOLS_DONT_CLOSE_BATCHES");
-        if (Boolean.parseBoolean(dontCloseBatchesStr))
-        {
+        if (Boolean.parseBoolean(dontCloseBatchesStr)) {
             logger.log("APPLITOOLS_DONT_CLOSE_BATCHES environment variable set to true. Skipping batch close.");
             return;
         }
@@ -703,7 +722,19 @@ public class ServerConnector extends RestClient
         String url = String.format(CLOSE_BATCH, batchId);
         WebTarget target = restClient.target(serverUrl).path(url).queryParam("apiKey", getApiKey());
         Response delete = target.request().delete();
-        logger.verbose("delete batch is done with "+delete.getStatus() + " status");
+        logger.verbose("delete batch is done with " + delete.getStatus() + " status");
+    }
+
+    @Override
+    public boolean getDontCloseBatches() {
+        return "true".equalsIgnoreCase(GeneralUtils.getEnvString("APPLITOOLS_DONT_CLOSE_BATCHES"));
+    }
+
+    @Override
+    public void closeConnector() {
+        if (restClient != null) {
+            restClient.close();
+        }
     }
 
     private byte[] downloadFile(Response response) {
@@ -721,4 +752,6 @@ public class ServerConnector extends RestClient
         }
         return bytes;
     }
+
+
 }

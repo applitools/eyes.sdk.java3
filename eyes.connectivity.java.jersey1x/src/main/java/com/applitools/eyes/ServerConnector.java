@@ -711,6 +711,15 @@ public class ServerConnector extends RestClient
         target.delete();
     }
 
+    @Override
+    public boolean getDontCloseBatches() {
+        return "true".equalsIgnoreCase(GeneralUtils.getEnvString("APPLITOOLS_DONT_CLOSE_BATCHES"));
+    }
+
+    @Override
+    public void closeConnector() {
+    }
+
     private byte[] downloadFile(ClientResponse response) {
 
         InputStream inputStream = response.getEntity(InputStream.class);
