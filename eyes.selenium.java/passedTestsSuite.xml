@@ -7,7 +7,7 @@
     </listeners>
 
     <test name="TestClassicApi">
-        <parameter name="dont_run" value="TestCheckInnerFrame+CSS" />
+        <parameter name="dont_run" value="TestCheckInnerFrame+CSS, TestCheckFrame+SCROLL" />
         <classes>
             <class name="com.applitools.eyes.selenium.TestClassicApi"></class>
         </classes>
@@ -49,14 +49,14 @@
     </test>
 
     <test name="TestFluentApi">
-        <parameter name="dont_run" value="TestCheckElementFully_Fluent+SCROLL, TestCheckFullWindowWithMultipleIgnoreRegionsBySelector_Fluent+VG, TestCheckWindow_Fluent+VG, TestCheckWindowWithFloatingByRegion_Fluent+VG, TestCheckWindowWithFloatingBySelector_Fluent+VG, TestCheckWindowWithIgnoreBySelector_Centered_Fluent+VG, TestCheckWindowWithIgnoreBySelector_Fluent+VG, TestCheckWindowWithIgnoreBySelector_Stretched_Fluent+VG, TestCheckWindowWithIgnoreRegion_Fluent+VG, TestIgnoreDisplacements+VG, TestAccessibilityRegions+VG" />
+        <parameter name="dont_run" value="TestCheckElementFully_Fluent+SCROLL, TestCheckFullWindowWithMultipleIgnoreRegionsBySelector_Fluent+VG, TestCheckWindow_Fluent+VG, TestCheckWindowWithFloatingByRegion_Fluent+VG, TestCheckWindowWithFloatingBySelector_Fluent+VG, TestCheckWindowWithIgnoreBySelector_Centered_Fluent+VG, TestCheckWindowWithIgnoreBySelector_Fluent+VG, TestCheckWindowWithIgnoreBySelector_Stretched_Fluent+VG, TestCheckWindowWithIgnoreRegion_Fluent+VG, TestIgnoreDisplacements+VG, TestAccessibilityRegions+VG, TestCheckMany+VG, TestCheckRegionBySelectorAfterManualScroll_Fluent+SCROLL, TestScrollbarsHiddenAndReturned_Fluent+VG" />
         <classes>
             <class name="com.applitools.eyes.selenium.TestFluentApi" />
         </classes>
     </test>
 
     <test name="TestFluentApi_Frames">
-        <parameter name="dont_run" value="TestCheckLongOutOfBoundsIFrameModal+SCROLL" />
+        <parameter name="dont_run" value="TestCheckLongOutOfBoundsIFrameModal+SCROLL, TestCheckFrameInFrame_Fully_Fluent+SCROLL" />
         <classes>
             <class name="com.applitools.eyes.selenium.TestFluentApi_Frames" />
         </classes>
