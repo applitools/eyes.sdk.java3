@@ -2,6 +2,10 @@
 
 <suite name="Suite1" verbose="1" parallel="tests">
 
+    <listeners>
+        <listener class-name="com.applitools.eyes.selenium.ExcludeFailingTestsListener"/>
+    </listeners>
+
     <test name="TestClassicApi">
         <parameter name="dont_run" value="TestCheckInnerFrame+CSS" />
         <classes>
