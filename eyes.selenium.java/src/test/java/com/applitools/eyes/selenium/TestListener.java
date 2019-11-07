@@ -99,6 +99,7 @@ public class TestListener implements ITestListener {
                 testSetup.getDriver().quit();
             }
             sendTestResluts(iTestResult, iTestResult.isSuccess());
+            sendExtraData(iTestResult.getMethod().getMethodName(), iTestResult, new Exception());
         }
     }
 
