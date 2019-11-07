@@ -1,3 +1,6 @@
+### Fixed
+-CSS scrolling in chrome 78. [Trello 1206](https://trello.com/c/euVqe1Sv) 
+
 ## [3.158.4] - 2019-10-23
 ### Fixed
 - Jersey1x proxy.
