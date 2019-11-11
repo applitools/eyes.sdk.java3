@@ -177,7 +177,5 @@ public interface IServerConnector {
 
     void closeBatch(String batchId);
 
-    boolean getDontCloseBatches();
-
     void closeConnector();
 }

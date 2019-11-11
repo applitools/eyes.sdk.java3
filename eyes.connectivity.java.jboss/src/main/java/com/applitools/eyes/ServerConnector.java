@@ -736,11 +736,6 @@ public class ServerConnector extends RestClient
     }
 
     @Override
-    public boolean getDontCloseBatches() {
-        return "true".equalsIgnoreCase(GeneralUtils.getEnvString("APPLITOOLS_DONT_CLOSE_BATCHES"));
-    }
-
-    @Override
     public void closeConnector() {
         if (restClient != null) {
             restClient.close();
