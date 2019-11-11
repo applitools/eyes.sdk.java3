@@ -151,9 +151,7 @@ public class ServerConnector extends RestClient
 
         logger.verbose("Using Jersey2 for REST API calls.");
 
-        restClient = buildRestClient(getTimeout(), getProxy());
-        endPoint = restClient.target(serverUrl);
-        endPoint = endPoint.path(API_PATH);
+        configureRestClient();
 
         String postData;
         Response response;
@@ -252,6 +250,8 @@ public class ServerConnector extends RestClient
     @Override
     public void deleteSession(TestResults testResults) {
         ArgumentGuard.notNull(testResults, "testResults");
+
+        configureRestClient();
 
         Invocation.Builder invocationBuilder = restClient.target(serverUrl)
                 .path("/api/sessions/batches/")
@@ -752,5 +752,10 @@ public class ServerConnector extends RestClient
         return bytes;
     }
 
+    private void configureRestClient() {
+        restClient = buildRestClient(getTimeout(), getProxy());
+        endPoint = restClient.target(serverUrl);
+        endPoint = endPoint.path(API_PATH);
+    }
 
 }

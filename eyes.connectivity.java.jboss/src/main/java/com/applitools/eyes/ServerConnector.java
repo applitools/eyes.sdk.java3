@@ -146,9 +146,7 @@ public class ServerConnector extends RestClient
 
         logger.verbose("Using Jboss for REST API calls.");
 
-        restClient = buildRestClient(getTimeout(), getProxy());
-        endPoint = restClient.target(serverUrl);
-        endPoint = endPoint.path(API_PATH);
+        configureRestClient();
 
         String postData;
         Response response;
@@ -193,6 +191,12 @@ public class ServerConnector extends RestClient
         runningSession.setIsNewSession(isNewSession);
 
         return runningSession;
+    }
+
+    private void configureRestClient() {
+        restClient = buildRestClient(getTimeout(), getProxy());
+        endPoint = restClient.target(serverUrl);
+        endPoint = endPoint.path(API_PATH);
     }
 
     /**
@@ -248,6 +252,8 @@ public class ServerConnector extends RestClient
     public void deleteSession(TestResults testResults) {
         ArgumentGuard.notNull(testResults, "testResults");
 
+        configureRestClient();
+
         Invocation.Builder invocationBuilder = restClient.target(serverUrl)
                 .path("/api/sessions/batches/")
                 .path(testResults.getBatchId())
@@ -258,6 +264,8 @@ public class ServerConnector extends RestClient
                 .request(MediaType.APPLICATION_JSON);
 
         Response response = invocationBuilder.delete();
+
+        this.restClient.close();
     }
 
     /**
