@@ -54,7 +54,7 @@ public class DomCapture {
     private Map<String, String> cssData = Collections.synchronizedMap(new HashMap<String, String>());
     private boolean shouldWaitForPhaser = false;
     private AtomicBoolean isCheckTimerTimedOut = new AtomicBoolean(false);
-//    private Timer timer;
+    private Timer timer;
 
     public DomCapture(SeleniumEyes eyes) {
         mServerConnector = eyes.getServerConnector();
@@ -103,8 +103,8 @@ public class DomCapture {
 
     private String getFrameDom() {
         logger.verbose("Trying to get DOM from driver");
-//        timer = new Timer(true);
-//        timer.schedule(new TimeoutTask(), DOM_EXTRACTION_TIMEOUT);
+        timer = new Timer(true);
+        timer.schedule(new TimeoutTask(), DOM_EXTRACTION_TIMEOUT);
         try {
             isCheckTimerTimedOut.set(false);
             String resultAsString;
@@ -156,7 +156,7 @@ public class DomCapture {
             e.printStackTrace();
         }
         finally {
-//            timer.cancel();
+            timer.cancel();
         }
         return "";
     }
