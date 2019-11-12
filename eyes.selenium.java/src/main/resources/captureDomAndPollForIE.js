@@ -1,4 +1,4 @@
-/* @applitools/dom-capture@7.0.18 */
+/* @applitools/dom-capture@7.0.22 */
 
 function __captureDomAndPollForIE() {
   var captureDomAndPollForIE = (function () {
@@ -16,7 +16,6 @@ function __captureDomAndPollForIE() {
             	return n && n['default'] || n;
             }
 
-            var O = 'object';
             var check = function (it) {
               return it && it.Math == Math && it;
             };
@@ -24,10 +23,10 @@ function __captureDomAndPollForIE() {
             // https://github.com/zloirock/core-js/issues/86#issuecomment-115759028
             var global_1 =
               // eslint-disable-next-line no-undef
-              check(typeof globalThis == O && globalThis) ||
-              check(typeof window == O && window) ||
-              check(typeof self == O && self) ||
-              check(typeof global$1 == O && global$1) ||
+              check(typeof globalThis == 'object' && globalThis) ||
+              check(typeof window == 'object' && window) ||
+              check(typeof self == 'object' && self) ||
+              check(typeof global$1 == 'object' && global$1) ||
               // eslint-disable-next-line no-new-func
               Function('return this')();
 
@@ -183,31 +182,33 @@ function __captureDomAndPollForIE() {
             	f: f$2
             };
 
-            var hide = descriptors ? function (object, key, value) {
+            var createNonEnumerableProperty = descriptors ? function (object, key, value) {
               return objectDefineProperty.f(object, key, createPropertyDescriptor(1, value));
             } : function (object, key, value) {
               object[key] = value;
               return object;
             };
 
+            var isPure = false;
+
             var setGlobal = function (key, value) {
               try {
-                hide(global_1, key, value);
+                createNonEnumerableProperty(global_1, key, value);
               } catch (error) {
                 global_1[key] = value;
               } return value;
             };
 
-            var isPure = false;
-
-            var shared = createCommonjsModule(function (module) {
             var SHARED = '__core-js_shared__';
             var store = global_1[SHARED] || setGlobal(SHARED, {});
 
+            var sharedStore = store;
+
+            var shared = createCommonjsModule(function (module) {
             (module.exports = function (key, value) {
-              return store[key] || (store[key] = value !== undefined ? value : {});
+              return sharedStore[key] || (sharedStore[key] = value !== undefined ? value : {});
             })('versions', []).push({
-              version: '3.1.3',
+              version: '3.4.0',
               mode: 'global',
               copyright: '© 2019 Denis Pushkarev (zloirock.ru)'
             });
@@ -215,9 +216,9 @@ function __captureDomAndPollForIE() {
 
             var functionToString = shared('native-function-to-string', Function.toString);
 
-            var WeakMap$1 = global_1.WeakMap;
+            var WeakMap = global_1.WeakMap;
 
-            var nativeWeakMap = typeof WeakMap$1 === 'function' && /native code/.test(functionToString.call(WeakMap$1));
+            var nativeWeakMap = typeof WeakMap === 'function' && /native code/.test(functionToString.call(WeakMap));
 
             var id = 0;
             var postfix = Math.random();
@@ -234,7 +235,7 @@ function __captureDomAndPollForIE() {
 
             var hiddenKeys = {};
 
-            var WeakMap$2 = global_1.WeakMap;
+            var WeakMap$1 = global_1.WeakMap;
             var set, get, has$1;
 
             var enforce = function (it) {
@@ -251,25 +252,25 @@ function __captureDomAndPollForIE() {
             };
 
             if (nativeWeakMap) {
-              var store = new WeakMap$2();
-              var wmget = store.get;
-              var wmhas = store.has;
-              var wmset = store.set;
+              var store$1 = new WeakMap$1();
+              var wmget = store$1.get;
+              var wmhas = store$1.has;
+              var wmset = store$1.set;
               set = function (it, metadata) {
-                wmset.call(store, it, metadata);
+                wmset.call(store$1, it, metadata);
                 return metadata;
               };
               get = function (it) {
-                return wmget.call(store, it) || {};
+                return wmget.call(store$1, it) || {};
               };
               has$1 = function (it) {
-                return wmhas.call(store, it);
+                return wmhas.call(store$1, it);
               };
             } else {
               var STATE = sharedKey('state');
               hiddenKeys[STATE] = true;
               set = function (it, metadata) {
-                hide(it, STATE, metadata);
+                createNonEnumerableProperty(it, STATE, metadata);
                 return metadata;
               };
               get = function (it) {
@@ -302,7 +303,7 @@ function __captureDomAndPollForIE() {
               var simple = options ? !!options.enumerable : false;
               var noTargetGet = options ? !!options.noTargetGet : false;
               if (typeof value == 'function') {
-                if (typeof key == 'string' && !has(value, 'name')) hide(value, 'name', key);
+                if (typeof key == 'string' && !has(value, 'name')) createNonEnumerableProperty(value, 'name', key);
                 enforceInternalState(value).source = TEMPLATE.join(typeof key == 'string' ? key : '');
               }
               if (O === global_1) {
@@ -315,7 +316,7 @@ function __captureDomAndPollForIE() {
                 simple = true;
               }
               if (simple) O[key] = value;
-              else hide(O, key, value);
+              else createNonEnumerableProperty(O, key, value);
             // add fake Function#toString for correct work wrapped methods / constructors with methods like LoDash isNative
             })(Function.prototype, 'toString', function toString() {
               return typeof this == 'function' && getInternalState(this).source || functionToString.call(this);
@@ -519,7 +520,7 @@ function __captureDomAndPollForIE() {
                 }
                 // add a flag to not completely full polyfills
                 if (options.sham || (targetProperty && targetProperty.sham)) {
-                  hide(sourceProperty, 'sham', true);
+                  createNonEnumerableProperty(sourceProperty, 'sham', true);
                 }
                 // extend global
                 redefine(target, key, sourceProperty, options);
@@ -634,10 +635,10 @@ function __captureDomAndPollForIE() {
             };
 
             var Symbol$1 = global_1.Symbol;
-            var store$1 = shared('wks');
+            var store$2 = shared('wks');
 
             var wellKnownSymbol = function (name) {
-              return store$1[name] || (store$1[name] = nativeSymbol && Symbol$1[name]
+              return store$2[name] || (store$2[name] = nativeSymbol && Symbol$1[name]
                 || (nativeSymbol ? Symbol$1 : uid)('Symbol.' + name));
             };
 
@@ -784,8 +785,7 @@ function __captureDomAndPollForIE() {
             var getInternalState = internalState.getterFor(SYMBOL);
             var ObjectPrototype = Object[PROTOTYPE$1];
             var $Symbol = global_1.Symbol;
-            var JSON$1 = global_1.JSON;
-            var nativeJSONStringify = JSON$1 && JSON$1.stringify;
+            var $stringify = getBuiltIn('JSON', 'stringify');
             var nativeGetOwnPropertyDescriptor$1 = objectGetOwnPropertyDescriptor.f;
             var nativeDefineProperty$1 = objectDefineProperty.f;
             var nativeGetOwnPropertyNames$1 = objectGetOwnPropertyNamesExternal.f;
@@ -1006,34 +1006,41 @@ function __captureDomAndPollForIE() {
 
             // `JSON.stringify` method behavior with symbols
             // https://tc39.github.io/ecma262/#sec-json.stringify
-            JSON$1 && _export({ target: 'JSON', stat: true, forced: !nativeSymbol || fails(function () {
-              var symbol = $Symbol();
-              // MS Edge converts symbol values to JSON as {}
-              return nativeJSONStringify([symbol]) != '[null]'
-                // WebKit converts symbol values to JSON as null
-                || nativeJSONStringify({ a: symbol }) != '{}'
-                // V8 throws on boxed symbols
-                || nativeJSONStringify(Object(symbol)) != '{}';
-            }) }, {
-              stringify: function stringify(it) {
-                var args = [it];
-                var index = 1;
-                var replacer, $replacer;
-                while (arguments.length > index) args.push(arguments[index++]);
-                $replacer = replacer = args[1];
-                if (!isObject(replacer) && it === undefined || isSymbol(it)) return; // IE8 returns string on undefined
-                if (!isArray(replacer)) replacer = function (key, value) {
-                  if (typeof $replacer == 'function') value = $replacer.call(this, key, value);
-                  if (!isSymbol(value)) return value;
-                };
-                args[1] = replacer;
-                return nativeJSONStringify.apply(JSON$1, args);
-              }
-            });
+            if ($stringify) {
+              var FORCED_JSON_STRINGIFY = !nativeSymbol || fails(function () {
+                var symbol = $Symbol();
+                // MS Edge converts symbol values to JSON as {}
+                return $stringify([symbol]) != '[null]'
+                  // WebKit converts symbol values to JSON as null
+                  || $stringify({ a: symbol }) != '{}'
+                  // V8 throws on boxed symbols
+                  || $stringify(Object(symbol)) != '{}';
+              });
+
+              _export({ target: 'JSON', stat: true, forced: FORCED_JSON_STRINGIFY }, {
+                // eslint-disable-next-line no-unused-vars
+                stringify: function stringify(it, replacer, space) {
+                  var args = [it];
+                  var index = 1;
+                  var $replacer;
+                  while (arguments.length > index) args.push(arguments[index++]);
+                  $replacer = replacer;
+                  if (!isObject(replacer) && it === undefined || isSymbol(it)) return; // IE8 returns string on undefined
+                  if (!isArray(replacer)) replacer = function (key, value) {
+                    if (typeof $replacer == 'function') value = $replacer.call(this, key, value);
+                    if (!isSymbol(value)) return value;
+                  };
+                  args[1] = replacer;
+                  return $stringify.apply(null, args);
+                }
+              });
+            }
 
             // `Symbol.prototype[@@toPrimitive]` method
             // https://tc39.github.io/ecma262/#sec-symbol.prototype-@@toprimitive
-            if (!$Symbol[PROTOTYPE$1][TO_PRIMITIVE]) hide($Symbol[PROTOTYPE$1], TO_PRIMITIVE, $Symbol[PROTOTYPE$1].valueOf);
+            if (!$Symbol[PROTOTYPE$1][TO_PRIMITIVE]) {
+              createNonEnumerableProperty($Symbol[PROTOTYPE$1], TO_PRIMITIVE, $Symbol[PROTOTYPE$1].valueOf);
+            }
             // `Symbol.prototype[@@toStringTag]` property
             // https://tc39.github.io/ecma262/#sec-symbol.prototype-@@tostringtag
             setToStringTag($Symbol, SYMBOL);
@@ -1374,7 +1381,7 @@ function __captureDomAndPollForIE() {
 
             var iterate = module.exports = function (iterable, fn, that, AS_ENTRIES, IS_ITERATOR) {
               var boundFunction = bindContext(fn, that, AS_ENTRIES ? 2 : 1);
-              var iterator, iterFn, index, length, result, step;
+              var iterator, iterFn, index, length, result, next, step;
 
               if (IS_ITERATOR) {
                 iterator = iterable;
@@ -1393,9 +1400,10 @@ function __captureDomAndPollForIE() {
                 iterator = iterFn.call(iterable);
               }
 
-              while (!(step = iterator.next()).done) {
+              next = iterator.next;
+              while (!(step = next.call(iterator)).done) {
                 result = callWithSafeIterationClosing(iterator, boundFunction, step.value, AS_ENTRIES);
-                if (result && result instanceof Result) return result;
+                if (typeof result == 'object' && result && result instanceof Result) return result;
               } return new Result(false);
             };
 
@@ -1772,6 +1780,12 @@ function __captureDomAndPollForIE() {
               } });
             }
 
+            // `globalThis` object
+            // https://github.com/tc39/proposal-global
+            _export({ global: true }, {
+              globalThis: global_1
+            });
+
             // `Array.from` method implementation
             // https://tc39.github.io/ecma262/#sec-array.from
             var arrayFrom = function from(arrayLike /* , mapfn = undefined, thisArg = undefined */) {
@@ -1782,13 +1796,14 @@ function __captureDomAndPollForIE() {
               var mapping = mapfn !== undefined;
               var index = 0;
               var iteratorMethod = getIteratorMethod(O);
-              var length, result, step, iterator;
+              var length, result, step, iterator, next;
               if (mapping) mapfn = bindContext(mapfn, argumentsLength > 2 ? arguments[2] : undefined, 2);
               // if the target is not iterable or it's an array with the default iterator - use a simple case
               if (iteratorMethod != undefined && !(C == Array && isArrayIteratorMethod(iteratorMethod))) {
                 iterator = iteratorMethod.call(O);
+                next = iterator.next;
                 result = new C();
-                for (;!(step = iterator.next()).done; index++) {
+                for (;!(step = next.call(iterator)).done; index++) {
                   createProperty(result, index, mapping
                     ? callWithSafeIterationClosing(iterator, mapfn, [step.value, index], true)
                     : step.value
@@ -1859,10 +1874,33 @@ function __captureDomAndPollForIE() {
               }
             });
 
+            var userAgent = getBuiltIn('navigator', 'userAgent') || '';
+
+            var process = global_1.process;
+            var versions = process && process.versions;
+            var v8 = versions && versions.v8;
+            var match, version;
+
+            if (v8) {
+              match = v8.split('.');
+              version = match[0] + match[1];
+            } else if (userAgent) {
+              match = userAgent.match(/Edge\/(\d+)/);
+              if (!match || match[1] >= 74) {
+                match = userAgent.match(/Chrome\/(\d+)/);
+                if (match) version = match[1];
+              }
+            }
+
+            var v8Version = version && +version;
+
             var SPECIES$1 = wellKnownSymbol('species');
 
             var arrayMethodHasSpeciesSupport = function (METHOD_NAME) {
-              return !fails(function () {
+              // We can't use this feature detection in V8 since it causes
+              // deoptimization and serious performance degradation
+              // https://github.com/zloirock/core-js/issues/677
+              return v8Version >= 51 || !fails(function () {
                 var array = [];
                 var constructor = array.constructor = {};
                 constructor[SPECIES$1] = function () {
@@ -1876,7 +1914,10 @@ function __captureDomAndPollForIE() {
             var MAX_SAFE_INTEGER = 0x1FFFFFFFFFFFFF;
             var MAXIMUM_ALLOWED_INDEX_EXCEEDED = 'Maximum allowed index exceeded';
 
-            var IS_CONCAT_SPREADABLE_SUPPORT = !fails(function () {
+            // We can't use this feature detection in V8 since it causes
+            // deoptimization and serious performance degradation
+            // https://github.com/zloirock/core-js/issues/679
+            var IS_CONCAT_SPREADABLE_SUPPORT = v8Version >= 51 || !fails(function () {
               var array = [];
               array[IS_CONCAT_SPREADABLE] = false;
               return array.concat()[0] !== array;
@@ -1948,7 +1989,7 @@ function __captureDomAndPollForIE() {
             // Array.prototype[@@unscopables]
             // https://tc39.github.io/ecma262/#sec-array.prototype-@@unscopables
             if (ArrayPrototype$1[UNSCOPABLES] == undefined) {
-              hide(ArrayPrototype$1, UNSCOPABLES, objectCreate(null));
+              createNonEnumerableProperty(ArrayPrototype$1, UNSCOPABLES, objectCreate(null));
             }
 
             // add a key to Array.prototype[@@unscopables]
@@ -2278,6 +2319,7 @@ function __captureDomAndPollForIE() {
             // https://bugs.webkit.org/show_bug.cgi?id=188794
             _export({ target: 'Array', proto: true, forced: String(test$1) === String(test$1.reverse()) }, {
               reverse: function reverse() {
+                // eslint-disable-next-line no-self-assign
                 if (isArray(this)) this.length = this.length;
                 return nativeReverse.call(this);
               }
@@ -2464,7 +2506,9 @@ function __captureDomAndPollForIE() {
             if (IteratorPrototype == undefined) IteratorPrototype = {};
 
             // 25.1.2.1.1 %IteratorPrototype%[@@iterator]()
-            if (!has(IteratorPrototype, ITERATOR$3)) hide(IteratorPrototype, ITERATOR$3, returnThis);
+            if (!has(IteratorPrototype, ITERATOR$3)) {
+              createNonEnumerableProperty(IteratorPrototype, ITERATOR$3, returnThis);
+            }
 
             var iteratorsCore = {
               IteratorPrototype: IteratorPrototype,
@@ -2527,7 +2571,7 @@ function __captureDomAndPollForIE() {
                     if (objectSetPrototypeOf) {
                       objectSetPrototypeOf(CurrentIteratorPrototype, IteratorPrototype$2);
                     } else if (typeof CurrentIteratorPrototype[ITERATOR$4] != 'function') {
-                      hide(CurrentIteratorPrototype, ITERATOR$4, returnThis$2);
+                      createNonEnumerableProperty(CurrentIteratorPrototype, ITERATOR$4, returnThis$2);
                     }
                   }
                   // Set @@toStringTag to native iterators
@@ -2543,7 +2587,7 @@ function __captureDomAndPollForIE() {
 
               // define iterator
               if (IterablePrototype[ITERATOR$4] !== defaultIterator) {
-                hide(IterablePrototype, ITERATOR$4, defaultIterator);
+                createNonEnumerableProperty(IterablePrototype, ITERATOR$4, defaultIterator);
               }
               iterators[NAME] = defaultIterator;
 
@@ -2849,14 +2893,21 @@ function __captureDomAndPollForIE() {
                 // Symbol-named RegExp methods call .exec
                 var execCalled = false;
                 var re = /a/;
-                re.exec = function () { execCalled = true; return null; };
 
                 if (KEY === 'split') {
+                  // We can't use real regex here since it causes deoptimization
+                  // and serious performance degradation in V8
+                  // https://github.com/zloirock/core-js/issues/306
+                  re = {};
                   // RegExp[@@split] doesn't call the regex's exec method, but first creates
                   // a new one. We need to return the patched regex when creating the new one.
                   re.constructor = {};
                   re.constructor[SPECIES$4] = function () { return re; };
+                  re.flags = '';
+                  re[SYMBOL] = /./[SYMBOL];
                 }
+
+                re.exec = function () { execCalled = true; return null; };
 
                 re[SYMBOL]('');
                 return !execCalled;
@@ -2893,7 +2944,7 @@ function __captureDomAndPollForIE() {
                   // 21.2.5.9 RegExp.prototype[@@search](string)
                   : function (string) { return regexMethod.call(string, this); }
                 );
-                if (sham) hide(RegExp.prototype[SYMBOL], 'sham', true);
+                if (sham) createNonEnumerableProperty(RegExp.prototype[SYMBOL], 'sham', true);
               }
             };
 
@@ -2978,6 +3029,11 @@ function __captureDomAndPollForIE() {
             var getInternalState$2 = internalState.getterFor(REGEXP_STRING_ITERATOR);
             var RegExpPrototype = RegExp.prototype;
             var regExpBuiltinExec = RegExpPrototype.exec;
+            var nativeMatchAll = ''.matchAll;
+
+            var WORKS_WITH_NON_GLOBAL_REGEX = !!nativeMatchAll && !fails(function () {
+              'a'.matchAll(/./);
+            });
 
             var regExpExec = function (R, S) {
               var exec = R.exec;
@@ -3033,22 +3089,30 @@ function __captureDomAndPollForIE() {
 
             // `String.prototype.matchAll` method
             // https://github.com/tc39/proposal-string-matchall
-            _export({ target: 'String', proto: true }, {
+            _export({ target: 'String', proto: true, forced: WORKS_WITH_NON_GLOBAL_REGEX }, {
               matchAll: function matchAll(regexp) {
                 var O = requireObjectCoercible(this);
-                var S, matcher, rx;
+                var flags, S, matcher, rx;
                 if (regexp != null) {
+                  if (isRegexp(regexp)) {
+                    flags = String(requireObjectCoercible('flags' in RegExpPrototype
+                      ? regexp.flags
+                      : regexpFlags.call(regexp)
+                    ));
+                    if (!~flags.indexOf('g')) throw TypeError('`.matchAll` does not allow non-global regexes');
+                  }
+                  if (WORKS_WITH_NON_GLOBAL_REGEX) return nativeMatchAll.apply(O, arguments);
                   matcher = regexp[MATCH_ALL];
                   if (matcher === undefined && isPure && classof(regexp) == 'RegExp') matcher = $matchAll;
                   if (matcher != null) return aFunction$1(matcher).call(regexp, O);
-                }
+                } else if (WORKS_WITH_NON_GLOBAL_REGEX) return nativeMatchAll.apply(O, arguments);
                 S = String(O);
                 rx = new RegExp(regexp, 'g');
                 return rx[MATCH_ALL](S);
               }
             });
 
-            MATCH_ALL in RegExpPrototype || hide(RegExpPrototype, MATCH_ALL, $matchAll);
+            MATCH_ALL in RegExpPrototype || createNonEnumerableProperty(RegExpPrototype, MATCH_ALL, $matchAll);
 
             // `String.prototype.repeat` method implementation
             // https://tc39.github.io/ecma262/#sec-string.prototype.repeat
@@ -3092,8 +3156,6 @@ function __captureDomAndPollForIE() {
               // https://tc39.github.io/ecma262/#sec-string.prototype.padend
               end: createMethod$5(true)
             };
-
-            var userAgent = getBuiltIn('navigator', 'userAgent') || '';
 
             // https://github.com/zloirock/core-js/issues/280
 
@@ -4233,12 +4295,17 @@ function __captureDomAndPollForIE() {
             // https://tc39.github.io/ecma262/#sec-math.fround
             _export({ target: 'Math', stat: true }, { fround: mathFround });
 
+            var $hypot = Math.hypot;
             var abs$4 = Math.abs;
             var sqrt$2 = Math.sqrt;
 
+            // Chrome 77 bug
+            // https://bugs.chromium.org/p/v8/issues/detail?id=9546
+            var BUGGY = !!$hypot && $hypot(Infinity, NaN) !== Infinity;
+
             // `Math.hypot` method
             // https://tc39.github.io/ecma262/#sec-math.hypot
-            _export({ target: 'Math', stat: true }, {
+            _export({ target: 'Math', stat: true, forced: BUGGY }, {
               hypot: function hypot(value1, value2) { // eslint-disable-line no-unused-vars
                 var sum = 0;
                 var i = 0;
@@ -4444,11 +4511,15 @@ function __captureDomAndPollForIE() {
 
             // `Date.prototype[@@toPrimitive]` method
             // https://tc39.github.io/ecma262/#sec-date.prototype-@@toprimitive
-            if (!(TO_PRIMITIVE$1 in DatePrototype$2)) hide(DatePrototype$2, TO_PRIMITIVE$1, dateToPrimitive);
+            if (!(TO_PRIMITIVE$1 in DatePrototype$2)) {
+              createNonEnumerableProperty(DatePrototype$2, TO_PRIMITIVE$1, dateToPrimitive);
+            }
 
             // JSON[@@toStringTag] property
             // https://tc39.github.io/ecma262/#sec-json-@@tostringtag
             setToStringTag(global_1.JSON, 'JSON', true);
+
+            var nativePromiseConstructor = global_1.Promise;
 
             var redefineAll = function (target, src, options) {
               for (var key in src) redefine(target, key, src[key], options);
@@ -4464,7 +4535,7 @@ function __captureDomAndPollForIE() {
             var location = global_1.location;
             var set$1 = global_1.setImmediate;
             var clear = global_1.clearImmediate;
-            var process = global_1.process;
+            var process$1 = global_1.process;
             var MessageChannel = global_1.MessageChannel;
             var Dispatch = global_1.Dispatch;
             var counter = 0;
@@ -4513,9 +4584,9 @@ function __captureDomAndPollForIE() {
                 delete queue[id];
               };
               // Node.js 0.8-
-              if (classofRaw(process) == 'process') {
+              if (classofRaw(process$1) == 'process') {
                 defer = function (id) {
-                  process.nextTick(runner(id));
+                  process$1.nextTick(runner(id));
                 };
               // Sphere (JS game engine) Dispatch API
               } else if (Dispatch && Dispatch.now) {
@@ -4523,7 +4594,8 @@ function __captureDomAndPollForIE() {
                   Dispatch.now(runner(id));
                 };
               // Browsers with MessageChannel, includes WebWorkers
-              } else if (MessageChannel) {
+              // except iOS - https://github.com/zloirock/core-js/issues/624
+              } else if (MessageChannel && !/(iphone|ipod|ipad).*applewebkit/i.test(userAgent)) {
                 channel = new MessageChannel();
                 port = channel.port2;
                 channel.port1.onmessage = listener;
@@ -4560,20 +4632,20 @@ function __captureDomAndPollForIE() {
 
 
             var MutationObserver = global_1.MutationObserver || global_1.WebKitMutationObserver;
-            var process$1 = global_1.process;
+            var process$2 = global_1.process;
             var Promise$1 = global_1.Promise;
-            var IS_NODE = classofRaw(process$1) == 'process';
+            var IS_NODE = classofRaw(process$2) == 'process';
             // Node.js 11 shows ExperimentalWarning on getting `queueMicrotask`
             var queueMicrotaskDescriptor = getOwnPropertyDescriptor$5(global_1, 'queueMicrotask');
             var queueMicrotask = queueMicrotaskDescriptor && queueMicrotaskDescriptor.value;
 
-            var flush, head, last, notify, toggle, node, promise;
+            var flush, head, last, notify, toggle, node, promise, then;
 
             // modern engines have queueMicrotask method
             if (!queueMicrotask) {
               flush = function () {
                 var parent, fn;
-                if (IS_NODE && (parent = process$1.domain)) parent.exit();
+                if (IS_NODE && (parent = process$2.domain)) parent.exit();
                 while (head) {
                   fn = head.fn;
                   head = head.next;
@@ -4591,13 +4663,13 @@ function __captureDomAndPollForIE() {
               // Node.js
               if (IS_NODE) {
                 notify = function () {
-                  process$1.nextTick(flush);
+                  process$2.nextTick(flush);
                 };
               // browsers with MutationObserver, except iOS - https://github.com/zloirock/core-js/issues/339
               } else if (MutationObserver && !/(iphone|ipod|ipad).*applewebkit/i.test(userAgent)) {
                 toggle = true;
                 node = document.createTextNode('');
-                new MutationObserver(flush).observe(node, { characterData: true }); // eslint-disable-line no-new
+                new MutationObserver(flush).observe(node, { characterData: true });
                 notify = function () {
                   node.data = toggle = !toggle;
                 };
@@ -4605,8 +4677,9 @@ function __captureDomAndPollForIE() {
               } else if (Promise$1 && Promise$1.resolve) {
                 // Promise.resolve without an argument throws an error in LG WebOS 2
                 promise = Promise$1.resolve(undefined);
+                then = promise.then;
                 notify = function () {
-                  promise.then(flush);
+                  then.call(promise, flush);
                 };
               // for other environments - macrotask based on:
               // - setImmediate
@@ -4691,16 +4764,14 @@ function __captureDomAndPollForIE() {
             var getInternalState$4 = internalState.get;
             var setInternalState$4 = internalState.set;
             var getInternalPromiseState = internalState.getterFor(PROMISE);
-            var PromiseConstructor = global_1[PROMISE];
+            var PromiseConstructor = nativePromiseConstructor;
             var TypeError$1 = global_1.TypeError;
             var document$2 = global_1.document;
-            var process$2 = global_1.process;
-            var $fetch = global_1.fetch;
-            var versions = process$2 && process$2.versions;
-            var v8 = versions && versions.v8 || '';
+            var process$3 = global_1.process;
+            var $fetch = getBuiltIn('fetch');
             var newPromiseCapability$1 = newPromiseCapability.f;
             var newGenericPromiseCapability = newPromiseCapability$1;
-            var IS_NODE$1 = classofRaw(process$2) == 'process';
+            var IS_NODE$1 = classofRaw(process$3) == 'process';
             var DISPATCH_EVENT = !!(document$2 && document$2.createEvent && global_1.dispatchEvent);
             var UNHANDLED_REJECTION = 'unhandledrejection';
             var REJECTION_HANDLED = 'rejectionhandled';
@@ -4709,24 +4780,27 @@ function __captureDomAndPollForIE() {
             var REJECTED = 2;
             var HANDLED = 1;
             var UNHANDLED = 2;
-            var Internal, OwnPromiseCapability, PromiseWrapper;
+            var Internal, OwnPromiseCapability, PromiseWrapper, nativeThen;
 
             var FORCED$e = isForced_1(PROMISE, function () {
-              // correct subclassing with @@species support
+              // V8 6.6 (Node 10 and Chrome 66) have a bug with resolving custom thenables
+              // https://bugs.chromium.org/p/chromium/issues/detail?id=830565
+              // We can't detect it synchronously, so just check versions
+              if (v8Version === 66) return true;
+              // Unhandled rejections tracking support, NodeJS Promise without it fails @@species test
+              if (!IS_NODE$1 && typeof PromiseRejectionEvent != 'function') return true;
+              // We can't use @@species feature detection in V8 since it causes
+              // deoptimization and performance degradation
+              // https://github.com/zloirock/core-js/issues/679
+              if (v8Version >= 51 && /native code/.test(PromiseConstructor)) return false;
+              // Detect correctness of subclassing with @@species support
               var promise = PromiseConstructor.resolve(1);
-              var empty = function () { /* empty */ };
-              var FakePromise = (promise.constructor = {})[SPECIES$6] = function (exec) {
-                exec(empty, empty);
+              var FakePromise = function (exec) {
+                exec(function () { /* empty */ }, function () { /* empty */ });
               };
-              // unhandled rejections tracking support, NodeJS Promise without it fails @@species test
-              return !((IS_NODE$1 || typeof PromiseRejectionEvent == 'function')
-                && (!isPure || promise['finally'])
-                && promise.then(empty) instanceof FakePromise
-                // v8 6.6 (Node 10 and Chrome 66) have a bug with resolving custom thenables
-                // https://bugs.chromium.org/p/chromium/issues/detail?id=830565
-                // we can't detect it synchronously, so just check versions
-                && v8.indexOf('6.6') !== 0
-                && userAgent.indexOf('Chrome/66') === -1);
+              var constructor = promise.constructor = {};
+              constructor[SPECIES$6] = FakePromise;
+              return !(promise.then(function () { /* empty */ }) instanceof FakePromise);
             });
 
             var INCORRECT_ITERATION$1 = FORCED$e || !checkCorrectnessOfIteration(function (iterable) {
@@ -4808,7 +4882,7 @@ function __captureDomAndPollForIE() {
                 if (IS_UNHANDLED) {
                   result = perform(function () {
                     if (IS_NODE$1) {
-                      process$2.emit('unhandledRejection', value, promise);
+                      process$3.emit('unhandledRejection', value, promise);
                     } else dispatchEvent(UNHANDLED_REJECTION, promise, value);
                   });
                   // Browsers should not trigger `rejectionHandled` event if it was handled here, NodeJS - should
@@ -4825,7 +4899,7 @@ function __captureDomAndPollForIE() {
             var onHandleUnhandled = function (promise, state) {
               task$1.call(global_1, function () {
                 if (IS_NODE$1) {
-                  process$2.emit('rejectionHandled', promise);
+                  process$3.emit('rejectionHandled', promise);
                 } else dispatchEvent(REJECTION_HANDLED, promise, state.value);
               });
             };
@@ -4909,7 +4983,7 @@ function __captureDomAndPollForIE() {
                   var reaction = newPromiseCapability$1(speciesConstructor(this, PromiseConstructor));
                   reaction.ok = typeof onFulfilled == 'function' ? onFulfilled : true;
                   reaction.fail = typeof onRejected == 'function' && onRejected;
-                  reaction.domain = IS_NODE$1 ? process$2.domain : undefined;
+                  reaction.domain = IS_NODE$1 ? process$3.domain : undefined;
                   state.parent = true;
                   state.reactions.push(reaction);
                   if (state.state != PENDING) notify$1(this, state, false);
@@ -4934,13 +5008,26 @@ function __captureDomAndPollForIE() {
                   : newGenericPromiseCapability(C);
               };
 
-              // wrap fetch result
-              if (typeof $fetch == 'function') _export({ global: true, enumerable: true, forced: true }, {
-                // eslint-disable-next-line no-unused-vars
-                fetch: function fetch(input) {
-                  return promiseResolve(PromiseConstructor, $fetch.apply(global_1, arguments));
-                }
-              });
+              if (typeof nativePromiseConstructor == 'function') {
+                nativeThen = nativePromiseConstructor.prototype.then;
+
+                // wrap native Promise#then for native async functions
+                redefine(nativePromiseConstructor.prototype, 'then', function then(onFulfilled, onRejected) {
+                  var that = this;
+                  return new PromiseConstructor(function (resolve, reject) {
+                    nativeThen.call(that, resolve, reject);
+                  }).then(onFulfilled, onRejected);
+                // https://github.com/zloirock/core-js/issues/640
+                }, { unsafe: true });
+
+                // wrap fetch result
+                if (typeof $fetch == 'function') _export({ global: true, enumerable: true, forced: true }, {
+                  // eslint-disable-next-line no-unused-vars
+                  fetch: function fetch(input /* , init */) {
+                    return promiseResolve(PromiseConstructor, $fetch.apply(global_1, arguments));
+                  }
+                });
+              }
             }
 
             _export({ global: true, wrap: true, forced: FORCED$e }, {
@@ -4950,7 +5037,7 @@ function __captureDomAndPollForIE() {
             setToStringTag(PromiseConstructor, PROMISE, false, true);
             setSpecies(PROMISE);
 
-            PromiseWrapper = path[PROMISE];
+            PromiseWrapper = getBuiltIn(PROMISE);
 
             // statics
             _export({ target: PROMISE, stat: true, forced: FORCED$e }, {
@@ -5018,6 +5105,43 @@ function __captureDomAndPollForIE() {
               }
             });
 
+            // `Promise.allSettled` method
+            // https://github.com/tc39/proposal-promise-allSettled
+            _export({ target: 'Promise', stat: true }, {
+              allSettled: function allSettled(iterable) {
+                var C = this;
+                var capability = newPromiseCapability.f(C);
+                var resolve = capability.resolve;
+                var reject = capability.reject;
+                var result = perform(function () {
+                  var promiseResolve = aFunction$1(C.resolve);
+                  var values = [];
+                  var counter = 0;
+                  var remaining = 1;
+                  iterate_1(iterable, function (promise) {
+                    var index = counter++;
+                    var alreadyCalled = false;
+                    values.push(undefined);
+                    remaining++;
+                    promiseResolve.call(C, promise).then(function (value) {
+                      if (alreadyCalled) return;
+                      alreadyCalled = true;
+                      values[index] = { status: 'fulfilled', value: value };
+                      --remaining || resolve(values);
+                    }, function (e) {
+                      if (alreadyCalled) return;
+                      alreadyCalled = true;
+                      values[index] = { status: 'rejected', reason: e };
+                      --remaining || resolve(values);
+                    });
+                  });
+                  --remaining || resolve(values);
+                });
+                if (result.error) reject(result.value);
+                return capability.promise;
+              }
+            });
+
             // `Promise.prototype.finally` method
             // https://tc39.github.io/ecma262/#sec-promise.prototype.finally
             _export({ target: 'Promise', proto: true, real: true }, {
@@ -5035,6 +5159,11 @@ function __captureDomAndPollForIE() {
               }
             });
 
+            // patch native Promise.prototype for native async functions
+            if (typeof nativePromiseConstructor == 'function' && !nativePromiseConstructor.prototype['finally']) {
+              redefine(nativePromiseConstructor.prototype, 'finally', getBuiltIn('Promise').prototype['finally']);
+            }
+
             var collection = function (CONSTRUCTOR_NAME, wrapper, common, IS_MAP, IS_WEAK) {
               var NativeConstructor = global_1[CONSTRUCTOR_NAME];
               var NativePrototype = NativeConstructor && NativeConstructor.prototype;
@@ -5045,17 +5174,17 @@ function __captureDomAndPollForIE() {
               var fixMethod = function (KEY) {
                 var nativeMethod = NativePrototype[KEY];
                 redefine(NativePrototype, KEY,
-                  KEY == 'add' ? function add(a) {
-                    nativeMethod.call(this, a === 0 ? 0 : a);
+                  KEY == 'add' ? function add(value) {
+                    nativeMethod.call(this, value === 0 ? 0 : value);
                     return this;
-                  } : KEY == 'delete' ? function (a) {
-                    return IS_WEAK && !isObject(a) ? false : nativeMethod.call(this, a === 0 ? 0 : a);
-                  } : KEY == 'get' ? function get(a) {
-                    return IS_WEAK && !isObject(a) ? undefined : nativeMethod.call(this, a === 0 ? 0 : a);
-                  } : KEY == 'has' ? function has(a) {
-                    return IS_WEAK && !isObject(a) ? false : nativeMethod.call(this, a === 0 ? 0 : a);
-                  } : function set(a, b) {
-                    nativeMethod.call(this, a === 0 ? 0 : a, b);
+                  } : KEY == 'delete' ? function (key) {
+                    return IS_WEAK && !isObject(key) ? false : nativeMethod.call(this, key === 0 ? 0 : key);
+                  } : KEY == 'get' ? function get(key) {
+                    return IS_WEAK && !isObject(key) ? undefined : nativeMethod.call(this, key === 0 ? 0 : key);
+                  } : KEY == 'has' ? function has(key) {
+                    return IS_WEAK && !isObject(key) ? false : nativeMethod.call(this, key === 0 ? 0 : key);
+                  } : function set(key, value) {
+                    nativeMethod.call(this, key === 0 ? 0 : key, value);
                     return this;
                   }
                 );
@@ -5072,7 +5201,7 @@ function __captureDomAndPollForIE() {
                 var instance = new Constructor();
                 // early implementations not supports chaining
                 var HASNT_CHAINING = instance[ADDER](IS_WEAK ? {} : -0, 1) != instance;
-                // V8 ~  Chromium 40- weak-collections throws on primitives, but should return false
+                // V8 ~ Chromium 40- weak-collections throws on primitives, but should return false
                 var THROWS_ON_PRIMITIVES = fails(function () { instance.has(1); });
                 // most early implementations doesn't supports iterables, most modern - not close it correctly
                 // eslint-disable-next-line no-new
@@ -5532,7 +5661,8 @@ function __captureDomAndPollForIE() {
             var TO_STRING_TAG$3 = wellKnownSymbol('toStringTag');
             var TYPED_ARRAY_TAG = uid('TYPED_ARRAY_TAG');
             var NATIVE_ARRAY_BUFFER = !!(global_1.ArrayBuffer && DataView$1);
-            var NATIVE_ARRAY_BUFFER_VIEWS = NATIVE_ARRAY_BUFFER && !!objectSetPrototypeOf;
+            // Fixing native typed arrays in Opera Presto crashes the browser, see #595
+            var NATIVE_ARRAY_BUFFER_VIEWS = NATIVE_ARRAY_BUFFER && !!objectSetPrototypeOf && classof(global_1.opera) !== 'Opera';
             var TYPED_ARRAY_TAG_REQIRED = false;
             var NAME$1;
 
@@ -5645,7 +5775,7 @@ function __captureDomAndPollForIE() {
                 return isObject(this) ? this[TYPED_ARRAY_TAG] : undefined;
               } });
               for (NAME$1 in TypedArrayConstructorsList) if (global_1[NAME$1]) {
-                hide(global_1[NAME$1], TYPED_ARRAY_TAG, NAME$1);
+                createNonEnumerableProperty(global_1[NAME$1], TYPED_ARRAY_TAG, NAME$1);
               }
             }
 
@@ -5678,10 +5808,7 @@ function __captureDomAndPollForIE() {
               return length;
             };
 
-            var arrayBuffer = createCommonjsModule(function (module, exports) {
-
-
-            var NATIVE_ARRAY_BUFFER = arrayBufferViewCore.NATIVE_ARRAY_BUFFER;
+            var NATIVE_ARRAY_BUFFER$1 = arrayBufferViewCore.NATIVE_ARRAY_BUFFER;
 
 
 
@@ -5689,31 +5816,31 @@ function __captureDomAndPollForIE() {
 
 
 
-            var getOwnPropertyNames = objectGetOwnPropertyNames.f;
-            var defineProperty = objectDefineProperty.f;
+            var getOwnPropertyNames$2 = objectGetOwnPropertyNames.f;
+            var defineProperty$8 = objectDefineProperty.f;
 
 
 
 
-            var getInternalState = internalState.get;
-            var setInternalState = internalState.set;
+            var getInternalState$5 = internalState.get;
+            var setInternalState$7 = internalState.set;
             var ARRAY_BUFFER = 'ArrayBuffer';
             var DATA_VIEW = 'DataView';
-            var PROTOTYPE = 'prototype';
+            var PROTOTYPE$2 = 'prototype';
             var WRONG_LENGTH = 'Wrong length';
             var WRONG_INDEX = 'Wrong index';
             var NativeArrayBuffer = global_1[ARRAY_BUFFER];
             var $ArrayBuffer = NativeArrayBuffer;
             var $DataView = global_1[DATA_VIEW];
-            var Math = global_1.Math;
-            var RangeError = global_1.RangeError;
+            var Math$1 = global_1.Math;
+            var RangeError$1 = global_1.RangeError;
             // eslint-disable-next-line no-shadow-restricted-names
-            var Infinity = 1 / 0;
-            var abs = Math.abs;
-            var pow = Math.pow;
-            var floor = Math.floor;
-            var log = Math.log;
-            var LN2 = Math.LN2;
+            var Infinity$1 = 1 / 0;
+            var abs$7 = Math$1.abs;
+            var pow$3 = Math$1.pow;
+            var floor$6 = Math$1.floor;
+            var log$8 = Math$1.log;
+            var LN2$2 = Math$1.LN2;
 
             // IEEE754 conversions based on https://github.com/feross/ieee754
             var packIEEE754 = function (number, mantissaLength, bytes) {
@@ -5721,26 +5848,26 @@ function __captureDomAndPollForIE() {
               var exponentLength = bytes * 8 - mantissaLength - 1;
               var eMax = (1 << exponentLength) - 1;
               var eBias = eMax >> 1;
-              var rt = mantissaLength === 23 ? pow(2, -24) - pow(2, -77) : 0;
+              var rt = mantissaLength === 23 ? pow$3(2, -24) - pow$3(2, -77) : 0;
               var sign = number < 0 || number === 0 && 1 / number < 0 ? 1 : 0;
               var index = 0;
               var exponent, mantissa, c;
-              number = abs(number);
+              number = abs$7(number);
               // eslint-disable-next-line no-self-compare
-              if (number != number || number === Infinity) {
+              if (number != number || number === Infinity$1) {
                 // eslint-disable-next-line no-self-compare
                 mantissa = number != number ? 1 : 0;
                 exponent = eMax;
               } else {
-                exponent = floor(log(number) / LN2);
-                if (number * (c = pow(2, -exponent)) < 1) {
+                exponent = floor$6(log$8(number) / LN2$2);
+                if (number * (c = pow$3(2, -exponent)) < 1) {
                   exponent--;
                   c *= 2;
                 }
                 if (exponent + eBias >= 1) {
                   number += rt / c;
                 } else {
-                  number += rt * pow(2, 1 - eBias);
+                  number += rt * pow$3(2, 1 - eBias);
                 }
                 if (number * c >= 2) {
                   exponent++;
@@ -5750,10 +5877,10 @@ function __captureDomAndPollForIE() {
                   mantissa = 0;
                   exponent = eMax;
                 } else if (exponent + eBias >= 1) {
-                  mantissa = (number * c - 1) * pow(2, mantissaLength);
+                  mantissa = (number * c - 1) * pow$3(2, mantissaLength);
                   exponent = exponent + eBias;
                 } else {
-                  mantissa = number * pow(2, eBias - 1) * pow(2, mantissaLength);
+                  mantissa = number * pow$3(2, eBias - 1) * pow$3(2, mantissaLength);
                   exponent = 0;
                 }
               }
@@ -5784,11 +5911,11 @@ function __captureDomAndPollForIE() {
               if (exponent === 0) {
                 exponent = 1 - eBias;
               } else if (exponent === eMax) {
-                return mantissa ? NaN : sign ? -Infinity : Infinity;
+                return mantissa ? NaN : sign ? -Infinity$1 : Infinity$1;
               } else {
-                mantissa = mantissa + pow(2, mantissaLength);
+                mantissa = mantissa + pow$3(2, mantissaLength);
                 exponent = exponent - eBias;
-              } return (sign ? -1 : 1) * mantissa * pow(2, exponent - mantissaLength);
+              } return (sign ? -1 : 1) * mantissa * pow$3(2, exponent - mantissaLength);
             };
 
             var unpackInt32 = function (buffer) {
@@ -5816,36 +5943,36 @@ function __captureDomAndPollForIE() {
             };
 
             var addGetter = function (Constructor, key) {
-              defineProperty(Constructor[PROTOTYPE], key, { get: function () { return getInternalState(this)[key]; } });
+              defineProperty$8(Constructor[PROTOTYPE$2], key, { get: function () { return getInternalState$5(this)[key]; } });
             };
 
-            var get = function (view, count, index, isLittleEndian) {
+            var get$1 = function (view, count, index, isLittleEndian) {
               var numIndex = +index;
               var intIndex = toIndex(numIndex);
-              var store = getInternalState(view);
-              if (intIndex + count > store.byteLength) throw RangeError(WRONG_INDEX);
-              var bytes = getInternalState(store.buffer).bytes;
+              var store = getInternalState$5(view);
+              if (intIndex + count > store.byteLength) throw RangeError$1(WRONG_INDEX);
+              var bytes = getInternalState$5(store.buffer).bytes;
               var start = intIndex + store.byteOffset;
               var pack = bytes.slice(start, start + count);
               return isLittleEndian ? pack : pack.reverse();
             };
 
-            var set = function (view, count, index, conversion, value, isLittleEndian) {
+            var set$2 = function (view, count, index, conversion, value, isLittleEndian) {
               var numIndex = +index;
               var intIndex = toIndex(numIndex);
-              var store = getInternalState(view);
-              if (intIndex + count > store.byteLength) throw RangeError(WRONG_INDEX);
-              var bytes = getInternalState(store.buffer).bytes;
+              var store = getInternalState$5(view);
+              if (intIndex + count > store.byteLength) throw RangeError$1(WRONG_INDEX);
+              var bytes = getInternalState$5(store.buffer).bytes;
               var start = intIndex + store.byteOffset;
               var pack = conversion(+value);
               for (var i = 0; i < count; i++) bytes[start + i] = pack[isLittleEndian ? i : count - i - 1];
             };
 
-            if (!NATIVE_ARRAY_BUFFER) {
+            if (!NATIVE_ARRAY_BUFFER$1) {
               $ArrayBuffer = function ArrayBuffer(length) {
                 anInstance(this, $ArrayBuffer, ARRAY_BUFFER);
                 var byteLength = toIndex(length);
-                setInternalState(this, {
+                setInternalState$7(this, {
                   bytes: arrayFill.call(new Array(byteLength), 0),
                   byteLength: byteLength
                 });
@@ -5855,12 +5982,12 @@ function __captureDomAndPollForIE() {
               $DataView = function DataView(buffer, byteOffset, byteLength) {
                 anInstance(this, $DataView, DATA_VIEW);
                 anInstance(buffer, $ArrayBuffer, DATA_VIEW);
-                var bufferLength = getInternalState(buffer).byteLength;
+                var bufferLength = getInternalState$5(buffer).byteLength;
                 var offset = toInteger(byteOffset);
-                if (offset < 0 || offset > bufferLength) throw RangeError('Wrong offset');
+                if (offset < 0 || offset > bufferLength) throw RangeError$1('Wrong offset');
                 byteLength = byteLength === undefined ? bufferLength - offset : toLength(byteLength);
-                if (offset + byteLength > bufferLength) throw RangeError(WRONG_LENGTH);
-                setInternalState(this, {
+                if (offset + byteLength > bufferLength) throw RangeError$1(WRONG_LENGTH);
+                setInternalState$7(this, {
                   buffer: buffer,
                   byteLength: byteLength,
                   byteOffset: offset
@@ -5879,56 +6006,56 @@ function __captureDomAndPollForIE() {
                 addGetter($DataView, 'byteOffset');
               }
 
-              redefineAll($DataView[PROTOTYPE], {
+              redefineAll($DataView[PROTOTYPE$2], {
                 getInt8: function getInt8(byteOffset) {
-                  return get(this, 1, byteOffset)[0] << 24 >> 24;
+                  return get$1(this, 1, byteOffset)[0] << 24 >> 24;
                 },
                 getUint8: function getUint8(byteOffset) {
-                  return get(this, 1, byteOffset)[0];
+                  return get$1(this, 1, byteOffset)[0];
                 },
                 getInt16: function getInt16(byteOffset /* , littleEndian */) {
-                  var bytes = get(this, 2, byteOffset, arguments.length > 1 ? arguments[1] : undefined);
+                  var bytes = get$1(this, 2, byteOffset, arguments.length > 1 ? arguments[1] : undefined);
                   return (bytes[1] << 8 | bytes[0]) << 16 >> 16;
                 },
                 getUint16: function getUint16(byteOffset /* , littleEndian */) {
-                  var bytes = get(this, 2, byteOffset, arguments.length > 1 ? arguments[1] : undefined);
+                  var bytes = get$1(this, 2, byteOffset, arguments.length > 1 ? arguments[1] : undefined);
                   return bytes[1] << 8 | bytes[0];
                 },
                 getInt32: function getInt32(byteOffset /* , littleEndian */) {
-                  return unpackInt32(get(this, 4, byteOffset, arguments.length > 1 ? arguments[1] : undefined));
+                  return unpackInt32(get$1(this, 4, byteOffset, arguments.length > 1 ? arguments[1] : undefined));
                 },
                 getUint32: function getUint32(byteOffset /* , littleEndian */) {
-                  return unpackInt32(get(this, 4, byteOffset, arguments.length > 1 ? arguments[1] : undefined)) >>> 0;
+                  return unpackInt32(get$1(this, 4, byteOffset, arguments.length > 1 ? arguments[1] : undefined)) >>> 0;
                 },
                 getFloat32: function getFloat32(byteOffset /* , littleEndian */) {
-                  return unpackIEEE754(get(this, 4, byteOffset, arguments.length > 1 ? arguments[1] : undefined), 23);
+                  return unpackIEEE754(get$1(this, 4, byteOffset, arguments.length > 1 ? arguments[1] : undefined), 23);
                 },
                 getFloat64: function getFloat64(byteOffset /* , littleEndian */) {
-                  return unpackIEEE754(get(this, 8, byteOffset, arguments.length > 1 ? arguments[1] : undefined), 52);
+                  return unpackIEEE754(get$1(this, 8, byteOffset, arguments.length > 1 ? arguments[1] : undefined), 52);
                 },
                 setInt8: function setInt8(byteOffset, value) {
-                  set(this, 1, byteOffset, packInt8, value);
+                  set$2(this, 1, byteOffset, packInt8, value);
                 },
                 setUint8: function setUint8(byteOffset, value) {
-                  set(this, 1, byteOffset, packInt8, value);
+                  set$2(this, 1, byteOffset, packInt8, value);
                 },
                 setInt16: function setInt16(byteOffset, value /* , littleEndian */) {
-                  set(this, 2, byteOffset, packInt16, value, arguments.length > 2 ? arguments[2] : undefined);
+                  set$2(this, 2, byteOffset, packInt16, value, arguments.length > 2 ? arguments[2] : undefined);
                 },
                 setUint16: function setUint16(byteOffset, value /* , littleEndian */) {
-                  set(this, 2, byteOffset, packInt16, value, arguments.length > 2 ? arguments[2] : undefined);
+                  set$2(this, 2, byteOffset, packInt16, value, arguments.length > 2 ? arguments[2] : undefined);
                 },
                 setInt32: function setInt32(byteOffset, value /* , littleEndian */) {
-                  set(this, 4, byteOffset, packInt32, value, arguments.length > 2 ? arguments[2] : undefined);
+                  set$2(this, 4, byteOffset, packInt32, value, arguments.length > 2 ? arguments[2] : undefined);
                 },
                 setUint32: function setUint32(byteOffset, value /* , littleEndian */) {
-                  set(this, 4, byteOffset, packInt32, value, arguments.length > 2 ? arguments[2] : undefined);
+                  set$2(this, 4, byteOffset, packInt32, value, arguments.length > 2 ? arguments[2] : undefined);
                 },
                 setFloat32: function setFloat32(byteOffset, value /* , littleEndian */) {
-                  set(this, 4, byteOffset, packFloat32, value, arguments.length > 2 ? arguments[2] : undefined);
+                  set$2(this, 4, byteOffset, packFloat32, value, arguments.length > 2 ? arguments[2] : undefined);
                 },
                 setFloat64: function setFloat64(byteOffset, value /* , littleEndian */) {
-                  set(this, 8, byteOffset, packFloat64, value, arguments.length > 2 ? arguments[2] : undefined);
+                  set$2(this, 8, byteOffset, packFloat64, value, arguments.length > 2 ? arguments[2] : undefined);
                 }
               });
             } else {
@@ -5946,18 +6073,20 @@ function __captureDomAndPollForIE() {
                   anInstance(this, $ArrayBuffer);
                   return new NativeArrayBuffer(toIndex(length));
                 };
-                var ArrayBufferPrototype = $ArrayBuffer[PROTOTYPE] = NativeArrayBuffer[PROTOTYPE];
-                for (var keys = getOwnPropertyNames(NativeArrayBuffer), j = 0, key; keys.length > j;) {
-                  if (!((key = keys[j++]) in $ArrayBuffer)) hide($ArrayBuffer, key, NativeArrayBuffer[key]);
+                var ArrayBufferPrototype = $ArrayBuffer[PROTOTYPE$2] = NativeArrayBuffer[PROTOTYPE$2];
+                for (var keys$3 = getOwnPropertyNames$2(NativeArrayBuffer), j$1 = 0, key$1; keys$3.length > j$1;) {
+                  if (!((key$1 = keys$3[j$1++]) in $ArrayBuffer)) {
+                    createNonEnumerableProperty($ArrayBuffer, key$1, NativeArrayBuffer[key$1]);
+                  }
                 }
                 ArrayBufferPrototype.constructor = $ArrayBuffer;
               }
               // iOS Safari 7.x bug
               var testView = new $DataView(new $ArrayBuffer(2));
-              var nativeSetInt8 = $DataView[PROTOTYPE].setInt8;
+              var nativeSetInt8 = $DataView[PROTOTYPE$2].setInt8;
               testView.setInt8(0, 2147483648);
               testView.setInt8(1, 2147483649);
-              if (testView.getInt8(0) || !testView.getInt8(1)) redefineAll($DataView[PROTOTYPE], {
+              if (testView.getInt8(0) || !testView.getInt8(1)) redefineAll($DataView[PROTOTYPE$2], {
                 setInt8: function setInt8(byteOffset, value) {
                   nativeSetInt8.call(this, byteOffset, value << 24 >> 24);
                 },
@@ -5969,21 +6098,23 @@ function __captureDomAndPollForIE() {
 
             setToStringTag($ArrayBuffer, ARRAY_BUFFER);
             setToStringTag($DataView, DATA_VIEW);
-            exports[ARRAY_BUFFER] = $ArrayBuffer;
-            exports[DATA_VIEW] = $DataView;
-            });
 
-            var ARRAY_BUFFER = 'ArrayBuffer';
-            var ArrayBuffer$1 = arrayBuffer[ARRAY_BUFFER];
-            var NativeArrayBuffer = global_1[ARRAY_BUFFER];
+            var arrayBuffer = {
+              ArrayBuffer: $ArrayBuffer,
+              DataView: $DataView
+            };
+
+            var ARRAY_BUFFER$1 = 'ArrayBuffer';
+            var ArrayBuffer$1 = arrayBuffer[ARRAY_BUFFER$1];
+            var NativeArrayBuffer$1 = global_1[ARRAY_BUFFER$1];
 
             // `ArrayBuffer` constructor
             // https://tc39.github.io/ecma262/#sec-arraybuffer-constructor
-            _export({ global: true, forced: NativeArrayBuffer !== ArrayBuffer$1 }, {
+            _export({ global: true, forced: NativeArrayBuffer$1 !== ArrayBuffer$1 }, {
               ArrayBuffer: ArrayBuffer$1
             });
 
-            setSpecies(ARRAY_BUFFER);
+            setSpecies(ARRAY_BUFFER$1);
 
             var NATIVE_ARRAY_BUFFER_VIEWS$1 = arrayBufferViewCore.NATIVE_ARRAY_BUFFER_VIEWS;
 
@@ -6021,11 +6152,11 @@ function __captureDomAndPollForIE() {
               }
             });
 
-            var NATIVE_ARRAY_BUFFER$1 = arrayBufferViewCore.NATIVE_ARRAY_BUFFER;
+            var NATIVE_ARRAY_BUFFER$2 = arrayBufferViewCore.NATIVE_ARRAY_BUFFER;
 
             // `DataView` constructor
             // https://tc39.github.io/ecma262/#sec-dataview-constructor
-            _export({ global: true, forced: !NATIVE_ARRAY_BUFFER$1 }, {
+            _export({ global: true, forced: !NATIVE_ARRAY_BUFFER$2 }, {
               DataView: arrayBuffer.DataView
             });
 
@@ -6048,13 +6179,19 @@ function __captureDomAndPollForIE() {
               new Int8Array$2(1.5);
               new Int8Array$2(iterable);
             }, true) || fails(function () {
-              // Safari 11 bug
+              // Safari (11+) bug - a reason why even Safari 13 should load a typed array polyfill
               return new Int8Array$2(new ArrayBuffer$3(2), 1, undefined).length !== 1;
             });
 
+            var toPositiveInteger = function (it) {
+              var result = toInteger(it);
+              if (result < 0) throw RangeError("The argument can't be less than 0");
+              return result;
+            };
+
             var toOffset = function (it, BYTES) {
-              var offset = toInteger(it);
-              if (offset < 0 || offset % BYTES) throw RangeError('Wrong offset');
+              var offset = toPositiveInteger(it);
+              if (offset % BYTES) throw RangeError('Wrong offset');
               return offset;
             };
 
@@ -6066,11 +6203,12 @@ function __captureDomAndPollForIE() {
               var mapfn = argumentsLength > 1 ? arguments[1] : undefined;
               var mapping = mapfn !== undefined;
               var iteratorMethod = getIteratorMethod(O);
-              var i, length, result, step, iterator;
+              var i, length, result, step, iterator, next;
               if (iteratorMethod != undefined && !isArrayIteratorMethod(iteratorMethod)) {
                 iterator = iteratorMethod.call(O);
+                next = iterator.next;
                 O = [];
-                while (!(step = iterator.next()).done) {
+                while (!(step = next.call(iterator)).done) {
                   O.push(step.value);
                 }
               }
@@ -6107,6 +6245,7 @@ function __captureDomAndPollForIE() {
             var getOwnPropertyNames = objectGetOwnPropertyNames.f;
 
             var forEach = arrayIteration.forEach;
+
 
 
 
@@ -6192,7 +6331,6 @@ function __captureDomAndPollForIE() {
                 defineProperty: wrappedDefineProperty
               });
 
-              // eslint-disable-next-line max-statements
               module.exports = function (TYPE, BYTES, wrapper, CLAMPED) {
                 var CONSTRUCTOR_NAME = TYPE + (CLAMPED ? 'Clamped' : '') + 'Array';
                 var GETTER = 'get' + TYPE;
@@ -6268,28 +6406,34 @@ function __captureDomAndPollForIE() {
                 } else if (typedArraysConstructorsRequiresWrappers) {
                   TypedArrayConstructor = wrapper(function (dummy, data, typedArrayOffset, $length) {
                     anInstance(dummy, TypedArrayConstructor, CONSTRUCTOR_NAME);
-                    if (!isObject(data)) return new NativeTypedArrayConstructor(toIndex(data));
-                    if (isArrayBuffer(data)) return $length !== undefined
-                      ? new NativeTypedArrayConstructor(data, toOffset(typedArrayOffset, BYTES), $length)
-                      : typedArrayOffset !== undefined
-                        ? new NativeTypedArrayConstructor(data, toOffset(typedArrayOffset, BYTES))
-                        : new NativeTypedArrayConstructor(data);
-                    if (isTypedArray(data)) return fromList(TypedArrayConstructor, data);
-                    return typedArrayFrom.call(TypedArrayConstructor, data);
+                    return inheritIfRequired(function () {
+                      if (!isObject(data)) return new NativeTypedArrayConstructor(toIndex(data));
+                      if (isArrayBuffer(data)) return $length !== undefined
+                        ? new NativeTypedArrayConstructor(data, toOffset(typedArrayOffset, BYTES), $length)
+                        : typedArrayOffset !== undefined
+                          ? new NativeTypedArrayConstructor(data, toOffset(typedArrayOffset, BYTES))
+                          : new NativeTypedArrayConstructor(data);
+                      if (isTypedArray(data)) return fromList(TypedArrayConstructor, data);
+                      return typedArrayFrom.call(TypedArrayConstructor, data);
+                    }(), dummy, TypedArrayConstructor);
                   });
 
                   if (objectSetPrototypeOf) objectSetPrototypeOf(TypedArrayConstructor, TypedArray);
                   forEach(getOwnPropertyNames(NativeTypedArrayConstructor), function (key) {
-                    if (!(key in TypedArrayConstructor)) hide(TypedArrayConstructor, key, NativeTypedArrayConstructor[key]);
+                    if (!(key in TypedArrayConstructor)) {
+                      createNonEnumerableProperty(TypedArrayConstructor, key, NativeTypedArrayConstructor[key]);
+                    }
                   });
                   TypedArrayConstructor.prototype = TypedArrayConstructorPrototype;
                 }
 
                 if (TypedArrayConstructorPrototype.constructor !== TypedArrayConstructor) {
-                  hide(TypedArrayConstructorPrototype, 'constructor', TypedArrayConstructor);
+                  createNonEnumerableProperty(TypedArrayConstructorPrototype, 'constructor', TypedArrayConstructor);
                 }
 
-                if (TYPED_ARRAY_TAG) hide(TypedArrayConstructorPrototype, TYPED_ARRAY_TAG, CONSTRUCTOR_NAME);
+                if (TYPED_ARRAY_TAG) {
+                  createNonEnumerableProperty(TypedArrayConstructorPrototype, TYPED_ARRAY_TAG, CONSTRUCTOR_NAME);
+                }
 
                 exported[CONSTRUCTOR_NAME] = TypedArrayConstructor;
 
@@ -6298,11 +6442,11 @@ function __captureDomAndPollForIE() {
                 }, exported);
 
                 if (!(BYTES_PER_ELEMENT in TypedArrayConstructor)) {
-                  hide(TypedArrayConstructor, BYTES_PER_ELEMENT, BYTES);
+                  createNonEnumerableProperty(TypedArrayConstructor, BYTES_PER_ELEMENT, BYTES);
                 }
 
                 if (!(BYTES_PER_ELEMENT in TypedArrayConstructorPrototype)) {
-                  hide(TypedArrayConstructorPrototype, BYTES_PER_ELEMENT, BYTES);
+                  createNonEnumerableProperty(TypedArrayConstructorPrototype, BYTES_PER_ELEMENT, BYTES);
                 }
 
                 setSpecies(CONSTRUCTOR_NAME);
@@ -6580,14 +6724,14 @@ function __captureDomAndPollForIE() {
             });
 
             var aTypedArray$g = arrayBufferViewCore.aTypedArray;
-            var floor$6 = Math.floor;
+            var floor$7 = Math.floor;
 
             // `%TypedArray%.prototype.reverse` method
             // https://tc39.github.io/ecma262/#sec-%typedarray%.prototype.reverse
             arrayBufferViewCore.exportProto('reverse', function reverse() {
               var that = this;
               var length = aTypedArray$g(that).length;
-              var middle = floor$6(length / 2);
+              var middle = floor$7(length / 2);
               var index = 0;
               var value;
               while (index < middle) {
@@ -6807,7 +6951,7 @@ function __captureDomAndPollForIE() {
 
             // `Reflect.get` method
             // https://tc39.github.io/ecma262/#sec-reflect.get
-            function get$1(target, propertyKey /* , receiver */) {
+            function get$2(target, propertyKey /* , receiver */) {
               var receiver = arguments.length < 3 ? target : arguments[2];
               var descriptor, prototype;
               if (anObject(target) === receiver) return target[propertyKey];
@@ -6816,11 +6960,11 @@ function __captureDomAndPollForIE() {
                 : descriptor.get === undefined
                   ? undefined
                   : descriptor.get.call(receiver);
-              if (isObject(prototype = objectGetPrototypeOf(target))) return get$1(prototype, propertyKey, receiver);
+              if (isObject(prototype = objectGetPrototypeOf(target))) return get$2(prototype, propertyKey, receiver);
             }
 
             _export({ target: 'Reflect', stat: true }, {
-              get: get$1
+              get: get$2
             });
 
             // `Reflect.getOwnPropertyDescriptor` method
@@ -6881,13 +7025,13 @@ function __captureDomAndPollForIE() {
 
             // `Reflect.set` method
             // https://tc39.github.io/ecma262/#sec-reflect.set
-            function set$2(target, propertyKey, V /* , receiver */) {
+            function set$3(target, propertyKey, V /* , receiver */) {
               var receiver = arguments.length < 4 ? target : arguments[3];
               var ownDescriptor = objectGetOwnPropertyDescriptor.f(anObject(target), propertyKey);
               var existingDescriptor, prototype;
               if (!ownDescriptor) {
                 if (isObject(prototype = objectGetPrototypeOf(target))) {
-                  return set$2(prototype, propertyKey, V, receiver);
+                  return set$3(prototype, propertyKey, V, receiver);
                 }
                 ownDescriptor = createPropertyDescriptor(0);
               }
@@ -6904,7 +7048,7 @@ function __captureDomAndPollForIE() {
             }
 
             _export({ target: 'Reflect', stat: true }, {
-              set: set$2
+              set: set$3
             });
 
             // `Reflect.setPrototypeOf` method
@@ -6963,7 +7107,7 @@ function __captureDomAndPollForIE() {
               var CollectionPrototype = Collection && Collection.prototype;
               // some Chrome versions have non-configurable methods on DOMTokenList
               if (CollectionPrototype && CollectionPrototype.forEach !== arrayForEach) try {
-                hide(CollectionPrototype, 'forEach', arrayForEach);
+                createNonEnumerableProperty(CollectionPrototype, 'forEach', arrayForEach);
               } catch (error) {
                 CollectionPrototype.forEach = arrayForEach;
               }
@@ -6979,15 +7123,17 @@ function __captureDomAndPollForIE() {
               if (CollectionPrototype$1) {
                 // some Chrome versions have non-configurable methods on DOMTokenList
                 if (CollectionPrototype$1[ITERATOR$6] !== ArrayValues) try {
-                  hide(CollectionPrototype$1, ITERATOR$6, ArrayValues);
+                  createNonEnumerableProperty(CollectionPrototype$1, ITERATOR$6, ArrayValues);
                 } catch (error) {
                   CollectionPrototype$1[ITERATOR$6] = ArrayValues;
                 }
-                if (!CollectionPrototype$1[TO_STRING_TAG$4]) hide(CollectionPrototype$1, TO_STRING_TAG$4, COLLECTION_NAME$1);
+                if (!CollectionPrototype$1[TO_STRING_TAG$4]) {
+                  createNonEnumerableProperty(CollectionPrototype$1, TO_STRING_TAG$4, COLLECTION_NAME$1);
+                }
                 if (domIterables[COLLECTION_NAME$1]) for (var METHOD_NAME in es_array_iterator) {
                   // some Chrome versions have non-configurable methods on DOMTokenList
                   if (CollectionPrototype$1[METHOD_NAME] !== es_array_iterator[METHOD_NAME]) try {
-                    hide(CollectionPrototype$1, METHOD_NAME, es_array_iterator[METHOD_NAME]);
+                    createNonEnumerableProperty(CollectionPrototype$1, METHOD_NAME, es_array_iterator[METHOD_NAME]);
                   } catch (error) {
                     CollectionPrototype$1[METHOD_NAME] = es_array_iterator[METHOD_NAME];
                   }
@@ -7007,14 +7153,14 @@ function __captureDomAndPollForIE() {
               clearImmediate: task.clear
             });
 
-            var process$3 = global_1.process;
-            var isNode = classofRaw(process$3) == 'process';
+            var process$4 = global_1.process;
+            var isNode = classofRaw(process$4) == 'process';
 
             // `queueMicrotask` method
             // https://html.spec.whatwg.org/multipage/timers-and-user-prompts.html#dom-queuemicrotask
             _export({ global: true, enumerable: true, noTargetGet: true }, {
               queueMicrotask: function queueMicrotask(fn) {
-                var domain = isNode && process$3.domain;
+                var domain = isNode && process$4.domain;
                 microtask(domain ? domain.bind(fn) : fn);
               }
             });
@@ -7047,12 +7193,17 @@ function __captureDomAndPollForIE() {
             var ITERATOR$7 = wellKnownSymbol('iterator');
 
             var nativeUrl = !fails(function () {
-              var url = new URL('b?e=1', 'http://a');
+              var url = new URL('b?a=1&b=2&c=3', 'http://a');
               var searchParams = url.searchParams;
+              var result = '';
               url.pathname = 'c%20d';
+              searchParams.forEach(function (value, key) {
+                searchParams['delete']('b');
+                result += key + value;
+              });
               return !searchParams.sort
-                || url.href !== 'http://a/c%20d?e=1'
-                || searchParams.get('e') !== '1'
+                || url.href !== 'http://a/c%20d?a=1&c=3'
+                || searchParams.get('c') !== '3'
                 || String(new URLSearchParams('?a=1')) !== 'a=1'
                 || !searchParams[ITERATOR$7]
                 // throws in Edge
@@ -7061,7 +7212,11 @@ function __captureDomAndPollForIE() {
                 // not punycoded in Edge
                 || new URL('http://тест').host !== 'xn--e1aybc'
                 // not escaped in Chrome 62-
-                || new URL('http://a#б').hash !== '#%D0%B1';
+                || new URL('http://a#б').hash !== '#%D0%B1'
+                // fails in Chrome 66-
+                || result !== 'a1c3'
+                // throws in Safari
+                || new URL('http://x', undefined).host !== 'x';
             });
 
             // based on https://github.com/bestiejs/punycode.js/blob/master/punycode.js
@@ -7078,7 +7233,7 @@ function __captureDomAndPollForIE() {
             var regexSeparators = /[.\u3002\uFF0E\uFF61]/g; // RFC 3490 separators
             var OVERFLOW_ERROR = 'Overflow: input needs wider integers to process';
             var baseMinusTMin = base - tMin;
-            var floor$7 = Math.floor;
+            var floor$8 = Math.floor;
             var stringFromCharCode = String.fromCharCode;
 
             /**
@@ -7127,12 +7282,12 @@ function __captureDomAndPollForIE() {
              */
             var adapt = function (delta, numPoints, firstTime) {
               var k = 0;
-              delta = firstTime ? floor$7(delta / damp) : delta >> 1;
-              delta += floor$7(delta / numPoints);
+              delta = firstTime ? floor$8(delta / damp) : delta >> 1;
+              delta += floor$8(delta / numPoints);
               for (; delta > baseMinusTMin * tMax >> 1; k += base) {
-                delta = floor$7(delta / baseMinusTMin);
+                delta = floor$8(delta / baseMinusTMin);
               }
-              return floor$7(k + (baseMinusTMin + 1) * delta / (delta + skew));
+              return floor$8(k + (baseMinusTMin + 1) * delta / (delta + skew));
             };
 
             /**
@@ -7184,7 +7339,7 @@ function __captureDomAndPollForIE() {
 
                 // Increase `delta` enough to advance the decoder's <n,i> state to <m,0>, but guard against overflow.
                 var handledCPCountPlusOne = handledCPCount + 1;
-                if (m - n > floor$7((maxInt - delta) / handledCPCountPlusOne)) {
+                if (m - n > floor$8((maxInt - delta) / handledCPCountPlusOne)) {
                   throw RangeError(OVERFLOW_ERROR);
                 }
 
@@ -7205,7 +7360,7 @@ function __captureDomAndPollForIE() {
                       var qMinusT = q - t;
                       var baseMinusT = base - t;
                       output.push(stringFromCharCode(digitToBasic(t + qMinusT % baseMinusT)));
-                      q = floor$7(qMinusT / baseMinusT);
+                      q = floor$8(qMinusT / baseMinusT);
                     }
 
                     output.push(stringFromCharCode(digitToBasic(q)));
@@ -7257,10 +7412,16 @@ function __captureDomAndPollForIE() {
 
 
 
+
+
+
+
+            var $fetch$1 = getBuiltIn('fetch');
+            var Headers = getBuiltIn('Headers');
             var ITERATOR$8 = wellKnownSymbol('iterator');
             var URL_SEARCH_PARAMS = 'URLSearchParams';
             var URL_SEARCH_PARAMS_ITERATOR = URL_SEARCH_PARAMS + 'Iterator';
-            var setInternalState$7 = internalState.set;
+            var setInternalState$8 = internalState.set;
             var getInternalParamsState = internalState.getterFor(URL_SEARCH_PARAMS);
             var getInternalIteratorState = internalState.getterFor(URL_SEARCH_PARAMS_ITERATOR);
 
@@ -7339,7 +7500,7 @@ function __captureDomAndPollForIE() {
             };
 
             var URLSearchParamsIterator = createIteratorConstructor(function Iterator(params, kind) {
-              setInternalState$7(this, {
+              setInternalState$8(this, {
                 type: URL_SEARCH_PARAMS_ITERATOR,
                 iterator: getIterator(getInternalParamsState(params).entries),
                 kind: kind
@@ -7361,9 +7522,9 @@ function __captureDomAndPollForIE() {
               var init = arguments.length > 0 ? arguments[0] : undefined;
               var that = this;
               var entries = [];
-              var iteratorMethod, iterator, step, entryIterator, first, second, key;
+              var iteratorMethod, iterator, next, step, entryIterator, entryNext, first, second, key;
 
-              setInternalState$7(that, {
+              setInternalState$8(that, {
                 type: URL_SEARCH_PARAMS,
                 entries: entries,
                 updateURL: function () { /* empty */ },
@@ -7375,12 +7536,14 @@ function __captureDomAndPollForIE() {
                   iteratorMethod = getIteratorMethod(init);
                   if (typeof iteratorMethod === 'function') {
                     iterator = iteratorMethod.call(init);
-                    while (!(step = iterator.next()).done) {
+                    next = iterator.next;
+                    while (!(step = next.call(iterator)).done) {
                       entryIterator = getIterator(anObject(step.value));
+                      entryNext = entryIterator.next;
                       if (
-                        (first = entryIterator.next()).done ||
-                        (second = entryIterator.next()).done ||
-                        !entryIterator.next().done
+                        (first = entryNext.call(entryIterator)).done ||
+                        (second = entryNext.call(entryIterator)).done ||
+                        !entryNext.call(entryIterator).done
                       ) throw TypeError('Expected sequence with length 2');
                       entries.push({ key: first.value + '', value: second.value + '' });
                     }
@@ -7545,6 +7708,34 @@ function __captureDomAndPollForIE() {
               URLSearchParams: URLSearchParamsConstructor
             });
 
+            // Wrap `fetch` for correct work with polyfilled `URLSearchParams`
+            // https://github.com/zloirock/core-js/issues/674
+            if (!nativeUrl && typeof $fetch$1 == 'function' && typeof Headers == 'function') {
+              _export({ global: true, enumerable: true, forced: true }, {
+                fetch: function fetch(input /* , init */) {
+                  var args = [input];
+                  var init, body, headers;
+                  if (arguments.length > 1) {
+                    init = arguments[1];
+                    if (isObject(init)) {
+                      body = init.body;
+                      if (classof(body) === URL_SEARCH_PARAMS) {
+                        headers = init.headers ? new Headers(init.headers) : new Headers();
+                        if (!headers.has('content-type')) {
+                          headers.set('content-type', 'application/x-www-form-urlencoded;charset=UTF-8');
+                        }
+                        init = objectCreate(init, {
+                          body: createPropertyDescriptor(0, String(body)),
+                          headers: createPropertyDescriptor(0, headers)
+                        });
+                      }
+                    }
+                    args.push(init);
+                  } return $fetch$1.apply(this, args);
+                }
+              });
+            }
+
             var web_urlSearchParams = {
               URLSearchParams: URLSearchParamsConstructor,
               getState: getInternalParamsState
@@ -7571,10 +7762,10 @@ function __captureDomAndPollForIE() {
             var NativeURL = global_1.URL;
             var URLSearchParams$1 = web_urlSearchParams.URLSearchParams;
             var getInternalSearchParamsState = web_urlSearchParams.getState;
-            var setInternalState$8 = internalState.set;
+            var setInternalState$9 = internalState.set;
             var getInternalURLState = internalState.getterFor('URL');
-            var floor$8 = Math.floor;
-            var pow$3 = Math.pow;
+            var floor$9 = Math.floor;
+            var pow$4 = Math.pow;
 
             var INVALID_AUTHORITY = 'Invalid authority';
             var INVALID_SCHEME = 'Invalid scheme';
@@ -7651,12 +7842,12 @@ function __captureDomAndPollForIE() {
               for (index = 0; index < partsLength; index++) {
                 number = numbers[index];
                 if (index == partsLength - 1) {
-                  if (number >= pow$3(256, 5 - partsLength)) return null;
+                  if (number >= pow$4(256, 5 - partsLength)) return null;
                 } else if (number > 255) return null;
               }
               ipv4 = numbers.pop();
               for (index = 0; index < numbers.length; index++) {
-                ipv4 += numbers[index] * pow$3(256, 3 - index);
+                ipv4 += numbers[index] * pow$4(256, 3 - index);
               }
               return ipv4;
             };
@@ -7771,7 +7962,7 @@ function __captureDomAndPollForIE() {
                 result = [];
                 for (index = 0; index < 4; index++) {
                   result.unshift(host % 256);
-                  host = floor$8(host / 256);
+                  host = floor$9(host / 256);
                 } return result.join('.');
               // ipv6
               } else if (typeof host == 'object') {
@@ -7811,7 +8002,6 @@ function __captureDomAndPollForIE() {
             var specialSchemes = {
               ftp: 21,
               file: null,
-              gopher: 70,
               http: 80,
               https: 443,
               ws: 80,
@@ -8289,7 +8479,7 @@ function __captureDomAndPollForIE() {
               var that = anInstance(this, URLConstructor, 'URL');
               var base = arguments.length > 1 ? arguments[1] : undefined;
               var urlString = String(url);
-              var state = setInternalState$8(that, { type: 'URL' });
+              var state = setInternalState$9(that, { type: 'URL' });
               var baseState, failure;
               if (base !== undefined) {
                 if (base instanceof URLConstructor) baseState = getInternalURLState(base);
@@ -9460,7 +9650,17 @@ function __captureDomAndPollForIE() {
                 global.URLSearchParams = URLSearchParams;
               };
 
-              if (!('URLSearchParams' in global) || (new global.URLSearchParams('?a=1').toString() !== 'a=1')) {
+              var checkIfURLSearchParamsSupported = function() {
+                try {
+                  var URLSearchParams = global.URLSearchParams;
+
+                  return (new URLSearchParams('?a=1').toString() === 'a=1') && (typeof URLSearchParams.prototype.set === 'function');
+                } catch (e) {
+                  return false;
+                }
+              };
+
+              if (!checkIfURLSearchParamsSupported()) {
                 polyfillURLSearchParams();
               }
 
@@ -9847,10 +10047,10 @@ function __captureDomAndPollForIE() {
               return iterator
             }
 
-            function Headers(headers) {
+            function Headers$1(headers) {
               this.map = {};
 
-              if (headers instanceof Headers) {
+              if (headers instanceof Headers$1) {
                 headers.forEach(function(value, name) {
                   this.append(name, value);
                 }, this);
@@ -9865,31 +10065,31 @@ function __captureDomAndPollForIE() {
               }
             }
 
-            Headers.prototype.append = function(name, value) {
+            Headers$1.prototype.append = function(name, value) {
               name = normalizeName(name);
               value = normalizeValue(value);
               var oldValue = this.map[name];
               this.map[name] = oldValue ? oldValue + ', ' + value : value;
             };
 
-            Headers.prototype['delete'] = function(name) {
+            Headers$1.prototype['delete'] = function(name) {
               delete this.map[normalizeName(name)];
             };
 
-            Headers.prototype.get = function(name) {
+            Headers$1.prototype.get = function(name) {
               name = normalizeName(name);
               return this.has(name) ? this.map[name] : null
             };
 
-            Headers.prototype.has = function(name) {
+            Headers$1.prototype.has = function(name) {
               return this.map.hasOwnProperty(normalizeName(name))
             };
 
-            Headers.prototype.set = function(name, value) {
+            Headers$1.prototype.set = function(name, value) {
               this.map[normalizeName(name)] = normalizeValue(value);
             };
 
-            Headers.prototype.forEach = function(callback, thisArg) {
+            Headers$1.prototype.forEach = function(callback, thisArg) {
               for (var name in this.map) {
                 if (this.map.hasOwnProperty(name)) {
                   callback.call(thisArg, this.map[name], name, this);
@@ -9897,7 +10097,7 @@ function __captureDomAndPollForIE() {
               }
             };
 
-            Headers.prototype.keys = function() {
+            Headers$1.prototype.keys = function() {
               var items = [];
               this.forEach(function(value, name) {
                 items.push(name);
@@ -9905,7 +10105,7 @@ function __captureDomAndPollForIE() {
               return iteratorFor(items)
             };
 
-            Headers.prototype.values = function() {
+            Headers$1.prototype.values = function() {
               var items = [];
               this.forEach(function(value) {
                 items.push(value);
@@ -9913,7 +10113,7 @@ function __captureDomAndPollForIE() {
               return iteratorFor(items)
             };
 
-            Headers.prototype.entries = function() {
+            Headers$1.prototype.entries = function() {
               var items = [];
               this.forEach(function(value, name) {
                 items.push([name, value]);
@@ -9922,7 +10122,7 @@ function __captureDomAndPollForIE() {
             };
 
             if (support.iterable) {
-              Headers.prototype[Symbol.iterator] = Headers.prototype.entries;
+              Headers$1.prototype[Symbol.iterator] = Headers$1.prototype.entries;
             }
 
             function consumed(body) {
@@ -10089,7 +10289,7 @@ function __captureDomAndPollForIE() {
                 this.url = input.url;
                 this.credentials = input.credentials;
                 if (!options.headers) {
-                  this.headers = new Headers(input.headers);
+                  this.headers = new Headers$1(input.headers);
                 }
                 this.method = input.method;
                 this.mode = input.mode;
@@ -10104,7 +10304,7 @@ function __captureDomAndPollForIE() {
 
               this.credentials = options.credentials || this.credentials || 'same-origin';
               if (options.headers || !this.headers) {
-                this.headers = new Headers(options.headers);
+                this.headers = new Headers$1(options.headers);
               }
               this.method = normalizeMethod(options.method || this.method || 'GET');
               this.mode = options.mode || this.mode || null;
@@ -10138,7 +10338,7 @@ function __captureDomAndPollForIE() {
             }
 
             function parseHeaders(rawHeaders) {
-              var headers = new Headers();
+              var headers = new Headers$1();
               // Replace instances of \r\n and \n followed by at least one space or horizontal tab with a space
               // https://tools.ietf.org/html/rfc7230#section-3.2
               var preProcessedHeaders = rawHeaders.replace(/\r?\n[\t ]+/g, ' ');
@@ -10164,7 +10364,7 @@ function __captureDomAndPollForIE() {
               this.status = options.status === undefined ? 200 : options.status;
               this.ok = this.status >= 200 && this.status < 300;
               this.statusText = 'statusText' in options ? options.statusText : 'OK';
-              this.headers = new Headers(options.headers);
+              this.headers = new Headers$1(options.headers);
               this.url = options.url || '';
               this._initBody(bodyInit);
             }
@@ -10175,7 +10375,7 @@ function __captureDomAndPollForIE() {
               return new Response(this._bodyInit, {
                 status: this.status,
                 statusText: this.statusText,
-                headers: new Headers(this.headers),
+                headers: new Headers$1(this.headers),
                 url: this.url
               })
             };
@@ -10282,54 +10482,18 @@ function __captureDomAndPollForIE() {
 
             if (!self.fetch) {
               self.fetch = fetch$1;
-              self.Headers = Headers;
+              self.Headers = Headers$1;
               self.Request = Request;
               self.Response = Response;
             }
 
             var fetch$2 = /*#__PURE__*/Object.freeze({
-                        Headers: Headers,
+                        Headers: Headers$1,
                         Request: Request,
                         Response: Response,
                         get DOMException () { return DOMException; },
                         fetch: fetch$1
             });
-
-            function asyncGeneratorStep(gen, resolve, reject, _next, _throw, key, arg) {
-              try {
-                var info = gen[key](arg);
-                var value = info.value;
-              } catch (error) {
-                reject(error);
-                return;
-              }
-
-              if (info.done) {
-                resolve(value);
-              } else {
-                Promise.resolve(value).then(_next, _throw);
-              }
-            }
-
-            function _asyncToGenerator(fn) {
-              return function () {
-                var self = this,
-                    args = arguments;
-                return new Promise(function (resolve, reject) {
-                  var gen = fn.apply(self, args);
-
-                  function _next(value) {
-                    asyncGeneratorStep(gen, resolve, reject, _next, _throw, "next", value);
-                  }
-
-                  function _throw(err) {
-                    asyncGeneratorStep(gen, resolve, reject, _next, _throw, "throw", err);
-                  }
-
-                  _next(undefined);
-                });
-              };
-            }
 
             var styleProps = ['background-repeat', 'background-origin', 'background-position', 'background-color', 'background-image', 'background-size', 'border-width', 'border-color', 'border-style', 'color', 'display', 'font-size', 'line-height', 'margin', 'opacity', 'overflow', 'padding', 'visibility'];
             var rectProps = ['width', 'height', 'top', 'left'];
@@ -10355,65 +10519,56 @@ function __captureDomAndPollForIE() {
               });
             };
 
-            function getImageSizes(_x) {
-              return _getImageSizes.apply(this, arguments);
-            }
+            function getImageSizes(_ref) {
+              var bgImages, _ref$timeout, timeout, _ref$Image, Image;
 
-            function _getImageSizes() {
-              _getImageSizes = _asyncToGenerator(
-              /*#__PURE__*/
-              regeneratorRuntime.mark(function _callee(_ref) {
-                var bgImages, _ref$timeout, timeout, _ref$Image, Image;
+              return regeneratorRuntime.async(function getImageSizes$(_context) {
+                while (1) {
+                  switch (_context.prev = _context.next) {
+                    case 0:
+                      bgImages = _ref.bgImages, _ref$timeout = _ref.timeout, timeout = _ref$timeout === void 0 ? 5000 : _ref$timeout, _ref$Image = _ref.Image, Image = _ref$Image === void 0 ? window.Image : _ref$Image;
+                      _context.next = 3;
+                      return regeneratorRuntime.awrap(Promise.all(Array.from(bgImages).map(function (url) {
+                        return Promise.race([new Promise(function (resolve) {
+                          var img = new Image();
 
-                return regeneratorRuntime.wrap(function _callee$(_context) {
-                  while (1) {
-                    switch (_context.prev = _context.next) {
-                      case 0:
-                        bgImages = _ref.bgImages, _ref$timeout = _ref.timeout, timeout = _ref$timeout === void 0 ? 5000 : _ref$timeout, _ref$Image = _ref.Image, Image = _ref$Image === void 0 ? window.Image : _ref$Image;
-                        _context.next = 3;
-                        return Promise.all(Array.from(bgImages).map(function (url) {
-                          return Promise.race([new Promise(function (resolve) {
-                            var img = new Image();
+                          img.onload = function () {
+                            return resolve({
+                              url: url,
+                              width: img.naturalWidth,
+                              height: img.naturalHeight
+                            });
+                          };
 
-                            img.onload = function () {
-                              return resolve({
-                                url: url,
-                                width: img.naturalWidth,
-                                height: img.naturalHeight
-                              });
-                            };
+                          img.onerror = function () {
+                            return resolve();
+                          };
 
-                            img.onerror = function () {
-                              return resolve();
-                            };
+                          img.src = url;
+                        }), psetTimeout(timeout)]);
+                      })));
 
-                            img.src = url;
-                          }), psetTimeout(timeout)]);
-                        }));
+                    case 3:
+                      _context.t0 = function (images, curr) {
+                        if (curr) {
+                          images[curr.url] = {
+                            width: curr.width,
+                            height: curr.height
+                          };
+                        }
 
-                      case 3:
-                        _context.t0 = function (images, curr) {
-                          if (curr) {
-                            images[curr.url] = {
-                              width: curr.width,
-                              height: curr.height
-                            };
-                          }
+                        return images;
+                      };
 
-                          return images;
-                        };
+                      _context.t1 = {};
+                      return _context.abrupt("return", _context.sent.reduce(_context.t0, _context.t1));
 
-                        _context.t1 = {};
-                        return _context.abrupt("return", _context.sent.reduce(_context.t0, _context.t1));
-
-                      case 6:
-                      case "end":
-                        return _context.stop();
-                    }
+                    case 6:
+                    case "end":
+                      return _context.stop();
                   }
-                }, _callee);
-              }));
-              return _getImageSizes.apply(this, arguments);
+                }
+              });
             }
 
             var getImageSizes_1 = getImageSizes;
@@ -10456,102 +10611,45 @@ function __captureDomAndPollForIE() {
               var parseCss = _ref.parseCss,
                   CSSImportRule = _ref.CSSImportRule,
                   absolutizeUrl = _ref.absolutizeUrl,
-                  fetchCss = _ref.fetchCss,
+                  getCssFromCache = _ref.getCssFromCache,
                   unfetchedToken = _ref.unfetchedToken;
-              return (
-                /*#__PURE__*/
-                function () {
-                  var _getBundledCssFromCssText = _asyncToGenerator(
-                  /*#__PURE__*/
-                  regeneratorRuntime.mark(function _callee(cssText, resourceUrl) {
-                    var unfetchedResources, bundledCss, styleSheet, _i, _Array$from, rule, nestedUrl, nestedResource, _ref2, nestedCssText, nestedUnfetchedResources;
+              return function getBundledCssFromCssText(cssText, resourceUrl) {
+                var unfetchedResources;
+                var bundledCss = '';
 
-                    return regeneratorRuntime.wrap(function _callee$(_context) {
-                      while (1) {
-                        switch (_context.prev = _context.next) {
-                          case 0:
-                            bundledCss = '';
-                            _context.prev = 1;
-                            styleSheet = parseCss(cssText);
-                            _i = 0, _Array$from = Array.from(styleSheet.cssRules);
+                try {
+                  var styleSheet = parseCss(cssText);
 
-                          case 4:
-                            if (!(_i < _Array$from.length)) {
-                              _context.next = 26;
-                              break;
-                            }
+                  for (var _i = 0, _Array$from = Array.from(styleSheet.cssRules); _i < _Array$from.length; _i++) {
+                    var rule = _Array$from[_i];
 
-                            rule = _Array$from[_i];
+                    if (rule instanceof CSSImportRule) {
+                      var nestedUrl = absolutizeUrl(rule.href, resourceUrl);
+                      var nestedResource = getCssFromCache(nestedUrl);
 
-                            if (!(rule instanceof CSSImportRule)) {
-                              _context.next = 23;
-                              break;
-                            }
+                      if (nestedResource !== undefined) {
+                        var _getBundledCssFromCss = getBundledCssFromCssText(nestedResource, nestedUrl),
+                            nestedCssText = _getBundledCssFromCss.bundledCss,
+                            nestedUnfetchedResources = _getBundledCssFromCss.unfetchedResources;
 
-                            nestedUrl = absolutizeUrl(rule.href, resourceUrl);
-                            _context.next = 10;
-                            return fetchCss(nestedUrl);
-
-                          case 10:
-                            nestedResource = _context.sent;
-
-                            if (!(nestedResource !== undefined)) {
-                              _context.next = 21;
-                              break;
-                            }
-
-                            _context.next = 14;
-                            return getBundledCssFromCssText(nestedResource, nestedUrl);
-
-                          case 14:
-                            _ref2 = _context.sent;
-                            nestedCssText = _ref2.bundledCss;
-                            nestedUnfetchedResources = _ref2.unfetchedResources;
-                            nestedUnfetchedResources && (unfetchedResources = new Set(nestedUnfetchedResources));
-                            bundledCss = "".concat(nestedCssText).concat(bundledCss);
-                            _context.next = 23;
-                            break;
-
-                          case 21:
-                            unfetchedResources = new Set([nestedUrl]);
-                            bundledCss = "\n".concat(unfetchedToken).concat(nestedUrl).concat(unfetchedToken);
-
-                          case 23:
-                            _i++;
-                            _context.next = 4;
-                            break;
-
-                          case 26:
-                            _context.next = 31;
-                            break;
-
-                          case 28:
-                            _context.prev = 28;
-                            _context.t0 = _context["catch"](1);
-                            console.log("error during getBundledCssFromCssText, resourceUrl=".concat(resourceUrl), _context.t0);
-
-                          case 31:
-                            bundledCss = "".concat(bundledCss).concat(getCss(cssText, resourceUrl));
-                            return _context.abrupt("return", {
-                              bundledCss: bundledCss,
-                              unfetchedResources: unfetchedResources
-                            });
-
-                          case 33:
-                          case "end":
-                            return _context.stop();
-                        }
+                        nestedUnfetchedResources && (unfetchedResources = new Set(nestedUnfetchedResources));
+                        bundledCss = "".concat(nestedCssText).concat(bundledCss);
+                      } else {
+                        unfetchedResources = new Set([nestedUrl]);
+                        bundledCss = "\n".concat(unfetchedToken).concat(nestedUrl).concat(unfetchedToken);
                       }
-                    }, _callee, null, [[1, 28]]);
-                  }));
-
-                  function getBundledCssFromCssText(_x, _x2) {
-                    return _getBundledCssFromCssText.apply(this, arguments);
+                    }
                   }
+                } catch (ex) {
+                  console.log("error during getBundledCssFromCssText, resourceUrl=".concat(resourceUrl), ex);
+                }
 
-                  return getBundledCssFromCssText;
-                }()
-              );
+                bundledCss = "".concat(bundledCss).concat(getCss(cssText, resourceUrl));
+                return {
+                  bundledCss: bundledCss,
+                  unfetchedResources: unfetchedResources
+                };
+              };
             }
 
             function getCss(newText, url) {
@@ -10572,148 +10670,96 @@ function __captureDomAndPollForIE() {
             var parseCss_1 = parseCss;
 
             function makeFetchCss(fetch) {
-              return (
-                /*#__PURE__*/
-                function () {
-                  var _fetchCss = _asyncToGenerator(
-                  /*#__PURE__*/
-                  regeneratorRuntime.mark(function _callee(url) {
-                    var response;
-                    return regeneratorRuntime.wrap(function _callee$(_context) {
-                      while (1) {
-                        switch (_context.prev = _context.next) {
-                          case 0:
-                            _context.prev = 0;
-                            _context.next = 3;
-                            return fetch(url, {
-                              cache: 'force-cache'
-                            });
+              return function fetchCss(url) {
+                var response;
+                return regeneratorRuntime.async(function fetchCss$(_context) {
+                  while (1) {
+                    switch (_context.prev = _context.next) {
+                      case 0:
+                        _context.prev = 0;
+                        _context.next = 3;
+                        return regeneratorRuntime.awrap(fetch(url, {
+                          cache: 'force-cache'
+                        }));
 
-                          case 3:
-                            response = _context.sent;
+                      case 3:
+                        response = _context.sent;
 
-                            if (!response.ok) {
-                              _context.next = 8;
-                              break;
-                            }
-
-                            _context.next = 7;
-                            return response.text();
-
-                          case 7:
-                            return _context.abrupt("return", _context.sent);
-
-                          case 8:
-                            console.log('/failed to fetch (status ' + response.status + ') css from: ' + url + '/');
-                            _context.next = 14;
-                            break;
-
-                          case 11:
-                            _context.prev = 11;
-                            _context.t0 = _context["catch"](0);
-                            console.log('/failed to fetch (error ' + _context.t0.toString() + ') css from: ' + url + '/');
-
-                          case 14:
-                          case "end":
-                            return _context.stop();
+                        if (!response.ok) {
+                          _context.next = 8;
+                          break;
                         }
-                      }
-                    }, _callee, null, [[0, 11]]);
-                  }));
 
-                  function fetchCss(_x) {
-                    return _fetchCss.apply(this, arguments);
+                        _context.next = 7;
+                        return regeneratorRuntime.awrap(response.text());
+
+                      case 7:
+                        return _context.abrupt("return", _context.sent);
+
+                      case 8:
+                        console.log('/failed to fetch (status ' + response.status + ') css from: ' + url + '/');
+                        _context.next = 14;
+                        break;
+
+                      case 11:
+                        _context.prev = 11;
+                        _context.t0 = _context["catch"](0);
+                        console.log('/failed to fetch (error ' + _context.t0.toString() + ') css from: ' + url + '/');
+
+                      case 14:
+                      case "end":
+                        return _context.stop();
+                    }
                   }
-
-                  return fetchCss;
-                }()
-              );
+                }, null, null, [[0, 11]]);
+              };
             }
 
             var fetchCss = makeFetchCss;
 
-            function makeExtractCssFromNode(_ref) {
-              var fetchCss = _ref.fetchCss,
-                  absolutizeUrl = _ref.absolutizeUrl;
-              return (
-                /*#__PURE__*/
-                function () {
-                  var _extractCssFromNode = _asyncToGenerator(
-                  /*#__PURE__*/
-                  regeneratorRuntime.mark(function _callee(node, baseUrl) {
-                    var cssText, resourceUrl, isUnfetched;
-                    return regeneratorRuntime.wrap(function _callee$(_context) {
-                      while (1) {
-                        switch (_context.prev = _context.next) {
-                          case 0:
-                            if (!isStyleElement(node)) {
-                              _context.next = 5;
-                              break;
-                            }
-
-                            cssText = Array.from(node.childNodes).map(function (node) {
-                              return node.nodeValue;
-                            }).join('');
-                            resourceUrl = baseUrl;
-                            _context.next = 11;
-                            break;
-
-                          case 5:
-                            if (!isLinkToStyleSheet(node)) {
-                              _context.next = 11;
-                              break;
-                            }
-
-                            resourceUrl = absolutizeUrl(getHrefAttr(node), baseUrl);
-                            _context.next = 9;
-                            return fetchCss(resourceUrl);
-
-                          case 9:
-                            cssText = _context.sent;
-
-                            if (cssText === undefined) {
-                              isUnfetched = true;
-                            }
-
-                          case 11:
-                            return _context.abrupt("return", {
-                              cssText: cssText,
-                              resourceUrl: resourceUrl,
-                              isUnfetched: isUnfetched
-                            });
-
-                          case 12:
-                          case "end":
-                            return _context.stop();
-                        }
-                      }
-                    }, _callee);
-                  }));
-
-                  function extractCssFromNode(_x, _x2) {
-                    return _extractCssFromNode.apply(this, arguments);
-                  }
-
-                  return extractCssFromNode;
-                }()
-              );
-            }
-
-            function isStyleElement(node) {
-              return node.nodeName && node.nodeName.toUpperCase() === 'STYLE';
-            }
-
-            function getHrefAttr(node) {
+            var getHrefAttr = function getHrefAttr(node) {
               var attr = Array.from(node.attributes).find(function (attr) {
                 return attr.name.toLowerCase() === 'href';
               });
               return attr && attr.value;
-            }
+            };
 
-            function isLinkToStyleSheet(node) {
+            var isLinkToStyleSheet = function isLinkToStyleSheet(node) {
               return node.nodeName && node.nodeName.toUpperCase() === 'LINK' && node.attributes && Array.from(node.attributes).find(function (attr) {
                 return attr.name.toLowerCase() === 'rel' && attr.value.toLowerCase() === 'stylesheet';
               });
+            };
+
+            function makeExtractCssFromNode(_ref) {
+              var getCssFromCache = _ref.getCssFromCache,
+                  absolutizeUrl = _ref.absolutizeUrl;
+              return function extractCssFromNode(node, baseUrl) {
+                var cssText, resourceUrl, isUnfetched;
+
+                if (isStyleElement(node)) {
+                  cssText = Array.from(node.childNodes).map(function (node) {
+                    return node.nodeValue;
+                  }).join('');
+                  resourceUrl = baseUrl;
+                } else if (isLinkToStyleSheet(node)) {
+                  resourceUrl = absolutizeUrl(getHrefAttr(node), baseUrl);
+                  cssText = getCssFromCache(resourceUrl);
+
+                  if (cssText === undefined) {
+                    isUnfetched = true;
+                  }
+                }
+
+                return {
+                  cssText: cssText,
+                  resourceUrl: resourceUrl,
+                  isUnfetched: isUnfetched
+                };
+              };
+            }
+
+            function isStyleElement(node) {
+              return node.nodeName && node.nodeName.toUpperCase() === 'STYLE';
             }
 
             var extractCssFromNode = makeExtractCssFromNode;
@@ -10722,72 +10768,32 @@ function __captureDomAndPollForIE() {
               var extractCssFromNode = _ref.extractCssFromNode,
                   getBundledCssFromCssText = _ref.getBundledCssFromCssText,
                   unfetchedToken = _ref.unfetchedToken;
-              return (
-                /*#__PURE__*/
-                function () {
-                  var _captureNodeCss = _asyncToGenerator(
-                  /*#__PURE__*/
-                  regeneratorRuntime.mark(function _callee(node, baseUrl) {
-                    var _ref2, resourceUrl, cssText, isUnfetched, unfetchedResources, bundledCss, _ref3, nestedCss, nestedUnfetched;
+              return function captureNodeCss(node, baseUrl) {
+                var _extractCssFromNode = extractCssFromNode(node, baseUrl),
+                    resourceUrl = _extractCssFromNode.resourceUrl,
+                    cssText = _extractCssFromNode.cssText,
+                    isUnfetched = _extractCssFromNode.isUnfetched;
 
-                    return regeneratorRuntime.wrap(function _callee$(_context) {
-                      while (1) {
-                        switch (_context.prev = _context.next) {
-                          case 0:
-                            _context.next = 2;
-                            return extractCssFromNode(node, baseUrl);
+                var unfetchedResources;
+                var bundledCss = '';
 
-                          case 2:
-                            _ref2 = _context.sent;
-                            resourceUrl = _ref2.resourceUrl;
-                            cssText = _ref2.cssText;
-                            isUnfetched = _ref2.isUnfetched;
-                            bundledCss = '';
+                if (cssText) {
+                  var _getBundledCssFromCss = getBundledCssFromCssText(cssText, resourceUrl),
+                      nestedCss = _getBundledCssFromCss.bundledCss,
+                      nestedUnfetched = _getBundledCssFromCss.unfetchedResources;
 
-                            if (!cssText) {
-                              _context.next = 17;
-                              break;
-                            }
+                  bundledCss += nestedCss;
+                  unfetchedResources = new Set(nestedUnfetched);
+                } else if (isUnfetched) {
+                  bundledCss += "".concat(unfetchedToken).concat(resourceUrl).concat(unfetchedToken);
+                  unfetchedResources = new Set([resourceUrl]);
+                }
 
-                            _context.next = 10;
-                            return getBundledCssFromCssText(cssText, resourceUrl);
-
-                          case 10:
-                            _ref3 = _context.sent;
-                            nestedCss = _ref3.bundledCss;
-                            nestedUnfetched = _ref3.unfetchedResources;
-                            bundledCss += nestedCss;
-                            unfetchedResources = new Set(nestedUnfetched);
-                            _context.next = 18;
-                            break;
-
-                          case 17:
-                            if (isUnfetched) {
-                              bundledCss += "".concat(unfetchedToken).concat(resourceUrl).concat(unfetchedToken);
-                              unfetchedResources = new Set([resourceUrl]);
-                            }
-
-                          case 18:
-                            return _context.abrupt("return", {
-                              bundledCss: bundledCss,
-                              unfetchedResources: unfetchedResources
-                            });
-
-                          case 19:
-                          case "end":
-                            return _context.stop();
-                        }
-                      }
-                    }, _callee);
-                  }));
-
-                  function captureNodeCss(_x, _x2) {
-                    return _captureNodeCss.apply(this, arguments);
-                  }
-
-                  return captureNodeCss;
-                }()
-              );
+                return {
+                  bundledCss: bundledCss,
+                  unfetchedResources: unfetchedResources
+                };
+              };
             }
 
             var captureNodeCss = makeCaptureNodeCss;
@@ -10796,505 +10802,545 @@ function __captureDomAndPollForIE() {
               ELEMENT: 1,
               TEXT: 3
             };
-            var API_VERSION = '1.0.0';
+            var nodeTypes = {
+              NODE_TYPES: NODE_TYPES
+            };
 
-            function captureFrame() {
-              return _captureFrame.apply(this, arguments);
-            }
+            var NODE_TYPES$1 = nodeTypes.NODE_TYPES;
 
-            function _captureFrame() {
-              _captureFrame = _asyncToGenerator(
-              /*#__PURE__*/
-              regeneratorRuntime.mark(function _callee5() {
-                var _ref,
-                    styleProps,
-                    rectProps,
-                    ignoredTagNames,
-                    doc,
+            function makePrefetchAllCss(fetchCss) {
+              return function prefetchAllCss() {
+                var doc,
+                    cssMap,
                     start,
-                    unfetchedResources,
-                    iframeCors,
-                    iframeToken,
-                    unfetchedToken,
-                    separator,
-                    fetchCss$$1,
-                    getBundledCssFromCssText$$1,
-                    extractCssFromNode$$1,
-                    captureNodeCss$$1,
-                    capturedFrame,
-                    iframePrefix,
-                    unfetchedPrefix,
-                    metaPrefix,
-                    ret,
-                    filter,
-                    notEmptyObj,
-                    captureTextNode,
-                    doCaptureFrame,
-                    _doCaptureFrame,
-                    _args5 = arguments;
-
-                return regeneratorRuntime.wrap(function _callee5$(_context5) {
+                    promises,
+                    fetchNodeCss,
+                    fetchBundledCss,
+                    doFetchAllCssFromFrame,
+                    _args6 = arguments;
+                return regeneratorRuntime.async(function prefetchAllCss$(_context6) {
                   while (1) {
-                    switch (_context5.prev = _context5.next) {
+                    switch (_context6.prev = _context6.next) {
                       case 0:
-                        _doCaptureFrame = function _ref14() {
-                          _doCaptureFrame = _asyncToGenerator(
-                          /*#__PURE__*/
-                          regeneratorRuntime.mark(function _callee4(frameDoc) {
-                            var bgImages, bundledCss, ret, captureNode, _captureNode, elementToJSON, _elementToJSON, iframeToJSON, _iframeToJSON;
+                        doFetchAllCssFromFrame = function _ref3(frameDoc, cssMap, promises) {
+                          fetchAllCssFromNode(frameDoc.documentElement);
 
-                            return regeneratorRuntime.wrap(function _callee4$(_context4) {
+                          function fetchAllCssFromNode(node) {
+                            promises.push(fetchNodeCss(node, frameDoc.location.href, cssMap));
+
+                            switch (node.nodeType) {
+                              case NODE_TYPES$1.ELEMENT:
+                                {
+                                  var tagName = node.tagName.toUpperCase();
+
+                                  if (tagName === 'IFRAME') {
+                                    return fetchAllCssFromIframe(node);
+                                  } else {
+                                    return fetchAllCssFromElement(node);
+                                  }
+                                }
+                            }
+                          }
+
+                          function fetchAllCssFromElement(el) {
+                            return regeneratorRuntime.async(function fetchAllCssFromElement$(_context4) {
                               while (1) {
                                 switch (_context4.prev = _context4.next) {
                                   case 0:
-                                    _iframeToJSON = function _ref9() {
-                                      _iframeToJSON = _asyncToGenerator(
-                                      /*#__PURE__*/
-                                      regeneratorRuntime.mark(function _callee3(el) {
-                                        var obj, doc, markFrameAsCors;
-                                        return regeneratorRuntime.wrap(function _callee3$(_context3) {
-                                          while (1) {
-                                            switch (_context3.prev = _context3.next) {
-                                              case 0:
-                                                markFrameAsCors = function _ref3() {
-                                                  var xpath = genXpath_1(el);
-                                                  iframeCors.push(xpath);
-                                                  obj.childNodes = ["".concat(iframeToken).concat(xpath).concat(iframeToken)];
-                                                };
+                                    Array.prototype.map.call(el.childNodes, fetchAllCssFromNode);
 
-                                                _context3.next = 3;
-                                                return elementToJSON(el);
-
-                                              case 3:
-                                                obj = _context3.sent;
-                                                _context3.prev = 4;
-                                                doc = el.contentDocument;
-                                                _context3.next = 12;
-                                                break;
-
-                                              case 8:
-                                                _context3.prev = 8;
-                                                _context3.t0 = _context3["catch"](4);
-                                                markFrameAsCors();
-                                                return _context3.abrupt("return", obj);
-
-                                              case 12:
-                                                _context3.prev = 12;
-
-                                                if (!doc) {
-                                                  _context3.next = 20;
-                                                  break;
-                                                }
-
-                                                _context3.next = 16;
-                                                return doCaptureFrame(el.contentDocument);
-
-                                              case 16:
-                                                _context3.t1 = _context3.sent;
-                                                obj.childNodes = [_context3.t1];
-                                                _context3.next = 21;
-                                                break;
-
-                                              case 20:
-                                                markFrameAsCors();
-
-                                              case 21:
-                                                _context3.next = 26;
-                                                break;
-
-                                              case 23:
-                                                _context3.prev = 23;
-                                                _context3.t2 = _context3["catch"](12);
-                                                console.log('error in iframeToJSON', _context3.t2);
-
-                                              case 26:
-                                                return _context3.abrupt("return", obj);
-
-                                              case 27:
-                                              case "end":
-                                                return _context3.stop();
-                                            }
-                                          }
-                                        }, _callee3, null, [[4, 8], [12, 23]]);
-                                      }));
-                                      return _iframeToJSON.apply(this, arguments);
-                                    };
-
-                                    iframeToJSON = function _ref8(_x4) {
-                                      return _iframeToJSON.apply(this, arguments);
-                                    };
-
-                                    _elementToJSON = function _ref7() {
-                                      _elementToJSON = _asyncToGenerator(
-                                      /*#__PURE__*/
-                                      regeneratorRuntime.mark(function _callee2(el) {
-                                        var childNodes, tagName, computedStyle, boundingClientRect, style, _iteratorNormalCompletion2, _didIteratorError2, _iteratorError2, _iterator2, _step2, p, rect, _iteratorNormalCompletion3, _didIteratorError3, _iteratorError3, _iterator3, _step3, _p, attributes, bgImage;
-
-                                        return regeneratorRuntime.wrap(function _callee2$(_context2) {
-                                          while (1) {
-                                            switch (_context2.prev = _context2.next) {
-                                              case 0:
-                                                _context2.next = 2;
-                                                return Promise.all(Array.prototype.map.call(el.childNodes, captureNode));
-
-                                              case 2:
-                                                _context2.t0 = filter;
-                                                childNodes = _context2.sent.filter(_context2.t0);
-                                                tagName = el.tagName.toUpperCase();
-
-                                                if (!(ignoredTagNames.indexOf(tagName) > -1)) {
-                                                  _context2.next = 7;
-                                                  break;
-                                                }
-
-                                                return _context2.abrupt("return", null);
-
-                                              case 7:
-                                                computedStyle = window.getComputedStyle(el);
-                                                boundingClientRect = el.getBoundingClientRect();
-                                                style = {};
-                                                _iteratorNormalCompletion2 = true;
-                                                _didIteratorError2 = false;
-                                                _iteratorError2 = undefined;
-                                                _context2.prev = 13;
-
-                                                for (_iterator2 = styleProps[Symbol.iterator](); !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
-                                                  p = _step2.value;
-                                                  style[p] = computedStyle.getPropertyValue(p);
-                                                }
-
-                                                _context2.next = 21;
-                                                break;
-
-                                              case 17:
-                                                _context2.prev = 17;
-                                                _context2.t1 = _context2["catch"](13);
-                                                _didIteratorError2 = true;
-                                                _iteratorError2 = _context2.t1;
-
-                                              case 21:
-                                                _context2.prev = 21;
-                                                _context2.prev = 22;
-
-                                                if (!_iteratorNormalCompletion2 && _iterator2.return != null) {
-                                                  _iterator2.return();
-                                                }
-
-                                              case 24:
-                                                _context2.prev = 24;
-
-                                                if (!_didIteratorError2) {
-                                                  _context2.next = 27;
-                                                  break;
-                                                }
-
-                                                throw _iteratorError2;
-
-                                              case 27:
-                                                return _context2.finish(24);
-
-                                              case 28:
-                                                return _context2.finish(21);
-
-                                              case 29:
-                                                if (!style['border-width']) {
-                                                  style['border-width'] = "".concat(computedStyle.getPropertyValue('border-top-width'), " ").concat(computedStyle.getPropertyValue('border-right-width'), " ").concat(computedStyle.getPropertyValue('border-bottom-width'), " ").concat(computedStyle.getPropertyValue('border-left-width'));
-                                                }
-
-                                                rect = {};
-                                                _iteratorNormalCompletion3 = true;
-                                                _didIteratorError3 = false;
-                                                _iteratorError3 = undefined;
-                                                _context2.prev = 34;
-
-                                                for (_iterator3 = rectProps[Symbol.iterator](); !(_iteratorNormalCompletion3 = (_step3 = _iterator3.next()).done); _iteratorNormalCompletion3 = true) {
-                                                  _p = _step3.value;
-                                                  rect[_p] = boundingClientRect[_p];
-                                                }
-
-                                                _context2.next = 42;
-                                                break;
-
-                                              case 38:
-                                                _context2.prev = 38;
-                                                _context2.t2 = _context2["catch"](34);
-                                                _didIteratorError3 = true;
-                                                _iteratorError3 = _context2.t2;
-
-                                              case 42:
-                                                _context2.prev = 42;
-                                                _context2.prev = 43;
-
-                                                if (!_iteratorNormalCompletion3 && _iterator3.return != null) {
-                                                  _iterator3.return();
-                                                }
-
-                                              case 45:
-                                                _context2.prev = 45;
-
-                                                if (!_didIteratorError3) {
-                                                  _context2.next = 48;
-                                                  break;
-                                                }
-
-                                                throw _iteratorError3;
-
-                                              case 48:
-                                                return _context2.finish(45);
-
-                                              case 49:
-                                                return _context2.finish(42);
-
-                                              case 50:
-                                                attributes = Array.from(el.attributes).map(function (a) {
-                                                  return {
-                                                    key: a.name,
-                                                    value: a.value
-                                                  };
-                                                }).reduce(function (obj, attr) {
-                                                  obj[attr.key] = attr.value;
-                                                  return obj;
-                                                }, {});
-                                                bgImage = getBackgroundImageUrl_1(computedStyle.getPropertyValue('background-image'));
-
-                                                if (bgImage) {
-                                                  bgImages.add(bgImage);
-                                                }
-
-                                                return _context2.abrupt("return", {
-                                                  tagName: tagName,
-                                                  style: notEmptyObj(style),
-                                                  rect: notEmptyObj(rect),
-                                                  attributes: notEmptyObj(attributes),
-                                                  childNodes: childNodes
-                                                });
-
-                                              case 54:
-                                              case "end":
-                                                return _context2.stop();
-                                            }
-                                          }
-                                        }, _callee2, null, [[13, 17, 21, 29], [22,, 24, 28], [34, 38, 42, 50], [43,, 45, 49]]);
-                                      }));
-                                      return _elementToJSON.apply(this, arguments);
-                                    };
-
-                                    elementToJSON = function _ref6(_x3) {
-                                      return _elementToJSON.apply(this, arguments);
-                                    };
-
-                                    _captureNode = function _ref5() {
-                                      _captureNode = _asyncToGenerator(
-                                      /*#__PURE__*/
-                                      regeneratorRuntime.mark(function _callee(node) {
-                                        var _ref2, nodeCss, nodeUnfetched, _iteratorNormalCompletion, _didIteratorError, _iteratorError, _iterator, _step, elem, tagName;
-
-                                        return regeneratorRuntime.wrap(function _callee$(_context) {
-                                          while (1) {
-                                            switch (_context.prev = _context.next) {
-                                              case 0:
-                                                _context.next = 2;
-                                                return captureNodeCss$$1(node, frameDoc.location.href);
-
-                                              case 2:
-                                                _ref2 = _context.sent;
-                                                nodeCss = _ref2.bundledCss;
-                                                nodeUnfetched = _ref2.unfetchedResources;
-                                                bundledCss += nodeCss;
-
-                                                if (!nodeUnfetched) {
-                                                  _context.next = 26;
-                                                  break;
-                                                }
-
-                                                _iteratorNormalCompletion = true;
-                                                _didIteratorError = false;
-                                                _iteratorError = undefined;
-                                                _context.prev = 10;
-
-                                                for (_iterator = nodeUnfetched[Symbol.iterator](); !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
-                                                  elem = _step.value;
-                                                  unfetchedResources.add(elem);
-                                                }
-
-                                                _context.next = 18;
-                                                break;
-
-                                              case 14:
-                                                _context.prev = 14;
-                                                _context.t0 = _context["catch"](10);
-                                                _didIteratorError = true;
-                                                _iteratorError = _context.t0;
-
-                                              case 18:
-                                                _context.prev = 18;
-                                                _context.prev = 19;
-
-                                                if (!_iteratorNormalCompletion && _iterator.return != null) {
-                                                  _iterator.return();
-                                                }
-
-                                              case 21:
-                                                _context.prev = 21;
-
-                                                if (!_didIteratorError) {
-                                                  _context.next = 24;
-                                                  break;
-                                                }
-
-                                                throw _iteratorError;
-
-                                              case 24:
-                                                return _context.finish(21);
-
-                                              case 25:
-                                                return _context.finish(18);
-
-                                              case 26:
-                                                _context.t1 = node.nodeType;
-                                                _context.next = _context.t1 === NODE_TYPES.TEXT ? 29 : _context.t1 === NODE_TYPES.ELEMENT ? 30 : 40;
-                                                break;
-
-                                              case 29:
-                                                return _context.abrupt("return", captureTextNode(node));
-
-                                              case 30:
-                                                tagName = node.tagName.toUpperCase();
-
-                                                if (!(tagName === 'IFRAME')) {
-                                                  _context.next = 37;
-                                                  break;
-                                                }
-
-                                                _context.next = 34;
-                                                return iframeToJSON(node);
-
-                                              case 34:
-                                                return _context.abrupt("return", _context.sent);
-
-                                              case 37:
-                                                _context.next = 39;
-                                                return elementToJSON(node);
-
-                                              case 39:
-                                                return _context.abrupt("return", _context.sent);
-
-                                              case 40:
-                                                return _context.abrupt("return", null);
-
-                                              case 41:
-                                              case "end":
-                                                return _context.stop();
-                                            }
-                                          }
-                                        }, _callee, null, [[10, 14, 18, 26], [19,, 21, 25]]);
-                                      }));
-                                      return _captureNode.apply(this, arguments);
-                                    };
-
-                                    captureNode = function _ref4(_x2) {
-                                      return _captureNode.apply(this, arguments);
-                                    };
-
-                                    bgImages = new Set();
-                                    bundledCss = '';
-                                    _context4.next = 10;
-                                    return captureNode(frameDoc.documentElement);
-
-                                  case 10:
-                                    ret = _context4.sent;
-                                    ret.css = bundledCss;
-                                    _context4.next = 14;
-                                    return getImageSizes_1({
-                                      bgImages: bgImages
-                                    });
-
-                                  case 14:
-                                    ret.images = _context4.sent;
-                                    return _context4.abrupt("return", ret);
-
-                                  case 16:
+                                  case 1:
                                   case "end":
                                     return _context4.stop();
                                 }
                               }
-                            }, _callee4);
-                          }));
-                          return _doCaptureFrame.apply(this, arguments);
+                            });
+                          }
+
+                          function fetchAllCssFromIframe(el) {
+                            return regeneratorRuntime.async(function fetchAllCssFromIframe$(_context5) {
+                              while (1) {
+                                switch (_context5.prev = _context5.next) {
+                                  case 0:
+                                    fetchAllCssFromElement(el);
+
+                                    try {
+                                      doFetchAllCssFromFrame(el.contentDocument, cssMap, promises);
+                                    } catch (ex) {
+                                      console.log(ex);
+                                    }
+
+                                  case 2:
+                                  case "end":
+                                    return _context5.stop();
+                                }
+                              }
+                            });
+                          }
                         };
 
-                        doCaptureFrame = function _ref13(_x) {
-                          return _doCaptureFrame.apply(this, arguments);
+                        fetchBundledCss = function _ref2(cssText, resourceUrl, cssMap) {
+                          var styleSheet, _promises, _loop, _i, _Array$from;
+
+                          return regeneratorRuntime.async(function fetchBundledCss$(_context3) {
+                            while (1) {
+                              switch (_context3.prev = _context3.next) {
+                                case 0:
+                                  _context3.prev = 0;
+                                  styleSheet = parseCss_1(cssText);
+                                  _promises = [];
+
+                                  _loop = function _loop() {
+                                    var rule = _Array$from[_i];
+
+                                    if (rule instanceof CSSImportRule) {
+                                      _promises.push(function _callee() {
+                                        var nestedUrl, cssText;
+                                        return regeneratorRuntime.async(function _callee$(_context2) {
+                                          while (1) {
+                                            switch (_context2.prev = _context2.next) {
+                                              case 0:
+                                                nestedUrl = absolutizeUrl_1(rule.href, resourceUrl);
+                                                _context2.next = 3;
+                                                return regeneratorRuntime.awrap(fetchCss(nestedUrl));
+
+                                              case 3:
+                                                cssText = _context2.sent;
+                                                cssMap[nestedUrl] = cssText;
+
+                                                if (!(cssText !== undefined)) {
+                                                  _context2.next = 8;
+                                                  break;
+                                                }
+
+                                                _context2.next = 8;
+                                                return regeneratorRuntime.awrap(fetchBundledCss(cssText, nestedUrl, cssMap));
+
+                                              case 8:
+                                              case "end":
+                                                return _context2.stop();
+                                            }
+                                          }
+                                        });
+                                      }());
+                                    }
+                                  };
+
+                                  for (_i = 0, _Array$from = Array.from(styleSheet.cssRules); _i < _Array$from.length; _i++) {
+                                    _loop();
+                                  }
+
+                                  _context3.next = 7;
+                                  return regeneratorRuntime.awrap(Promise.all(_promises));
+
+                                case 7:
+                                  _context3.next = 12;
+                                  break;
+
+                                case 9:
+                                  _context3.prev = 9;
+                                  _context3.t0 = _context3["catch"](0);
+                                  console.log("error during fetchBundledCss, resourceUrl=".concat(resourceUrl), _context3.t0);
+
+                                case 12:
+                                case "end":
+                                  return _context3.stop();
+                              }
+                            }
+                          }, null, null, [[0, 9]]);
                         };
 
-                        captureTextNode = function _ref12(node) {
-                          return {
-                            tagName: '#text',
-                            text: node.textContent
-                          };
+                        fetchNodeCss = function _ref(node, baseUrl, cssMap) {
+                          var cssText, resourceUrl;
+                          return regeneratorRuntime.async(function fetchNodeCss$(_context) {
+                            while (1) {
+                              switch (_context.prev = _context.next) {
+                                case 0:
+                                  if (!isLinkToStyleSheet(node)) {
+                                    _context.next = 6;
+                                    break;
+                                  }
+
+                                  resourceUrl = absolutizeUrl_1(getHrefAttr(node), baseUrl);
+                                  _context.next = 4;
+                                  return regeneratorRuntime.awrap(fetchCss(resourceUrl));
+
+                                case 4:
+                                  cssText = _context.sent;
+
+                                  if (cssText !== undefined) {
+                                    cssMap[resourceUrl] = cssText;
+                                  }
+
+                                case 6:
+                                  if (!cssText) {
+                                    _context.next = 9;
+                                    break;
+                                  }
+
+                                  _context.next = 9;
+                                  return regeneratorRuntime.awrap(fetchBundledCss(cssText, resourceUrl, cssMap));
+
+                                case 9:
+                                case "end":
+                                  return _context.stop();
+                              }
+                            }
+                          });
                         };
 
-                        notEmptyObj = function _ref11(obj) {
-                          return Object.keys(obj).length ? obj : undefined;
-                        };
-
-                        filter = function _ref10(x) {
-                          return !!x;
-                        };
-
-                        _ref = _args5.length > 0 && _args5[0] !== undefined ? _args5[0] : defaultDomProps, styleProps = _ref.styleProps, rectProps = _ref.rectProps, ignoredTagNames = _ref.ignoredTagNames;
-                        doc = _args5.length > 1 && _args5[1] !== undefined ? _args5[1] : document;
+                        doc = _args6.length > 0 && _args6[0] !== undefined ? _args6[0] : document;
+                        cssMap = {};
                         start = Date.now();
-                        unfetchedResources = new Set();
-                        iframeCors = [];
-                        iframeToken = '@@@@@';
-                        unfetchedToken = '#####';
-                        separator = '-----';
-                        fetchCss$$1 = fetchCss(fetch);
-                        getBundledCssFromCssText$$1 = getBundledCssFromCssText({
-                          parseCss: parseCss_1,
-                          CSSImportRule: CSSImportRule,
-                          fetchCss: fetchCss$$1,
-                          absolutizeUrl: absolutizeUrl_1,
-                          unfetchedToken: unfetchedToken
-                        });
-                        extractCssFromNode$$1 = extractCssFromNode({
-                          fetchCss: fetchCss$$1,
-                          absolutizeUrl: absolutizeUrl_1
-                        });
-                        captureNodeCss$$1 = captureNodeCss({
-                          extractCssFromNode: extractCssFromNode$$1,
-                          getBundledCssFromCssText: getBundledCssFromCssText$$1,
-                          unfetchedToken: unfetchedToken
-                        }); // Note: Change the API_VERSION when changing json structure.
+                        promises = [];
+                        doFetchAllCssFromFrame(doc, cssMap, promises);
+                        _context6.next = 10;
+                        return regeneratorRuntime.awrap(Promise.all(promises));
 
-                        _context5.next = 19;
-                        return doCaptureFrame(doc);
-
-                      case 19:
-                        capturedFrame = _context5.sent;
-                        capturedFrame.version = API_VERSION;
-                        iframePrefix = iframeCors.length ? "".concat(iframeCors.join('\n'), "\n") : '';
-                        unfetchedPrefix = unfetchedResources.size ? "".concat(Array.from(unfetchedResources).join('\n'), "\n") : '';
-                        metaPrefix = JSON.stringify({
-                          separator: separator,
-                          cssStartToken: unfetchedToken,
-                          cssEndToken: unfetchedToken,
-                          iframeStartToken: "\"".concat(iframeToken),
-                          iframeEndToken: "".concat(iframeToken, "\"")
+                      case 10:
+                        console.log('[prefetchAllCss]', Date.now() - start);
+                        return _context6.abrupt("return", function fetchCssSync(url) {
+                          return cssMap[url];
                         });
-                        ret = "".concat(metaPrefix, "\n").concat(unfetchedPrefix).concat(separator, "\n").concat(iframePrefix).concat(separator, "\n").concat(JSON.stringify(capturedFrame));
-                        console.log('[captureFrame]', Date.now() - start);
-                        return _context5.abrupt("return", ret);
 
-                      case 27:
+                      case 12:
                       case "end":
-                        return _context5.stop();
+                        return _context6.stop();
                     }
                   }
-                }, _callee5);
-              }));
-              return _captureFrame.apply(this, arguments);
+                });
+              };
+            }
+
+            var prefetchAllCss = makePrefetchAllCss;
+
+            var NODE_TYPES$2 = nodeTypes.NODE_TYPES;
+            var API_VERSION = '1.0.0';
+
+            function captureFrame() {
+              var _ref,
+                  styleProps,
+                  rectProps,
+                  ignoredTagNames,
+                  doc,
+                  addStats,
+                  performance,
+                  startTime,
+                  endTime,
+                  promises,
+                  unfetchedResources,
+                  iframeCors,
+                  iframeToken,
+                  unfetchedToken,
+                  separator,
+                  prefetchAllCss$$1,
+                  getCssFromCache,
+                  getBundledCssFromCssText$$1,
+                  extractCssFromNode$$1,
+                  captureNodeCss$$1,
+                  capturedFrame,
+                  iframePrefix,
+                  unfetchedPrefix,
+                  metaPrefix,
+                  stats,
+                  ret,
+                  filter,
+                  notEmptyObj,
+                  captureTextNode,
+                  doCaptureFrame,
+                  _args = arguments;
+
+              return regeneratorRuntime.async(function captureFrame$(_context) {
+                while (1) {
+                  switch (_context.prev = _context.next) {
+                    case 0:
+                      doCaptureFrame = function _ref8(frameDoc) {
+                        var bgImages = new Set();
+                        var bundledCss = '';
+                        var ret = captureNode(frameDoc.documentElement);
+                        ret.css = bundledCss;
+                        promises.push(getImageSizes_1({
+                          bgImages: bgImages
+                        }).then(function (images) {
+                          return ret.images = images;
+                        }));
+                        return ret;
+
+                        function captureNode(node) {
+                          var _captureNodeCss = captureNodeCss$$1(node, frameDoc.location.href),
+                              nodeCss = _captureNodeCss.bundledCss,
+                              nodeUnfetched = _captureNodeCss.unfetchedResources;
+
+                          bundledCss += nodeCss;
+
+                          if (nodeUnfetched) {
+                            var _iteratorNormalCompletion = true;
+                            var _didIteratorError = false;
+                            var _iteratorError = undefined;
+
+                            try {
+                              for (var _iterator = nodeUnfetched[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+                                var elem = _step.value;
+                                unfetchedResources.add(elem);
+                              }
+                            } catch (err) {
+                              _didIteratorError = true;
+                              _iteratorError = err;
+                            } finally {
+                              try {
+                                if (!_iteratorNormalCompletion && _iterator.return != null) {
+                                  _iterator.return();
+                                }
+                              } finally {
+                                if (_didIteratorError) {
+                                  throw _iteratorError;
+                                }
+                              }
+                            }
+                          }
+
+                          switch (node.nodeType) {
+                            case NODE_TYPES$2.TEXT:
+                              {
+                                return captureTextNode(node);
+                              }
+
+                            case NODE_TYPES$2.ELEMENT:
+                              {
+                                var tagName = node.tagName.toUpperCase();
+
+                                if (tagName === 'IFRAME') {
+                                  return iframeToJSON(node);
+                                } else {
+                                  return elementToJSON(node);
+                                }
+                              }
+
+                            default:
+                              {
+                                return null;
+                              }
+                          }
+                        }
+
+                        function elementToJSON(el) {
+                          var childNodes = Array.prototype.map.call(el.childNodes, captureNode).filter(filter);
+                          var tagName = el.tagName.toUpperCase();
+                          if (ignoredTagNames.indexOf(tagName) > -1) return null;
+                          var computedStyle = window.getComputedStyle(el);
+                          var boundingClientRect = el.getBoundingClientRect();
+                          var style = {};
+                          var _iteratorNormalCompletion2 = true;
+                          var _didIteratorError2 = false;
+                          var _iteratorError2 = undefined;
+
+                          try {
+                            for (var _iterator2 = styleProps[Symbol.iterator](), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
+                              var p = _step2.value;
+                              style[p] = computedStyle.getPropertyValue(p);
+                            }
+                          } catch (err) {
+                            _didIteratorError2 = true;
+                            _iteratorError2 = err;
+                          } finally {
+                            try {
+                              if (!_iteratorNormalCompletion2 && _iterator2.return != null) {
+                                _iterator2.return();
+                              }
+                            } finally {
+                              if (_didIteratorError2) {
+                                throw _iteratorError2;
+                              }
+                            }
+                          }
+
+                          if (!style['border-width']) {
+                            style['border-width'] = "".concat(computedStyle.getPropertyValue('border-top-width'), " ").concat(computedStyle.getPropertyValue('border-right-width'), " ").concat(computedStyle.getPropertyValue('border-bottom-width'), " ").concat(computedStyle.getPropertyValue('border-left-width'));
+                          }
+
+                          var rect = {};
+                          var _iteratorNormalCompletion3 = true;
+                          var _didIteratorError3 = false;
+                          var _iteratorError3 = undefined;
+
+                          try {
+                            for (var _iterator3 = rectProps[Symbol.iterator](), _step3; !(_iteratorNormalCompletion3 = (_step3 = _iterator3.next()).done); _iteratorNormalCompletion3 = true) {
+                              var _p = _step3.value;
+                              rect[_p] = boundingClientRect[_p];
+                            }
+                          } catch (err) {
+                            _didIteratorError3 = true;
+                            _iteratorError3 = err;
+                          } finally {
+                            try {
+                              if (!_iteratorNormalCompletion3 && _iterator3.return != null) {
+                                _iterator3.return();
+                              }
+                            } finally {
+                              if (_didIteratorError3) {
+                                throw _iteratorError3;
+                              }
+                            }
+                          }
+
+                          var attributes = Array.from(el.attributes).map(function (a) {
+                            return {
+                              key: a.name,
+                              value: a.value
+                            };
+                          }).reduce(function (obj, attr) {
+                            obj[attr.key] = attr.value;
+                            return obj;
+                          }, {});
+                          var bgImage = getBackgroundImageUrl_1(computedStyle.getPropertyValue('background-image'));
+
+                          if (bgImage) {
+                            bgImages.add(bgImage);
+                          }
+
+                          return {
+                            tagName: tagName,
+                            style: notEmptyObj(style),
+                            rect: notEmptyObj(rect),
+                            attributes: notEmptyObj(attributes),
+                            childNodes: childNodes
+                          };
+                        }
+
+                        function iframeToJSON(el) {
+                          var obj = elementToJSON(el);
+                          var doc;
+
+                          try {
+                            doc = el.contentDocument;
+                          } catch (ex) {
+                            markFrameAsCors();
+                            return obj;
+                          }
+
+                          try {
+                            if (doc) {
+                              obj.childNodes = [doCaptureFrame(el.contentDocument)];
+                            } else {
+                              markFrameAsCors();
+                            }
+                          } catch (ex) {
+                            console.log('error in iframeToJSON', ex);
+                          }
+
+                          return obj;
+
+                          function markFrameAsCors() {
+                            var xpath = genXpath_1(el);
+                            iframeCors.push(xpath);
+                            obj.childNodes = ["".concat(iframeToken).concat(xpath).concat(iframeToken)];
+                          }
+                        }
+                      };
+
+                      captureTextNode = function _ref7(node) {
+                        return {
+                          tagName: '#text',
+                          text: node.textContent
+                        };
+                      };
+
+                      notEmptyObj = function _ref6(obj) {
+                        return Object.keys(obj).length ? obj : undefined;
+                      };
+
+                      filter = function _ref5(x) {
+                        return !!x;
+                      };
+
+                      stats = function _ref4() {
+                        if (!addStats) {
+                          return '';
+                        }
+
+                        return "\n".concat(separator, "\n").concat(JSON.stringify(performance));
+                      };
+
+                      endTime = function _ref3(obj) {
+                        obj.endTime = Date.now();
+                        obj.ellapsedTime = obj.endTime - obj.startTime;
+                      };
+
+                      startTime = function _ref2(obj) {
+                        obj.startTime = Date.now();
+                      };
+
+                      _ref = _args.length > 0 && _args[0] !== undefined ? _args[0] : defaultDomProps, styleProps = _ref.styleProps, rectProps = _ref.rectProps, ignoredTagNames = _ref.ignoredTagNames;
+                      doc = _args.length > 1 && _args[1] !== undefined ? _args[1] : document;
+                      addStats = _args.length > 2 && _args[2] !== undefined ? _args[2] : false;
+                      performance = {
+                        total: {},
+                        prefetchCss: {},
+                        doCaptureFrame: {},
+                        waitForImages: {}
+                      };
+                      promises = [];
+                      startTime(performance.total);
+                      unfetchedResources = new Set();
+                      iframeCors = [];
+                      iframeToken = '@@@@@';
+                      unfetchedToken = '#####';
+                      separator = '-----';
+                      startTime(performance.prefetchCss);
+                      prefetchAllCss$$1 = prefetchAllCss(fetchCss(fetch));
+                      _context.next = 22;
+                      return regeneratorRuntime.awrap(prefetchAllCss$$1(doc));
+
+                    case 22:
+                      getCssFromCache = _context.sent;
+                      endTime(performance.prefetchCss);
+                      getBundledCssFromCssText$$1 = getBundledCssFromCssText({
+                        parseCss: parseCss_1,
+                        CSSImportRule: CSSImportRule,
+                        getCssFromCache: getCssFromCache,
+                        absolutizeUrl: absolutizeUrl_1,
+                        unfetchedToken: unfetchedToken
+                      });
+                      extractCssFromNode$$1 = extractCssFromNode({
+                        getCssFromCache: getCssFromCache,
+                        absolutizeUrl: absolutizeUrl_1
+                      });
+                      captureNodeCss$$1 = captureNodeCss({
+                        extractCssFromNode: extractCssFromNode$$1,
+                        getBundledCssFromCssText: getBundledCssFromCssText$$1,
+                        unfetchedToken: unfetchedToken
+                      }); // Note: Change the API_VERSION when changing json structure.
+
+                      startTime(performance.doCaptureFrame);
+                      capturedFrame = doCaptureFrame(doc);
+                      endTime(performance.doCaptureFrame);
+                      startTime(performance.waitForImages);
+                      _context.next = 33;
+                      return regeneratorRuntime.awrap(Promise.all(promises));
+
+                    case 33:
+                      endTime(performance.waitForImages);
+                      capturedFrame.version = API_VERSION;
+                      iframePrefix = iframeCors.length ? "".concat(iframeCors.join('\n'), "\n") : '';
+                      unfetchedPrefix = unfetchedResources.size ? "".concat(Array.from(unfetchedResources).join('\n'), "\n") : '';
+                      metaPrefix = JSON.stringify({
+                        separator: separator,
+                        cssStartToken: unfetchedToken,
+                        cssEndToken: unfetchedToken,
+                        iframeStartToken: "\"".concat(iframeToken),
+                        iframeEndToken: "".concat(iframeToken, "\"")
+                      });
+                      endTime(performance.total);
+                      ret = "".concat(metaPrefix, "\n").concat(unfetchedPrefix).concat(separator, "\n").concat(iframePrefix).concat(separator, "\n").concat(JSON.stringify(capturedFrame)).concat(stats());
+                      console.log('[captureFrame]', JSON.stringify(performance));
+                      return _context.abrupt("return", ret);
+
+                    case 42:
+                    case "end":
+                      return _context.stop();
+                  }
+                }
+              });
             }
 
             var captureFrame_1 = captureFrame;

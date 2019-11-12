@@ -352,4 +352,8 @@ public class GeneralUtils {
     public static String getEnvString(String applitools_env) {
         return System.getenv(applitools_env) == null ? System.getenv("bamboo_" + applitools_env) : System.getenv(applitools_env);
     }
+
+    public static boolean getDontCloseBatches() {
+        return "true".equalsIgnoreCase(GeneralUtils.getEnvString("APPLITOOLS_DONT_CLOSE_BATCHES"));
+    }
 }

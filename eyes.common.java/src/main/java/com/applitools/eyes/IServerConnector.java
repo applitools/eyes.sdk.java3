@@ -176,4 +176,6 @@ public interface IServerConnector {
     void setRenderingInfo(RenderingInfo renderInfo);
 
     void closeBatch(String batchId);
+
+    void closeConnector();
 }

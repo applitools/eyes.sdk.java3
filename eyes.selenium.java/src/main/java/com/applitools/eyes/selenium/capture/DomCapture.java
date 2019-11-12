@@ -54,7 +54,7 @@ public class DomCapture {
     private Map<String, String> cssData = Collections.synchronizedMap(new HashMap<String, String>());
     private boolean shouldWaitForPhaser = false;
     private AtomicBoolean isCheckTimerTimedOut = new AtomicBoolean(false);
-    private Timer timer = new Timer("DomCapture_StopWatch", true);
+    private Timer timer;
 
     public DomCapture(SeleniumEyes eyes) {
         mServerConnector = eyes.getServerConnector();
@@ -103,6 +103,7 @@ public class DomCapture {
 
     private String getFrameDom() {
         logger.verbose("Trying to get DOM from driver");
+        timer = new Timer(true);
         timer.schedule(new TimeoutTask(), DOM_EXTRACTION_TIMEOUT);
         try {
             isCheckTimerTimedOut.set(false);
@@ -150,12 +151,13 @@ public class DomCapture {
             //noinspection UnnecessaryLocalVariable
             String inlaidString = EfficientStringReplace.efficientStringReplace(
                     separators.iframeStartToken, separators.iframeEndToken, data.get(0), framesData);
-            timer.cancel();
             return inlaidString;
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-        timer.cancel();
+        finally {
+            timer.cancel();
+        }
         return "";
     }
 
@@ -195,22 +197,27 @@ public class DomCapture {
 
     private void fetchCssFiles(List<String> missingCssList) {
         for (final String missingCssUrl : missingCssList) {
-            if (missingCssUrl.startsWith("blob:")) {
+            if (missingCssUrl.startsWith("blob:") || missingCssUrl.startsWith("data:")) {
                 logger.log("Found blob url continuing - " + missingCssUrl);
                 continue;
             }
             if (missingCssUrl.isEmpty()) continue;
             try {
+                logger.verbose("DomCapture.fetchCssFiles() downloading");
                 final CssTreeNode cssTreeNode = new CssTreeNode(new URL(missingCssUrl));
                 downloadCss(cssTreeNode, new IDownloadListener<String>() {
                     @Override
                     public void onDownloadComplete(String downloadedString, String contentType) {
-                        logger.verbose("DomCapture.onDownloadComplete");
-                        parseCSS(cssTreeNode, downloadedString);
-                        if (cssTreeNode.allImportRules != null && !cssTreeNode.allImportRules.isEmpty()) {
-                            cssTreeNode.downloadNodeCss();
+                        try {
+                            logger.verbose("DomCapture.onDownloadComplete  - finished");
+                            parseCSS(cssTreeNode, downloadedString);
+                            if (cssTreeNode.allImportRules != null && !cssTreeNode.allImportRules.isEmpty()) {
+                                cssTreeNode.downloadNodeCss();
+                            }
+                            cssData.put(missingCssUrl, EfficientStringReplace.CleanForJSON(cssTreeNode.calcCss()));
+                        } catch (Throwable e) {
+                            e.printStackTrace();
                         }
-                        cssData.put(missingCssUrl, EfficientStringReplace.CleanForJSON(cssTreeNode.calcCss()));
                     }
 
                     @Override
@@ -220,7 +227,7 @@ public class DomCapture {
                     }
                 });
 
-            } catch (MalformedURLException e) {
+            } catch (Throwable e) {
                 GeneralUtils.logExceptionStackTrace(logger, e);
             }
         }
@@ -313,7 +320,7 @@ public class DomCapture {
                             }
                         });
                         decedents.add(cssTreeNode);
-                    } catch (MalformedURLException e) {
+                    } catch (Throwable e) {
                         GeneralUtils.logExceptionStackTrace(logger, e);
                     }
 
@@ -356,7 +363,7 @@ public class DomCapture {
                     node.setCss(downloadedString);
                     listener.onDownloadComplete(downloadedString, "String");
 
-                } catch (Exception e) {
+                } catch (Throwable e) {
                     GeneralUtils.logExceptionStackTrace(logger, e);
                 } finally {
                     cssPhaser.arriveAndDeregister();

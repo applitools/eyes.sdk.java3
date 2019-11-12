@@ -144,7 +144,9 @@ public class ServerConnector extends RestClient
 
         ArgumentGuard.notNull(sessionStartInfo, "sessionStartInfo");
 
-        logger.verbose("Using JBoss for REST API calls.");
+        logger.verbose("Using Jboss for REST API calls.");
+
+        configureRestClient();
 
         String postData;
         Response response;
@@ -189,6 +191,12 @@ public class ServerConnector extends RestClient
         runningSession.setIsNewSession(isNewSession);
 
         return runningSession;
+    }
+
+    private void configureRestClient() {
+        restClient = buildRestClient(getTimeout(), getProxy());
+        endPoint = restClient.target(serverUrl);
+        endPoint = endPoint.path(API_PATH);
     }
 
     /**
@@ -244,6 +252,8 @@ public class ServerConnector extends RestClient
     public void deleteSession(TestResults testResults) {
         ArgumentGuard.notNull(testResults, "testResults");
 
+        configureRestClient();
+
         Invocation.Builder invocationBuilder = restClient.target(serverUrl)
                 .path("/api/sessions/batches/")
                 .path(testResults.getBatchId())
@@ -254,6 +264,8 @@ public class ServerConnector extends RestClient
                 .request(MediaType.APPLICATION_JSON);
 
         Response response = invocationBuilder.delete();
+
+        this.restClient.close();
     }
 
     /**
@@ -350,30 +362,38 @@ public class ServerConnector extends RestClient
     @Override
     public void downloadString(final URL uri, final boolean isSecondRetry, final IDownloadListener<String> listener) {
 
-        Client client = ClientBuilder.newBuilder().build();
-
-        WebTarget target = client.target(uri.toString());
+        WebTarget target = this.restClient.target(uri.toString());
 
         Invocation.Builder request = target.request(MediaType.WILDCARD);
 
-        request.async().get(new InvocationCallback<String>() {
+        logger.verbose("Firing async GET");
+
+        request.async().get(new InvocationCallback<Response>() {
             @Override
-            public void completed(String response) {
-                logger.verbose(uri + " - completed");
-                listener.onDownloadComplete(response, null);
+            public void completed(Response response) {
+                try {
+                    byte[] resource = downloadFile(response);
+                    listener.onDownloadComplete(new String(resource), null);
+                    logger.verbose("response finished");
+                } catch (Throwable e) {
+                    logger.verbose(e.getMessage());
+                } finally {
+                    response.close();
+                }
             }
 
             @Override
             public void failed(Throwable throwable) {
-                GeneralUtils.logExceptionStackTrace(logger, throwable);
+                // on fail
                 if (!isSecondRetry) {
-                    logger.verbose("Entering retry");
+                    logger.verbose("Async GET failed - entering retry");
                     downloadString(uri, true, listener);
                 } else {
                     listener.onDownloadFailed();
                 }
             }
         });
+
     }
 
     @Override
@@ -443,14 +463,12 @@ public class ServerConnector extends RestClient
     public String postDomSnapshot(String domJson) {
 
         WebTarget target = restClient.target(serverUrl).path((RUNNING_DATA_PATH)).queryParam("apiKey", getApiKey());
+        Invocation.Builder request = target.request(MediaType.APPLICATION_JSON);
 
         byte[] resultStream = GeneralUtils.getGzipByteArrayOutputStream(domJson);
 
-        Invocation.Builder request = target.request(MediaType.APPLICATION_JSON);
-
         Response response = sendWithRetry(HttpMethod.POST, request, Entity.entity(resultStream,
                 MediaType.APPLICATION_OCTET_STREAM), null);
-
         @SuppressWarnings("UnnecessaryLocalVariable")
         String entity = response.getHeaderString("Location");
         return entity;
@@ -484,7 +502,7 @@ public class ServerConnector extends RestClient
                 Thread.sleep(THREAD_SLEEP_MILLIS);
 
             } catch (InterruptedException e1) {
-                GeneralUtils.logExceptionStackTrace(logger, e);
+                GeneralUtils.logExceptionStackTrace(logger, e1);
             }
 
             if (retiresCounter.incrementAndGet() < NUM_OF_RETRIES) {
@@ -500,13 +518,14 @@ public class ServerConnector extends RestClient
 
     @Override
     public RenderingInfo getRenderInfo() {
-        WebTarget target = restClient.target(serverUrl).path((RENDER_INFO_PATH)).queryParam("apiKey", getApiKey());
+
+        String apiKey = getApiKey();
+        WebTarget target = restClient.target(serverUrl).path((RENDER_INFO_PATH)).queryParam("apiKey", apiKey);
         Invocation.Builder request = target.request(MediaType.APPLICATION_JSON);
 
         // Ok, let's create the running session from the response
         List<Integer> validStatusCodes = new ArrayList<>();
         validStatusCodes.add(Response.Status.OK.getStatusCode());
-
 
         Response response = request.get();
         renderingInfo = parseResponseWithJsonData(response, validStatusCodes, RenderingInfo.class);
@@ -515,11 +534,10 @@ public class ServerConnector extends RestClient
 
     @Override
     public List<RunningRender> render(RenderRequest... renderRequests) {
-
         ArgumentGuard.notNull(renderRequests, "renderRequests");
         this.logger.verbose("called with " + Arrays.toString(renderRequests));
 
-        WebTarget target = buildRestClient(30 * 1000, getProxy()).target(renderingInfo.getServiceUrl()).path((RENDER));
+        WebTarget target = restClient.target(renderingInfo.getServiceUrl()).path((RENDER));
         if (renderRequests.length > 1) {
             target.matrixParam("render-id", (Object) renderRequests);
         } else {
@@ -600,7 +618,7 @@ public class ServerConnector extends RestClient
         String renderId = runningRender.getRenderId();
         logger.verbose("resource hash:" + hash + " ; url: " + resource.getUrl() + " ; render id: " + renderId);
 
-        WebTarget target = buildRestClient(30 * 1000, getProxy()).target(renderingInfo.getServiceUrl())
+        WebTarget target = restClient.target(renderingInfo.getServiceUrl())
                 .path(RESOURCES_SHA_256 + hash)
                 .queryParam("render-id", renderId);
 
@@ -611,11 +629,24 @@ public class ServerConnector extends RestClient
         Entity entity = null;
         if (contentType != null && !"None".equalsIgnoreCase(contentType)) {
             entity = Entity.entity(content, contentType);
-        }
-        else{
+
+        } else {
             entity = Entity.entity(content, MediaType.APPLICATION_OCTET_STREAM_TYPE);
         }
-        final Future<Response> future = request.async().put(entity);
+        final Future<Response> future;
+        future = request.async().put(entity, new InvocationCallback<Response>() {
+            @Override
+            public void completed(Response response) {
+                logger.verbose("PUT callback  success");
+                response.close();
+                logger.verbose("Response closed");
+            }
+
+            @Override
+            public void failed(Throwable throwable) {
+                logger.verbose("PUT callback failed");
+            }
+        });
         logger.verbose("future created.");
         PutFuture putFuture = new PutFuture(future, resource, runningRender, this, logger, userAgent);
         return putFuture;
@@ -635,7 +666,7 @@ public class ServerConnector extends RestClient
             ArgumentGuard.notNull(renderIds, "renderIds");
             this.logger.verbose("called for render: " + Arrays.toString(renderIds));
 
-            WebTarget target = buildRestClient(TIMEOUT, getProxy()).target(renderingInfo.getServiceUrl()).path((RENDER_STATUS));
+            WebTarget target = restClient.target(renderingInfo.getServiceUrl()).path((RENDER_STATUS));
             Invocation.Builder request = target.request(MediaType.TEXT_PLAIN);
             request.header("X-Auth-Token", renderingInfo.getAccessToken());
 
@@ -690,10 +721,8 @@ public class ServerConnector extends RestClient
 
     @Override
     public void closeBatch(String batchId) {
-        String dontCloseBatchesStr = GeneralUtils.getEnvString("APPLITOOLS_DONT_CLOSE_BATCHES");
-        dontCloseBatchesStr = dontCloseBatchesStr != null ? dontCloseBatchesStr : GeneralUtils.getEnvString("bamboo_APPLITOOLS_DONT_CLOSE_BATCHES");
-        if (Boolean.parseBoolean(dontCloseBatchesStr))
-        {
+        boolean dontCloseBatchesStr = GeneralUtils.getDontCloseBatches();
+        if (dontCloseBatchesStr){
             logger.log("APPLITOOLS_DONT_CLOSE_BATCHES environment variable set to true. Skipping batch close.");
             return;
         }
@@ -703,7 +732,14 @@ public class ServerConnector extends RestClient
         String url = String.format(CLOSE_BATCH, batchId);
         WebTarget target = restClient.target(serverUrl).path(url).queryParam("apiKey", getApiKey());
         Response delete = target.request().delete();
-        logger.verbose("delete batch is done with "+delete.getStatus() + " status");
+        logger.verbose("delete batch is done with " + delete.getStatus() + " status");
+    }
+
+    @Override
+    public void closeConnector() {
+        if (restClient != null) {
+            restClient.close();
+        }
     }
 
     private byte[] downloadFile(Response response) {
@@ -721,5 +757,6 @@ public class ServerConnector extends RestClient
         }
         return bytes;
     }
+
 
 }

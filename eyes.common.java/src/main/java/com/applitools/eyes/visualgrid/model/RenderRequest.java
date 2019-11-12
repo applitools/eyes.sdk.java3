@@ -17,7 +17,7 @@ public class  RenderRequest {
     private final VisualGridTask visualGridTask;
 
     @JsonInclude
-    private String agentId = "eyes.selenium.visualgrid.java/3.158.4";
+    private String agentId = "eyes.selenium.visualgrid.java/3.158.5";
 
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private String webhook;

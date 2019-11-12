@@ -5,7 +5,7 @@
     <parent>
         <artifactId>eyes-sdk-java3-parent</artifactId>
         <groupId>com.applitools</groupId>
-        <version>3.158.4</version>
+        <version>3.158.5</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
@@ -15,32 +15,32 @@
         <dependency>
             <groupId>com.applitools</groupId>
             <artifactId>eyes-connectivity-java3-jersey2x</artifactId>
-            <version>3.158.4</version>
+            <version>3.158.5</version>
         </dependency>
         <dependency>
             <groupId>com.applitools</groupId>
             <artifactId>eyes-connectivity-java3-jersey1x</artifactId>
-            <version>3.158.4</version>
+            <version>3.158.5</version>
         </dependency>
         <dependency>
             <groupId>com.applitools</groupId>
             <artifactId>eyes-connectivity-java3-jboss</artifactId>
-            <version>3.158.4</version>
+            <version>3.158.5</version>
         </dependency>
         <dependency>
             <groupId>com.applitools</groupId>
             <artifactId>eyes-common-java3</artifactId>
-            <version>3.158.4</version>
+            <version>3.158.5</version>
         </dependency>
         <dependency>
             <groupId>com.applitools</groupId>
             <artifactId>eyes-sdk-core-java3</artifactId>
-            <version>3.158.4</version>
+            <version>3.158.5</version>
         </dependency>
         <dependency>
             <groupId>com.applitools</groupId>
             <artifactId>eyes-images-java3</artifactId>
-            <version>3.158.4</version>
+            <version>3.158.5</version>
         </dependency>
     </dependencies>
 
