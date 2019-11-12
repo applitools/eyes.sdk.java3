@@ -36,7 +36,7 @@ jobs:
         - chmod +x ./sendMail.sh;
         - TEST_COVERAGE_GAP=$(cat testCoverageGap.txt)
         - ./sendMail.sh "$SDK" "$TRAVIS_TAG" "$CHANGELOG" "$TEST_COVERAGE_GAP";
-        - mvn test -e -X
+        #- mvn test -e -X
     - stage: deploy
       if: tag =~ ^RELEASE_CANDIDATE- AND fork == false
       script:
