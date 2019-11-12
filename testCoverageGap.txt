@@ -1,0 +1,21 @@
+mobile native (full screen)
+mobile native (viewport only)
+mobile web
+tutorials
+sauce labs (web)
+sauce labs (mobile native)
+sauce labs (mobile web)
+browser stack (mobile native)
+browser stack (mobile web)
+perfecto mobile (mobile web)
+perfecto mobile (mobile native)
+all supported browser versions
+accessibility
+batch completion
+multiple viewport sizes
+visual locators
+css stiching
+scroll stiching
+iframes
+Ultrafast Grid
+Screenshots

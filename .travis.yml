@@ -30,6 +30,12 @@ jobs:
           git push origin HEAD:$RELEASE_BRANCH;
           sed -i 's/devTestsSuite.xml/regressionTestsSuite.xml/g' $TRAVIS_BUILD_DIR/eyes.selenium.java/pom.xml;
           fi
+        - echo "DEPLOY";
+        - chmod +x ./extractChangeLog.sh;
+        - CHANGELOG=$(./extractChangeLog.sh "$SDK_VERSION" "CHANGELOG.md");
+        - chmod +x ./sendMail.sh;
+        - TEST_COVERAGE_GAP=$(cat testCoverageGap.txt)
+        - ./sendMail.sh "$SDK" "$TRAVIS_TAG" "$CHANGELOG" "$TEST_COVERAGE_GAP";
         - mvn test -e -X
     - stage: deploy
       if: tag =~ ^RELEASE_CANDIDATE- AND fork == false
@@ -42,5 +48,6 @@ jobs:
           chmod +x ./extractChangeLog.sh;
           CHANGELOG=$(./extractChangeLog.sh "$SDK_VERSION" "CHANGELOG.md");
           chmod +x ./sendMail.sh;
-          ./sendMail.sh "$SDK" "$TRAVIS_TAG" "$CHANGELOG";
+          TEST_COVERAGE_GAP=$(cat testCoverageGap.txt)
+          ./sendMail.sh "$SDK" "$TRAVIS_TAG" "$CHANGELOG" "$TEST_COVERAGE_GAP";
           fi
