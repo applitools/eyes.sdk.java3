@@ -99,6 +99,7 @@ public class TestListener implements ITestListener {
                 testSetup.getDriver().quit();
             }
             sendTestResluts(iTestResult, iTestResult.isSuccess());
+            sendExtraData(iTestResult.getMethod().getMethodName(), iTestResult, new Exception());
         }
     }
 
@@ -121,16 +122,8 @@ public class TestListener implements ITestListener {
                 try {
                     results = eyes.close();
                 } catch (Throwable e) {
-                    if (e instanceof TestFailedException) {
-                        TestFailedException testException = (TestFailedException) e;
-                        String testMode = "";
-                        try {
-                            testMode = ((TestSetup)iTestResult.getInstance()).mode;
-                        } catch (Throwable t){}
-                        JsonObject json = createExtraDataJson(methodName, testException.getTestResults(), testMode);
-                        CommUtils.postJson("http://sdk-test-results.herokuapp.com/extra_test_data", new Gson().fromJson(json, Map.class), null);
-                    }
                     sendTestResluts(iTestResult, false);
+                    sendExtraData(methodName, iTestResult, e);
                     throw e;
                 }
                 sendTestResluts(iTestResult, iTestResult.isSuccess());
@@ -161,6 +154,25 @@ public class TestListener implements ITestListener {
             if (testSetup.getDriver() != null) {
                 testSetup.getDriver().quit();
             }
+        }
+    }
+
+    private void sendExtraData(String methodName, ITestResult iTestResult, Throwable e) {
+        if (e instanceof TestFailedException) {
+            TestFailedException testException = (TestFailedException) e;
+            String testMode = "";
+            try {
+                testMode = ((TestSetup)iTestResult.getInstance()).mode;
+            } catch (Throwable t){}
+            JsonObject json = createExtraDataJson(methodName, testException.getTestResults(), testMode);
+            CommUtils.postJson("http://sdk-test-results.herokuapp.com/extra_test_data", new Gson().fromJson(json, Map.class), null);
+        } else {
+            String testMode = "";
+            try {
+                testMode = ((TestSetup)iTestResult.getInstance()).mode;
+            } catch (Throwable t){}
+            JsonObject json = createExtraDataJson(methodName, new TestResults(), testMode);
+            CommUtils.postJson("http://sdk-test-results.herokuapp.com/extra_test_data", new Gson().fromJson(json, Map.class), null);
         }
     }
 

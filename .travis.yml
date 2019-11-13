@@ -42,5 +42,6 @@ jobs:
           chmod +x ./extractChangeLog.sh;
           CHANGELOG=$(./extractChangeLog.sh "$SDK_VERSION" "CHANGELOG.md");
           chmod +x ./sendMail.sh;
-          ./sendMail.sh "$SDK" "$TRAVIS_TAG" "$CHANGELOG";
+          TEST_COVERAGE_GAP=$(cat testCoverageGap.txt)
+          ./sendMail.sh "$SDK" "$TRAVIS_TAG" "$CHANGELOG" "$TEST_COVERAGE_GAP";
           fi

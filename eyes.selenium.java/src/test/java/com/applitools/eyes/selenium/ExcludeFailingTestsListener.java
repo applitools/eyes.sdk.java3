@@ -22,7 +22,8 @@ public class ExcludeFailingTestsListener implements IInvokedMethodListener2 {
                 for (Map.Entry<String,String> entry : testParameters.entrySet()) {
                     if (entry.getKey().toLowerCase().equals("dont_run") &&
                             entry.getValue().toLowerCase().contains(iTestResult.getMethod().getMethodName().toLowerCase() + "+" + ((TestSetup) testInstance).mode.toLowerCase())) {
-                        throw new DataSetSkipException("Skipping data set " + testParameters.entrySet().toString());
+                        System.out.println("Test: " + entry.getValue() + " is excluded");
+                        throw new SkipException("Skipping data set " + testParameters.entrySet().toString());
                     }
                 }
             }
