@@ -3,7 +3,7 @@
 <suite name="Suite1" verbose="1" parallel="tests">
 
     <test name="TestClassicApi">
-        <parameter name="dont_run" value="TestCheckInnerFrame+CSS, TestCheckFrame+SCROLL" />
+        <parameter name="dont_run" value="TestCheckInnerFrame+CSS, TestCheckInnerFrame+SCROLL, TestCheckInnerFrame+VG, TestCheckFrame+SCROLL, TestCheckFrame+VG, TestCheckWindow+VG, TestCheckRegion2+SCROLL, TestCheckRegion2+VG, TestCheckRegionInFrame+SCROLL, TestCheckRegionInFrame+VG, TestCheckWindowFully+VG, TestDoubleCheckWindow+VG" />
         <classes>
             <class name="com.applitools.eyes.selenium.TestClassicApi"></class>
         </classes>
@@ -52,7 +52,7 @@
     </test>
 
     <test name="TestFluentApi_Frames">
-        <parameter name="dont_run" value="TestCheckLongOutOfBoundsIFrameModal+SCROLL, TestCheckFrameInFrame_Fully_Fluent+SCROLL" />
+        <parameter name="dont_run" value="TestCheckLongOutOfBoundsIFrameModal+CSS, TestCheckLongOutOfBoundsIFrameModal+SCROLL, TestCheckLongOutOfBoundsIFrameModal+VG, TestCheckFrameInFrame_Fully_Fluent+SCROLL, TestCheckFrameInFrame_Fully_Fluent+VG, TestCheckFrame_Fluent+VG, TestCheckFrame_Fully_Fluent+SCROLL, TestCheckFrame_Fully_Fluent+VG, TestCheckRegionByCoordinateInFrame_Fluent+CSS, TestCheckRegionByCoordinateInFrame_Fluent+SCROLL, TestCheckRegionByCoordinateInFrame_Fluent+VG, TestCheckRegionByCoordinateInFrameFully_Fluent+SCROLL, TestCheckRegionByCoordinateInFrameFully_Fluent+VG, TestCheckFrameInFrame_Fully_Fluent2+SCROLL, TestCheckFrameInFrame_Fully_Fluent2+VG, TestCheckRegionInFrame_Fluent+SCROLL, TestCheckRegionInFrame_Fluent+VG, TestCheckRegionInFrame3_Fluent+SCROLL, TestCheckRegionInFrame3_Fluent+VG, TestCheckRegionInFrameInFrame_Fluent+SCROLL, TestCheckRegionInFrameInFrame_Fluent+VG, TestCheckLongIFrameModal+CSS, TestCheckLongIFrameModal+VG, TestCheckRegionInFrame2_Fluent+SCROLL, TestCheckRegionInFrame2_Fluent+VG" />
         <classes>
             <class name="com.applitools.eyes.selenium.TestFluentApi_Frames" />
         </classes>
