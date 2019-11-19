@@ -58,7 +58,7 @@ public final class TestRenderingGridServiceWithJsHook {
             GeneralUtils.logExceptionStackTrace(eyes.getLogger(), e);
         } finally {
             if (webDriver != null) {
-//                webDriver.quit();
+                webDriver.quit();
             }
         }
     }
@@ -84,6 +84,7 @@ public final class TestRenderingGridServiceWithJsHook {
 
     @AfterMethod
     public void After(ITestContext testContext) {
+
         renderingManager.getLogger().log(renderingManager.getAllTestResults().toString());
         webDriver.quit();
     }
