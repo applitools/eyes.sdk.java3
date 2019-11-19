@@ -3,87 +3,90 @@
 <suite name="Suite1" verbose="1" parallel="tests">
 
     <test name="TestClassicApi">
-        <parameter name="dont_run" value="TestCheckInnerFrame+CSS, TestCheckFrame+SCROLL,TestCheckFrame+VG" />
+        <parameter name="dont_run" value="TestCheckInnerFrame+CSS, TestCheckFrame+SCROLL,TestCheckFrame+VG"/>
         <classes>
             <class name="com.applitools.eyes.selenium.TestClassicApi"></class>
         </classes>
     </test>
 
     <test name="TestAcme">
-        <parameter name="dont_run" value="TestAcmeLogin+SCROLL, TestAcmeLogin+VG, TestAcmeLogin+CSS" />
+        <parameter name="dont_run" value="TestAcmeLogin+SCROLL, TestAcmeLogin+VG, TestAcmeLogin+CSS"/>
         <classes>
-            <class name="com.applitools.eyes.selenium.TestAcme" />
+            <class name="com.applitools.eyes.selenium.TestAcme"/>
         </classes>
     </test>
     <test name="TestSimpleCases">
-        <parameter name="dont_run" value="TestCheckDivOverflowingThePage+SCROLL" />
+        <parameter name="dont_run" value="TestCheckDivOverflowingThePage+SCROLL"/>
         <classes>
-            <class name="com.applitools.eyes.selenium.TestSimpleCases" />
+            <class name="com.applitools.eyes.selenium.TestSimpleCases"/>
         </classes>
     </test>
 
     <test name="TestPageWithHeader">
-        <parameter name="dont_run" value="TestCheckPageWithHeader_Region_Fully+SCROLL" />
+        <parameter name="dont_run" value="TestCheckPageWithHeader_Region_Fully+SCROLL"/>
         <classes>
-            <class name="com.applitools.eyes.selenium.TestPageWithHeader" />
+            <class name="com.applitools.eyes.selenium.TestPageWithHeader"/>
         </classes>
     </test>
 
     <test name="TestScrollRootElementOnSimplePage">
-        <parameter name="dont_run" value="TestCheckWindow_Simple_Body+SCROLL, TestCheckWindow_Simple_Html+SCROLL, TestCheckWindow_Simple_Html+CSS" />
+        <parameter name="dont_run"
+                   value="TestCheckWindow_Simple_Body+SCROLL, TestCheckWindow_Simple_Html+SCROLL, TestCheckWindow_Simple_Html+CSS"/>
         <classes>
-            <class name="com.applitools.eyes.selenium.TestScrollRootElementOnSimplePage" />
+            <class name="com.applitools.eyes.selenium.TestScrollRootElementOnSimplePage"/>
         </classes>
     </test>
 
     <test name="TestSpecialCases">
-        <parameter name="dont_run" value="TestCheckRegionInAVeryBigFrame+SCROLL" />
+        <parameter name="dont_run" value="TestCheckRegionInAVeryBigFrame+SCROLL"/>
         <classes>
-            <class name="com.applitools.eyes.selenium.TestSpecialCases" />
+            <class name="com.applitools.eyes.selenium.TestSpecialCases"/>
         </classes>
     </test>
 
     <test name="TestFluentApi">
-        <parameter name="dont_run" value="TestCheckElementFully_Fluent+SCROLL, TestCheckFullWindowWithMultipleIgnoreRegionsBySelector_Fluent+VG, TestCheckWindow_Fluent+VG, TestCheckWindowWithFloatingByRegion_Fluent+VG, TestCheckWindowWithFloatingBySelector_Fluent+VG, TestCheckWindowWithIgnoreBySelector_Centered_Fluent+VG, TestCheckWindowWithIgnoreBySelector_Fluent+VG, TestCheckWindowWithIgnoreBySelector_Stretched_Fluent+VG, TestCheckWindowWithIgnoreRegion_Fluent+VG, TestIgnoreDisplacements+VG, TestAccessibilityRegions+VG, TestCheckMany+VG, TestCheckRegionBySelectorAfterManualScroll_Fluent+SCROLL, TestScrollbarsHiddenAndReturned_Fluent+VG, TestScrollbarsHiddenAndReturned_Fluent+SCROLL" />
+        <parameter name="dont_run"
+                   value="TestCheckElementFully_Fluent+SCROLL, TestCheckFullWindowWithMultipleIgnoreRegionsBySelector_Fluent+VG, TestCheckWindow_Fluent+VG, TestCheckWindowWithFloatingByRegion_Fluent+VG, TestCheckWindowWithFloatingBySelector_Fluent+VG, TestCheckWindowWithIgnoreBySelector_Centered_Fluent+VG, TestCheckWindowWithIgnoreBySelector_Fluent+VG, TestCheckWindowWithIgnoreBySelector_Stretched_Fluent+VG, TestCheckWindowWithIgnoreRegion_Fluent+VG, TestIgnoreDisplacements+VG, TestAccessibilityRegions+VG, TestCheckMany+VG, TestCheckRegionBySelectorAfterManualScroll_Fluent+SCROLL, TestScrollbarsHiddenAndReturned_Fluent+VG, TestScrollbarsHiddenAndReturned_Fluent+SCROLL"/>
         <classes>
-            <class name="com.applitools.eyes.selenium.TestFluentApi" />
+            <class name="com.applitools.eyes.selenium.TestFluentApi"/>
         </classes>
     </test>
 
     <test name="TestFluentApi_Frames">
-        <parameter name="dont_run" value="TestCheckLongOutOfBoundsIFrameModal+SCROLL, TestCheckFrameInFrame_Fully_Fluent+SCROLL" />
+        <parameter name="dont_run"
+                   value="TestCheckLongOutOfBoundsIFrameModal+SCROLL, TestCheckFrameInFrame_Fully_Fluent+SCROLL"/>
         <classes>
-            <class name="com.applitools.eyes.selenium.TestFluentApi_Frames" />
+            <class name="com.applitools.eyes.selenium.TestFluentApi_Frames"/>
         </classes>
     </test>
 
     <test name="Test_WEB" parallel="instances">
         <classes>
-            <class name="com.applitools.eyes.selenium.TestClassicRunner" />
-            <class name="com.applitools.eyes.selenium.TestBatchSequenceName" />
-            <class name="com.applitools.eyes.selenium.TestBatchAPI" />
-            <class name="com.applitools.eyes.selenium.TestSeleniumEyesWithNullRunner" />
-            <class name="com.applitools.eyes.selenium.TestDuplicates" />
-            <class name="com.applitools.eyes.selenium.TestScrollRootElement" />
-            <class name="com.applitools.eyes.selenium.TestSendDom" />
-            <class name="com.applitools.eyes.renderingGrid.TestVGServerConfigs" />
+            <class name="com.applitools.eyes.selenium.TestClassicRunner"/>
+            <class name="com.applitools.eyes.selenium.TestBatchSequenceName"/>
+            <class name="com.applitools.eyes.selenium.TestBatchAPI"/>
+            <class name="com.applitools.eyes.selenium.TestSeleniumEyesWithNullRunner"/>
+            <class name="com.applitools.eyes.selenium.TestDuplicates"/>
+            <class name="com.applitools.eyes.selenium.TestScrollRootElement"/>
+            <class name="com.applitools.eyes.selenium.TestSendDom"/>
+            <class name="com.applitools.eyes.renderingGrid.TestVGServerConfigs"/>
 
         </classes>
     </test>
-<!--        <test name="Test_VG" parallel="instances">-->
-<!--            <classes>-->
-<!--                <class name="com.applitools.eyes.renderingGrid.TestVGDemo" />-->
-<!--                <class name="com.applitools.eyes.renderingGrid.TestTopSites" />-->
-<!--                <class name="com.applitools.eyes.renderingGrid.TestRenderingGridServiceWithJsHook" />-->
-<!--                <class name="com.applitools.eyes.renderingGrid.TestVGWithJunit"/>-->
-<!--                <class name="com.applitools.eyes.renderingGrid.TestAbortVG"/>-->
-<!--                <class name="com.applitools.eyes.renderingGrid.TestVGExceptionInRegion"/>-->
+    <!--        <test name="Test_VG" parallel="instances">-->
+    <!--            <classes>-->
+    <!--                <class name="com.applitools.eyes.renderingGrid.TestVGDemo" />-->
+    <!--                <class name="com.applitools.eyes.renderingGrid.TestTopSites" />-->
+    <!--                <class name="com.applitools.eyes.renderingGrid.TestRenderingGridServiceWithJsHook" />-->
+    <!--                <class name="com.applitools.eyes.renderingGrid.TestVGWithJunit"/>-->
+    <!--                <class name="com.applitools.eyes.renderingGrid.TestAbortVG"/>-->
+    <!--                <class name="com.applitools.eyes.renderingGrid.TestVGExceptionInRegion"/>-->
 
-<!--            </classes>-->
-<!--        </test>-->
-<!--    <test name="Test_Mobile" parallel="methods">-->
-<!--        <classes>-->
-<!--            <class name="com.applitools.eyes.selenium.MobileNativeTests"/>-->
-<!--        </classes>-->
-<!--</test>-->
+    <!--            </classes>-->
+    <!--        </test>-->
+    <test name="Test_Mobile" parallel="methods">
+        <classes>
+            <class name="com.applitools.eyes.selenium.MobileNativeTests"/>
+        </classes>
+    </test>
 </suite>
