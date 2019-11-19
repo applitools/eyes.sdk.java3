@@ -3,7 +3,7 @@
 <suite name="Suite1" verbose="1" parallel="tests">
 
     <test name="TestClassicApi">
-        <parameter name="dont_run" value="TestCheckInnerFrame+CSS, TestCheckFrame+SCROLL" />
+        <parameter name="dont_run" value="TestCheckInnerFrame+CSS, TestCheckFrame+SCROLL,TestCheckFrame+VG" />
         <classes>
             <class name="com.applitools.eyes.selenium.TestClassicApi"></class>
         </classes>
@@ -15,7 +15,6 @@
             <class name="com.applitools.eyes.selenium.TestAcme" />
         </classes>
     </test>
-
     <test name="TestSimpleCases">
         <parameter name="dont_run" value="TestCheckDivOverflowingThePage+SCROLL" />
         <classes>
@@ -71,20 +70,20 @@
 
         </classes>
     </test>
-    <!--    <test name="Test_VG" parallel="instances">-->
-    <!--        <classes>-->
-    <!--            <class name="com.applitools.eyes.renderingGrid.TestVGDemo" />-->
-    <!--            <class name="com.applitools.eyes.renderingGrid.TestTopSites" />-->
-    <!--            <class name="com.applitools.eyes.renderingGrid.TestRenderingGridServiceWithJsHook" />-->
-    <!--            <class name="com.applitools.eyes.renderingGrid.TestVGWithJunit"/>-->
-    <!--            <class name="com.applitools.eyes.renderingGrid.TestAbortVG"/>-->
-    <!--            <class name="com.applitools.eyes.renderingGrid.TestVGExceptionInRegion"/>-->
+<!--        <test name="Test_VG" parallel="instances">-->
+<!--            <classes>-->
+<!--                <class name="com.applitools.eyes.renderingGrid.TestVGDemo" />-->
+<!--                <class name="com.applitools.eyes.renderingGrid.TestTopSites" />-->
+<!--                <class name="com.applitools.eyes.renderingGrid.TestRenderingGridServiceWithJsHook" />-->
+<!--                <class name="com.applitools.eyes.renderingGrid.TestVGWithJunit"/>-->
+<!--                <class name="com.applitools.eyes.renderingGrid.TestAbortVG"/>-->
+<!--                <class name="com.applitools.eyes.renderingGrid.TestVGExceptionInRegion"/>-->
 
-    <!--        </classes>-->
-    <!--    </test>-->
-    <test name="Test_Mobile" parallel="methods">
-        <classes>
-            <class name="com.applitools.eyes.selenium.MobileNativeTests"/>
-        </classes>
-    </test>
+<!--            </classes>-->
+<!--        </test>-->
+<!--    <test name="Test_Mobile" parallel="methods">-->
+<!--        <classes>-->
+<!--            <class name="com.applitools.eyes.selenium.MobileNativeTests"/>-->
+<!--        </classes>-->
+<!--</test>-->
 </suite>
