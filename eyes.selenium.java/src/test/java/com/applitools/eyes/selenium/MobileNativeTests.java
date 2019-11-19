@@ -111,8 +111,8 @@ public class MobileNativeTests {
 
         Eyes eyes = initEyes(caps);
         eyes.setLogHandler(new StdoutLogHandler());
-        setCapabilities(eyes, caps, "iOSNativeAppTest");
-        TestUtils.setupLogging(eyes);
+//        setCapabilities(eyes, caps, "iOSNativeAppTest");
+//        TestUtils.setupLogging(eyes);
         eyes.setBatch(TestDataProvider.batchInfo);
 
 
