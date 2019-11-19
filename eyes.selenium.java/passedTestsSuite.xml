@@ -84,9 +84,9 @@
 
     <!--            </classes>-->
     <!--        </test>-->
-    <test name="Test_Mobile" parallel="methods">
-        <classes>
-            <class name="com.applitools.eyes.selenium.MobileNativeTests"/>
-        </classes>
-    </test>
+<!--    <test name="Test_Mobile" parallel="methods">-->
+<!--        <classes>-->
+<!--            <class name="com.applitools.eyes.selenium.MobileNativeTests"/>-->
+<!--        </classes>-->
+<!--    </test>-->
 </suite>
