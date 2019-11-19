@@ -65,7 +65,8 @@ public class TestDataProvider {
         }));
         //lists.add(Arrays.asList(platforms));
         lists.add(Arrays.asList(new Object[]{
-                "CSS", "SCROLL", "VG"
+//                "CSS", "SCROLL"
+                 "VG"
         }));
 
         List<Object[]> permutations = TestUtils.generatePermutationsList(lists);

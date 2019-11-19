@@ -37,7 +37,7 @@ public abstract class TestSetup implements ITest {
         this.mode = mode;
         switch (mode) {
             case "VG":
-//                this.useVisualGrid = true;
+                this.useVisualGrid = true;
                 break;
             case "CSS":
                 this.stitchMode = StitchMode.CSS;
