@@ -3,7 +3,7 @@
 <suite name="Suite1" verbose="1" parallel="tests">
 
     <test name="TestClassicApi">
-        <parameter name="dont_run" value="TestCheckInnerFrame+CSS, TestCheckFrame+SCROLL,TestCheckFrame+VG"/>
+        <parameter name="dont_run" value="TestCheckInnerFrame+CSS, TestCheckInnerFrame+SCROLL, TestCheckFrame+SCROLL,TestCheckFrame+VG"/>
         <classes>
             <class name="com.applitools.eyes.selenium.TestClassicApi"></class>
         </classes>
@@ -38,7 +38,7 @@
     </test>
 
     <test name="TestSpecialCases">
-        <parameter name="dont_run" value="TestCheckRegionInAVeryBigFrame+SCROLL"/>
+        <parameter name="dont_run" value="TestCheckRegionInAVeryBigFrame+SCROLL, TestCheckRegionInAVeryBigFrame+VG, TestCheckRegionInAVeryBigFrameAfterManualSwitchToFrame+VG"/>
         <classes>
             <class name="com.applitools.eyes.selenium.TestSpecialCases"/>
         </classes>
@@ -46,7 +46,7 @@
 
     <test name="TestFluentApi">
         <parameter name="dont_run"
-                   value="TestCheckElementFully_Fluent+SCROLL, TestCheckFullWindowWithMultipleIgnoreRegionsBySelector_Fluent+VG, TestCheckWindow_Fluent+VG, TestCheckWindowWithFloatingByRegion_Fluent+VG, TestCheckWindowWithFloatingBySelector_Fluent+VG, TestCheckWindowWithIgnoreBySelector_Centered_Fluent+VG, TestCheckWindowWithIgnoreBySelector_Fluent+VG, TestCheckWindowWithIgnoreBySelector_Stretched_Fluent+VG, TestCheckWindowWithIgnoreRegion_Fluent+VG, TestIgnoreDisplacements+VG, TestAccessibilityRegions+VG, TestCheckMany+VG, TestCheckRegionBySelectorAfterManualScroll_Fluent+SCROLL, TestScrollbarsHiddenAndReturned_Fluent+VG, TestScrollbarsHiddenAndReturned_Fluent+SCROLL"/>
+                   value="TestCheckElementFully_Fluent+SCROLL, TestCheckFullWindowWithMultipleIgnoreRegionsBySelector_Fluent+VG, TestCheckWindow_Fluent+VG, TestCheckWindowWithFloatingByRegion_Fluent+VG, TestCheckWindowWithFloatingBySelector_Fluent+VG, TestCheckWindowWithIgnoreBySelector_Centered_Fluent+VG, TestCheckWindowWithIgnoreBySelector_Fluent+VG, TestCheckWindowWithIgnoreBySelector_Stretched_Fluent+VG, TestCheckWindowWithIgnoreRegion_Fluent+VG, TestIgnoreDisplacements+VG, TestAccessibilityRegions+VG, TestCheckMany+VG, TestCheckRegionBySelectorAfterManualScroll_Fluent+SCROLL, TestScrollbarsHiddenAndReturned_Fluent+VG, TestScrollbarsHiddenAndReturned_Fluent+SCROLL, TestCheckElementWithIgnoreRegionBySameElement_Fluent+CSS"/>
         <classes>
             <class name="com.applitools.eyes.selenium.TestFluentApi"/>
         </classes>
@@ -54,7 +54,7 @@
 
     <test name="TestFluentApi_Frames">
         <parameter name="dont_run"
-                   value="TestCheckLongOutOfBoundsIFrameModal+SCROLL, TestCheckFrameInFrame_Fully_Fluent+SCROLL"/>
+                   value="TestCheckLongOutOfBoundsIFrameModal+SCROLL, TestCheckFrameInFrame_Fully_Fluent+SCROLL, TestCheckFrameInFrame_Fully_Fluent+VG, TestCheckFrameInFrame_Fully_Fluent2+VG, TestCheckFrame_Fluent+VG, TestCheckFrame_Fully_Fluent+VG, TestCheckRegionByCoordinateInFrame_Fluent+VG, TestCheckRegionByCoordinateInFrameFully_Fluent+VG, TestCheckRegionInFrame_Fluent+VG, TestCheckRegionInFrame3_Fluent+VG, TestCheckRegionInFrameInFrame_Fluent+VG, TestCheckRegionInFrame2_Fluent+VG, TestCheckLongOutOfBoundsIFrameModal+VG, TestCheckLongIFrameModal+VG"/>
         <classes>
             <class name="com.applitools.eyes.selenium.TestFluentApi_Frames"/>
         </classes>
@@ -84,9 +84,9 @@
 
         </classes>
     </test>
-    <test name="Test_Mobile" parallel="methods">
-        <classes>
-            <class name="com.applitools.eyes.selenium.MobileNativeTests"/>
-        </classes>
-    </test>
+<!--    <test name="Test_Mobile" parallel="methods">-->
+<!--        <classes>-->
+<!--            <class name="com.applitools.eyes.selenium.MobileNativeTests"/>-->
+<!--        </classes>-->
+<!--    </test>-->
 </suite>
