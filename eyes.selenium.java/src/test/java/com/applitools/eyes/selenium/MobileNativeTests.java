@@ -122,7 +122,7 @@ public class MobileNativeTests {
             if (driver != null) {
                 driver.quit();
             }
-            
+
             eyes.abortIfNotClosed();
         }
     }
