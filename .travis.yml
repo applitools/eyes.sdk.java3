@@ -11,7 +11,7 @@ addons:
 # $RELEASE_BRANCH
 # $GITHUB_TOKEN
 # $ALLOWED_RELEASE_COMMITERS
-# $SDK
+# $SDK 
 jobs:
   include:
     - stage: test
