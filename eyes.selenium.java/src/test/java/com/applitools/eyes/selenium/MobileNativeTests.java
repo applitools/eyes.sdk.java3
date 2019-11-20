@@ -95,35 +95,35 @@ public class MobileNativeTests {
         }
     }
 
-    @Test
-    public void iOSNativeAppTest() throws Exception {
-
-        DesiredCapabilities caps = DesiredCapabilities.iphone();
-        caps.setCapability("appiumVersion", "1.13.0");
-        caps.setCapability("deviceName", "iPhone XS Simulator");
-        caps.setCapability("deviceOrientation", "portrait");
-        caps.setCapability("platformVersion", "12.2");
-        caps.setCapability("platformName", "iOS");
-        caps.setCapability("browserName", "");
-        caps.setCapability("app", "https://applitools.bintray.com/Examples/HelloWorldiOS_1_0.zip");
-
-        Eyes eyes = initEyes(caps);
-        eyes.setLogHandler(new StdoutLogHandler());
-        eyes.setBatch(TestDataProvider.batchInfo);
-
-
-        WebDriver driver = null;
-        try {
-            driver = new IOSDriver(new URL(SAUCE_SELENIUM_URL), caps);
-            eyes.open(driver, "Mobile Native Tests", "iOS Native App");
-            eyes.checkWindow("checkWindow");
-            eyes.close();
-        } finally {
-            if (driver != null) {
-                driver.quit();
-            }
-
-            eyes.abortIfNotClosed();
-        }
-    }
+//    @Test
+//    public void iOSNativeAppTest() throws Exception {
+//
+//        DesiredCapabilities caps = DesiredCapabilities.iphone();
+//        caps.setCapability("appiumVersion", "1.13.0");
+//        caps.setCapability("deviceName", "iPhone XS Simulator");
+//        caps.setCapability("deviceOrientation", "portrait");
+//        caps.setCapability("platformVersion", "12.2");
+//        caps.setCapability("platformName", "iOS");
+//        caps.setCapability("browserName", "");
+//        caps.setCapability("app", "https://applitools.bintray.com/Examples/HelloWorldiOS_1_0.zip");
+//
+//        Eyes eyes = initEyes(caps);
+//        eyes.setLogHandler(new StdoutLogHandler());
+//        eyes.setBatch(TestDataProvider.batchInfo);
+//
+//
+//        WebDriver driver = null;
+//        try {
+//            driver = new IOSDriver(new URL(SAUCE_SELENIUM_URL), caps);
+//            eyes.open(driver, "Mobile Native Tests", "iOS Native App");
+//            eyes.checkWindow("checkWindow");
+//            eyes.close();
+//        } finally {
+//            if (driver != null) {
+//                driver.quit();
+//            }
+//
+//            eyes.abortIfNotClosed();
+//        }
+//    }
 }
