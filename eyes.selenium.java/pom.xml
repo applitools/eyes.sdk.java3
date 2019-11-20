@@ -52,7 +52,7 @@
                 <version>2.22.0</version>
                 <configuration>
                     <suiteXmlFiles>
-                        <suiteXmlFile>devTestsSuite.xml</suiteXmlFile>
+                        <suiteXmlFile>regressionTestsSuite.xml</suiteXmlFile>
                     </suiteXmlFiles>
                     <useFile>false</useFile>
                     <trimStackTrace>false</trimStackTrace>
