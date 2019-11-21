@@ -51,14 +51,12 @@ public final class TestBatchAPI {
 
             eyes.closeAsync();
         } finally {
+            //noinspection ConstantConditions
             if (driver != null) {
-
                 driver.quit();
             }
+            runner.getAllTestResults(false);
         }
-
-
-        runner.getAllTestResults(false);
         BatchInfo batch = CommUtils.getBatch(batchInfo.getId(), eyes.getServerUrl().toString(), eyes.getApiKey());
         Assert.assertTrue(batch.isCompleted());
     }
