@@ -46,7 +46,7 @@
 
     <test name="TestFluentApi">
         <parameter name="dont_run"
-                   value="TestCheckElementFully_Fluent+SCROLL, TestCheckFullWindowWithMultipleIgnoreRegionsBySelector_Fluent+VG, TestCheckWindow_Fluent+VG, TestCheckWindowWithFloatingByRegion_Fluent+VG, TestCheckWindowWithFloatingBySelector_Fluent+VG, TestCheckWindowWithIgnoreBySelector_Centered_Fluent+VG, TestCheckWindowWithIgnoreBySelector_Fluent+VG, TestCheckWindowWithIgnoreBySelector_Stretched_Fluent+VG, TestCheckWindowWithIgnoreRegion_Fluent+VG, TestIgnoreDisplacements+VG, TestAccessibilityRegions+VG, TestCheckMany+VG, TestCheckRegionBySelectorAfterManualScroll_Fluent+SCROLL, TestScrollbarsHiddenAndReturned_Fluent+VG, TestScrollbarsHiddenAndReturned_Fluent+SCROLL, TestScrollbarsHiddenAndReturned_Fluent+CSS, TestCheckElementWithIgnoreRegionBySameElement_Fluent+CSS, TestCheckElementWithIgnoreRegionBySameElement_Fluent+SCROLL, TestSimpleRegion+CSS"/>
+                   value="TestCheckElementFully_Fluent+SCROLL, TestCheckFullWindowWithMultipleIgnoreRegionsBySelector_Fluent+VG, TestCheckWindow_Fluent+VG, TestCheckWindowWithFloatingByRegion_Fluent+VG, TestCheckWindowWithFloatingBySelector_Fluent+VG, TestCheckWindowWithIgnoreBySelector_Centered_Fluent+VG, TestCheckWindowWithIgnoreBySelector_Fluent+VG, TestCheckWindowWithIgnoreBySelector_Stretched_Fluent+VG, TestCheckWindowWithIgnoreRegion_Fluent+VG, TestIgnoreDisplacements+VG, TestAccessibilityRegions+VG, TestCheckMany+VG, TestCheckRegionBySelectorAfterManualScroll_Fluent+SCROLL, TestScrollbarsHiddenAndReturned_Fluent+VG, TestScrollbarsHiddenAndReturned_Fluent+SCROLL, TestScrollbarsHiddenAndReturned_Fluent+CSS, TestCheckElementWithIgnoreRegionBySameElement_Fluent+CSS, TestCheckElementWithIgnoreRegionBySameElement_Fluent+SCROLL, TestSimpleRegion+CSS, TestSimpleRegion+SCROLL, TestSimpleRegion+VG"/>
         <classes>
             <class name="com.applitools.eyes.selenium.TestFluentApi"/>
         </classes>
@@ -60,33 +60,4 @@
         </classes>
     </test>
 
-<!--    <test name="Test_WEB" parallel="instances">-->
-<!--        <classes>-->
-<!--            <class name="com.applitools.eyes.selenium.TestClassicRunner"/>-->
-<!--            <class name="com.applitools.eyes.selenium.TestBatchSequenceName"/>-->
-<!--            <class name="com.applitools.eyes.selenium.TestBatchAPI"/>-->
-<!--            <class name="com.applitools.eyes.selenium.TestSeleniumEyesWithNullRunner"/>-->
-<!--            <class name="com.applitools.eyes.selenium.TestDuplicates"/>-->
-<!--            <class name="com.applitools.eyes.selenium.TestScrollRootElement"/>-->
-<!--            <class name="com.applitools.eyes.selenium.TestSendDom"/>-->
-<!--            <class name="com.applitools.eyes.renderingGrid.TestVGServerConfigs"/>-->
-
-<!--        </classes>-->
-<!--    </test>-->
-<!--    <test name="Test_VG" parallel="instances">-->
-<!--        <classes>-->
-<!--            <class name="com.applitools.eyes.renderingGrid.TestVGDemo"/>-->
-<!--            <class name="com.applitools.eyes.renderingGrid.TestTopSites"/>-->
-<!--            <class name="com.applitools.eyes.renderingGrid.TestRenderingGridServiceWithJsHook"/>-->
-<!--            <class name="com.applitools.eyes.renderingGrid.TestVGWithJunit"/>-->
-<!--            <class name="com.applitools.eyes.renderingGrid.TestAbortVG"/>-->
-<!--            <class name="com.applitools.eyes.renderingGrid.TestVGExceptionInRegion"/>-->
-
-<!--        </classes>-->
-<!--    </test>-->
-<!--    <test name="Test_Mobile" parallel="methods">-->
-<!--        <classes>-->
-<!--            <class name="com.applitools.eyes.selenium.MobileNativeTests"/>-->
-<!--        </classes>-->
-<!--    </test>-->
 </suite>
