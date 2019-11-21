@@ -1,6 +1,6 @@
 <!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd" >
 
-<suite name="Suite1" verbose="1" parallel="tests">
+<suite name="passed tests" verbose="1" parallel="tests">
 
     <test name="TestClassicApi">
         <parameter name="dont_run" value="TestCheckInnerFrame+CSS, TestCheckInnerFrame+SCROLL, TestCheckInnerFrame+VG, TestCheckFrame+SCROLL,TestCheckFrame+VG, TestCheckWindowFully+VG, TestDoubleCheckWindow+VG, TestCheckWindow+VG, TestCheckWindow+SCROLL, TestCheckRegionInFrame+VG, TestCheckRegionInFrame+SCROLL, TestCheckRegion2+SCROLL"/>

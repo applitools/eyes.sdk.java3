@@ -20,6 +20,7 @@ public class ExcludeFailingTestsListener implements IInvokedMethodListener2 {
             Object testInstance = iInvokedMethod.getTestResult().getInstance();
             if (testInstance instanceof TestSetup){
                 for (Map.Entry<String,String> entry : testParameters.entrySet()) {
+                    System.out.println("Searching for test: " + iTestResult.getTestClass().getName() + "." + iTestResult.getMethod().getMethodName() + "+" + ((TestSetup) testInstance).mode + " in parameter dont_run: " + entry.getValue());
                     if (entry.getKey().toLowerCase().equals("dont_run") &&
                             entry.getValue().toLowerCase().contains(iTestResult.getMethod().getMethodName().toLowerCase() + "+" + ((TestSetup) testInstance).mode.toLowerCase())) {
                         System.out.println("Test: " + iTestResult.getTestClass().getName() + "." + iTestResult.getMethod().getMethodName() + "+" + ((TestSetup) testInstance).mode + " is excluded");
