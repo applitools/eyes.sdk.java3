@@ -3,7 +3,7 @@
 <suite name="Suite1" verbose="1" parallel="tests">
 
     <test name="TestClassicApi">
-        <parameter name="dont_run" value="TestCheckInnerFrame+CSS, TestCheckInnerFrame+SCROLL, TestCheckFrame+SCROLL,TestCheckFrame+VG"/>
+        <parameter name="dont_run" value="TestCheckInnerFrame+CSS, TestCheckInnerFrame+SCROLL, TestCheckInnerFrame+VG, TestCheckFrame+SCROLL,TestCheckFrame+VG, TestCheckWindowFully+VG, TestDoubleCheckWindow+VG, TestCheckWindow+VG, TestCheckRegionInFrame+VG, TestCheckRegion2+SCROLL"/>
         <classes>
             <class name="com.applitools.eyes.selenium.TestClassicApi"></class>
         </classes>
@@ -54,7 +54,7 @@
 
     <test name="TestFluentApi_Frames">
         <parameter name="dont_run"
-                   value="TestCheckLongOutOfBoundsIFrameModal+SCROLL, TestCheckFrameInFrame_Fully_Fluent+SCROLL, TestCheckFrameInFrame_Fully_Fluent+VG, TestCheckFrameInFrame_Fully_Fluent2+VG, TestCheckFrameInFrame_Fully_Fluent2+SCROLL, TestCheckFrame_Fluent+VG, TestCheckFrame_Fully_Fluent+VG, TestCheckFrame_Fully_Fluent+SCROLL, TestCheckFrame_Fully_Fluent+CSS, TestCheckRegionByCoordinateInFrame_Fluent+VG, TestCheckRegionByCoordinateInFrameFully_Fluent+VG, TestCheckRegionByCoordinateInFrameFully_Fluent+SCROLL, TestCheckRegionInFrame_Fluent+VG, TestCheckRegionInFrame3_Fluent+VG, TestCheckRegionInFrame3_Fluent+SCROLL, TestCheckRegionInFrameInFrame_Fluent+VG, TestCheckRegionInFrameInFrame_Fluent+SCROLL, TestCheckRegionInFrame2_Fluent+VG, TestCheckRegionInFrame2_Fluent+SCROLL, TestCheckLongOutOfBoundsIFrameModal+VG, TestCheckLongIFrameModal+VG"/>
+                   value="TestCheckLongOutOfBoundsIFrameModal+SCROLL, TestCheckFrameInFrame_Fully_Fluent+SCROLL, TestCheckFrameInFrame_Fully_Fluent+VG, TestCheckFrameInFrame_Fully_Fluent2+VG, TestCheckFrameInFrame_Fully_Fluent2+SCROLL, TestCheckFrame_Fluent+VG, TestCheckFrame_Fully_Fluent+VG, TestCheckFrame_Fully_Fluent+SCROLL, TestCheckFrame_Fully_Fluent+CSS, TestCheckRegionByCoordinateInFrame_Fluent+VG, TestCheckRegionByCoordinateInFrameFully_Fluent+VG, TestCheckRegionByCoordinateInFrameFully_Fluent+SCROLL, TestCheckRegionInFrame_Fluent+VG, TestCheckRegionInFrame_Fluent+SCROLL, TestCheckRegionInFrame3_Fluent+VG, TestCheckRegionInFrame3_Fluent+SCROLL, TestCheckRegionInFrameInFrame_Fluent+VG, TestCheckRegionInFrameInFrame_Fluent+SCROLL, TestCheckRegionInFrame2_Fluent+VG, TestCheckRegionInFrame2_Fluent+SCROLL, TestCheckLongOutOfBoundsIFrameModal+VG, TestCheckLongIFrameModal+VG, TestCheckLongIFrameModal+CSS"/>
         <classes>
             <class name="com.applitools.eyes.selenium.TestFluentApi_Frames"/>
         </classes>
