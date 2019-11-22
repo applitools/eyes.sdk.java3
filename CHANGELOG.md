@@ -1,7 +1,9 @@
+### Fixed
+- Calling updated methods in DOM Snapshot. [Trello 375](https://trello.com/c/elkaV9Dm)
+
 ## [3.158.7] - 2019-11-22
 ### Fixed
 - Updated DOM snapshot script. [Trello 375](https://trello.com/c/elkaV9Dm)
-
 
 ## [3.158.6] - 2019-11-13
 ### Fixed
