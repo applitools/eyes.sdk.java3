@@ -137,7 +137,7 @@ public class CommUtils {
     public static BatchInfo getBatch(String batchId, String serverUrl, String apikey) {
         BatchInfo batchInfo = null;
         try (CloseableHttpClient httpClient = HttpClients.custom().build()) {
-            String url = String.format("%sapi/sessions/batches/%s/bypointerid?apikey=%s", serverUrl, batchId, apikey);
+            String url = String.format("%s/api/sessions/batches/%s/bypointerid?apikey=%s", serverUrl, batchId, apikey);
             HttpGet request = new HttpGet(url);
 
             HttpResponse response = httpClient.execute(request);

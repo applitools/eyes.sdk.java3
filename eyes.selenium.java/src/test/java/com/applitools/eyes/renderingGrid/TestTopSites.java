@@ -19,6 +19,7 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 
 public class TestTopSites {
+    public static BatchInfo batch = new BatchInfo("TTS");
     private EyesRunner visualGridRunner;
 
     private String logsPath = System.getenv("APPLITOOLS_LOGS_PATH");
