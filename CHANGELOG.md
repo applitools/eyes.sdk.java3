@@ -1,3 +1,7 @@
+### Fixed
+-Fixed creation of new Rest client when closing batches. [Trello 1327](https://trello.com/c/Jdoj8AQ9) 
+
+
 ## [3.158.6] - 2019-11-13
 ### Fixed
 -Fixed connection pool hanging with DomCapture. [Trello 1144](https://trello.com/c/Aex0NkjK) 
