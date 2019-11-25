@@ -30,7 +30,8 @@ jobs:
           git push origin HEAD:$RELEASE_BRANCH;
           sed -i 's/devTestsSuite.xml/regressionTestsSuite.xml/g' $TRAVIS_BUILD_DIR/eyes.selenium.java/pom.xml;
           fi
-        - mvn test -e -X
+        - chmod +x ./runTests.sh
+        - ./runTests.sh
     - stage: deploy
       if: tag =~ ^RELEASE_CANDIDATE- AND fork == false
       script:

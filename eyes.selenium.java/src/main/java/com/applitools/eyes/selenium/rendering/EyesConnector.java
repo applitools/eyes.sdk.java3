@@ -116,7 +116,7 @@ class EyesConnector extends EyesBase implements IEyesConnector , IBatchCloser {
 
     @Override
     protected String getBaseAgentId() {
-        return "eyes.selenium.visualgrid.java/3.158.6";
+        return "eyes.selenium.visualgrid.java/3.158.8";
     }
 
     @Override

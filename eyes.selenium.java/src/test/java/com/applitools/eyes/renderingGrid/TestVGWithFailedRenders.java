@@ -18,6 +18,7 @@ import org.testng.annotations.*;
 
 public class TestVGWithFailedRenders {
     private EyesRunner visualGridRunner;
+    private BatchInfo java3_sdk = new BatchInfo("Java3 SDK");;
 
     @BeforeClass
     public void beforeClass() {
@@ -58,7 +59,7 @@ public class TestVGWithFailedRenders {
             Configuration configuration = new Configuration();
             configuration.setTestName("Top 10 websites - " + testedUrl);
             configuration.setAppName("Top Ten Sites");
-            configuration.setBatch(TestTopSites.batch);
+            configuration.setBatch(java3_sdk);
             configuration.setBranchName("TTS - config branch");
             configuration.setBaselineEnvName("My Other Env Name");
             String environment = "My env name";

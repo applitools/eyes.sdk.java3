@@ -130,7 +130,7 @@ public class SeleniumEyes extends EyesBase implements IDriverProvider ,IBatchClo
 
     @Override
     public String getBaseAgentId() {
-        return "eyes.selenium.java/3.158.6";
+        return "eyes.selenium.java/3.158.8";
     }
 
     /**
