@@ -181,7 +181,9 @@ public final class TestSendDom {
     }
 
     @Test
-    public void TestSendDOM_1() {captureDom("https://applitools.github.io/demo/TestPages/DomTest/dom_capture.html", "TestSendDOM_1");}
+    public void TestSendDOM_1() {
+        captureDom("https://applitools.github.io/demo/TestPages/DomTest/dom_capture.html", "TestSendDOM_1");
+    }
 
     @Test
     public void TestSendDOM_2() {
