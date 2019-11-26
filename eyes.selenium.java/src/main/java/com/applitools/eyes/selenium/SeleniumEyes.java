@@ -130,7 +130,7 @@ public class SeleniumEyes extends EyesBase implements IDriverProvider ,IBatchClo
 
     @Override
     public String getBaseAgentId() {
-        return "eyes.selenium.java/3.158.6";
+        return "eyes.selenium.java/3.158.8";
     }
 
     /**
@@ -596,7 +596,7 @@ public class SeleniumEyes extends EyesBase implements IDriverProvider ,IBatchClo
             logger.log(String.format("check('%s', %s): Ignored", name, checkSettings));
             return;
         }
-
+        ArgumentGuard.isValidState(isOpen, "Eyes not open");
         ArgumentGuard.notNull(checkSettings, "checkSettings");
         if (name != null) {
             checkSettings = checkSettings.withName(name);

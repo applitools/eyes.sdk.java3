@@ -1,7 +1,7 @@
 /* @applitools/dom-snapshot@3.1.4 */
 
-function __processPageAndSerializeForIE() {
-  var processPageAndSerializeForIE = (function () {
+function __processPageAndSerializePollForIE() {
+  var processPageAndSerializePollForIE = (function () {
             'use strict';
 
             var global$1 = (typeof global !== "undefined" ? global :
@@ -10,6 +10,10 @@ function __processPageAndSerializeForIE() {
 
             function createCommonjsModule(fn, module) {
             	return module = { exports: {} }, fn(module, module.exports), module.exports;
+            }
+
+            function getCjsExportFromNamespace (n) {
+            	return n && n['default'] || n;
             }
 
             var O = 'object';
@@ -9107,6 +9111,10 @@ function __processPageAndSerializeForIE() {
                 : ((typeof self !== 'undefined') ? self : undefined))
             );
 
+            var urlPolyfill = /*#__PURE__*/Object.freeze({
+
+            });
+
             var support = {
               searchParams: 'URLSearchParams' in self,
               iterable: 'Symbol' in self && 'iterator' in Symbol,
@@ -9623,6 +9631,50 @@ function __processPageAndSerializeForIE() {
               self.Request = Request;
               self.Response = Response;
             }
+
+            var fetch$1 = /*#__PURE__*/Object.freeze({
+                        Headers: Headers,
+                        Request: Request,
+                        Response: Response,
+                        get DOMException () { return DOMException; },
+                        fetch: fetch
+            });
+
+            var EYES_NAME_SPACE = '__EYES__APPLITOOLS__';
+
+            function pullify(script) {
+              var win = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : window;
+              return function () {
+                var scriptName = script.name;
+
+                if (!win[EYES_NAME_SPACE]) {
+                  win[EYES_NAME_SPACE] = {};
+                }
+
+                if (!win[EYES_NAME_SPACE][scriptName]) {
+                  win[EYES_NAME_SPACE][scriptName] = {
+                    status: 'WIP',
+                    value: null,
+                    error: null
+                  };
+                  script.apply(null, arguments).then(function (r) {
+                    return resultObject.status = 'SUCCESS', resultObject.value = r;
+                  }).catch(function (e) {
+                    return resultObject.status = 'ERROR', resultObject.error = e.message;
+                  });
+                }
+
+                var resultObject = win[EYES_NAME_SPACE][scriptName];
+
+                if (resultObject.status === 'SUCCESS') {
+                  win[EYES_NAME_SPACE][scriptName] = null;
+                }
+
+                return JSON.stringify(resultObject);
+              };
+            }
+
+            var pollify = pullify;
 
             // License: https://github.com/beatgammit/base64-js/blob/bf68aaa277d9de7007cc0c58279c411bb10670ac/LICENSE
 
@@ -10679,9 +10731,15 @@ function __processPageAndSerializeForIE() {
 
             var processPageAndSerialize_1 = processPageAndSerialize;
 
-            return processPageAndSerialize_1;
+            getCjsExportFromNamespace(urlPolyfill);
+
+            getCjsExportFromNamespace(fetch$1);
+
+            var processPageAndSerializePoll = pollify(processPageAndSerialize_1);
+
+            return processPageAndSerializePoll;
 
 }());
 
-  return processPageAndSerializeForIE.apply(this, arguments);
+  return processPageAndSerializePollForIE.apply(this, arguments);
 }

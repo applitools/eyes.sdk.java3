@@ -81,7 +81,7 @@ public class VisualGridEyes implements IRenderingEyes {
 
     {
         try {
-            PROCESS_RESOURCES = GeneralUtils.readToEnd(VisualGridEyes.class.getResourceAsStream("/processPageAndPoll.js"));
+            PROCESS_RESOURCES = GeneralUtils.readToEnd(VisualGridEyes.class.getResourceAsStream("/processPageAndSerializePoll.js"));
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -509,7 +509,7 @@ public class VisualGridEyes implements IRenderingEyes {
             ScriptResponse.Status status = null;
             ScriptResponse scriptResponse = null;
             do {
-                resultAsString = (String) this.webDriver.executeScript(PROCESS_RESOURCES + "return __processPageAndPoll();");
+                resultAsString = (String) this.webDriver.executeScript(PROCESS_RESOURCES + "return __processPageAndSerializePoll();");
                 try {
                     scriptResponse = GeneralUtils.parseJsonToObject(resultAsString, ScriptResponse.class);
                     logger.verbose("Dom extraction polling...");
@@ -780,7 +780,7 @@ public class VisualGridEyes implements IRenderingEyes {
     @SuppressWarnings("WeakerAccess")
     public String getBaseAgentId() {
         //noinspection SpellCheckingInspection
-        return "eyes.selenium.visualgrid.java/3.158.6";
+        return "eyes.selenium.visualgrid.java/3.158.8";
     }
 
     /**

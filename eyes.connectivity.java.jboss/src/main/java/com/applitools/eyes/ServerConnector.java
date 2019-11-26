@@ -726,6 +726,7 @@ public class ServerConnector extends RestClient
             logger.log("APPLITOOLS_DONT_CLOSE_BATCHES environment variable set to true. Skipping batch close.");
             return;
         }
+        this.configureRestClient();
         ArgumentGuard.notNull(batchId, "batchId");
         this.logger.verbose("called with " + batchId);
 
@@ -733,6 +734,7 @@ public class ServerConnector extends RestClient
         WebTarget target = restClient.target(serverUrl).path(url).queryParam("apiKey", getApiKey());
         Response delete = target.request().delete();
         logger.verbose("delete batch is done with " + delete.getStatus() + " status");
+        this.restClient.close();
     }
 
     @Override

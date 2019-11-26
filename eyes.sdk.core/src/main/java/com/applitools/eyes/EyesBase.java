@@ -61,7 +61,7 @@ public abstract class EyesBase implements IEyesBase{
     private boolean isDisabled;
     protected Logger logger;
 
-    private boolean isOpen;
+    protected boolean isOpen;
 
     private final Queue<Trigger> userInputs;
     private final List<PropertyData> properties = new ArrayList<>();

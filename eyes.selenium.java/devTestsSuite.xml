@@ -1,6 +1,6 @@
 <!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd" >
 
-<suite name="regression suite">
+<suite name="dev suite">
     <suite-files>
         <suite-file path="passedTestsSuite.xml" />
         <suite-file path="failedTestsSuite.xml" />

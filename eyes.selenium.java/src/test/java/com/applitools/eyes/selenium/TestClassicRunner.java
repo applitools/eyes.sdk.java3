@@ -18,8 +18,9 @@ public final class TestClassicRunner {
         eyesTest(VGRunner);
 
     }
+
     @Test
-    public void testClassicRunnerThrowException(){
+    public void testClassicRunnerThrowException() {
         WebDriver driver = SeleniumUtils.createChromeDriver();
         final EyesRunner runner = new ClassicRunner();
         Eyes eyes = new Eyes(runner);
@@ -39,56 +40,65 @@ public final class TestClassicRunner {
             }
         });
     }
+
     private void eyesTest(EyesRunner runner) {
 
-        WebDriver driver = SeleniumUtils.createChromeDriver();
+        WebDriver driver = null;
+        try {
+            driver = SeleniumUtils.createChromeDriver();
 
-        // Initialize the VisualGridEyes SDK and set your private API key.
-        Eyes eyes = new Eyes(runner);
-        Eyes eyes2 = new Eyes(runner);
-        eyes.setLogHandler(new FileLogger("runnerTest.log", false, true));
-        eyes2.setLogHandler(new FileLogger("runnerTest.log", false, true));
+            // Initialize the VisualGridEyes SDK and set your private API key.
+            Eyes eyes = new Eyes(runner);
+            Eyes eyes2 = new Eyes(runner);
+            eyes.setLogHandler(new FileLogger("runnerTest.log", false, true));
+            eyes2.setLogHandler(new FileLogger("runnerTest.log", false, true));
 //        eyes.setLogHandler(new StdoutLogHandler(true));
-        eyes.setServerUrl("https://eyes.applitools.com/");
-        eyes.setProxy(new ProxySettings("http://127.0.0.1:8888"));
-        eyes2.setProxy(new ProxySettings("http://127.0.0.1:8888"));
+            eyes.setServerUrl("https://eyes.applitools.com/");
+            eyes.setProxy(new ProxySettings("http://127.0.0.1:8888"));
+            eyes2.setProxy(new ProxySettings("http://127.0.0.1:8888"));
 
-        // Switch sendDom flag on
-        eyes.setSendDom(true);
-        eyes2.setSendDom(false);
-        eyes2.setStitchMode(StitchMode.CSS);
-        eyes.setStitchMode(StitchMode.CSS);
-        BatchInfo batchInfo = new BatchInfo("Runner Testing");
-        batchInfo.setId("RCA_Batch_ID");
-        eyes.setBatch(batchInfo);
-        eyes2.setBatch(batchInfo);
+            // Switch sendDom flag on
+            eyes.setSendDom(true);
+            eyes2.setSendDom(false);
+            eyes2.setStitchMode(StitchMode.CSS);
+            eyes.setStitchMode(StitchMode.CSS);
+            BatchInfo batchInfo = new BatchInfo("Runner Testing");
+            batchInfo.setId("RCA_Batch_ID");
+            eyes.setBatch(batchInfo);
+            eyes2.setBatch(batchInfo);
 //        try {
 
 
-        // Navigate the browser to the "hello world!" web-site.
-        driver.get("http://applitools.github.io/demo/TestPages/VisualGridTestPage/index.html");
+            // Navigate the browser to the "hello world!" web-site.
+            driver.get("http://applitools.github.io/demo/TestPages/VisualGridTestPage/index.html");
 
-        eyes.open(driver, "Applitools Eyes Java SDK", "Classic Runner Test",
-                new RectangleSize(1200, 800));
-        eyes2.open(driver, "Applitools Eyes Java SDK", "Classic Runner 2 Test",
-                new RectangleSize(1200, 800));
-
-
-        eyes.check(Target.window().fully().ignoreDisplacements(false).withName("Step 1"));
-        eyes2.check(Target.window().fully().ignoreDisplacements(false).withName("Step 1"));
+            eyes.open(driver, "Applitools Eyes Java SDK", "Classic Runner Test",
+                    new RectangleSize(1200, 800));
+            eyes2.open(driver, "Applitools Eyes Java SDK", "Classic Runner 2 Test",
+                    new RectangleSize(1200, 800));
 
 
-        eyes.closeAsync();
+            eyes.check(Target.window().fully().ignoreDisplacements(false).withName("Step 1"));
+            eyes2.check(Target.window().fully().ignoreDisplacements(false).withName("Step 1"));
 
-        eyes.open(driver, "Applitools Eyes Java SDK", "Classic Runner Test",
-                new RectangleSize(1200, 800));
 
-        eyes.check(Target.window().fully().ignoreDisplacements(false).withName("Step 2"));
+            eyes.closeAsync();
 
-        eyes.closeAsync();
-        eyes2.close(true);
+            eyes.open(driver, "Applitools Eyes Java SDK", "Classic Runner Test",
+                    new RectangleSize(1200, 800));
 
-        driver.quit();
+            eyes.check(Target.window().fully().ignoreDisplacements(false).withName("Step 2"));
+
+            eyes.closeAsync();
+            eyes2.close(true);
+        } finally {
+            if (driver != null) {
+
+                driver.quit();
+            }
+
+        }
+
 
         TestResultsSummary allTestResults = runner.getAllTestResults();
         if (allTestResults.getAllResults().length != 3) {

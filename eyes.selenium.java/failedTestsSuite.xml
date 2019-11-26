@@ -1,5 +1,42 @@
 <!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd" >
 
-<suite name="passed tests" verbose="1" parallel="tests">
+<suite name="failed tests" verbose="1" parallel="tests">
+
+    <test name="TestAcme">
+        <parameter name="dont_run" value="TestAcmeLogin+SCROLL, TestAcmeLogin+VG, TestAcmeLogin+CSS"/>
+        <classes>
+            <class name="com.applitools.eyes.selenium.TestAcme" />
+        </classes>
+    </test>
+
+    <test name="Test_WEB" parallel="instances">
+        <classes>
+            <class name="com.applitools.eyes.selenium.TestClassicRunner"/>
+            <class name="com.applitools.eyes.selenium.TestBatchSequenceName"/>
+            <class name="com.applitools.eyes.selenium.TestBatchAPI"/>
+            <class name="com.applitools.eyes.selenium.TestSeleniumEyesWithNullRunner"/>
+            <class name="com.applitools.eyes.selenium.TestDuplicates"/>
+            <class name="com.applitools.eyes.selenium.TestScrollRootElement"/>
+            <class name="com.applitools.eyes.selenium.TestSendDom"/>
+            <class name="com.applitools.eyes.renderingGrid.TestVGServerConfigs"/>
+
+        </classes>
+    </test>
+    <test name="Test_VG" parallel="instances">
+        <classes>
+            <class name="com.applitools.eyes.renderingGrid.TestVGDemo"/>
+            <class name="com.applitools.eyes.renderingGrid.TestTopSites"/>
+            <class name="com.applitools.eyes.renderingGrid.TestRenderingGridServiceWithJsHook"/>
+            <class name="com.applitools.eyes.renderingGrid.TestVGWithJunit"/>
+            <class name="com.applitools.eyes.renderingGrid.TestAbortVG"/>
+            <class name="com.applitools.eyes.renderingGrid.TestVGExceptionInRegion"/>
+
+        </classes>
+    </test>
+    <test name="Test_Mobile" parallel="methods">
+        <classes>
+            <class name="com.applitools.eyes.selenium.MobileNativeTests"/>
+        </classes>
+    </test>
 
 </suite>
