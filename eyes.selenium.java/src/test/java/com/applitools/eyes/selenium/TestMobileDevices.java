@@ -169,7 +169,9 @@ public class TestMobileDevices {
     }
 
     private String initTestName(String deviceName, String platformVersion, ScreenOrientation deviceOrientation, boolean fully, String page) {
-        String testName = deviceName + " " + platformVersion + " " + deviceOrientation + " " + page;
+        String deviceOrientationStr = (deviceOrientation.toString().equals("LANDSCAPE")) ? "Landscape" : "Portrait";
+        String testName = deviceName + " " + platformVersion + " " + deviceOrientationStr + " " + page;
+
 
         if (fully) {
             testName += " fully";

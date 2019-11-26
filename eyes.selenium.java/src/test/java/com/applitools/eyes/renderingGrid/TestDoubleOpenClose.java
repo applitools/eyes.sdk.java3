@@ -32,11 +32,11 @@ public class TestDoubleOpenClose {
 
         String suffix = useVisualGrid ? "_VG" : "";
 
-        eyes.open(driver, "Applitools Eyes Java SDK", "TestDoubleOpenCheckClose" + suffix, new RectangleSize(1200, 800));
+        eyes.open(driver, "Applitools Eyes SDK", "TestDoubleOpenCheckClose" + suffix, new RectangleSize(1200, 800));
         eyes.check(Target.window().fully().ignoreDisplacements(false).withName("Step 1"));
         eyes.close(false);
 
-        eyes.open(driver, "Applitools Eyes Java SDK", "TestDoubleOpenCheckClose" + suffix, new RectangleSize(1200, 800));
+        eyes.open(driver, "Applitools Eyes SDK", "TestDoubleOpenCheckClose" + suffix, new RectangleSize(1200, 800));
         eyes.check(Target.window().fully().ignoreDisplacements(false).withName("Step 2"));
         eyes.close(false);
 
@@ -56,11 +56,11 @@ public class TestDoubleOpenClose {
 
         String suffix = useVisualGrid ? "_VG" : "";
 
-        eyes.open(driver, "Applitools Eyes Java SDK", "TestDoubleOpenCheckCloseAsync" + suffix, new RectangleSize(1200, 800));
+        eyes.open(driver, "Applitools Eyes SDK", "TestDoubleOpenCheckCloseAsync" + suffix, new RectangleSize(1200, 800));
         eyes.check(Target.window().fully().ignoreDisplacements(false).withName("Step 1"));
         eyes.closeAsync();
 
-        eyes.open(driver, "Applitools Eyes Java SDK", "TestDoubleOpenCheckCloseAsync" + suffix, new RectangleSize(1200, 800));
+        eyes.open(driver, "Applitools Eyes SDK", "TestDoubleOpenCheckCloseAsync" + suffix, new RectangleSize(1200, 800));
         eyes.check(Target.window().fully().ignoreDisplacements(false).withName("Step 2"));
         eyes.closeAsync();
 
@@ -83,13 +83,13 @@ public class TestDoubleOpenClose {
 
         Eyes eyes1 = new Eyes(runner);
         eyes1.setBatch(TestDataProvider.batchInfo);
-        eyes1.open(driver, "Applitools Eyes Java SDK", "TestDoubleOpenCheckCloseWithDifferentInstances" + suffix, new RectangleSize(1200, 800));
+        eyes1.open(driver, "Applitools Eyes SDK", "TestDoubleOpenCheckCloseWithDifferentInstances" + suffix, new RectangleSize(1200, 800));
         eyes1.check(Target.window().fully().ignoreDisplacements(false).withName("Step 1"));
         eyes1.close(false);
 
         Eyes eyes2 = new Eyes(runner);
         eyes2.setBatch(TestDataProvider.batchInfo);
-        eyes2.open(driver, "Applitools Eyes Java SDK", "TestDoubleOpenCheckCloseWithDifferentInstances" + suffix, new RectangleSize(1200, 800));
+        eyes2.open(driver, "Applitools Eyes SDK", "TestDoubleOpenCheckCloseWithDifferentInstances" + suffix, new RectangleSize(1200, 800));
         eyes2.check(Target.window().fully().ignoreDisplacements(false).withName("Step 2"));
         eyes2.close(false);
 
@@ -111,13 +111,13 @@ public class TestDoubleOpenClose {
 
         Eyes eyes1 = new Eyes(runner);
         eyes1.setBatch(TestDataProvider.batchInfo);
-        eyes1.open(driver, "Applitools Eyes Java SDK", "TestDoubleOpenCheckCloseAsyncWithDifferentInstances" + suffix, new RectangleSize(1200, 800));
+        eyes1.open(driver, "Applitools Eyes SDK", "TestDoubleOpenCheckCloseAsyncWithDifferentInstances" + suffix, new RectangleSize(1200, 800));
         eyes1.check(Target.window().fully().ignoreDisplacements(false).withName("Step 1"));
         eyes1.closeAsync();
 
         Eyes eyes2 = new Eyes(runner);
         eyes2.setBatch(TestDataProvider.batchInfo);
-        eyes2.open(driver, "Applitools Eyes Java SDK", "TestDoubleOpenCheckCloseAsyncWithDifferentInstances" + suffix, new RectangleSize(1200, 800));
+        eyes2.open(driver, "Applitools Eyes SDK", "TestDoubleOpenCheckCloseAsyncWithDifferentInstances" + suffix, new RectangleSize(1200, 800));
         eyes2.check(Target.window().fully().ignoreDisplacements(false).withName("Step 2"));
         eyes2.closeAsync();
 
@@ -132,13 +132,13 @@ public class TestDoubleOpenClose {
     {
         runner = useVisualGrid ? new VisualGridRunner(10) : new ClassicRunner();
         final WebDriver driver = SeleniumUtils.createChromeDriver();
-        driver.get("https://applitools.github.io/demo/TestPages/VisualGridTestPage/");
+        driver.get("https://applitools.com/helloworld");
 
         String suffix = useVisualGrid ? "_VG" : "";
 
         Eyes eyes1 = new Eyes(runner);
         eyes1.setBatch(TestDataProvider.batchInfo);
-        eyes1.open(driver, "Applitools Eyes Java SDK", "TestDoubleCheckDontGetAllResults" + suffix, new RectangleSize(1200, 800));
+        eyes1.open(driver, "Applitools Eyes SDK", "TestDoubleCheckDontGetAllResults" + suffix, new RectangleSize(1200, 800));
         eyes1.check(Target.window().withName("Step 1"));
         eyes1.check(Target.window().withName("Step 2"));
         eyes1.close(false);
