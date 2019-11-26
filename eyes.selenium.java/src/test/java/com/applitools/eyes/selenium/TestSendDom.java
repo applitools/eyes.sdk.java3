@@ -185,7 +185,7 @@ public final class TestSendDom {
 
     @Test
     public void TestSendDOM_2() {
-        captureDom("https://applitools.github.io/demo/TestPages/DomTest/dom_capture.html", "TestSendDOM_1");
+        captureDom("https://applitools.github.io/demo/TestPages/DomTest/dom_capture_2.html", "TestSendDOM_2");
     }
 
     private static boolean getHasDom(IEyesBase eyes, TestResults results) {
