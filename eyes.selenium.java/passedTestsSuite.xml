@@ -130,5 +130,40 @@
             </class>
         </classes>
     </test>
-
+    <test name="TestAcme">
+        <parameter name="dont_run"
+                   value="TestAcmeLogin+SCROLL, TestAcmeLogin+VG"/>
+        <classes>
+            <class name="com.applitools.eyes.selenium.TestAcme">
+                <methods>
+                    <include name="TestAcmeLogin"/>
+                </methods>
+            </class>
+        </classes>
+    </test>
+    <test name="TestSendDom">
+        <classes>
+            <class name="com.applitools.eyes.selenium.TestSendDom">
+                <methods>
+                    <include name="TestSendDOM_Selector"/>
+                    <include name="TestNotSendDOM"/>
+                    <include name="TestSendDOM_1"/>
+                    <include name="TestSendDOM_2"/>
+                </methods>
+            </class>
+        </classes>
+    </test>
+    <test name="TestDoubleOpenClose">
+        <classes>
+            <class name="com.applitools.eyes.renderingGrid.TestDoubleOpenClose">
+                <methods>
+                    <include name="TestDoubleOpenCheckClose"/>
+                    <include name="TestDoubleOpenCheckCloseAsync"/>
+                    <include name="TestDoubleOpenCheckCloseWithDifferentInstances"/>
+                    <include name="TestDoubleOpenCheckCloseAsyncWithDifferentInstances"/>
+                    <include name="TestDoubleCheckDontGetAllResults"/>
+                </methods>
+            </class>
+        </classes>
+    </test>
 </suite>
