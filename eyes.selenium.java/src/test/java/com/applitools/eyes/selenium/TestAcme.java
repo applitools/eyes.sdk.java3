@@ -15,7 +15,7 @@ public class TestAcme extends TestSetup {
 
     @Factory(dataProvider = "dp", dataProviderClass = TestDataProvider.class)
     public TestAcme(Capabilities caps, String mode) {
-        super("Eyes Selenium SDK - Test Acme", caps, mode);
+        super("Eyes Selenium SDK - ACME", caps, mode);
         testedPageSize = new RectangleSize(1024,768);
     }
 

@@ -28,15 +28,13 @@ public final class TestSendDom {
         void initWebDriver(WebDriver webDriver);
     }
 
-    private static void captureDom(String url) {
-        captureDom(url, null);
-    }
+    private static void captureDom(String url, String testName) {captureDom(url, null, testName);}
 
-    private static void captureDom(String url, WebDriverInitializer initCode) {
+    private static void captureDom(String url, WebDriverInitializer initCode, String testName) {
         WebDriver webDriver = SeleniumUtils.createChromeDriver();
         webDriver.get(url);
         Logger logger = new Logger();
-        String testName = Thread.currentThread().getStackTrace()[2].getMethodName();
+
         logger.setLogHandler(TestUtils.initLogger(testName));
         if (initCode != null) {
             initCode.initWebDriver(webDriver);
@@ -184,12 +182,12 @@ public final class TestSendDom {
 
     @Test
     public void TestSendDOM_1() {
-        captureDom("https://applitools.github.io/demo/TestPages/DomTest/dom_capture.html");
+        captureDom("https://applitools.github.io/demo/TestPages/DomTest/dom_capture.html", "TestSendDOM_1");
     }
 
     @Test
     public void TestSendDOM_2() {
-        captureDom("https://applitools.github.io/demo/TestPages/DomTest/dom_capture_2.html");
+        captureDom("https://applitools.github.io/demo/TestPages/DomTest/dom_capture_2.html", "TestSendDOM_2");
     }
 
     private static boolean getHasDom(IEyesBase eyes, TestResults results) {

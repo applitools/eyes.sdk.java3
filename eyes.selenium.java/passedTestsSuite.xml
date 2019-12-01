@@ -71,6 +71,42 @@
         </classes>
     </test>
 
+    <test name="TestAcme">
+        <parameter name="dont_run" value="TestAcmeLogin+SCROLL, TestAcmeLogin+VG"/>
+        <classes>
+            <class name="com.applitools.eyes.selenium.TestAcme">
+                <methods>
+                    <include name="TestAcmeLogin"/>
+                </methods>
+            </class>
+        </classes>
+    </test>
+    <test name="TestSendDom">
+        <classes>
+            <class name="com.applitools.eyes.selenium.TestSendDom">
+                <methods>
+                    <include name="TestSendDOM_Selector"/>
+                    <include name="TestNotSendDOM"/>
+                    <include name="TestSendDOM_1"/>
+                    <include name="TestSendDOM_2"/>
+                </methods>
+            </class>
+        </classes>
+    </test>
+    <test name="TestDoubleOpenClose">
+        <classes>
+            <class name="com.applitools.eyes.renderingGrid.TestDoubleOpenClose">
+                <methods>
+                    <include name="TestDoubleOpenCheckClose"/>
+                    <include name="TestDoubleOpenCheckCloseAsync"/>
+                    <include name="TestDoubleOpenCheckCloseWithDifferentInstances"/>
+                    <include name="TestDoubleOpenCheckCloseAsyncWithDifferentInstances"/>
+                    <include name="TestDoubleCheckDontGetAllResults"/>
+                </methods>
+            </class>
+        </classes>
+    </test>
+
     <test name="TestFluentApi">
         <parameter name="dont_run"
                    value="TestCheckElementFully_Fluent+SCROLL, TestCheckFullWindowWithMultipleIgnoreRegionsBySelector_Fluent+VG, TestCheckWindow_Fluent+VG, TestCheckWindowWithFloatingByRegion_Fluent+VG, TestCheckWindowWithFloatingBySelector_Fluent+VG, TestCheckWindowWithIgnoreBySelector_Centered_Fluent+VG, TestCheckWindowWithIgnoreBySelector_Fluent+VG, TestCheckWindowWithIgnoreBySelector_Stretched_Fluent+VG, TestCheckWindowWithIgnoreRegion_Fluent+VG, TestIgnoreDisplacements+VG, TestAccessibilityRegions+VG, TestCheckMany+VG, TestCheckRegionBySelectorAfterManualScroll_Fluent+SCROLL, TestScrollbarsHiddenAndReturned_Fluent+VG, TestScrollbarsHiddenAndReturned_Fluent+SCROLL, TestScrollbarsHiddenAndReturned_Fluent+CSS, TestCheckElementWithIgnoreRegionBySameElement_Fluent+CSS, TestCheckElementWithIgnoreRegionBySameElement_Fluent+SCROLL, TestSimpleRegion+CSS, TestSimpleRegion+SCROLL, TestSimpleRegion+VG"/>

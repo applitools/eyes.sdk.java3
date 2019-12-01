@@ -19,3 +19,4 @@ scroll stiching
 iframes
 Ultrafast Grid
 Screenshots
+Default configuration validation
