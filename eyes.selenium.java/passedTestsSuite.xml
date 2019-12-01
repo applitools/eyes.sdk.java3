@@ -153,6 +153,7 @@
             </class>
         </classes>
     </test>
+    
     <test name="TestDoubleOpenClose">
         <classes>
             <class name="com.applitools.eyes.renderingGrid.TestDoubleOpenClose">
