@@ -18,10 +18,12 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.testng.Assert;
+import org.testng.annotations.Listeners;
 import org.testng.annotations.Test;
 
 import java.io.IOException;
 
+@Listeners(TestListener.class)
 public final class TestSendDom {
 
     private interface WebDriverInitializer {
