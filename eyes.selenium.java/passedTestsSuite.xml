@@ -122,4 +122,14 @@
         </classes>
     </test>
 
+    <test name="Proxy_Test">
+        <classes>
+            <class name="com.applitools.eyes.selenium.ProxyTest">
+                <methods>
+                    <include name="checkNetworkThroughProxy" />
+                </methods>
+            </class>
+        </classes>
+    </test>
+
 </suite>
