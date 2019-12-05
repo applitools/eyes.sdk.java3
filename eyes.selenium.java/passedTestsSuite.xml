@@ -72,7 +72,7 @@
     </test>
 
     <test name="TestAcme">
-        <parameter name="dont_run" value="TestAcmeLogin+SCROLL, TestAcmeLogin+VG"/>
+        <parameter name="dont_run" value="TestAcmeLogin+SCROLL"/>
         <classes>
             <class name="com.applitools.eyes.selenium.TestAcme">
                 <methods>
@@ -89,6 +89,7 @@
                     <include name="TestNotSendDOM"/>
                     <include name="TestSendDOM_1"/>
                     <include name="TestSendDOM_2"/>
+                    <include name="TestSendDOM_FullWindow"/>
                 </methods>
             </class>
         </classes>
