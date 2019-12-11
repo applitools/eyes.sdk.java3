@@ -12,7 +12,6 @@ import org.testng.annotations.Test;
 import java.util.ArrayList;
 import java.util.List;
 
-@Listeners(TestListener.class)
 public class TestFluentApi_Frames extends TestSetup {
 
     @Factory(dataProvider = "dp", dataProviderClass = TestDataProvider.class)

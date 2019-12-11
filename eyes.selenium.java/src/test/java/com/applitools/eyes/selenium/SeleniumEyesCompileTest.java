@@ -13,7 +13,6 @@ import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Listeners;
 import org.testng.annotations.Test;
 
-@Listeners(TestListener.class)
 public class SeleniumEyesCompileTest {
     private Eyes eyes;
     private Region region = new Region(10, 10, 10, 10);

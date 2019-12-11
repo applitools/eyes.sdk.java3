@@ -23,7 +23,6 @@ import org.testng.annotations.Test;
 
 import java.io.IOException;
 
-@Listeners(TestListener.class)
 public final class TestSendDom {
 
     private interface WebDriverInitializer {

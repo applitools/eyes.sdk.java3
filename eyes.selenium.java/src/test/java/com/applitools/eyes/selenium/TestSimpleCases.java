@@ -8,7 +8,6 @@ import org.testng.annotations.Factory;
 import org.testng.annotations.Listeners;
 import org.testng.annotations.Test;
 
-@Listeners(TestListener.class)
 public class TestSimpleCases extends TestSetup {
 
     @Factory(dataProvider = "dp", dataProviderClass = TestDataProvider.class)

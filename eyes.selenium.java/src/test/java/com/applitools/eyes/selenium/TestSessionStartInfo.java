@@ -10,7 +10,6 @@ import org.testng.annotations.Test;
 import java.io.IOException;
 import java.util.Calendar;
 
-@Listeners(TestListener.class)
 @SuppressWarnings("SpellCheckingInspection")
 public class TestSessionStartInfo {
 
