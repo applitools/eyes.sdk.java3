@@ -3,10 +3,7 @@
  */
 package com.applitools.eyes.selenium.wrappers;
 
-import com.applitools.eyes.EyesException;
-import com.applitools.eyes.Location;
-import com.applitools.eyes.Logger;
-import com.applitools.eyes.RectangleSize;
+import com.applitools.eyes.*;
 import com.applitools.eyes.positioning.PositionMemento;
 import com.applitools.eyes.positioning.PositionProvider;
 import com.applitools.eyes.selenium.Borders;
@@ -71,9 +68,9 @@ public class EyesTargetLocator implements WebDriver.TargetLocator {
         SizeAndBorders sizeAndBorders = eyesFrame.getSizeAndBorders();
         Borders borders = sizeAndBorders.getBorders();
         RectangleSize frameInnerSize = sizeAndBorders.getSize();
-        Rectangle bounds = eyesFrame.getBoundingClientRect();
+        Region bounds = eyesFrame.getBoundingClientRect();
 
-        Location contentLocation = new Location(bounds.getX() + borders.getLeft(), bounds.getY() + borders.getTop());
+        Location contentLocation = bounds.getLocation();
         Location originalLocation = eyesFrame.getScrollLocation();// ScrollPositionProvider.getCurrentPosition(jsExecutor, driver.findElement(By.tagName("html")));
 
         Frame frame = new Frame(logger, targetFrame,

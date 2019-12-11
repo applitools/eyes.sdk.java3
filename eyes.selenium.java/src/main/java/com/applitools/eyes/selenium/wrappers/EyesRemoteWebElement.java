@@ -611,11 +611,11 @@ public class EyesRemoteWebElement extends RemoteWebElement {
                 Integer.parseInt(((String) esAsList.get(5)).replace("px", "")));
     }
 
-    public Rectangle getBoundingClientRect() {
+    public Region getBoundingClientRect() {
         String retVal = (String) eyesDriver.executeScript("var r = arguments[0].getBoundingClientRect();" +
                 "return r.left+';'+r.top+';'+r.width+';'+r.height;", this);
         String[] parts = retVal.split(";");
-        Rectangle rect = new Rectangle(
+        Region rect = new Region(
                 Math.round(Float.parseFloat(parts[0])),
                 Math.round(Float.parseFloat(parts[1])),
                 Math.round(Float.parseFloat(parts[3])),
@@ -637,5 +637,15 @@ public class EyesRemoteWebElement extends RemoteWebElement {
         return new RectangleSize(
                 Math.round(Float.parseFloat(parts[0])),
                 Math.round(Float.parseFloat(parts[1])));
+    }
+
+    public Region getRectAsRegion() {
+        Response response = execute(DriverCommand.GET_ELEMENT_RECT, ImmutableMap.of("id", id));
+        Map<String, Object> rawRect = (Map<String, Object>) response.getValue();
+        int x = ((Number) rawRect.get("x")).intValue();
+        int y = ((Number) rawRect.get("y")).intValue();
+        int width = ((Number) rawRect.get("width")).intValue();
+        int height = ((Number) rawRect.get("height")).intValue();
+        return new Region(x, y, height, width);
     }
 }

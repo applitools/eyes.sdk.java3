@@ -1012,13 +1012,13 @@ public class SeleniumEyes extends EyesBase implements IDriverProvider ,IBatchClo
                 Region rect = settings.getTargetRegion();
                 Region r;
                 if (rect == null) {
-                    Rectangle bounds;
+                    Region bounds;
                     if (EyesSeleniumUtils.isMobileDevice(driver)) {
-                        bounds = eyesTargetElement.getRect();
+                        bounds = eyesTargetElement.getRectAsRegion();
                     } else {
                         bounds = eyesTargetElement.getBoundingClientRect();
                     }
-                    r = new Region(bounds.getX(), bounds.getY(), bounds.getWidth(), bounds.getHeight(), CoordinatesType.CONTEXT_RELATIVE);
+                    r = bounds;
                 } else {
                     SizeAndBorders sizeAndBorders = eyesTargetElement.getSizeAndBorders();
                     RectangleSize s = sizeAndBorders.getSize();
