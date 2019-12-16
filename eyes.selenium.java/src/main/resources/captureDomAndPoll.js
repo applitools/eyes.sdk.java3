@@ -152,7 +152,7 @@ function __captureDomAndPoll() {
   }
 
   function getCss(newText, url) {
-    return `\n/** ${url} **/\n${newText}`;
+    return `\n/** http://www.applitools.com **/\n${newText}`;
   }
 
   var getBundledCssFromCssText = makeGetBundledCssFromCssText;
