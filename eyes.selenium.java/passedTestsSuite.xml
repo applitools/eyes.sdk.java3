@@ -5,7 +5,6 @@
     <listeners>
         <listener class-name="com.applitools.eyes.selenium.TestListener" />
     </listeners>
-
     
     <test name="TestClassicApi">
         <parameter name="dont_run" value="TestCheckInnerFrame+CSS, TestCheckInnerFrame+SCROLL, TestCheckInnerFrame+VG, TestCheckFrame+SCROLL,TestCheckFrame+VG, TestCheckWindowFully+VG, TestDoubleCheckWindow+VG, TestCheckWindow+VG, TestCheckWindow+SCROLL, TestCheckRegionInFrame+VG, TestCheckRegionInFrame+SCROLL, TestCheckRegion2+SCROLL"/>
