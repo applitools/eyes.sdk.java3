@@ -13,12 +13,8 @@ import com.applitools.eyes.utils.CommUtils;
 import com.applitools.eyes.utils.SeleniumUtils;
 import com.applitools.eyes.utils.TestUtils;
 import com.applitools.utils.GeneralUtils;
-import com.fasterxml.jackson.core.PrettyPrinter;
-import com.fasterxml.jackson.core.util.DefaultIndenter;
-import com.fasterxml.jackson.core.util.DefaultPrettyPrinter;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.testng.Assert;
@@ -110,10 +106,12 @@ public final class TestSendDom {
             TestResults results = eyes.close(false);
             boolean hasDom = getHasDom(eyes, results);
             Assert.assertTrue(hasDom);
+            ObjectMapper mapper = new ObjectMapper();
             try {
                 String expectedDomJson = GeneralUtils.readToEnd(TestSendDom.class.getResourceAsStream("/expected_dom1.json"));
-                String actualDomJson = NormalizeJsonString(actualDomJsonString, eyes);
-                Assert.assertEquals(actualDomJson, expectedDomJson);
+                JsonNode actual = mapper.readTree(actualDomJsonString);
+                JsonNode expected = mapper.readTree(expectedDomJson);
+                Assert.assertTrue(actual.equals(expected));
             } catch (IOException e) {
                 GeneralUtils.logExceptionStackTrace(eyes.getLogger(), e);
             }
@@ -211,27 +209,5 @@ public final class TestSendDom {
     private String getExpectedDomFromUrl(String domUrl) {
         String expectedDomJsonString = CommUtils.getString(domUrl);
         return expectedDomJsonString;
-    }
-
-    private String NormalizeJsonString(String json, SeleniumEyes eyes)
-    {
-        try {
-            ObjectMapper mapper = new ObjectMapper();
-            ObjectMapper mapperSort = new ObjectMapper();
-            mapperSort.configure(SerializationFeature.ORDER_MAP_ENTRIES_BY_KEYS, true);
-            mapperSort.enable(SerializationFeature.INDENT_OUTPUT);
-            JsonNode actualObj = mapper.readTree(json);
-            Object obj = mapperSort.treeToValue(actualObj, Object.class);
-            String res = mapperSort.writer(getPrettyPrinter()).writeValueAsString(obj);
-            return res.replace("\" : ","\": ").replace(": [ ],",": [],").replace("\": { },","\": {},");
-        }
-        catch (Exception e) {
-            GeneralUtils.logExceptionStackTrace(eyes.getLogger(), e);
-        }
-        return "Couldn't normalize JSON";
-    }
-
-    public PrettyPrinter getPrettyPrinter() {
-        return new DefaultPrettyPrinter().withArrayIndenter(DefaultIndenter.SYSTEM_LINEFEED_INSTANCE).withObjectIndenter(DefaultIndenter.SYSTEM_LINEFEED_INSTANCE).createInstance();
     }
 }
