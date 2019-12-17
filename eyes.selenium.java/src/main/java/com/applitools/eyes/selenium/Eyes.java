@@ -1611,7 +1611,7 @@ public class Eyes implements ISeleniumConfigurationProvider, IEyesBase {
             this.seleniumEyes.check(checkSettings);
         } else {
             for (ICheckSettings checkSetting : checkSettings) {
-                this.visualGridEyes.check(null, checkSetting);
+                this.visualGridEyes.check(checkSetting);
             }
         }
     }
