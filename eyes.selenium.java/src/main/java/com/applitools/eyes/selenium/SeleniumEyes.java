@@ -968,7 +968,9 @@ public class SeleniumEyes extends EyesBase implements IDriverProvider ,IBatchClo
 
             PositionProvider positionProvider = getElementPositionProvider(scrollRootElement);
             PositionMemento positionMemento = positionProvider.getState();
-            positionProvider.setPosition(elementLocation);
+            Point sreLocation = ((EyesRemoteWebElement)scrollRootElement).getBoundingClientRect().getPoint();
+            Location scrollToLocation = elementLocation.offset(-sreLocation.getX(), -sreLocation.getY());
+            positionProvider.setPosition(scrollToLocation);
             ppams.add(new PositionProviderAndMemento(positionProvider, positionMemento, fc));
         }
         return ppams;
@@ -1301,6 +1303,9 @@ public class SeleniumEyes extends EyesBase implements IDriverProvider ,IBatchClo
         if (scrollRootElement instanceof EyesRemoteWebElement) {
             EyesRemoteWebElement eyesRemoteWebElement = (EyesRemoteWebElement) scrollRootElement;
             eyesRemoteWebElement.setPositionProvider(positionProvider);
+            Rectangle sreBounds = eyesRemoteWebElement.getBoundingClientRect();
+            Region sreBoundsRegion = new Region(sreBounds.getX(), sreBounds.getY(), sreBounds.getWidth(), sreBounds.getHeight());
+            effectiveViewport.intersect(sreBoundsRegion);
         }
 
         ensureElementVisible(targetElement);
@@ -1333,9 +1338,19 @@ public class SeleniumEyes extends EyesBase implements IDriverProvider ,IBatchClo
                 elementPositionProvider = null;
             }
 
-            final Region elementRegion = new Region(
-                    pl.getX() + borderWidths.getLeft(), pl.getY() + borderWidths.getTop(),
-                    elementSize.getWidth(), elementSize.getHeight(), CoordinatesType.SCREENSHOT_AS_IS);
+            final Region elementRegion;
+            if (useEntireSize) {
+                elementRegion = new Region(
+                        pl.getX() + borderWidths.getLeft(), pl.getY() + borderWidths.getTop(),
+                        elementSize.getWidth(), elementSize.getHeight(), CoordinatesType.SCREENSHOT_AS_IS);
+            }
+            else{
+                elementRegion = new Region(
+                        pl.getX(), pl.getY(),
+                        elementSize.getWidth() + borderWidths.getLeft() + borderWidths.getRight(),
+                        elementSize.getHeight() + borderWidths.getTop()+borderWidths.getBottom(),
+                        CoordinatesType.SCREENSHOT_AS_IS);
+            }
 
             logger.verbose("Element region: " + elementRegion);
 

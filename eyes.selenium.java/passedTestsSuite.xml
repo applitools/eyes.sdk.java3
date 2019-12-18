@@ -167,6 +167,11 @@
             </class>
         </classes>
     </test>
+    <test name="TestScrollRootElementInCenter_Test">
+        <classes>
+            <class name="com.applitools.eyes.selenium.TestScrollRootElementInCenter"/>
+        </classes>
+    </test>
     <test name="Test_Mobile" parallel="methods">
         <classes>
             <class name="com.applitools.eyes.selenium.MobileNativeTests"/>
