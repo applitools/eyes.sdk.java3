@@ -243,6 +243,7 @@ public class EyesSeleniumUtils {
 
         String script = String.format("var origOF = arguments[0].style.overflow;" +
                 "arguments[0].style.overflow = '%s';" +
+                "return origOF;" +
                 "if ('%s'.toUpperCase() === 'HIDDEN' && origOF.toUpperCase() !== 'HIDDEN') arguments[0].setAttribute('data-applitools-original-overflow',origOF);" +
                 "return origOF;", value, value);
 
