@@ -20,7 +20,7 @@ jobs:
     - stage: test
       script:
         - latestChromeDriverURL=$(wget http://chromedriver.storage.googleapis.com/LATEST_RELEASE -q -O -)
-        - wget "https://chromedriver.storage.googleapis.com/78.0.3904.105/chromedriver_linux64.zip"
+        - wget "https://chromedriver.storage.googleapis.com/79.0.3945.36/chromedriver_linux64.zip"
         - unzip chromedriver_linux64.zip -d /home/travis/build/
         - env webdriver.chrome.driver=/home/travis/build/
         - SDK_VERSION=$(echo $TRAVIS_TAG | sed 's/[^.0-9]*//g')
