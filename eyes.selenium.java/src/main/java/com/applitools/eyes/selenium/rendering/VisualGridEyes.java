@@ -797,9 +797,6 @@ public class VisualGridEyes implements IRenderingEyes {
 
     private List<VisualGridSelector[]> getRegionsXPaths(ICheckSettingsInternal csInternal) {
         List<VisualGridSelector[]> result = new ArrayList<>();
-        FrameChain frameChain = webDriver.getFrameChain().clone();
-        EyesTargetLocator switchTo = (EyesTargetLocator) webDriver.switchTo();
-        switchToFrame((ISeleniumCheckTarget) csInternal);
         List<WebElementRegion>[] elementLists = collectSeleniumRegions(csInternal);
         for (List<WebElementRegion> elementList : elementLists) {
             //noinspection SpellCheckingInspection
@@ -811,7 +808,6 @@ public class VisualGridEyes implements IRenderingEyes {
             }
             result.add(xpaths.toArray(new VisualGridSelector[0]));
         }
-        switchTo.frames(frameChain);
         return result;
     }
 
