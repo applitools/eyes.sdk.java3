@@ -87,7 +87,7 @@ public class TestMobileDevices {
                     {"iPhone 5s Simulator", "10.3", ScreenOrientation.LANDSCAPE, true}
             }));
         }
-        devices = addPageType(devices);
+        devices = AddPageOrientation(devices);
         return devices.toArray(new Object[0][]);
     }
 
@@ -97,8 +97,24 @@ public class TestMobileDevices {
                 {"Android Emulator", "8.0", ScreenOrientation.PORTRAIT, false},
                 {"Android Emulator", "8.0", ScreenOrientation.LANDSCAPE, true}
         });
-        devices = addPageType(devices);
+        devices = AddPageOrientation(devices);
         return devices.toArray(new Object[0][]);
+    }
+
+    private static List<Object[]> AddPageOrientation(List<Object[]> devices)
+    {
+        List<Object[]> devicesWithPage = new ArrayList<Object[]>();
+        for(String page : Arrays.asList(new String[]{"mobile", "desktop", "scrolled_mobile"}))
+        {
+            for(Object[] device : devices)
+            {
+                Object[] params = new Object[device.length + 1];
+                for(int i=0; i < device.length; i++) params[i] = device[i];
+                params[device.length] = page;
+                devicesWithPage.add(params);
+            }
+        }
+        return devicesWithPage;
     }
 
     protected void initEyes(String deviceName, String platformVersion, ScreenOrientation deviceOrientation, boolean fully,
@@ -142,22 +158,6 @@ public class TestMobileDevices {
         } else {
             Assert.fail("failed to initialize web driver.");
         }
-    }
-
-    private static List<Object[]> addPageType(List<Object[]> devices)
-    {
-        List<Object[]> devicesWithPage = new ArrayList<Object[]>();
-        for(String page : Arrays.asList(new String[]{"mobile", "desktop", "scrolled_mobile"}))
-        {
-            for(Object[] device : devices)
-            {
-                Object[] params = new Object[device.length + 1];
-                for(int i=0; i < device.length; i++) params[i] = device[i];
-                params[device.length] = page;
-                devicesWithPage.add(params);
-            }
-        }
-        return devicesWithPage;
     }
 
     private void runTest(boolean fully, Eyes eyes, String testName, WebDriver driver, String page) {

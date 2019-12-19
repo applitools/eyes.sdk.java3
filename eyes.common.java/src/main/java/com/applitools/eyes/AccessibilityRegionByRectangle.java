@@ -2,7 +2,7 @@ package com.applitools.eyes;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.sun.javafx.beans.IDProperty;
+//import com.sun.javafx.beans.IDProperty;
 
 import java.util.Arrays;
 import java.util.List;
