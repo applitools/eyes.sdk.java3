@@ -18,20 +18,19 @@ public class ExcludeFailingTestsListener implements IInvokedMethodListener2 {
         if (iTestResult.getMethod().isBeforeMethodConfiguration() || iTestResult.getMethod().isTest()) {
             Map<String, String> testParameters = iTestContext.getCurrentXmlTest().getAllParameters();
             Object testInstance = iInvokedMethod.getTestResult().getInstance();
+            String testData;
             if (testInstance instanceof TestSetup){
-                for (String parameter: testParameters.values()) {
-                    System.out.println("Searching for test: " + iTestResult.getTestClass().getName() + "." + iTestResult.getMethod().getMethodName() + "+" + ((TestSetup) testInstance).mode + " in parameter dont_run: " + parameter);
-                }
-                for (Map.Entry<String,String> entry : testParameters.entrySet()) {
-                    if (entry.getKey().toLowerCase().equals("dont_run") &&
-                            entry.getValue().toLowerCase().contains(iTestResult.getMethod().getMethodName().toLowerCase() + "+" + ((TestSetup) testInstance).mode.toLowerCase())) {
-                        System.out.println("Test: " + iTestResult.getTestClass().getName() + "." + iTestResult.getMethod().getMethodName() + "+" + ((TestSetup) testInstance).mode + " is excluded");
-                        throw new SkipException("Skipping data set " + testParameters.entrySet().toString());
-                    } else {
-                        System.out.println("Test: " + iTestResult.getTestClass().getName() + "." + iTestResult.getMethod().getMethodName() + "+" + ((TestSetup) testInstance).mode + " is running");
-                    }
-                }
+                testData = ((TestSetup) testInstance).mode;
             }
+            else if (testInstance instanceof TestMobileDevices){
+                testData = ((TestMobileDevices) testInstance).deviceName
+                        + "+" + ((TestMobileDevices) testInstance).platformVersion
+                        + "+" + ((TestMobileDevices) testInstance).deviceOrientation.toString()
+                        + "+" + Boolean.toString(((TestMobileDevices) testInstance).fully)
+                        + "+" + ((TestMobileDevices) testInstance).page;
+            }
+            else return;
+            handleTests(iTestResult, testParameters, testData);
         }
     }
 
@@ -52,6 +51,21 @@ public class ExcludeFailingTestsListener implements IInvokedMethodListener2 {
     public static class DataSetSkipException extends SkipException {
         public DataSetSkipException(String message) {
             super(message);
+        }
+    }
+
+    private void handleTests(ITestResult iTestResult, Map<String, String> testParameters, String testData) {
+        for (String parameter: testParameters.values()) {
+            System.out.println("Searching for test: " + iTestResult.getTestClass().getName() + "." + iTestResult.getMethod().getMethodName() + "+" + testData + " in parameter dont_run: " + parameter);
+        }
+        for (Map.Entry<String,String> entry : testParameters.entrySet()) {
+            if (entry.getKey().toLowerCase().equals("dont_run") &&
+                    entry.getValue().toLowerCase().contains((iTestResult.getMethod().getMethodName().toLowerCase() + "+" + testData).toLowerCase())) {
+                System.out.println("Test: " + iTestResult.getTestClass().getName() + "." + iTestResult.getMethod().getMethodName() + "+" + testData + " is excluded");
+                throw new SkipException("Skipping data set " + testParameters.entrySet().toString());
+            } else {
+                System.out.println("Test: " + iTestResult.getTestClass().getName() + "." + iTestResult.getMethod().getMethodName() + "+" + testData + " is running");
+            }
         }
     }
 }
