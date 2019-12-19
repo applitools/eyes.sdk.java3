@@ -19,7 +19,7 @@ import org.apache.http.impl.conn.tsccm.ThreadSafeClientConnManager;
 import org.apache.http.params.BasicHttpParams;
 import org.apache.http.params.HttpParams;
 import org.apache.http.params.HttpProtocolParams;
-//import sun.net.www.http.HttpClient;
+import sun.net.www.http.HttpClient;
 
 import javax.ws.rs.core.UriBuilder;
 import java.io.IOException;
