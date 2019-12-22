@@ -5,6 +5,7 @@
     <listeners>
         <listener class-name="com.applitools.eyes.selenium.ExcludeFailingTestsListener"/>
         <listener class-name="com.applitools.eyes.selenium.TestListener" />
+        <listener class-name="com.applitools.eyes.selenium.RetryListener" />
     </listeners>
 
     <suite-files>
