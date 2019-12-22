@@ -13,6 +13,7 @@ public class RetryAnalyzer implements IRetryAnalyzer {
 
         if(counter < retryLimit)
         {
+            System.out.println("Retrying failed method: " + result.getMethod().getQualifiedName());
             counter++;
             return true;
         }
