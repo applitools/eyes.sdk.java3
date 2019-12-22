@@ -11,3 +11,4 @@ all supported browser versions
 batch completion
 visual locators
 Default configuration validation
+Revert driver back to initial IFrame after checkWindow
