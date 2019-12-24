@@ -2,6 +2,7 @@ package com.applitools.eyes.selenium;
 
 import org.testng.*;
 import java.util.*;
+import java.lang.reflect.Method;
 
 
 
@@ -22,6 +23,9 @@ public class ExcludeFailingTestsListener implements IInvokedMethodListener2 {
             String testData;
             if (testInstance instanceof TestSetup){
                 testData = ((TestSetup) testInstance).mode;
+                handleTests(iTestResult, testParameters, testData);
+                Method method = iTestResult.getMethod().getConstructorOrMethod().getMethod();
+                ((TestSetup) testInstance).beforeMethod(method.getName());
             }
             else if (testInstance instanceof TestMobileDevices){
                 testData = ((TestMobileDevices) testInstance).deviceName
@@ -29,9 +33,8 @@ public class ExcludeFailingTestsListener implements IInvokedMethodListener2 {
                         + "+" + ((TestMobileDevices) testInstance).deviceOrientation.toString()
                         + "+" + Boolean.toString(((TestMobileDevices) testInstance).fully)
                         + "+" + ((TestMobileDevices) testInstance).page;
+                handleTests(iTestResult, testParameters, testData);
             }
-            else return;
-            handleTests(iTestResult, testParameters, testData);
         }
     }
 
