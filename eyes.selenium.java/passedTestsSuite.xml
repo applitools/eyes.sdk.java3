@@ -177,9 +177,65 @@
             </class>
         </classes>
     </test>
+    <test name="TestDuplicates" parallel="methods">
+        <classes>
+            <class name="com.applitools.eyes.selenium.TestDuplicates">
+                <methods>
+                    <include name="TestDuplicatedIFrames" />
+                </methods>
+            </class>
+        </classes>
+    </test>
     <test name="TestScrollRootElement" parallel="methods">
         <parameter name="dont_run"
                    value="TestCheckWindow_Body+CSS"/>
+        <classes>
+            <class name="com.applitools.eyes.selenium.TestScrollRootElement">
+                <methods>
+                    <include name="TestCheckWindow_Body" />
+                    <include name="TestCheckWindow_Html" />
+                </methods>
+            </class>
+        </classes>
+    </test>
+    <test name="TestMobileDevicesIOS">
+        <parameter name="dont_run" value="TestIOSSafariCrop_SauceLabs+iPhone XR Simulator+12.2+PORTRAIT+true+desktop,
+            TestIOSSafariCrop_SauceLabs+iPhone XR Simulator+12.2+PORTRAIT+true+scrolled_mobile,
+            TestIOSSafariCrop_SauceLabs+iPad Air Simulator+11.0+PORTRAIT+true+desktop,
+            TestIOSSafariCrop_SauceLabs+iPad Simulator+11.0+LANDSCAPE+true+desktop,
+            TestIOSSafariCrop_SauceLabs+iPad Pro (9.7 inch) Simulator+11.0+LANDSCAPE+true+desktop,
+            TestIOSSafariCrop_SauceLabs+iPad Pro (12.9 inch) (2nd generation) Simulator+11.0+PORTRAIT+true+desktop,
+            TestIOSSafariCrop_SauceLabs+iPad Pro (12.9 inch) (2nd generation) Simulator+12.0+PORTRAIT+true+desktop,
+            TestIOSSafariCrop_SauceLabs+iPad Pro (10.5 inch) Simulator+11.0+LANDSCAPE+true+desktop,
+            TestIOSSafariCrop_SauceLabs+iPhone XS Max Simulator+12.2+LANDSCAPE+true+mobile,
+            TestIOSSafariCrop_SauceLabs+iPhone XS Max Simulator+12.2+LANDSCAPE+true+desktop,
+            TestIOSSafariCrop_SauceLabs+iPhone XS Max Simulator+12.2+LANDSCAPE+true+scrolled_mobile,
+            TestIOSSafariCrop_SauceLabs+iPhone XS Max Simulator+12.2+PORTRAIT+false+scrolled_mobile,
+            TestIOSSafariCrop_SauceLabs+iPhone XS Max Simulator+12.2+PORTRAIT+true+mobile,
+            TestIOSSafariCrop_SauceLabs+iPhone XS Max Simulator+12.2+PORTRAIT+true+desktop,
+            TestIOSSafariCrop_SauceLabs+iPhone XS Max Simulator+12.2+PORTRAIT+true+scrolled_mobile,
+            TestIOSSafariCrop_SauceLabs+iPhone XS Simulator+12.2+PORTRAIT+false+scrolled_mobile,
+            TestIOSSafariCrop_SauceLabs+iPhone XS Simulator+12.2+LANDSCAPE+false+mobile,
+            TestIOSSafariCrop_SauceLabs+iPhone XS Simulator+12.2+LANDSCAPE+false+desktop,
+            TestIOSSafariCrop_SauceLabs+iPhone XS Simulator+12.2+PORTRAIT+true+mobile,
+            TestIOSSafariCrop_SauceLabs+iPhone XS Simulator+12.2+PORTRAIT+true+desktop,
+            TestIOSSafariCrop_SauceLabs+iPhone XS Simulator+12.2+PORTRAIT+true+scrolled_mobile,
+            TestIOSSafariCrop_SauceLabs+iPhone XS Simulator+12.2+LANDSCAPE+true+desktop,
+            TestIOSSafariCrop_SauceLabs+iPhone XS Simulator+12.2+LANDSCAPE+true+scrolled_mobile,
+            TestIOSSafariCrop_SauceLabs+iPhone XR Simulator+12.2+PORTRAIT+false+scrolled_mobile,
+            TestIOSSafariCrop_SauceLabs+iPhone XR Simulator+12.2+LANDSCAPE+true+mobile,
+            TestIOSSafariCrop_SauceLabs+iPhone XR Simulator+12.2+LANDSCAPE+true+desktop,
+            TestIOSSafariCrop_SauceLabs+iPhone XR Simulator+12.2+LANDSCAPE+true+scrolled_mobile,
+            TestIOSSafariCrop_SauceLabs+iPhone X Simulator+11.2+PORTRAIT+true+mobile,
+            TestIOSSafariCrop_SauceLabs+iPhone X Simulator+11.2+PORTRAIT+true+desktop,
+            TestIOSSafariCrop_SauceLabs+iPhone X Simulator+11.2+PORTRAIT+true+scrolled_mobile,
+            TestIOSSafariCrop_SauceLabs+iPhone 7 Simulator+10.3+PORTRAIT+true+desktop,
+            TestIOSSafariCrop_SauceLabs+iPhone 7 Simulator+10.3+PORTRAIT+true+scrolled_mobile,
+            TestIOSSafariCrop_SauceLabs+iPhone 6 Plus Simulator+11.0+LANDSCAPE+true+mobile,
+            TestIOSSafariCrop_SauceLabs+iPhone 6 Plus Simulator+11.0+LANDSCAPE+true+desktop,
+            TestIOSSafariCrop_SauceLabs+iPhone 6 Plus Simulator+11.0+LANDSCAPE+true+scrolled_mobile,
+            TestIOSSafariCrop_SauceLabs+iPhone 5s Simulator+10.3+LANDSCAPE+true+desktop
+        "/>
         <classes>
             <class name="com.applitools.eyes.selenium.TestScrollRootElement">
                 <methods>
