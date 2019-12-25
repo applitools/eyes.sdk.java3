@@ -4,9 +4,12 @@
 
     <listeners>
         <listener class-name="com.applitools.eyes.selenium.ExcludeFailingTestsListener"/>
+        <listener class-name="com.applitools.eyes.selenium.RetryListener" />
+        <listener class-name="com.applitools.eyes.selenium.PostTestResultsListener" />
     </listeners>
 
     <suite-files>
         <suite-file path="passedTestsSuite.xml" />
+        <suite-file path="mobileTestsSuite.xml" />
     </suite-files>
 </suite>
