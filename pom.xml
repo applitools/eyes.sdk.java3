@@ -13,9 +13,8 @@
     <description>Applitools Eyes SDK base for Java</description>
     <licenses>
         <license>
-            <name>Apache License, Version 2.0</name>
-            <url>http://www.apache.org/licenses/LICENSE-2.0</url>
-            <distribution>repo</distribution>
+            <name>Applitools License</name>
+            <url>https://www.applitools.com/eula/sdk</url>
         </license>
     </licenses>
     <scm>
