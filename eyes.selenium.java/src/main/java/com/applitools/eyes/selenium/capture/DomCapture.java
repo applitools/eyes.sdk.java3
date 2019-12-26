@@ -80,7 +80,7 @@ public class DomCapture {
     }
 
     private String getDom() {
-        FrameChain originalFC = driver.getFrameChain();
+        FrameChain originalFC = driver.getFrameChain().clone();
 
         String dom = getFrameDom();
 
