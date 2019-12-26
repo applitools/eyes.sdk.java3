@@ -5,6 +5,7 @@ import com.applitools.utils.GeneralUtils;
 
 import java.io.File;
 import java.io.FileOutputStream;
+import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
 
 public class FileDebugResourceWriter implements IDebugResourceWriter {
@@ -45,7 +46,7 @@ public class FileDebugResourceWriter implements IDebugResourceWriter {
         String url = resource.getUrl();
         if (filter == null || filter.isEmpty() || url.toUpperCase().contains(filter.toUpperCase())) {
             try {
-                String urlHash = GeneralUtils.getSha256hash(url.getBytes());
+                String urlHash = GeneralUtils.getSha256hash(url.getBytes(StandardCharsets.UTF_8));
                 String ext = resource.getContentType();
                 int slash = ext.indexOf("/");
                 ext = ext.substring(slash + 1);
