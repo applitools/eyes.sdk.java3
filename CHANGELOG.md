@@ -2,8 +2,9 @@
 - Capture scripts. [Trello 151](https://trello.com/c/owyVIQG9)
 
 ###Fixed
-- Java SDK was missing abortAsync. [Trello 1420](https://trello.com/c/3NOKuLLj)
+- Added missing method: abortAsync. [Trello 1420](https://trello.com/c/3NOKuLLj)
 - Fixed viewport computation on edge cases.
+- Some special characters are not rendering on Visual Grid. [Trello 1443](https://trello.com/c/GWzVCY7W)
 
 ## [3.158.9] - 2019-12-12
 ### Fixed
