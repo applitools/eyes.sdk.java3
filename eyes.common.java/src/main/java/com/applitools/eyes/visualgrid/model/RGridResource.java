@@ -10,6 +10,7 @@ import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.Objects;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -47,7 +48,7 @@ public class RGridResource {
     public RGridResource(String url, String contentType, byte[] content, Logger logger, String msg) {
 
         this.contentType = contentType;
-        this.content = content.length > MAX_RESOURCE_SIZE ? Arrays.copyOf(contentType.getBytes(), MAX_RESOURCE_SIZE) : content;
+        this.content = content.length > MAX_RESOURCE_SIZE ? Arrays.copyOf(content, MAX_RESOURCE_SIZE) : content;
         this.logger = logger;
         this.sha256 = GeneralUtils.getSha256hash(this.content);
         this.url = url;

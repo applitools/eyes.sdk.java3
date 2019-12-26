@@ -4,6 +4,8 @@ import org.apache.commons.codec.binary.Base64;
 import org.apache.http.Header;
 import org.apache.http.message.BasicHeader;
 
+import java.nio.charset.StandardCharsets;
+
 public class HttpAuth {
     private String username;
     private String password;
@@ -19,7 +21,7 @@ public class HttpAuth {
 
     public Header getHeader() {
         String token = this.username + ":" + this.password;
-        token = Base64.encodeBase64String(token.getBytes());
+        token = Base64.encodeBase64String(token.getBytes(StandardCharsets.UTF_8));
         Header header = new BasicHeader("Authorization", this.mode + " " + token);
         return header;
     }

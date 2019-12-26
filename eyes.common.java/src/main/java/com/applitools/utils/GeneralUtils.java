@@ -11,6 +11,7 @@ import org.apache.commons.lang3.ArrayUtils;
 
 import java.io.*;
 import java.net.*;
+import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.text.DateFormat;
@@ -250,7 +251,7 @@ public class GeneralUtils {
 
         try {
             GZIPOutputStream gzip = new GZIPOutputStream(resultStream);
-            gzip.write(domJson.getBytes());
+            gzip.write(domJson.getBytes(StandardCharsets.UTF_8));
             gzip.close();
         } catch (IOException e) {
             e.printStackTrace();

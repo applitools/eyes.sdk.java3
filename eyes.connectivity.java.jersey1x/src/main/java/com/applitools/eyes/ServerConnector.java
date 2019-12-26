@@ -31,6 +31,7 @@ import javax.xml.bind.DatatypeConverter;
 import java.io.*;
 import java.net.URI;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
@@ -538,7 +539,7 @@ public class ServerConnector extends RestClient
             ObjectMapper objectMapper = new ObjectMapper();
             objectMapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
             objectMapper.configure(MapperFeature.SORT_PROPERTIES_ALPHABETICALLY, true);
-            byte[] bytes = objectMapper.writeValueAsString(renderRequests).getBytes();
+            byte[] bytes = objectMapper.writeValueAsString(renderRequests).getBytes(StandardCharsets.UTF_8);
             if (webResource == null) {
                 builder = target.getRequestBuilder();
                 builder = builder.entity(bytes, MediaType.APPLICATION_JSON);

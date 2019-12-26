@@ -8,8 +8,13 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.MapperFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.ArrayUtils;
 
+import java.io.File;
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -75,7 +80,7 @@ public class RGridDom {
     @JsonProperty("hash")
     public String getSha256() throws JsonProcessingException {
         if (this.sha256 == null) {
-            sha256 = GeneralUtils.getSha256hash((getStringObjectMap().getBytes()));
+            sha256 = GeneralUtils.getSha256hash((getStringObjectMap().getBytes(StandardCharsets.UTF_8)));
         }
         return sha256;
     }
@@ -98,8 +103,8 @@ public class RGridDom {
 
     public RGridResource asResource() throws JsonProcessingException {
        if (gridResource == null) {
-            gridResource =  new RGridResource(this.url, CONTENT_TYPE, getStringObjectMap().getBytes(), logger, "RGridDom - "+msg);
-        }
+           gridResource =  new RGridResource(this.url, CONTENT_TYPE, getStringObjectMap().getBytes(StandardCharsets.UTF_8), logger, "RGridDom - "+msg);
+       }
         return gridResource;
     }
 

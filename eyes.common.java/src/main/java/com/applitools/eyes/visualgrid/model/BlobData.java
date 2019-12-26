@@ -2,6 +2,7 @@ package com.applitools.eyes.visualgrid.model;
 
 
 import java.net.URI;
+import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 
 public class BlobData {
@@ -37,7 +38,7 @@ public class BlobData {
     }
 
     public void setValue(String value) {
-        this.value = value.getBytes().length > MAX_RESOURCE_SIZE ? new String(Arrays.copyOf(value.getBytes(), MAX_RESOURCE_SIZE)) : value;
+        this.value = value.getBytes(StandardCharsets.UTF_8).length > MAX_RESOURCE_SIZE ? new String(Arrays.copyOf(value.getBytes(StandardCharsets.UTF_8), MAX_RESOURCE_SIZE)) : value;
     }
 
     @Override
