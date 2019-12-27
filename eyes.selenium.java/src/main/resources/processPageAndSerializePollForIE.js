@@ -1,4 +1,4 @@
-/* @applitools/dom-snapshot@3.2.1 */
+/* @applitools/dom-snapshot@3.2.2 */
 
 function __processPageAndSerializePollForIE() {
   var processPageAndSerializePollForIE = (function () {
@@ -197,32 +197,37 @@ function __processPageAndSerializePollForIE() {
               } return value;
             };
 
-            var isPure = false;
-
             var SHARED = '__core-js_shared__';
             var store = global_1[SHARED] || setGlobal(SHARED, {});
 
             var sharedStore = store;
 
-            var shared = createCommonjsModule(function (module) {
-            (module.exports = function (key, value) {
-              return sharedStore[key] || (sharedStore[key] = value !== undefined ? value : {});
-            })('versions', []).push({
-              version: '3.4.7',
-              mode: 'global',
-              copyright: '© 2019 Denis Pushkarev (zloirock.ru)'
-            });
-            });
-
             var functionToString = Function.toString;
 
-            var inspectSource = shared('inspectSource', function (it) {
-              return functionToString.call(it);
-            });
+            // this helper broken in `3.4.1-3.4.4`, so we can't use `shared` helper
+            if (typeof sharedStore.inspectSource != 'function') {
+              sharedStore.inspectSource = function (it) {
+                return functionToString.call(it);
+              };
+            }
+
+            var inspectSource = sharedStore.inspectSource;
 
             var WeakMap$1 = global_1.WeakMap;
 
             var nativeWeakMap = typeof WeakMap$1 === 'function' && /native code/.test(inspectSource(WeakMap$1));
+
+            var isPure = false;
+
+            var shared = createCommonjsModule(function (module) {
+            (module.exports = function (key, value) {
+              return sharedStore[key] || (sharedStore[key] = value !== undefined ? value : {});
+            })('versions', []).push({
+              version: '3.6.1',
+              mode: 'global',
+              copyright: '© 2019 Denis Pushkarev (zloirock.ru)'
+            });
+            });
 
             var id = 0;
             var postfix = Math.random();
@@ -537,7 +542,7 @@ function __processPageAndSerializePollForIE() {
               // eslint-disable-next-line no-undef
               && !Symbol.sham
               // eslint-disable-next-line no-undef
-              && typeof Symbol() == 'symbol';
+              && typeof Symbol.iterator == 'symbol';
 
             // `IsArray` abstract operation
             // https://tc39.github.io/ecma262/#sec-isarray
@@ -571,48 +576,76 @@ function __processPageAndSerializePollForIE() {
 
             var html = getBuiltIn('document', 'documentElement');
 
+            var GT = '>';
+            var LT = '<';
+            var PROTOTYPE = 'prototype';
+            var SCRIPT = 'script';
             var IE_PROTO = sharedKey('IE_PROTO');
 
-            var PROTOTYPE = 'prototype';
-            var Empty = function () { /* empty */ };
+            var EmptyConstructor = function () { /* empty */ };
+
+            var scriptTag = function (content) {
+              return LT + SCRIPT + GT + content + LT + '/' + SCRIPT + GT;
+            };
+
+            // Create object with fake `null` prototype: use ActiveX Object with cleared prototype
+            var NullProtoObjectViaActiveX = function (activeXDocument) {
+              activeXDocument.write(scriptTag(''));
+              activeXDocument.close();
+              var temp = activeXDocument.parentWindow.Object;
+              activeXDocument = null; // avoid memory leak
+              return temp;
+            };
 
             // Create object with fake `null` prototype: use iframe Object with cleared prototype
-            var createDict = function () {
+            var NullProtoObjectViaIFrame = function () {
               // Thrash, waste and sodomy: IE GC bug
               var iframe = documentCreateElement('iframe');
-              var length = enumBugKeys.length;
-              var lt = '<';
-              var script = 'script';
-              var gt = '>';
-              var js = 'java' + script + ':';
+              var JS = 'java' + SCRIPT + ':';
               var iframeDocument;
               iframe.style.display = 'none';
               html.appendChild(iframe);
-              iframe.src = String(js);
+              // https://github.com/zloirock/core-js/issues/475
+              iframe.src = String(JS);
               iframeDocument = iframe.contentWindow.document;
               iframeDocument.open();
-              iframeDocument.write(lt + script + gt + 'document.F=Object' + lt + '/' + script + gt);
+              iframeDocument.write(scriptTag('document.F=Object'));
               iframeDocument.close();
-              createDict = iframeDocument.F;
-              while (length--) delete createDict[PROTOTYPE][enumBugKeys[length]];
-              return createDict();
+              return iframeDocument.F;
             };
+
+            // Check for document.domain and active x support
+            // No need to use active x approach when document.domain is not set
+            // see https://github.com/es-shims/es5-shim/issues/150
+            // variation of https://github.com/kitcambridge/es5-shim/commit/4f738ac066346
+            // avoid IE GC bug
+            var activeXDocument;
+            var NullProtoObject = function () {
+              try {
+                /* global ActiveXObject */
+                activeXDocument = document.domain && new ActiveXObject('htmlfile');
+              } catch (error) { /* ignore */ }
+              NullProtoObject = activeXDocument ? NullProtoObjectViaActiveX(activeXDocument) : NullProtoObjectViaIFrame();
+              var length = enumBugKeys.length;
+              while (length--) delete NullProtoObject[PROTOTYPE][enumBugKeys[length]];
+              return NullProtoObject();
+            };
+
+            hiddenKeys[IE_PROTO] = true;
 
             // `Object.create` method
             // https://tc39.github.io/ecma262/#sec-object.create
             var objectCreate = Object.create || function create(O, Properties) {
               var result;
               if (O !== null) {
-                Empty[PROTOTYPE] = anObject(O);
-                result = new Empty();
-                Empty[PROTOTYPE] = null;
+                EmptyConstructor[PROTOTYPE] = anObject(O);
+                result = new EmptyConstructor();
+                EmptyConstructor[PROTOTYPE] = null;
                 // add "__proto__" for Object.getPrototypeOf polyfill
                 result[IE_PROTO] = O;
-              } else result = createDict();
+              } else result = NullProtoObject();
               return Properties === undefined ? result : objectDefineProperties(result, Properties);
             };
-
-            hiddenKeys[IE_PROTO] = true;
 
             var nativeGetOwnPropertyNames = objectGetOwnPropertyNames.f;
 
@@ -642,7 +675,7 @@ function __processPageAndSerializePollForIE() {
 
             var WellKnownSymbolsStore = shared('wks');
             var Symbol$1 = global_1.Symbol;
-            var createWellKnownSymbol = useSymbolAsUid ? Symbol$1 : uid;
+            var createWellKnownSymbol = useSymbolAsUid ? Symbol$1 : Symbol$1 && Symbol$1.withoutSetter || uid;
 
             var wellKnownSymbol = function (name) {
               if (!has(WellKnownSymbolsStore, name)) {
@@ -833,7 +866,7 @@ function __processPageAndSerializePollForIE() {
               return symbol;
             };
 
-            var isSymbol = nativeSymbol && typeof $Symbol.iterator == 'symbol' ? function (it) {
+            var isSymbol = useSymbolAsUid ? function (it) {
               return typeof it == 'symbol';
             } : function (it) {
               return Object(it) instanceof $Symbol;
@@ -928,11 +961,19 @@ function __processPageAndSerializePollForIE() {
                 return getInternalState(this).tag;
               });
 
+              redefine($Symbol, 'withoutSetter', function (description) {
+                return wrap(uid(description), description);
+              });
+
               objectPropertyIsEnumerable.f = $propertyIsEnumerable;
               objectDefineProperty.f = $defineProperty;
               objectGetOwnPropertyDescriptor.f = $getOwnPropertyDescriptor;
               objectGetOwnPropertyNames.f = objectGetOwnPropertyNamesExternal.f = $getOwnPropertyNames;
               objectGetOwnPropertySymbols.f = $getOwnPropertySymbols;
+
+              wrappedWellKnownSymbol.f = function (name) {
+                return wrap(wellKnownSymbol(name), name);
+              };
 
               if (descriptors) {
                 // https://github.com/tc39/proposal-Symbol-description
@@ -946,12 +987,6 @@ function __processPageAndSerializePollForIE() {
                   redefine(ObjectPrototype, 'propertyIsEnumerable', $propertyIsEnumerable, { unsafe: true });
                 }
               }
-            }
-
-            if (!useSymbolAsUid) {
-              wrappedWellKnownSymbol.f = function (name) {
-                return wrap(wellKnownSymbol(name), name);
-              };
             }
 
             _export({ global: true, wrap: true, forced: !nativeSymbol, sham: !nativeSymbol }, {
@@ -2011,7 +2046,10 @@ function __processPageAndSerializePollForIE() {
             // Array.prototype[@@unscopables]
             // https://tc39.github.io/ecma262/#sec-array.prototype-@@unscopables
             if (ArrayPrototype$1[UNSCOPABLES] == undefined) {
-              createNonEnumerableProperty(ArrayPrototype$1, UNSCOPABLES, objectCreate(null));
+              objectDefineProperty.f(ArrayPrototype$1, UNSCOPABLES, {
+                configurable: true,
+                value: objectCreate(null)
+              });
             }
 
             // add a key to Array.prototype[@@unscopables]
@@ -2852,6 +2890,31 @@ function __processPageAndSerializePollForIE() {
               return result;
             };
 
+            // babel-minify transpiles RegExp('a', 'y') -> /a/y and it causes SyntaxError,
+            // so we use an intermediate function.
+            function RE(s, f) {
+              return RegExp(s, f);
+            }
+
+            var UNSUPPORTED_Y = fails(function () {
+              // babel-minify transpiles RegExp('a', 'y') -> /a/y and it causes SyntaxError
+              var re = RE('a', 'y');
+              re.lastIndex = 2;
+              return re.exec('abcd') != null;
+            });
+
+            var BROKEN_CARET = fails(function () {
+              // https://bugzilla.mozilla.org/show_bug.cgi?id=773687
+              var re = RE('^r', 'gy');
+              re.lastIndex = 2;
+              return re.exec('str') != null;
+            });
+
+            var regexpStickyHelpers = {
+            	UNSUPPORTED_Y: UNSUPPORTED_Y,
+            	BROKEN_CARET: BROKEN_CARET
+            };
+
             var nativeExec = RegExp.prototype.exec;
             // This always refers to the native implementation, because the
             // String#replace polyfill uses ./fix-regexp-well-known-symbol-logic.js,
@@ -2868,24 +2931,56 @@ function __processPageAndSerializePollForIE() {
               return re1.lastIndex !== 0 || re2.lastIndex !== 0;
             })();
 
+            var UNSUPPORTED_Y$1 = regexpStickyHelpers.UNSUPPORTED_Y || regexpStickyHelpers.BROKEN_CARET;
+
             // nonparticipating capturing group, copied from es5-shim's String#split patch.
             var NPCG_INCLUDED = /()??/.exec('')[1] !== undefined;
 
-            var PATCH = UPDATES_LAST_INDEX_WRONG || NPCG_INCLUDED;
+            var PATCH = UPDATES_LAST_INDEX_WRONG || NPCG_INCLUDED || UNSUPPORTED_Y$1;
 
             if (PATCH) {
               patchedExec = function exec(str) {
                 var re = this;
                 var lastIndex, reCopy, match, i;
+                var sticky = UNSUPPORTED_Y$1 && re.sticky;
+                var flags = regexpFlags.call(re);
+                var source = re.source;
+                var charsAdded = 0;
+                var strCopy = str;
+
+                if (sticky) {
+                  flags = flags.replace('y', '');
+                  if (flags.indexOf('g') === -1) {
+                    flags += 'g';
+                  }
+
+                  strCopy = String(str).slice(re.lastIndex);
+                  // Support anchored sticky behavior.
+                  if (re.lastIndex > 0 && (!re.multiline || re.multiline && str[re.lastIndex - 1] !== '\n')) {
+                    source = '(?: ' + source + ')';
+                    strCopy = ' ' + strCopy;
+                    charsAdded++;
+                  }
+                  // ^(? + rx + ) is needed, in combination with some str slicing, to
+                  // simulate the 'y' flag.
+                  reCopy = new RegExp('^(?:' + source + ')', flags);
+                }
 
                 if (NPCG_INCLUDED) {
-                  reCopy = new RegExp('^' + re.source + '$(?!\\s)', regexpFlags.call(re));
+                  reCopy = new RegExp('^' + source + '$(?!\\s)', flags);
                 }
                 if (UPDATES_LAST_INDEX_WRONG) lastIndex = re.lastIndex;
 
-                match = nativeExec.call(re, str);
+                match = nativeExec.call(sticky ? reCopy : re, strCopy);
 
-                if (UPDATES_LAST_INDEX_WRONG && match) {
+                if (sticky) {
+                  if (match) {
+                    match.input = match.input.slice(charsAdded);
+                    match[0] = match[0].slice(charsAdded);
+                    match.index = re.lastIndex;
+                    re.lastIndex += match[0].length;
+                  } else re.lastIndex = 0;
+                } else if (UPDATES_LAST_INDEX_WRONG && match) {
                   re.lastIndex = re.global ? match.index + match[0].length : lastIndex;
                 }
                 if (NPCG_INCLUDED && match && match.length > 1) {
@@ -2918,6 +3013,12 @@ function __processPageAndSerializePollForIE() {
               };
               return ''.replace(re, '$<a>') !== '7';
             });
+
+            // IE <= 11 replaces $0 with the whole match, as if it was $&
+            // https://stackoverflow.com/questions/6024666/getting-ie-to-replace-a-regex-with-the-literal-string-0
+            var REPLACE_KEEPS_$0 = (function () {
+              return 'a'.replace(/./, '$0') === '$0';
+            })();
 
             // Chrome 51 has a buggy "split" implementation when RegExp#exec !== nativeExec
             // Weex JS has frozen built-in prototypes, so use try / catch wrapper
@@ -2966,7 +3067,7 @@ function __processPageAndSerializePollForIE() {
               if (
                 !DELEGATES_TO_SYMBOL ||
                 !DELEGATES_TO_EXEC ||
-                (KEY === 'replace' && !REPLACE_SUPPORTS_NAMED_GROUPS) ||
+                (KEY === 'replace' && !(REPLACE_SUPPORTS_NAMED_GROUPS && REPLACE_KEEPS_$0)) ||
                 (KEY === 'split' && !SPLIT_WORKS_WITH_OVERWRITTEN_EXEC)
               ) {
                 var nativeRegExpMethod = /./[SYMBOL];
@@ -2981,7 +3082,7 @@ function __processPageAndSerializePollForIE() {
                     return { done: true, value: nativeMethod.call(str, regexp, arg2) };
                   }
                   return { done: false };
-                });
+                }, { REPLACE_KEEPS_$0: REPLACE_KEEPS_$0 });
                 var stringMethod = methods[0];
                 var regexMethod = methods[1];
 
@@ -2994,8 +3095,9 @@ function __processPageAndSerializePollForIE() {
                   // 21.2.5.9 RegExp.prototype[@@search](string)
                   : function (string) { return regexMethod.call(string, this); }
                 );
-                if (sham) createNonEnumerableProperty(RegExp.prototype[SYMBOL], 'sham', true);
               }
+
+              if (sham) createNonEnumerableProperty(RegExp.prototype[SYMBOL], 'sham', true);
             };
 
             var charAt = stringMultibyte.charAt;
@@ -3252,7 +3354,7 @@ function __processPageAndSerializePollForIE() {
             };
 
             // @@replace logic
-            fixRegexpWellKnownSymbolLogic('replace', 2, function (REPLACE, nativeReplace, maybeCallNative) {
+            fixRegexpWellKnownSymbolLogic('replace', 2, function (REPLACE, nativeReplace, maybeCallNative, reason) {
               return [
                 // `String.prototype.replace` method
                 // https://tc39.github.io/ecma262/#sec-string.prototype.replace
@@ -3266,8 +3368,10 @@ function __processPageAndSerializePollForIE() {
                 // `RegExp.prototype[@@replace]` method
                 // https://tc39.github.io/ecma262/#sec-regexp.prototype-@@replace
                 function (regexp, replaceValue) {
-                  var res = maybeCallNative(nativeReplace, regexp, this, replaceValue);
-                  if (res.done) return res.value;
+                  if (reason.REPLACE_KEEPS_$0 || (typeof replaceValue === 'string' && replaceValue.indexOf('$0') === -1)) {
+                    var res = maybeCallNative(nativeReplace, regexp, this, replaceValue);
+                    if (res.done) return res.value;
+                  }
 
                   var rx = anObject(regexp);
                   var S = String(this);
@@ -3798,6 +3902,8 @@ function __processPageAndSerializePollForIE() {
 
 
 
+            var setInternalState$4 = internalState.set;
+
 
 
             var MATCH$2 = wellKnownSymbol('match');
@@ -3809,7 +3915,9 @@ function __processPageAndSerializePollForIE() {
             // "new" should create a new object, old webkit bug
             var CORRECT_NEW = new NativeRegExp(re1) !== re1;
 
-            var FORCED$5 = descriptors && isForced_1('RegExp', (!CORRECT_NEW || fails(function () {
+            var UNSUPPORTED_Y$2 = regexpStickyHelpers.UNSUPPORTED_Y;
+
+            var FORCED$5 = descriptors && isForced_1('RegExp', (!CORRECT_NEW || UNSUPPORTED_Y$2 || fails(function () {
               re2[MATCH$2] = false;
               // RegExp constructor can alter flags and IsRegExp works correct with @@match
               return NativeRegExp(re1) != re1 || NativeRegExp(re2) == re2 || NativeRegExp(re1, 'i') != '/a/i';
@@ -3822,13 +3930,33 @@ function __processPageAndSerializePollForIE() {
                 var thisIsRegExp = this instanceof RegExpWrapper;
                 var patternIsRegExp = isRegexp(pattern);
                 var flagsAreUndefined = flags === undefined;
-                return !thisIsRegExp && patternIsRegExp && pattern.constructor === RegExpWrapper && flagsAreUndefined ? pattern
-                  : inheritIfRequired(CORRECT_NEW
-                    ? new NativeRegExp(patternIsRegExp && !flagsAreUndefined ? pattern.source : pattern, flags)
-                    : NativeRegExp((patternIsRegExp = pattern instanceof RegExpWrapper)
-                      ? pattern.source
-                      : pattern, patternIsRegExp && flagsAreUndefined ? regexpFlags.call(pattern) : flags)
-                  , thisIsRegExp ? this : RegExpPrototype$1, RegExpWrapper);
+                var sticky;
+
+                if (!thisIsRegExp && patternIsRegExp && pattern.constructor === RegExpWrapper && flagsAreUndefined) {
+                  return pattern;
+                }
+
+                if (CORRECT_NEW) {
+                  if (patternIsRegExp && !flagsAreUndefined) pattern = pattern.source;
+                } else if (pattern instanceof RegExpWrapper) {
+                  if (flagsAreUndefined) flags = regexpFlags.call(pattern);
+                  pattern = pattern.source;
+                }
+
+                if (UNSUPPORTED_Y$2) {
+                  sticky = !!flags && flags.indexOf('y') > -1;
+                  if (sticky) flags = flags.replace(/y/g, '');
+                }
+
+                var result = inheritIfRequired(
+                  CORRECT_NEW ? new NativeRegExp(pattern, flags) : NativeRegExp(pattern, flags),
+                  thisIsRegExp ? this : RegExpPrototype$1,
+                  RegExpWrapper
+                );
+
+                if (UNSUPPORTED_Y$2 && sticky) setInternalState$4(result, { sticky: sticky });
+
+                return result;
               };
               var proxy = function (key) {
                 key in RegExpWrapper || defineProperty$5(RegExpWrapper, key, {
@@ -3852,18 +3980,66 @@ function __processPageAndSerializePollForIE() {
               exec: regexpExec
             });
 
+            var UNSUPPORTED_Y$3 = regexpStickyHelpers.UNSUPPORTED_Y;
+
             // `RegExp.prototype.flags` getter
             // https://tc39.github.io/ecma262/#sec-get-regexp.prototype.flags
-            if (descriptors && /./g.flags != 'g') {
+            if (descriptors && (/./g.flags != 'g' || UNSUPPORTED_Y$3)) {
               objectDefineProperty.f(RegExp.prototype, 'flags', {
                 configurable: true,
                 get: regexpFlags
               });
             }
 
-            var TO_STRING = 'toString';
+            var UNSUPPORTED_Y$4 = regexpStickyHelpers.UNSUPPORTED_Y;
+            var defineProperty$6 = objectDefineProperty.f;
+            var getInternalState$4 = internalState.get;
             var RegExpPrototype$2 = RegExp.prototype;
-            var nativeToString = RegExpPrototype$2[TO_STRING];
+
+            // `RegExp.prototype.sticky` getter
+            if (descriptors && UNSUPPORTED_Y$4) {
+              defineProperty$6(RegExp.prototype, 'sticky', {
+                configurable: true,
+                get: function () {
+                  if (this === RegExpPrototype$2) return undefined;
+                  // We can't use InternalStateModule.getterFor because
+                  // we don't add metadata for regexps created by a literal.
+                  if (this instanceof RegExp) {
+                    return !!getInternalState$4(this).sticky;
+                  }
+                  throw TypeError('Incompatible receiver, RegExp required');
+                }
+              });
+            }
+
+            var DELEGATES_TO_EXEC = function () {
+              var execCalled = false;
+              var re = /[ac]/;
+              re.exec = function () {
+                execCalled = true;
+                return /./.exec.apply(this, arguments);
+              };
+              return re.test('abc') === true && execCalled;
+            }();
+
+            var nativeTest = /./.test;
+
+            _export({ target: 'RegExp', proto: true, forced: !DELEGATES_TO_EXEC }, {
+              test: function (str) {
+                if (typeof this.exec !== 'function') {
+                  return nativeTest.call(this, str);
+                }
+                var result = this.exec(str);
+                if (result !== null && !isObject(result)) {
+                  throw new Error('RegExp exec method returned something other than an Object or null');
+                }
+                return !!result;
+              }
+            });
+
+            var TO_STRING = 'toString';
+            var RegExpPrototype$3 = RegExp.prototype;
+            var nativeToString = RegExpPrototype$3[TO_STRING];
 
             var NOT_GENERIC = fails(function () { return nativeToString.call({ source: 'a', flags: 'b' }) != '/a/b'; });
             // FF44- RegExp#toString has a wrong name
@@ -3876,7 +4052,7 @@ function __processPageAndSerializePollForIE() {
                 var R = anObject(this);
                 var p = String(R.source);
                 var rf = R.flags;
-                var f = String(rf === undefined && R instanceof RegExp && !('flags' in RegExpPrototype$2) ? regexpFlags.call(R) : rf);
+                var f = String(rf === undefined && R instanceof RegExp && !('flags' in RegExpPrototype$3) ? regexpFlags.call(R) : rf);
                 return '/' + p + '/' + f;
               }, { unsafe: true });
             }
@@ -3923,7 +4099,7 @@ function __processPageAndSerializePollForIE() {
 
             var getOwnPropertyNames$1 = objectGetOwnPropertyNames.f;
             var getOwnPropertyDescriptor$6 = objectGetOwnPropertyDescriptor.f;
-            var defineProperty$6 = objectDefineProperty.f;
+            var defineProperty$7 = objectDefineProperty.f;
             var trim$2 = stringTrim.trim;
 
             var NUMBER = 'Number';
@@ -3981,7 +4157,7 @@ function __processPageAndSerializePollForIE() {
                 'MIN_SAFE_INTEGER,parseFloat,parseInt,isInteger'
               ).split(','), j = 0, key; keys$2.length > j; j++) {
                 if (has(NativeNumber, key = keys$2[j]) && !has(NumberWrapper, key)) {
-                  defineProperty$6(NumberWrapper, key, getOwnPropertyDescriptor$6(NativeNumber, key));
+                  defineProperty$7(NumberWrapper, key, getOwnPropertyDescriptor$6(NativeNumber, key));
                 }
               }
               NumberWrapper.prototype = NumberPrototype;
@@ -4856,8 +5032,8 @@ function __processPageAndSerializePollForIE() {
 
             var SPECIES$6 = wellKnownSymbol('species');
             var PROMISE = 'Promise';
-            var getInternalState$4 = internalState.get;
-            var setInternalState$4 = internalState.set;
+            var getInternalState$5 = internalState.get;
+            var setInternalState$5 = internalState.set;
             var getInternalPromiseState = internalState.getterFor(PROMISE);
             var PromiseConstructor = nativePromiseConstructor;
             var TypeError$1 = global_1.TypeError;
@@ -5053,7 +5229,7 @@ function __processPageAndSerializePollForIE() {
                 anInstance(this, PromiseConstructor, PROMISE);
                 aFunction$1(executor);
                 Internal.call(this);
-                var state = getInternalState$4(this);
+                var state = getInternalState$5(this);
                 try {
                   executor(bind(internalResolve, this, state), bind(internalReject, this, state));
                 } catch (error) {
@@ -5062,7 +5238,7 @@ function __processPageAndSerializePollForIE() {
               };
               // eslint-disable-next-line no-unused-vars
               Internal = function Promise(executor) {
-                setInternalState$4(this, {
+                setInternalState$5(this, {
                   type: PROMISE,
                   done: false,
                   notified: false,
@@ -5095,7 +5271,7 @@ function __processPageAndSerializePollForIE() {
               });
               OwnPromiseCapability = function () {
                 var promise = new Internal();
-                var state = getInternalState$4(promise);
+                var state = getInternalState$5(promise);
                 this.promise = promise;
                 this.resolve = bind(internalResolve, promise, state);
                 this.reject = bind(internalReject, promise, state);
@@ -5353,7 +5529,7 @@ function __processPageAndSerializePollForIE() {
               return Constructor;
             };
 
-            var defineProperty$7 = objectDefineProperty.f;
+            var defineProperty$8 = objectDefineProperty.f;
 
 
 
@@ -5365,14 +5541,14 @@ function __processPageAndSerializePollForIE() {
             var fastKey = internalMetadata.fastKey;
 
 
-            var setInternalState$5 = internalState.set;
+            var setInternalState$6 = internalState.set;
             var internalStateGetterFor = internalState.getterFor;
 
             var collectionStrong = {
               getConstructor: function (wrapper, CONSTRUCTOR_NAME, IS_MAP, ADDER) {
                 var C = wrapper(function (that, iterable) {
                   anInstance(that, C, CONSTRUCTOR_NAME);
-                  setInternalState$5(that, {
+                  setInternalState$6(that, {
                     type: CONSTRUCTOR_NAME,
                     index: objectCreate(null),
                     first: undefined,
@@ -5495,7 +5671,7 @@ function __processPageAndSerializePollForIE() {
                     return define(this, value = value === 0 ? 0 : value, value);
                   }
                 });
-                if (descriptors) defineProperty$7(C.prototype, 'size', {
+                if (descriptors) defineProperty$8(C.prototype, 'size', {
                   get: function () {
                     return getInternalState(this).size;
                   }
@@ -5509,7 +5685,7 @@ function __processPageAndSerializePollForIE() {
                 // add .keys, .values, .entries, [@@iterator]
                 // 23.1.3.4, 23.1.3.8, 23.1.3.11, 23.1.3.12, 23.2.3.5, 23.2.3.8, 23.2.3.10, 23.2.3.11
                 defineIterator(C, CONSTRUCTOR_NAME, function (iterated, kind) {
-                  setInternalState$5(this, {
+                  setInternalState$6(this, {
                     type: ITERATOR_NAME,
                     target: iterated,
                     state: getInternalCollectionState(iterated),
@@ -5560,7 +5736,7 @@ function __processPageAndSerializePollForIE() {
 
 
 
-            var setInternalState$6 = internalState.set;
+            var setInternalState$7 = internalState.set;
             var internalStateGetterFor$1 = internalState.getterFor;
             var find = arrayIteration.find;
             var findIndex = arrayIteration.findIndex;
@@ -5607,7 +5783,7 @@ function __processPageAndSerializePollForIE() {
               getConstructor: function (wrapper, CONSTRUCTOR_NAME, IS_MAP, ADDER) {
                 var C = wrapper(function (that, iterable) {
                   anInstance(that, C, CONSTRUCTOR_NAME);
-                  setInternalState$6(that, {
+                  setInternalState$7(that, {
                     type: CONSTRUCTOR_NAME,
                     id: id$1++,
                     frozen: undefined
@@ -5746,7 +5922,7 @@ function __processPageAndSerializePollForIE() {
               return function WeakSet() { return init(this, arguments.length ? arguments[0] : undefined); };
             }, collectionWeak);
 
-            var defineProperty$8 = objectDefineProperty.f;
+            var defineProperty$9 = objectDefineProperty.f;
 
 
 
@@ -5876,7 +6052,7 @@ function __processPageAndSerializePollForIE() {
 
             if (descriptors && !has(TypedArrayPrototype, TO_STRING_TAG$3)) {
               TYPED_ARRAY_TAG_REQIRED = true;
-              defineProperty$8(TypedArrayPrototype, TO_STRING_TAG$3, { get: function () {
+              defineProperty$9(TypedArrayPrototype, TO_STRING_TAG$3, { get: function () {
                 return isObject(this) ? this[TYPED_ARRAY_TAG] : undefined;
               } });
               for (NAME$1 in TypedArrayConstructorsList) if (global_1[NAME$1]) {
@@ -6012,13 +6188,13 @@ function __processPageAndSerializePollForIE() {
 
 
             var getOwnPropertyNames$2 = objectGetOwnPropertyNames.f;
-            var defineProperty$9 = objectDefineProperty.f;
+            var defineProperty$a = objectDefineProperty.f;
 
 
 
 
-            var getInternalState$5 = internalState.get;
-            var setInternalState$7 = internalState.set;
+            var getInternalState$6 = internalState.get;
+            var setInternalState$8 = internalState.set;
             var ARRAY_BUFFER = 'ArrayBuffer';
             var DATA_VIEW = 'DataView';
             var PROTOTYPE$2 = 'prototype';
@@ -6057,14 +6233,14 @@ function __processPageAndSerializePollForIE() {
             };
 
             var addGetter = function (Constructor, key) {
-              defineProperty$9(Constructor[PROTOTYPE$2], key, { get: function () { return getInternalState$5(this)[key]; } });
+              defineProperty$a(Constructor[PROTOTYPE$2], key, { get: function () { return getInternalState$6(this)[key]; } });
             };
 
             var get$1 = function (view, count, index, isLittleEndian) {
               var intIndex = toIndex(index);
-              var store = getInternalState$5(view);
+              var store = getInternalState$6(view);
               if (intIndex + count > store.byteLength) throw RangeError$1(WRONG_INDEX);
-              var bytes = getInternalState$5(store.buffer).bytes;
+              var bytes = getInternalState$6(store.buffer).bytes;
               var start = intIndex + store.byteOffset;
               var pack = bytes.slice(start, start + count);
               return isLittleEndian ? pack : pack.reverse();
@@ -6072,9 +6248,9 @@ function __processPageAndSerializePollForIE() {
 
             var set$2 = function (view, count, index, conversion, value, isLittleEndian) {
               var intIndex = toIndex(index);
-              var store = getInternalState$5(view);
+              var store = getInternalState$6(view);
               if (intIndex + count > store.byteLength) throw RangeError$1(WRONG_INDEX);
-              var bytes = getInternalState$5(store.buffer).bytes;
+              var bytes = getInternalState$6(store.buffer).bytes;
               var start = intIndex + store.byteOffset;
               var pack = conversion(+value);
               for (var i = 0; i < count; i++) bytes[start + i] = pack[isLittleEndian ? i : count - i - 1];
@@ -6084,7 +6260,7 @@ function __processPageAndSerializePollForIE() {
               $ArrayBuffer = function ArrayBuffer(length) {
                 anInstance(this, $ArrayBuffer, ARRAY_BUFFER);
                 var byteLength = toIndex(length);
-                setInternalState$7(this, {
+                setInternalState$8(this, {
                   bytes: arrayFill.call(new Array(byteLength), 0),
                   byteLength: byteLength
                 });
@@ -6094,12 +6270,12 @@ function __processPageAndSerializePollForIE() {
               $DataView = function DataView(buffer, byteOffset, byteLength) {
                 anInstance(this, $DataView, DATA_VIEW);
                 anInstance(buffer, $ArrayBuffer, DATA_VIEW);
-                var bufferLength = getInternalState$5(buffer).byteLength;
+                var bufferLength = getInternalState$6(buffer).byteLength;
                 var offset = toInteger(byteOffset);
                 if (offset < 0 || offset > bufferLength) throw RangeError$1('Wrong offset');
                 byteLength = byteLength === undefined ? bufferLength - offset : toLength(byteLength);
                 if (offset + byteLength > bufferLength) throw RangeError$1(WRONG_LENGTH);
-                setInternalState$7(this, {
+                setInternalState$8(this, {
                   buffer: buffer,
                   byteLength: byteLength,
                   byteOffset: offset
@@ -7573,7 +7749,7 @@ function __processPageAndSerializePollForIE() {
             var ITERATOR$8 = wellKnownSymbol('iterator');
             var URL_SEARCH_PARAMS = 'URLSearchParams';
             var URL_SEARCH_PARAMS_ITERATOR = URL_SEARCH_PARAMS + 'Iterator';
-            var setInternalState$8 = internalState.set;
+            var setInternalState$9 = internalState.set;
             var getInternalParamsState = internalState.getterFor(URL_SEARCH_PARAMS);
             var getInternalIteratorState = internalState.getterFor(URL_SEARCH_PARAMS_ITERATOR);
 
@@ -7652,7 +7828,7 @@ function __processPageAndSerializePollForIE() {
             };
 
             var URLSearchParamsIterator = createIteratorConstructor(function Iterator(params, kind) {
-              setInternalState$8(this, {
+              setInternalState$9(this, {
                 type: URL_SEARCH_PARAMS_ITERATOR,
                 iterator: getIterator(getInternalParamsState(params).entries),
                 kind: kind
@@ -7676,7 +7852,7 @@ function __processPageAndSerializePollForIE() {
               var entries = [];
               var iteratorMethod, iterator, next, step, entryIterator, entryNext, first, second, key;
 
-              setInternalState$8(that, {
+              setInternalState$9(that, {
                 type: URL_SEARCH_PARAMS,
                 entries: entries,
                 updateURL: function () { /* empty */ },
@@ -7914,7 +8090,7 @@ function __processPageAndSerializePollForIE() {
             var NativeURL = global_1.URL;
             var URLSearchParams$1 = web_urlSearchParams.URLSearchParams;
             var getInternalSearchParamsState = web_urlSearchParams.getState;
-            var setInternalState$9 = internalState.set;
+            var setInternalState$a = internalState.set;
             var getInternalURLState = internalState.getterFor('URL');
             var floor$9 = Math.floor;
             var pow$4 = Math.pow;
@@ -8631,7 +8807,7 @@ function __processPageAndSerializePollForIE() {
               var that = anInstance(this, URLConstructor, 'URL');
               var base = arguments.length > 1 ? arguments[1] : undefined;
               var urlString = String(url);
-              var state = setInternalState$9(that, { type: 'URL' });
+              var state = setInternalState$a(that, { type: 'URL' });
               var baseState, failure;
               if (base !== undefined) {
                 if (base instanceof URLConstructor) baseState = getInternalURLState(base);
@@ -10913,7 +11089,7 @@ function __processPageAndSerializePollForIE() {
               });
               return doProcessPage(doc).then(function (result) {
                 log('processPage end');
-                result.scriptVersion = '3.2.0';
+                result.scriptVersion = '3.2.2';
                 return result;
               });
 

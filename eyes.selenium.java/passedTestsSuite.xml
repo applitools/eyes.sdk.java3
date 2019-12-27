@@ -186,4 +186,38 @@
             </class>
         </classes>
     </test>
+    <test name="TestCounts" parallel="methods">
+        <classes>
+            <class name="com.applitools.eyes.selenium.TestCounts">
+                <methods>
+                    <include name="Test_VGTestsCount_1" />
+                    <include name="Test_VGTestsCount_2" />
+                    <include name="Test_VGTestsCount_3" />
+                    <include name="Test_VGTestsCount_4" />
+                    <include name="Test_VGTestsCount_5" />
+                </methods>
+            </class>
+        </classes>
+    </test>
+    <test name="TestScrolling" parallel="methods">
+        <parameter name="dont_run" value="TestWebAppScrolling+false, TestWebAppScrolling3+false"/>
+        <classes>
+            <class name="com.applitools.eyes.selenium.TestScrolling">
+                <methods>
+                    <include name="TestWebAppScrolling" />
+                    <include name="TestWebAppScrolling2" />
+                    <include name="TestWebAppScrolling3" />
+                </methods>
+            </class>
+        </classes>
+    </test>
+    <test name="TestVGServerConfigs" parallel="methods">
+        <classes>
+            <class name="com.applitools.eyes.renderingGrid.TestVGServerConfigs">
+                <methods>
+                    <include name="TestVGDoubleCloseNoCheck" />
+                </methods>
+            </class>
+        </classes>
+    </test>
 </suite>

@@ -1,4 +1,4 @@
-/* @applitools/dom-capture@7.1.2 */
+/* @applitools/dom-capture@7.1.3 */
 
 function __captureDomAndPollForIE() {
   var captureDomAndPollForIE = (function () {
@@ -197,32 +197,37 @@ function __captureDomAndPollForIE() {
               } return value;
             };
 
-            var isPure = false;
-
             var SHARED = '__core-js_shared__';
             var store = global_1[SHARED] || setGlobal(SHARED, {});
 
             var sharedStore = store;
 
+            var functionToString = Function.toString;
+
+            // this helper broken in `3.4.1-3.4.4`, so we can't use `shared` helper
+            if (typeof sharedStore.inspectSource != 'function') {
+              sharedStore.inspectSource = function (it) {
+                return functionToString.call(it);
+              };
+            }
+
+            var inspectSource = sharedStore.inspectSource;
+
+            var WeakMap$1 = global_1.WeakMap;
+
+            var nativeWeakMap = typeof WeakMap$1 === 'function' && /native code/.test(inspectSource(WeakMap$1));
+
+            var isPure = false;
+
             var shared = createCommonjsModule(function (module) {
             (module.exports = function (key, value) {
               return sharedStore[key] || (sharedStore[key] = value !== undefined ? value : {});
             })('versions', []).push({
-              version: '3.4.7',
+              version: '3.6.1',
               mode: 'global',
               copyright: '© 2019 Denis Pushkarev (zloirock.ru)'
             });
             });
-
-            var functionToString = Function.toString;
-
-            var inspectSource = shared('inspectSource', function (it) {
-              return functionToString.call(it);
-            });
-
-            var WeakMap = global_1.WeakMap;
-
-            var nativeWeakMap = typeof WeakMap === 'function' && /native code/.test(inspectSource(WeakMap));
 
             var id = 0;
             var postfix = Math.random();
@@ -239,7 +244,7 @@ function __captureDomAndPollForIE() {
 
             var hiddenKeys = {};
 
-            var WeakMap$1 = global_1.WeakMap;
+            var WeakMap$2 = global_1.WeakMap;
             var set, get, has$1;
 
             var enforce = function (it) {
@@ -256,7 +261,7 @@ function __captureDomAndPollForIE() {
             };
 
             if (nativeWeakMap) {
-              var store$1 = new WeakMap$1();
+              var store$1 = new WeakMap$2();
               var wmget = store$1.get;
               var wmhas = store$1.has;
               var wmset = store$1.set;
@@ -537,7 +542,7 @@ function __captureDomAndPollForIE() {
               // eslint-disable-next-line no-undef
               && !Symbol.sham
               // eslint-disable-next-line no-undef
-              && typeof Symbol() == 'symbol';
+              && typeof Symbol.iterator == 'symbol';
 
             // `IsArray` abstract operation
             // https://tc39.github.io/ecma262/#sec-isarray
@@ -571,48 +576,76 @@ function __captureDomAndPollForIE() {
 
             var html = getBuiltIn('document', 'documentElement');
 
+            var GT = '>';
+            var LT = '<';
+            var PROTOTYPE = 'prototype';
+            var SCRIPT = 'script';
             var IE_PROTO = sharedKey('IE_PROTO');
 
-            var PROTOTYPE = 'prototype';
-            var Empty = function () { /* empty */ };
+            var EmptyConstructor = function () { /* empty */ };
+
+            var scriptTag = function (content) {
+              return LT + SCRIPT + GT + content + LT + '/' + SCRIPT + GT;
+            };
+
+            // Create object with fake `null` prototype: use ActiveX Object with cleared prototype
+            var NullProtoObjectViaActiveX = function (activeXDocument) {
+              activeXDocument.write(scriptTag(''));
+              activeXDocument.close();
+              var temp = activeXDocument.parentWindow.Object;
+              activeXDocument = null; // avoid memory leak
+              return temp;
+            };
 
             // Create object with fake `null` prototype: use iframe Object with cleared prototype
-            var createDict = function () {
+            var NullProtoObjectViaIFrame = function () {
               // Thrash, waste and sodomy: IE GC bug
               var iframe = documentCreateElement('iframe');
-              var length = enumBugKeys.length;
-              var lt = '<';
-              var script = 'script';
-              var gt = '>';
-              var js = 'java' + script + ':';
+              var JS = 'java' + SCRIPT + ':';
               var iframeDocument;
               iframe.style.display = 'none';
               html.appendChild(iframe);
-              iframe.src = String(js);
+              // https://github.com/zloirock/core-js/issues/475
+              iframe.src = String(JS);
               iframeDocument = iframe.contentWindow.document;
               iframeDocument.open();
-              iframeDocument.write(lt + script + gt + 'document.F=Object' + lt + '/' + script + gt);
+              iframeDocument.write(scriptTag('document.F=Object'));
               iframeDocument.close();
-              createDict = iframeDocument.F;
-              while (length--) delete createDict[PROTOTYPE][enumBugKeys[length]];
-              return createDict();
+              return iframeDocument.F;
             };
+
+            // Check for document.domain and active x support
+            // No need to use active x approach when document.domain is not set
+            // see https://github.com/es-shims/es5-shim/issues/150
+            // variation of https://github.com/kitcambridge/es5-shim/commit/4f738ac066346
+            // avoid IE GC bug
+            var activeXDocument;
+            var NullProtoObject = function () {
+              try {
+                /* global ActiveXObject */
+                activeXDocument = document.domain && new ActiveXObject('htmlfile');
+              } catch (error) { /* ignore */ }
+              NullProtoObject = activeXDocument ? NullProtoObjectViaActiveX(activeXDocument) : NullProtoObjectViaIFrame();
+              var length = enumBugKeys.length;
+              while (length--) delete NullProtoObject[PROTOTYPE][enumBugKeys[length]];
+              return NullProtoObject();
+            };
+
+            hiddenKeys[IE_PROTO] = true;
 
             // `Object.create` method
             // https://tc39.github.io/ecma262/#sec-object.create
             var objectCreate = Object.create || function create(O, Properties) {
               var result;
               if (O !== null) {
-                Empty[PROTOTYPE] = anObject(O);
-                result = new Empty();
-                Empty[PROTOTYPE] = null;
+                EmptyConstructor[PROTOTYPE] = anObject(O);
+                result = new EmptyConstructor();
+                EmptyConstructor[PROTOTYPE] = null;
                 // add "__proto__" for Object.getPrototypeOf polyfill
                 result[IE_PROTO] = O;
-              } else result = createDict();
+              } else result = NullProtoObject();
               return Properties === undefined ? result : objectDefineProperties(result, Properties);
             };
-
-            hiddenKeys[IE_PROTO] = true;
 
             var nativeGetOwnPropertyNames = objectGetOwnPropertyNames.f;
 
@@ -642,7 +675,7 @@ function __captureDomAndPollForIE() {
 
             var WellKnownSymbolsStore = shared('wks');
             var Symbol$1 = global_1.Symbol;
-            var createWellKnownSymbol = useSymbolAsUid ? Symbol$1 : uid;
+            var createWellKnownSymbol = useSymbolAsUid ? Symbol$1 : Symbol$1 && Symbol$1.withoutSetter || uid;
 
             var wellKnownSymbol = function (name) {
               if (!has(WellKnownSymbolsStore, name)) {
@@ -833,7 +866,7 @@ function __captureDomAndPollForIE() {
               return symbol;
             };
 
-            var isSymbol = nativeSymbol && typeof $Symbol.iterator == 'symbol' ? function (it) {
+            var isSymbol = useSymbolAsUid ? function (it) {
               return typeof it == 'symbol';
             } : function (it) {
               return Object(it) instanceof $Symbol;
@@ -928,11 +961,19 @@ function __captureDomAndPollForIE() {
                 return getInternalState(this).tag;
               });
 
+              redefine($Symbol, 'withoutSetter', function (description) {
+                return wrap(uid(description), description);
+              });
+
               objectPropertyIsEnumerable.f = $propertyIsEnumerable;
               objectDefineProperty.f = $defineProperty;
               objectGetOwnPropertyDescriptor.f = $getOwnPropertyDescriptor;
               objectGetOwnPropertyNames.f = objectGetOwnPropertyNamesExternal.f = $getOwnPropertyNames;
               objectGetOwnPropertySymbols.f = $getOwnPropertySymbols;
+
+              wrappedWellKnownSymbol.f = function (name) {
+                return wrap(wellKnownSymbol(name), name);
+              };
 
               if (descriptors) {
                 // https://github.com/tc39/proposal-Symbol-description
@@ -946,12 +987,6 @@ function __captureDomAndPollForIE() {
                   redefine(ObjectPrototype, 'propertyIsEnumerable', $propertyIsEnumerable, { unsafe: true });
                 }
               }
-            }
-
-            if (!useSymbolAsUid) {
-              wrappedWellKnownSymbol.f = function (name) {
-                return wrap(wellKnownSymbol(name), name);
-              };
             }
 
             _export({ global: true, wrap: true, forced: !nativeSymbol, sham: !nativeSymbol }, {
@@ -2011,7 +2046,10 @@ function __captureDomAndPollForIE() {
             // Array.prototype[@@unscopables]
             // https://tc39.github.io/ecma262/#sec-array.prototype-@@unscopables
             if (ArrayPrototype$1[UNSCOPABLES] == undefined) {
-              createNonEnumerableProperty(ArrayPrototype$1, UNSCOPABLES, objectCreate(null));
+              objectDefineProperty.f(ArrayPrototype$1, UNSCOPABLES, {
+                configurable: true,
+                value: objectCreate(null)
+              });
             }
 
             // add a key to Array.prototype[@@unscopables]
@@ -2852,6 +2890,31 @@ function __captureDomAndPollForIE() {
               return result;
             };
 
+            // babel-minify transpiles RegExp('a', 'y') -> /a/y and it causes SyntaxError,
+            // so we use an intermediate function.
+            function RE(s, f) {
+              return RegExp(s, f);
+            }
+
+            var UNSUPPORTED_Y = fails(function () {
+              // babel-minify transpiles RegExp('a', 'y') -> /a/y and it causes SyntaxError
+              var re = RE('a', 'y');
+              re.lastIndex = 2;
+              return re.exec('abcd') != null;
+            });
+
+            var BROKEN_CARET = fails(function () {
+              // https://bugzilla.mozilla.org/show_bug.cgi?id=773687
+              var re = RE('^r', 'gy');
+              re.lastIndex = 2;
+              return re.exec('str') != null;
+            });
+
+            var regexpStickyHelpers = {
+            	UNSUPPORTED_Y: UNSUPPORTED_Y,
+            	BROKEN_CARET: BROKEN_CARET
+            };
+
             var nativeExec = RegExp.prototype.exec;
             // This always refers to the native implementation, because the
             // String#replace polyfill uses ./fix-regexp-well-known-symbol-logic.js,
@@ -2868,24 +2931,56 @@ function __captureDomAndPollForIE() {
               return re1.lastIndex !== 0 || re2.lastIndex !== 0;
             })();
 
+            var UNSUPPORTED_Y$1 = regexpStickyHelpers.UNSUPPORTED_Y || regexpStickyHelpers.BROKEN_CARET;
+
             // nonparticipating capturing group, copied from es5-shim's String#split patch.
             var NPCG_INCLUDED = /()??/.exec('')[1] !== undefined;
 
-            var PATCH = UPDATES_LAST_INDEX_WRONG || NPCG_INCLUDED;
+            var PATCH = UPDATES_LAST_INDEX_WRONG || NPCG_INCLUDED || UNSUPPORTED_Y$1;
 
             if (PATCH) {
               patchedExec = function exec(str) {
                 var re = this;
                 var lastIndex, reCopy, match, i;
+                var sticky = UNSUPPORTED_Y$1 && re.sticky;
+                var flags = regexpFlags.call(re);
+                var source = re.source;
+                var charsAdded = 0;
+                var strCopy = str;
+
+                if (sticky) {
+                  flags = flags.replace('y', '');
+                  if (flags.indexOf('g') === -1) {
+                    flags += 'g';
+                  }
+
+                  strCopy = String(str).slice(re.lastIndex);
+                  // Support anchored sticky behavior.
+                  if (re.lastIndex > 0 && (!re.multiline || re.multiline && str[re.lastIndex - 1] !== '\n')) {
+                    source = '(?: ' + source + ')';
+                    strCopy = ' ' + strCopy;
+                    charsAdded++;
+                  }
+                  // ^(? + rx + ) is needed, in combination with some str slicing, to
+                  // simulate the 'y' flag.
+                  reCopy = new RegExp('^(?:' + source + ')', flags);
+                }
 
                 if (NPCG_INCLUDED) {
-                  reCopy = new RegExp('^' + re.source + '$(?!\\s)', regexpFlags.call(re));
+                  reCopy = new RegExp('^' + source + '$(?!\\s)', flags);
                 }
                 if (UPDATES_LAST_INDEX_WRONG) lastIndex = re.lastIndex;
 
-                match = nativeExec.call(re, str);
+                match = nativeExec.call(sticky ? reCopy : re, strCopy);
 
-                if (UPDATES_LAST_INDEX_WRONG && match) {
+                if (sticky) {
+                  if (match) {
+                    match.input = match.input.slice(charsAdded);
+                    match[0] = match[0].slice(charsAdded);
+                    match.index = re.lastIndex;
+                    re.lastIndex += match[0].length;
+                  } else re.lastIndex = 0;
+                } else if (UPDATES_LAST_INDEX_WRONG && match) {
                   re.lastIndex = re.global ? match.index + match[0].length : lastIndex;
                 }
                 if (NPCG_INCLUDED && match && match.length > 1) {
@@ -2918,6 +3013,12 @@ function __captureDomAndPollForIE() {
               };
               return ''.replace(re, '$<a>') !== '7';
             });
+
+            // IE <= 11 replaces $0 with the whole match, as if it was $&
+            // https://stackoverflow.com/questions/6024666/getting-ie-to-replace-a-regex-with-the-literal-string-0
+            var REPLACE_KEEPS_$0 = (function () {
+              return 'a'.replace(/./, '$0') === '$0';
+            })();
 
             // Chrome 51 has a buggy "split" implementation when RegExp#exec !== nativeExec
             // Weex JS has frozen built-in prototypes, so use try / catch wrapper
@@ -2966,7 +3067,7 @@ function __captureDomAndPollForIE() {
               if (
                 !DELEGATES_TO_SYMBOL ||
                 !DELEGATES_TO_EXEC ||
-                (KEY === 'replace' && !REPLACE_SUPPORTS_NAMED_GROUPS) ||
+                (KEY === 'replace' && !(REPLACE_SUPPORTS_NAMED_GROUPS && REPLACE_KEEPS_$0)) ||
                 (KEY === 'split' && !SPLIT_WORKS_WITH_OVERWRITTEN_EXEC)
               ) {
                 var nativeRegExpMethod = /./[SYMBOL];
@@ -2981,7 +3082,7 @@ function __captureDomAndPollForIE() {
                     return { done: true, value: nativeMethod.call(str, regexp, arg2) };
                   }
                   return { done: false };
-                });
+                }, { REPLACE_KEEPS_$0: REPLACE_KEEPS_$0 });
                 var stringMethod = methods[0];
                 var regexMethod = methods[1];
 
@@ -2994,8 +3095,9 @@ function __captureDomAndPollForIE() {
                   // 21.2.5.9 RegExp.prototype[@@search](string)
                   : function (string) { return regexMethod.call(string, this); }
                 );
-                if (sham) createNonEnumerableProperty(RegExp.prototype[SYMBOL], 'sham', true);
               }
+
+              if (sham) createNonEnumerableProperty(RegExp.prototype[SYMBOL], 'sham', true);
             };
 
             var charAt = stringMultibyte.charAt;
@@ -3252,7 +3354,7 @@ function __captureDomAndPollForIE() {
             };
 
             // @@replace logic
-            fixRegexpWellKnownSymbolLogic('replace', 2, function (REPLACE, nativeReplace, maybeCallNative) {
+            fixRegexpWellKnownSymbolLogic('replace', 2, function (REPLACE, nativeReplace, maybeCallNative, reason) {
               return [
                 // `String.prototype.replace` method
                 // https://tc39.github.io/ecma262/#sec-string.prototype.replace
@@ -3266,8 +3368,10 @@ function __captureDomAndPollForIE() {
                 // `RegExp.prototype[@@replace]` method
                 // https://tc39.github.io/ecma262/#sec-regexp.prototype-@@replace
                 function (regexp, replaceValue) {
-                  var res = maybeCallNative(nativeReplace, regexp, this, replaceValue);
-                  if (res.done) return res.value;
+                  if (reason.REPLACE_KEEPS_$0 || (typeof replaceValue === 'string' && replaceValue.indexOf('$0') === -1)) {
+                    var res = maybeCallNative(nativeReplace, regexp, this, replaceValue);
+                    if (res.done) return res.value;
+                  }
 
                   var rx = anObject(regexp);
                   var S = String(this);
@@ -3798,6 +3902,8 @@ function __captureDomAndPollForIE() {
 
 
 
+            var setInternalState$4 = internalState.set;
+
 
 
             var MATCH$2 = wellKnownSymbol('match');
@@ -3809,7 +3915,9 @@ function __captureDomAndPollForIE() {
             // "new" should create a new object, old webkit bug
             var CORRECT_NEW = new NativeRegExp(re1) !== re1;
 
-            var FORCED$5 = descriptors && isForced_1('RegExp', (!CORRECT_NEW || fails(function () {
+            var UNSUPPORTED_Y$2 = regexpStickyHelpers.UNSUPPORTED_Y;
+
+            var FORCED$5 = descriptors && isForced_1('RegExp', (!CORRECT_NEW || UNSUPPORTED_Y$2 || fails(function () {
               re2[MATCH$2] = false;
               // RegExp constructor can alter flags and IsRegExp works correct with @@match
               return NativeRegExp(re1) != re1 || NativeRegExp(re2) == re2 || NativeRegExp(re1, 'i') != '/a/i';
@@ -3822,13 +3930,33 @@ function __captureDomAndPollForIE() {
                 var thisIsRegExp = this instanceof RegExpWrapper;
                 var patternIsRegExp = isRegexp(pattern);
                 var flagsAreUndefined = flags === undefined;
-                return !thisIsRegExp && patternIsRegExp && pattern.constructor === RegExpWrapper && flagsAreUndefined ? pattern
-                  : inheritIfRequired(CORRECT_NEW
-                    ? new NativeRegExp(patternIsRegExp && !flagsAreUndefined ? pattern.source : pattern, flags)
-                    : NativeRegExp((patternIsRegExp = pattern instanceof RegExpWrapper)
-                      ? pattern.source
-                      : pattern, patternIsRegExp && flagsAreUndefined ? regexpFlags.call(pattern) : flags)
-                  , thisIsRegExp ? this : RegExpPrototype$1, RegExpWrapper);
+                var sticky;
+
+                if (!thisIsRegExp && patternIsRegExp && pattern.constructor === RegExpWrapper && flagsAreUndefined) {
+                  return pattern;
+                }
+
+                if (CORRECT_NEW) {
+                  if (patternIsRegExp && !flagsAreUndefined) pattern = pattern.source;
+                } else if (pattern instanceof RegExpWrapper) {
+                  if (flagsAreUndefined) flags = regexpFlags.call(pattern);
+                  pattern = pattern.source;
+                }
+
+                if (UNSUPPORTED_Y$2) {
+                  sticky = !!flags && flags.indexOf('y') > -1;
+                  if (sticky) flags = flags.replace(/y/g, '');
+                }
+
+                var result = inheritIfRequired(
+                  CORRECT_NEW ? new NativeRegExp(pattern, flags) : NativeRegExp(pattern, flags),
+                  thisIsRegExp ? this : RegExpPrototype$1,
+                  RegExpWrapper
+                );
+
+                if (UNSUPPORTED_Y$2 && sticky) setInternalState$4(result, { sticky: sticky });
+
+                return result;
               };
               var proxy = function (key) {
                 key in RegExpWrapper || defineProperty$5(RegExpWrapper, key, {
@@ -3852,18 +3980,66 @@ function __captureDomAndPollForIE() {
               exec: regexpExec
             });
 
+            var UNSUPPORTED_Y$3 = regexpStickyHelpers.UNSUPPORTED_Y;
+
             // `RegExp.prototype.flags` getter
             // https://tc39.github.io/ecma262/#sec-get-regexp.prototype.flags
-            if (descriptors && /./g.flags != 'g') {
+            if (descriptors && (/./g.flags != 'g' || UNSUPPORTED_Y$3)) {
               objectDefineProperty.f(RegExp.prototype, 'flags', {
                 configurable: true,
                 get: regexpFlags
               });
             }
 
-            var TO_STRING = 'toString';
+            var UNSUPPORTED_Y$4 = regexpStickyHelpers.UNSUPPORTED_Y;
+            var defineProperty$6 = objectDefineProperty.f;
+            var getInternalState$4 = internalState.get;
             var RegExpPrototype$2 = RegExp.prototype;
-            var nativeToString = RegExpPrototype$2[TO_STRING];
+
+            // `RegExp.prototype.sticky` getter
+            if (descriptors && UNSUPPORTED_Y$4) {
+              defineProperty$6(RegExp.prototype, 'sticky', {
+                configurable: true,
+                get: function () {
+                  if (this === RegExpPrototype$2) return undefined;
+                  // We can't use InternalStateModule.getterFor because
+                  // we don't add metadata for regexps created by a literal.
+                  if (this instanceof RegExp) {
+                    return !!getInternalState$4(this).sticky;
+                  }
+                  throw TypeError('Incompatible receiver, RegExp required');
+                }
+              });
+            }
+
+            var DELEGATES_TO_EXEC = function () {
+              var execCalled = false;
+              var re = /[ac]/;
+              re.exec = function () {
+                execCalled = true;
+                return /./.exec.apply(this, arguments);
+              };
+              return re.test('abc') === true && execCalled;
+            }();
+
+            var nativeTest = /./.test;
+
+            _export({ target: 'RegExp', proto: true, forced: !DELEGATES_TO_EXEC }, {
+              test: function (str) {
+                if (typeof this.exec !== 'function') {
+                  return nativeTest.call(this, str);
+                }
+                var result = this.exec(str);
+                if (result !== null && !isObject(result)) {
+                  throw new Error('RegExp exec method returned something other than an Object or null');
+                }
+                return !!result;
+              }
+            });
+
+            var TO_STRING = 'toString';
+            var RegExpPrototype$3 = RegExp.prototype;
+            var nativeToString = RegExpPrototype$3[TO_STRING];
 
             var NOT_GENERIC = fails(function () { return nativeToString.call({ source: 'a', flags: 'b' }) != '/a/b'; });
             // FF44- RegExp#toString has a wrong name
@@ -3876,7 +4052,7 @@ function __captureDomAndPollForIE() {
                 var R = anObject(this);
                 var p = String(R.source);
                 var rf = R.flags;
-                var f = String(rf === undefined && R instanceof RegExp && !('flags' in RegExpPrototype$2) ? regexpFlags.call(R) : rf);
+                var f = String(rf === undefined && R instanceof RegExp && !('flags' in RegExpPrototype$3) ? regexpFlags.call(R) : rf);
                 return '/' + p + '/' + f;
               }, { unsafe: true });
             }
@@ -3923,7 +4099,7 @@ function __captureDomAndPollForIE() {
 
             var getOwnPropertyNames$1 = objectGetOwnPropertyNames.f;
             var getOwnPropertyDescriptor$6 = objectGetOwnPropertyDescriptor.f;
-            var defineProperty$6 = objectDefineProperty.f;
+            var defineProperty$7 = objectDefineProperty.f;
             var trim$2 = stringTrim.trim;
 
             var NUMBER = 'Number';
@@ -3981,7 +4157,7 @@ function __captureDomAndPollForIE() {
                 'MIN_SAFE_INTEGER,parseFloat,parseInt,isInteger'
               ).split(','), j = 0, key; keys$2.length > j; j++) {
                 if (has(NativeNumber, key = keys$2[j]) && !has(NumberWrapper, key)) {
-                  defineProperty$6(NumberWrapper, key, getOwnPropertyDescriptor$6(NativeNumber, key));
+                  defineProperty$7(NumberWrapper, key, getOwnPropertyDescriptor$6(NativeNumber, key));
                 }
               }
               NumberWrapper.prototype = NumberPrototype;
@@ -4856,8 +5032,8 @@ function __captureDomAndPollForIE() {
 
             var SPECIES$6 = wellKnownSymbol('species');
             var PROMISE = 'Promise';
-            var getInternalState$4 = internalState.get;
-            var setInternalState$4 = internalState.set;
+            var getInternalState$5 = internalState.get;
+            var setInternalState$5 = internalState.set;
             var getInternalPromiseState = internalState.getterFor(PROMISE);
             var PromiseConstructor = nativePromiseConstructor;
             var TypeError$1 = global_1.TypeError;
@@ -5053,7 +5229,7 @@ function __captureDomAndPollForIE() {
                 anInstance(this, PromiseConstructor, PROMISE);
                 aFunction$1(executor);
                 Internal.call(this);
-                var state = getInternalState$4(this);
+                var state = getInternalState$5(this);
                 try {
                   executor(bind(internalResolve, this, state), bind(internalReject, this, state));
                 } catch (error) {
@@ -5062,7 +5238,7 @@ function __captureDomAndPollForIE() {
               };
               // eslint-disable-next-line no-unused-vars
               Internal = function Promise(executor) {
-                setInternalState$4(this, {
+                setInternalState$5(this, {
                   type: PROMISE,
                   done: false,
                   notified: false,
@@ -5095,7 +5271,7 @@ function __captureDomAndPollForIE() {
               });
               OwnPromiseCapability = function () {
                 var promise = new Internal();
-                var state = getInternalState$4(promise);
+                var state = getInternalState$5(promise);
                 this.promise = promise;
                 this.resolve = bind(internalResolve, promise, state);
                 this.reject = bind(internalReject, promise, state);
@@ -5353,7 +5529,7 @@ function __captureDomAndPollForIE() {
               return Constructor;
             };
 
-            var defineProperty$7 = objectDefineProperty.f;
+            var defineProperty$8 = objectDefineProperty.f;
 
 
 
@@ -5365,14 +5541,14 @@ function __captureDomAndPollForIE() {
             var fastKey = internalMetadata.fastKey;
 
 
-            var setInternalState$5 = internalState.set;
+            var setInternalState$6 = internalState.set;
             var internalStateGetterFor = internalState.getterFor;
 
             var collectionStrong = {
               getConstructor: function (wrapper, CONSTRUCTOR_NAME, IS_MAP, ADDER) {
                 var C = wrapper(function (that, iterable) {
                   anInstance(that, C, CONSTRUCTOR_NAME);
-                  setInternalState$5(that, {
+                  setInternalState$6(that, {
                     type: CONSTRUCTOR_NAME,
                     index: objectCreate(null),
                     first: undefined,
@@ -5495,7 +5671,7 @@ function __captureDomAndPollForIE() {
                     return define(this, value = value === 0 ? 0 : value, value);
                   }
                 });
-                if (descriptors) defineProperty$7(C.prototype, 'size', {
+                if (descriptors) defineProperty$8(C.prototype, 'size', {
                   get: function () {
                     return getInternalState(this).size;
                   }
@@ -5509,7 +5685,7 @@ function __captureDomAndPollForIE() {
                 // add .keys, .values, .entries, [@@iterator]
                 // 23.1.3.4, 23.1.3.8, 23.1.3.11, 23.1.3.12, 23.2.3.5, 23.2.3.8, 23.2.3.10, 23.2.3.11
                 defineIterator(C, CONSTRUCTOR_NAME, function (iterated, kind) {
-                  setInternalState$5(this, {
+                  setInternalState$6(this, {
                     type: ITERATOR_NAME,
                     target: iterated,
                     state: getInternalCollectionState(iterated),
@@ -5560,7 +5736,7 @@ function __captureDomAndPollForIE() {
 
 
 
-            var setInternalState$6 = internalState.set;
+            var setInternalState$7 = internalState.set;
             var internalStateGetterFor$1 = internalState.getterFor;
             var find = arrayIteration.find;
             var findIndex = arrayIteration.findIndex;
@@ -5607,7 +5783,7 @@ function __captureDomAndPollForIE() {
               getConstructor: function (wrapper, CONSTRUCTOR_NAME, IS_MAP, ADDER) {
                 var C = wrapper(function (that, iterable) {
                   anInstance(that, C, CONSTRUCTOR_NAME);
-                  setInternalState$6(that, {
+                  setInternalState$7(that, {
                     type: CONSTRUCTOR_NAME,
                     id: id$1++,
                     frozen: undefined
@@ -5746,7 +5922,7 @@ function __captureDomAndPollForIE() {
               return function WeakSet() { return init(this, arguments.length ? arguments[0] : undefined); };
             }, collectionWeak);
 
-            var defineProperty$8 = objectDefineProperty.f;
+            var defineProperty$9 = objectDefineProperty.f;
 
 
 
@@ -5876,7 +6052,7 @@ function __captureDomAndPollForIE() {
 
             if (descriptors && !has(TypedArrayPrototype, TO_STRING_TAG$3)) {
               TYPED_ARRAY_TAG_REQIRED = true;
-              defineProperty$8(TypedArrayPrototype, TO_STRING_TAG$3, { get: function () {
+              defineProperty$9(TypedArrayPrototype, TO_STRING_TAG$3, { get: function () {
                 return isObject(this) ? this[TYPED_ARRAY_TAG] : undefined;
               } });
               for (NAME$1 in TypedArrayConstructorsList) if (global_1[NAME$1]) {
@@ -6012,13 +6188,13 @@ function __captureDomAndPollForIE() {
 
 
             var getOwnPropertyNames$2 = objectGetOwnPropertyNames.f;
-            var defineProperty$9 = objectDefineProperty.f;
+            var defineProperty$a = objectDefineProperty.f;
 
 
 
 
-            var getInternalState$5 = internalState.get;
-            var setInternalState$7 = internalState.set;
+            var getInternalState$6 = internalState.get;
+            var setInternalState$8 = internalState.set;
             var ARRAY_BUFFER = 'ArrayBuffer';
             var DATA_VIEW = 'DataView';
             var PROTOTYPE$2 = 'prototype';
@@ -6057,14 +6233,14 @@ function __captureDomAndPollForIE() {
             };
 
             var addGetter = function (Constructor, key) {
-              defineProperty$9(Constructor[PROTOTYPE$2], key, { get: function () { return getInternalState$5(this)[key]; } });
+              defineProperty$a(Constructor[PROTOTYPE$2], key, { get: function () { return getInternalState$6(this)[key]; } });
             };
 
             var get$1 = function (view, count, index, isLittleEndian) {
               var intIndex = toIndex(index);
-              var store = getInternalState$5(view);
+              var store = getInternalState$6(view);
               if (intIndex + count > store.byteLength) throw RangeError$1(WRONG_INDEX);
-              var bytes = getInternalState$5(store.buffer).bytes;
+              var bytes = getInternalState$6(store.buffer).bytes;
               var start = intIndex + store.byteOffset;
               var pack = bytes.slice(start, start + count);
               return isLittleEndian ? pack : pack.reverse();
@@ -6072,9 +6248,9 @@ function __captureDomAndPollForIE() {
 
             var set$2 = function (view, count, index, conversion, value, isLittleEndian) {
               var intIndex = toIndex(index);
-              var store = getInternalState$5(view);
+              var store = getInternalState$6(view);
               if (intIndex + count > store.byteLength) throw RangeError$1(WRONG_INDEX);
-              var bytes = getInternalState$5(store.buffer).bytes;
+              var bytes = getInternalState$6(store.buffer).bytes;
               var start = intIndex + store.byteOffset;
               var pack = conversion(+value);
               for (var i = 0; i < count; i++) bytes[start + i] = pack[isLittleEndian ? i : count - i - 1];
@@ -6084,7 +6260,7 @@ function __captureDomAndPollForIE() {
               $ArrayBuffer = function ArrayBuffer(length) {
                 anInstance(this, $ArrayBuffer, ARRAY_BUFFER);
                 var byteLength = toIndex(length);
-                setInternalState$7(this, {
+                setInternalState$8(this, {
                   bytes: arrayFill.call(new Array(byteLength), 0),
                   byteLength: byteLength
                 });
@@ -6094,12 +6270,12 @@ function __captureDomAndPollForIE() {
               $DataView = function DataView(buffer, byteOffset, byteLength) {
                 anInstance(this, $DataView, DATA_VIEW);
                 anInstance(buffer, $ArrayBuffer, DATA_VIEW);
-                var bufferLength = getInternalState$5(buffer).byteLength;
+                var bufferLength = getInternalState$6(buffer).byteLength;
                 var offset = toInteger(byteOffset);
                 if (offset < 0 || offset > bufferLength) throw RangeError$1('Wrong offset');
                 byteLength = byteLength === undefined ? bufferLength - offset : toLength(byteLength);
                 if (offset + byteLength > bufferLength) throw RangeError$1(WRONG_LENGTH);
-                setInternalState$7(this, {
+                setInternalState$8(this, {
                   buffer: buffer,
                   byteLength: byteLength,
                   byteOffset: offset
@@ -7573,7 +7749,7 @@ function __captureDomAndPollForIE() {
             var ITERATOR$8 = wellKnownSymbol('iterator');
             var URL_SEARCH_PARAMS = 'URLSearchParams';
             var URL_SEARCH_PARAMS_ITERATOR = URL_SEARCH_PARAMS + 'Iterator';
-            var setInternalState$8 = internalState.set;
+            var setInternalState$9 = internalState.set;
             var getInternalParamsState = internalState.getterFor(URL_SEARCH_PARAMS);
             var getInternalIteratorState = internalState.getterFor(URL_SEARCH_PARAMS_ITERATOR);
 
@@ -7652,7 +7828,7 @@ function __captureDomAndPollForIE() {
             };
 
             var URLSearchParamsIterator = createIteratorConstructor(function Iterator(params, kind) {
-              setInternalState$8(this, {
+              setInternalState$9(this, {
                 type: URL_SEARCH_PARAMS_ITERATOR,
                 iterator: getIterator(getInternalParamsState(params).entries),
                 kind: kind
@@ -7676,7 +7852,7 @@ function __captureDomAndPollForIE() {
               var entries = [];
               var iteratorMethod, iterator, next, step, entryIterator, entryNext, first, second, key;
 
-              setInternalState$8(that, {
+              setInternalState$9(that, {
                 type: URL_SEARCH_PARAMS,
                 entries: entries,
                 updateURL: function () { /* empty */ },
@@ -7914,7 +8090,7 @@ function __captureDomAndPollForIE() {
             var NativeURL = global_1.URL;
             var URLSearchParams$1 = web_urlSearchParams.URLSearchParams;
             var getInternalSearchParamsState = web_urlSearchParams.getState;
-            var setInternalState$9 = internalState.set;
+            var setInternalState$a = internalState.set;
             var getInternalURLState = internalState.getterFor('URL');
             var floor$9 = Math.floor;
             var pow$4 = Math.pow;
@@ -8631,7 +8807,7 @@ function __captureDomAndPollForIE() {
               var that = anInstance(this, URLConstructor, 'URL');
               var base = arguments.length > 1 ? arguments[1] : undefined;
               var urlString = String(url);
-              var state = setInternalState$9(that, { type: 'URL' });
+              var state = setInternalState$a(that, { type: 'URL' });
               var baseState, failure;
               if (base !== undefined) {
                 if (base instanceof URLConstructor) baseState = getInternalURLState(base);
@@ -10647,6 +10823,42 @@ function __captureDomAndPollForIE() {
                         fetch: fetch$1
             });
 
+            function asyncGeneratorStep(gen, resolve, reject, _next, _throw, key, arg) {
+              try {
+                var info = gen[key](arg);
+                var value = info.value;
+              } catch (error) {
+                reject(error);
+                return;
+              }
+
+              if (info.done) {
+                resolve(value);
+              } else {
+                Promise.resolve(value).then(_next, _throw);
+              }
+            }
+
+            function _asyncToGenerator(fn) {
+              return function () {
+                var self = this,
+                    args = arguments;
+                return new Promise(function (resolve, reject) {
+                  var gen = fn.apply(self, args);
+
+                  function _next(value) {
+                    asyncGeneratorStep(gen, resolve, reject, _next, _throw, "next", value);
+                  }
+
+                  function _throw(err) {
+                    asyncGeneratorStep(gen, resolve, reject, _next, _throw, "throw", err);
+                  }
+
+                  _next(undefined);
+                });
+              };
+            }
+
             var styleProps = ['background-repeat', 'background-origin', 'background-position', 'background-color', 'background-image', 'background-size', 'border-width', 'border-color', 'border-style', 'color', 'display', 'font-size', 'line-height', 'margin', 'opacity', 'overflow', 'padding', 'visibility'];
             var rectProps = ['width', 'height', 'top', 'left'];
             var ignoredTagNames = ['HEAD', 'SCRIPT'];
@@ -10671,56 +10883,65 @@ function __captureDomAndPollForIE() {
               });
             };
 
-            function getImageSizes(_ref) {
-              var bgImages, _ref$timeout, timeout, _ref$Image, Image;
+            function getImageSizes(_x) {
+              return _getImageSizes.apply(this, arguments);
+            }
 
-              return regeneratorRuntime.async(function getImageSizes$(_context) {
-                while (1) {
-                  switch (_context.prev = _context.next) {
-                    case 0:
-                      bgImages = _ref.bgImages, _ref$timeout = _ref.timeout, timeout = _ref$timeout === void 0 ? 5000 : _ref$timeout, _ref$Image = _ref.Image, Image = _ref$Image === void 0 ? window.Image : _ref$Image;
-                      _context.next = 3;
-                      return regeneratorRuntime.awrap(Promise.all(Array.from(bgImages).map(function (url) {
-                        return Promise.race([new Promise(function (resolve) {
-                          var img = new Image();
+            function _getImageSizes() {
+              _getImageSizes = _asyncToGenerator(
+              /*#__PURE__*/
+              regeneratorRuntime.mark(function _callee(_ref) {
+                var bgImages, _ref$timeout, timeout, _ref$Image, Image;
 
-                          img.onload = function () {
-                            return resolve({
-                              url: url,
-                              width: img.naturalWidth,
-                              height: img.naturalHeight
-                            });
-                          };
+                return regeneratorRuntime.wrap(function _callee$(_context) {
+                  while (1) {
+                    switch (_context.prev = _context.next) {
+                      case 0:
+                        bgImages = _ref.bgImages, _ref$timeout = _ref.timeout, timeout = _ref$timeout === void 0 ? 5000 : _ref$timeout, _ref$Image = _ref.Image, Image = _ref$Image === void 0 ? window.Image : _ref$Image;
+                        _context.next = 3;
+                        return Promise.all(Array.from(bgImages).map(function (url) {
+                          return Promise.race([new Promise(function (resolve) {
+                            var img = new Image();
 
-                          img.onerror = function () {
-                            return resolve();
-                          };
+                            img.onload = function () {
+                              return resolve({
+                                url: url,
+                                width: img.naturalWidth,
+                                height: img.naturalHeight
+                              });
+                            };
 
-                          img.src = url;
-                        }), psetTimeout(timeout)]);
-                      })));
+                            img.onerror = function () {
+                              return resolve();
+                            };
 
-                    case 3:
-                      _context.t0 = function (images, curr) {
-                        if (curr) {
-                          images[curr.url] = {
-                            width: curr.width,
-                            height: curr.height
-                          };
-                        }
+                            img.src = url;
+                          }), psetTimeout(timeout)]);
+                        }));
 
-                        return images;
-                      };
+                      case 3:
+                        _context.t0 = function (images, curr) {
+                          if (curr) {
+                            images[curr.url] = {
+                              width: curr.width,
+                              height: curr.height
+                            };
+                          }
 
-                      _context.t1 = {};
-                      return _context.abrupt("return", _context.sent.reduce(_context.t0, _context.t1));
+                          return images;
+                        };
 
-                    case 6:
-                    case "end":
-                      return _context.stop();
+                        _context.t1 = {};
+                        return _context.abrupt("return", _context.sent.reduce(_context.t0, _context.t1));
+
+                      case 6:
+                      case "end":
+                        return _context.stop();
+                    }
                   }
-                }
-              });
+                }, _callee);
+              }));
+              return _getImageSizes.apply(this, arguments);
             }
 
             var getImageSizes_1 = getImageSizes;
@@ -10822,49 +11043,62 @@ function __captureDomAndPollForIE() {
             var parseCss_1 = parseCss;
 
             function makeFetchCss(fetch) {
-              return function fetchCss(url) {
-                var response;
-                return regeneratorRuntime.async(function fetchCss$(_context) {
-                  while (1) {
-                    switch (_context.prev = _context.next) {
-                      case 0:
-                        _context.prev = 0;
-                        _context.next = 3;
-                        return regeneratorRuntime.awrap(fetch(url, {
-                          cache: 'force-cache'
-                        }));
+              return (
+                /*#__PURE__*/
+                function () {
+                  var _fetchCss = _asyncToGenerator(
+                  /*#__PURE__*/
+                  regeneratorRuntime.mark(function _callee(url) {
+                    var response;
+                    return regeneratorRuntime.wrap(function _callee$(_context) {
+                      while (1) {
+                        switch (_context.prev = _context.next) {
+                          case 0:
+                            _context.prev = 0;
+                            _context.next = 3;
+                            return fetch(url, {
+                              cache: 'force-cache'
+                            });
 
-                      case 3:
-                        response = _context.sent;
+                          case 3:
+                            response = _context.sent;
 
-                        if (!response.ok) {
-                          _context.next = 8;
-                          break;
+                            if (!response.ok) {
+                              _context.next = 8;
+                              break;
+                            }
+
+                            _context.next = 7;
+                            return response.text();
+
+                          case 7:
+                            return _context.abrupt("return", _context.sent);
+
+                          case 8:
+                            console.log('/failed to fetch (status ' + response.status + ') css from: ' + url + '/');
+                            _context.next = 14;
+                            break;
+
+                          case 11:
+                            _context.prev = 11;
+                            _context.t0 = _context["catch"](0);
+                            console.log('/failed to fetch (error ' + _context.t0.toString() + ') css from: ' + url + '/');
+
+                          case 14:
+                          case "end":
+                            return _context.stop();
                         }
+                      }
+                    }, _callee, null, [[0, 11]]);
+                  }));
 
-                        _context.next = 7;
-                        return regeneratorRuntime.awrap(response.text());
-
-                      case 7:
-                        return _context.abrupt("return", _context.sent);
-
-                      case 8:
-                        console.log('/failed to fetch (status ' + response.status + ') css from: ' + url + '/');
-                        _context.next = 14;
-                        break;
-
-                      case 11:
-                        _context.prev = 11;
-                        _context.t0 = _context["catch"](0);
-                        console.log('/failed to fetch (error ' + _context.t0.toString() + ') css from: ' + url + '/');
-
-                      case 14:
-                      case "end":
-                        return _context.stop();
-                    }
+                  function fetchCss(_x) {
+                    return _fetchCss.apply(this, arguments);
                   }
-                }, null, null, [[0, 11]]);
-              };
+
+                  return fetchCss;
+                }()
+              );
             }
 
             var fetchCss = makeFetchCss;
@@ -10972,207 +11206,261 @@ function __captureDomAndPollForIE() {
             var NODE_TYPES$1 = nodeTypes.NODE_TYPES;
 
             function makePrefetchAllCss(fetchCss) {
-              return function prefetchAllCss() {
-                var doc,
-                    cssMap,
-                    start,
-                    promises,
-                    fetchNodeCss,
-                    fetchBundledCss,
-                    doFetchAllCssFromFrame,
-                    _args6 = arguments;
-                return regeneratorRuntime.async(function prefetchAllCss$(_context6) {
-                  while (1) {
-                    switch (_context6.prev = _context6.next) {
-                      case 0:
-                        doFetchAllCssFromFrame = function _ref3(frameDoc, cssMap, promises) {
-                          fetchAllCssFromNode(frameDoc.documentElement);
+              return (
+                /*#__PURE__*/
+                function () {
+                  var _prefetchAllCss = _asyncToGenerator(
+                  /*#__PURE__*/
+                  regeneratorRuntime.mark(function _callee6() {
+                    var doc,
+                        cssMap,
+                        start,
+                        promises,
+                        fetchNodeCss,
+                        _fetchNodeCss,
+                        fetchBundledCss,
+                        _fetchBundledCss,
+                        doFetchAllCssFromFrame,
+                        _args6 = arguments;
 
-                          function fetchAllCssFromNode(node) {
-                            promises.push(fetchNodeCss(node, frameDoc.location.href, cssMap));
+                    return regeneratorRuntime.wrap(function _callee6$(_context6) {
+                      while (1) {
+                        switch (_context6.prev = _context6.next) {
+                          case 0:
+                            doFetchAllCssFromFrame = function _ref6(frameDoc, cssMap, promises) {
+                              fetchAllCssFromNode(frameDoc.documentElement);
 
-                            switch (node.nodeType) {
-                              case NODE_TYPES$1.ELEMENT:
-                                {
-                                  var tagName = node.tagName.toUpperCase();
+                              function fetchAllCssFromNode(node) {
+                                promises.push(fetchNodeCss(node, frameDoc.location.href, cssMap));
 
-                                  if (tagName === 'IFRAME') {
-                                    return fetchAllCssFromIframe(node);
-                                  } else {
-                                    return fetchAllCssFromElement(node);
-                                  }
-                                }
-                            }
-                          }
+                                switch (node.nodeType) {
+                                  case NODE_TYPES$1.ELEMENT:
+                                    {
+                                      var tagName = node.tagName.toUpperCase();
 
-                          function fetchAllCssFromElement(el) {
-                            return regeneratorRuntime.async(function fetchAllCssFromElement$(_context4) {
-                              while (1) {
-                                switch (_context4.prev = _context4.next) {
-                                  case 0:
-                                    Array.prototype.map.call(el.childNodes, fetchAllCssFromNode);
-
-                                  case 1:
-                                  case "end":
-                                    return _context4.stop();
-                                }
-                              }
-                            });
-                          }
-
-                          function fetchAllCssFromIframe(el) {
-                            return regeneratorRuntime.async(function fetchAllCssFromIframe$(_context5) {
-                              while (1) {
-                                switch (_context5.prev = _context5.next) {
-                                  case 0:
-                                    fetchAllCssFromElement(el);
-
-                                    try {
-                                      doFetchAllCssFromFrame(el.contentDocument, cssMap, promises);
-                                    } catch (ex) {
-                                      console.log(ex);
+                                      if (tagName === 'IFRAME') {
+                                        return fetchAllCssFromIframe(node);
+                                      } else {
+                                        return fetchAllCssFromElement(node);
+                                      }
                                     }
-
-                                  case 2:
-                                  case "end":
-                                    return _context5.stop();
                                 }
                               }
-                            });
-                          }
-                        };
 
-                        fetchBundledCss = function _ref2(cssText, resourceUrl, cssMap) {
-                          var styleSheet, _promises, _loop, _i, _Array$from;
+                              function fetchAllCssFromElement(_x7) {
+                                return _fetchAllCssFromElement.apply(this, arguments);
+                              }
 
-                          return regeneratorRuntime.async(function fetchBundledCss$(_context3) {
-                            while (1) {
-                              switch (_context3.prev = _context3.next) {
-                                case 0:
-                                  _context3.prev = 0;
-                                  styleSheet = parseCss_1(cssText);
-                                  _promises = [];
+                              function _fetchAllCssFromElement() {
+                                _fetchAllCssFromElement = _asyncToGenerator(
+                                /*#__PURE__*/
+                                regeneratorRuntime.mark(function _callee(el) {
+                                  return regeneratorRuntime.wrap(function _callee$(_context) {
+                                    while (1) {
+                                      switch (_context.prev = _context.next) {
+                                        case 0:
+                                          Array.prototype.map.call(el.childNodes, fetchAllCssFromNode);
 
-                                  _loop = function _loop() {
-                                    var rule = _Array$from[_i];
+                                        case 1:
+                                        case "end":
+                                          return _context.stop();
+                                      }
+                                    }
+                                  }, _callee);
+                                }));
+                                return _fetchAllCssFromElement.apply(this, arguments);
+                              }
 
-                                    if (rule instanceof CSSImportRule) {
-                                      _promises.push(function _callee() {
-                                        var nestedUrl, cssText;
-                                        return regeneratorRuntime.async(function _callee$(_context2) {
-                                          while (1) {
-                                            switch (_context2.prev = _context2.next) {
-                                              case 0:
-                                                nestedUrl = absolutizeUrl_1(rule.href, resourceUrl);
-                                                _context2.next = 3;
-                                                return regeneratorRuntime.awrap(fetchCss(nestedUrl));
+                              function fetchAllCssFromIframe(_x8) {
+                                return _fetchAllCssFromIframe.apply(this, arguments);
+                              }
 
-                                              case 3:
-                                                cssText = _context2.sent;
-                                                cssMap[nestedUrl] = cssText;
+                              function _fetchAllCssFromIframe() {
+                                _fetchAllCssFromIframe = _asyncToGenerator(
+                                /*#__PURE__*/
+                                regeneratorRuntime.mark(function _callee2(el) {
+                                  return regeneratorRuntime.wrap(function _callee2$(_context2) {
+                                    while (1) {
+                                      switch (_context2.prev = _context2.next) {
+                                        case 0:
+                                          fetchAllCssFromElement(el);
 
-                                                if (!(cssText !== undefined)) {
-                                                  _context2.next = 8;
-                                                  break;
-                                                }
-
-                                                _context2.next = 8;
-                                                return regeneratorRuntime.awrap(fetchBundledCss(cssText, nestedUrl, cssMap));
-
-                                              case 8:
-                                              case "end":
-                                                return _context2.stop();
-                                            }
+                                          try {
+                                            doFetchAllCssFromFrame(el.contentDocument, cssMap, promises);
+                                          } catch (ex) {
+                                            console.log(ex);
                                           }
-                                        });
-                                      }());
+
+                                        case 2:
+                                        case "end":
+                                          return _context2.stop();
+                                      }
                                     }
-                                  };
-
-                                  for (_i = 0, _Array$from = Array.from(styleSheet.cssRules); _i < _Array$from.length; _i++) {
-                                    _loop();
-                                  }
-
-                                  _context3.next = 7;
-                                  return regeneratorRuntime.awrap(Promise.all(_promises));
-
-                                case 7:
-                                  _context3.next = 12;
-                                  break;
-
-                                case 9:
-                                  _context3.prev = 9;
-                                  _context3.t0 = _context3["catch"](0);
-                                  console.log("error during fetchBundledCss, resourceUrl=".concat(resourceUrl), _context3.t0);
-
-                                case 12:
-                                case "end":
-                                  return _context3.stop();
+                                  }, _callee2);
+                                }));
+                                return _fetchAllCssFromIframe.apply(this, arguments);
                               }
-                            }
-                          }, null, null, [[0, 9]]);
-                        };
+                            };
 
-                        fetchNodeCss = function _ref(node, baseUrl, cssMap) {
-                          var cssText, resourceUrl;
-                          return regeneratorRuntime.async(function fetchNodeCss$(_context) {
-                            while (1) {
-                              switch (_context.prev = _context.next) {
-                                case 0:
-                                  if (!isLinkToStyleSheet(node)) {
-                                    _context.next = 6;
-                                    break;
+                            _fetchBundledCss = function _ref5() {
+                              _fetchBundledCss = _asyncToGenerator(
+                              /*#__PURE__*/
+                              regeneratorRuntime.mark(function _callee5(cssText, resourceUrl, cssMap) {
+                                var styleSheet, _promises, _loop, _i, _Array$from;
+
+                                return regeneratorRuntime.wrap(function _callee5$(_context5) {
+                                  while (1) {
+                                    switch (_context5.prev = _context5.next) {
+                                      case 0:
+                                        _context5.prev = 0;
+                                        styleSheet = parseCss_1(cssText);
+                                        _promises = [];
+
+                                        _loop = function _loop() {
+                                          var rule = _Array$from[_i];
+
+                                          if (rule instanceof CSSImportRule) {
+                                            _promises.push(_asyncToGenerator(
+                                            /*#__PURE__*/
+                                            regeneratorRuntime.mark(function _callee4() {
+                                              var nestedUrl, cssText;
+                                              return regeneratorRuntime.wrap(function _callee4$(_context4) {
+                                                while (1) {
+                                                  switch (_context4.prev = _context4.next) {
+                                                    case 0:
+                                                      nestedUrl = absolutizeUrl_1(rule.href, resourceUrl);
+                                                      _context4.next = 3;
+                                                      return fetchCss(nestedUrl);
+
+                                                    case 3:
+                                                      cssText = _context4.sent;
+                                                      cssMap[nestedUrl] = cssText;
+
+                                                      if (!(cssText !== undefined)) {
+                                                        _context4.next = 8;
+                                                        break;
+                                                      }
+
+                                                      _context4.next = 8;
+                                                      return fetchBundledCss(cssText, nestedUrl, cssMap);
+
+                                                    case 8:
+                                                    case "end":
+                                                      return _context4.stop();
+                                                  }
+                                                }
+                                              }, _callee4);
+                                            }))());
+                                          }
+                                        };
+
+                                        for (_i = 0, _Array$from = Array.from(styleSheet.cssRules); _i < _Array$from.length; _i++) {
+                                          _loop();
+                                        }
+
+                                        _context5.next = 7;
+                                        return Promise.all(_promises);
+
+                                      case 7:
+                                        _context5.next = 12;
+                                        break;
+
+                                      case 9:
+                                        _context5.prev = 9;
+                                        _context5.t0 = _context5["catch"](0);
+                                        console.log("error during fetchBundledCss, resourceUrl=".concat(resourceUrl), _context5.t0);
+
+                                      case 12:
+                                      case "end":
+                                        return _context5.stop();
+                                    }
                                   }
+                                }, _callee5, null, [[0, 9]]);
+                              }));
+                              return _fetchBundledCss.apply(this, arguments);
+                            };
 
-                                  resourceUrl = absolutizeUrl_1(getHrefAttr(node), baseUrl);
-                                  _context.next = 4;
-                                  return regeneratorRuntime.awrap(fetchCss(resourceUrl));
+                            fetchBundledCss = function _ref4(_x4, _x5, _x6) {
+                              return _fetchBundledCss.apply(this, arguments);
+                            };
 
-                                case 4:
-                                  cssText = _context.sent;
+                            _fetchNodeCss = function _ref3() {
+                              _fetchNodeCss = _asyncToGenerator(
+                              /*#__PURE__*/
+                              regeneratorRuntime.mark(function _callee3(node, baseUrl, cssMap) {
+                                var cssText, resourceUrl;
+                                return regeneratorRuntime.wrap(function _callee3$(_context3) {
+                                  while (1) {
+                                    switch (_context3.prev = _context3.next) {
+                                      case 0:
+                                        if (!isLinkToStyleSheet(node)) {
+                                          _context3.next = 6;
+                                          break;
+                                        }
 
-                                  if (cssText !== undefined) {
-                                    cssMap[resourceUrl] = cssText;
+                                        resourceUrl = absolutizeUrl_1(getHrefAttr(node), baseUrl);
+                                        _context3.next = 4;
+                                        return fetchCss(resourceUrl);
+
+                                      case 4:
+                                        cssText = _context3.sent;
+
+                                        if (cssText !== undefined) {
+                                          cssMap[resourceUrl] = cssText;
+                                        }
+
+                                      case 6:
+                                        if (!cssText) {
+                                          _context3.next = 9;
+                                          break;
+                                        }
+
+                                        _context3.next = 9;
+                                        return fetchBundledCss(cssText, resourceUrl, cssMap);
+
+                                      case 9:
+                                      case "end":
+                                        return _context3.stop();
+                                    }
                                   }
+                                }, _callee3);
+                              }));
+                              return _fetchNodeCss.apply(this, arguments);
+                            };
 
-                                case 6:
-                                  if (!cssText) {
-                                    _context.next = 9;
-                                    break;
-                                  }
+                            fetchNodeCss = function _ref2(_x, _x2, _x3) {
+                              return _fetchNodeCss.apply(this, arguments);
+                            };
 
-                                  _context.next = 9;
-                                  return regeneratorRuntime.awrap(fetchBundledCss(cssText, resourceUrl, cssMap));
+                            doc = _args6.length > 0 && _args6[0] !== undefined ? _args6[0] : document;
+                            cssMap = {};
+                            start = Date.now();
+                            promises = [];
+                            doFetchAllCssFromFrame(doc, cssMap, promises);
+                            _context6.next = 12;
+                            return Promise.all(promises);
 
-                                case 9:
-                                case "end":
-                                  return _context.stop();
-                              }
-                            }
-                          });
-                        };
+                          case 12:
+                            console.log('[prefetchAllCss]', Date.now() - start);
+                            return _context6.abrupt("return", function fetchCssSync(url) {
+                              return cssMap[url];
+                            });
 
-                        doc = _args6.length > 0 && _args6[0] !== undefined ? _args6[0] : document;
-                        cssMap = {};
-                        start = Date.now();
-                        promises = [];
-                        doFetchAllCssFromFrame(doc, cssMap, promises);
-                        _context6.next = 10;
-                        return regeneratorRuntime.awrap(Promise.all(promises));
+                          case 14:
+                          case "end":
+                            return _context6.stop();
+                        }
+                      }
+                    }, _callee6);
+                  }));
 
-                      case 10:
-                        console.log('[prefetchAllCss]', Date.now() - start);
-                        return _context6.abrupt("return", function fetchCssSync(url) {
-                          return cssMap[url];
-                        });
-
-                      case 12:
-                      case "end":
-                        return _context6.stop();
-                    }
+                  function prefetchAllCss() {
+                    return _prefetchAllCss.apply(this, arguments);
                   }
-                });
-              };
+
+                  return prefetchAllCss;
+                }()
+              );
             }
 
             var prefetchAllCss = makePrefetchAllCss;
@@ -11181,330 +11469,339 @@ function __captureDomAndPollForIE() {
             var API_VERSION = '1.1.0';
 
             function captureFrame() {
-              var _ref,
-                  styleProps,
-                  rectProps,
-                  ignoredTagNames,
-                  doc,
-                  addStats,
-                  performance,
-                  startTime,
-                  endTime,
-                  promises,
-                  unfetchedResources,
-                  iframeCors,
-                  iframeToken,
-                  unfetchedToken,
-                  separator,
-                  prefetchAllCss$$1,
-                  getCssFromCache,
-                  getBundledCssFromCssText$$1,
-                  extractCssFromNode$$1,
-                  captureNodeCss$$1,
-                  capturedFrame,
-                  iframePrefix,
-                  unfetchedPrefix,
-                  metaPrefix,
-                  stats,
-                  ret,
-                  filter,
-                  notEmptyObj,
-                  captureTextNode,
-                  doCaptureFrame,
-                  _args = arguments;
+              return _captureFrame.apply(this, arguments);
+            }
 
-              return regeneratorRuntime.async(function captureFrame$(_context) {
-                while (1) {
-                  switch (_context.prev = _context.next) {
-                    case 0:
-                      doCaptureFrame = function _ref8(frameDoc) {
-                        var bgImages = new Set();
-                        var bundledCss = '';
-                        var ret = captureNode(frameDoc.documentElement);
-                        ret.css = bundledCss;
-                        promises.push(getImageSizes_1({
-                          bgImages: bgImages
-                        }).then(function (images) {
-                          return ret.images = images;
-                        }));
-                        return ret;
+            function _captureFrame() {
+              _captureFrame = _asyncToGenerator(
+              /*#__PURE__*/
+              regeneratorRuntime.mark(function _callee() {
+                var _ref,
+                    styleProps,
+                    rectProps,
+                    ignoredTagNames,
+                    doc,
+                    addStats,
+                    performance,
+                    startTime,
+                    endTime,
+                    promises,
+                    unfetchedResources,
+                    iframeCors,
+                    iframeToken,
+                    unfetchedToken,
+                    separator,
+                    prefetchAllCss$$1,
+                    getCssFromCache,
+                    getBundledCssFromCssText$$1,
+                    extractCssFromNode$$1,
+                    captureNodeCss$$1,
+                    capturedFrame,
+                    iframePrefix,
+                    unfetchedPrefix,
+                    metaPrefix,
+                    stats,
+                    ret,
+                    filter,
+                    notEmptyObj,
+                    captureTextNode,
+                    doCaptureFrame,
+                    _args = arguments;
 
-                        function captureNode(node) {
-                          var _captureNodeCss = captureNodeCss$$1(node, frameDoc.location.href),
-                              nodeCss = _captureNodeCss.bundledCss,
-                              nodeUnfetched = _captureNodeCss.unfetchedResources;
+                return regeneratorRuntime.wrap(function _callee$(_context) {
+                  while (1) {
+                    switch (_context.prev = _context.next) {
+                      case 0:
+                        doCaptureFrame = function _ref8(frameDoc) {
+                          var bgImages = new Set();
+                          var bundledCss = '';
+                          var ret = captureNode(frameDoc.documentElement);
+                          ret.css = bundledCss;
+                          promises.push(getImageSizes_1({
+                            bgImages: bgImages
+                          }).then(function (images) {
+                            return ret.images = images;
+                          }));
+                          return ret;
 
-                          bundledCss += nodeCss;
+                          function captureNode(node) {
+                            var _captureNodeCss = captureNodeCss$$1(node, frameDoc.location.href),
+                                nodeCss = _captureNodeCss.bundledCss,
+                                nodeUnfetched = _captureNodeCss.unfetchedResources;
 
-                          if (nodeUnfetched) {
-                            var _iteratorNormalCompletion = true;
-                            var _didIteratorError = false;
-                            var _iteratorError = undefined;
+                            bundledCss += nodeCss;
+
+                            if (nodeUnfetched) {
+                              var _iteratorNormalCompletion = true;
+                              var _didIteratorError = false;
+                              var _iteratorError = undefined;
+
+                              try {
+                                for (var _iterator = nodeUnfetched[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+                                  var elem = _step.value;
+                                  unfetchedResources.add(elem);
+                                }
+                              } catch (err) {
+                                _didIteratorError = true;
+                                _iteratorError = err;
+                              } finally {
+                                try {
+                                  if (!_iteratorNormalCompletion && _iterator.return != null) {
+                                    _iterator.return();
+                                  }
+                                } finally {
+                                  if (_didIteratorError) {
+                                    throw _iteratorError;
+                                  }
+                                }
+                              }
+                            }
+
+                            switch (node.nodeType) {
+                              case NODE_TYPES$2.TEXT:
+                                {
+                                  return captureTextNode(node);
+                                }
+
+                              case NODE_TYPES$2.ELEMENT:
+                                {
+                                  var tagName = node.tagName.toUpperCase();
+
+                                  if (tagName === 'IFRAME') {
+                                    return iframeToJSON(node);
+                                  } else {
+                                    return elementToJSON(node);
+                                  }
+                                }
+
+                              default:
+                                {
+                                  return null;
+                                }
+                            }
+                          }
+
+                          function elementToJSON(el) {
+                            var childNodes = Array.prototype.map.call(el.childNodes, captureNode).filter(filter);
+                            var tagName = el.tagName.toUpperCase();
+                            if (ignoredTagNames.indexOf(tagName) > -1) return null;
+                            var computedStyle = window.getComputedStyle(el);
+                            var boundingClientRect = el.getBoundingClientRect();
+                            var style = {};
+                            var _iteratorNormalCompletion2 = true;
+                            var _didIteratorError2 = false;
+                            var _iteratorError2 = undefined;
 
                             try {
-                              for (var _iterator = nodeUnfetched[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
-                                var elem = _step.value;
-                                unfetchedResources.add(elem);
+                              for (var _iterator2 = styleProps[Symbol.iterator](), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
+                                var p = _step2.value;
+                                style[p] = computedStyle.getPropertyValue(p);
                               }
                             } catch (err) {
-                              _didIteratorError = true;
-                              _iteratorError = err;
+                              _didIteratorError2 = true;
+                              _iteratorError2 = err;
                             } finally {
                               try {
-                                if (!_iteratorNormalCompletion && _iterator.return != null) {
-                                  _iterator.return();
+                                if (!_iteratorNormalCompletion2 && _iterator2.return != null) {
+                                  _iterator2.return();
                                 }
                               } finally {
-                                if (_didIteratorError) {
-                                  throw _iteratorError;
+                                if (_didIteratorError2) {
+                                  throw _iteratorError2;
                                 }
                               }
                             }
-                          }
 
-                          switch (node.nodeType) {
-                            case NODE_TYPES$2.TEXT:
-                              {
-                                return captureTextNode(node);
+                            if (!style['border-width']) {
+                              style['border-width'] = "".concat(computedStyle.getPropertyValue('border-top-width'), " ").concat(computedStyle.getPropertyValue('border-right-width'), " ").concat(computedStyle.getPropertyValue('border-bottom-width'), " ").concat(computedStyle.getPropertyValue('border-left-width'));
+                            }
+
+                            var rect = {};
+                            var _iteratorNormalCompletion3 = true;
+                            var _didIteratorError3 = false;
+                            var _iteratorError3 = undefined;
+
+                            try {
+                              for (var _iterator3 = rectProps[Symbol.iterator](), _step3; !(_iteratorNormalCompletion3 = (_step3 = _iterator3.next()).done); _iteratorNormalCompletion3 = true) {
+                                var _p = _step3.value;
+                                rect[_p] = boundingClientRect[_p];
                               }
-
-                            case NODE_TYPES$2.ELEMENT:
-                              {
-                                var tagName = node.tagName.toUpperCase();
-
-                                if (tagName === 'IFRAME') {
-                                  return iframeToJSON(node);
-                                } else {
-                                  return elementToJSON(node);
+                            } catch (err) {
+                              _didIteratorError3 = true;
+                              _iteratorError3 = err;
+                            } finally {
+                              try {
+                                if (!_iteratorNormalCompletion3 && _iterator3.return != null) {
+                                  _iterator3.return();
+                                }
+                              } finally {
+                                if (_didIteratorError3) {
+                                  throw _iteratorError3;
                                 }
                               }
-
-                            default:
-                              {
-                                return null;
-                              }
-                          }
-                        }
-
-                        function elementToJSON(el) {
-                          var childNodes = Array.prototype.map.call(el.childNodes, captureNode).filter(filter);
-                          var tagName = el.tagName.toUpperCase();
-                          if (ignoredTagNames.indexOf(tagName) > -1) return null;
-                          var computedStyle = window.getComputedStyle(el);
-                          var boundingClientRect = el.getBoundingClientRect();
-                          var style = {};
-                          var _iteratorNormalCompletion2 = true;
-                          var _didIteratorError2 = false;
-                          var _iteratorError2 = undefined;
-
-                          try {
-                            for (var _iterator2 = styleProps[Symbol.iterator](), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
-                              var p = _step2.value;
-                              style[p] = computedStyle.getPropertyValue(p);
                             }
-                          } catch (err) {
-                            _didIteratorError2 = true;
-                            _iteratorError2 = err;
-                          } finally {
-                            try {
-                              if (!_iteratorNormalCompletion2 && _iterator2.return != null) {
-                                _iterator2.return();
-                              }
-                            } finally {
-                              if (_didIteratorError2) {
-                                throw _iteratorError2;
-                              }
+
+                            var attributes = Array.from(el.attributes).map(function (a) {
+                              return {
+                                key: a.name,
+                                value: a.value
+                              };
+                            }).reduce(function (obj, attr) {
+                              obj[attr.key] = attr.value;
+                              return obj;
+                            }, {});
+                            var bgImage = getBackgroundImageUrl_1(computedStyle.getPropertyValue('background-image'));
+
+                            if (bgImage) {
+                              bgImages.add(bgImage);
                             }
-                          }
 
-                          if (!style['border-width']) {
-                            style['border-width'] = "".concat(computedStyle.getPropertyValue('border-top-width'), " ").concat(computedStyle.getPropertyValue('border-right-width'), " ").concat(computedStyle.getPropertyValue('border-bottom-width'), " ").concat(computedStyle.getPropertyValue('border-left-width'));
-                          }
-
-                          var rect = {};
-                          var _iteratorNormalCompletion3 = true;
-                          var _didIteratorError3 = false;
-                          var _iteratorError3 = undefined;
-
-                          try {
-                            for (var _iterator3 = rectProps[Symbol.iterator](), _step3; !(_iteratorNormalCompletion3 = (_step3 = _iterator3.next()).done); _iteratorNormalCompletion3 = true) {
-                              var _p = _step3.value;
-                              rect[_p] = boundingClientRect[_p];
-                            }
-                          } catch (err) {
-                            _didIteratorError3 = true;
-                            _iteratorError3 = err;
-                          } finally {
-                            try {
-                              if (!_iteratorNormalCompletion3 && _iterator3.return != null) {
-                                _iterator3.return();
-                              }
-                            } finally {
-                              if (_didIteratorError3) {
-                                throw _iteratorError3;
-                              }
-                            }
-                          }
-
-                          var attributes = Array.from(el.attributes).map(function (a) {
                             return {
-                              key: a.name,
-                              value: a.value
+                              tagName: tagName,
+                              style: notEmptyObj(style),
+                              rect: notEmptyObj(rect),
+                              attributes: notEmptyObj(attributes),
+                              childNodes: childNodes
                             };
-                          }).reduce(function (obj, attr) {
-                            obj[attr.key] = attr.value;
-                            return obj;
-                          }, {});
-                          var bgImage = getBackgroundImageUrl_1(computedStyle.getPropertyValue('background-image'));
-
-                          if (bgImage) {
-                            bgImages.add(bgImage);
                           }
 
-                          return {
-                            tagName: tagName,
-                            style: notEmptyObj(style),
-                            rect: notEmptyObj(rect),
-                            attributes: notEmptyObj(attributes),
-                            childNodes: childNodes
-                          };
-                        }
+                          function iframeToJSON(el) {
+                            var obj = elementToJSON(el);
+                            var doc;
 
-                        function iframeToJSON(el) {
-                          var obj = elementToJSON(el);
-                          var doc;
-
-                          try {
-                            doc = el.contentDocument;
-                          } catch (ex) {
-                            markFrameAsCors();
-                            return obj;
-                          }
-
-                          try {
-                            if (doc) {
-                              obj.childNodes = [doCaptureFrame(el.contentDocument)];
-                            } else {
+                            try {
+                              doc = el.contentDocument;
+                            } catch (ex) {
                               markFrameAsCors();
+                              return obj;
                             }
-                          } catch (ex) {
-                            console.log('error in iframeToJSON', ex);
+
+                            try {
+                              if (doc) {
+                                obj.childNodes = [doCaptureFrame(el.contentDocument)];
+                              } else {
+                                markFrameAsCors();
+                              }
+                            } catch (ex) {
+                              console.log('error in iframeToJSON', ex);
+                            }
+
+                            return obj;
+
+                            function markFrameAsCors() {
+                              var xpath = genXpath_1(el);
+                              iframeCors.push(xpath);
+                              obj.childNodes = ["".concat(iframeToken).concat(xpath).concat(iframeToken)];
+                            }
                           }
-
-                          return obj;
-
-                          function markFrameAsCors() {
-                            var xpath = genXpath_1(el);
-                            iframeCors.push(xpath);
-                            obj.childNodes = ["".concat(iframeToken).concat(xpath).concat(iframeToken)];
-                          }
-                        }
-                      };
-
-                      captureTextNode = function _ref7(node) {
-                        return {
-                          tagName: '#text',
-                          text: node.textContent
                         };
-                      };
 
-                      notEmptyObj = function _ref6(obj) {
-                        return Object.keys(obj).length ? obj : undefined;
-                      };
+                        captureTextNode = function _ref7(node) {
+                          return {
+                            tagName: '#text',
+                            text: node.textContent
+                          };
+                        };
 
-                      filter = function _ref5(x) {
-                        return !!x;
-                      };
+                        notEmptyObj = function _ref6(obj) {
+                          return Object.keys(obj).length ? obj : undefined;
+                        };
 
-                      stats = function _ref4() {
-                        if (!addStats) {
-                          return '';
-                        }
+                        filter = function _ref5(x) {
+                          return !!x;
+                        };
 
-                        return "\n".concat(separator, "\n").concat(JSON.stringify(performance));
-                      };
+                        stats = function _ref4() {
+                          if (!addStats) {
+                            return '';
+                          }
 
-                      endTime = function _ref3(obj) {
-                        obj.endTime = Date.now();
-                        obj.ellapsedTime = obj.endTime - obj.startTime;
-                      };
+                          return "\n".concat(separator, "\n").concat(JSON.stringify(performance));
+                        };
 
-                      startTime = function _ref2(obj) {
-                        obj.startTime = Date.now();
-                      };
+                        endTime = function _ref3(obj) {
+                          obj.endTime = Date.now();
+                          obj.ellapsedTime = obj.endTime - obj.startTime;
+                        };
 
-                      _ref = _args.length > 0 && _args[0] !== undefined ? _args[0] : defaultDomProps, styleProps = _ref.styleProps, rectProps = _ref.rectProps, ignoredTagNames = _ref.ignoredTagNames;
-                      doc = _args.length > 1 && _args[1] !== undefined ? _args[1] : document;
-                      addStats = _args.length > 2 && _args[2] !== undefined ? _args[2] : false;
-                      performance = {
-                        total: {},
-                        prefetchCss: {},
-                        doCaptureFrame: {},
-                        waitForImages: {}
-                      };
-                      promises = [];
-                      startTime(performance.total);
-                      unfetchedResources = new Set();
-                      iframeCors = [];
-                      iframeToken = '@@@@@';
-                      unfetchedToken = '#####';
-                      separator = '-----';
-                      startTime(performance.prefetchCss);
-                      prefetchAllCss$$1 = prefetchAllCss(fetchCss(fetch));
-                      _context.next = 22;
-                      return regeneratorRuntime.awrap(prefetchAllCss$$1(doc));
+                        startTime = function _ref2(obj) {
+                          obj.startTime = Date.now();
+                        };
 
-                    case 22:
-                      getCssFromCache = _context.sent;
-                      endTime(performance.prefetchCss);
-                      getBundledCssFromCssText$$1 = getBundledCssFromCssText({
-                        parseCss: parseCss_1,
-                        CSSImportRule: CSSImportRule,
-                        getCssFromCache: getCssFromCache,
-                        absolutizeUrl: absolutizeUrl_1,
-                        unfetchedToken: unfetchedToken
-                      });
-                      extractCssFromNode$$1 = extractCssFromNode({
-                        getCssFromCache: getCssFromCache,
-                        absolutizeUrl: absolutizeUrl_1
-                      });
-                      captureNodeCss$$1 = captureNodeCss({
-                        extractCssFromNode: extractCssFromNode$$1,
-                        getBundledCssFromCssText: getBundledCssFromCssText$$1,
-                        unfetchedToken: unfetchedToken
-                      });
-                      startTime(performance.doCaptureFrame);
-                      capturedFrame = doCaptureFrame(doc);
-                      endTime(performance.doCaptureFrame);
-                      startTime(performance.waitForImages);
-                      _context.next = 33;
-                      return regeneratorRuntime.awrap(Promise.all(promises));
+                        _ref = _args.length > 0 && _args[0] !== undefined ? _args[0] : defaultDomProps, styleProps = _ref.styleProps, rectProps = _ref.rectProps, ignoredTagNames = _ref.ignoredTagNames;
+                        doc = _args.length > 1 && _args[1] !== undefined ? _args[1] : document;
+                        addStats = _args.length > 2 && _args[2] !== undefined ? _args[2] : false;
+                        performance = {
+                          total: {},
+                          prefetchCss: {},
+                          doCaptureFrame: {},
+                          waitForImages: {}
+                        };
+                        promises = [];
+                        startTime(performance.total);
+                        unfetchedResources = new Set();
+                        iframeCors = [];
+                        iframeToken = '@@@@@';
+                        unfetchedToken = '#####';
+                        separator = '-----';
+                        startTime(performance.prefetchCss);
+                        prefetchAllCss$$1 = prefetchAllCss(fetchCss(fetch));
+                        _context.next = 22;
+                        return prefetchAllCss$$1(doc);
 
-                    case 33:
-                      endTime(performance.waitForImages); // Note: Change the API_VERSION when changing json structure.
+                      case 22:
+                        getCssFromCache = _context.sent;
+                        endTime(performance.prefetchCss);
+                        getBundledCssFromCssText$$1 = getBundledCssFromCssText({
+                          parseCss: parseCss_1,
+                          CSSImportRule: CSSImportRule,
+                          getCssFromCache: getCssFromCache,
+                          absolutizeUrl: absolutizeUrl_1,
+                          unfetchedToken: unfetchedToken
+                        });
+                        extractCssFromNode$$1 = extractCssFromNode({
+                          getCssFromCache: getCssFromCache,
+                          absolutizeUrl: absolutizeUrl_1
+                        });
+                        captureNodeCss$$1 = captureNodeCss({
+                          extractCssFromNode: extractCssFromNode$$1,
+                          getBundledCssFromCssText: getBundledCssFromCssText$$1,
+                          unfetchedToken: unfetchedToken
+                        });
+                        startTime(performance.doCaptureFrame);
+                        capturedFrame = doCaptureFrame(doc);
+                        endTime(performance.doCaptureFrame);
+                        startTime(performance.waitForImages);
+                        _context.next = 33;
+                        return Promise.all(promises);
 
-                      capturedFrame.version = API_VERSION;
-                      capturedFrame.scriptVersion = '7.1.1';
-                      iframePrefix = iframeCors.length ? "".concat(iframeCors.join('\n'), "\n") : '';
-                      unfetchedPrefix = unfetchedResources.size ? "".concat(Array.from(unfetchedResources).join('\n'), "\n") : '';
-                      metaPrefix = JSON.stringify({
-                        separator: separator,
-                        cssStartToken: unfetchedToken,
-                        cssEndToken: unfetchedToken,
-                        iframeStartToken: "\"".concat(iframeToken),
-                        iframeEndToken: "".concat(iframeToken, "\"")
-                      });
-                      endTime(performance.total);
-                      ret = "".concat(metaPrefix, "\n").concat(unfetchedPrefix).concat(separator, "\n").concat(iframePrefix).concat(separator, "\n").concat(JSON.stringify(capturedFrame)).concat(stats());
-                      console.log('[captureFrame]', JSON.stringify(performance));
-                      return _context.abrupt("return", ret);
+                      case 33:
+                        endTime(performance.waitForImages); // Note: Change the API_VERSION when changing json structure.
 
-                    case 43:
-                    case "end":
-                      return _context.stop();
+                        capturedFrame.version = API_VERSION;
+                        capturedFrame.scriptVersion = '7.1.3';
+                        iframePrefix = iframeCors.length ? "".concat(iframeCors.join('\n'), "\n") : '';
+                        unfetchedPrefix = unfetchedResources.size ? "".concat(Array.from(unfetchedResources).join('\n'), "\n") : '';
+                        metaPrefix = JSON.stringify({
+                          separator: separator,
+                          cssStartToken: unfetchedToken,
+                          cssEndToken: unfetchedToken,
+                          iframeStartToken: "\"".concat(iframeToken),
+                          iframeEndToken: "".concat(iframeToken, "\"")
+                        });
+                        endTime(performance.total);
+                        ret = "".concat(metaPrefix, "\n").concat(unfetchedPrefix).concat(separator, "\n").concat(iframePrefix).concat(separator, "\n").concat(JSON.stringify(capturedFrame)).concat(stats());
+                        console.log('[captureFrame]', JSON.stringify(performance));
+                        return _context.abrupt("return", ret);
+
+                      case 43:
+                      case "end":
+                        return _context.stop();
+                    }
                   }
-                }
-              });
+                }, _callee);
+              }));
+              return _captureFrame.apply(this, arguments);
             }
 
             var captureFrame_1 = captureFrame;

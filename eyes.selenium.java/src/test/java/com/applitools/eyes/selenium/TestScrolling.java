@@ -14,6 +14,7 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.remote.RemoteWebDriver;
+import org.testng.annotations.Factory;
 import org.testng.annotations.Test;
 
 import java.net.MalformedURLException;
@@ -26,6 +27,13 @@ import java.util.Map;
 import static com.applitools.eyes.selenium.TestDataProvider.*;
 
 public class TestScrolling {
+
+    public final boolean useEmulation;
+
+    @Factory(dataProvider = "booleanDP", dataProviderClass = TestDataProvider.class)
+    public TestScrolling(boolean useEmulation) {
+        this.useEmulation = useEmulation;
+    }
 
     private WebDriver getSeleniumWebDriver(DesiredCapabilities capabilities) {
         WebDriver driver = null;
@@ -40,8 +48,8 @@ public class TestScrolling {
         return driver;
     }
 
-    @Test(dataProvider = "booleanDP", dataProviderClass = TestDataProvider.class)
-    public void TestWebAppScrolling(boolean useEmulation) {
+    @Test
+    public void TestWebAppScrolling() {
         WebDriver driver;
         if (useEmulation) {
             ChromeOptions options = new ChromeOptions();
@@ -96,8 +104,8 @@ public class TestScrolling {
         }
     }
 
-    @Test(dataProvider = "booleanDP", dataProviderClass = TestDataProvider.class)
-    public void TestWebAppScrolling2(boolean useEmulation) {
+    @Test
+    public void TestWebAppScrolling2() {
         WebDriver driver;
         if (useEmulation) {
             ChromeOptions options = new ChromeOptions();
@@ -139,8 +147,8 @@ public class TestScrolling {
         }
     }
 
-    @Test(dataProvider = "booleanDP", dataProviderClass = TestDataProvider.class)
-    public void TestWebAppScrolling3(boolean useEmulation) {
+    @Test
+    public void TestWebAppScrolling3() {
         WebDriver driver;
         if (useEmulation) {
             ChromeOptions options = new ChromeOptions();
