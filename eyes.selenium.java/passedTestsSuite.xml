@@ -221,57 +221,23 @@
             </class>
         </classes>
     </test>
+    <test name="TestScrolling" parallel="methods">
+        <parameter name="dont_run" value="TestWebAppScrolling+false, TestWebAppScrolling3+false"/>
+        <classes>
+            <class name="com.applitools.eyes.selenium.TestScrolling">
+                <methods>
+                    <include name="TestWebAppScrolling" />
+                    <include name="TestWebAppScrolling2" />
+                    <include name="TestWebAppScrolling3" />
+                </methods>
+            </class>
+        </classes>
+    </test>
     <test name="TestVGServerConfigs" parallel="methods">
         <classes>
             <class name="com.applitools.eyes.renderingGrid.TestVGServerConfigs">
                 <methods>
                     <include name="TestVGDoubleCloseNoCheck" />
-                </methods>
-            </class>
-        </classes>
-    </test>
-    <test name="TestAbort" parallel="methods">
-        <classes>
-            <class name="com.applitools.eyes.api.TestAbort">
-                <methods>
-                    <include name="TestAbortIfNotClosed" />
-                </methods>
-            </class>
-        </classes>
-    </test>
-    <test name="TestApiMethods" parallel="methods">
-        <parameter name="dont_run" value="TestCloseAsync+false"/>
-        <classes>
-            <class name="com.applitools.eyes.api.TestApiMethods">
-                <methods>
-                    <include name="TestCloseAsync" />
-                </methods>
-            </class>
-        </classes>
-    </test>
-    <test name="TestConfigurationSentCorrectlyToServer" parallel="methods">
-        <classes>
-            <class name="com.applitools.eyes.selenium.TestConfigurationSentCorrectlyToServer">
-                <methods>
-                    <include name="TestEyesConfiguration" />
-                </methods>
-            </class>
-        </classes>
-    </test>
-    <test name="TestAbort2" parallel="methods">
-        <classes>
-            <class name="com.applitools.eyes.api.TestAbort2">
-                <methods>
-                    <include name="Test_GetAllResults" />
-                </methods>
-            </class>
-        </classes>
-    </test>
-    <test name="TestIEyesSelenium" parallel="methods">
-        <classes>
-            <class name="com.applitools.eyes.renderingGrid.TestIEyesSelenium">
-                <methods>
-                    <include name="Test_GetAllResults" />
                 </methods>
             </class>
         </classes>
