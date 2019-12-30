@@ -228,18 +228,6 @@
             </class>
         </classes>
     </test>
-    <test name="TestScrolling" parallel="methods">
-        <parameter name="dont_run" value="TestWebAppScrolling+false, TestWebAppScrolling3+false"/>
-        <classes>
-            <class name="com.applitools.eyes.selenium.TestScrolling">
-                <methods>
-                    <include name="TestWebAppScrolling" />
-                    <include name="TestWebAppScrolling2" />
-                    <include name="TestWebAppScrolling3" />
-                </methods>
-            </class>
-        </classes>
-    </test>
     <test name="TestVGServerConfigs" parallel="methods">
         <classes>
             <class name="com.applitools.eyes.renderingGrid.TestVGServerConfigs">
