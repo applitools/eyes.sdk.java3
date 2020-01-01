@@ -1,3 +1,6 @@
+### Updated
+- Capture scripts. [Trello 151](https://trello.com/c/owyVIQG9)
+
 ###Fixed
 - Java SDK was missing abortAsync. [Trello 1420](https://trello.com/c/3NOKuLLj)
 
