@@ -1,4 +1,4 @@
-/* @applitools/dom-snapshot@3.2.1 */
+/* @applitools/dom-snapshot@3.2.2 */
 
 function __processPageAndSerializePoll() {
   var processPageAndSerializePoll = (function () {
@@ -913,7 +913,7 @@ function __processPageAndSerializePoll() {
 
     return doProcessPage(doc).then(result => {
       log$$1('processPage end');
-      result.scriptVersion = '3.2.0';
+      result.scriptVersion = '3.2.2';
       return result;
     });
 
