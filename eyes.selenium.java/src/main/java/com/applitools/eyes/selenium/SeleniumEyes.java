@@ -79,6 +79,7 @@ public class SeleniumEyes extends EyesBase implements IDriverProvider, IBatchClo
 
     private UserAgent userAgent;
     private ImageProvider imageProvider;
+    private ISizeAdjuster sizeAdjuster;
     private RegionPositionCompensation regionPositionCompensation;
     private WebElement targetElement;
     private PositionMemento positionMemento;
@@ -251,13 +252,14 @@ public class SeleniumEyes extends EyesBase implements IDriverProvider, IBatchClo
             userAgent = UserAgent.ParseUserAgentString(uaString, true);
         }
 
+        this.jsExecutor = new SeleniumJavaScriptExecutor(this.driver);
+        updateScalingParams();
+
         imageProvider = ImageProviderFactory.getImageProvider(userAgent, this, logger, this.driver);
+        sizeAdjuster = ImageProviderFactory.getImageSizeAdjuster(userAgent, jsExecutor);
         regionPositionCompensation = RegionPositionCompensationFactory.getRegionPositionCompensation(userAgent, this, logger);
 
         ArgumentGuard.notNull(driver, "driver");
-
-        devicePixelRatio = UNKNOWN_DEVICE_PIXEL_RATIO;
-        this.jsExecutor = new SeleniumJavaScriptExecutor(this.driver);
 
         this.driver.setRotation(rotation);
         this.runner.addBatch(this.getConfigGetter().getBatch().getId(), this);

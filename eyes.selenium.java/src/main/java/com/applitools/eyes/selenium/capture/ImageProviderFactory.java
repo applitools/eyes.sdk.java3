@@ -2,9 +2,11 @@ package com.applitools.eyes.selenium.capture;
 
 import com.applitools.eyes.BrowserNames;
 import com.applitools.eyes.Logger;
+import com.applitools.eyes.OSNames;
 import com.applitools.eyes.UserAgent;
 import com.applitools.eyes.capture.ImageProvider;
 import com.applitools.eyes.selenium.SeleniumEyes;
+import com.applitools.eyes.selenium.SeleniumJavaScriptExecutor;
 import org.openqa.selenium.TakesScreenshot;
 
 public class ImageProviderFactory {
@@ -26,5 +28,14 @@ public class ImageProviderFactory {
             }
         }
         return new TakesScreenshotImageProvider(logger, tsInstance);
+    }
+
+    public static ISizeAdjuster getImageSizeAdjuster(UserAgent ua, SeleniumJavaScriptExecutor jsExecutor) {
+
+        if (ua != null && (ua.getOS().equals(OSNames.Android) || ua.getOS().equals(OSNames.IOS)))
+        {
+            return new MobileDeviceSizeAdjuster(jsExecutor);
+        }
+        return NullSizeAdjuster.getInstance();
     }
 }
