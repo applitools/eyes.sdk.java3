@@ -19,7 +19,7 @@ public class TestViewportMetaTagParsing {
     @Test(dataProvider = "dp")
     public void TestParseViewportMetaTag(String viewportMetaTag, boolean expectedFollowDeviceWidth, float expectedDeviceWidth, float expectedInitialScale)
     {
-        ViewportMetaTag data = ViewportMetaTag.ParseViewportMetaTag(viewportMetaTag);
+        ViewportMetaTag data = ViewportMetaTag.parseViewportMetaTag(viewportMetaTag);
         Assert.assertEquals( data.getFollowDeviceWidth(), expectedFollowDeviceWidth, "FollowDeviceWidth");
         Assert.assertEquals( data.getDeviceWidth(), expectedDeviceWidth, "DeviceWidth");
         Assert.assertEquals( data.getInitialScale(), expectedInitialScale, "InitialScale");

@@ -27,16 +27,34 @@ public class ViewportMetaTag {
     private ViewportMetaTag() {
     }
 
-    public static ViewportMetaTag ParseViewportMetaTag(String viewportMetaTagContent) {
-        Matcher viewportMatches = viewportParsingRegex.matcher(viewportMetaTagContent);
-        String widthStr = viewportMatches.group("width");
-        String initialScaleStr = viewportMatches.group("initialScale");
+    public static ViewportMetaTag parseViewportMetaTag(String viewportMetaTagContent) {
         ViewportMetaTag viewportData = new ViewportMetaTag();
-        viewportData.followDeviceWidth = "device-width".equalsIgnoreCase(widthStr);
-        if (!viewportData.followDeviceWidth) {
-            viewportData.deviceWidth = Float.parseFloat(widthStr);
+        Matcher match = viewportParsingRegex.matcher(viewportMetaTagContent);
+        String widthStr = null;
+        String initialScaleStr = null;
+        while (match.find() && (widthStr == null || initialScaleStr == null)) {
+            String matchResult = match.group("width");
+            if (widthStr == null && matchResult != null) {
+                widthStr = matchResult;
+            }
+            matchResult = match.group("initialScale");
+            if (initialScaleStr == null && matchResult != null) {
+                initialScaleStr = matchResult;
+            }
         }
-        viewportData.initialScale = Float.parseFloat(initialScaleStr);
+        viewportData.followDeviceWidth = "device-width".equalsIgnoreCase(widthStr);
+        if (!viewportData.followDeviceWidth && widthStr != null) {
+            try {
+                viewportData.deviceWidth = Float.parseFloat(widthStr);
+            } finally {
+            }
+        }
+        if (initialScaleStr != null) {
+            try {
+                viewportData.initialScale = Float.parseFloat(initialScaleStr);
+            } finally {
+            }
+        }
         return viewportData;
     }
 
