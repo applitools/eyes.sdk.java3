@@ -1,10 +1,8 @@
 package com.applitools.eyes.selenium.capture;
 
 import com.applitools.eyes.*;
-import com.applitools.eyes.capture.ImageProvider;
 import com.applitools.eyes.positioning.PositionProvider;
 import com.applitools.eyes.selenium.SeleniumEyes;
-import com.applitools.eyes.selenium.SeleniumJavaScriptExecutor;
 import com.applitools.eyes.selenium.frames.FrameChain;
 import com.applitools.eyes.selenium.positioning.ScrollPositionProviderFactory;
 import com.applitools.eyes.selenium.wrappers.EyesWebDriver;
@@ -13,26 +11,17 @@ import org.openqa.selenium.OutputType;
 import org.openqa.selenium.TakesScreenshot;
 import org.openqa.selenium.WebElement;
 
+import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.util.HashMap;
 import java.util.Map;
 
-public class SafariScreenshotImageProvider implements ImageProvider {
+public class SafariScreenshotImageProvider extends MobileScreenshotImageProvider {
 
-    private final SeleniumEyes eyes;
-    private final Logger logger;
-    private final TakesScreenshot tsInstance;
-    private final IEyesJsExecutor jsExecutor;
-    private final UserAgent userAgent;
-
-    private static Map<RectangleSize, Region[]> devicesRegions = null;
+    private static Map<RectangleSize, Rectangle[]> devicesRegions = null;
 
     public SafariScreenshotImageProvider(SeleniumEyes eyes, Logger logger, TakesScreenshot tsInstance, UserAgent userAgent) {
-        this.eyes = eyes;
-        this.logger = logger;
-        this.tsInstance = tsInstance;
-        this.jsExecutor = new SeleniumJavaScriptExecutor((EyesWebDriver) eyes.getDriver());
-        this.userAgent = userAgent;
+        super(eyes, logger, tsInstance, userAgent);
     }
 
     @Override
@@ -68,28 +57,23 @@ public class SafariScreenshotImageProvider implements ImageProvider {
 
             if (devicesRegions.containsKey(imageSize)) {
 
-                Region[] resolutions = devicesRegions.get(imageSize);
-                float widthRatio = image.getWidth() / (float)originalViewportSize.getWidth();
+                Rectangle[] resolutions = devicesRegions.get(imageSize);
+                float widthRatio = image.getWidth() / (float) originalViewportSize.getWidth();
                 float height = widthRatio * originalViewportSize.getHeight();
-                if (Math.abs(height - image.getHeight()) > 1.5)
-                {
-                    Region bestMatchingRect = resolutions[0];
-                    float bestHeightDiff = Math.abs(bestMatchingRect.getHeight() - height);
-                    for (int i = 1; i < resolutions.length; ++i)
-                    {
-                        Region rect = resolutions[i];
-                        float heightDiff = Math.abs(rect.getHeight() - height);
-                        if (heightDiff < bestHeightDiff)
-                        {
+                if (Math.abs(height - image.getHeight()) > 1.5) {
+                    Rectangle bestMatchingRect = resolutions[0];
+                    float bestHeightDiff = Math.abs(bestMatchingRect.height - height);
+                    for (int i = 1; i < resolutions.length; ++i) {
+                        Rectangle rect = resolutions[i];
+                        float heightDiff = Math.abs(rect.height - height);
+                        if (heightDiff < bestHeightDiff) {
                             bestHeightDiff = heightDiff;
                             bestMatchingRect = rect;
                         }
                     }
                     logger.verbose("closest crop rect found: " + bestMatchingRect);
-                    image = ImageUtils.cropImage(logger, image, bestMatchingRect);
-                }
-                else
-                {
+                    image = ImageUtils.cropImage(logger, image, new Region(bestMatchingRect.x, bestMatchingRect.y, bestMatchingRect.width, bestMatchingRect.height));
+                } else {
                     logger.verbose("no crop needed. must be using chrome emulator.");
                 }
             }
@@ -118,25 +102,26 @@ public class SafariScreenshotImageProvider implements ImageProvider {
     }
 
     private void initDeviceRegionsTable() {
+
         devicesRegions = new HashMap<>();
-        devicesRegions.put(new RectangleSize(1536, 2048), new Region[]{ new Region(0, 141, 1536, 1907), new Region(0, 206, 1536, 1842), new Region(0, 129, 1536, 1919), new Region(0, 194, 1536, 1854) });
-        devicesRegions.put(new RectangleSize(2048, 1536), new Region[]{ new Region(0, 141, 2048, 1395), new Region(0, 206, 2048, 1330), new Region(0, 129, 2048, 1407), new Region(0, 194, 2048, 1342) } );
-        devicesRegions.put(new RectangleSize(828, 1792),  new Region[]{ new Region(0, 189, 828, 1436) } );
-        devicesRegions.put(new RectangleSize(1792, 828),  new Region[]{ new Region(88, 101, 1616, 685) } );
-        devicesRegions.put(new RectangleSize(1242, 2688), new Region[]{ new Region(0, 283, 1242, 2155) } );
-        devicesRegions.put(new RectangleSize(2688, 1242), new Region[]{ new Region(132, 151, 2424, 1028) } );
-        devicesRegions.put(new RectangleSize(1125, 2436), new Region[]{ new Region(0, 283, 1125, 1903) } );
-        devicesRegions.put(new RectangleSize(2436, 1125), new Region[]{ new Region(132, 151, 2172, 930) } );
-        devicesRegions.put(new RectangleSize(1242, 2208), new Region[]{ new Region(0, 211, 1242, 1863), new Region(0, 193, 1242, 1882) } );
-        devicesRegions.put(new RectangleSize(2208, 1242), new Region[]{ new Region(0, 151, 2208, 1090), new Region(0, 231, 2208, 1010) } );
-        devicesRegions.put(new RectangleSize(750, 1334),  new Region[]{ new Region(0, 141, 750, 1104), new Region(0, 129, 750, 1116) } );
-        devicesRegions.put(new RectangleSize(1334, 750),  new Region[]{ new Region(0, 101, 1334, 648), new Region(0, 89, 1334, 660) } );
-        devicesRegions.put(new RectangleSize(640, 1136),  new Region[]{ new Region(0, 129, 640, 918) } );
-        devicesRegions.put(new RectangleSize(1136, 640),  new Region[]{ new Region(0, 89, 1136, 462) } );
-        devicesRegions.put(new RectangleSize(2048, 2732), new Region[]{ new Region(0, 141, 2048, 2591) } );
-        devicesRegions.put(new RectangleSize(2732, 2048), new Region[]{ new Region(0, 141, 2732, 1907) } );
-        devicesRegions.put(new RectangleSize(1668, 2224), new Region[]{ new Region(0, 141, 1668, 2083) } );
-        devicesRegions.put(new RectangleSize(2224, 1668), new Region[]{ new Region(0, 141, 2224, 1527) } );
+        devicesRegions.put(new RectangleSize(1536, 2048), new Rectangle[]{new Rectangle(0, 140, 1536, 1908), new Rectangle(0, 205, 1536, 1843), new Rectangle(0, 128, 1536, 1920), new Rectangle(0, 194, 1536, 1854)});
+        devicesRegions.put(new RectangleSize(2048, 1536), new Rectangle[]{new Rectangle(0, 140, 2048, 1396), new Rectangle(0, 205, 2048, 1331), new Rectangle(0, 128, 2048, 1408), new Rectangle(0, 194, 2048, 1342)});
+        devicesRegions.put(new RectangleSize(828, 1792), new Rectangle[]{new Rectangle(0, 188, 828, 1438)});
+        devicesRegions.put(new RectangleSize(1792, 828), new Rectangle[]{new Rectangle(88, 100, 1616, 686), new Rectangle(88, 166, 1616, 620)});
+        devicesRegions.put(new RectangleSize(1242, 2688), new Rectangle[]{new Rectangle(0, 282, 1242, 2157)});
+        devicesRegions.put(new RectangleSize(2688, 1242), new Rectangle[]{new Rectangle(132, 150, 2424, 1029), new Rectangle(132, 249, 2424, 930)});
+        devicesRegions.put(new RectangleSize(1125, 2436), new Rectangle[]{new Rectangle(0, 282, 1125, 1905)});
+        devicesRegions.put(new RectangleSize(2436, 1125), new Rectangle[]{new Rectangle(132, 150, 2172, 912), new Rectangle(132, 249, 2172, 813)});
+        devicesRegions.put(new RectangleSize(1242, 2208), new Rectangle[]{new Rectangle(0, 210, 1242, 1866), new Rectangle(0, 192, 1242, 1884)});
+        devicesRegions.put(new RectangleSize(2208, 1242), new Rectangle[]{new Rectangle(0, 150, 2208, 1092), new Rectangle(0, 230, 2208, 1012)});
+        devicesRegions.put(new RectangleSize(750, 1334), new Rectangle[]{new Rectangle(0, 140, 750, 1106), new Rectangle(0, 128, 750, 1118)});
+        devicesRegions.put(new RectangleSize(1334, 750), new Rectangle[]{new Rectangle(0, 100, 1334, 650), new Rectangle(0, 88, 1334, 662)});
+        devicesRegions.put(new RectangleSize(640, 1136), new Rectangle[]{new Rectangle(0, 128, 640, 920)});
+        devicesRegions.put(new RectangleSize(1136, 640), new Rectangle[]{new Rectangle(0, 88, 1136, 464)});
+        devicesRegions.put(new RectangleSize(2048, 2732), new Rectangle[]{new Rectangle(0, 140, 2048, 2592)});
+        devicesRegions.put(new RectangleSize(2732, 2048), new Rectangle[]{new Rectangle(0, 140, 2732, 1908)});
+        devicesRegions.put(new RectangleSize(1668, 2224), new Rectangle[]{new Rectangle(0, 140, 1668, 2084)});
+        devicesRegions.put(new RectangleSize(2224, 1668), new Rectangle[]{new Rectangle(0, 140, 2224, 1528)});
     }
 
 }

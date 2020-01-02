@@ -13,8 +13,8 @@ import java.awt.image.BufferedImage;
  */
 public class TakesScreenshotImageProvider implements ImageProvider {
 
-    private final Logger logger;
-    private final TakesScreenshot tsInstance;
+    protected final Logger logger;
+    protected final TakesScreenshot tsInstance;
 
     public TakesScreenshotImageProvider(Logger logger, TakesScreenshot tsInstance) {
         this.logger = logger;
