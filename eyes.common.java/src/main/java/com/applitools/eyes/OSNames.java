@@ -7,5 +7,5 @@ public class OSNames {
     public final static String IOS = "IOS";
     public final static String Macintosh = "Macintosh";
     public final static String ChromeOS = "ChromeOS";
-
+    public static final String Android = "Android";
 }
