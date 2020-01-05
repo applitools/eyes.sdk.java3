@@ -81,6 +81,7 @@ public class TestMobileDevices {
                     {"iPhone X Simulator", "11.2", ScreenOrientation.PORTRAIT, false},
                     {"iPhone X Simulator", "11.2", ScreenOrientation.PORTRAIT, true},
                     {"iPhone 7 Simulator", "10.3", ScreenOrientation.PORTRAIT, true},
+                    {"iPhone 7 Plus Simulator", "10.3", ScreenOrientation.LANDSCAPE, false},
                     {"iPhone 6 Plus Simulator", "11.0", ScreenOrientation.PORTRAIT, false},
                     {"iPhone 6 Plus Simulator", "11.0", ScreenOrientation.LANDSCAPE, true},
                     {"iPhone 5s Simulator", "10.3", ScreenOrientation.LANDSCAPE, false},
