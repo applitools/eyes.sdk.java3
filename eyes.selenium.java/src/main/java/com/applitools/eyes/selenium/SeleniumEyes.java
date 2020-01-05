@@ -1616,10 +1616,14 @@ public class SeleniumEyes extends EyesBase implements IDriverProvider, IBatchClo
      */
     @Override
     public RectangleSize getViewportSize() {
-        if (viewportSize == null) {
-            viewportSize = driver.getDefaultContentViewportSize();
+        RectangleSize vpSize;
+        if (imageProvider instanceof MobileScreenshotImageProvider) {
+            BufferedImage image = imageProvider.getImage();
+            vpSize = new RectangleSize((int) Math.round(image.getWidth() / devicePixelRatio), (int) Math.round(image.getHeight() / devicePixelRatio));
+        } else {
+            vpSize = EyesSeleniumUtils.getViewportSize(driver);
         }
-        return viewportSize;
+        return vpSize;
     }
 
     /**
@@ -1960,7 +1964,7 @@ public class SeleniumEyes extends EyesBase implements IDriverProvider, IBatchClo
                 scaleProviderFactory,
                 cutProviderHandler.get(),
                 getConfigGetter().getStitchOverlap(),
-                imageProvider);
+                imageProvider, sizeAdjuster);
     }
 
     @Override
