@@ -12,6 +12,7 @@ import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.remote.SessionId;
 import org.testng.Assert;
+import org.testng.ITest;
 import org.testng.annotations.DataProvider;
 
 import java.net.MalformedURLException;
@@ -24,12 +25,13 @@ import java.util.concurrent.TimeUnit;
 import static com.applitools.eyes.selenium.TestDataProvider.*;
 
 
-public class TestMobileDevices {
+public class TestMobileDevices implements ITest {
     public final String deviceName;
     public final String platformVersion;
     public final ScreenOrientation deviceOrientation;
     public final boolean fully;
     public final String page;
+    private final String testName;
 
     public TestMobileDevices(String deviceName, String platformVersion, ScreenOrientation deviceOrientation, boolean fully, String page) {
         this.deviceName = deviceName;
@@ -37,6 +39,7 @@ public class TestMobileDevices {
         this.deviceOrientation = deviceOrientation;
         this.fully = fully;
         this.page = page;
+        this.testName = initTestName(deviceName, platformVersion, deviceOrientation, fully, this.page);
     }
 
     @DataProvider(name = "IOSDevices", parallel = true)
@@ -119,8 +122,6 @@ public class TestMobileDevices {
         caps.setCapability("username", SAUCE_USERNAME);
         caps.setCapability("accesskey", SAUCE_ACCESS_KEY);
 
-        String testName = initTestName(deviceName, platformVersion, deviceOrientation, fully, page);
-
         caps.setCapability("name", testName + " (" + eyes.getFullAgentId() + ")");
 
         String sauceUrl = SAUCE_SELENIUM_URL;
@@ -177,16 +178,20 @@ public class TestMobileDevices {
         }
     }
 
-    private String initTestName(String deviceName, String platformVersion, ScreenOrientation deviceOrientation, boolean fully, String page) {
+    private static String initTestName(String deviceName, String platformVersion, ScreenOrientation deviceOrientation, boolean fully, String page) {
         String deviceOrientationStr = (deviceOrientation.toString().equals("LANDSCAPE")) ? "Landscape" : "Portrait";
         String testName = deviceName + " " + platformVersion + " " + deviceOrientationStr + " " + page;
-
 
         if (fully) {
             testName += " fully";
         }
 
         return testName;
+    }
+
+    @Override
+    public String getTestName() {
+        return this.testName;
     }
 
 }
