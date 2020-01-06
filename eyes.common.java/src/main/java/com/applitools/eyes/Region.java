@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+import java.awt.*;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
@@ -589,15 +590,14 @@ public class Region implements IRegion {
         this.top = y;
     }
 
-    public Iterable<SubregionForStitching> getSubRegions(RectangleSize maxSubRegionSize, int logicalOverlap, double l2pScaleRatio, Region physicalRectInScreenshot, Logger logger) {
+    public SubregionForStitching[] getSubRegions(RectangleSize maxSubRegionSize, int logicalOverlap, double l2pScaleRatio, Rectangle physicalRectInScreenshot, Logger logger) {
         List<SubregionForStitching> subRegions = new ArrayList<>();
 
         int doubleLogicalOverlap = logicalOverlap * 2;
         int physicalOverlap = (int) Math.round(doubleLogicalOverlap * l2pScaleRatio);
 
-        boolean needVScroll = this.height > physicalRectInScreenshot.getHeight();
-        boolean needHScroll = this.width > physicalRectInScreenshot.getWidth();
-
+        boolean needVScroll = (this.height * l2pScaleRatio) > physicalRectInScreenshot.getHeight();
+        boolean needHScroll = (this.width * l2pScaleRatio) > physicalRectInScreenshot.getWidth();
 
         int scrollY = 0;
         int currentTop = 0;
@@ -608,15 +608,13 @@ public class Region implements IRegion {
         boolean isTopEdge = true;
         boolean isBottomEdge = false;
 
-        int scaleRaioOffset = (int) Math.round(l2pScaleRatio - 1);
-
         while (!isBottomEdge) {
             int currentScrollTop = scrollY + maxSubRegionSize.getHeight();
-            if (currentScrollTop >= height) {
+            if (currentScrollTop >= this.height) {
                 if (!isTopEdge) {
                     scrollY = height - currentLogicalHeight;
                     currentLogicalHeight = height - currentTop;
-                    currentTop = height - currentLogicalHeight - doubleLogicalOverlap - logicalOverlap + scaleRaioOffset;
+                    currentTop = height - currentLogicalHeight - doubleLogicalOverlap - logicalOverlap;
                 } else {
                     currentLogicalHeight = height - currentTop;
                 }
@@ -638,58 +636,85 @@ public class Region implements IRegion {
                     if (!isLeftEdge) {
                         scrollX = width - currentLogicalWidth;
                         currentLogicalWidth = width - currentLeft;
-                        currentLeft = width - currentLogicalWidth - doubleLogicalOverlap - logicalOverlap + scaleRaioOffset;
+                        currentLeft = width - currentLogicalWidth - doubleLogicalOverlap - logicalOverlap;
                     } else {
                         currentLogicalWidth = width - currentLeft;
                     }
                     isRightEdge = true;
                 }
 
-                Region physicalCropArea = new Region(physicalRectInScreenshot);
-                Region logicalCropArea = new Region(0, 0, currentLogicalWidth, currentLogicalHeight);
-                Location pastePoint = new Location(currentLeft, currentTop);
+                Rectangle physicalCropArea = new Rectangle(physicalRectInScreenshot);
+                Rectangle logicalCropArea = new Rectangle(0, 0, currentLogicalWidth, currentLogicalHeight);
+                Point pastePoint = new Point(currentLeft, currentTop);
 
                 // handle horizontal
                 if (isRightEdge) {
                     int physicalWidth = (int) Math.round(currentLogicalWidth * l2pScaleRatio);
-                    physicalCropArea.left = physicalRectInScreenshot.getRight() - physicalWidth;
+                    physicalCropArea.x = physicalRectInScreenshot.x + physicalRectInScreenshot.width - physicalWidth;
                     physicalCropArea.width = physicalWidth;
                 }
 
+
                 if (!isLeftEdge) {
-                    logicalCropArea.left += logicalOverlap;
+                    logicalCropArea.x += logicalOverlap;
                     logicalCropArea.width -= logicalOverlap;
                 }
 
                 if (isRightEdge && !isLeftEdge) {
-                    physicalCropArea.left -= physicalOverlap * 2;
-                    physicalCropArea.width += physicalOverlap * 2;
-                    logicalCropArea.width += doubleLogicalOverlap * 2;
+                    // If scrolled to the right edge, make sure the left part is still inside physical viewport.
+                    int newX = physicalCropArea.x - (physicalOverlap * 2);
+                    if (newX >= physicalRectInScreenshot.x) // everything is okay
+                    {
+                        physicalCropArea.x -= physicalOverlap * 2;
+                        physicalCropArea.width += physicalOverlap * 2;
+                        logicalCropArea.width += doubleLogicalOverlap * 2;
+                    } else // Oops, overshoot. We need to correct the width and left position.
+                    {
+                        int pDelta = physicalRectInScreenshot.x - newX;
+                        int lDelta = (int) Math.round(pDelta / l2pScaleRatio);
+                        physicalCropArea.x = physicalRectInScreenshot.x;
+                        physicalCropArea.width += (physicalOverlap * 2) - pDelta;
+                        logicalCropArea.width += (doubleLogicalOverlap * 2) - lDelta;
+                        pastePoint.x += lDelta;
+                    }
                 }
 
                 // handle vertical
                 if (isBottomEdge) {
                     int physicalHeight = (int) Math.round(currentLogicalHeight * l2pScaleRatio);
-                    physicalCropArea.top = physicalRectInScreenshot.getBottom() - physicalHeight;
+                    physicalCropArea.y = physicalRectInScreenshot.y + physicalRectInScreenshot.height - physicalHeight;
                     physicalCropArea.height = physicalHeight;
                 }
 
                 if (!isTopEdge) {
-                    logicalCropArea.top += logicalOverlap;
+                    logicalCropArea.y += logicalOverlap;
                     logicalCropArea.height -= logicalOverlap;
                 }
 
                 if (isBottomEdge && !isTopEdge) {
-                    physicalCropArea.top -= physicalOverlap * 2;
-                    physicalCropArea.height += physicalOverlap * 2;
-                    logicalCropArea.height += doubleLogicalOverlap * 2;
+                    // If scrolled to the bottom edge, make sure the top part is still inside physical viewport.
+                    int newY = physicalCropArea.y - (physicalOverlap * 2);
+                    if (newY >= physicalRectInScreenshot.y) // everything is okay
+                    {
+                        physicalCropArea.y -= physicalOverlap * 2;
+                        physicalCropArea.height += physicalOverlap * 2;
+                        logicalCropArea.height += doubleLogicalOverlap * 2;
+                    } else // Oops, overshoot. We need to correct the height and top position.
+                    {
+                        int pDelta = physicalRectInScreenshot.y - newY;
+                        int lDelta = (int) Math.round(pDelta / l2pScaleRatio);
+                        physicalCropArea.y = physicalRectInScreenshot.y;
+                        physicalCropArea.height += (physicalOverlap * 2) - pDelta;
+                        logicalCropArea.height += (doubleLogicalOverlap * 2) - lDelta;
+                        pastePoint.y += lDelta;
+                    }
                 }
 
                 SubregionForStitching subregion = new SubregionForStitching(
-                        new Location(scrollX, scrollY),
-                        pastePoint,
-                        physicalCropArea,
-                        logicalCropArea
+                        new Point(scrollX, scrollY),
+                        new Point(pastePoint),
+                        new Rectangle(physicalCropArea),
+                        new Rectangle(logicalCropArea)
                 );
 
                 logger.verbose("adding subregion - " + subregion);
@@ -700,7 +725,7 @@ public class Region implements IRegion {
                 scrollX += deltaX;
 
                 if (needHScroll && isLeftEdge) {
-                    currentLeft += logicalOverlap + scaleRaioOffset;
+                    currentLeft += logicalOverlap;
                 }
                 isLeftEdge = false;
             }
@@ -709,12 +734,12 @@ public class Region implements IRegion {
             scrollY += deltaY;
 
             if (needVScroll && isTopEdge) {
-                currentTop += logicalOverlap + scaleRaioOffset;
+                currentTop += logicalOverlap;
             }
             isTopEdge = false;
         }
 
-        return subRegions;
+        return subRegions.toArray(new SubregionForStitching[0]);
     }
 
 }

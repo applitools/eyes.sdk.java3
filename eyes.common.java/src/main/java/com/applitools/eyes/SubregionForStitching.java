@@ -1,12 +1,14 @@
 package com.applitools.eyes;
 
-public class SubregionForStitching {
-    private final Location scrollTo;
-    private final Location pastePhysicalLocation;
-    private final Region physicalCropArea;
-    private final Region logicalCropArea;
+import java.awt.*;
 
-    public SubregionForStitching(Location scrollTo, Location pastePhysicalLocation, Region physicalCropArea, Region logicalCropArea) {
+public class SubregionForStitching {
+    private final Point scrollTo;
+    private final Point pastePhysicalLocation;
+    private final Rectangle physicalCropArea;
+    private final Rectangle logicalCropArea;
+
+    public SubregionForStitching(Point scrollTo, Point pastePhysicalLocation, Rectangle physicalCropArea, Rectangle logicalCropArea) {
 
         this.scrollTo = scrollTo;
         this.pastePhysicalLocation = pastePhysicalLocation;
@@ -14,19 +16,45 @@ public class SubregionForStitching {
         this.logicalCropArea = logicalCropArea;
     }
 
-    public Location getScrollTo() {
+    public Point getScrollTo() {
         return scrollTo;
     }
 
-    public Location getPastePhysicalLocation() {
+    public Point getPastePhysicalLocation() {
         return pastePhysicalLocation;
     }
 
-    public Region getPhysicalCropArea() {
+    public Rectangle getPhysicalCropArea() {
         return physicalCropArea;
     }
 
-    public Region getLogicalCropArea() {
+    public Rectangle getLogicalCropArea() {
         return logicalCropArea;
+    }
+
+    @Override
+    public String toString() {
+        return String.format("scrollTo: (%d, %d) ; pastePhysicalLocation: (%d, %d) ; physicalCropArea: (%d, %d) (%d x %d) ; logicalCropArea: (%d, %d) (%d x %d)",
+                scrollTo.x, scrollTo.y,
+                pastePhysicalLocation.x, pastePhysicalLocation.y,
+                physicalCropArea.x, physicalCropArea.y, physicalCropArea.width, physicalCropArea.height,
+                logicalCropArea.x, logicalCropArea.y, logicalCropArea.width, logicalCropArea.height);
+    }
+
+    @Override
+    public int hashCode() {
+        return this.scrollTo.hashCode();
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (!(obj instanceof SubregionForStitching)) {
+            return false;
+        }
+        SubregionForStitching other = (SubregionForStitching) obj;
+        return this.scrollTo.equals(other.scrollTo) &&
+                this.pastePhysicalLocation.equals(other.pastePhysicalLocation) &&
+                this.physicalCropArea.equals(other.physicalCropArea) &&
+                this.logicalCropArea.equals(other.logicalCropArea);
     }
 }
