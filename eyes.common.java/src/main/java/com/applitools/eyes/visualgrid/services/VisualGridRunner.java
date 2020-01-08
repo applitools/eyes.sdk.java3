@@ -10,6 +10,8 @@ import java.util.concurrent.*;
 
 public class VisualGridRunner extends EyesRunner {
 
+    private static final int MAX_CHECKS = 50;
+    private final Semaphore maxChecksSemaphore;
     private int concurrentOpenSessions;
 
     //For Testing...
@@ -173,6 +175,7 @@ public class VisualGridRunner extends EyesRunner {
         this.closerServiceDebugLock = closerServiceDebugLock;
         this.renderServiceDebugLock = renderServiceDebugLock;
         this.rateLimiter = new RateLimiter(logger, 20);
+        this.maxChecksSemaphore = new Semaphore(MAX_CHECKS);
         init();
         startServices();
         logger.verbose("rendering grid manager is built");
@@ -571,5 +574,13 @@ public class VisualGridRunner extends EyesRunner {
         eyesOpenerService.setLogger(logger);
         renderingGridService.setLogger(logger);
         this.logger = logger;
+    }
+
+    public void registerCheck() throws InterruptedException {
+        this.maxChecksSemaphore.acquire();
+    }
+
+    public void deregisterCheck(){
+        this.maxChecksSemaphore.release();
     }
 }

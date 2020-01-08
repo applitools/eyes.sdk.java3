@@ -110,6 +110,7 @@ public class VisualGridEyes implements IRenderingEyes {
         @Override
         public void onRenderComplete() {
             VisualGridEyes.this.listener.onRenderComplete();
+            VisualGridEyes.this.renderingGridRunner.deregisterCheck();
         }
 
     };
@@ -462,6 +463,14 @@ public class VisualGridEyes implements IRenderingEyes {
         if (!validateEyes()) return;
 
         ArgumentGuard.notOfType(checkSettings, ICheckSettings.class, "checkSettings");
+
+        try {
+
+            this.renderingGridRunner.registerCheck();
+
+        } catch (InterruptedException e) {
+            GeneralUtils.logExceptionStackTrace(logger, e);
+        }
 
         waitBeforeDomSnapshot();
 

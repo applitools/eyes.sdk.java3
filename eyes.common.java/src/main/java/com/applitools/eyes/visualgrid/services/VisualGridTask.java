@@ -222,6 +222,10 @@ public class VisualGridTask implements Callable<TestResultContainer>, Completabl
     public void setRenderResult(RenderStatusResults renderResult) {
         logger.verbose("enter");
         this.renderResult = renderResult;
+
+        //remove render task when completed
+        this.renderingTask = null;
+
         notifyRenderCompleteAllListeners();
         logger.verbose("exit");
     }
