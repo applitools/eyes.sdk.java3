@@ -136,7 +136,7 @@
 
     <test name="TestFluentApi_Frames">
         <parameter name="dont_run"
-                   value="TestCheckFrameInFrame_Fully_Fluent+SCROLL, TestCheckFrameInFrame_Fully_Fluent+VG, TestCheckFrameInFrame_Fully_Fluent2+VG, TestCheckFrameInFrame_Fully_Fluent2+SCROLL, TestCheckFrame_Fluent+VG, TestCheckFrame_Fully_Fluent+VG, TestCheckRegionByCoordinateInFrame_Fluent+VG, TestCheckRegionByCoordinateInFrameFully_Fluent+VG, TestCheckRegionInFrame_Fluent+VG, TestCheckRegionInFrame_Fluent+SCROLL, TestCheckRegionInFrame3_Fluent+VG, TestCheckRegionInFrameInFrame_Fluent+VG, TestCheckRegionInFrameInFrame_Fluent+SCROLL, TestCheckRegionInFrame2_Fluent+VG, TestCheckRegionInFrame2_Fluent+SCROLL"/>
+                   value="TestCheckLongOutOfBoundsIFrameModal+SCROLL, TestCheckLongOutOfBoundsIFrameModal+VG, TestCheckFrameInFrame_Fully_Fluent+SCROLL, TestCheckFrameInFrame_Fully_Fluent+VG, TestCheckFrameInFrame_Fully_Fluent2+VG, TestCheckFrameInFrame_Fully_Fluent2+SCROLL, TestCheckFrame_Fluent+VG, TestCheckFrame_Fully_Fluent+VG, TestCheckFrame_Fully_Fluent+SCROLL, TestCheckFrame_Fully_Fluent+CSS, TestCheckRegionByCoordinateInFrame_Fluent+VG, TestCheckRegionByCoordinateInFrameFully_Fluent+VG, TestCheckRegionByCoordinateInFrameFully_Fluent+SCROLL, TestCheckRegionInFrame_Fluent+VG, TestCheckRegionInFrame_Fluent+SCROLL, TestCheckRegionInFrame3_Fluent+VG, TestCheckRegionInFrame3_Fluent+SCROLL, TestCheckRegionInFrameInFrame_Fluent+VG, TestCheckRegionInFrameInFrame_Fluent+SCROLL, TestCheckRegionInFrame2_Fluent+VG, TestCheckRegionInFrame2_Fluent+SCROLL, TestCheckLongIFrameModal+VG"/>
         <classes>
             <class name="com.applitools.eyes.selenium.TestFluentApi_Frames">
                 <methods>
@@ -226,6 +226,15 @@
             <class name="com.applitools.eyes.renderingGrid.TestVGServerConfigs">
                 <methods>
                     <include name="TestVGDoubleCloseNoCheck" />
+                </methods>
+            </class>
+        </classes>
+    </test>
+    <test name="TestAbort" parallel="methods">
+        <classes>
+            <class name="com.applitools.eyes.api.TestAbort">
+                <methods>
+                    <include name="TestAbortIfNotClosed" />
                 </methods>
             </class>
         </classes>
