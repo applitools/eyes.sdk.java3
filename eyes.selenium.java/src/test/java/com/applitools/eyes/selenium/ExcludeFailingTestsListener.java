@@ -35,16 +35,9 @@ public class ExcludeFailingTestsListener implements IInvokedMethodListener2 {
                         + "+" + ((TestMobileDevices) testInstance).page;
                 handleTests(iTestResult, testParameters, testData);
             }
-            if (testInstance instanceof TestScrolling) {
-                testData = Boolean.toString(((TestScrolling) testInstance).useEmulation);
-                handleTests(iTestResult, testParameters, testData);
-            }
-            if (testInstance instanceof TestApiMethods) {
-                Object[] parameters = iTestResult.getParameters();
-                testData = parameters[0].toString();
-                handleTests(iTestResult, testParameters, testData);
-            }
-            if (testInstance instanceof TestConfigurationSentCorrectlyToServer) {
+            if (    (testInstance instanceof TestScrolling) ||
+                    (testInstance instanceof TestApiMethods) ||
+                    (testInstance instanceof TestConfigurationSentCorrectlyToServer)){
                 Object[] parameters = iTestResult.getParameters();
                 testData = parameters[0].toString();
                 handleTests(iTestResult, testParameters, testData);
