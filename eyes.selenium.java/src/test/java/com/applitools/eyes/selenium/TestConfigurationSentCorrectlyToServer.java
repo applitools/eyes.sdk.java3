@@ -26,7 +26,7 @@ public class TestConfigurationSentCorrectlyToServer extends EnvironmentModifier 
                 {false, null, null},
                 {true, "Test Sequence", "Test Sequence Name Env Var"},
                 {true, null, "Test Sequence Name Env Var"},
-                {true, null, null},
+                {true, null, null}
         };
     }
 
@@ -67,6 +67,7 @@ public class TestConfigurationSentCorrectlyToServer extends EnvironmentModifier 
                     //.setBaselineBranchName("baseline branch")
                     //.setBaselineEnvName("baseline env")
                     .setEnvironmentName("env name")
+                    .setViewportSize(new RectangleSize(800, 600))
                     .setBatch(batchInfo);
 
             eyes.setConfiguration(conf);

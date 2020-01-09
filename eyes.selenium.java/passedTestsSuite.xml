@@ -238,11 +238,40 @@
             </class>
         </classes>
     </test>
+    <test name="TestSpecialCharacters" parallel="methods">
+        <classes>
+            <class name="com.applitools.eyes.renderingGrid.TestSpecialCharacters">
+                <methods>
+                    <include name="TestRenderSpecialCharacters" />
+                </methods>
+            </class>
+        </classes>
+    </test>
     <test name="TestAbort" parallel="methods">
         <classes>
             <class name="com.applitools.eyes.api.TestAbort">
                 <methods>
                     <include name="TestAbortIfNotClosed" />
+                </methods>
+            </class>
+        </classes>
+    </test>
+    <test name="TestApiMethods" parallel="methods">
+        <parameter name="dont_run" value="TestCloseAsync+false"/>
+        <classes>
+            <class name="com.applitools.eyes.api.TestApiMethods">
+                <methods>
+                    <include name="TestCloseAsync" />
+                </methods>
+            </class>
+        </classes>
+    </test>
+    <test name="TestConfigurationSentCorrectlyToServer" parallel="methods">
+        <parameter name="dont_run" value="TestEyesConfiguration+true"/>
+        <classes>
+            <class name="com.applitools.eyes.selenium.TestConfigurationSentCorrectlyToServer">
+                <methods>
+                    <include name="TestEyesConfiguration" />
                 </methods>
             </class>
         </classes>

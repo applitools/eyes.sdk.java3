@@ -3,6 +3,7 @@ package com.applitools.eyes.selenium;
 import org.testng.*;
 import java.util.*;
 import java.lang.reflect.Method;
+import com.applitools.eyes.api.TestApiMethods;
 
 
 
@@ -36,6 +37,16 @@ public class ExcludeFailingTestsListener implements IInvokedMethodListener2 {
             }
             if (testInstance instanceof TestScrolling) {
                 testData = Boolean.toString(((TestScrolling) testInstance).useEmulation);
+                handleTests(iTestResult, testParameters, testData);
+            }
+            if (testInstance instanceof TestApiMethods) {
+                Object[] parameters = iTestResult.getParameters();
+                testData = parameters[0].toString();
+                handleTests(iTestResult, testParameters, testData);
+            }
+            if (testInstance instanceof TestConfigurationSentCorrectlyToServer) {
+                Object[] parameters = iTestResult.getParameters();
+                testData = parameters[0].toString();
                 handleTests(iTestResult, testParameters, testData);
             }
         }
