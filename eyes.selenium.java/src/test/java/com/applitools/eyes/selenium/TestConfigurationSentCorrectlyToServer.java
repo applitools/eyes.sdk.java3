@@ -12,11 +12,9 @@ import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
 import java.io.IOException;
-import java.lang.reflect.Field;
 import java.util.Calendar;
-import java.util.Map;
 
-public class TestConfigurationSentCorrectlyToServer extends EnivironmentModifier {
+public class TestConfigurationSentCorrectlyToServer extends EnvironmentModifier {
 
     @DataProvider(name = "dp")
     public static Object[][] dp() {

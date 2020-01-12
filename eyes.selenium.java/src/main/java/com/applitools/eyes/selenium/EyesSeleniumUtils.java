@@ -24,7 +24,6 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.UriBuilder;
 import java.net.URI;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -55,7 +54,7 @@ public class EyesSeleniumUtils {
                     + "if (b.clientWidth) {"
                     + "width = b.clientWidth;}"
                     + "};"
-                    + "return [width, height];";
+                    + "return width+';'+height;";
 
     private static final String JS_GET_CURRENT_SCROLL_POSITION =
             "var doc = document.documentElement; " +
@@ -63,7 +62,7 @@ public class EyesSeleniumUtils {
                     "((window.pageXOffset || doc.scrollLeft) - (doc.clientLeft || 0));"
                     + " var y = window.scrollY || " +
                     "((window.pageYOffset || doc.scrollTop) - (doc.clientTop || 0));" +
-                    "return [x, y];";
+                    "return x+';'+y;";
 
 
     // IMPORTANT: Notice there's a major difference between scrollWidth
@@ -82,7 +81,7 @@ public class EyesSeleniumUtils {
                     "var maxDocElementHeight = Math.max(clientHeight, scrollHeight); " +
                     "var maxBodyHeight = Math.max(bodyClientHeight, bodyScrollHeight); " +
                     "var totalHeight = Math.max(maxDocElementHeight, maxBodyHeight); " +
-                    "return [totalWidth, totalHeight];";
+                    "return totalWidth+';'+totalHeight;";
 
     private static final String[] JS_TRANSFORM_KEYS = {"transform",
             "-webkit-transform"
@@ -92,12 +91,11 @@ public class EyesSeleniumUtils {
     private static final String JS_GET_ENTIRE_PAGE_SIZE =
             "var width = Math.max(arguments[0].clientWidth, arguments[0].scrollWidth);" +
                     "var height = Math.max(arguments[0].clientHeight, arguments[0].scrollHeight);" +
-                    "return [width, height];";
+                    "return width+';'+height;";
 
     /**
      * Extracts the location relative to the entire page from the coordinates
      * (e.g. as opposed to viewport)
-     *
      * @param coordinates The coordinates from which location is extracted.
      * @return The location relative to the entire page
      */
@@ -113,7 +111,6 @@ public class EyesSeleniumUtils {
     /**
      * Extracts the location relative to the <b>viewport</b> from the
      * coordinates (e.g. as opposed to the entire page).
-     *
      * @param coordinates The coordinates from which location is extracted.
      * @return The location relative to the viewport.
      */
@@ -129,7 +126,6 @@ public class EyesSeleniumUtils {
     /**
      * For EyesWebDriver instances, returns the underlying WebDriver. For all other types - return the driver received
      * as parameter.
-     *
      * @param driver The driver instance for which to get the underlying WebDriver.
      * @return The underlying WebDriver
      */
@@ -155,7 +151,6 @@ public class EyesSeleniumUtils {
 
     /**
      * Is landscape orientation boolean.
-     *
      * @param logger the logger
      * @param driver The driver for which to check the orientation.
      * @return {@code true} if this is a mobile device and is in landscape orientation. {@code false} otherwise.
@@ -165,7 +160,7 @@ public class EyesSeleniumUtils {
         if (isMobileDevice(driver)) {
             AppiumDriver<?> appiumDriver = (AppiumDriver<?>) getUnderlyingDriver(driver);
 
-            String originalContext = null;
+            String originalContext;
             try {
                 // We must be in native context in order to ask for orientation,
                 // because of an Appium bug.
@@ -176,10 +171,6 @@ public class EyesSeleniumUtils {
                 } else {
                     originalContext = null;
                 }
-            } catch (WebDriverException e) {
-                originalContext = null;
-            }
-            try {
             } catch (WebDriverException e) {
                 originalContext = null;
             }
@@ -202,7 +193,6 @@ public class EyesSeleniumUtils {
 
     /**
      * Select root element string.
-     *
      * @param executor the executor
      * @return the string
      */
@@ -229,7 +219,6 @@ public class EyesSeleniumUtils {
 
     /**
      * Sets the overflow of the current context's body.
-     *
      * @param executor    The executor to use for setting the overflow.
      * @param value       The overflow value to set.
      * @param rootElement the root element
@@ -257,21 +246,24 @@ public class EyesSeleniumUtils {
 
     /**
      * Gets current scroll position.
-     *
      * @param executor The executor to use.
      * @return The current scroll position of the current frame.
      */
     public static Location getCurrentScrollPosition(
             IEyesJsExecutor executor) {
         //noinspection unchecked
-        List<Number> positionAsList = (List<Number>) executor.executeScript(JS_GET_CURRENT_SCROLL_POSITION);
-        return new Location((int) Math.ceil(positionAsList.get(0).doubleValue()),
-                (int) Math.ceil(positionAsList.get(1).doubleValue()));
+        String positionAsString = (String) executor.executeScript(JS_GET_CURRENT_SCROLL_POSITION);
+        String[] xy = positionAsString.split(";");
+        if (xy.length != 2) {
+            throw new EyesException("Could not get scroll position!");
+        }
+        float x = Float.parseFloat(xy[0]);
+        float y = Float.parseFloat(xy[1]);
+        return new Location((int) Math.ceil(x), (int) Math.ceil(y));
     }
 
     /**
      * Sets the scroll position of the current frame.
-     *
      * @param executor The executor to use.
      * @param location The position to be set.
      */
@@ -283,48 +275,51 @@ public class EyesSeleniumUtils {
 
     /**
      * Gets current frame content entire size.
-     *
      * @param executor The executor to use.
      * @return The size of the entire content.
      */
-    @SuppressWarnings("unchecked")
-    public static RectangleSize getCurrentFrameContentEntireSize(
-            IEyesJsExecutor executor) {
+    public static RectangleSize getCurrentFrameContentEntireSize(IEyesJsExecutor executor) {
         RectangleSize result;
         try {
             //noinspection unchecked
             Object retVal = executor.executeScript(JS_GET_CONTENT_ENTIRE_SIZE);
-            List<Long> esAsList = (List<Long>) retVal;
-            result = new RectangleSize(esAsList.get(0).intValue(),
-                    esAsList.get(1).intValue());
+            String[] wh = ((String) retVal).split(";");
+
+            if (wh.length != 2) {
+                throw new EyesException("Could not get entire size!");
+            }
+            float w = Float.parseFloat(wh[0]);
+            float h = Float.parseFloat(wh[1]);
+            result = new RectangleSize(Math.round(w), Math.round(h));
         } catch (WebDriverException e) {
-            throw new EyesDriverOperationException(
-                    "Failed to extract entire size!");
+            throw new EyesDriverOperationException("Failed to extract entire size!");
         }
         return result;
     }
 
     /**
      * Gets entire element size.
-     *
      * @param logger   the logger
      * @param executor the executor
      * @param element  the element
      * @return the entire element size
      */
-    @SuppressWarnings("unchecked")
     public static RectangleSize getEntireElementSize(Logger logger, IEyesJsExecutor executor, WebElement element) {
         RectangleSize result;
         try {
             //noinspection unchecked
             Object retVal = executor.executeScript(JS_GET_ENTIRE_PAGE_SIZE, element);
-            List<Long> esAsList = (List<Long>) retVal;
-            result = new RectangleSize(esAsList.get(0).intValue(),
-                    esAsList.get(1).intValue());
+            String[] wh = ((String) retVal).split(";");
+
+            if (wh.length != 2) {
+                throw new EyesException("Could not get entire element size!");
+            }
+            float w = Float.parseFloat(wh[0]);
+            float h = Float.parseFloat(wh[1]);
+            result = new RectangleSize(Math.round(w), Math.round(h));
         } catch (WebDriverException e) {
             GeneralUtils.logExceptionStackTrace(logger, e);
-            throw new EyesDriverOperationException(
-                    "Failed to extract entire size!");
+            throw new EyesDriverOperationException("Failed to extract entire element size!");
         }
         return result;
 
@@ -332,40 +327,42 @@ public class EyesSeleniumUtils {
 
     /**
      * Gets viewport size.
-     *
      * @param executor The executor to use.
      * @return The viewport size.
      */
-    public static RectangleSize getViewportSize(
-            JavascriptExecutor executor) {
-        //noinspection unchecked
-        List<Long> vsAsList =
-                (List<Long>) executor.executeScript(JS_GET_VIEWPORT_SIZE);
-        return new RectangleSize(vsAsList.get(0).intValue(),
-                vsAsList.get(1).intValue());
+    public static RectangleSize getViewportSize(JavascriptExecutor executor) {
+        String viewportSizeAsString = (String) executor.executeScript(JS_GET_VIEWPORT_SIZE);
+        String[] wh = viewportSizeAsString.split(";");
+
+        if (wh.length != 2) {
+            throw new EyesException("Could not get viewport size!");
+        }
+        float w = Float.parseFloat(wh[0]);
+        float h = Float.parseFloat(wh[1]);
+        return new RectangleSize(Math.round(w), Math.round(h));
     }
 
     /**
      * Gets viewport size.
-     *
      * @param executor The executor to use.
-     * @param logger logger
+     * @param logger   logger
      * @return The viewport size.
      */
-    public static RectangleSize getViewportSize(
-            JavascriptExecutor executor, Logger logger) {
-        //noinspection unchecked
+    public static RectangleSize getViewportSize(JavascriptExecutor executor, Logger logger) {
         Object scriptResult = executor.executeScript(JS_GET_VIEWPORT_SIZE);
-        logger.verbose("scriptResult result = "+ scriptResult);
-        List<Long> vsAsList =
-                (List<Long>) scriptResult;
-        return new RectangleSize(vsAsList.get(0).intValue(),
-                vsAsList.get(1).intValue());
+        logger.verbose("scriptResult result = " + scriptResult);
+        String[] wh = ((String) scriptResult).split(";");
+
+        if (wh.length != 2) {
+            throw new EyesException("Could not get viewport size!");
+        }
+        float w = Float.parseFloat(wh[0]);
+        float h = Float.parseFloat(wh[1]);
+        return new RectangleSize(Math.round(w), Math.round(h));
     }
 
     /**
      * Gets viewport size or display size.
-     *
      * @param logger The logger to use.
      * @param driver The web driver to use.
      * @return The viewport size of the current context, or the display size
@@ -407,7 +404,6 @@ public class EyesSeleniumUtils {
 
     /**
      * Sets browser size.
-     *
      * @param logger       the logger
      * @param driver       the driver
      * @param requiredSize the required size
@@ -435,7 +431,6 @@ public class EyesSeleniumUtils {
 
     /**
      * Sets browser size by viewport size.
-     *
      * @param logger               the logger
      * @param driver               the driver
      * @param actualViewportSize   the actual viewport size
@@ -459,7 +454,6 @@ public class EyesSeleniumUtils {
 
     /**
      * Sets viewport size.
-     *
      * @param logger The logger to use.
      * @param driver The web driver to use.
      * @param size   The size to set as the viewport size.
@@ -471,7 +465,7 @@ public class EyesSeleniumUtils {
         logger.verbose("setViewportSize(" + size + ")");
 
         RectangleSize requiredSize = new RectangleSize(size.getWidth(), size.getHeight());
-        RectangleSize actualViewportSize = null;
+        RectangleSize actualViewportSize;
         try {
             actualViewportSize = getViewportSize((JavascriptExecutor) driver, logger);
         } catch (Exception e) {
@@ -576,7 +570,6 @@ public class EyesSeleniumUtils {
 
     /**
      * Is android boolean.
-     *
      * @param driver The driver to test.
      * @return {@code true} if the driver is an Android driver. {@code false} otherwise.
      */
@@ -587,7 +580,6 @@ public class EyesSeleniumUtils {
 
     /**
      * Is ios boolean.
-     *
      * @param driver The driver to test.
      * @return {@code true} if the driver is an iOS driver. {@code false} otherwise.
      */
@@ -598,7 +590,6 @@ public class EyesSeleniumUtils {
 
     /**
      * Gets platform version.
-     *
      * @param driver The driver to get the platform version from.
      * @return The platform version or {@code null} if it is undefined.
      */
@@ -614,7 +605,6 @@ public class EyesSeleniumUtils {
 
     /**
      * Gets device pixel ratio.
-     *
      * @param executor The executor to use.
      * @return The device pixel ratio.
      */
@@ -626,7 +616,6 @@ public class EyesSeleniumUtils {
 
     /**
      * Gets current transform.
-     *
      * @param executor The executor to use.
      * @return The current documentElement transform values, according to {@link #JS_TRANSFORM_KEYS}.
      */
@@ -649,7 +638,6 @@ public class EyesSeleniumUtils {
     /**
      * Sets transforms for document.documentElement according to the given
      * map of style keys and values.
-     *
      * @param executor   The executor to use.
      * @param transforms The transforms to set. Keys are used as style keys,                   and values are the values for those styles.
      */
@@ -668,7 +656,6 @@ public class EyesSeleniumUtils {
     /**
      * Set the given transform to document.documentElement for all style keys
      * defined in {@link #JS_TRANSFORM_KEYS} .
-     *
      * @param executor  The executor to use.
      * @param transform The transform value to set.
      */
@@ -685,7 +672,6 @@ public class EyesSeleniumUtils {
 
     /**
      * Translates the current documentElement to the given position.
-     *
      * @param executor The executor to use.
      * @param position The position to translate to.
      */
@@ -697,7 +683,6 @@ public class EyesSeleniumUtils {
 
     /**
      * Returns given element visible portion size.
-     *
      * @param logger  the logger
      * @param element The element for which to return the size.
      * @return The given element's visible portion size.

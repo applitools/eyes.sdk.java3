@@ -31,6 +31,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
+@SuppressWarnings("WeakerAccess")
 public class RenderingTask implements Callable<RenderStatusResults>, CompletableTask {
 
     private static final int MAX_FETCH_FAILS = 62;
@@ -55,7 +56,7 @@ public class RenderingTask implements Callable<RenderStatusResults>, Completable
     private AtomicBoolean isForcePutNeeded;
     private final List<VisualGridSelector[]> regionSelectors;
     private IDebugResourceWriter debugResourceWriter;
-    private FrameData result = null;
+    private FrameData result;
     private AtomicInteger framesLevel = new AtomicInteger();
     private RGridDom dom = null;
     private Timer timer = new Timer("VG_StopWatch", true);
@@ -428,7 +429,7 @@ public class RenderingTask implements Callable<RenderStatusResults>, Completable
             List<BlobData> allFramesBlobs = frameObj.getBlobs();
             @SuppressWarnings("unchecked")
             List<String> allResourceUrls = frameObj.getResourceUrls();
-            URL frameUrl = null;
+            URL frameUrl;
             try {
                 frameUrl = new URL(baseUrl, frameObj.getUrl());
             } catch (MalformedURLException e) {
@@ -511,8 +512,7 @@ public class RenderingTask implements Callable<RenderStatusResults>, Completable
 
     private void parseBlobs(Map<String, RGridResource> allBlobs, Base64 codec, URL baseUrl, List<BlobData> value) {
         //TODO check if empty
-        List<BlobData> listOfBlobs = value;
-        for (BlobData blob : listOfBlobs) {
+        for (BlobData blob : value) {
             RGridResource resource = parseBlobToGridResource(codec, baseUrl, blob);
             if (!allBlobs.containsKey(resource.getUrl())) {
                 allBlobs.put(resource.getUrl(), resource);
@@ -649,14 +649,12 @@ public class RenderingTask implements Callable<RenderStatusResults>, Completable
         }
 
         //remove double quotes if surrounded
-        charset = charset.replaceAll( "\"", "");
+        charset = charset.replaceAll("\"", "");
 
-        if (charset != null) {
-            try {
-                tdr.data = new String(contentBytes, charset);
-            } catch (UnsupportedEncodingException e) {
-                GeneralUtils.logExceptionStackTrace(logger, e);
-            }
+        try {
+            tdr.data = new String(contentBytes, charset);
+        } catch (UnsupportedEncodingException e) {
+            GeneralUtils.logExceptionStackTrace(logger, e);
         }
 
         try {
@@ -674,21 +672,20 @@ public class RenderingTask implements Callable<RenderStatusResults>, Completable
 
     private void parseCSS(TextualDataResource css, Set<URL> resourceUrls) {
 //        logger.verbose("enter");
-        CascadingStyleSheet cascadingStyleSheet = null;
         try {
             String data = css.data;
-            if(data == null ) return;
-            cascadingStyleSheet = CSSReader.readFromString(data, ECSSVersion.CSS30);
+            if (data == null) return;
+            CascadingStyleSheet cascadingStyleSheet = CSSReader.readFromString(data, ECSSVersion.CSS30);
             if (cascadingStyleSheet == null) {
                 logger.verbose("exit - failed to read CSS String");
                 return;
             }
+            collectAllImportUris(cascadingStyleSheet, resourceUrls, css.uri);
+            collectAllFontFaceUris(cascadingStyleSheet, resourceUrls, css.uri);
+            collectAllBackgroundImageUris(cascadingStyleSheet, resourceUrls, css.uri);
         } catch (Throwable e) {
             GeneralUtils.logExceptionStackTrace(logger, e);
         }
-        collectAllImportUris(cascadingStyleSheet, resourceUrls, css.uri);
-        collectAllFontFaceUris(cascadingStyleSheet, resourceUrls, css.uri);
-        collectAllBackgroundImageUris(cascadingStyleSheet, resourceUrls, css.uri);
 //        logger.verbose("exit");
     }
 
@@ -808,7 +805,7 @@ public class RenderingTask implements Callable<RenderStatusResults>, Completable
 
                 // If resource is not being fetched yet (limited guarantee)
                 IEyesConnector eyesConnector = this.visualGridTaskList.get(0).getEyesConnector();
-                IResourceFuture future = null;
+                IResourceFuture future;
                 try {
                     future = eyesConnector.getResource(link, userAgent.getOriginalUserAgentString());
                 } catch (Exception e) {
@@ -855,7 +852,7 @@ public class RenderingTask implements Callable<RenderStatusResults>, Completable
 
                 String contentType = resource.getContentType();
                 logger.verbose("handling " + contentType + " resource from URL: " + url);
-                Set newResourceUrls = new HashSet();
+                Set<URL> newResourceUrls = new HashSet<>();
                 getAndParseResource(resource, result.getUrl(), newResourceUrls);
                 resource.setIsResourceParsed(true);
                 fetchAllResources(allBlobs, newResourceUrls, result);
@@ -882,9 +879,9 @@ public class RenderingTask implements Callable<RenderStatusResults>, Completable
         logger.verbose("enter");
         List<String> ids = getRenderIds(runningRenders.keySet());
         logger.verbose("render ids : " + ids);
-        List<RenderStatusResults> renderStatusResultsList = null;
         timer.schedule(new TimeoutTask(), HOUR);
         do {
+            List<RenderStatusResults> renderStatusResultsList;
             try {
                 renderStatusResultsList = this.eyesConnector.renderStatusById(ids.toArray(new String[0]));
             } catch (Exception e) {

@@ -429,11 +429,11 @@ public class ServerConnector extends RestClient
                 } catch (InterruptedException | ExecutionException e) {
                     GeneralUtils.logExceptionStackTrace(logger, e);
                 }
+                assert response != null;
                 int status = response.getStatus();
                 List<String> contentLengthHeaders = response.getHeaders().get("Content-length");
-                int contentLength = 0;
                 if (contentLengthHeaders != null) {
-                    contentLength = Integer.parseInt(contentLengthHeaders.get(0));
+                    int contentLength = Integer.parseInt(contentLengthHeaders.get(0));
                     logger.verbose("Content Length: " + contentLength);
                 }
 
@@ -550,6 +550,7 @@ public class ServerConnector extends RestClient
         } catch (JsonProcessingException e) {
             GeneralUtils.logExceptionStackTrace(logger, e);
         }
+        assert builder != null;
         WebResource.Builder request = builder.accept(MediaType.APPLICATION_JSON).header("X-Auth-Token", renderingInfo.getAccessToken());
 
         // Ok, let's create the running session from the response
@@ -568,7 +569,7 @@ public class ServerConnector extends RestClient
     }
 
     private List<String> extractIdsFromRRequests(RenderRequest[] renderRequests) {
-        List ids = new ArrayList();
+        List<String> ids = new ArrayList<>();
         for (RenderRequest renderRequest : renderRequests) {
             String renderId = renderRequest.getRenderId();
             if (renderId != null) {
@@ -592,10 +593,9 @@ public class ServerConnector extends RestClient
         WebResource.Builder request = target.accept(MediaType.APPLICATION_JSON);
 
         // Ok, let's create the running session from the response
-        List<Integer> validStatusCodes = new ArrayList<>();
-        validStatusCodes.add(ClientResponse.Status.OK.getStatusCode());
-        validStatusCodes.add(ClientResponse.Status.NOT_FOUND.getStatusCode());
-
+//        List<Integer> validStatusCodes = new ArrayList<>();
+//        validStatusCodes.add(ClientResponse.Status.OK.getStatusCode());
+//        validStatusCodes.add(ClientResponse.Status.NOT_FOUND.getStatusCode());
 
         ClientResponse response = request.head();
         return response.getStatus() == ClientResponse.Status.OK.getStatusCode();
@@ -628,6 +628,7 @@ public class ServerConnector extends RestClient
         builder = builder.header("X-Auth-Token", renderingInfo.getAccessToken());
         final Future<ClientResponse> future = builder.put(ClientResponse.class);
         logger.verbose("future created.");
+        //noinspection UnnecessaryLocalVariable
         PutFuture putFuture = new PutFuture(future, resource, runningRender, this, logger, userAgent);
         return putFuture;
     }
@@ -664,6 +665,7 @@ public class ServerConnector extends RestClient
                 if (validStatusCodes.contains(response.getStatus())) {
                     this.logger.verbose("request succeeded");
                     RenderStatusResults[] renderStatusResults = parseResponseWithJsonData(response, validStatusCodes, RenderStatusResults[].class);
+                    //noinspection ForLoopReplaceableByForEach
                     for (int i = 0; i < renderStatusResults.length; i++) {
                         RenderStatusResults renderStatusResult = renderStatusResults[i];
                         if(renderStatusResult != null && renderStatusResult.getStatus() == RenderStatus.ERROR){

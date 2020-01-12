@@ -3,11 +3,11 @@ package com.applitools.eyes.selenium;
 import java.lang.reflect.Field;
 import java.util.Map;
 
-class EnivironmentModifier {
+class EnvironmentModifier {
 
-    private Map<String, String> unmodEnvMap = null;
+    private Map<String, String> unmodifiedEnvMap = null;
 
-    public EnivironmentModifier() {
+    public EnvironmentModifier() {
         try {
             Class<?> processEnvironment = Class.forName("java.lang.ProcessEnvironment");
 
@@ -18,7 +18,8 @@ class EnivironmentModifier {
             Class unmodifiableMapClass = Class.forName("java.util.Collections$UnmodifiableMap");
             Field field = getAccessibleField(unmodifiableMapClass, "m");
             Object obj = field.get(unmodifiableMap);
-            unmodEnvMap = (Map<String, String>) obj;
+            //noinspection unchecked
+            unmodifiedEnvMap = (Map<String, String>) obj;
 
 //            Field mapField = getAccessibleField(processEnvironment, "theEnvironment");
 //            environmentMap = (Map<String, String>) mapField.get(null);
@@ -45,9 +46,9 @@ class EnivironmentModifier {
 
     void setEnvironmentVariable(String key, String value) {
         if (value != null) {
-            unmodEnvMap.put(key, value);
+            unmodifiedEnvMap.put(key, value);
         } else {
-            unmodEnvMap.remove(key);
+            unmodifiedEnvMap.remove(key);
         }
 
         //environmentMap.put(key, value);

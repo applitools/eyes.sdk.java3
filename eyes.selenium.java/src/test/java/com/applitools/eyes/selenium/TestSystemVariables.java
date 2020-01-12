@@ -7,7 +7,7 @@ import org.testng.Assert;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
-public class TestSystemVariables extends EnivironmentModifier {
+public class TestSystemVariables extends EnvironmentModifier {
 
     private final Logger logger = new Logger();
 

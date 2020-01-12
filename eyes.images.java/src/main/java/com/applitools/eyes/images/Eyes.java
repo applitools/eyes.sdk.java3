@@ -20,6 +20,7 @@ import com.applitools.utils.ImageUtils;
 
 import java.awt.image.BufferedImage;
 
+@SuppressWarnings({"WeakerAccess", "UnusedReturnValue"})
 public class Eyes extends EyesBase implements IConfigurationGetter, IConfigurationSetter {
 
     private String title;
@@ -73,12 +74,14 @@ public class Eyes extends EyesBase implements IConfigurationGetter, IConfigurati
 
     public boolean check(String name, ICheckSettings checkSettings) {
         IImagesCheckTarget imagesCheckTarget = (checkSettings instanceof IImagesCheckTarget) ? (IImagesCheckTarget) checkSettings : null;
+
+        if (imagesCheckTarget == null) return false;
+
         BufferedImage image = imagesCheckTarget.getImage();
 
         if (viewportSizeHandler.get() == null) {
             setViewportSize(new RectangleSize(image.getWidth(), image.getHeight()));
         }
-
         return checkImage_(RegionProvider.NULL_INSTANCE, image, name, false, checkSettings);
     }
 
@@ -616,13 +619,13 @@ public class Eyes extends EyesBase implements IConfigurationGetter, IConfigurati
     }
 
     @Override
-    protected <T extends IConfigurationGetter> T getConfigGetter() {
-        return (T) config;
+    protected IConfigurationGetter getConfigGetter() {
+        return config;
     }
 
     @Override
-    protected <T extends IConfigurationSetter> T getConfigSetter() {
-        return (T) config;
+    protected IConfigurationSetter getConfigSetter() {
+        return config;
     }
 
     /**

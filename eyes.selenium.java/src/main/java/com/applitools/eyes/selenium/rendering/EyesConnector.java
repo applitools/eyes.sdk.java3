@@ -151,13 +151,13 @@ class EyesConnector extends EyesBase implements IEyesConnector , IBatchCloser {
     }
 
     @Override
-    protected <T extends com.applitools.eyes.config.IConfigurationGetter> T getConfigGetter() {
-        return (T) configurationGetter;
+    protected com.applitools.eyes.config.IConfigurationGetter getConfigGetter() {
+        return configurationGetter;
     }
 
     @Override
-    protected <T extends IConfigurationSetter> T getConfigSetter() {
-        return (T) configurationGetter;
+    protected IConfigurationSetter getConfigSetter() {
+        return (IConfigurationSetter)configurationGetter;
     }
 
     public void setRenderInfo(RenderingInfo renderInfo) {

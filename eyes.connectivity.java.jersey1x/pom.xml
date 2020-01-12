@@ -8,6 +8,10 @@
 
     <description>Applitools Eyes SDK REST API communication implementation depending on Jersey version 1x</description>
 
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    </properties>
+
     <parent>
         <groupId>com.applitools</groupId>
         <artifactId>eyes-sdk-java3-parent</artifactId>

@@ -1465,9 +1465,9 @@ public abstract class EyesBase implements IEyesBase{
         return getConfigSetter();
     }
 
-    protected abstract <T extends IConfigurationGetter> T getConfigGetter();
+    protected abstract IConfigurationGetter getConfigGetter();
 
-    protected abstract <T extends IConfigurationSetter> T getConfigSetter();
+    protected abstract IConfigurationSetter getConfigSetter();
 
     public void abortAsync() {
         abort();
