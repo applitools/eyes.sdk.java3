@@ -61,6 +61,7 @@ public class AppiumJsCommandExtractor {
 
 
             try {
+                //noinspection unchecked
                 tapObject = (Map<String, String>) args[0];
                 xObj  = tapObject.get("x");
                 yObj  = tapObject.get("y");

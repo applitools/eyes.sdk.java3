@@ -3,6 +3,7 @@ package com.applitools.eyes.selenium.wrappers;
 import com.applitools.eyes.*;
 import com.applitools.eyes.positioning.PositionProvider;
 import com.applitools.eyes.selenium.EyesSeleniumUtils;
+import com.applitools.eyes.selenium.SeleniumEyes;
 import com.applitools.eyes.selenium.SizeAndBorders;
 import com.applitools.eyes.triggers.MouseAction;
 import com.applitools.utils.ArgumentGuard;
@@ -289,10 +290,11 @@ public class EyesRemoteWebElement extends RemoteWebElement {
 
     @Override
     public void click() {
-
+        SeleniumEyes eyes = eyesDriver.getEyes();
+        if (eyes == null) return;
         // Letting the driver know about the current action.
         Region currentControl = getBounds();
-        eyesDriver.getEyes().addMouseTrigger(MouseAction.Click, this);
+        eyes.addMouseTrigger(MouseAction.Click, this);
         logger.verbose(String.format("click(%s)", currentControl));
 
         webElement.click();
@@ -342,9 +344,11 @@ public class EyesRemoteWebElement extends RemoteWebElement {
 
     @Override
     public void sendKeys(CharSequence... keysToSend) {
+        SeleniumEyes eyes = eyesDriver.getEyes();
+        if (eyes == null) return;
         for (CharSequence keys : keysToSend) {
             String text = String.valueOf(keys);
-            eyesDriver.getEyes().addTextTrigger(this, text);
+            eyes.addTextTrigger(this, text);
         }
 
         webElement.sendKeys(keysToSend);
@@ -572,7 +576,9 @@ public class EyesRemoteWebElement extends RemoteWebElement {
 
     public RectangleSize getClientSize() {
         Object retVal = eyesDriver.executeScript(JS_GET_CLIENT_SIZE, this);
-        if (retVal == null) { return null; }
+        if (retVal == null) {
+            return null;
+        }
         @SuppressWarnings("unchecked") String sizeStr = (String) retVal;
         sizeStr = sizeStr.replace("px", "");
         String[] parts = sizeStr.split(";");

@@ -33,13 +33,14 @@ public class PostTestResultsListener implements ITestListener {
 
     @Override
     public void onTestSuccess(ITestResult result) {
-        sendTestResluts(result, result.isSuccess());
+        sendTestResults(result, result.isSuccess());
     }
 
     @Override
     public void onTestFailure(ITestResult result) {
-        sendTestResluts(result, result.isSuccess());
+        sendTestResults(result, result.isSuccess());
         sendExtraData(result.getMethod().getMethodName(), result, result.getThrowable());
+        System.out.println("Test failed: " + result.getTestName());
     }
 
     @Override
@@ -49,7 +50,7 @@ public class PostTestResultsListener implements ITestListener {
 
     @Override
     public void onTestFailedButWithinSuccessPercentage(ITestResult result) {
-        sendTestResluts(result, result.isSuccess());
+        sendTestResults(result, result.isSuccess());
         sendExtraData(result.getMethod().getMethodName(), result, result.getThrowable());
     }
 
@@ -63,7 +64,7 @@ public class PostTestResultsListener implements ITestListener {
 
     }
 
-    private void sendTestResluts(ITestResult iTestResult, boolean success) {
+    private void sendTestResults(ITestResult iTestResult, boolean success) {
         JsonObject resultJson = getResultJson(iTestResult, success);
         System.out.println("Unified report: sending JSON to report " + resultJson.toString());
         try {
