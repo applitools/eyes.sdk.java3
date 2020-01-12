@@ -40,7 +40,7 @@ public class PostTestResultsListener implements ITestListener {
     public void onTestFailure(ITestResult result) {
         sendTestResults(result, result.isSuccess());
         sendExtraData(result.getMethod().getMethodName(), result, result.getThrowable());
-        System.out.println("Test failed: " + result.getTestName());
+        System.out.println("Test failed: " + result.getMethod().getMethodName() + " (" + result.getTestName() + ")");
     }
 
     @Override
@@ -79,15 +79,17 @@ public class PostTestResultsListener implements ITestListener {
             TestFailedException testException = (TestFailedException) e;
             String testMode = "";
             try {
-                testMode = ((TestSetup)iTestResult.getInstance()).mode;
-            } catch (Throwable t){}
+                testMode = ((TestSetup) iTestResult.getInstance()).mode;
+            } catch (Throwable t) {
+            }
             JsonObject json = createExtraDataJson(methodName, testException.getTestResults(), testMode);
             CommUtils.postJson("http://sdk-test-results.herokuapp.com/extra_test_data", new Gson().fromJson(json, Map.class), null);
         } else {
             String testMode = "";
             try {
-                testMode = ((TestSetup)iTestResult.getInstance()).mode;
-            } catch (Throwable t){}
+                testMode = ((TestSetup) iTestResult.getInstance()).mode;
+            } catch (Throwable t) {
+            }
             JsonObject json = createExtraDataJson(methodName, new TestResults(), testMode);
             CommUtils.postJson("http://sdk-test-results.herokuapp.com/extra_test_data", new Gson().fromJson(json, Map.class), null);
         }
@@ -105,7 +107,7 @@ public class PostTestResultsListener implements ITestListener {
         return finalJsonObject;
     }
 
-    private JsonObject getResultJson(ITestResult testResult, boolean success){
+    private JsonObject getResultJson(ITestResult testResult, boolean success) {
         JsonArray resultsJsonArray = new JsonArray();
         JsonObject innerResultsJsonObject = new JsonObject();
         innerResultsJsonObject.addProperty("test_name", testResult.getMethod().getMethodName());
@@ -116,7 +118,7 @@ public class PostTestResultsListener implements ITestListener {
         finalJsonObject.addProperty("id", suiteId.get());
         finalJsonObject.addProperty("group", "selenium");
         String travisGitTag = System.getenv("TRAVIS_TAG");
-        if (travisGitTag == null || !travisGitTag.contains("RELEASE_CANDIDATE")){
+        if (travisGitTag == null || !travisGitTag.contains("RELEASE_CANDIDATE")) {
             finalJsonObject.addProperty("sandbox", true);
         }
         finalJsonObject.add("results", resultsJsonArray);
