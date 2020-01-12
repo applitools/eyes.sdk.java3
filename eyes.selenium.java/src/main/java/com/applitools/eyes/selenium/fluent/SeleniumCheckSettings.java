@@ -436,19 +436,16 @@ public class SeleniumCheckSettings extends CheckSettings implements ISeleniumChe
     public String getSizeMode() {
         ICheckSettingsInternal checkSettingsInternal = this;
         Boolean stitchContent = checkSettingsInternal.getStitchContent();
-        if (region == null) {
-            region  = checkSettingsInternal.getTargetRegion();
+        if (stitchContent == null) {
+            stitchContent = false;
         }
-        if (region == null && getVGTargetSelector() == null)
-        {
-            return stitchContent == null || stitchContent ? FULL_PAGE : VIEWPORT;
-        }
-        else if (region != null)
-        {
+        Region region = checkSettingsInternal.getTargetRegion();
+
+        if (region == null && getVGTargetSelector() == null) {
+            return stitchContent ? FULL_PAGE : VIEWPORT;
+        } else if (region != null) {
             return REGION;
-        }
-        else /* if (selector != null) */
-        {
+        } else /* if (selector != null) */ {
             return SELECTOR;
         }
     }
@@ -495,25 +492,21 @@ public class SeleniumCheckSettings extends CheckSettings implements ISeleniumChe
         return this.ignoreDisplacements(true);
     }
 
-    public SeleniumCheckSettings accessibility(By regionSelector, AccessibilityRegionType regionType)
-    {
+    public SeleniumCheckSettings accessibility(By regionSelector, AccessibilityRegionType regionType) {
         SeleniumCheckSettings clone = clone();
         clone.accessibility_(new AccessibilityRegionBySelector(regionSelector, regionType));
         return clone;
     }
 
-    public SeleniumCheckSettings accessibility(WebElement element, AccessibilityRegionType regionType)
-    {
+    public SeleniumCheckSettings accessibility(WebElement element, AccessibilityRegionType regionType) {
         SeleniumCheckSettings clone = clone();
         clone.accessibility(new AccessibilityRegionByElement(element, regionType));
         return clone;
     }
 
-    public SeleniumCheckSettings accessibility(AccessibilityRegionType regionType, WebElement[] elementsToIgnore)
-    {
+    public SeleniumCheckSettings accessibility(AccessibilityRegionType regionType, WebElement[] elementsToIgnore) {
         SeleniumCheckSettings clone = clone();
-        for (WebElement element : elementsToIgnore)
-        {
+        for (WebElement element : elementsToIgnore) {
             clone.accessibility(new AccessibilityRegionByElement(element, regionType));
         }
         return clone;

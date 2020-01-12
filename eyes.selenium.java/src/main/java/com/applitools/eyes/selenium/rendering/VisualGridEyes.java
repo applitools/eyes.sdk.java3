@@ -449,7 +449,6 @@ public class VisualGridEyes implements IRenderingEyes {
     public void check(String name, ICheckSettings checkSettings) {
         if (!validateEyes()) return;
         ArgumentGuard.notNull(checkSettings, "checkSettings");
-        trySetTargetSelector((SeleniumCheckSettings) checkSettings);
         if (name != null) {
             checkSettings = checkSettings.withName(name);
         }
@@ -531,6 +530,8 @@ public class VisualGridEyes implements IRenderingEyes {
             List<VisualGridSelector[]> regionsXPaths = getRegionsXPaths(checkSettingsInternal);
 
             logger.verbose("regionXPaths : " + regionsXPaths);
+
+            trySetTargetSelector((SeleniumCheckSettings)checkSettings);
 
             List<RunningTest> filteredTests = new ArrayList<>();
 

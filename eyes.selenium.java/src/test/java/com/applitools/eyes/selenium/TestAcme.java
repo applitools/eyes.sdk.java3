@@ -35,10 +35,8 @@ public class TestAcme extends TestSetup {
     public void TestAcmeLogin() {
         getDriver().get("https://afternoon-savannah-68940.herokuapp.com/#");
         WebElement username = getDriver().findElement(By.id("username"));
-        username.click();
         username.sendKeys("adamC");
         WebElement password = getDriver().findElement(By.id("password"));
-        username.click();
         password.sendKeys("MySecret123?");
         (getEyes()).check(
                 Target.region(username),

@@ -291,11 +291,12 @@ public class EyesRemoteWebElement extends RemoteWebElement {
     @Override
     public void click() {
         SeleniumEyes eyes = eyesDriver.getEyes();
-        if (eyes == null) return;
-        // Letting the driver know about the current action.
-        Region currentControl = getBounds();
-        eyes.addMouseTrigger(MouseAction.Click, this);
-        logger.verbose(String.format("click(%s)", currentControl));
+        if (eyes != null) {
+            // Letting the driver know about the current action.
+            Region currentControl = getBounds();
+            eyes.addMouseTrigger(MouseAction.Click, this);
+            logger.verbose(String.format("click(%s)", currentControl));
+        }
 
         webElement.click();
     }
@@ -345,12 +346,12 @@ public class EyesRemoteWebElement extends RemoteWebElement {
     @Override
     public void sendKeys(CharSequence... keysToSend) {
         SeleniumEyes eyes = eyesDriver.getEyes();
-        if (eyes == null) return;
-        for (CharSequence keys : keysToSend) {
-            String text = String.valueOf(keys);
-            eyes.addTextTrigger(this, text);
+        if (eyes != null) {
+            for (CharSequence keys : keysToSend) {
+                String text = String.valueOf(keys);
+                eyes.addTextTrigger(this, text);
+            }
         }
-
         webElement.sendKeys(keysToSend);
     }
 
