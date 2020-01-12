@@ -548,7 +548,7 @@ public class RenderingTask implements Callable<RenderStatusResults>, Completable
             }
 
             RenderInfo renderInfo = new RenderInfo(browserInfo.getWidth(), browserInfo.getHeight(),
-                    sizeMode, checkSettingsInternal.getRegion(), checkSettingsInternal.getVGTargetSelector(), browserInfo.getEmulationInfo());
+                    sizeMode, checkSettingsInternal.getTargetRegion(), checkSettingsInternal.getVGTargetSelector(), browserInfo.getEmulationInfo());
 
             RenderRequest request = new RenderRequest(this.renderingInfo.getResultsUrl(), result.getUrl(), dom,
                     resourceMapping, renderInfo, browserInfo.getPlatform(), browserInfo.getBrowserType(),

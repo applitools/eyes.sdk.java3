@@ -436,11 +436,6 @@ public class CheckSettings implements ICheckSettings, ICheckSettingsInternal {
         return null;
     }
 
-    @Override
-    public Region getRegion() {
-        return targetRegion;
-    }
-
     protected void updateTargetRegion(Region region) {
         this.targetRegion = region;
     }
@@ -474,7 +469,7 @@ public class CheckSettings implements ICheckSettings, ICheckSettingsInternal {
         return enablePatterns != null ? enablePatterns : false;
     }
 
-        @Override
+    @Override
     public VisualGridSelector getVGTargetSelector() {
         return null;
     }

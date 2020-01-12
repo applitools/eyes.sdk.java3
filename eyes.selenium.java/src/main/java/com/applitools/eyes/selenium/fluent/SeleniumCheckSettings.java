@@ -27,8 +27,6 @@ public class SeleniumCheckSettings extends CheckSettings implements ISeleniumChe
     private By scrollRootSelector;
 
     private VisualGridSelector selector;
-    private Region region;
-
 
     public SeleniumCheckSettings() {
     }
@@ -74,7 +72,6 @@ public class SeleniumCheckSettings extends CheckSettings implements ISeleniumChe
         clone.frameChain.addAll(this.frameChain);
         clone.scrollRootElement = this.scrollRootElement;
         clone.scrollRootSelector = this.scrollRootSelector;
-        clone.region = this.region;
         clone.selector = this.selector;
         clone.sendDom = this.sendDom;
         return clone;
@@ -428,7 +425,7 @@ public class SeleniumCheckSettings extends CheckSettings implements ISeleniumChe
     }
 
     public SeleniumCheckSettings(Region region, boolean isSendDom) {
-        this.region = region;
+        super(region);
         this.sendDom = isSendDom;
     }
 
@@ -448,10 +445,6 @@ public class SeleniumCheckSettings extends CheckSettings implements ISeleniumChe
         } else /* if (selector != null) */ {
             return SELECTOR;
         }
-    }
-
-    public Region getRegion() {
-        return region;
     }
 
     @Override

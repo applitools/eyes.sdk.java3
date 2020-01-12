@@ -20,8 +20,6 @@ public interface ICheckSettingsInternal {
 
     String getSizeMode();
 
-    Region getRegion();
-
     Boolean isSendDom();
 
     Boolean isUseDom();
