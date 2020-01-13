@@ -80,10 +80,6 @@ public class FullPageCaptureAlgorithm {
 
         PositionMemento originalPosition = originProvider.getState();
 
-        if (!positionProvider.equals(originProvider)) {
-            originProvider.setPosition(Location.ZERO); // first scroll to 0,0 so CSS stitching works.
-        }
-
         PositionMemento originalStitchedState = positionProvider.getState();
         logger.verbose("region size: " + region);
 
