@@ -94,6 +94,7 @@ public class FrameChain implements Iterable<Frame> {
      * @return the frame
      */
     public Frame pop() {
+        if (frames.size() == 0) return null;
         return frames.remove(frames.size() - 1);
     }
 
