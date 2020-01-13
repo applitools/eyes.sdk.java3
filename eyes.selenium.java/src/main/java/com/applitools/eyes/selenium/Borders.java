@@ -13,6 +13,9 @@ public class Borders {
         this.bottom = bottom;
     }
 
+    public Borders() {
+    }
+
     public int getLeft() {
         return left;
     }
@@ -27,5 +30,13 @@ public class Borders {
 
     public int getBottom() {
         return bottom;
+    }
+
+    public int getHorizontal() {
+        return left + right;
+    }
+
+    public int getVertical() {
+        return top + bottom;
     }
 }

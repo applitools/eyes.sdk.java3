@@ -54,7 +54,7 @@ public class ScrollPositionProvider implements PositionProvider, ISeleniumPositi
         return parseLocationString(position);
     }
 
-    static Location parseLocationString(Object position) {
+    public static Location parseLocationString(Object position) {
         String[] xy = position.toString().split(";");
         if (xy.length != 2)
         {

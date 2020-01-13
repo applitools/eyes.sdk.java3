@@ -284,8 +284,8 @@ public class EyesRemoteWebElement extends RemoteWebElement {
      * Sets the overflow of the element.
      * @param overflow The overflow to set.
      */
-    public void setOverflow(String overflow) {
-        EyesSeleniumUtils.setOverflow(eyesDriver, overflow, this);
+    public String setOverflow(String overflow) {
+        return EyesSeleniumUtils.setOverflow(eyesDriver, overflow, this);
     }
 
     @Override

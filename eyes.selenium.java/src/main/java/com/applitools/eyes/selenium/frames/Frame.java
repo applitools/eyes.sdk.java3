@@ -3,14 +3,11 @@
  */
 package com.applitools.eyes.selenium.frames;
 
-import com.applitools.eyes.IEyesJsExecutor;
-import com.applitools.eyes.Location;
-import com.applitools.eyes.Logger;
-import com.applitools.eyes.RectangleSize;
+import com.applitools.eyes.*;
 import com.applitools.eyes.positioning.PositionMemento;
 import com.applitools.eyes.positioning.PositionProvider;
+import com.applitools.eyes.selenium.Borders;
 import com.applitools.eyes.selenium.positioning.ScrollPositionMemento;
-import com.applitools.eyes.selenium.positioning.ScrollPositionProvider;
 import com.applitools.eyes.selenium.positioning.ScrollPositionProviderFactory;
 import com.applitools.eyes.selenium.wrappers.EyesWebDriver;
 import com.applitools.utils.ArgumentGuard;
@@ -37,6 +34,8 @@ public final class Frame {
 
     private WebElement scrollRootElement;
     private String originalOverflow;
+    private Region bounds;
+    private Borders borderWidths;
 
     /**
      * @param logger           A Logger instance.
@@ -49,7 +48,7 @@ public final class Frame {
      */
     public Frame(Logger logger, WebElement reference,
                  Location location, RectangleSize outerSize, RectangleSize innerSize,
-                 Location originalLocation, IEyesJsExecutor jsExecutor) {
+                 Location originalLocation, Region bounds, Borders borderWidths, IEyesJsExecutor jsExecutor) {
         ArgumentGuard.notNull(logger, "logger");
         ArgumentGuard.notNull(reference, "reference");
         ArgumentGuard.notNull(location, "location");
@@ -70,6 +69,8 @@ public final class Frame {
         this.originalLocation = originalLocation;
         this.positionMemento = new ScrollPositionMemento(originalLocation);
         this.jsExecutor = jsExecutor;
+        this.bounds = bounds;
+        this.borderWidths = borderWidths;
     }
 
     public WebElement getReference() {
@@ -128,4 +129,11 @@ public final class Frame {
         return scrollRootElement;
     }
 
+    public Region getBounds() {
+        return this.bounds;
+    }
+
+    public Borders getBorderWidths() {
+        return this.borderWidths;
+    }
 }

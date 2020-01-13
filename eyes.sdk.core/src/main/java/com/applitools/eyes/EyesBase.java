@@ -49,7 +49,7 @@ public abstract class EyesBase implements IEyesBase{
     protected IServerConnector serverConnector;
     protected RunningSession runningSession;
     protected SessionStartInfo sessionStartInfo;
-    protected PropertyHandler<RectangleSize> viewportSizeHandler;
+    protected RectangleSize viewportSize;
     protected EyesScreenshot lastScreenshot;
     protected PropertyHandler<ScaleProvider> scaleProviderHandler;
     protected PropertyHandler<CutProvider> cutProviderHandler;
@@ -104,8 +104,6 @@ public abstract class EyesBase implements IEyesBase{
             cutProviderHandler.set(new NullCutProvider());
             positionProviderHandler = new SimplePropertyHandler<>();
             positionProviderHandler.set(new InvalidPositionProvider());
-            viewportSizeHandler = new SimplePropertyHandler<>();
-            viewportSizeHandler.set(null);
 
             return;
         }
@@ -123,11 +121,6 @@ public abstract class EyesBase implements IEyesBase{
         if (positionProviderHandler == null) {
             positionProviderHandler = new SimplePropertyHandler<>();
             positionProviderHandler.set(new InvalidPositionProvider());
-        }
-
-        if (viewportSizeHandler == null) {
-            viewportSizeHandler = new SimplePropertyHandler<>();
-            viewportSizeHandler.set(null);
         }
     }
 
@@ -1014,8 +1007,7 @@ public abstract class EyesBase implements IEyesBase{
 
                 beforeOpen();
 
-                RectangleSize viewportSize = getViewportSizeForOpen();
-                viewportSizeHandler.set(viewportSize);
+                viewportSize = getViewportSizeForOpen();
 
                 try {
                     if (viewportSize != null) {
@@ -1112,22 +1104,21 @@ public abstract class EyesBase implements IEyesBase{
      */
     protected abstract IConfigurationSetter setViewportSize(RectangleSize size);
 
+    protected void setEffectiveViewportSize(RectangleSize size) { }
+
     /**
      * Define the viewport size as {@code size} without doing any actual action on the
      * @param explicitViewportSize The size of the viewport. {@code null} disables the explicit size.
      */
     public void setExplicitViewportSize(RectangleSize explicitViewportSize) {
         if (explicitViewportSize == null) {
-            viewportSizeHandler = new SimplePropertyHandler<>();
-            viewportSizeHandler.set(null);
+            this.viewportSize = null;
             this.isViewportSizeSet = false;
-
             return;
         }
 
         logger.verbose("Viewport size explicitly set to " + explicitViewportSize);
-        viewportSizeHandler = new ReadOnlyPropertyHandler<>(logger,
-                new RectangleSize(explicitViewportSize.getWidth(), explicitViewportSize.getHeight()));
+        this.viewportSize = explicitViewportSize;
         this.isViewportSizeSet = true;
     }
 
@@ -1280,7 +1271,7 @@ public abstract class EyesBase implements IEyesBase{
         }
 
         appEnv.setInferred(getInferredEnvironment());
-        appEnv.setDisplaySize(viewportSizeHandler.get());
+        appEnv.setDisplaySize(viewportSize);
         return appEnv;
     }
 
@@ -1349,24 +1340,28 @@ public abstract class EyesBase implements IEyesBase{
 
     private void ensureViewportSize() {
         if (!isViewportSizeSet) {
-
-            try {
-                if (viewportSizeHandler.get() == null) {
-                    // If it's read-only, no point in making the getViewportSize() call.
-                    if (!(viewportSizeHandler instanceof ReadOnlyPropertyHandler)) {
-                        RectangleSize targetSize = getViewportSize();
-                        sessionEventHandlers.setSizeWillStart(targetSize);
-                        viewportSizeHandler.set(targetSize);
-                    }
-                } else {
-                    RectangleSize targetSize = viewportSizeHandler.get();
-                    sessionEventHandlers.setSizeWillStart(targetSize);
-                    setViewportSize(targetSize);
+            if (viewportSize == null || viewportSize.isEmpty()) {
+                try {
+                    viewportSize = getViewportSize();
+                    logger.verbose("viewport size: " + viewportSize);
+                    setEffectiveViewportSize(viewportSize);
+                } catch (NullPointerException e) {
+                    isViewportSizeSet = false;
                 }
-                isViewportSizeSet = true;
-                sessionEventHandlers.setSizeEnded();
-            } catch (NullPointerException e) {
-                isViewportSizeSet = false;
+            }
+            else {
+                try
+                {
+                    logger.verbose("Setting viewport size to " + viewportSize);
+                    setViewportSize(viewportSize);
+                    isViewportSizeSet = true;
+                }
+                catch (Exception ex)
+                {
+                    //setEffectiveViewportSize(ex.ActualViewportSize);
+                    isViewportSizeSet = false;
+                    throw ex;
+                }
             }
         }
     }

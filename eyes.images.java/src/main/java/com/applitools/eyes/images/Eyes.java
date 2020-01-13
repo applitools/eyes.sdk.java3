@@ -79,7 +79,7 @@ public class Eyes extends EyesBase implements IConfigurationGetter, IConfigurati
 
         BufferedImage image = imagesCheckTarget.getImage();
 
-        if (viewportSizeHandler.get() == null) {
+        if (viewportSize == null) {
             setViewportSize(new RectangleSize(image.getWidth(), image.getHeight()));
         }
         return checkImage_(RegionProvider.NULL_INSTANCE, image, name, false, checkSettings);
@@ -144,7 +144,7 @@ public class Eyes extends EyesBase implements IConfigurationGetter, IConfigurati
 
         logger.verbose(String.format("CheckImage(Image, '%s', %b)", tag, ignoreMismatch));
 
-        if (viewportSizeHandler.get() == null) {
+        if (viewportSize == null) {
             setViewportSize(new RectangleSize(image.getWidth(), image.getHeight()));
         }
 
@@ -236,7 +236,7 @@ public class Eyes extends EyesBase implements IConfigurationGetter, IConfigurati
 
         logger.verbose(String.format("CheckRegion(Image, [%s], '%s', %b)", region, tag, ignoreMismatch));
 
-        if (viewportSizeHandler.get() == null) {
+        if (viewportSize == null) {
             setViewportSize(new RectangleSize(image.getWidth(), image.getHeight()));
         }
 
@@ -294,7 +294,7 @@ public class Eyes extends EyesBase implements IConfigurationGetter, IConfigurati
      */
     @Override
     public RectangleSize getViewportSize() {
-        return viewportSizeHandler.get();
+        return viewportSize;
     }
 
     @Override
@@ -314,7 +314,7 @@ public class Eyes extends EyesBase implements IConfigurationGetter, IConfigurati
     @Override
     public IConfigurationSetter setViewportSize(RectangleSize size) {
         ArgumentGuard.notNull(size, "size");
-        viewportSizeHandler.set(new RectangleSize(size.getWidth(), size.getHeight()));
+        viewportSize = new RectangleSize(size.getWidth(), size.getHeight());
         return config;
     }
 

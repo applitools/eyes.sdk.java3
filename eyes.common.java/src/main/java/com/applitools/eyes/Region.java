@@ -9,6 +9,8 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
+import static sun.management.snmp.jvminstr.JvmThreadInstanceEntryImpl.ThreadStateMap.Byte1.other;
+
 /**
  * Represents a region.
  */
@@ -153,6 +155,21 @@ public class Region implements IRegion {
         width = other.getWidth();
         height = other.getHeight();
         coordinatesType = other.getCoordinatesType();
+    }
+
+    /**
+     * Instantiates a new Region.
+     * @param other the other
+     * @param coordinatesType the new Region coordinates type.
+     */
+    public Region(IRegion other, CoordinatesType coordinatesType) {
+        ArgumentGuard.notNull(other, "other");
+
+        left = other.getLeft();
+        top = other.getTop();
+        width = other.getWidth();
+        height = other.getHeight();
+        this.coordinatesType = coordinatesType;
     }
 
     /**
