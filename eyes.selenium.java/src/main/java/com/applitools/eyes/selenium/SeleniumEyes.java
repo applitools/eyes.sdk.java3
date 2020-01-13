@@ -1277,7 +1277,6 @@ public class SeleniumEyes extends EyesBase implements IDriverProvider, IBatchClo
         logger.verbose(String.format("displayStyle: %s ; scrollSize: %s ; clientSize %s ; effectiveViewport size: %s",
                 displayStyle, scrollSize, clientSize, effectiveViewport.getSize()));
 
-
         String originalOverflow = null;
         if (this.stitchContent && !displayStyle.equalsIgnoreCase("inline") &&
                 ((clientSize.getHeight() <= effectiveViewport.getHeight() && clientSize.getWidth() < effectiveViewport.getWidth()) ||
@@ -1301,13 +1300,13 @@ public class SeleniumEyes extends EyesBase implements IDriverProvider, IBatchClo
 
         if (this.stitchContent && this.elementPositionProvider != null) {
             Borders borders = sizeAndBorders.getBorders();
-            elementBounds.offset(borders.getLeft(), borders.getTop());
+            elementBounds = elementBounds.offset(borders.getLeft(), borders.getTop());
             elementBounds.setWidth(elementBounds.getWidth() - borders.getHorizontal());
             elementBounds.setHeight(elementBounds.getHeight() - borders.getVertical());
         }
 
         Region originalElementBounds = new Region(elementBounds);
-        Region fullElementBounds = elementBounds;
+        Region fullElementBounds = new Region(elementBounds);
 
         if (this.stitchContent) {
             fullElementBounds.setWidth(Math.max(fullElementBounds.getWidth(), scrollSize.getWidth()));
@@ -1321,7 +1320,7 @@ public class SeleniumEyes extends EyesBase implements IDriverProvider, IBatchClo
         Location offset;
 
         Region bounds;
-        Borders borders;
+        Borders borders = new Borders();
         for (int i = fc.size() - 1; i >= 0; --i) {
             Frame frame = fc.getAt(i);
             bounds = frame.getBounds();
@@ -1337,8 +1336,8 @@ public class SeleniumEyes extends EyesBase implements IDriverProvider, IBatchClo
                 memento = positionProvider.getState();
                 Location location = new Location(elementBounds.getLeft(), elementBounds.getTop());
                 offset = positionProvider.setPosition(location);
-                elementBounds.offset(-offset.getX(), -offset.getY());
-                fullElementBounds.offset(-offset.getX(), -offset.getY());
+                elementBounds = elementBounds.offset(-offset.getX(), -offset.getY());
+                fullElementBounds = fullElementBounds.offset(-offset.getX(), -offset.getY());
 
                 Region prevBounds = new Region(bounds);
                 logger.verbose("offset: " + offset);
@@ -1352,11 +1351,11 @@ public class SeleniumEyes extends EyesBase implements IDriverProvider, IBatchClo
 
             logger.verbose("Element region (before intersection with effective viewport): " + this.regionToCheck);
 
-            elementBounds.offset(bounds.getLeft(), bounds.getTop());
-            elementBounds.offset(borders.getLeft(), borders.getTop());
+            elementBounds = elementBounds.offset(bounds.getLeft(), bounds.getTop());
+            elementBounds = elementBounds.offset(borders.getLeft(), borders.getTop());
 
-            fullElementBounds.offset(bounds.getLeft(), bounds.getTop());
-            fullElementBounds.offset(borders.getLeft(), borders.getTop());
+            fullElementBounds = fullElementBounds.offset(bounds.getLeft(), bounds.getTop());
+            fullElementBounds = fullElementBounds.offset(borders.getLeft(), borders.getTop());
 
             boundsList.add(new BoundsAndBorders(bounds, borders));
             switchTo.parentFrame();
@@ -1375,8 +1374,8 @@ public class SeleniumEyes extends EyesBase implements IDriverProvider, IBatchClo
             //positionProvider = SeleniumScrollPositionProviderFactory.GetPositionProvider(Logger, StitchMode, jsExecutor_, scrollRootElement, userAgent_);
             positionProvider = getElementPositionProvider(scrollRootElement);
             memento = positionProvider.getState();
-            elementBounds.offset(memento.getX(), memento.getY());
-            fullElementBounds.offset(memento.getX(), memento.getY());
+            elementBounds = elementBounds.offset(memento.getX(), memento.getY());
+            fullElementBounds = fullElementBounds.offset(memento.getX(), memento.getY());
 
             Location elementLocation = elementBounds.getLocation();
             elementLocation.offset(-effectiveViewport.getLeft(), -effectiveViewport.getTop());
@@ -1384,8 +1383,8 @@ public class SeleniumEyes extends EyesBase implements IDriverProvider, IBatchClo
             offset = positionProvider.setPosition(elementLocation);
             logger.verbose("offset: " + offset);
 
-            elementBounds.offset(-offset.getX(), -offset.getY());
-            fullElementBounds.offset(-offset.getX(), -offset.getY());
+            elementBounds = elementBounds.offset(-offset.getX(), -offset.getY());
+            fullElementBounds = fullElementBounds.offset(-offset.getX(), -offset.getY());
 
             if (fc.size() > 0) {
                 //EyesRemoteWebElement eyesFrame = (EyesRemoteWebElement)fc[0].Reference;
@@ -1400,7 +1399,7 @@ public class SeleniumEyes extends EyesBase implements IDriverProvider, IBatchClo
             fullElementBounds.intersect(effectiveViewport);
         }
 
-        Region viewport = elementBounds;
+        Region viewport = new Region(elementBounds);
         if (fc.size() > 0) {
             Frame frame = fc.peek();
             viewport.setSize(frame.getInnerSize());
@@ -1416,9 +1415,9 @@ public class SeleniumEyes extends EyesBase implements IDriverProvider, IBatchClo
             }
         }
 
-        this.regionToCheck = viewport;
-        this.fullRegionToCheck = fullElementBounds;
-        this.effectiveViewport = viewport;
+        this.regionToCheck = new Region(viewport);
+        this.fullRegionToCheck = new Region(fullElementBounds);
+        this.effectiveViewport = new Region(viewport);
 
         MatchResult result = checkWindowBase(new RegionProvider() {
             public Region getRegion(ICheckSettingsInternal settings) {
