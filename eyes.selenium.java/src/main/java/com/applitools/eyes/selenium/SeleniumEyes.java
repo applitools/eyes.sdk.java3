@@ -733,7 +733,7 @@ public class SeleniumEyes extends EyesBase implements IDriverProvider, IBatchClo
                     }
                     checkWindowBase(RegionProvider.NULL_INSTANCE, name, false, checkSettings, source);
                     if (this.stitchContent) {
-                        driver.executeScript("var e = document.documentElement; if (e.scrollTo) {e.scrollTo(" + curPos.getX() + "," + curPos.getY() + ");} else {e.scrollLeft=" + curPos.getX() + ";e.scrollTop=" + curPos.getX() + ";}}");
+                        driver.executeScript("var e = document.documentElement; if (e.scrollTo) {e.scrollTo(" + curPos.getX() + "," + curPos.getY() + ");} else {e.scrollLeft=" + curPos.getX() + ";e.scrollTop=" + curPos.getX() + ";}");
                     }
                     switchTo.frames(originalFC);
                 }
