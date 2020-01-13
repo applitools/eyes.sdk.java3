@@ -633,8 +633,7 @@ public class SeleniumEyes extends EyesBase implements IDriverProvider, IBatchClo
     }
 
     @Override
-    protected void setEffectiveViewportSize(RectangleSize size)
-    {
+    protected void setEffectiveViewportSize(RectangleSize size) {
         this.effectiveViewport = new Region(Location.ZERO, size);
         logger.verbose("setting effective viewport size to " + size);
     }
@@ -1266,11 +1265,6 @@ public class SeleniumEyes extends EyesBase implements IDriverProvider, IBatchClo
         check(tag, settings.region(selector).timeout(matchTimeout).fully(stitchContent));
     }
 
-
-    private MatchResult checkElement(String name, ICheckSettings checkSettings, String source) {
-        return this.checkElement(this.targetElement, name, checkSettings, source);
-    }
-
     private MatchResult checkElement(WebElement element, String name, ICheckSettings checkSettings, String source) {
 
         // Since the element might already have been found using EyesWebDriver.
@@ -1428,7 +1422,9 @@ public class SeleniumEyes extends EyesBase implements IDriverProvider, IBatchClo
 
         MatchResult result = checkWindowBase(new RegionProvider() {
             public Region getRegion(ICheckSettingsInternal settings) {
-                return settings.getTargetRegion();
+                Region result = settings.getTargetRegion();
+                if (result == null) result = Region.EMPTY;
+                return result;
             }
         }, name, false, checkSettings, source);
 
@@ -1791,9 +1787,7 @@ public class SeleniumEyes extends EyesBase implements IDriverProvider, IBatchClo
             switchTo.frames(originalFrameChain);
         }
 
-        //FrameChain originalFC = tryHideScrollbars();
-
-        EyesWebDriverScreenshot result;
+        EyesWebDriverScreenshot result = null;
 
         Object activeElement = null;
         if (getConfigGetter().getHideCaret() && !isMobileDevice) {
@@ -1802,10 +1796,9 @@ public class SeleniumEyes extends EyesBase implements IDriverProvider, IBatchClo
 
         Boolean forceFullPageScreenshot = getConfigGetter().getForceFullPageScreenshot();
         if (forceFullPageScreenshot == null) forceFullPageScreenshot = false;
-        if (checkFrameOrElement && !isMobileDevice) {
+
+        if ((this.targetElement != null || forceFullPageScreenshot || this.stitchContent) && !isMobileDevice) {
             result = getFrameOrElementScreenshot(scaleProviderFactory, originalFrameChain, switchTo);
-        } else if ((forceFullPageScreenshot || stitchContent) && !isMobileDevice) {
-            result = getFullPageScreenshot(scaleProviderFactory, originalFrameChain, switchTo);
         } else {
             result = getElementScreenshot(scaleProviderFactory, switchTo);
         }
@@ -1814,8 +1807,6 @@ public class SeleniumEyes extends EyesBase implements IDriverProvider, IBatchClo
             switchTo.frames(originalFrameChain);
             driver.executeScript("arguments[0].focus();", activeElement);
         }
-
-        //tryRestoreScrollbars(originalFC);
 
         if (!isMobileDevice) {
             result.setDomUrl(tryCaptureAndPostDom(checkSettingsInternal));
