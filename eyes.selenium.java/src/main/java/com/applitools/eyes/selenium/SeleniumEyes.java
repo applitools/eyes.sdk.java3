@@ -697,7 +697,7 @@ public class SeleniumEyes extends EyesBase implements IDriverProvider, IBatchClo
                 checkWindowBase(new RegionProvider() {
                     @Override
                     public Region getRegion(ICheckSettingsInternal settings) {
-                        return new Region(targetRegion, CoordinatesType.CONTEXT_RELATIVE);
+                        return new Region(targetRegion.getLocation(), targetRegion.getSize(), CoordinatesType.CONTEXT_RELATIVE);
                     }
                 }, name, false, checkSettings, source);
             } else if (seleniumCheckTarget != null) {

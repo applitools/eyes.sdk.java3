@@ -156,21 +156,6 @@ public class Region implements IRegion {
     }
 
     /**
-     * Instantiates a new Region.
-     * @param other the other
-     * @param coordinatesType the new Region coordinates type.
-     */
-    public Region(IRegion other, CoordinatesType coordinatesType) {
-        ArgumentGuard.notNull(other, "other");
-
-        left = other.getLeft();
-        top = other.getTop();
-        width = other.getWidth();
-        height = other.getHeight();
-        this.coordinatesType = coordinatesType;
-    }
-
-    /**
      * Gets location.
      * @return The (left, top) position of the current region.
      */

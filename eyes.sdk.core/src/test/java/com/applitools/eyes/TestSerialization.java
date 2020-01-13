@@ -82,7 +82,7 @@ public class TestSerialization {
         } catch (IllegalArgumentException e) {
         }
         try {
-            new Region(0,0,0,0);
+            new Region(null, null);
             Assert.fail("Location and size must not be null!");
         } catch (IllegalArgumentException e) {
         }
