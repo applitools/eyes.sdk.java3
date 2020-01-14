@@ -51,7 +51,7 @@ public abstract class TestSetup implements ITest {
     class SpecificTestContextRequirements {
 
         private Eyes eyes;
-        private WebDriver driver;
+        private WebDriver eyesDriver;
         private WebDriver webDriver;
 
         public HashSet<FloatingMatchSettings> expectedFloatingRegions = new HashSet<>();
@@ -70,19 +70,19 @@ public abstract class TestSetup implements ITest {
             return this.eyes;
         }
 
-        public WebDriver getWrappedDriver() {
-            return this.driver;
+        public WebDriver getEyesDriver() {
+            return this.eyesDriver;
         }
 
-        public void setWrappedDriver(WebDriver driver) {
-            this.driver = driver;
+        public void setEyesDriver(WebDriver driver) {
+            this.eyesDriver = driver;
         }
 
         public WebDriver getWebDriver() {
             return this.webDriver;
         }
 
-        public void setDriver(WebDriver driver) {
+        public void setWebDriver(WebDriver driver) {
             this.webDriver = driver;
         }
     }
@@ -119,7 +119,7 @@ public abstract class TestSetup implements ITest {
     }
 
     public WebDriver getDriver() {
-        return getTestData().getWrappedDriver();
+        return getTestData().getEyesDriver();
     }
 
     protected WebDriver getWebDriver() {
@@ -207,8 +207,8 @@ public abstract class TestSetup implements ITest {
         driver.get(testedPageUrl);
         eyes.getLogger().log(testName + ": " + TestDataProvider.batchInfo.getName());
 
-        testData.setWrappedDriver(driver);
-        testData.setDriver(webDriver);
+        testData.setEyesDriver(driver);
+        testData.setWebDriver(webDriver);
     }
 
     private Eyes initEyes() {
