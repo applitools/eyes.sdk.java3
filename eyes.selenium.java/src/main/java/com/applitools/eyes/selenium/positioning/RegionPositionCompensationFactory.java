@@ -2,6 +2,7 @@ package com.applitools.eyes.selenium.positioning;
 
 import com.applitools.eyes.BrowserNames;
 import com.applitools.eyes.Logger;
+import com.applitools.eyes.OSNames;
 import com.applitools.eyes.UserAgent;
 import com.applitools.eyes.selenium.SeleniumEyes;
 
@@ -17,7 +18,7 @@ public class RegionPositionCompensationFactory {
                 } catch (NumberFormatException e) {
                     return new NullRegionPositionCompensation();
                 }
-            } else if (userAgent.getBrowser().equals(BrowserNames.Safari)) {
+            } else if (userAgent.getBrowser().equals(BrowserNames.Safari) && userAgent.getOS().equals(OSNames.MacOSX)) {
                 return new SafariRegionPositionCompensation();
             }
             else if (userAgent.getBrowser().equals(BrowserNames.IE))
