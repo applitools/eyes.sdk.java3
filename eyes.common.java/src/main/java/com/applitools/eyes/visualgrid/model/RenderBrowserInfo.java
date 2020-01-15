@@ -32,6 +32,7 @@ public class RenderBrowserInfo {
     public RenderBrowserInfo(int width, int height) {
         this(new RectangleSize(width, height), BrowserType.CHROME, null);
     }
+
     public RenderBrowserInfo(EmulationBaseInfo emulationInfo) {
         this.emulationInfo = emulationInfo;
     }
@@ -66,9 +67,23 @@ public class RenderBrowserInfo {
         if (browserType != null) {
             switch (this.browserType) {
                 case CHROME:
-                    return "chrome";
+                    return "chrome-0";
+                case CHROME_ONE_VERSION_BACK:
+                    return "chrome-1";
+                case CHROME_TWO_VERSIONS_BACK:
+                    return "chrome-2";
                 case FIREFOX:
-                    return "firefox";
+                    return "firefox-0";
+                case FIREFOX_ONE_VERSION_BACK:
+                    return "firefox-1";
+                case FIREFOX_TWO_VERSIONS_BACK:
+                    return "firefox-2";
+                case SAFARI:
+                    return "safari-0";
+                case SAFARI_ONE_VERSION_BACK:
+                    return "safari-1";
+                case SAFARI_TWO_VERSIONS_BACK:
+                    return "safari-2";
                 case IE_10:
                     return "ie10";
                 case IE_11:
@@ -84,8 +99,16 @@ public class RenderBrowserInfo {
         if (browserType != null) {
             switch (this.browserType) {
                 case CHROME:
+                case CHROME_ONE_VERSION_BACK:
+                case CHROME_TWO_VERSIONS_BACK:
                 case FIREFOX:
+                case FIREFOX_ONE_VERSION_BACK:
+                case FIREFOX_TWO_VERSIONS_BACK:
                     return "linux";
+                case SAFARI:
+                case SAFARI_ONE_VERSION_BACK:
+                case SAFARI_TWO_VERSIONS_BACK:
+                    return "mac os x";
                 case IE_10:
                 case IE_11:
                 case EDGE:

@@ -25,6 +25,7 @@ public class TestVGCloseAsync {
     public void TestCloseAsync() {
         EyesRunner runner = new VisualGridRunner(10);
         Eyes eyes = new Eyes(runner);
+        TestUtils.setupLogging(eyes);
         WebDriver driver = SeleniumUtils.createChromeDriver();
         driver.get("https://applitools.com/helloworld");
         try {
