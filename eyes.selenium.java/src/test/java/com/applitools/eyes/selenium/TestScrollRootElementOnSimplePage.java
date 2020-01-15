@@ -17,11 +17,6 @@ public class TestScrollRootElementOnSimplePage extends TestSetup {
     }
 
     @Test
-    public void TestCheckWindow_Simple_Body() {
-        getEyes().check("Body (" + stitchMode + " stitching)", Target.window().scrollRootElement(By.tagName("body")).fully());
-    }
-
-    @Test
     public void TestCheckWindow_Simple_Html() {
         getEyes().check("Html (" + stitchMode + " stitching)", Target.window().scrollRootElement(By.tagName("html")).fully());
     }

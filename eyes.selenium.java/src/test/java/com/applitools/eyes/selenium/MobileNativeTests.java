@@ -15,7 +15,6 @@ import java.net.URL;
 
 import static com.applitools.eyes.selenium.TestDataProvider.*;
 
-@Test()
 public class MobileNativeTests {
 
     private void setCapabilities(Eyes eyes, DesiredCapabilities capabilities, String methodName) {
