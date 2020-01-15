@@ -21,3 +21,8 @@ eyes.selenium.java/src/main/resources/processPage.js
 eyes.selenium.java/src/main/resources/processPageAndSerialize.js
 eyes.selenium.java/src/main/resources/processResource.js
 /.java-version
+
+*/bin
+*/.settings
+.project
+.classpath
