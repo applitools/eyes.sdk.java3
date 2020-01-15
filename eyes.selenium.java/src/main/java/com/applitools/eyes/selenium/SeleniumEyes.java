@@ -1682,11 +1682,15 @@ public class SeleniumEyes extends EyesBase implements ISeleniumEyes, IDriverProv
     @Override
     public RectangleSize getViewportSize() {
         RectangleSize vpSize;
-        if (imageProvider instanceof MobileScreenshotImageProvider) {
-            BufferedImage image = imageProvider.getImage();
-            vpSize = new RectangleSize((int) Math.round(image.getWidth() / devicePixelRatio), (int) Math.round(image.getHeight() / devicePixelRatio));
+        if (!EyesSeleniumUtils.isMobileDevice(driver)) {
+            if (imageProvider instanceof MobileScreenshotImageProvider) {
+                BufferedImage image = imageProvider.getImage();
+                vpSize = new RectangleSize((int) Math.round(image.getWidth() / devicePixelRatio), (int) Math.round(image.getHeight() / devicePixelRatio));
+            } else {
+                vpSize = EyesSeleniumUtils.getViewportSize(driver);
+            }
         } else {
-            vpSize = EyesSeleniumUtils.getViewportSize(driver);
+            vpSize = getViewportSize(driver);
         }
         return vpSize;
     }
@@ -1697,8 +1701,6 @@ public class SeleniumEyes extends EyesBase implements ISeleniumEyes, IDriverProv
      */
     static RectangleSize getViewportSize(WebDriver driver) {
         ArgumentGuard.notNull(driver, "driver");
-
-
         return EyesSeleniumUtils.getViewportSizeOrDisplaySize(new Logger(), driver);
     }
 
