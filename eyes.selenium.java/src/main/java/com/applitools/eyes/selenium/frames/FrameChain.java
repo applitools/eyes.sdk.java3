@@ -30,6 +30,9 @@ public class FrameChain implements Iterable<Frame> {
      */
     @SuppressWarnings("BooleanMethodIsAlwaysInverted")
     public static boolean isSameFrameChain(FrameChain c1, FrameChain c2) {
+        if (c1 == null) return c2 == null || c2.frames.size() == 0;
+        if (c2 == null) return c1.frames.size() == 0;
+
         int lc1 = c1.frames.size();
         int lc2 = c2.frames.size();
 
