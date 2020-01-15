@@ -42,59 +42,6 @@ public class TestMobileDevices implements ITest {
         this.testName = initTestName(deviceName, platformVersion, deviceOrientation, fully, this.page);
     }
 
-    @DataProvider(name = "IOSDevices", parallel = true)
-    public static Object[][] IOSDevices() {
-        List<Object[]> devices = new ArrayList<Object[]>(Arrays.asList(new Object[][]{
-                {"iPad Pro (9.7 inch) Simulator", "12.0", ScreenOrientation.LANDSCAPE, false},
-                {"iPhone XR Simulator", "12.2", ScreenOrientation.PORTRAIT, true}
-        }));
-        if (TestUtils.runOnCI) {
-            devices.addAll(Arrays.asList(new Object[][]{
-                    {"iPad Air 2 Simulator", "12.0", ScreenOrientation.LANDSCAPE, false},
-                    {"iPad Air 2 Simulator", "11.3", ScreenOrientation.LANDSCAPE, false},
-                    {"iPad Air 2 Simulator", "11.0", ScreenOrientation.LANDSCAPE, false},
-                    {"iPad Air 2 Simulator", "10.3", ScreenOrientation.LANDSCAPE, false},
-                    {"iPad Air 2 Simulator", "12.0", ScreenOrientation.PORTRAIT, false},
-                    {"iPad Air 2 Simulator", "11.3", ScreenOrientation.PORTRAIT, false},
-                    {"iPad Air 2 Simulator", "11.0", ScreenOrientation.PORTRAIT, false},
-                    {"iPad Air 2 Simulator", "10.3", ScreenOrientation.PORTRAIT, false},
-                    {"iPad Air Simulator", "12.0", ScreenOrientation.LANDSCAPE, false},
-                    {"iPad Air Simulator", "11.0", ScreenOrientation.PORTRAIT, true},
-                    {"iPad Simulator", "11.0", ScreenOrientation.LANDSCAPE, true},
-                    {"iPad Simulator", "11.0", ScreenOrientation.PORTRAIT, false},
-                    {"iPad (5th generation) Simulator", "11.0", ScreenOrientation.PORTRAIT, false},
-                    {"iPad Pro (9.7 inch) Simulator", "11.0", ScreenOrientation.LANDSCAPE, false},
-                    {"iPad Pro (9.7 inch) Simulator", "11.0", ScreenOrientation.LANDSCAPE, true},
-                    {"iPad Pro (12.9 inch) (2nd generation) Simulator", "11.0", ScreenOrientation.LANDSCAPE, false},
-                    {"iPad Pro (12.9 inch) (2nd generation) Simulator", "11.0", ScreenOrientation.PORTRAIT, true},
-                    {"iPad Pro (12.9 inch) (2nd generation) Simulator", "12.0", ScreenOrientation.PORTRAIT, true},
-                    {"iPad Pro (10.5 inch) Simulator", "11.0", ScreenOrientation.PORTRAIT, false},
-                    {"iPad Pro (10.5 inch) Simulator", "11.0", ScreenOrientation.LANDSCAPE, true},
-                    {"iPhone XS Max Simulator", "12.2", ScreenOrientation.LANDSCAPE, false},
-                    {"iPhone XS Max Simulator", "12.2", ScreenOrientation.LANDSCAPE, true},
-                    {"iPhone XS Max Simulator", "12.2", ScreenOrientation.PORTRAIT, false},
-                    {"iPhone XS Max Simulator", "12.2", ScreenOrientation.PORTRAIT, true},
-                    {"iPhone XS Simulator", "12.2", ScreenOrientation.PORTRAIT, false},
-                    {"iPhone XS Simulator", "12.2", ScreenOrientation.LANDSCAPE, false},
-                    {"iPhone XS Simulator", "12.2", ScreenOrientation.PORTRAIT, true},
-                    {"iPhone XS Simulator", "12.2", ScreenOrientation.LANDSCAPE, true},
-                    {"iPhone XR Simulator", "12.2", ScreenOrientation.PORTRAIT, false},
-                    {"iPhone XR Simulator", "12.2", ScreenOrientation.LANDSCAPE, false},
-                    {"iPhone XR Simulator", "12.2", ScreenOrientation.LANDSCAPE, true},
-                    {"iPhone X Simulator", "11.2", ScreenOrientation.PORTRAIT, false},
-                    {"iPhone X Simulator", "11.2", ScreenOrientation.PORTRAIT, true},
-                    {"iPhone 7 Simulator", "10.3", ScreenOrientation.PORTRAIT, true},
-                    {"iPhone 7 Plus Simulator", "10.3", ScreenOrientation.LANDSCAPE, false},
-                    {"iPhone 6 Plus Simulator", "11.0", ScreenOrientation.PORTRAIT, false},
-                    {"iPhone 6 Plus Simulator", "11.0", ScreenOrientation.LANDSCAPE, true},
-                    {"iPhone 5s Simulator", "10.3", ScreenOrientation.LANDSCAPE, false},
-                    {"iPhone 5s Simulator", "10.3", ScreenOrientation.LANDSCAPE, true}
-            }));
-        }
-        devices = addPageType(devices);
-        return devices.toArray(new Object[0][]);
-    }
-
     @DataProvider(name = "androidDevices", parallel = true)
     public static Object[][] androidDevices() {
         List<Object[]> devices = Arrays.asList(new Object[][]{
@@ -106,7 +53,7 @@ public class TestMobileDevices implements ITest {
     }
 
     protected void initEyes(String deviceName, String platformVersion, ScreenOrientation deviceOrientation, boolean fully,
-                          String platformName, String browserName, String page) {
+                            String platformName, String browserName, String page) {
         Eyes eyes = new Eyes();
 
         eyes.setBatch(TestDataProvider.batchInfo);
@@ -138,6 +85,7 @@ public class TestMobileDevices implements ITest {
 
             eyes.setStitchMode(StitchMode.CSS);
 
+            eyes.addProperty("Page", page);
             eyes.addProperty("Orientation", deviceOrientation.toString());
             eyes.addProperty("Stitched", fully ? "True" : "False");
             runTest(fully, eyes, testName, driver, page);
@@ -146,15 +94,12 @@ public class TestMobileDevices implements ITest {
         }
     }
 
-    private static List<Object[]> addPageType(List<Object[]> devices)
-    {
+    protected static List<Object[]> addPageType(List<Object[]> devices) {
         List<Object[]> devicesWithPage = new ArrayList<Object[]>();
-        for(String page : Arrays.asList(new String[]{"mobile", "desktop", "scrolled_mobile"}))
-        {
-            for(Object[] device : devices)
-            {
+        for (String page : Arrays.asList(new String[]{"mobile", "desktop", "scrolled_mobile"})) {
+            for (Object[] device : devices) {
                 Object[] params = new Object[device.length + 1];
-                for(int i=0; i < device.length; i++) params[i] = device[i];
+                for (int i = 0; i < device.length; i++) params[i] = device[i];
                 params[device.length] = page;
                 devicesWithPage.add(params);
             }
