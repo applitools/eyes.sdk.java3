@@ -24,11 +24,12 @@ import org.openqa.selenium.remote.RemoteWebDriver;
 import java.io.IOException;
 import java.net.URI;
 import java.util.*;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.concurrent.FutureTask;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-public class VisualGridEyes implements IRenderingEyes {
+public class VisualGridEyes implements ISeleniumEyes, IRenderingEyes {
 
     private static long DOM_EXTRACTION_TIMEOUT = 5 * 60 * 1000;
     private Logger logger;
@@ -129,6 +130,33 @@ public class VisualGridEyes implements IRenderingEyes {
         if (currentLogHandler.isOpen() && !logHandler.isOpen()) {
             logHandler.open();
         }
+    }
+
+    public LogHandler getLogHandler(){
+        if (getIsDisabled()) return NullLogHandler.instance;
+        return this.logger.getLogHandler();
+    }
+
+    public void apiKey(String apiKey){
+        setApiKey(apiKey);
+    }
+
+    public void serverUrl(String serverUrl){
+        setServerUrl(serverUrl);
+    }
+
+    public void serverUrl(URI serverUrl){
+        setServerUrl(serverUrl.toString());
+    }
+
+    @Override
+    public WebDriver open(WebDriver driver, String appName, String testName, RectangleSize viewportSize) throws EyesException {
+        IConfigurationSetter configSetter = (IConfigurationSetter)getConfigSetter().setAppName(appName).setTestName(testName);
+        if (viewportSize != null && !viewportSize.isEmpty())
+        {
+            configSetter.setViewportSize(new RectangleSize(viewportSize));
+        }
+        return open(driver);
     }
 
     public WebDriver open(WebDriver webDriver) {
@@ -268,18 +296,56 @@ public class VisualGridEyes implements IRenderingEyes {
         return null;
     }
 
-    public Collection<Future<TestResultContainer>> close(boolean throwException) {
-        if (!validateEyes()) return new ArrayList<>();
-        return closeAndReturnResults(throwException);
-    }
-
     public Collection<Future<TestResultContainer>> close() {
         if (!validateEyes()) return new ArrayList<>();
         return closeAndReturnResults(false);
     }
 
-    public Collection<Future<TestResultContainer>> abortIfNotClosed() {
-        return abortAndCollectTasks();
+    public TestResults close(boolean throwException) {
+        Collection<Future<TestResultContainer>> close = close();
+        return parseCloseFutures(close, throwException);
+    }
+
+    private TestResults parseCloseFutures(Collection<Future<TestResultContainer>> close, boolean shouldThrowException) {
+        if (close != null && !close.isEmpty()) {
+            TestResultContainer errorResult = null;
+            TestResultContainer firstResult = null;
+            try {
+                for (Future<TestResultContainer> closeFuture : close) {
+                    TestResultContainer testResultContainer = closeFuture.get();
+                    if (firstResult == null) {
+                        firstResult = testResultContainer;
+                    }
+                    Throwable error = testResultContainer.getException();
+                    if (error != null && errorResult == null) {
+                        errorResult = testResultContainer;
+                    }
+
+                }
+//                    return firstCloseFuture.get().getTestResults();
+            } catch (InterruptedException | ExecutionException e) {
+                e.printStackTrace();
+            }
+
+            if (errorResult != null) {
+                if (shouldThrowException) {
+                    throw new Error(errorResult.getException());
+                } else {
+                    return errorResult.getTestResults();
+                }
+            } else { // returning the first result
+                if (firstResult != null) {
+                    return firstResult.getTestResults();
+                }
+            }
+
+        }
+        return null;
+    }
+
+    public TestResults abortIfNotClosed() {
+        List<Future<TestResultContainer>> futures = abortAndCollectTasks();
+        return parseCloseFutures(futures, false);
     }
 
     public boolean getIsOpen() {
@@ -888,13 +954,6 @@ public class VisualGridEyes implements IRenderingEyes {
         }
     }
 
-    private void abort(Throwable e) {
-        for (RunningTest runningTest : testList) {
-            runningTest.abort(true, e);
-        }
-    }
-
-
     @SuppressWarnings("BooleanMethodIsAlwaysInverted")
     private boolean validateEyes() {
         if (isDisabled) {
@@ -927,9 +986,20 @@ public class VisualGridEyes implements IRenderingEyes {
         return this.getConfigGetter().getBatch().getId();
     }
 
+    private void abort(Throwable e) {
+        for (RunningTest runningTest : testList) {
+            runningTest.abort(true, e);
+        }
+    }
+
     public void abortAsync()
     {
         abortAndCollectTasks();
+    }
+
+    public TestResults abort() {
+        List<Future<TestResultContainer>> tasks = abortAndCollectTasks();
+        return parseCloseFutures(tasks, false);
     }
 
     private List<Future<TestResultContainer>> abortAndCollectTasks()

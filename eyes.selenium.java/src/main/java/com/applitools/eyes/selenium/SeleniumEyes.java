@@ -35,13 +35,14 @@ import org.openqa.selenium.Point;
 import org.openqa.selenium.remote.RemoteWebDriver;
 
 import java.awt.image.BufferedImage;
+import java.net.URI;
 import java.util.*;
 
 /**
  * The main API gateway for the SDK.
  */
 @SuppressWarnings("WeakerAccess")
-public class SeleniumEyes extends EyesBase implements IDriverProvider, IBatchCloser {
+public class SeleniumEyes extends EyesBase implements ISeleniumEyes, IDriverProvider, IBatchCloser {
 
     private FrameChain originalFC;
     private WebElement scrollRootElement;
@@ -132,6 +133,17 @@ public class SeleniumEyes extends EyesBase implements IDriverProvider, IBatchClo
         return "eyes.selenium.java/3.158.9";
     }
 
+    public void apiKey(String apiKey){
+        setApiKey(apiKey);
+    }
+
+    public void serverUrl(String serverUrl){
+        setServerUrl(serverUrl);
+    }
+
+    public void serverUrl(URI serverUrl){
+        setServerUrl(serverUrl);
+    }
     /**
      * Gets driver.
      * @return the driver
@@ -221,13 +233,24 @@ public class SeleniumEyes extends EyesBase implements IDriverProvider, IBatchClo
         return devicePixelRatio;
     }
 
+    @Override
+    public WebDriver open(WebDriver driver, String appName, String testName, RectangleSize viewportSize) throws EyesException {
+        IConfigurationSetter configSetter = (IConfigurationSetter)getConfigSetter().setAppName(appName).setTestName(testName);
+        if (viewportSize != null && !viewportSize.isEmpty())
+        {
+            configSetter.setViewportSize(new RectangleSize(viewportSize));
+        }
+        return open(driver);
+    }
+
     /**
      * Open web driver.
      * @param driver the driver
      * @return the web driver
      * @throws EyesException the eyes exception
      */
-    protected WebDriver open(WebDriver driver) throws EyesException {
+    public WebDriver open(WebDriver driver) throws EyesException {
+
         openLogger();
         this.cachedAUTSessionId = null;
 
@@ -238,13 +261,9 @@ public class SeleniumEyes extends EyesBase implements IDriverProvider, IBatchClo
 
         initDriver(driver);
 
-        screenshotFactory = new EyesWebDriverScreenshotFactory(logger, this.driver);
+        this.jsExecutor = new SeleniumJavaScriptExecutor(this.driver);
 
-        ensureViewportSize();
-
-        openBase();
-
-        String uaString = sessionStartInfo.getEnvironment().getInferred();
+        String uaString = this.driver.getUserAgent();
         if (uaString != null) {
             if (uaString.startsWith("useragent:")) {
                 uaString = uaString.substring(10);
@@ -252,18 +271,35 @@ public class SeleniumEyes extends EyesBase implements IDriverProvider, IBatchClo
             userAgent = UserAgent.ParseUserAgentString(uaString, true);
         }
 
-        this.jsExecutor = new SeleniumJavaScriptExecutor(this.driver);
-        updateScalingParams();
+        initDevicePixelRatio();
 
+        screenshotFactory = new EyesWebDriverScreenshotFactory(logger, this.driver);
         imageProvider = ImageProviderFactory.getImageProvider(userAgent, this, logger, this.driver);
         sizeAdjuster = ImageProviderFactory.getImageSizeAdjuster(userAgent, jsExecutor);
         regionPositionCompensation = RegionPositionCompensationFactory.getRegionPositionCompensation(userAgent, this, logger);
 
-        ArgumentGuard.notNull(driver, "driver");
+        openBase();
+
+        //updateScalingParams();
 
         this.driver.setRotation(rotation);
         this.runner.addBatch(this.getConfigGetter().getBatch().getId(), this);
         return this.driver;
+    }
+
+    private void initDevicePixelRatio()
+    {
+        logger.verbose("Trying to extract device pixel ratio...");
+        try
+        {
+            devicePixelRatio = EyesSeleniumUtils.getDevicePixelRatio(this.jsExecutor);
+        }
+        catch (Exception ex)
+        {
+            logger.verbose("Failed to extract device pixel ratio! Using default.");
+            devicePixelRatio = DEFAULT_DEVICE_PIXEL_RATIO;
+        }
+        logger.verbose("Device pixel ratio: " + devicePixelRatio);
     }
 
     private void ensureViewportSize() {
@@ -1661,6 +1697,8 @@ public class SeleniumEyes extends EyesBase implements IDriverProvider, IBatchClo
      */
     static RectangleSize getViewportSize(WebDriver driver) {
         ArgumentGuard.notNull(driver, "driver");
+
+
         return EyesSeleniumUtils.getViewportSizeOrDisplaySize(new Logger(), driver);
     }
 
