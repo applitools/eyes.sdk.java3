@@ -13,10 +13,7 @@ import java.awt.image.BufferedImage;
 import java.awt.image.DataBuffer;
 import java.awt.image.DataBufferByte;
 import java.awt.image.Raster;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.IOException;
+import java.io.*;
 import java.nio.charset.Charset;
 
 public class ImageUtils {
@@ -104,6 +101,28 @@ public class ImageUtils {
             throw new EyesException(
                     "Failed to to load the image from resource: " + resource,
                     e);
+        }
+        return image;
+    }
+
+    /**
+     * Creates a {@link BufferedImage} from an input stream specified by {@code
+     * stream}.
+     * @param stream The input stream.
+     * @return A {@code BufferedImage} instance.
+     * @throws EyesException If there was a problem
+     *                       creating the {@code BufferedImage} instance.
+     */
+    public static BufferedImage imageFromStream(InputStream stream) throws
+            EyesException {
+        BufferedImage image;
+        try {
+            image = ImageIO.read(stream);
+            // Make sure the image is of the correct type
+            image = normalizeImageType(image);
+        } catch (IOException e) {
+            throw new EyesException(
+                    "Failed to to load the image from stream.", e);
         }
         return image;
     }
@@ -225,6 +244,20 @@ public class ImageUtils {
         g.dispose();
 
         return normalizeImageType(rotatedImage);
+    }
+
+    public static boolean areImagesEqual(BufferedImage img1, BufferedImage img2) {
+        if (img1.getWidth() == img2.getWidth() && img1.getHeight() == img2.getHeight()) {
+            for (int x = 0; x < img1.getWidth(); x++) {
+                for (int y = 0; y < img1.getHeight(); y++) {
+                    if (img1.getRGB(x, y) != img2.getRGB(x, y))
+                        return false;
+                }
+            }
+        } else {
+            return false;
+        }
+        return true;
     }
 
     /**

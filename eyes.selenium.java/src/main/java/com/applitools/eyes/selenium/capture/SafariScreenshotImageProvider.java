@@ -75,7 +75,7 @@ public class SafariScreenshotImageProvider extends MobileScreenshotImageProvider
         return image;
     }
 
-    static BufferedImage cropIOSImage(BufferedImage image, RectangleSize originalViewportSize, Logger logger)
+    public static BufferedImage cropIOSImage(BufferedImage image, RectangleSize originalViewportSize, Logger logger)
     {
         if (logger == null) logger = new Logger();
 
