@@ -210,4 +210,13 @@
             </class>
         </classes>
     </test>
+    <test name="TestVGCloseAsync" parallel="methods">
+        <classes>
+            <class name="com.applitools.eyes.renderingGrid.TestVGCloseAsync">
+                <methods>
+                    <include name="TestCloseAsync"/>
+                </methods>
+            </class>
+        </classes>
+    </test>
 </suite>
