@@ -651,7 +651,9 @@ public class SeleniumEyes extends EyesBase implements IDriverProvider, IBatchClo
             ArgumentGuard.notNull(checkSettings, "checkSettings");
             ArgumentGuard.notOfType(checkSettings, ISeleniumCheckTarget.class, "checkSettings");
 
-            if (!EyesSeleniumUtils.isMobileDevice(driver)) {
+            boolean isMobileDevice = EyesSeleniumUtils.isMobileDevice(driver);
+
+            if (!isMobileDevice) {
                 logger.verbose("URL: " + driver.getCurrentUrl());
             }
 
@@ -671,7 +673,10 @@ public class SeleniumEyes extends EyesBase implements IDriverProvider, IBatchClo
 
             logger.verbose("setting scrollRootElement...");
             this.scrollRootElement = getScrollRootElement(seleniumCheckTarget, driver);
-            WebElement documentElement = driver.findElement(By.tagName("html"));
+            WebElement documentElement = null;
+            if (!isMobileDevice) {
+                documentElement = driver.findElement(By.tagName("html"));
+            }
             logger.verbose("scrollRootElement_ set to " + scrollRootElement);
 
             this.elementPositionProvider = null;
@@ -686,7 +691,7 @@ public class SeleniumEyes extends EyesBase implements IDriverProvider, IBatchClo
 
             EyesTargetLocator switchTo = null;
             String source = null;
-            if (!EyesSeleniumUtils.isMobileDevice(this.driver)) {
+            if (!isMobileDevice) {
                 switchTo = (EyesTargetLocator) driver.switchTo();
                 source = driver.getCurrentUrl();
             }
@@ -708,7 +713,7 @@ public class SeleniumEyes extends EyesBase implements IDriverProvider, IBatchClo
                     logger.verbose("have target element");
                     this.targetElement = targetElement;
                     this.checkElement(this.targetElement, name, checkSettings, source);
-                } else if (seleniumCheckTarget.getFrameChain().size() > 0 || !this.scrollRootElement.equals(documentElement)) {
+                } else if (!isMobileDevice && (seleniumCheckTarget.getFrameChain().size() > 0 || !this.scrollRootElement.equals(documentElement))) {
                     logger.verbose("have frame chain");
                     if (this.stitchContent) {
                         this.targetElement = getCurrentFrameScrollRootElement();
@@ -726,18 +731,22 @@ public class SeleniumEyes extends EyesBase implements IDriverProvider, IBatchClo
                 } else {
                     logger.verbose("default case");
                     // required to prevent cut line on the last stitched part of the page on some browsers (like firefox).
-                    switchTo.defaultContent();
+                    if (!isMobileDevice) {
+                        switchTo.defaultContent();
+                    }
                     Location curPos = null;
                     currentFramePositionProvider = PositionProviderFactory.getPositionProvider(logger, getConfigGetter().getStitchMode(), jsExecutor, scrollRootElement, userAgent);
-                    if (this.stitchContent) {
+                    if (!isMobileDevice && this.stitchContent) {
                         String curPosStr = (String) driver.executeScript("var e = document.documentElement; var curPos = e.scrollLeft+';'+e.scrollTop; if (e.scrollTo) {e.scrollTo(0,0);} else {e.scrollTop=0;e.scrollLeft=0;} return curPos;");
                         curPos = ScrollPositionProvider.parseLocationString(curPosStr);
                     }
                     checkWindowBase(RegionProvider.NULL_INSTANCE, name, false, checkSettings, source);
-                    if (this.stitchContent) {
-                        driver.executeScript("var e = document.documentElement; if (e.scrollTo) {e.scrollTo(" + curPos.getX() + "," + curPos.getY() + ");} else {e.scrollLeft=" + curPos.getX() + ";e.scrollTop=" + curPos.getX() + ";}");
+                    if (!isMobileDevice) {
+                        if (this.stitchContent) {
+                            driver.executeScript("var e = document.documentElement; if (e.scrollTo) {e.scrollTo(" + curPos.getX() + "," + curPos.getY() + ");} else {e.scrollLeft=" + curPos.getX() + ";e.scrollTop=" + curPos.getX() + ";}");
+                        }
+                        switchTo.frames(originalFC);
                     }
-                    switchTo.frames(originalFC);
                 }
                 this.targetElement = null;
             }
@@ -1086,7 +1095,7 @@ public class SeleniumEyes extends EyesBase implements IDriverProvider, IBatchClo
         WebElement scrollRootElement = null;
         if (currentFrame != null) {
             scrollRootElement = currentFrame.getScrollRootElement();
-        } else {
+        } else if (FrameChain.isSameFrameChain(fc, this.originalFC)) {
             scrollRootElement = this.scrollRootElement;
         }
 
@@ -1249,11 +1258,13 @@ public class SeleniumEyes extends EyesBase implements IDriverProvider, IBatchClo
     /**
      * Switches into the given frame, takes a snapshot of the application under
      * test and matches a region specified by the given selector.
-     * @param framePath     The path to the frame to check. This is a list of                      frame names/IDs (where each frame is nested in the previous frame).
+     * @param framePath     The path to the frame to check. This is a list of
+     *                      frame names/IDs (where each frame is nested in the previous frame).
      * @param selector      A Selector specifying the region to check.
      * @param matchTimeout  The amount of time to retry matching (milliseconds).
      * @param tag           An optional tag to be associated with the snapshot.
-     * @param stitchContent Whether or not to stitch the internal content of the                      region (i.e., perform {@link #checkElement(By, int, String)} on the region.
+     * @param stitchContent Whether or not to stitch the internal content of the
+     *                      region (i.e., perform {@link #checkElement(By, int, String)} on the region.
      */
     public void checkRegionInFrame(String[] framePath, By selector,
                                    int matchTimeout, String tag,
@@ -1271,6 +1282,10 @@ public class SeleniumEyes extends EyesBase implements IDriverProvider, IBatchClo
         // Since the element might already have been found using EyesWebDriver.
         final EyesRemoteWebElement eyesElement = (element instanceof EyesRemoteWebElement) ?
                 (EyesRemoteWebElement) element : new EyesRemoteWebElement(logger, driver, element);
+
+        if (EyesSeleniumUtils.isMobileDevice(driver)) {
+            return checkNativeElement(eyesElement, name, checkSettings, source);
+        }
 
         String displayStyle = eyesElement.getComputedStyle("display");
         RectangleSize scrollSize = eyesElement.getScrollSize();
@@ -1379,7 +1394,7 @@ public class SeleniumEyes extends EyesBase implements IDriverProvider, IBatchClo
             fullElementBounds = fullElementBounds.offset(memento.getX(), memento.getY());
 
             Location elementLocation = elementBounds.getLocation();
-            elementLocation.offset(-effectiveViewport.getLeft(), -effectiveViewport.getTop());
+            elementLocation = elementLocation.offset(-effectiveViewport.getLeft(), -effectiveViewport.getTop());
 
             offset = positionProvider.setPosition(elementLocation);
             logger.verbose("offset: " + offset);
@@ -1447,6 +1462,21 @@ public class SeleniumEyes extends EyesBase implements IDriverProvider, IBatchClo
         if (originalOverflow != null) {
             eyesElement.setOverflow(originalOverflow);
         }
+
+        return result;
+    }
+
+    private MatchResult checkNativeElement(EyesRemoteWebElement eyesElement, String name, ICheckSettings checkSettings, String source) {
+
+        final Rectangle rect = eyesElement.getRect();
+
+        MatchResult result = checkWindowBase(new RegionProvider() {
+            public Region getRegion(ICheckSettingsInternal settings) {
+                Region result = settings.getTargetRegion();
+                if (result == null) result = new Region(rect.x, rect.y, rect.width, rect.height);
+                return result;
+            }
+        }, name, false, checkSettings, source);
 
         return result;
     }
@@ -1850,49 +1880,6 @@ public class SeleniumEyes extends EyesBase implements IDriverProvider, IBatchClo
         return result;
     }
 
-    private EyesWebDriverScreenshot getFullPageScreenshot(ScaleProviderFactory scaleProviderFactory, FrameChain originalFrameChain, EyesTargetLocator switchTo) {
-        EyesWebDriverScreenshot result;
-        logger.verbose("ForceFullPageScreenshot || stitchContent_ - enter");
-        // Save the current frame path.
-        Location originalFramePosition = originalFrameChain.size() > 0 ? originalFrameChain.getDefaultContentScrollPosition() : Location.ZERO;
-
-        switchTo.frames(this.originalFC);
-        FullPageCaptureAlgorithm algo = createFullPageCaptureAlgorithm(scaleProviderFactory);
-
-        EyesRemoteWebElement eyesScrollRootElement;
-        if (scrollRootElement instanceof EyesRemoteWebElement) {
-            eyesScrollRootElement = (EyesRemoteWebElement) scrollRootElement;
-        } else {
-            eyesScrollRootElement = new EyesRemoteWebElement(logger, driver, scrollRootElement);
-        }
-
-        WebElement scrollRootElement = getCurrentFrameScrollRootElement();
-        PositionProvider originProvider = new ScrollPositionProvider(logger, jsExecutor, scrollRootElement);
-        logger.verbose("resetting originProvider location");
-        originProvider.setPosition(Location.ZERO);
-
-        Point location = eyesScrollRootElement.getLocation();
-        SizeAndBorders sizeAndBorders = eyesScrollRootElement.getSizeAndBorders();
-
-        Region region = new Region(
-                location.getX() + sizeAndBorders.getBorders().getLeft(),
-                location.getY() + sizeAndBorders.getBorders().getTop(),
-                sizeAndBorders.getSize().getWidth(),
-                sizeAndBorders.getSize().getHeight());
-
-        PositionProvider positionProvider = positionProviderHandler.get();
-        if (positionProvider instanceof ISeleniumPositionProvider) {
-            jsExecutor.executeScript("var e = arguments[0]; if (e != null) e.setAttribute('data-applitools-scroll','true');",
-                    ((ISeleniumPositionProvider) positionProvider).getScrolledElement());
-        }
-        BufferedImage fullPageImage = algo.getStitchedRegion(region, Region.EMPTY, positionProvider);
-
-        switchTo.frames(originalFrameChain);
-
-        result = new EyesWebDriverScreenshot(logger, driver, fullPageImage, null, originalFramePosition);
-        return result;
-    }
-
     private EyesWebDriverScreenshot getElementScreenshot(ScaleProviderFactory scaleProviderFactory, EyesTargetLocator switchTo) {
         EyesWebDriverScreenshot result;
         List<PositionProviderAndMemento> ppams = null;
@@ -2063,10 +2050,16 @@ public class SeleniumEyes extends EyesBase implements IDriverProvider, IBatchClo
     }
 
     private PositionProvider getElementPositionProvider(WebElement scrollRootElement) {
-        PositionProvider positionProvider = ((EyesRemoteWebElement) scrollRootElement).getPositionProvider();
+        EyesRemoteWebElement eyesScrollRootElement = (EyesRemoteWebElement) scrollRootElement;
+        PositionProvider positionProvider = eyesScrollRootElement.getPositionProvider();
         if (positionProvider == null) {
-            positionProvider = createPositionProvider(scrollRootElement);
-            ((EyesRemoteWebElement) scrollRootElement).setPositionProvider(positionProvider);
+            logger.verbose("creating a new position provider.");
+            if (scrollRootElement.getTagName().equalsIgnoreCase("html")) {
+                positionProvider = PositionProviderFactory.getPositionProvider(logger, configurationProvider.get().getStitchMode(), jsExecutor, scrollRootElement, userAgent);
+            } else {
+                positionProvider = new ElementPositionProvider(logger, driver, eyesScrollRootElement);
+            }
+            eyesScrollRootElement.setPositionProvider(positionProvider);
         }
         logger.verbose("position provider: " + positionProvider);
         currentFramePositionProvider = positionProvider;
