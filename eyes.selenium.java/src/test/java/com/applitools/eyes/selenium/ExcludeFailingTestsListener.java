@@ -31,7 +31,6 @@ public class ExcludeFailingTestsListener implements IInvokedMethodListener2 {
                 testData = ((TestMobileDevices) testInstance).deviceName
                         + "+" + ((TestMobileDevices) testInstance).platformVersion
                         + "+" + ((TestMobileDevices) testInstance).deviceOrientation.toString()
-                        + "+" + Boolean.toString(((TestMobileDevices) testInstance).fully)
                         + "+" + ((TestMobileDevices) testInstance).page;
                 handleTests(iTestResult, testParameters, testData);
             }
