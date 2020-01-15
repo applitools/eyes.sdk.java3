@@ -99,11 +99,8 @@ public class TestMobileDevices implements ITest {
         ChromeMobileEmulationDeviceSettings mobileSettings = chromeSimulationData.get(deviceName + ";" + platformVersion + ";" + deviceOrientation);
         WebDriver driver = null;
         if (mobileSettings != null) {
-            Map<String, Object> mobileEmulationSettings = new HashMap<>();
-            mobileEmulationSettings.put("deviceMetrics", mobileSettings.toMap());
-
             ChromeOptions options = new ChromeOptions();
-            options.setExperimentalOption("mobileEmulation", mobileEmulationSettings);
+            options.setExperimentalOption("mobileEmulation", mobileSettings.toMap());
             options.setExperimentalOption("w3c", false);
             driver = SeleniumUtils.createChromeDriver(options);
         }
@@ -334,15 +331,21 @@ public class TestMobileDevices implements ITest {
     }
 
     private static class ChromeMobileEmulationDeviceSettings {
+        private Map<String, Object> map;
+
         public ChromeMobileEmulationDeviceSettings(String userAgent, int width, int height, int pixelRatio) {
+            Map<String,Object> deviceMetrics = new HashMap<>();
+            deviceMetrics.put("width", width);
+            deviceMetrics.put("height", height);
+            deviceMetrics.put("pixelRatio", pixelRatio);
+
             map = new HashMap<>();
-            map.put("UserAgent", userAgent);
-            map.put("Width", width);
-            map.put("Height", height);
-            map.put("PixelRatio", pixelRatio);
+            map.put("deviceMetrics", deviceMetrics);
+            map.put("userAgent", userAgent);
         }
 
-        private Map<String, Object> map;
-        public Map<String, Object> toMap() { return map;}
+        public Map<String, Object> toMap() {
+            return map;
+        }
     }
 }
