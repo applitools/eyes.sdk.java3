@@ -1,6 +1,6 @@
 <!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd" >
 
-<suite name="passed tests" verbose="1" parallel="methods" thread-count="20">
+<suite name="passed tests" verbose="1" parallel="tests" thread-count="20">
     <test name="TestMobileDevicesIOS">
         <classes>
             <class name="com.applitools.eyes.selenium.TestMobileDevicesIOS">
