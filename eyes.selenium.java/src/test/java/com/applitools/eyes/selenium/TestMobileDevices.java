@@ -303,16 +303,16 @@ public class TestMobileDevices implements ITest {
         return devicesWithPage;
     }
 
-    private static void runTest(boolean fully, Eyes eyes, String testName, WebDriver driver, String page) {
+    private static TestResults runTest(boolean fully, Eyes eyes, String testName, WebDriver driver, String page) {
         try {
             driver.get("https://applitools.github.io/demo/TestPages/DynamicResolution/" + page + ".html");
             eyes.open(driver, "Eyes Selenium SDK - iOS Safari Cropping", testName);
             //eyes.Check("Initial view", Target.Region(By.CssSelector("div.page")).Fully(fully).SendDom(false));
             eyes.check(Target.window().fully(fully));
             TestResults result = eyes.close();
-
-            SessionId session = ((RemoteWebDriver) driver).getSessionId();
-            CommUtils.putTestResultJsonToSauceLabs(new PassedResult(result.isPassed()), session.toString());
+            return result;
+            //SessionId session = ((RemoteWebDriver) driver).getSessionId();
+            //CommUtils.putTestResultJsonToSauceLabs(new PassedResult(result.isPassed()), session.toString());
         } finally {
             eyes.abort();
             driver.quit();
