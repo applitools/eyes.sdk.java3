@@ -12,6 +12,7 @@ import org.testng.annotations.Test;
 
 import java.awt.image.BufferedImage;
 import java.io.File;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -58,17 +59,25 @@ public class TestIOSCrop {
     @Test(dataProvider = "IOSDevices")
     public void TestIOSSafariCrop(String deviceName, String platformVersion, ScreenOrientation deviceOrientation, int vpWidth, int vpHeight) {
         String testName = deviceName + " " + platformVersion + " " + deviceOrientation;
-
-        BufferedImage input = ImageUtils.imageFromStream(TestIOSCrop.class.getResourceAsStream("/IOSImages/Input/" + testName + ".png"));
-        BufferedImage expected = ImageUtils.imageFromStream(TestIOSCrop.class.getResourceAsStream("/IOSImages/Expected/" + testName + ".png"));
+        String sanitizedTestName = testName.replaceAll("[^\\.A-Za-z0-9]", "_");
 
         Logger logger = new Logger();
+        logger.setLogHandler(TestUtils.initLogger(testName));
+
+        logger.log("looking for resource: '/IOSImages/Input/" + sanitizedTestName + ".png'");
+        InputStream inputStream = TestIOSCrop.class.getResourceAsStream("/IOSImages/Input/" + sanitizedTestName + ".png");
+        BufferedImage input = ImageUtils.imageFromStream(inputStream);
+
+        logger.log("looking for resource: '/IOSImages/Expected/" + sanitizedTestName + ".png'");
+        InputStream expectedStream = TestIOSCrop.class.getResourceAsStream("/IOSImages/Expected/" + sanitizedTestName + ".png");
+        BufferedImage expected = ImageUtils.imageFromStream(expectedStream);
+
         if (input != null && expected != null) {
             BufferedImage output = SafariScreenshotImageProvider.cropIOSImage(input, new RectangleSize(vpWidth, vpHeight), logger);
             if (!TestUtils.runOnCI) {
-                String inputPath = TestUtils.logsPath + File.separator + "java" + File.separator + "IOSCrop" + File.separator + testName + "_input.png";
+                String inputPath = TestUtils.logsPath + File.separator + "java" + File.separator + "IOSCrop" + File.separator + sanitizedTestName + "_input.png";
                 ImageUtils.saveImage(logger, input, inputPath);
-                String outputPath = TestUtils.logsPath + File.separator + "java" + File.separator + "IOSCrop" + File.separator + testName + "_output.png";
+                String outputPath = TestUtils.logsPath + File.separator + "java" + File.separator + "IOSCrop" + File.separator + sanitizedTestName + "_output.png";
                 ImageUtils.saveImage(logger, output, outputPath);
             }
             Assert.assertEquals(output.getWidth(), expected.getWidth(), "Width");
