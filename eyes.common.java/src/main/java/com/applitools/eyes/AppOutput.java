@@ -5,7 +5,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 /**
  * An application output (title, image, etc).
  */
-@JsonIgnoreProperties({"screenshot64"})
+@JsonIgnoreProperties({"screenshotBytes"})
 public class AppOutput {
 
     /**
@@ -14,17 +14,17 @@ public class AppOutput {
     private final String title;
     private final String domUrl;
     private final String screenshotUrl;
-    private final String screenshot64;
+    private final byte[] screenshotBytes;
 
     /**
-     * @param title         The title of the window.
-     * @param screenshot64  Base64 encoding of the screenshot's bytes.
-     * @param domUrl        A URL to a DOM snapshot.
-     * @param screenshotUrl A URL to a screenshot.
+     * @param title           The title of the window.
+     * @param screenshotBytes The screenshot's bytes.
+     * @param domUrl          A URL to a DOM snapshot.
+     * @param screenshotUrl   A URL to a screenshot.
      */
-    public AppOutput(String title, String screenshot64, String domUrl, String screenshotUrl) {
+    public AppOutput(String title, byte[] screenshotBytes, String domUrl, String screenshotUrl) {
         this.title = title;
-        this.screenshot64 = screenshot64;
+        this.screenshotBytes = screenshotBytes;
         this.domUrl = domUrl;
         this.screenshotUrl = screenshotUrl;
     }
@@ -33,8 +33,8 @@ public class AppOutput {
         return title;
     }
 
-    public String getScreenshot64() {
-        return screenshot64;
+    public byte[] getScreenshotBytes() {
+        return screenshotBytes;
     }
 
     public String getDomUrl() {

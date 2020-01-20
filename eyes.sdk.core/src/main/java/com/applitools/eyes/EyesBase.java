@@ -1388,16 +1388,15 @@ public abstract class EyesBase implements IEyesBase{
             debugScreenshotsProvider.save(screenshot.getImage(), "SUB_SCREENSHOT");
         }
 
-        logger.verbose("Compressing screenshot...");
+        logger.verbose("Getting image bytes (encoded as PNG)...");
         BufferedImage screenshotImage = screenshot.getImage();
-        byte[] pngBytes = ImageUtils.encodeAsPng(screenshotImage);
-        String compressResult = Base64.encodeBase64String(pngBytes);
+        byte[] screenshotBytes = ImageUtils.encodeAsPng(screenshotImage);
 
         logger.verbose("Done! Getting title...");
         String title = getTitle();
         logger.verbose("Done!");
 
-        AppOutputWithScreenshot result = new AppOutputWithScreenshot(new AppOutput(title, compressResult, screenshot.domUrl, null), screenshot, location);
+        AppOutputWithScreenshot result = new AppOutputWithScreenshot(new AppOutput(title, screenshotBytes, screenshot.domUrl, null), screenshot, location);
         logger.verbose("Done!");
         return result;
     }
