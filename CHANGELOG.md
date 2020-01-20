@@ -1,6 +1,7 @@
 ### Updated
 - Capture scripts. [Trello 151](https://trello.com/c/owyVIQG9)
 - Upload images directly to storage service on MatchWindow. [Trello 1461](https://trello.com/c/1V5X9O37)
+- Visual Grid: Added older versions support for Chrome, Firefox and Safari browsers. [Trello 1479](https://trello.com/c/kwsR1zql)
 
 ### Fixed
 - Added missing method: abortAsync. [Trello 1420](https://trello.com/c/3NOKuLLj)
