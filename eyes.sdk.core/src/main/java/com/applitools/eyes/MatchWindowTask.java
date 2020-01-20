@@ -164,12 +164,59 @@ public class MatchWindowTask {
                 ignoreMismatch, options, agentSetupStr, renderId);
 
 
+        if (!tryUploadImage(data)) {
+            throw new EyesException("matchWindow failed: could not upload image to storage service.");
+        }
         // Perform match.
         return serverConnector.matchWindow(runningSession, data);
     }
 
-    private void collectRegions(ImageMatchSettings imageMatchSettings, ICheckSettingsInternal checkSettingsInternal)
-    {
+    private boolean tryUploadImage(MatchWindowData matchData) {
+        if (matchData.getAppOutput().getScreenshotUrl() != null) {
+            return true;
+        }
+
+        String imageTargetUrl;
+
+        // Getting the screenshot's bytes
+        byte[] screenshotBytes = matchData.getAppOutput().getScreenshotBytes();
+
+        RenderingInfo renderingInfo = serverConnector.getRenderInfo();
+        if (renderingInfo != null && (imageTargetUrl = renderingInfo.getResultsUrl()) != null) {
+            try {
+                UUID uuid = UUID.randomUUID();
+                imageTargetUrl = imageTargetUrl.replace("__random__", uuid.toString());
+                logger.verbose("uploading image to " + imageTargetUrl);
+
+                int retriesLeft = 3;
+                int wait = 500;
+                while (retriesLeft-- > 0) {
+                    try {
+                        int statusCode = serverConnector.uploadImage(screenshotBytes, renderingInfo, imageTargetUrl);
+                        if (statusCode == 200 || statusCode == 201) {
+                            matchData.getAppOutput().setScreenshotUrl(imageTargetUrl);
+                            logger.verbose("upload image guid " + uuid + "complete.");
+                            return true;
+                        }
+                        if (statusCode < 500) {
+                            break;
+                        }
+                    } catch (Exception e) {
+                        if (retriesLeft == 0) throw e;
+                    }
+                    Thread.sleep(wait);
+                    wait *= 2;
+                    wait = Math.min(10000, wait);
+                }
+            } catch (Exception e) {
+                logger.log("Error uploading image");
+                GeneralUtils.logExceptionStackTrace(logger, e);
+            }
+        }
+        return false;
+    }
+
+    private void collectRegions(ImageMatchSettings imageMatchSettings, ICheckSettingsInternal checkSettingsInternal) {
         imageMatchSettings.setIgnoreRegions(convertSimpleRegions(checkSettingsInternal.getIgnoreRegions(), imageMatchSettings.getIgnoreRegions()));
         imageMatchSettings.setContentRegions(convertSimpleRegions(checkSettingsInternal.getContentRegions(), imageMatchSettings.getContentRegions()));
         imageMatchSettings.setLayoutRegions(convertSimpleRegions(checkSettingsInternal.getLayoutRegions(), imageMatchSettings.getLayoutRegions()));

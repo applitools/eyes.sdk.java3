@@ -317,11 +317,6 @@ public class ServerConnector extends RestClient
             throw new EyesException("Failed create binary model from JSON!", e);
         }
 
-        // Getting the screenshot's bytes (notice this can be either
-        // compressed/uncompressed form).
-        byte[] screenshot = Base64.decodeBase64(
-                matchData.getAppOutput().getScreenshot64());
-
         // Ok, let's create the request model
         ByteArrayOutputStream requestOutputStream = new ByteArrayOutputStream();
         DataOutputStream requestDos = new DataOutputStream(requestOutputStream);
@@ -330,9 +325,6 @@ public class ServerConnector extends RestClient
             requestDos.writeInt(jsonBytes.length);
             requestDos.flush();
             requestOutputStream.write(jsonBytes);
-            if (screenshot != null) {
-                requestOutputStream.write(screenshot);
-            }
             requestOutputStream.flush();
 
             // Ok, get the model bytes
@@ -358,7 +350,22 @@ public class ServerConnector extends RestClient
                 MatchResult.class);
 
         return result;
+    }
 
+    @Override
+    public int uploadImage(byte[] screenshotBytes, RenderingInfo renderingInfo, String imageTargetUrl) {
+        WebTarget target = restClient.target(imageTargetUrl);
+        Invocation.Builder request = target
+                .request("image/png")
+                .accept("image/png")
+                .header("X-Auth-Token", renderingInfo.getAccessToken())
+                .header("x-ms-blob-type", "BlockBlob");
+
+        Response response = request.put(Entity.entity(screenshotBytes, "image/png"));
+        int statusCode = response.getStatus();
+        response.close();
+        logger.verbose("Upload Status Code: " + statusCode);
+        return statusCode;
     }
 
     @Override
@@ -520,17 +527,18 @@ public class ServerConnector extends RestClient
 
     @Override
     public RenderingInfo getRenderInfo() {
+        if (renderingInfo == null) {
+            String apiKey = getApiKey();
+            WebTarget target = restClient.target(serverUrl).path((RENDER_INFO_PATH)).queryParam("apiKey", apiKey);
+            Invocation.Builder request = target.request(MediaType.APPLICATION_JSON);
 
-        String apiKey = getApiKey();
-        WebTarget target = restClient.target(serverUrl).path((RENDER_INFO_PATH)).queryParam("apiKey", apiKey);
-        Invocation.Builder request = target.request(MediaType.APPLICATION_JSON);
+            // Ok, let's create the running session from the response
+            List<Integer> validStatusCodes = new ArrayList<>();
+            validStatusCodes.add(Response.Status.OK.getStatusCode());
 
-        // Ok, let's create the running session from the response
-        List<Integer> validStatusCodes = new ArrayList<>();
-        validStatusCodes.add(Response.Status.OK.getStatusCode());
-
-        Response response = request.get();
-        renderingInfo = parseResponseWithJsonData(response, validStatusCodes, RenderingInfo.class);
+            Response response = request.get();
+            renderingInfo = parseResponseWithJsonData(response, validStatusCodes, RenderingInfo.class);
+        }
         return renderingInfo;
     }
 

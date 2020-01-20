@@ -182,4 +182,6 @@ public interface IServerConnector {
     void closeConnector();
 
     boolean getDontCloseBatches();
+
+    int uploadImage(byte[] screenshotBytes, RenderingInfo renderingInfo, String imageTargetUrl);
 }

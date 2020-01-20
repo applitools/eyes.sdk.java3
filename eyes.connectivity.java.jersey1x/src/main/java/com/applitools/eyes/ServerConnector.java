@@ -318,15 +318,6 @@ public class ServerConnector extends RestClient
             throw new EyesException("Failed create binary model from JSON!", e);
         }
 
-        // Getting the screenshot's bytes (notice this can be either
-        // compressed/uncompressed form).
-        byte[] screenshot = new byte[0];
-            String screenshot64 = matchData.getAppOutput().getScreenshot64();
-        if (screenshot64 != null) {
-            screenshot = DatatypeConverter.parseBase64Binary(
-                    screenshot64);
-        }
-
         // Ok, let's create the request model
         ByteArrayOutputStream requestOutputStream = new ByteArrayOutputStream();
         DataOutputStream requestDos = new DataOutputStream(requestOutputStream);
@@ -335,9 +326,6 @@ public class ServerConnector extends RestClient
             requestDos.writeInt(jsonBytes.length);
             requestDos.flush();
             requestOutputStream.write(jsonBytes);
-            if (screenshot64 != null) {
-                requestOutputStream.write(screenshot);
-            }
             requestOutputStream.flush();
 
             // Ok, get the model bytes
@@ -364,6 +352,22 @@ public class ServerConnector extends RestClient
 
         return result;
 
+    }
+
+    @Override
+    public int uploadImage(byte[] screenshotBytes, RenderingInfo renderingInfo, String imageTargetUrl) {
+        WebResource target = restClient.resource(imageTargetUrl);
+        WebResource.Builder request = target
+                .accept("image/png")
+                .entity(screenshotBytes,"image/png")
+                .header("X-Auth-Token", renderingInfo.getAccessToken())
+                .header("x-ms-blob-type", "BlockBlob");
+
+        ClientResponse response = request.put(ClientResponse.class);
+        int statusCode = response.getStatus();
+        response.close();
+        logger.verbose("Upload Status Code: " + statusCode);
+        return statusCode;
     }
 
     @Override
@@ -499,19 +503,17 @@ public class ServerConnector extends RestClient
     @Override
     public RenderingInfo getRenderInfo() {
         this.logger.verbose("enter");
-        WebResource target = restClient.resource(serverUrl).path(RENDER_INFO_PATH).queryParam("apiKey", getApiKey());
+        if (renderingInfo == null) {
+            WebResource target = restClient.resource(serverUrl).path(RENDER_INFO_PATH).queryParam("apiKey", getApiKey());
+            WebResource.Builder request = target.accept(MediaType.APPLICATION_JSON);
+            ClientResponse response = request.get(ClientResponse.class);
 
+            // Ok, let's create the running session from the response
+            List<Integer> validStatusCodes = new ArrayList<>(1);
+            validStatusCodes.add(ClientResponse.Status.OK.getStatusCode());
 
-        WebResource.Builder request = target.accept(MediaType.APPLICATION_JSON);
-
-        ClientResponse response = request.get(ClientResponse.class);
-
-        // Ok, let's create the running session from the response
-        List<Integer> validStatusCodes = new ArrayList<>(1);
-        validStatusCodes.add(ClientResponse.Status.OK.getStatusCode());
-
-        renderingInfo = parseResponseWithJsonData(response, validStatusCodes,
-                RenderingInfo.class);
+            renderingInfo = parseResponseWithJsonData(response, validStatusCodes, RenderingInfo.class);
+        }
         return renderingInfo;
     }
 

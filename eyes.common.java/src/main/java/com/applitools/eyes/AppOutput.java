@@ -13,7 +13,7 @@ public class AppOutput {
      */
     private final String title;
     private final String domUrl;
-    private final String screenshotUrl;
+    private String screenshotUrl;
     private final byte[] screenshotBytes;
 
     /**
@@ -43,5 +43,9 @@ public class AppOutput {
 
     public String getScreenshotUrl() {
         return screenshotUrl;
+    }
+
+    public void setScreenshotUrl(String screenshotUrl) {
+        this.screenshotUrl = screenshotUrl;
     }
 }
