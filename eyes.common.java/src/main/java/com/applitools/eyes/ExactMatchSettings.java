@@ -5,6 +5,15 @@ package com.applitools.eyes;
  */
 public class ExactMatchSettings {
 
+    public ExactMatchSettings() {}
+
+    public ExactMatchSettings(ExactMatchSettings other) {
+        minDiffIntensity = other.minDiffIntensity;
+        minDiffWidth = other.minDiffWidth;
+        minDiffHeight = other.minDiffHeight;
+        matchThreshold = other.matchThreshold;
+    }
+
     /**
      * Minimal non-ignorable pixel intensity difference.
      */

@@ -39,7 +39,7 @@ public class ImageMatchSettings {
 
     public ImageMatchSettings(ImageMatchSettings other) {
         this.matchLevel = other.matchLevel;
-        this.exact = other.exact;
+        this.exact = new ExactMatchSettings(other.exact);
         this.ignoreCaret = other.ignoreCaret;
         this.ignoreRegions = other.ignoreRegions;
         this.layoutRegions = other.layoutRegions;
@@ -52,7 +52,6 @@ public class ImageMatchSettings {
         this.accessibility = other.accessibility;
         this.accessibilityLevel = other.accessibilityLevel;
     }
-
 
     /**
      *

@@ -49,7 +49,7 @@ public class Configuration implements IConfigurationSetter, IConfigurationGetter
         this.appName = other.getAppName();
         this.testName = other.getTestName();
         this.viewportSize = other.getViewportSize();
-        this.defaultMatchSettings = other.getDefaultMatchSettings();
+        this.defaultMatchSettings = new ImageMatchSettings(other.getDefaultMatchSettings());
         this.matchTimeout = other.getMatchTimeout();
         this.hostApp = other.getHostApp();
         this.hostOS = other.getHostOS();
