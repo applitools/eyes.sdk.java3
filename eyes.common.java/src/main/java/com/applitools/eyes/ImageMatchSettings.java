@@ -38,19 +38,23 @@ public class ImageMatchSettings {
     }
 
     public ImageMatchSettings(ImageMatchSettings other) {
-        this.matchLevel = other.matchLevel;
-        this.exact = new ExactMatchSettings(other.exact);
-        this.ignoreCaret = other.ignoreCaret;
-        this.ignoreRegions = other.ignoreRegions;
-        this.layoutRegions = other.layoutRegions;
-        this.strictRegions = other.strictRegions;
-        this.contentRegions = other.contentRegions;
-        this.floatingMatchSettings = other.floatingMatchSettings;
-        this.useDom = other.useDom;
-        this.enablePatterns = other.enablePatterns;
-        this.ignoreDisplacements = other.ignoreDisplacements;
-        this.accessibility = other.accessibility;
-        this.accessibilityLevel = other.accessibilityLevel;
+        if (other != null) {
+            this.matchLevel = other.matchLevel;
+            this.exact = other.exact == null ? null : new ExactMatchSettings(other.exact);
+            this.ignoreCaret = other.ignoreCaret;
+            this.ignoreRegions = other.ignoreRegions;
+            this.layoutRegions = other.layoutRegions;
+            this.strictRegions = other.strictRegions;
+            this.contentRegions = other.contentRegions;
+            this.floatingMatchSettings = other.floatingMatchSettings;
+            this.useDom = other.useDom;
+            this.enablePatterns = other.enablePatterns;
+            this.ignoreDisplacements = other.ignoreDisplacements;
+            this.accessibility = other.accessibility;
+            this.accessibilityLevel = other.accessibilityLevel;
+        } else {
+            this.matchLevel = MatchLevel.STRICT;
+        }
     }
 
     /**

@@ -8,10 +8,12 @@ public class ExactMatchSettings {
     public ExactMatchSettings() {}
 
     public ExactMatchSettings(ExactMatchSettings other) {
-        minDiffIntensity = other.minDiffIntensity;
-        minDiffWidth = other.minDiffWidth;
-        minDiffHeight = other.minDiffHeight;
-        matchThreshold = other.matchThreshold;
+        if (other != null) {
+            minDiffIntensity = other.minDiffIntensity;
+            minDiffWidth = other.minDiffWidth;
+            minDiffHeight = other.minDiffHeight;
+            matchThreshold = other.matchThreshold;
+        }
     }
 
     /**
