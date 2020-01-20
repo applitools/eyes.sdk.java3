@@ -5,6 +5,7 @@ package com.applitools.eyes;
 
 import com.applitools.eyes.capture.AppOutputProvider;
 import com.applitools.eyes.capture.AppOutputWithScreenshot;
+import com.applitools.eyes.config.IConfigurationGetter;
 import com.applitools.eyes.fluent.*;
 import com.applitools.eyes.visualgrid.model.IGetFloatingRegionOffsets;
 import com.applitools.eyes.visualgrid.model.MutableRegion;
@@ -486,12 +487,16 @@ public class MatchWindowTask {
     public static ImageMatchSettings createImageMatchSettings(ICheckSettingsInternal checkSettingsInternal, EyesBase eyes) {
         ImageMatchSettings imageMatchSettings = null;
         if (checkSettingsInternal != null) {
-            MatchLevel matchLevel = checkSettingsInternal.getMatchLevel() != null ? checkSettingsInternal.getMatchLevel() : eyes.getConfigGetter().getDefaultMatchSettings().getMatchLevel();
-            imageMatchSettings = new ImageMatchSettings(matchLevel, null, checkSettingsInternal.isUseDom() != null ? checkSettingsInternal.isUseDom() : false);
-            imageMatchSettings.setIgnoreCaret(checkSettingsInternal.getIgnoreCaret() != null ? checkSettingsInternal.getIgnoreCaret() : eyes.getConfigGetter().getIgnoreCaret());
+
+            IConfigurationGetter configGetter = eyes.getConfigGetter();
+            ImageMatchSettings defaultMatchSettings = configGetter.getDefaultMatchSettings();
+
+            MatchLevel matchLevel = checkSettingsInternal.getMatchLevel() != null ? checkSettingsInternal.getMatchLevel() : defaultMatchSettings.getMatchLevel();
+            imageMatchSettings = new ImageMatchSettings(matchLevel, defaultMatchSettings.getExact(), checkSettingsInternal.isUseDom() != null ? checkSettingsInternal.isUseDom() : false );
+            imageMatchSettings.setIgnoreCaret(checkSettingsInternal.getIgnoreCaret()!= null ? checkSettingsInternal.getIgnoreCaret() : configGetter.getIgnoreCaret());
             imageMatchSettings.setEnablePatterns(checkSettingsInternal.isEnablePatterns());
-            imageMatchSettings.setIgnoreDisplacements(checkSettingsInternal.isIgnoreDisplacements() != null ? checkSettingsInternal.isIgnoreDisplacements() : eyes.getConfigGetter().getIgnoreDisplacements());
-            imageMatchSettings.setAccessibilityLevel(eyes.getConfigGetter().getAccessibilityValidation());
+            imageMatchSettings.setIgnoreDisplacements(checkSettingsInternal.isIgnoreDisplacements() != null ? checkSettingsInternal.isIgnoreDisplacements() : configGetter.getIgnoreDisplacements() );
+            imageMatchSettings.setAccessibilityLevel(configGetter.getAccessibilityValidation());
         }
         return imageMatchSettings;
     }
