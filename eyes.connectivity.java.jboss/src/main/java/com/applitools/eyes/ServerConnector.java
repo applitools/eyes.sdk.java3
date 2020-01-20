@@ -516,7 +516,6 @@ public class ServerConnector extends RestClient
 
     }
 
-
     @Override
     public RenderingInfo getRenderInfo() {
         if (renderingInfo == null) {
@@ -723,8 +722,7 @@ public class ServerConnector extends RestClient
 
     @Override
     public void closeBatch(String batchId) {
-        if (getDontCloseBatches())
-        {
+        if (getDontCloseBatches()) {
             logger.log("APPLITOOLS_DONT_CLOSE_BATCHES environment variable set to true. Skipping batch close.");
             return;
         }

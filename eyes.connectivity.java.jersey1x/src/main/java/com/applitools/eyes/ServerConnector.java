@@ -80,7 +80,6 @@ public class ServerConnector extends RestClient
 
     /**
      * Sets the API key of your applitools Eyes account.
-     *
      * @param apiKey The api key to set.
      */
     public void setApiKey(String apiKey) {
@@ -97,7 +96,6 @@ public class ServerConnector extends RestClient
 
     /**
      * Sets the proxy settings to be used by the rest client.
-     *
      * @param abstractProxySettings The proxy settings to be used by the rest client.
      *                              If {@code null} then no proxy is set.
      */
@@ -120,7 +118,6 @@ public class ServerConnector extends RestClient
 
     /**
      * Sets the current server URL used by the rest client.
-     *
      * @param serverUrl The URI of the rest server.
      */
     @SuppressWarnings("UnusedDeclaration")
@@ -143,7 +140,6 @@ public class ServerConnector extends RestClient
      * Starts a new running session in the agent. Based on the given parameters,
      * this running session will either be linked to an existing session, or to
      * a completely new session.
-     *
      * @param sessionStartInfo The start parameters for the session.
      * @return RunningSession object which represents the current running
      * session
@@ -205,7 +201,6 @@ public class ServerConnector extends RestClient
 
     /**
      * Stops the running session.
-     *
      * @param runningSession The running session to be stopped.
      * @return TestResults object for the stopped running session
      * @throws EyesException For invalid status codes, or if response parsing
@@ -273,7 +268,6 @@ public class ServerConnector extends RestClient
     /**
      * Matches the current window (held by the WebDriver) to the expected
      * window.
-     *
      * @param runningSession The current agent's running session.
      * @param matchData      Encapsulation of a capture taken from the application.
      * @return The results of the window matching.
@@ -359,7 +353,7 @@ public class ServerConnector extends RestClient
         WebResource target = restClient.resource(imageTargetUrl);
         WebResource.Builder request = target
                 .accept("image/png")
-                .entity(screenshotBytes,"image/png")
+                .entity(screenshotBytes, "image/png")
                 .header("X-Auth-Token", renderingInfo.getAccessToken())
                 .header("x-ms-blob-type", "BlockBlob");
 
@@ -423,7 +417,7 @@ public class ServerConnector extends RestClient
 
         final IResourceFuture newFuture = new ResourceFuture(url.toString(), logger, this, userAgent);
 
-        Future<ClientResponse> responseFuture =  request.get(new TypeListener<ClientResponse>(ClientResponse.class) {
+        Future<ClientResponse> responseFuture = request.get(new TypeListener<ClientResponse>(ClientResponse.class) {
 
             public void onComplete(Future<ClientResponse> future) {
                 logger.verbose("GET callback  success");
@@ -522,7 +516,7 @@ public class ServerConnector extends RestClient
         ArgumentGuard.notNull(renderRequests, "renderRequests");
         this.logger.verbose("called with " + Arrays.toString(renderRequests));
 
-        WebResource target = restClient.resource(renderingInfo.getServiceUrl()).path((RENDER));
+        WebResource target = restClient.resource(renderingInfo.getServiceUrl()).path(RENDER);
         WebResource webResource = null;
 
         if (renderRequests.length > 1) {
@@ -671,8 +665,8 @@ public class ServerConnector extends RestClient
                     //noinspection ForLoopReplaceableByForEach
                     for (int i = 0; i < renderStatusResults.length; i++) {
                         RenderStatusResults renderStatusResult = renderStatusResults[i];
-                        if(renderStatusResult != null && renderStatusResult.getStatus() == RenderStatus.ERROR){
-                            logger.verbose("error on render id - "+renderStatusResult);
+                        if (renderStatusResult != null && renderStatusResult.getStatus() == RenderStatus.ERROR) {
+                            logger.verbose("error on render id - " + renderStatusResult);
                         }
                     }
                     return Arrays.asList(renderStatusResults);
@@ -701,8 +695,7 @@ public class ServerConnector extends RestClient
     @Override
     public void closeBatch(String batchId) {
         boolean dontCloseBatchesStr = GeneralUtils.getDontCloseBatches();
-        if (dontCloseBatchesStr)
-        {
+        if (dontCloseBatchesStr) {
             logger.log("APPLITOOLS_DONT_CLOSE_BATCHES environment variable set to true. Skipping batch close.");
             return;
         }
@@ -715,8 +708,9 @@ public class ServerConnector extends RestClient
     }
 
     @Override
-    public void closeConnector() {}
-    
+    public void closeConnector() {
+    }
+
     public boolean getDontCloseBatches() {
         return "true".equalsIgnoreCase(GeneralUtils.getEnvString("APPLITOOLS_DONT_CLOSE_BATCHES"));
     }

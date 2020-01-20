@@ -8,6 +8,7 @@ import com.applitools.eyes.capture.AppOutputWithScreenshot;
 import com.applitools.eyes.fluent.*;
 import com.applitools.eyes.visualgrid.model.IGetFloatingRegionOffsets;
 import com.applitools.eyes.visualgrid.model.MutableRegion;
+import com.applitools.eyes.visualgrid.model.RenderingInfo;
 import com.applitools.eyes.visualgrid.model.VisualGridSelector;
 import com.applitools.utils.ArgumentGuard;
 import com.applitools.utils.GeneralUtils;
@@ -15,10 +16,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.awt.image.BufferedImage;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
 public class MatchWindowTask {
 
@@ -84,7 +82,6 @@ public class MatchWindowTask {
 
     /**
      * Creates the match model and calls the server connector matchWindow method.
-     *
      * @param userInputs         The user inputs related to the current appOutput.
      * @param appOutput          The application output to be matched.
      * @param tag                Optional tag to be associated with the match (can be {@code null}).
@@ -97,8 +94,7 @@ public class MatchWindowTask {
                                     String tag, boolean ignoreMismatch,
                                     ICheckSettingsInternal checkSettingsInternal,
                                     ImageMatchSettings imageMatchSettings,
-                                    EyesBase eyes, String source)
-    {
+                                    EyesBase eyes, String source) {
         EyesScreenshot screenshot = appOutput.getScreenshot(checkSettingsInternal);
 
         collectSimpleRegions(checkSettingsInternal, imageMatchSettings, eyes, screenshot);
@@ -122,7 +118,6 @@ public class MatchWindowTask {
 
     /**
      * Creates the match model and calls the server connector matchWindow method.
-     *
      * @param appOutput          The application output to be matched.
      * @param tag                Optional tag to be associated with the match (can be {@code null}).
      * @param ignoreMismatch     Whether to instruct the server to ignore the match attempt in case of a mismatch.
@@ -137,8 +132,7 @@ public class MatchWindowTask {
                                     ImageMatchSettings imageMatchSettings,
                                     List<? extends IRegion> regions,
                                     List<VisualGridSelector[]> regionSelectors,
-                                    EyesBase eyes, String renderId, String source)
-    {
+                                    EyesBase eyes, String renderId, String source) {
         EyesScreenshot screenshot = appOutput.getScreenshot(checkSettingsInternal);
         String agentSetupStr = (String) eyes.getAgentSetup();
 
@@ -154,13 +148,12 @@ public class MatchWindowTask {
                                      String tag, boolean ignoreMismatch,
                                      ImageMatchSettings imageMatchSettings,
                                      String agentSetupStr, String renderId,
-                                     String source)
-    {
+                                     String source) {
         // Prepare match data.
         MatchWindowData.Options options = new MatchWindowData.Options(tag, userInputs.toArray(new Trigger[0]),
                 ignoreMismatch, false, false, false, imageMatchSettings, source, renderId);
 
-        MatchWindowData data = new MatchWindowData(userInputs.toArray(new Trigger[0]),appOutput.getAppOutput(), tag,
+        MatchWindowData data = new MatchWindowData(userInputs.toArray(new Trigger[0]), appOutput.getAppOutput(), tag,
                 ignoreMismatch, options, agentSetupStr, renderId);
 
 
@@ -240,18 +233,14 @@ public class MatchWindowTask {
         return mutableRegions.toArray(new AccessibilityRegionByRectangle[0]);
     }
 
-    private static Region[] convertSimpleRegions(GetRegion[] simpleRegions, Region[] currentRegions)
-    {
+    private static Region[] convertSimpleRegions(GetRegion[] simpleRegions, Region[] currentRegions) {
         List<Region> mutableRegions = new ArrayList<>();
-        if (currentRegions != null)
-        {
+        if (currentRegions != null) {
             Collections.addAll(mutableRegions, currentRegions);
         }
 
-        for (GetRegion getRegions : simpleRegions)
-        {
-            if (getRegions instanceof SimpleRegionByRectangle)
-            {
+        for (GetRegion getRegions : simpleRegions) {
+            if (getRegions instanceof SimpleRegionByRectangle) {
                 mutableRegions.addAll(getRegions.getRegions(null, null));
             }
         }
@@ -259,18 +248,14 @@ public class MatchWindowTask {
         return mutableRegions.toArray(new Region[0]);
     }
 
-    private FloatingMatchSettings[] convertFloatingRegions(GetFloatingRegion[] floatingRegions, FloatingMatchSettings[] currentRegions)
-    {
+    private FloatingMatchSettings[] convertFloatingRegions(GetFloatingRegion[] floatingRegions, FloatingMatchSettings[] currentRegions) {
         List<FloatingMatchSettings> mutableRegions = new ArrayList<>();
-        if (currentRegions != null)
-        {
+        if (currentRegions != null) {
             Collections.addAll(mutableRegions, currentRegions);
         }
 
-        for (GetFloatingRegion getRegions : floatingRegions)
-        {
-            if (getRegions instanceof FloatingRegionByRectangle)
-            {
+        for (GetFloatingRegion getRegions : floatingRegions) {
+            if (getRegions instanceof FloatingRegionByRectangle) {
                 mutableRegions.addAll(getRegions.getRegions(null, null));
             }
         }
@@ -313,8 +298,7 @@ public class MatchWindowTask {
         Location location = Location.ZERO;
 
         // If target element location available
-        if (mutableRegions.get(5).size() > 0)
-        {
+        if (mutableRegions.get(5).size() > 0) {
             location = mutableRegions.get(5).get(0).getLocation();
         }
 
@@ -368,13 +352,11 @@ public class MatchWindowTask {
     }
 
     private static MutableRegion[] filterEmptyEntries(List<MutableRegion> list, Location location) {
-        for (int i = list.size() - 1; i >= 0; i--)
-        {
+        for (int i = list.size() - 1; i >= 0; i--) {
             MutableRegion mutableRegion = list.get(i);
-            if (mutableRegion.getArea() == 0){
+            if (mutableRegion.getArea() == 0) {
                 list.remove(i);
-            }
-            else{
+            } else {
                 mutableRegion.offset(-location.getX(), -location.getY());
             }
         }
@@ -383,8 +365,8 @@ public class MatchWindowTask {
 
 
     private static void collectSimpleRegions(ICheckSettingsInternal checkSettingsInternal,
-                                              ImageMatchSettings imageMatchSettings, EyesBase eyes,
-                                              EyesScreenshot screenshot) {
+                                             ImageMatchSettings imageMatchSettings, EyesBase eyes,
+                                             EyesScreenshot screenshot) {
         imageMatchSettings.setIgnoreRegions(collectSimpleRegions(eyes, screenshot, checkSettingsInternal.getIgnoreRegions()));
         imageMatchSettings.setStrictRegions(collectSimpleRegions(eyes, screenshot, checkSettingsInternal.getStrictRegions()));
         imageMatchSettings.setLayoutRegions(collectSimpleRegions(eyes, screenshot, checkSettingsInternal.getLayoutRegions()));
@@ -392,7 +374,7 @@ public class MatchWindowTask {
     }
 
     private static Region[] collectSimpleRegions(EyesBase eyes,
-                                                           EyesScreenshot screenshot, GetRegion[] regionProviders) {
+                                                 EyesScreenshot screenshot, GetRegion[] regionProviders) {
         List<List<Region>> mutableRegions = new ArrayList<>();
         for (GetRegion regionProvider : regionProviders) {
             mutableRegions.add(regionProvider.getRegions(eyes, screenshot));
@@ -420,7 +402,6 @@ public class MatchWindowTask {
     /**
      * Repeatedly obtains an application snapshot and matches it with the next
      * expected output, until a match is found or the timeout expires.
-     *
      * @param userInputs             User input preceding this match.
      * @param region                 Window region to capture.
      * @param tag                    Optional tag to be associated with the match (can be {@code null}).
@@ -483,7 +464,6 @@ public class MatchWindowTask {
 
     /**
      * Build match settings by merging the check settings and the default match settings.
-     *
      * @param checkSettingsInternal the settings to match the image by.
      * @param screenshot            the Screenshot wrapper object.
      * @return Merged match settings.
@@ -497,22 +477,20 @@ public class MatchWindowTask {
         }
         return imageMatchSettings;
     }
+
     /**
      * Build match settings by merging the check settings and the default match settings.
-     *
      * @param checkSettingsInternal the settings to match the image by.
      * @return Merged match settings.
      */
-    public static ImageMatchSettings createImageMatchSettings(ICheckSettingsInternal checkSettingsInternal, EyesBase eyes)
-    {
+    public static ImageMatchSettings createImageMatchSettings(ICheckSettingsInternal checkSettingsInternal, EyesBase eyes) {
         ImageMatchSettings imageMatchSettings = null;
-        if (checkSettingsInternal != null)
-        {
+        if (checkSettingsInternal != null) {
             MatchLevel matchLevel = checkSettingsInternal.getMatchLevel() != null ? checkSettingsInternal.getMatchLevel() : eyes.getConfigGetter().getDefaultMatchSettings().getMatchLevel();
-            imageMatchSettings = new ImageMatchSettings(matchLevel, null, checkSettingsInternal.isUseDom() != null ? checkSettingsInternal.isUseDom() : false );
-            imageMatchSettings.setIgnoreCaret(checkSettingsInternal.getIgnoreCaret()!= null ? checkSettingsInternal.getIgnoreCaret() : eyes.getConfigGetter().getIgnoreCaret());
+            imageMatchSettings = new ImageMatchSettings(matchLevel, null, checkSettingsInternal.isUseDom() != null ? checkSettingsInternal.isUseDom() : false);
+            imageMatchSettings.setIgnoreCaret(checkSettingsInternal.getIgnoreCaret() != null ? checkSettingsInternal.getIgnoreCaret() : eyes.getConfigGetter().getIgnoreCaret());
             imageMatchSettings.setEnablePatterns(checkSettingsInternal.isEnablePatterns());
-            imageMatchSettings.setIgnoreDisplacements(checkSettingsInternal.isIgnoreDisplacements() != null ? checkSettingsInternal.isIgnoreDisplacements() : eyes.getConfigGetter().getIgnoreDisplacements() );
+            imageMatchSettings.setIgnoreDisplacements(checkSettingsInternal.isIgnoreDisplacements() != null ? checkSettingsInternal.isIgnoreDisplacements() : eyes.getConfigGetter().getIgnoreDisplacements());
             imageMatchSettings.setAccessibilityLevel(eyes.getConfigGetter().getAccessibilityValidation());
         }
         return imageMatchSettings;
