@@ -307,15 +307,10 @@ public class ImageUtils {
 
         image = normalizeImageType(image);
 
-        if (scaleRatio == 1) {
-            return image;
-        }
+        int targetWidth = (int)Math.ceil(image.getWidth() * scaleRatio);
+        int targetHeight = (int)Math.ceil(image.getHeight() * scaleRatio);
 
-        double imageRatio = (double) image.getHeight() / (double) image.getWidth();
-        int scaledWidth = (int) Math.ceil(image.getWidth() * scaleRatio);
-        int scaledHeight = (int) Math.ceil(scaledWidth * imageRatio);
-
-        BufferedImage scaledImage = resizeImage(image, scaledWidth, scaledHeight);
+        BufferedImage scaledImage = resizeImage(image, targetWidth, targetHeight);
 
         return normalizeImageType(scaledImage);
     }
