@@ -7,7 +7,7 @@
 - Added missing method: abortAsync. [Trello 1420](https://trello.com/c/3NOKuLLj)
 - Fixed viewport computation on edge cases.
 - Some special characters are not rendering on Visual Grid. [Trello 1443](https://trello.com/c/GWzVCY7W)
-- Fixed Exact property not being sent to server on every check. [Trello 1374](https://trello.com/c/IdPRUveT)
+- Fixed default match settings being incorrectly overriden by image match settings. [Trello 1495](https://trello.com/c/KEbWXavV)
 
 ## [3.158.9] - 2019-12-12
 ### Fixed
