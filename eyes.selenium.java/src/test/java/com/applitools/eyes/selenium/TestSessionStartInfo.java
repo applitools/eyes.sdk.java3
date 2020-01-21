@@ -1,9 +1,14 @@
 package com.applitools.eyes.selenium;
 
+import com.applitools.ICheckSettings;
 import com.applitools.eyes.*;
+import com.applitools.eyes.fluent.ICheckSettingsInternal;
+import com.applitools.eyes.selenium.fluent.Target;
 import com.applitools.utils.GeneralUtils;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
 import org.testng.Assert;
+import org.testng.annotations.DataProvider;
 import org.testng.annotations.Listeners;
 import org.testng.annotations.Test;
 
@@ -13,7 +18,6 @@ import java.util.Calendar;
 @Listeners(TestListener.class)
 @SuppressWarnings("SpellCheckingInspection")
 public class TestSessionStartInfo {
-
 
     @Test()
     public void TestSessionInfo() {
@@ -43,15 +47,117 @@ public class TestSessionStartInfo {
                 null);
 
         ObjectMapper mapper = new ObjectMapper();
+        mapper.configure(SerializationFeature.INDENT_OUTPUT, true);
         try {
             String targetJsonObj = mapper.writeValueAsString(sessionStartInfo);
             String sourceJsonAsString = GeneralUtils.readToEnd(TestDomCapture.class.getResourceAsStream("/sessionStartInfo.json"));
-            boolean equals = targetJsonObj.equals(sourceJsonAsString);
-            Assert.assertTrue(equals, "JSON strings are different.");
+            Assert.assertEquals(targetJsonObj, sourceJsonAsString, "JSON strings are different.");
         } catch (IOException e) {
             e.printStackTrace();
         }
-
-
     }
+
+    @DataProvider(name = "three_booleans")
+    public static Object[][] threeBooleansDP() {
+        return new Object[][]{
+                {true, true, true},
+                {true, true, false},
+                {true, false, true},
+                {true, false, false},
+                {false, true, true},
+                {false, true, false},
+                {false, false, true},
+                {false, false, false},
+        };
+    }
+
+    @Test(dataProvider = "three_booleans")
+    public void TestFluentApiSerialization(boolean useDom, boolean enablePatterns, boolean ignoreDisplacements) {
+        ICheckSettings settings = Target.window().fully().useDom(useDom).enablePatterns(enablePatterns).ignoreDisplacements(ignoreDisplacements);
+        EyesBase eyes = new TestEyes();
+        EyesScreenshot screenshot = new TestEyesScreenshot();
+        ImageMatchSettings imageMatchSettings = MatchWindowTask.createImageMatchSettings((ICheckSettingsInternal) settings, screenshot, eyes);
+
+        ObjectMapper mapper = new ObjectMapper();
+        mapper.configure(SerializationFeature.INDENT_OUTPUT, true);
+        try {
+            String json = mapper.writeValueAsString(imageMatchSettings);
+            String expectedJsonName = "/sessionStartInfo_FluentApiSerialization_" + useDom + "_" + enablePatterns + "_" + ignoreDisplacements + ".json";
+            String expectedJson = GeneralUtils.readToEnd(TestDomCapture.class.getResourceAsStream(expectedJsonName));
+            Assert.assertEquals(json, expectedJson);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Test(dataProvider = "three_booleans")
+    public void TestImageMatchSettingsSerialization(boolean useDom, boolean enablePatterns, boolean ignoreDisplacements) {
+        ICheckSettings settings = Target.window().fully().useDom(useDom).enablePatterns(enablePatterns).ignoreDisplacements(ignoreDisplacements);
+        TestEyes eyes = new TestEyes();
+        ExactMatchSettings exactMatchSettings = new ExactMatchSettings();
+        exactMatchSettings.setMatchThreshold(0.5f);
+        eyes.setDefaultMatchSettings(new ImageMatchSettings(MatchLevel.EXACT, exactMatchSettings, useDom));
+        ImageMatchSettings imageMatchSettings = MatchWindowTask.createImageMatchSettings((ICheckSettingsInternal) settings, eyes);
+
+        ObjectMapper mapper = new ObjectMapper();
+        mapper.configure(SerializationFeature.INDENT_OUTPUT, true);
+        try {
+            String json = mapper.writeValueAsString(imageMatchSettings);
+            String expectedJsonName = "/sessionStartInfo_FluentApiSerialization_NonDefaultIMS_" + useDom + "_" + enablePatterns + "_" + ignoreDisplacements + ".json";
+            String expectedJson = GeneralUtils.readToEnd(TestDomCapture.class.getResourceAsStream(expectedJsonName));
+            Assert.assertEquals(json, expectedJson);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Test(dataProvider = "three_booleans")
+    public void TestImageMatchSettingsSerialization_Global(boolean useDom, boolean enablePatterns, boolean ignoreDisplacements) {
+        ICheckSettings settings = Target.window().fully().useDom(useDom).enablePatterns(enablePatterns);
+        TestEyes eyes = new TestEyes();
+        IConfigurationSetter configuration = (IConfigurationSetter) eyes.getConfigSetter();
+        ExactMatchSettings exactMatchSettings = new ExactMatchSettings();
+        exactMatchSettings.setMatchThreshold(0.5f);
+        configuration.setDefaultMatchSettings(new ImageMatchSettings(MatchLevel.EXACT, exactMatchSettings, useDom));
+        configuration.setIgnoreDisplacements(ignoreDisplacements);
+        eyes.setConfiguration((Configuration) configuration);
+        ImageMatchSettings imageMatchSettings = MatchWindowTask.createImageMatchSettings((ICheckSettingsInternal) settings, eyes);
+
+        ObjectMapper mapper = new ObjectMapper();
+        mapper.configure(SerializationFeature.INDENT_OUTPUT, true);
+        try {
+            String json = mapper.writeValueAsString(imageMatchSettings);
+            String expectedJsonName = "/sessionStartInfo_FluentApiSerialization_NonDefaultIMS_" + useDom + "_" + enablePatterns + "_" + ignoreDisplacements + ".json";
+            String expectedJson = GeneralUtils.readToEnd(TestDomCapture.class.getResourceAsStream(expectedJsonName));
+            Assert.assertEquals(json, expectedJson);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Test(dataProvider = "three_booleans")
+    public void TestConfigurationSerialization(boolean useDom, boolean enablePatterns, boolean ignoreDisplacements) {
+        ICheckSettings settings = Target.window().fully();
+        TestEyes eyes = new TestEyes();
+        Configuration configuration = (Configuration) eyes.getConfigSetter();
+        configuration.setUseDom(useDom);
+        configuration.setEnablePatterns(enablePatterns);
+        configuration.setIgnoreDisplacements(ignoreDisplacements);
+        eyes.setConfiguration(configuration);
+
+        EyesScreenshot screenshot = new TestEyesScreenshot();
+        ImageMatchSettings imageMatchSettings = MatchWindowTask.createImageMatchSettings((ICheckSettingsInternal) settings, screenshot, eyes);
+
+        ObjectMapper mapper = new ObjectMapper();
+        mapper.configure(SerializationFeature.INDENT_OUTPUT, true);
+        try {
+            String json = mapper.writeValueAsString(imageMatchSettings);
+            String expectedJsonName = "/sessionStartInfo_FluentApiSerialization_" + useDom + "_" + enablePatterns + "_" + ignoreDisplacements + ".json";
+            String expectedJson = GeneralUtils.readToEnd(TestDomCapture.class.getResourceAsStream(expectedJsonName));
+            Assert.assertEquals(json, expectedJson);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
 }

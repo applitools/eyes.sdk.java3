@@ -1,0 +1,20 @@
+{
+  "matchLevel" : "EXACT",
+  "exact" : {
+    "minDiffIntensity" : 0,
+    "minDiffWidth" : 0,
+    "minDiffHeight" : 0,
+    "matchThreshold" : 0.5
+  },
+  "ignoreCaret" : false,
+  "useDom" : false,
+  "enablePatterns" : true,
+  "ignoreDisplacements" : true,
+  "accessibility" : [ ],
+  "accessibilityLevel" : "None",
+  "Ignore" : null,
+  "Layout" : null,
+  "Strict" : null,
+  "Content" : null,
+  "Floating" : null
+}

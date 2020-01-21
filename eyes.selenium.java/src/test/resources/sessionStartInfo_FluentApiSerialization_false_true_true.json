@@ -1,0 +1,15 @@
+{
+  "matchLevel" : "STRICT",
+  "exact" : null,
+  "ignoreCaret" : true,
+  "useDom" : false,
+  "enablePatterns" : true,
+  "ignoreDisplacements" : true,
+  "accessibility" : [ ],
+  "accessibilityLevel" : "None",
+  "Ignore" : [ ],
+  "Layout" : [ ],
+  "Strict" : [ ],
+  "Content" : [ ],
+  "Floating" : [ ]
+}

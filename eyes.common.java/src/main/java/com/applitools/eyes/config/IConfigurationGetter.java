@@ -61,4 +61,7 @@ public interface IConfigurationGetter {
 
     AccessibilityLevel getAccessibilityValidation();
 
+    boolean getUseDom();
+
+    boolean getEnablePatterns();
 }

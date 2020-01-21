@@ -34,7 +34,9 @@ public class Configuration implements IConfigurationSetter, IConfigurationGetter
     private String serverUrl = null;
     private AbstractProxySettings proxy = null;
     private FailureReports failureReports = FailureReports.ON_CLOSE;
-    private AccessibilityLevel accessibilityValidation;
+    private AccessibilityLevel accessibilityValidation = null;
+    private boolean enablePatterns;
+    private boolean useDom;
 
     public Configuration(IConfigurationGetter other) {
         this.branchName = other.getBranchName();
@@ -58,6 +60,8 @@ public class Configuration implements IConfigurationSetter, IConfigurationGetter
         this.stitchOverlap = other.getStitchOverlap();
         this.isSendDom = other.isSendDom();
         this.apiKey = other.getApiKey();
+        this.useDom = other.getUseDom();
+        this.enablePatterns = other.getEnablePatterns();
         URI serverUrl = other.getServerUrl();
         if (serverUrl != null) {
             this.serverUrl = serverUrl.toString();
@@ -350,7 +354,6 @@ public class Configuration implements IConfigurationSetter, IConfigurationGetter
 
     /**
      * Sets the ignore blinking caret value.
-     *
      * @param value The ignore value.
      */
     @Override
@@ -420,13 +423,35 @@ public class Configuration implements IConfigurationSetter, IConfigurationGetter
 
     @Override
     public AccessibilityLevel getAccessibilityValidation() {
-        AccessibilityLevel level = getDefaultMatchSettings().getAccessibilityLevel();
-        return level;
+        return this.accessibilityValidation != null ? this.accessibilityValidation : getDefaultMatchSettings().getAccessibilityLevel();
     }
 
     @Override
-    public Configuration setAccessibilityValidation(AccessibilityLevel accessibilityValidation) {
-        this.getDefaultMatchSettings().setAccessibilityLevel(accessibilityValidation);
+    public IConfigurationSetter setAccessibilityValidation(AccessibilityLevel accessibilityValidation) {
+        this.accessibilityValidation = accessibilityValidation;
         return this;
     }
+
+    @Override
+    public IConfigurationSetter setUseDom(boolean useDom) {
+        this.useDom = useDom;
+        return this;
+    }
+
+    @Override
+    public boolean getUseDom() {
+        return useDom;
+    }
+
+    @Override
+    public IConfigurationSetter setEnablePatterns(boolean enablePatterns) {
+        this.enablePatterns = enablePatterns;
+        return this;
+    }
+
+    @Override
+    public boolean getEnablePatterns() {
+        return enablePatterns;
+    }
+
 }

@@ -440,24 +440,25 @@ public class MatchWindowTask {
         return matchResult;
     }
 
-    private void collectSimpleRegions(ICheckSettingsInternal checkSettingsInternal,
-                                      ImageMatchSettings imageMatchSettings,
-                                      EyesScreenshot screenshot) {
+    private static void collectSimpleRegions(EyesBase eyes,
+                                             ICheckSettingsInternal checkSettingsInternal,
+                                             ImageMatchSettings imageMatchSettings,
+                                             EyesScreenshot screenshot) {
 
-        imageMatchSettings.setIgnoreRegions(collectSimpleRegions(checkSettingsInternal.getIgnoreRegions(), screenshot));
-        imageMatchSettings.setLayoutRegions(collectSimpleRegions(checkSettingsInternal.getLayoutRegions(), screenshot));
-        imageMatchSettings.setStrictRegions(collectSimpleRegions(checkSettingsInternal.getStrictRegions(), screenshot));
-        imageMatchSettings.setContentRegions(collectSimpleRegions(checkSettingsInternal.getContentRegions(), screenshot));
+        imageMatchSettings.setIgnoreRegions(collectSimpleRegions(eyes, checkSettingsInternal.getIgnoreRegions(), screenshot));
+        imageMatchSettings.setLayoutRegions(collectSimpleRegions(eyes, checkSettingsInternal.getLayoutRegions(), screenshot));
+        imageMatchSettings.setStrictRegions(collectSimpleRegions(eyes, checkSettingsInternal.getStrictRegions(), screenshot));
+        imageMatchSettings.setContentRegions(collectSimpleRegions(eyes, checkSettingsInternal.getContentRegions(), screenshot));
     }
 
-    private Region[] collectSimpleRegions(GetRegion[] regionProviders, EyesScreenshot screenshot) {
+    private static Region[] collectSimpleRegions(EyesBase eyes, GetRegion[] regionProviders, EyesScreenshot screenshot) {
 
         List<Region> regions = new ArrayList<>();
         for (GetRegion regionProvider : regionProviders) {
             try {
                 regions.addAll(regionProvider.getRegions(eyes, screenshot));
             } catch (OutOfBoundsException ex) {
-                logger.log("WARNING - region was out of bounds.");
+                eyes.getLogger().log("WARNING - region was out of bounds.");
             }
         }
         return regions.toArray(new Region[0]);
@@ -469,12 +470,12 @@ public class MatchWindowTask {
      * @param screenshot            the Screenshot wrapper object.
      * @return Merged match settings.
      */
-    public ImageMatchSettings createImageMatchSettings(ICheckSettingsInternal checkSettingsInternal, EyesScreenshot screenshot, EyesBase eyesBase) {
+    public static ImageMatchSettings createImageMatchSettings(ICheckSettingsInternal checkSettingsInternal, EyesScreenshot screenshot, EyesBase eyesBase) {
         ImageMatchSettings imageMatchSettings = createImageMatchSettings(checkSettingsInternal, eyesBase);
         if (imageMatchSettings != null) {
-            collectSimpleRegions(checkSettingsInternal, imageMatchSettings, screenshot);
+            collectSimpleRegions(eyesBase, checkSettingsInternal, imageMatchSettings, screenshot);
             collectFloatingRegions(checkSettingsInternal, imageMatchSettings, eyesBase, screenshot);
-            collectAccessibilityRegions(checkSettingsInternal, imageMatchSettings, eyes, screenshot);
+            collectAccessibilityRegions(checkSettingsInternal, imageMatchSettings, eyesBase, screenshot);
         }
         return imageMatchSettings;
     }
@@ -491,11 +492,12 @@ public class MatchWindowTask {
             IConfigurationGetter configGetter = eyes.getConfigGetter();
             ImageMatchSettings defaultMatchSettings = configGetter.getDefaultMatchSettings();
 
-            MatchLevel matchLevel = checkSettingsInternal.getMatchLevel() != null ? checkSettingsInternal.getMatchLevel() : defaultMatchSettings.getMatchLevel();
-            imageMatchSettings = new ImageMatchSettings(matchLevel, defaultMatchSettings.getExact(), checkSettingsInternal.isUseDom() != null ? checkSettingsInternal.isUseDom() : false );
-            imageMatchSettings.setIgnoreCaret(checkSettingsInternal.getIgnoreCaret()!= null ? checkSettingsInternal.getIgnoreCaret() : configGetter.getIgnoreCaret());
-            imageMatchSettings.setEnablePatterns(checkSettingsInternal.isEnablePatterns());
-            imageMatchSettings.setIgnoreDisplacements(checkSettingsInternal.isIgnoreDisplacements() != null ? checkSettingsInternal.isIgnoreDisplacements() : configGetter.getIgnoreDisplacements() );
+            imageMatchSettings = new ImageMatchSettings(defaultMatchSettings); // clone default match settings
+            imageMatchSettings.setMatchLevel(checkSettingsInternal.getMatchLevel() != null ? checkSettingsInternal.getMatchLevel() : defaultMatchSettings.getMatchLevel());
+            imageMatchSettings.setIgnoreCaret(checkSettingsInternal.getIgnoreCaret() != null ? checkSettingsInternal.getIgnoreCaret() : configGetter.getIgnoreCaret());
+            imageMatchSettings.setUseDom(checkSettingsInternal.isUseDom() != null ? checkSettingsInternal.isUseDom() : configGetter.getUseDom());
+            imageMatchSettings.setEnablePatterns(checkSettingsInternal.isEnablePatterns() != null ? checkSettingsInternal.isEnablePatterns() : configGetter.getEnablePatterns());
+            imageMatchSettings.setIgnoreDisplacements(checkSettingsInternal.isIgnoreDisplacements() != null ? checkSettingsInternal.isIgnoreDisplacements() : configGetter.getIgnoreDisplacements());
             imageMatchSettings.setAccessibilityLevel(configGetter.getAccessibilityValidation());
         }
         return imageMatchSettings;

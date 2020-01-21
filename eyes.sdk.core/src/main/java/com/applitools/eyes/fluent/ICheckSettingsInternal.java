@@ -20,7 +20,7 @@ public interface ICheckSettingsInternal extends com.applitools.ICheckSettingsInt
 
     Boolean getIgnoreCaret();
 
-    boolean isEnablePatterns();
+    Boolean isEnablePatterns();
 
     VisualGridSelector getVGTargetSelector();
 

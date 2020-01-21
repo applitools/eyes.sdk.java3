@@ -24,7 +24,6 @@ import com.applitools.eyes.triggers.MouseAction;
 import com.applitools.eyes.triggers.MouseTrigger;
 import com.applitools.eyes.triggers.TextTrigger;
 import com.applitools.utils.*;
-import org.apache.commons.codec.binary.Base64;
 
 import java.awt.image.BufferedImage;
 import java.net.URI;

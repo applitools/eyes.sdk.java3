@@ -675,8 +675,18 @@ public class Eyes extends EyesBase implements IConfigurationGetter, IConfigurati
     }
 
     @Override
-    public Configuration setAccessibilityValidation(AccessibilityLevel accessibilityValidation) {
+    public IConfigurationSetter setAccessibilityValidation(AccessibilityLevel accessibilityValidation) {
         return this.config.setAccessibilityValidation(accessibilityValidation);
+    }
+
+    @Override
+    public IConfigurationSetter setUseDom(boolean useDom) {
+        return config.setUseDom(useDom);
+    }
+
+    @Override
+    public IConfigurationSetter setEnablePatterns(boolean enablePatterns) {
+        return config.setUseDom(enablePatterns);
     }
 
     /**
@@ -695,6 +705,16 @@ public class Eyes extends EyesBase implements IConfigurationGetter, IConfigurati
     @Override
     public AccessibilityLevel getAccessibilityValidation() {
         return config.getAccessibilityValidation();
+    }
+
+    @Override
+    public boolean getUseDom() {
+        return config.getUseDom();
+    }
+
+    @Override
+    public boolean getEnablePatterns() {
+        return config.getEnablePatterns();
     }
 
     /**
