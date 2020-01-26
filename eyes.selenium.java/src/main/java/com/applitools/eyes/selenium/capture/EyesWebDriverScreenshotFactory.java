@@ -1,6 +1,7 @@
 package com.applitools.eyes.selenium.capture;
 
 import com.applitools.eyes.EyesScreenshot;
+import com.applitools.eyes.Location;
 import com.applitools.eyes.capture.EyesScreenshotFactory;
 import com.applitools.eyes.Logger;
 import com.applitools.eyes.selenium.wrappers.EyesWebDriver;
@@ -20,6 +21,6 @@ public class EyesWebDriverScreenshotFactory implements EyesScreenshotFactory {
     }
 
     public EyesScreenshot makeScreenshot(BufferedImage image) {
-        return new EyesWebDriverScreenshot(logger, driver, image);
+        return new EyesWebDriverScreenshot(logger, driver, image, EyesWebDriverScreenshot.ScreenshotType.VIEWPORT, Location.ZERO);
     }
 }

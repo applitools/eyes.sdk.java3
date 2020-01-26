@@ -1916,7 +1916,8 @@ public class SeleniumEyes extends EyesBase implements ISeleniumEyes, IDriverProv
 
         logger.verbose("Building screenshot object...");
         RectangleSize size = new RectangleSize(entireFrameOrElement.getWidth(), entireFrameOrElement.getHeight());
-        result = new EyesWebDriverScreenshot(logger, driver, entireFrameOrElement, size);
+        Location frameLocationInScreenshot = new Location(-regionToCheck.getLeft(), -regionToCheck.getTop());
+        result = new EyesWebDriverScreenshot(logger, driver, entireFrameOrElement, size, frameLocationInScreenshot);
         return result;
     }
 
