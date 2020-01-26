@@ -1,3 +1,6 @@
+### Fixed
+- Misaligned coded regions. [Trello 1504](https://trello.com/c/ob3kzcDR)
+
 ## [3.159.0] - 2020-01-21
 ### Updated
 - Capture scripts. [Trello 151](https://trello.com/c/owyVIQG9)
