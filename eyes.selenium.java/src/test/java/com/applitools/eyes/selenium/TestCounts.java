@@ -86,6 +86,7 @@ public final class TestCounts {
         try {
             Configuration conf = new Configuration();
             conf.setBatch(TestDataProvider.batchInfo);
+            conf.addBrowser(new RenderBrowserInfo(800, 600));
             conf.setAppName("Test Count").setTestName("Test_VGTestsCount_4");
             testObjects.eyes.setConfiguration(conf);
             testObjects.eyes.open(testObjects.webDriver);
