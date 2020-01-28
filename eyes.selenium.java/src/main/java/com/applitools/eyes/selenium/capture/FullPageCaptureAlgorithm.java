@@ -7,7 +7,6 @@ import com.applitools.eyes.debug.DebugScreenshotsProvider;
 import com.applitools.eyes.CutProvider;
 import com.applitools.eyes.positioning.PositionMemento;
 import com.applitools.eyes.positioning.PositionProvider;
-import com.applitools.eyes.selenium.exceptions.EyesDriverOperationException;
 import com.applitools.eyes.selenium.positioning.NullRegionPositionCompensation;
 import com.applitools.eyes.selenium.positioning.RegionPositionCompensation;
 import com.applitools.utils.ArgumentGuard;
@@ -16,7 +15,6 @@ import com.applitools.utils.ImageUtils;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
-import java.awt.image.Raster;
 
 public class FullPageCaptureAlgorithm {
     private static final int MIN_SCREENSHOT_PART_SIZE = 10;
@@ -220,6 +218,7 @@ public class FullPageCaptureAlgorithm {
     private void stitchScreenshot(PositionMemento originalStitchedState, PositionProvider stitchProvider,
                                   SubregionForStitching[] screenshotParts, BufferedImage stitchedImage, double scaleRatio,
                                   CutProvider scaledCutProvider, float sizeRatio) {
+        //noinspection unused
         int index = 0;
         logger.verbose(String.format("enter: originalStitchedState: %s ; scaleRatio: %s",
                 originalStitchedState, scaleRatio));

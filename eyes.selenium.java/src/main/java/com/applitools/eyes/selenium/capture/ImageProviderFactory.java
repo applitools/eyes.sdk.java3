@@ -25,6 +25,8 @@ public class ImageProviderFactory {
                 return new SafariScreenshotImageProvider(eyes, logger, tsInstance, ua);
             } else if (ua.getBrowser().equals(BrowserNames.IE)) {
                 return new InternetExplorerScreenshotImageProvider(eyes, logger, tsInstance, ua);
+            } else if (ua.getOS().equals(OSNames.Android)) {
+                return new AndroidScreenshotImageProvider(eyes, logger, tsInstance, ua);
             }
         }
         return new TakesScreenshotImageProvider(logger, tsInstance);
@@ -32,8 +34,7 @@ public class ImageProviderFactory {
 
     public static ISizeAdjuster getImageSizeAdjuster(UserAgent ua, SeleniumJavaScriptExecutor jsExecutor) {
 
-        if (ua != null && (ua.getOS().equals(OSNames.Android) || ua.getOS().equals(OSNames.IOS)))
-        {
+        if (ua != null && (ua.getOS().equals(OSNames.Android) || ua.getOS().equals(OSNames.IOS))) {
             return new MobileDeviceSizeAdjuster(jsExecutor);
         }
         return NullSizeAdjuster.getInstance();

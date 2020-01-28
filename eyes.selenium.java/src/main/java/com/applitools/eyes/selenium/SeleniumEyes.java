@@ -80,7 +80,6 @@ public class SeleniumEyes extends EyesBase implements ISeleniumEyes, IDriverProv
 
     private UserAgent userAgent;
     private ImageProvider imageProvider;
-    private ISizeAdjuster sizeAdjuster;
     private RegionPositionCompensation regionPositionCompensation;
     private WebElement targetElement;
     private PositionMemento positionMemento;
@@ -275,7 +274,6 @@ public class SeleniumEyes extends EyesBase implements ISeleniumEyes, IDriverProv
 
         screenshotFactory = new EyesWebDriverScreenshotFactory(logger, this.driver);
         imageProvider = ImageProviderFactory.getImageProvider(userAgent, this, logger, this.driver);
-        sizeAdjuster = ImageProviderFactory.getImageSizeAdjuster(userAgent, jsExecutor);
         regionPositionCompensation = RegionPositionCompensationFactory.getRegionPositionCompensation(userAgent, this, logger);
 
         openBase();
@@ -1984,6 +1982,7 @@ public class SeleniumEyes extends EyesBase implements ISeleniumEyes, IDriverProv
     private FullPageCaptureAlgorithm createFullPageCaptureAlgorithm(ScaleProviderFactory scaleProviderFactory) {
         WebElement scrollRootElement = getCurrentFrameScrollRootElement();
         PositionProvider originProvider = ScrollPositionProviderFactory.getScrollPositionProvider(userAgent, logger, jsExecutor, scrollRootElement);
+        ISizeAdjuster sizeAdjuster = ImageProviderFactory.getImageSizeAdjuster(userAgent, jsExecutor);
 
         return new FullPageCaptureAlgorithm(logger, regionPositionCompensation,
                 getConfigGetter().getWaitBeforeScreenshots(), debugScreenshotsProvider, screenshotFactory,
