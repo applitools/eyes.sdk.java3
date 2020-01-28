@@ -1,3 +1,6 @@
+### Fixed
+- Update sizes and SizeAdjuster on every check due to possible URL change. [Trello 1353](https://trello.com/c/rhTs54Kb)
+
 ## [3.160.0] - 2020-01-30
 ### Fixed
 - Misaligned coded regions. [Trello 1504](https://trello.com/c/ob3kzcDR)
