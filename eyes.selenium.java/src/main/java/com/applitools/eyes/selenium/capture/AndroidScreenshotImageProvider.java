@@ -3,9 +3,7 @@ package com.applitools.eyes.selenium.capture;
 import com.applitools.eyes.Logger;
 import com.applitools.eyes.RectangleSize;
 import com.applitools.eyes.UserAgent;
-import com.applitools.eyes.selenium.EyesSeleniumUtils;
 import com.applitools.eyes.selenium.SeleniumEyes;
-import com.applitools.eyes.selenium.wrappers.EyesWebDriver;
 import com.applitools.utils.ImageUtils;
 import org.openqa.selenium.TakesScreenshot;
 
@@ -13,8 +11,6 @@ import java.awt.*;
 import java.awt.image.BufferedImage;
 
 public class AndroidScreenshotImageProvider extends MobileScreenshotImageProvider {
-    private RectangleSize cachedViewportSize = null;
-    private String cachedUrl;
 
     public AndroidScreenshotImageProvider(SeleniumEyes eyes, Logger logger, TakesScreenshot tsInstance, UserAgent userAgent) {
         super(eyes, logger, tsInstance, userAgent);
@@ -31,12 +27,7 @@ public class AndroidScreenshotImageProvider extends MobileScreenshotImageProvide
             return image;
         }
 
-        EyesWebDriver driver = (EyesWebDriver)eyes.getDriver();
-        if (cachedViewportSize == null || !driver.getCurrentUrl().equals(cachedUrl)) {
-            cachedUrl = driver.getCurrentUrl();
-            cachedViewportSize = EyesSeleniumUtils.getViewportSize(driver, logger);
-        }
-        RectangleSize originalViewportSize = cachedViewportSize;
+        RectangleSize originalViewportSize = getViewportSize();
 
         logger.verbose("logical viewport size: " + originalViewportSize);
 

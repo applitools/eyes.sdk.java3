@@ -2,7 +2,6 @@ package com.applitools.eyes.selenium.capture;
 
 import com.applitools.eyes.*;
 import com.applitools.eyes.positioning.PositionProvider;
-import com.applitools.eyes.selenium.EyesSeleniumUtils;
 import com.applitools.eyes.selenium.SeleniumEyes;
 import com.applitools.eyes.selenium.frames.FrameChain;
 import com.applitools.eyes.selenium.positioning.ScrollPositionProviderFactory;
@@ -10,7 +9,6 @@ import com.applitools.eyes.selenium.wrappers.EyesWebDriver;
 import com.applitools.utils.ImageUtils;
 import org.openqa.selenium.*;
 
-import java.awt.*;
 import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
 import java.util.HashMap;
@@ -19,8 +17,6 @@ import java.util.Map;
 public class SafariScreenshotImageProvider extends MobileScreenshotImageProvider {
 
     private static Map<RectangleSize, Rectangle[]> devicesRegions = null;
-    private RectangleSize cachedViewportSize = null;
-    private String cachedUrl;
 
     public SafariScreenshotImageProvider(SeleniumEyes eyes, Logger logger, TakesScreenshot tsInstance, UserAgent userAgent) {
         super(eyes, logger, tsInstance, userAgent);
@@ -40,12 +36,7 @@ public class SafariScreenshotImageProvider extends MobileScreenshotImageProvider
         }
 
         double scaleRatio = eyes.getDevicePixelRatio();
-        WebDriver driver = eyes.getDriver();
-        if (cachedViewportSize == null || cachedUrl != driver.getCurrentUrl()) {
-            cachedUrl = driver.getCurrentUrl();
-            cachedViewportSize = EyesSeleniumUtils.getViewportSize((JavascriptExecutor)driver, logger);
-        }
-        RectangleSize originalViewportSize = cachedViewportSize;
+        RectangleSize originalViewportSize = getViewportSize();
         RectangleSize viewportSize = originalViewportSize.scale(scaleRatio);
 
         logger.verbose("logical viewport size: " + originalViewportSize);
