@@ -174,10 +174,8 @@ public class ServerConnector extends RestClient
         }
 
         try {
-            response = endPoint.queryParam("apiKey", getApiKey()).
-                    accept(MediaType.APPLICATION_JSON).
-                    entity(postData, MediaType.APPLICATION_JSON_TYPE).
-                    post(ClientResponse.class);
+            WebResource.Builder builder = endPoint.queryParam("apiKey", getApiKey()).accept(MediaType.APPLICATION_JSON);
+            response = sendLongRequest(builder, HttpMethod.POST, postData, MediaType.APPLICATION_JSON);
         } catch (RuntimeException e) {
             logger.log("startSession(): Server request failed: " + e.getMessage());
             throw e;
@@ -451,7 +449,7 @@ public class ServerConnector extends RestClient
         if (renderingInfo == null) {
             WebResource target = restClient.resource(serverUrl).path(RENDER_INFO_PATH).queryParam("apiKey", getApiKey());
             WebResource.Builder request = target.accept(MediaType.APPLICATION_JSON);
-            ClientResponse response = request.get(ClientResponse.class);
+            ClientResponse response = sendLongRequest(request, HttpMethod.GET, null, null);
 
             // Ok, let's create the running session from the response
             List<Integer> validStatusCodes = new ArrayList<>(1);
