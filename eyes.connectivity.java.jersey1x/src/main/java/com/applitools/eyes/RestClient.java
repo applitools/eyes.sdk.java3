@@ -215,9 +215,9 @@ public class RestClient {
 
             int wait = 500;
             while (true) {
-                response = Get(statusUrl);
+                response = get(statusUrl);
                 if (response.getStatus() == HttpStatus.SC_CREATED) {
-                    return Delete(response.getHeaders().getFirst(HttpHeaders.LOCATION));
+                    return delete(response.getHeaders().getFirst(HttpHeaders.LOCATION));
                 }
 
                 if (response.getStatus() == HttpStatus.SC_OK) {
@@ -239,20 +239,25 @@ public class RestClient {
         return response;
     }
 
-    private ClientResponse Get(String path, String accept) {
+    public String getString(String path, String accept) {
+        ClientResponse response = sendHttpWebRequest(path, HttpMethod.GET, accept);
+        return response.getEntity(String.class);
+    }
+
+    private ClientResponse get(String path, String accept) {
         return sendHttpWebRequest(path, HttpMethod.GET, accept);
     }
 
-    private ClientResponse Get(String path) {
-        return Get(path, null);
+    private ClientResponse get(String path) {
+        return get(path, null);
     }
 
-    private ClientResponse Delete(String path, String accept) {
+    private ClientResponse delete(String path, String accept) {
         return sendHttpWebRequest(path, HttpMethod.DELETE, accept);
     }
 
-    private ClientResponse Delete(String path) {
-        return Delete(path, null);
+    private ClientResponse delete(String path) {
+        return delete(path, null);
     }
 
     protected ClientResponse sendHttpWebRequest(String path, final String method, String accept) {
