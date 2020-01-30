@@ -1,7 +1,6 @@
 ### Fixed
 - Misaligned coded regions. [Trello 1504](https://trello.com/c/ob3kzcDR)
 - Fixed long-request implementation in all 3 connectivity packages. [Trello 1516](https://trello.com/c/GThsXbIL)
-- `MatchWindow` now supports long-request. [Trello 1516](https://trello.com/c/GThsXbIL)
 
 ## [3.159.0] - 2020-01-21
 ### Updated
