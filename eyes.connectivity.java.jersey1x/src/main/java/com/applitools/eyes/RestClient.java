@@ -196,6 +196,7 @@ public class RestClient {
     protected ClientResponse sendLongRequest(WebResource.Builder invocationBuilder, String method, Object entity, String mediaType)
             throws EyesException {
 
+        logger.verbose("enter");
         String currentTime = GeneralUtils.toRfc1123(Calendar.getInstance(TimeZone.getTimeZone("UTC")));
         invocationBuilder = invocationBuilder
                 .header("Eyes-Expect", "202+location")
@@ -210,13 +211,16 @@ public class RestClient {
         ClientResponse response = invocationBuilder.method(method, ClientResponse.class);
 
         String statusUrl = response.getHeaders().getFirst(HttpHeaders.LOCATION);
-        if (statusUrl != null && response.getStatus() == HttpStatus.SC_ACCEPTED) {
+        int status = response.getStatus();
+        if (statusUrl != null && status == HttpStatus.SC_ACCEPTED) {
             response.close();
 
             int wait = 500;
             while (true) {
                 response = get(statusUrl);
-                if (response.getStatus() == HttpStatus.SC_CREATED) {
+                status = response.getStatus();
+                if (status == HttpStatus.SC_CREATED) {
+                    logger.verbose("exit (CREATED)");
                     return delete(response.getHeaders().getFirst(HttpHeaders.LOCATION));
                 }
 
@@ -233,9 +237,11 @@ public class RestClient {
                 }
 
                 // Something went wrong.
+                logger.verbose("exit (inside loop) (" + status + ")");
                 return response;
             }
         }
+        logger.verbose("exit (" + status + ")");
         return response;
     }
 

@@ -186,22 +186,26 @@ public class RestClient {
     protected Response sendLongRequest(Invocation.Builder invocationBuilder, String method, Entity<?> entity)
             throws EyesException {
 
+        logger.verbose("enter");
         String currentTime = GeneralUtils.toRfc1123(Calendar.getInstance(TimeZone.getTimeZone("UTC")));
         invocationBuilder = invocationBuilder.header("Eyes-Expect", "202+location").header("Eyes-Date", currentTime);
         Response response = invocationBuilder.method(method, entity);
 
         String statusUrl = response.getHeaderString(HttpHeaders.LOCATION);
-        if (statusUrl != null && response.getStatus() == HttpStatus.SC_ACCEPTED) {
+        int status = response.getStatus();
+        if (statusUrl != null && status == HttpStatus.SC_ACCEPTED) {
             response.close();
 
             int wait = 500;
             while (true) {
-                response = Get(statusUrl);
+                response = get(statusUrl);
                 if (response.getStatus() == HttpStatus.SC_CREATED) {
-                    return Delete(response.getHeaderString(HttpHeaders.LOCATION));
+                    logger.verbose("exit (CREATED)");
+                    return delete(response.getHeaderString(HttpHeaders.LOCATION));
                 }
 
-                if (response.getStatus() == HttpStatus.SC_OK) {
+                status = response.getStatus();
+                if (status == HttpStatus.SC_OK) {
                     try {
                         Thread.sleep(wait);
                     } catch (InterruptedException e) {
@@ -210,30 +214,38 @@ public class RestClient {
                     wait *= 2;
                     wait = Math.min(10000, wait);
                     response.close();
+                    logger.verbose("polling...");
                     continue;
                 }
 
                 // Something went wrong.
+                logger.verbose("exit (inside loop) (" + status + ")");
                 return response;
             }
         }
+        logger.verbose("exit (" + status + ")");
         return response;
     }
 
-    private Response Get(String path, String accept) {
+    public String getString(String path, String accept) {
+        Response response = sendHttpWebRequest(path, HttpMethod.GET, accept);
+        return response.readEntity(String.class);
+    }
+
+    private Response get(String path, String accept) {
         return sendHttpWebRequest(path, HttpMethod.GET, accept);
     }
 
-    private Response Get(String path) {
-        return Get(path, null);
+    private Response get(String path) {
+        return get(path, null);
     }
 
-    private Response Delete(String path, String accept) {
+    private Response delete(String path, String accept) {
         return sendHttpWebRequest(path, HttpMethod.DELETE, accept);
     }
 
-    private Response Delete(String path) {
-        return Delete(path, null);
+    private Response delete(String path) {
+        return delete(path, null);
     }
 
     protected Response sendHttpWebRequest(String path, final String method, String accept) {
