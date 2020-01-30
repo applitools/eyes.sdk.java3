@@ -24,10 +24,10 @@ import com.sun.jersey.core.util.MultivaluedMapImpl;
 import org.apache.commons.io.IOUtils;
 import org.brotli.dec.BrotliInputStream;
 
+import javax.ws.rs.HttpMethod;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
-import javax.xml.bind.DatatypeConverter;
 import java.io.*;
 import java.net.URI;
 import java.net.URL;
@@ -217,27 +217,13 @@ public class ServerConnector extends RestClient
         List<Integer> validStatusCodes;
         TestResults result;
 
-        HttpMethodCall delete = new HttpMethodCall() {
-            public ClientResponse call() {
+        WebResource.Builder builder = endPoint.path(sessionId)
+                .queryParam("apiKey", getApiKey())
+                .queryParam("aborted", String.valueOf(isAborted))
+                .queryParam("updateBaseline", String.valueOf(save))
+                .accept(MediaType.APPLICATION_JSON);
 
-                String currentTime = GeneralUtils.toRfc1123(
-                        Calendar.getInstance(TimeZone.getTimeZone("UTC")));
-
-                // Building the request
-                WebResource.Builder builder = endPoint.path(sessionId)
-                        .queryParam("apiKey", getApiKey())
-                        .queryParam("aborted", String.valueOf(isAborted))
-                        .queryParam("updateBaseline", String.valueOf(save))
-                        .accept(MediaType.APPLICATION_JSON)
-                        .header("Eyes-Expect", "202-accepted")
-                        .header("Eyes-Date", currentTime);
-
-                // Actually perform the method call and return the result
-                return builder.delete(ClientResponse.class);
-            }
-        };
-
-        response = sendLongRequest(delete, "stopSession");
+        response = sendLongRequest(builder, "DELETE", null, null);
 
         // Ok, let's create the running session from the response
         validStatusCodes = new ArrayList<>();
@@ -291,58 +277,23 @@ public class ServerConnector extends RestClient
                 endPoint.path(runningSession.getId());
 
         // Serializing model into JSON (we'll treat it as binary later).
-        // IMPORTANT This serializes everything EXCEPT for the screenshot (which
-        // we'll add later).
         try {
             jsonData = jsonMapper.writeValueAsString(matchData);
         } catch (IOException e) {
-            throw new EyesException("Failed to serialize model for matchWindow!",
-                    e);
-        }
-
-        // Convert the JSON to binary.
-        byte[] jsonBytes;
-        ByteArrayOutputStream jsonToBytesConverter = new ByteArrayOutputStream();
-        try {
-            jsonToBytesConverter.write(
-                    jsonData.getBytes(DEFAULT_CHARSET_NAME));
-            jsonToBytesConverter.flush();
-            jsonBytes = jsonToBytesConverter.toByteArray();
-        } catch (IOException e) {
-            throw new EyesException("Failed create binary model from JSON!", e);
-        }
-
-        // Ok, let's create the request model
-        ByteArrayOutputStream requestOutputStream = new ByteArrayOutputStream();
-        DataOutputStream requestDos = new DataOutputStream(requestOutputStream);
-        byte[] requestData;
-        try {
-            requestDos.writeInt(jsonBytes.length);
-            requestDos.flush();
-            requestOutputStream.write(jsonBytes);
-            requestOutputStream.flush();
-
-            // Ok, get the model bytes
-            requestData = requestOutputStream.toByteArray();
-
-            // Release the streams
-            requestDos.close();
-        } catch (IOException e) {
-            throw new EyesException("Failed send check window request!", e);
+            throw new EyesException("Failed to serialize model for matchWindow!", e);
         }
 
         // Sending the request
-        response = runningSessionsEndpoint.queryParam("apiKey", getApiKey()).
-                accept(MediaType.APPLICATION_JSON).
-                entity(requestData, MediaType.APPLICATION_OCTET_STREAM_TYPE).
-                post(ClientResponse.class);
+        WebResource.Builder request = runningSessionsEndpoint.queryParam("apiKey", getApiKey())
+                .accept(MediaType.APPLICATION_JSON);
+
+        response = sendLongRequest(request, HttpMethod.POST, jsonData, MediaType.APPLICATION_JSON);
 
         // Ok, let's create the running session from the response
         validStatusCodes = new ArrayList<>(1);
         validStatusCodes.add(ClientResponse.Status.OK.getStatusCode());
 
-        result = parseResponseWithJsonData(response, validStatusCodes,
-                MatchResult.class);
+        result = parseResponseWithJsonData(response, validStatusCodes, MatchResult.class);
 
         return result;
 
@@ -729,5 +680,18 @@ public class ServerConnector extends RestClient
             GeneralUtils.logExceptionStackTrace(logger, e);
         }
         return bytes;
+    }
+
+
+    @Override
+    protected ClientResponse sendHttpWebRequest(String path, final String method, String accept) {
+        // Building the request
+        WebResource.Builder invocationBuilder = restClient
+                .resource(path)
+                .queryParam("apikey", getApiKey())
+                .accept(accept);
+
+        // Actually perform the method call and return the result
+        return invocationBuilder.method(method, ClientResponse.class);
     }
 }

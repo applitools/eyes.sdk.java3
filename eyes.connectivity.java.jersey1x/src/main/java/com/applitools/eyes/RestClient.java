@@ -1,6 +1,7 @@
 package com.applitools.eyes;
 
 import com.applitools.utils.ArgumentGuard;
+import com.applitools.utils.GeneralUtils;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sun.jersey.api.client.Client;
@@ -9,11 +10,17 @@ import com.sun.jersey.api.client.WebResource;
 import com.sun.jersey.client.apache4.ApacheHttpClient4;
 import com.sun.jersey.client.apache4.config.ApacheHttpClient4Config;
 import com.sun.jersey.client.apache4.config.DefaultApacheHttpClient4Config;
+import org.apache.http.HttpHeaders;
+import org.apache.http.HttpStatus;
 
+import javax.ws.rs.HttpMethod;
+import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriBuilder;
 import java.io.IOException;
 import java.net.URI;
+import java.util.Calendar;
 import java.util.List;
+import java.util.TimeZone;
 
 /**
  * Provides common rest client functionality.
@@ -44,7 +51,7 @@ public class RestClient {
      * @param abstractProxySettings (optional) Setting for communicating via proxy.
      */
     static Client buildRestClient(int timeout,
-                                          AbstractProxySettings abstractProxySettings) {
+                                  AbstractProxySettings abstractProxySettings) {
         // Creating the client configuration
         ApacheHttpClient4Config cc = new DefaultApacheHttpClient4Config();
         cc.getProperties().put(ApacheHttpClient4Config.PROPERTY_CONNECT_TIMEOUT, timeout);
@@ -117,7 +124,6 @@ public class RestClient {
     /**
      * Creates a rest client instance with timeout default of 5 minutes and
      * no proxy settings.
-     *
      * @param logger    A logger instance.
      * @param serverUrl The URI of the rest server.
      */
@@ -128,7 +134,6 @@ public class RestClient {
 
     /**
      * Sets the proxy settings to be used by the rest client.
-     *
      * @param abstractProxySettings The proxy settings to be used by the rest client.
      *                              If {@code null} then no proxy is set.
      */
@@ -151,7 +156,6 @@ public class RestClient {
 
     /**
      * Sets the connect and read timeouts for web requests.
-     *
      * @param timeout Connect/Read timeout in milliseconds. 0 equals infinity.
      */
     public void setTimeout(int timeout) {
@@ -172,7 +176,6 @@ public class RestClient {
 
     /**
      * Sets the current server URL used by the rest client.
-     *
      * @param serverUrl The URI of the rest server.
      */
     @SuppressWarnings("UnusedDeclaration")
@@ -190,42 +193,78 @@ public class RestClient {
         return serverUrl;
     }
 
-    protected ClientResponse sendLongRequest(HttpMethodCall method, String name)
+    protected ClientResponse sendLongRequest(WebResource.Builder invocationBuilder, String method, Object entity, String mediaType)
             throws EyesException {
 
-        // Adding the long request headers
-        int maxDelay = 10000;
-        int delay = 2000;  // milliseconds
-        ClientResponse response;
-        while (true) {
-            response = method.call();
-            if (response.getStatus() != 202) {
-                return response;
-            }
+        String currentTime = GeneralUtils.toRfc1123(Calendar.getInstance(TimeZone.getTimeZone("UTC")));
+        invocationBuilder = invocationBuilder
+                .header("Eyes-Expect", "202+location")
+                .header("Eyes-Date", currentTime);
 
-            // Since we haven't read the entity, We must release the response
-            // or the connection stays open (meaning it'll get stuck after two
-            // requests).
+        if (entity != null && mediaType != null) {
+            invocationBuilder = invocationBuilder.entity(entity, mediaType);
+        } else if (entity != null) {
+            invocationBuilder = invocationBuilder.entity(entity);
+        }
+
+        ClientResponse response = invocationBuilder.method(method, ClientResponse.class);
+
+        String statusUrl = response.getHeaders().getFirst(HttpHeaders.LOCATION);
+        if (statusUrl != null && response.getStatus() == HttpStatus.SC_ACCEPTED) {
             response.close();
 
-            // Waiting a delay
-            logger.verbose(String.format(
-                    "%s: Still running... Retrying in %d ms", name, delay));
-            try {
-                Thread.sleep(delay);
-            } catch (InterruptedException e) {
-                throw new EyesException("Long request interrupted!", e);
-            }
+            int wait = 500;
+            while (true) {
+                response = Get(statusUrl);
+                if (response.getStatus() == HttpStatus.SC_CREATED) {
+                    return Delete(response.getHeaders().getFirst(HttpHeaders.LOCATION));
+                }
 
-            // increasing the delay
-            delay = Math.min(maxDelay, (int) Math.floor(delay * 1.5));
+                if (response.getStatus() == HttpStatus.SC_OK) {
+                    try {
+                        Thread.sleep(wait);
+                    } catch (InterruptedException e) {
+                        throw new EyesException("Long request interrupted!", e);
+                    }
+                    wait *= 2;
+                    wait = Math.min(10000, wait);
+                    response.close();
+                    continue;
+                }
+
+                // Something went wrong.
+                return response;
+            }
         }
+        return response;
     }
 
+    private ClientResponse Get(String path, String accept) {
+        return sendHttpWebRequest(path, HttpMethod.GET, accept);
+    }
+
+    private ClientResponse Get(String path) {
+        return Get(path, null);
+    }
+
+    private ClientResponse Delete(String path, String accept) {
+        return sendHttpWebRequest(path, HttpMethod.DELETE, accept);
+    }
+
+    private ClientResponse Delete(String path) {
+        return Delete(path, null);
+    }
+
+    protected ClientResponse sendHttpWebRequest(String path, final String method, String accept) {
+        // Building the request
+        WebResource.Builder invocationBuilder = restClient.resource(path).accept(accept);
+
+        // Actually perform the method call and return the result
+        return invocationBuilder.method(method, ClientResponse.class);
+    }
 
     /**
      * Builds an error message which includes the response model.
-     *
      * @param errMsg       The error message.
      * @param statusCode   The response status code.
      * @param statusPhrase The response status phrase.
@@ -255,7 +294,6 @@ public class RestClient {
      * 1. Verify that we are able to read response model.
      * 2. verify that the status code is valid
      * 3. Parse the response model from JSON to the relevant type.
-     *
      * @param response             The response to parse.
      * @param validHttpStatusCodes The list of acceptable status codes.
      * @param resultType           The class object of the type of result this response
@@ -284,7 +322,7 @@ public class RestClient {
                     statusCode,
                     statusPhrase,
                     data);
-            if(statusCode == 401 || statusCode == 403){
+            if (statusCode == 401 || statusCode == 403) {
                 errorMessage += "\nThis is most likely due to an invalid API key.";
             }
             throw new EyesException(errorMessage);

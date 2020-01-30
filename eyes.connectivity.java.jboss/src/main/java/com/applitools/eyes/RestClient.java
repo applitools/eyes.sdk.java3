@@ -228,7 +228,7 @@ public class RestClient {
             throws EyesException {
 
         String currentTime = GeneralUtils.toRfc1123(Calendar.getInstance(TimeZone.getTimeZone("UTC")));
-        invocationBuilder.header("Eyes-Expect", "202+location").header("Eyes-Date", currentTime);
+        invocationBuilder = invocationBuilder.header("Eyes-Expect", "202+location").header("Eyes-Date", currentTime);
         Response response = invocationBuilder.method(method, entity);
 
         String statusUrl = response.getHeaderString(HttpHeaders.LOCATION);
