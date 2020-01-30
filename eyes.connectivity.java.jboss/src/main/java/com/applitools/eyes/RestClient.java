@@ -1,8 +1,11 @@
 package com.applitools.eyes;
 
 import com.applitools.utils.ArgumentGuard;
+import com.applitools.utils.GeneralUtils;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.apache.http.HttpHeaders;
+import org.apache.http.HttpStatus;
 import org.apache.http.auth.AuthScope;
 import org.apache.http.auth.Credentials;
 import org.apache.http.auth.UsernamePasswordCredentials;
@@ -15,12 +18,17 @@ import org.jboss.resteasy.client.jaxrs.ResteasyClient;
 import org.jboss.resteasy.client.jaxrs.ResteasyClientBuilder;
 import org.jboss.resteasy.client.jaxrs.engines.ApacheHttpClient4Engine;
 
+import javax.ws.rs.HttpMethod;
 import javax.ws.rs.client.Client;
+import javax.ws.rs.client.Entity;
+import javax.ws.rs.client.Invocation;
 import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.Response;
 import java.io.IOException;
 import java.net.URI;
+import java.util.Calendar;
 import java.util.List;
+import java.util.TimeZone;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -216,38 +224,66 @@ public class RestClient {
         return serverUrl;
     }
 
-    protected Response sendLongRequest(HttpMethodCall method, String name)
+    protected Response sendLongRequest(Invocation.Builder invocationBuilder, String method, Entity<?> entity)
             throws EyesException {
 
-        // Adding the long request headers
-        int maxDelay = 10000;
-        int delay = 2000;  // milliseconds
-        Response response;
-        while (true) {
-            response = method.call();
-            if (response.getStatus() != 202) {
-                return response;
-            }
+        String currentTime = GeneralUtils.toRfc1123(Calendar.getInstance(TimeZone.getTimeZone("UTC")));
+        invocationBuilder.header("Eyes-Expect", "202+location").header("Eyes-Date", currentTime);
+        Response response = invocationBuilder.method(method, entity);
 
-            // Since we haven't read the entity, We must release the response
-            // or the connection stays open (meaning it'll get stuck after two
-            // requests).
+        String statusUrl = response.getHeaderString(HttpHeaders.LOCATION);
+        if (statusUrl != null && response.getStatus() == HttpStatus.SC_ACCEPTED) {
             response.close();
 
-            // Waiting a delay
-            logger.verbose(String.format(
-                    "%s: Still running... Retrying in %d ms", name, delay));
-            try {
-                Thread.sleep(delay);
-            } catch (InterruptedException e) {
-                throw new EyesException("Long request interrupted!", e);
-            }
+            int wait = 500;
+            while (true) {
+                response = Get(statusUrl);
+                if (response.getStatus() == HttpStatus.SC_CREATED) {
+                    return Delete(response.getHeaderString(HttpHeaders.LOCATION));
+                }
 
-            // increasing the delay
-            delay = Math.min(maxDelay, (int) Math.floor(delay * 1.5));
+                if (response.getStatus() == HttpStatus.SC_OK) {
+                    try {
+                        Thread.sleep(wait);
+                    } catch (InterruptedException e) {
+                        throw new EyesException("Long request interrupted!", e);
+                    }
+                    wait *= 2;
+                    wait = Math.min(10000, wait);
+                    response.close();
+                    continue;
+                }
+
+                // Something went wrong.
+                return response;
+            }
         }
+        return response;
     }
 
+    private Response Get(String path, String accept) {
+        return sendHttpWebRequest(path, HttpMethod.GET, accept);
+    }
+
+    private Response Get(String path) {
+        return Get(path, null);
+    }
+
+    private Response Delete(String path, String accept) {
+        return sendHttpWebRequest(path, HttpMethod.DELETE, accept);
+    }
+
+    private Response Delete(String path) {
+        return Delete(path, null);
+    }
+
+    protected Response sendHttpWebRequest(String path, final String method, String accept) {
+        // Building the request
+        Invocation.Builder invocationBuilder = restClient.target(path).request(accept);
+
+        // Actually perform the method call and return the result
+        return invocationBuilder.method(method);
+    }
 
     /**
      * Builds an error message which includes the response model.
