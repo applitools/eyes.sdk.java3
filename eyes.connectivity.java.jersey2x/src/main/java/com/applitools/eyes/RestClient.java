@@ -1,20 +1,26 @@
 package com.applitools.eyes;
 
 import com.applitools.utils.ArgumentGuard;
+import com.applitools.utils.GeneralUtils;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.apache.http.Header;
+import org.apache.http.HttpHeaders;
+import org.apache.http.HttpStatus;
 import org.glassfish.jersey.apache.connector.ApacheConnectorProvider;
 import org.glassfish.jersey.client.ClientConfig;
 import org.glassfish.jersey.client.ClientProperties;
 import org.glassfish.jersey.client.RequestEntityProcessing;
 
-import javax.ws.rs.client.Client;
-import javax.ws.rs.client.ClientBuilder;
-import javax.ws.rs.client.WebTarget;
+import javax.ws.rs.HttpMethod;
+import javax.ws.rs.client.*;
+import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.io.IOException;
 import java.net.URI;
+import java.util.Calendar;
 import java.util.List;
+import java.util.TimeZone;
 
 /**
  * Provides common rest client functionality.
@@ -41,12 +47,11 @@ public class RestClient {
     protected ObjectMapper jsonMapper;
 
     /**
-     *
-     * @param timeout Connect/Read timeout in milliseconds. 0 equals infinity.
+     * @param timeout               Connect/Read timeout in milliseconds. 0 equals infinity.
      * @param abstractProxySettings (optional) Setting for communicating via proxy.
      */
     static Client buildRestClient(int timeout,
-                                      AbstractProxySettings abstractProxySettings) {
+                                  AbstractProxySettings abstractProxySettings) {
         // Creating the client configuration
         ClientConfig cc = new ClientConfig();
         cc.property(ClientProperties.CONNECT_TIMEOUT, timeout);
@@ -97,7 +102,7 @@ public class RestClient {
         endPoint = restClient.target(serverUrl);
     }
 
-    public void setLogger(Logger logger){
+    public void setLogger(Logger logger) {
         ArgumentGuard.notNull(logger, "logger");
         this.logger = logger;
     }
@@ -113,14 +118,14 @@ public class RestClient {
      * @param serverUrl The URI of the rest server.
      */
     public RestClient(Logger logger, URI serverUrl) {
-        this(logger, serverUrl, 1000*60*5);
+        this(logger, serverUrl, 1000 * 60 * 5);
     }
 
 
     /**
      * Sets the proxy settings to be used by the rest client.
      * @param abstractProxySettings The proxy settings to be used by the rest client.
-     * If {@code null} then no proxy is set.
+     *                              If {@code null} then no proxy is set.
      */
     @SuppressWarnings("UnusedDeclaration")
     public void setProxyBase(AbstractProxySettings abstractProxySettings) {
@@ -131,7 +136,6 @@ public class RestClient {
     }
 
     /**
-     *
      * @return The current proxy settings used by the rest client,
      * or {@code null} if no proxy is set.
      */
@@ -142,7 +146,6 @@ public class RestClient {
 
     /**
      * Sets the connect and read timeouts for web requests.
-     *
      * @param timeout Connect/Read timeout in milliseconds. 0 equals infinity.
      */
     public void setTimeout(int timeout) {
@@ -154,7 +157,6 @@ public class RestClient {
     }
 
     /**
-     *
      * @return The timeout for web requests (in seconds).
      */
     public int getTimeout() {
@@ -175,51 +177,77 @@ public class RestClient {
     }
 
     /**
-     *
      * @return The URI of the eyes server.
      */
     protected URI getServerUrlBase() {
         return serverUrl;
     }
 
-    protected Response sendLongRequest(HttpMethodCall method, String name)
+    protected Response sendLongRequest(Invocation.Builder invocationBuilder, String method, Entity<?> entity)
             throws EyesException {
 
-        // Adding the long request headers
-        int maxDelay = 10000;
-        int delay = 2000;  // milliseconds
-        Response response;
-        while (true) {
-            response = method.call();
-            if (response.getStatus() != 202) {
-                return response;
-            }
+        String currentTime = GeneralUtils.toRfc1123(Calendar.getInstance(TimeZone.getTimeZone("UTC")));
+        invocationBuilder.header("Eyes-Expect", "202+location").header("Eyes-Date", currentTime);
+        Response response = invocationBuilder.method(method, entity);
 
-            // Since we haven't read the entity, We must release the response
-            // or the connection stays open (meaning it'll get stuck after two
-            // requests).
+        String statusUrl = response.getHeaderString(HttpHeaders.LOCATION);
+        if (statusUrl != null && response.getStatus() == HttpStatus.SC_ACCEPTED) {
             response.close();
 
-            // Waiting a delay
-            logger.verbose(String.format(
-                    "%s: Still running... Retrying in %d ms", name, delay));
-            try {
-                Thread.sleep(delay);
-            } catch (InterruptedException e) {
-                throw new EyesException("Long request interrupted!", e);
-            }
+            int wait = 500;
+            while (true) {
+                response = Get(statusUrl);
+                if (response.getStatus() == HttpStatus.SC_CREATED) {
+                    return Delete(response.getHeaderString(HttpHeaders.LOCATION));
+                }
 
-            // increasing the delay
-            delay = Math.min(maxDelay, (int) Math.floor(delay * 1.5));
+                if (response.getStatus() == HttpStatus.SC_OK) {
+                    try {
+                        Thread.sleep(wait);
+                    } catch (InterruptedException e) {
+                        throw new EyesException("Long request interrupted!", e);
+                    }
+                    wait *= 2;
+                    wait = Math.min(10000, wait);
+                    response.close();
+                    continue;
+                }
+
+                // Something went wrong.
+                return response;
+            }
         }
+        return response;
     }
 
+    private Response Get(String path, String accept) {
+        return sendHttpWebRequest(path, HttpMethod.GET, accept);
+    }
+
+    private Response Get(String path) {
+        return Get(path, null);
+    }
+
+    private Response Delete(String path, String accept) {
+        return sendHttpWebRequest(path, HttpMethod.DELETE, accept);
+    }
+
+    private Response Delete(String path) {
+        return Delete(path, null);
+    }
+
+    protected Response sendHttpWebRequest(String path, final String method, String accept) {
+        // Building the request
+        Invocation.Builder invocationBuilder = restClient.target(path).request(accept);
+
+        // Actually perform the method call and return the result
+        return invocationBuilder.method(method);
+    }
 
     /**
      * Builds an error message which includes the response model.
-     *
-     * @param errMsg The error message.
-     * @param statusCode The response status code.
+     * @param errMsg       The error message.
+     * @param statusCode   The response status code.
      * @param statusPhrase The response status phrase.
      * @param responseBody The response body.
      * @return An error message which includes the response model.
@@ -246,18 +274,17 @@ public class RestClient {
      * 1. Verify that we are able to read response model.
      * 2. verify that the status code is valid
      * 3. Parse the response model from JSON to the relevant type.
-     *
-     * @param response The response to parse.
+     * @param response             The response to parse.
      * @param validHttpStatusCodes The list of acceptable status codes.
-     * @param resultType The class object of the type of result this response
-     *                   should be parsed to.
-     * @param <T> The return value type.
+     * @param resultType           The class object of the type of result this response
+     *                             should be parsed to.
+     * @param <T>                  The return value type.
      * @return The parse response of the type given in {@code resultType}.
      * @throws EyesException For invalid status codes or if the response
-     * parsing failed.
+     *                       parsing failed.
      */
     protected <T> T parseResponseWithJsonData(Response response,
-        List<Integer> validHttpStatusCodes, Class<T> resultType)
+                                              List<Integer> validHttpStatusCodes, Class<T> resultType)
             throws EyesException {
         ArgumentGuard.notNull(response, "response");
         ArgumentGuard.notNull(validHttpStatusCodes, "validHttpStatusCodes");
@@ -276,7 +303,7 @@ public class RestClient {
                     statusCode,
                     statusPhrase,
                     data);
-            if(statusCode == 401 || statusCode == 403){
+            if (statusCode == 401 || statusCode == 403) {
                 errorMessage += "\nThis is most likely due to an invalid API key.";
             }
             throw new EyesException(errorMessage);
