@@ -1,16 +1,11 @@
 package com.applitools.eyes.utils;
 
-import com.applitools.eyes.FileLogger;
-import com.applitools.eyes.LogHandler;
-import com.applitools.eyes.StdoutLogHandler;
-import com.applitools.eyes.TestResults;
+import com.applitools.eyes.*;
 import com.applitools.eyes.metadata.SessionResults;
 import com.applitools.eyes.selenium.Eyes;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import javax.ws.rs.client.Client;
-import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.UriBuilder;
 import java.io.File;
@@ -86,11 +81,8 @@ public class TestUtils {
                 .queryParam("apiKey", apiKey)
                 .build();
 
-        Client client = ClientBuilder.newClient();
-        String srStr = client.target(apiSessionUri)
-                .request(MediaType.APPLICATION_JSON)
-                .get(String.class);
-
+        RestClient client = new RestClient(new Logger(), apiSessionUri);
+        String srStr = client.getString(apiSessionUri.toString(), MediaType.APPLICATION_JSON);
         ObjectMapper jsonMapper = new ObjectMapper();
         jsonMapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
 
