@@ -272,17 +272,13 @@ public class ServerConnector extends RestClient
         final String jsonData;
 
         // since we rather not add an empty "tag" param
-        final WebTarget runningSessionsEndpoint =
-                endPoint.path(runningSession.getId());
+        final WebTarget runningSessionsEndpoint = endPoint.path(runningSession.getId());
 
         // Serializing model into JSON (we'll treat it as binary later).
-        // IMPORTANT This serializes everything EXCEPT for the screenshot (which
-        // we'll add later).
         try {
             jsonData = jsonMapper.writeValueAsString(matchData);
         } catch (IOException e) {
-            throw new EyesException("Failed to serialize model for matchWindow!",
-                    e);
+            throw new EyesException("Failed to serialize model for matchWindow!", e);
         }
 
         // Sending the request
