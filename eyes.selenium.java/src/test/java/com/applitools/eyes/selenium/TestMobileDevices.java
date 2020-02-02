@@ -2,10 +2,7 @@ package com.applitools.eyes.selenium;
 
 import com.applitools.eyes.TestResults;
 import com.applitools.eyes.selenium.fluent.Target;
-import com.applitools.eyes.utils.CommUtils;
-import com.applitools.eyes.utils.PassedResult;
-import com.applitools.eyes.utils.SeleniumUtils;
-import com.applitools.eyes.utils.TestUtils;
+import com.applitools.eyes.utils.*;
 import org.openqa.selenium.ScreenOrientation;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
@@ -328,24 +325,5 @@ public class TestMobileDevices implements ITest {
     @Override
     public String getTestName() {
         return this.testName;
-    }
-
-    private static class ChromeMobileEmulationDeviceSettings {
-        private Map<String, Object> map;
-
-        public ChromeMobileEmulationDeviceSettings(String userAgent, int width, int height, int pixelRatio) {
-            Map<String,Object> deviceMetrics = new HashMap<>();
-            deviceMetrics.put("width", width);
-            deviceMetrics.put("height", height);
-            deviceMetrics.put("pixelRatio", pixelRatio);
-
-            map = new HashMap<>();
-            map.put("deviceMetrics", deviceMetrics);
-            map.put("userAgent", userAgent);
-        }
-
-        public Map<String, Object> toMap() {
-            return map;
-        }
     }
 }
