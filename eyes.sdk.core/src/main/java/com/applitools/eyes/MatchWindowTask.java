@@ -96,25 +96,26 @@ public class MatchWindowTask {
                                     ICheckSettingsInternal checkSettingsInternal,
                                     ImageMatchSettings imageMatchSettings,
                                     EyesBase eyes, String source) {
+        eyes.getLogger().verbose("enter");
         EyesScreenshot screenshot = appOutput.getScreenshot(checkSettingsInternal);
 
         collectSimpleRegions(checkSettingsInternal, imageMatchSettings, eyes, screenshot);
         collectFloatingRegions(checkSettingsInternal, imageMatchSettings, eyes, screenshot);
         collectAccessibilityRegions(checkSettingsInternal, imageMatchSettings, eyes, screenshot);
 
-        String agentSetupStr = "";
-        if (eyes != null) {
-            Object agentSetup = eyes.getAgentSetup();
-            ObjectMapper jsonMapper = new ObjectMapper();
-            try {
-                agentSetupStr = jsonMapper.writeValueAsString(agentSetup);
-            } catch (JsonProcessingException e) {
-                GeneralUtils.logExceptionStackTrace(logger, e);
-            }
+        logRegions(eyes.getLogger(), imageMatchSettings);
 
+        String agentSetupStr = "";
+        Object agentSetup = eyes.getAgentSetup();
+        ObjectMapper jsonMapper = new ObjectMapper();
+        try {
+            agentSetupStr = jsonMapper.writeValueAsString(agentSetup);
+        } catch (JsonProcessingException e) {
+            GeneralUtils.logExceptionStackTrace(logger, e);
         }
-        return performMatch(userInputs, appOutput, tag, ignoreMismatch, imageMatchSettings, agentSetupStr,
-                null, source);
+
+        eyes.getLogger().verbose("exit");
+        return performMatch(userInputs, appOutput, tag, ignoreMismatch, imageMatchSettings, agentSetupStr, null, source);
     }
 
     /**
@@ -471,12 +472,15 @@ public class MatchWindowTask {
      * @return Merged match settings.
      */
     public static ImageMatchSettings createImageMatchSettings(ICheckSettingsInternal checkSettingsInternal, EyesScreenshot screenshot, EyesBase eyesBase) {
+        eyesBase.getLogger().verbose("enter");
         ImageMatchSettings imageMatchSettings = createImageMatchSettings(checkSettingsInternal, eyesBase);
         if (imageMatchSettings != null) {
             collectSimpleRegions(eyesBase, checkSettingsInternal, imageMatchSettings, screenshot);
             collectFloatingRegions(checkSettingsInternal, imageMatchSettings, eyesBase, screenshot);
             collectAccessibilityRegions(checkSettingsInternal, imageMatchSettings, eyesBase, screenshot);
+            logRegions(eyesBase.getLogger(), imageMatchSettings);
         }
+        eyesBase.getLogger().verbose("exit");
         return imageMatchSettings;
     }
 
@@ -607,4 +611,23 @@ public class MatchWindowTask {
 
     }
 
+    private static void logRegions(Logger logger, ImageMatchSettings ims) {
+        logTypedRegions(logger, "Ignore", ims.getIgnoreRegions());
+        logTypedRegions(logger, "Strict", ims.getStrictRegions());
+        logTypedRegions(logger, "Content", ims.getContentRegions());
+        logTypedRegions(logger, "Layout", ims.getLayoutRegions());
+        logTypedRegions(logger, "Floating", ims.getFloatingRegions());
+        logTypedRegions(logger, "Accessibility", ims.getAccessibility());
+    }
+
+    private static void logTypedRegions(Logger logger, String regionType, Object[] regions) {
+        if (regions == null || regions.length == 0) {
+            logger.verbose(regionType + " Regions list is null or empty");
+            return;
+        }
+        logger.verbose(regionType + " Regions:");
+        for (Object region : regions) {
+            logger.verbose("    " + region);
+        }
+    }
 }
