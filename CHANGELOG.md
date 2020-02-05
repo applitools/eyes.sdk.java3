@@ -1,5 +1,7 @@
 ### Fixed
 - Update sizes and SizeAdjuster on every check due to possible URL change. [Trello 1353](https://trello.com/c/rhTs54Kb)
+### Updated
+- DOM-Snapshot script [Trello 1535](https://trello.com/c/uPA9p8OJ)
 
 ## [3.160.0] - 2020-01-30
 ### Fixed

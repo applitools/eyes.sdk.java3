@@ -1,4 +1,4 @@
-/* @applitools/dom-snapshot@3.2.2 */
+/* @applitools/dom-snapshot@3.3.0 */
 
 function __processPageAndSerializePoll() {
   var processPageAndSerializePoll = (function () {
@@ -109,9 +109,9 @@ function __processPageAndSerializePoll() {
       .map(el => el.getAttribute('data'))
       .filter(Boolean);
 
-    const cssUrls = Array.from(doc.querySelectorAll('link[rel="stylesheet"]')).map(link =>
-      link.getAttribute('href'),
-    );
+    const cssUrls = Array.from(
+      doc.querySelectorAll('link[rel~="stylesheet"], link[as="stylesheet"]'),
+    ).map(link => link.getAttribute('href'));
 
     const videoPosterUrls = Array.from(doc.querySelectorAll('video[poster]')).map(videoEl =>
       videoEl.getAttribute('poster'),
@@ -454,10 +454,16 @@ function __processPageAndSerializePoll() {
               throw e;
             }
           })
-          .then(({url, type, value, probablyCORS}) => {
+          .then(({url, type, value, errorStatusCode, probablyCORS}) => {
             if (probablyCORS) {
               sessionCache && sessionCache.setItem(url, []);
               return {resourceUrls: [url]};
+            }
+
+            if (errorStatusCode) {
+              const blobsObj = {[url]: {errorStatusCode}};
+              sessionCache && sessionCache.setItem(url, []);
+              return {blobsObj};
             }
 
             log('fetched', `[${Date.now() - now}ms]`, url);
@@ -617,10 +623,10 @@ function __processPageAndSerializePoll() {
                 type: resp.headers.get('Content-Type'),
                 value: buff,
               }))
-            : Promise.reject(`bad status code ${resp.status}`),
+            : {url, errorStatusCode: resp.status},
         )
         .then(resolve)
-        .catch(err => reject(err));
+        .catch(reject);
     });
   }
 
@@ -913,7 +919,7 @@ function __processPageAndSerializePoll() {
 
     return doProcessPage(doc).then(result => {
       log$$1('processPage end');
-      result.scriptVersion = '3.2.2';
+      result.scriptVersion = '3.3.0';
       return result;
     });
 
@@ -1004,11 +1010,9 @@ function __processPageAndSerializePoll() {
   }
 
   function serializeFrame(frame) {
-    frame.blobs = frame.blobs.map(({url, type, value}) => ({
-      url,
-      type,
-      value: arrayBufferToBase64_1(value),
-    }));
+    frame.blobs = frame.blobs.map(blob =>
+      blob.value ? Object.assign(blob, {value: arrayBufferToBase64_1(blob.value)}) : blob,
+    );
     frame.frames.forEach(serializeFrame);
     return frame;
   }
