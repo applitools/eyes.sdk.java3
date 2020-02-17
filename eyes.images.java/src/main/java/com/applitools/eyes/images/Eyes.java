@@ -901,6 +901,7 @@ public class Eyes extends EyesBase implements IConfigurationGetter, IConfigurati
     }
 
     public void setConfiguration(Configuration config) {
-        this.config = config;
+        this.config = new Configuration(config);
+        //this.config = config;
     }
 }

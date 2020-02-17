@@ -1,5 +1,6 @@
 ### Fixed
 - Update sizes and SizeAdjuster on every check due to possible URL change. [Trello 1353](https://trello.com/c/rhTs54Kb)
+- Clone incoming configuration. [Trello 1560](https://trello.com/c/hSTcBcvJ)
 
 ## [3.160.0] - 2020-01-30
 ### Fixed
