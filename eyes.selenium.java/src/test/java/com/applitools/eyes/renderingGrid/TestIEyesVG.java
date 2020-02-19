@@ -45,6 +45,7 @@ public class TestIEyesVG extends TestIEyesBase {
     protected Eyes initEyes(WebDriver webDriver, String testedUrl) {
         Eyes eyes = new Eyes(runner);
         Logger logger = eyes.getLogger();
+        TestUtils.setupLogging(eyes);
         logger.log("creating WebDriver: " + testedUrl);
         Configuration renderingConfiguration = new Configuration(GetConfiguration());
         renderingConfiguration.setTestName("Top Sites - " + testedUrl);
@@ -81,7 +82,7 @@ public class TestIEyesVG extends TestIEyesBase {
 
 
         List<RenderBrowserInfo> browsers = renderingConfiguration.getBrowsersInfo();
-        TestResultsSummary resultsSummary = runner.getAllTestResults();
+        TestResultsSummary resultsSummary = runner.getAllTestResults(false);
 
         logger.log(resultsSummary.toString());
 

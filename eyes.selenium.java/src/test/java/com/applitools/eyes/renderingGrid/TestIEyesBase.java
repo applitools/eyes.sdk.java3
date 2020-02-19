@@ -51,7 +51,7 @@ public abstract class TestIEyesBase {
 
 
     @Test(dataProvider = "TTS")
-    public void Test(String testedUrl, MatchLevel matchLevel) {
+    public void TestEyesDifferentRunners(String testedUrl, MatchLevel matchLevel) {
         WebDriver webDriver = SeleniumUtils.createChromeDriver();
         Logger logger;
         Eyes eyes = null;

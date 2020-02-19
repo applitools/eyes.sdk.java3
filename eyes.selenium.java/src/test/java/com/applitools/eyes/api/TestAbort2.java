@@ -76,7 +76,7 @@ public class TestAbort2 {
     }
 
     @Test
-    public void Test_GetAllResults() {
+    public void Test_GetAllResults() throws Exception {
         beforeEachTest();
         Assert.assertThrows(Exception.class, new Assert.ThrowingRunnable() {
             @Override
@@ -96,12 +96,17 @@ public class TestAbort2 {
         AfterEachTest();
 
         beforeEachTest();
-        Assert.assertThrows(Exception.class, new Assert.ThrowingRunnable() {
-            @Override
-            public void run() throws Throwable {
-                Test_ThrowDuringCheck();
-            }
-        });
+        if (!useVisualGrid_) {
+            Assert.assertThrows(Exception.class, new Assert.ThrowingRunnable() {
+                @Override
+                public void run() throws Throwable {
+                    Test_ThrowDuringCheck();
+                }
+            });
+        }
+        else {
+            Test_ThrowDuringCheck();
+        }
         AfterEachTest();
 
         beforeEachTest();

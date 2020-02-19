@@ -105,7 +105,7 @@ public class TestConfigurationSentCorrectlyToServer extends EnvironmentModifier 
         Assert.assertEquals(MatchLevel.LAYOUT2, sessionResults.getActualAppOutput()[0].getImageMatchSettings().getMatchLevel());
         Assert.assertEquals(MatchLevel.CONTENT, sessionResults.getActualAppOutput()[1].getImageMatchSettings().getMatchLevel());
 
-        TestResultsSummary resultsSummary = runner.getAllTestResults();
+        TestResultsSummary resultsSummary = runner.getAllTestResults(false);
         eyes.abortIfNotClosed();
     }
 
