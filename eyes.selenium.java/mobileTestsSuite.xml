@@ -10,7 +10,7 @@
             </class>
         </classes>
     </test>
-    <!--<test name="TestIOSCrop">
+    <test name="TestIOSCrop">
         <classes>
             <class name="com.applitools.eyes.selenium.TestIOSCrop">
                 <methods>
@@ -19,7 +19,7 @@
             </class>
         </classes>
     </test>
-    <test name="Test_Mobile">
+    <!--<test name="Test_Mobile">
         <classes>
             <class name="com.applitools.eyes.selenium.MobileNativeTests"/>
         </classes>
