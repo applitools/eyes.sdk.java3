@@ -8,6 +8,10 @@
                     <include name="TestIOSSafariStitch" />
                 </methods>
             </class>
+        </classes>
+    </test>
+    <!--<test name="TestIOSCrop">
+        <classes>
             <class name="com.applitools.eyes.selenium.TestIOSCrop">
                 <methods>
                     <include name="TestIOSSafariCrop" />
@@ -19,5 +23,5 @@
         <classes>
             <class name="com.applitools.eyes.selenium.MobileNativeTests"/>
         </classes>
-    </test>
+    </test>-->
 </suite>
