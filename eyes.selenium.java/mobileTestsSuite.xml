@@ -19,9 +19,9 @@
             </class>
         </classes>
     </test>
-    <!--<test name="Test_Mobile">
+    <test name="MobileNativeTests">
         <classes>
             <class name="com.applitools.eyes.selenium.MobileNativeTests"/>
         </classes>
-    </test>-->
+    </test>
 </suite>
