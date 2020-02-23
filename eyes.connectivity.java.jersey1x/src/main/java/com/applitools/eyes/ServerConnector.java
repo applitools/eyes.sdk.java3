@@ -475,10 +475,13 @@ public class ServerConnector extends RestClient
                 params.put(RENDER_ID, idsAsList);
                 webResource = target.queryParams(params);
             }
-
         } else {
-            webResource = target.queryParam("render-id", renderRequests[0].getRenderId());
+            String renderId = renderRequests[0].getRenderId();
+            if (renderId != null) {
+                webResource = target.queryParam("render-id", renderId);
+            }
         }
+
         WebResource.Builder builder = null;
         try {
             ObjectMapper objectMapper = new ObjectMapper();
@@ -534,7 +537,6 @@ public class ServerConnector extends RestClient
         this.logger.verbose("called with resource#" + resource.getSha256() + " for render: " + runningRender.getRenderId());
 
         WebResource target = restClient.resource(renderingInfo.getServiceUrl()).path((RESOURCES_SHA_256) + resource.getSha256()).queryParam("render-id", runningRender.getRenderId());
-
 
         WebResource.Builder request = target.accept(MediaType.APPLICATION_JSON);
 
