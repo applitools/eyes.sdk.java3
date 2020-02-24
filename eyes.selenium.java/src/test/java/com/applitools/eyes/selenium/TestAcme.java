@@ -1,6 +1,7 @@
 package com.applitools.eyes.selenium;
 
 import com.applitools.eyes.RectangleSize;
+import com.applitools.eyes.Region;
 import com.applitools.eyes.selenium.fluent.Target;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Capabilities;
@@ -16,7 +17,7 @@ public class TestAcme extends TestSetup {
     @Factory(dataProvider = "dp", dataProviderClass = TestDataProvider.class)
     public TestAcme(Capabilities caps, String mode) {
         super("Eyes Selenium SDK - ACME", caps, mode);
-        testedPageSize = new RectangleSize(1024,768);
+        testedPageSize = new RectangleSize(1024, 768);
     }
 
 //    @Test
@@ -42,5 +43,15 @@ public class TestAcme extends TestSetup {
                 Target.region(username),
                 Target.region(password)
         );
+    }
+
+    @Test
+    public void TestCodedRegions() {
+        getDriver().get("https://demo.applitools.com");
+        getEyes().checkWindow("Step 1");
+        getEyes().check(Target.region(By.cssSelector("body > div > div"))
+                .layout(By.cssSelector("body > div > div > form > div:nth-child(1)")));
+        setExpectedLayoutRegions(new Region(80, 322, 290, 62));
+
     }
 }
