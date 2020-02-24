@@ -1,3 +1,7 @@
+## [vNext]
+### Fixed
+- Fixed UFG coded regions placements. [Trello 1542](https://trello.com/c/2Awzru1V)
+
 ## [3.160.1] - 2020-02-23
 ### Fixed
 - Update sizes and SizeAdjuster on every check due to possible URL change. [Trello 1353](https://trello.com/c/rhTs54Kb)
