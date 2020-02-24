@@ -300,8 +300,9 @@ public class MatchWindowTask {
         Location location = Location.ZERO;
 
         // If target element location available
-        if (mutableRegions.get(5).size() > 0) {
-            location = mutableRegions.get(5).get(0).getLocation();
+        int selectorRegionsIndex = mutableRegions.size() - 1;
+        if (mutableRegions.get(selectorRegionsIndex).size() > 0) {
+            location = mutableRegions.get(selectorRegionsIndex).get(0).getLocation();
         }
 
         imageMatchSettings.setIgnoreRegions(filterEmptyEntries(mutableRegions.get(0), location));
