@@ -475,7 +475,7 @@ public class ServerConnector extends RestClient
                 params.put(RENDER_ID, idsAsList);
                 webResource = target.queryParams(params);
             }
-        } else {
+        } else if (renderRequests.length == 1) {
             String renderId = renderRequests[0].getRenderId();
             if (renderId != null) {
                 webResource = target.queryParam("render-id", renderId);

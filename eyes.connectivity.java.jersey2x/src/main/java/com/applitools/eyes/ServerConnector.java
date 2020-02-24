@@ -494,7 +494,7 @@ public class ServerConnector extends RestClient
         WebTarget target = restClient.target(renderingInfo.getServiceUrl()).path((RENDER));
         if (renderRequests.length > 1) {
             target.matrixParam("render-id", (Object) renderRequests);
-        } else {
+        } else if (renderRequests.length == 1) {
             target.queryParam("render-id", (Object) renderRequests);
         }
         Invocation.Builder request = target.request(MediaType.APPLICATION_JSON);
