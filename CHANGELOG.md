@@ -1,4 +1,8 @@
-## [3.160.2]
+## [vNext]
+### Updated
+- DOM Snapshot script to version 3.3.3. [Trello 1588](https://trello.com/c/ZS0Wb1FN)
+
+## [3.160.2] - 2020-02-24
 ### Fixed
 - Fixed UFG coded regions placements. [Trello 1542](https://trello.com/c/2Awzru1V)
 - Check at least one render request exists before extracting id. [Trello 1489](https://trello.com/c/KSfk2LhY)
