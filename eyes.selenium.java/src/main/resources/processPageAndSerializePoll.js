@@ -1,4 +1,4 @@
-/* @applitools/dom-snapshot@3.2.2 */
+/* @applitools/dom-snapshot@3.3.3 */
 
 function __processPageAndSerializePoll() {
   var processPageAndSerializePoll = (function () {
@@ -88,14 +88,10 @@ function __processPageAndSerializePoll() {
   var arrayBufferToBase64_1 = arrayBufferToBase64;
 
   function extractLinks(doc = document) {
-    const srcsetUrls = Array.from(doc.querySelectorAll('img[srcset],source[srcset]'))
-      .map(srcsetEl =>
-        srcsetEl
-          .getAttribute('srcset')
-          .split(', ')
-          .map(str => str.trim().split(/\s+/)[0]),
-      )
-      .reduce((acc, urls) => acc.concat(urls), []);
+    const srcsetRegexp = /(\S+)(?:\s+[\d.]+[wx])?(?:,|$)/g;
+    const srcsetUrls = Array.from(doc.querySelectorAll('img[srcset],source[srcset]'), srcsetEl =>
+      execAll(srcsetRegexp, srcsetEl.getAttribute('srcset'), match => match[1]),
+    ).reduce((acc, urls) => acc.concat(urls), []);
 
     const srcUrls = Array.from(
       doc.querySelectorAll('img[src],source[src],input[type="image"][src]'),
@@ -109,9 +105,9 @@ function __processPageAndSerializePoll() {
       .map(el => el.getAttribute('data'))
       .filter(Boolean);
 
-    const cssUrls = Array.from(doc.querySelectorAll('link[rel="stylesheet"]')).map(link =>
-      link.getAttribute('href'),
-    );
+    const cssUrls = Array.from(
+      doc.querySelectorAll('link[rel~="stylesheet"], link[as="stylesheet"]'),
+    ).map(link => link.getAttribute('href'));
 
     const videoPosterUrls = Array.from(doc.querySelectorAll('video[poster]')).map(videoEl =>
       videoEl.getAttribute('poster'),
@@ -123,6 +119,19 @@ function __processPageAndSerializePoll() {
       .concat(Array.from(cssUrls))
       .concat(Array.from(videoPosterUrls))
       .concat(Array.from(objectUrls));
+
+    // can be replaced with matchAll once Safari supports it
+    function execAll(regexp, string, mapper) {
+      const matches = [];
+      const clonedRegexp = new RegExp(regexp.source, regexp.flags);
+      const isGlobal = clonedRegexp.global;
+      let match;
+      while ((match = clonedRegexp.exec(string))) {
+        matches.push(mapper(match));
+        if (!isGlobal) break;
+      }
+      return matches;
+    }
   }
 
   var extractLinks_1 = extractLinks;
@@ -138,7 +147,7 @@ function __processPageAndSerializePoll() {
       !/^https?:.+/.test(frame.src) ||
       (frame.contentDocument &&
         frame.contentDocument.location &&
-        frame.contentDocument.location.href === 'about:blank')
+        ['about:blank', 'about:srcdoc'].includes(frame.contentDocument.location.href))
     );
   }
 
@@ -147,7 +156,7 @@ function __processPageAndSerializePoll() {
   function isAccessibleFrame(frame) {
     try {
       const doc = frame.contentDocument;
-      return !!(doc && doc.defaultView && doc.defaultView.frameElement);
+      return Boolean(doc && doc.defaultView && doc.defaultView.frameElement);
     } catch (err) {
       // for CORS frames
     }
@@ -789,7 +798,9 @@ function __processPageAndSerializePoll() {
 
   function extractFrames(documents = [document]) {
     const iframes = flat_1(
-      documents.map(d => Array.from(d.querySelectorAll('iframe[src]:not([src=""])'))),
+      documents.map(d =>
+        Array.from(d.querySelectorAll('iframe[src]:not([src=""]),iframe[srcdoc]:not([srcdoc=""])')),
+      ),
     );
 
     return iframes.filter(f => isAccessibleFrame_1(f) && !isInlineFrame_1(f)).map(f => f.contentDocument);
@@ -913,7 +924,7 @@ function __processPageAndSerializePoll() {
 
     return doProcessPage(doc).then(result => {
       log$$1('processPage end');
-      result.scriptVersion = '3.2.2';
+      result.scriptVersion = '3.3.3';
       return result;
     });
 

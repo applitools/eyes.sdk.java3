@@ -1,4 +1,4 @@
-/* @applitools/dom-snapshot@3.2.2 */
+/* @applitools/dom-snapshot@3.3.3 */
 
 function __processPageAndSerializePollForIE() {
   var processPageAndSerializePollForIE = (function () {
@@ -40,7 +40,7 @@ function __processPageAndSerializePollForIE() {
 
             // Thank's IE8 for his funny defineProperty
             var descriptors = !fails(function () {
-              return Object.defineProperty({}, 'a', { get: function () { return 7; } }).a != 7;
+              return Object.defineProperty({}, 1, { get: function () { return 7; } })[1] != 7;
             });
 
             var nativePropertyIsEnumerable = {}.propertyIsEnumerable;
@@ -223,9 +223,9 @@ function __processPageAndSerializePollForIE() {
             (module.exports = function (key, value) {
               return sharedStore[key] || (sharedStore[key] = value !== undefined ? value : {});
             })('versions', []).push({
-              version: '3.6.1',
+              version: '3.6.4',
               mode: 'global',
-              copyright: '© 2019 Denis Pushkarev (zloirock.ru)'
+              copyright: '© 2020 Denis Pushkarev (zloirock.ru)'
             });
             });
 
@@ -686,7 +686,7 @@ function __processPageAndSerializePollForIE() {
 
             var f$6 = wellKnownSymbol;
 
-            var wrappedWellKnownSymbol = {
+            var wellKnownSymbolWrapped = {
             	f: f$6
             };
 
@@ -695,7 +695,7 @@ function __processPageAndSerializePollForIE() {
             var defineWellKnownSymbol = function (NAME) {
               var Symbol = path.Symbol || (path.Symbol = {});
               if (!has(Symbol, NAME)) defineProperty(Symbol, NAME, {
-                value: wrappedWellKnownSymbol.f(NAME)
+                value: wellKnownSymbolWrapped.f(NAME)
               });
             };
 
@@ -718,7 +718,7 @@ function __processPageAndSerializePollForIE() {
             };
 
             // optional / simple context binding
-            var bindContext = function (fn, that, length) {
+            var functionBindContext = function (fn, that, length) {
               aFunction$1(fn);
               if (that === undefined) return fn;
               switch (length) {
@@ -770,7 +770,7 @@ function __processPageAndSerializePollForIE() {
               return function ($this, callbackfn, that, specificCreate) {
                 var O = toObject($this);
                 var self = indexedObject(O);
-                var boundFunction = bindContext(callbackfn, that, 3);
+                var boundFunction = functionBindContext(callbackfn, that, 3);
                 var length = toLength(self.length);
                 var index = 0;
                 var create = specificCreate || arraySpeciesCreate;
@@ -971,7 +971,7 @@ function __processPageAndSerializePollForIE() {
               objectGetOwnPropertyNames.f = objectGetOwnPropertyNamesExternal.f = $getOwnPropertyNames;
               objectGetOwnPropertySymbols.f = $getOwnPropertySymbols;
 
-              wrappedWellKnownSymbol.f = function (name) {
+              wellKnownSymbolWrapped.f = function (name) {
                 return wrap(wellKnownSymbol(name), name);
               };
 
@@ -1444,7 +1444,7 @@ function __processPageAndSerializePollForIE() {
             };
 
             var iterate = module.exports = function (iterable, fn, that, AS_ENTRIES, IS_ITERATOR) {
-              var boundFunction = bindContext(fn, that, AS_ENTRIES ? 2 : 1);
+              var boundFunction = functionBindContext(fn, that, AS_ENTRIES ? 2 : 1);
               var iterator, iterFn, index, length, result, next, step;
 
               if (IS_ITERATOR) {
@@ -1708,7 +1708,7 @@ function __processPageAndSerializePollForIE() {
             }
 
             // Forced replacement object prototype accessors methods
-            var forcedObjectPrototypeAccessorsMethods = isPure || !fails(function () {
+            var objectPrototypeAccessorsForced = isPure || !fails(function () {
               var key = Math.random();
               // In FF throws only define methods
               // eslint-disable-next-line no-undef, no-useless-call
@@ -1719,7 +1719,7 @@ function __processPageAndSerializePollForIE() {
             // `Object.prototype.__defineGetter__` method
             // https://tc39.github.io/ecma262/#sec-object.prototype.__defineGetter__
             if (descriptors) {
-              _export({ target: 'Object', proto: true, forced: forcedObjectPrototypeAccessorsMethods }, {
+              _export({ target: 'Object', proto: true, forced: objectPrototypeAccessorsForced }, {
                 __defineGetter__: function __defineGetter__(P, getter) {
                   objectDefineProperty.f(toObject(this), P, { get: aFunction$1(getter), enumerable: true, configurable: true });
                 }
@@ -1729,7 +1729,7 @@ function __processPageAndSerializePollForIE() {
             // `Object.prototype.__defineSetter__` method
             // https://tc39.github.io/ecma262/#sec-object.prototype.__defineSetter__
             if (descriptors) {
-              _export({ target: 'Object', proto: true, forced: forcedObjectPrototypeAccessorsMethods }, {
+              _export({ target: 'Object', proto: true, forced: objectPrototypeAccessorsForced }, {
                 __defineSetter__: function __defineSetter__(P, setter) {
                   objectDefineProperty.f(toObject(this), P, { set: aFunction$1(setter), enumerable: true, configurable: true });
                 }
@@ -1741,7 +1741,7 @@ function __processPageAndSerializePollForIE() {
             // `Object.prototype.__lookupGetter__` method
             // https://tc39.github.io/ecma262/#sec-object.prototype.__lookupGetter__
             if (descriptors) {
-              _export({ target: 'Object', proto: true, forced: forcedObjectPrototypeAccessorsMethods }, {
+              _export({ target: 'Object', proto: true, forced: objectPrototypeAccessorsForced }, {
                 __lookupGetter__: function __lookupGetter__(P) {
                   var O = toObject(this);
                   var key = toPrimitive(P, true);
@@ -1758,7 +1758,7 @@ function __processPageAndSerializePollForIE() {
             // `Object.prototype.__lookupSetter__` method
             // https://tc39.github.io/ecma262/#sec-object.prototype.__lookupSetter__
             if (descriptors) {
-              _export({ target: 'Object', proto: true, forced: forcedObjectPrototypeAccessorsMethods }, {
+              _export({ target: 'Object', proto: true, forced: objectPrototypeAccessorsForced }, {
                 __lookupSetter__: function __lookupSetter__(P) {
                   var O = toObject(this);
                   var key = toPrimitive(P, true);
@@ -1851,26 +1851,25 @@ function __processPageAndSerializePollForIE() {
               var argumentsLength = arguments.length;
               var mapfn = argumentsLength > 1 ? arguments[1] : undefined;
               var mapping = mapfn !== undefined;
-              var index = 0;
               var iteratorMethod = getIteratorMethod(O);
-              var length, result, step, iterator, next;
-              if (mapping) mapfn = bindContext(mapfn, argumentsLength > 2 ? arguments[2] : undefined, 2);
+              var index = 0;
+              var length, result, step, iterator, next, value;
+              if (mapping) mapfn = functionBindContext(mapfn, argumentsLength > 2 ? arguments[2] : undefined, 2);
               // if the target is not iterable or it's an array with the default iterator - use a simple case
               if (iteratorMethod != undefined && !(C == Array && isArrayIteratorMethod(iteratorMethod))) {
                 iterator = iteratorMethod.call(O);
                 next = iterator.next;
                 result = new C();
                 for (;!(step = next.call(iterator)).done; index++) {
-                  createProperty(result, index, mapping
-                    ? callWithSafeIterationClosing(iterator, mapfn, [step.value, index], true)
-                    : step.value
-                  );
+                  value = mapping ? callWithSafeIterationClosing(iterator, mapfn, [step.value, index], true) : step.value;
+                  createProperty(result, index, value);
                 }
               } else {
                 length = toLength(O.length);
                 result = new C(length);
                 for (;length > index; index++) {
-                  createProperty(result, index, mapping ? mapfn(O[index], index) : O[index]);
+                  value = mapping ? mapfn(O[index], index) : O[index];
+                  createProperty(result, index, value);
                 }
               }
               result.length = index;
@@ -1931,7 +1930,7 @@ function __processPageAndSerializePollForIE() {
               }
             });
 
-            var userAgent = getBuiltIn('navigator', 'userAgent') || '';
+            var engineUserAgent = getBuiltIn('navigator', 'userAgent') || '';
 
             var process = global_1.process;
             var versions = process && process.versions;
@@ -1941,15 +1940,15 @@ function __processPageAndSerializePollForIE() {
             if (v8) {
               match = v8.split('.');
               version = match[0] + match[1];
-            } else if (userAgent) {
-              match = userAgent.match(/Edge\/(\d+)/);
+            } else if (engineUserAgent) {
+              match = engineUserAgent.match(/Edge\/(\d+)/);
               if (!match || match[1] >= 74) {
-                match = userAgent.match(/Chrome\/(\d+)/);
+                match = engineUserAgent.match(/Chrome\/(\d+)/);
                 if (match) version = match[1];
               }
             }
 
-            var v8Version = version && +version;
+            var engineV8Version = version && +version;
 
             var SPECIES$1 = wellKnownSymbol('species');
 
@@ -1957,7 +1956,7 @@ function __processPageAndSerializePollForIE() {
               // We can't use this feature detection in V8 since it causes
               // deoptimization and serious performance degradation
               // https://github.com/zloirock/core-js/issues/677
-              return v8Version >= 51 || !fails(function () {
+              return engineV8Version >= 51 || !fails(function () {
                 var array = [];
                 var constructor = array.constructor = {};
                 constructor[SPECIES$1] = function () {
@@ -1974,7 +1973,7 @@ function __processPageAndSerializePollForIE() {
             // We can't use this feature detection in V8 since it causes
             // deoptimization and serious performance degradation
             // https://github.com/zloirock/core-js/issues/679
-            var IS_CONCAT_SPREADABLE_SUPPORT = v8Version >= 51 || !fails(function () {
+            var IS_CONCAT_SPREADABLE_SUPPORT = engineV8Version >= 51 || !fails(function () {
               var array = [];
               array[IS_CONCAT_SPREADABLE] = false;
               return array.concat()[0] !== array;
@@ -2066,20 +2065,48 @@ function __processPageAndSerializePollForIE() {
             // https://tc39.github.io/ecma262/#sec-array.prototype-@@unscopables
             addToUnscopables('copyWithin');
 
-            var sloppyArrayMethod = function (METHOD_NAME, argument) {
+            var arrayMethodIsStrict = function (METHOD_NAME, argument) {
               var method = [][METHOD_NAME];
-              return !method || !fails(function () {
+              return !!method && fails(function () {
                 // eslint-disable-next-line no-useless-call,no-throw-literal
                 method.call(null, argument || function () { throw 1; }, 1);
+              });
+            };
+
+            var defineProperty$5 = Object.defineProperty;
+            var cache = {};
+
+            var thrower = function (it) { throw it; };
+
+            var arrayMethodUsesToLength = function (METHOD_NAME, options) {
+              if (has(cache, METHOD_NAME)) return cache[METHOD_NAME];
+              if (!options) options = {};
+              var method = [][METHOD_NAME];
+              var ACCESSORS = has(options, 'ACCESSORS') ? options.ACCESSORS : false;
+              var argument0 = has(options, 0) ? options[0] : thrower;
+              var argument1 = has(options, 1) ? options[1] : undefined;
+
+              return cache[METHOD_NAME] = !!method && !fails(function () {
+                if (ACCESSORS && !descriptors) return true;
+                var O = { length: -1 };
+
+                if (ACCESSORS) defineProperty$5(O, 1, { enumerable: true, get: thrower });
+                else O[1] = 1;
+
+                method.call(O, argument0, argument1);
               });
             };
 
             var $every = arrayIteration.every;
 
 
+
+            var STRICT_METHOD = arrayMethodIsStrict('every');
+            var USES_TO_LENGTH = arrayMethodUsesToLength('every');
+
             // `Array.prototype.every` method
             // https://tc39.github.io/ecma262/#sec-array.prototype.every
-            _export({ target: 'Array', proto: true, forced: sloppyArrayMethod('every') }, {
+            _export({ target: 'Array', proto: true, forced: !STRICT_METHOD || !USES_TO_LENGTH }, {
               every: function every(callbackfn /* , thisArg */) {
                 return $every(this, callbackfn, arguments.length > 1 ? arguments[1] : undefined);
               }
@@ -2113,14 +2140,12 @@ function __processPageAndSerializePollForIE() {
 
             var HAS_SPECIES_SUPPORT = arrayMethodHasSpeciesSupport('filter');
             // Edge 14- issue
-            var USES_TO_LENGTH = HAS_SPECIES_SUPPORT && !fails(function () {
-              [].filter.call({ length: -1, 0: 1 }, function (it) { throw it; });
-            });
+            var USES_TO_LENGTH$1 = arrayMethodUsesToLength('filter');
 
             // `Array.prototype.filter` method
             // https://tc39.github.io/ecma262/#sec-array.prototype.filter
             // with adding support of @@species
-            _export({ target: 'Array', proto: true, forced: !HAS_SPECIES_SUPPORT || !USES_TO_LENGTH }, {
+            _export({ target: 'Array', proto: true, forced: !HAS_SPECIES_SUPPORT || !USES_TO_LENGTH$1 }, {
               filter: function filter(callbackfn /* , thisArg */) {
                 return $filter(this, callbackfn, arguments.length > 1 ? arguments[1] : undefined);
               }
@@ -2129,15 +2154,18 @@ function __processPageAndSerializePollForIE() {
             var $find = arrayIteration.find;
 
 
+
             var FIND = 'find';
             var SKIPS_HOLES = true;
+
+            var USES_TO_LENGTH$2 = arrayMethodUsesToLength(FIND);
 
             // Shouldn't skip holes
             if (FIND in []) Array(1)[FIND](function () { SKIPS_HOLES = false; });
 
             // `Array.prototype.find` method
             // https://tc39.github.io/ecma262/#sec-array.prototype.find
-            _export({ target: 'Array', proto: true, forced: SKIPS_HOLES }, {
+            _export({ target: 'Array', proto: true, forced: SKIPS_HOLES || !USES_TO_LENGTH$2 }, {
               find: function find(callbackfn /* , that = undefined */) {
                 return $find(this, callbackfn, arguments.length > 1 ? arguments[1] : undefined);
               }
@@ -2149,15 +2177,18 @@ function __processPageAndSerializePollForIE() {
             var $findIndex = arrayIteration.findIndex;
 
 
+
             var FIND_INDEX = 'findIndex';
             var SKIPS_HOLES$1 = true;
+
+            var USES_TO_LENGTH$3 = arrayMethodUsesToLength(FIND_INDEX);
 
             // Shouldn't skip holes
             if (FIND_INDEX in []) Array(1)[FIND_INDEX](function () { SKIPS_HOLES$1 = false; });
 
             // `Array.prototype.findIndex` method
             // https://tc39.github.io/ecma262/#sec-array.prototype.findindex
-            _export({ target: 'Array', proto: true, forced: SKIPS_HOLES$1 }, {
+            _export({ target: 'Array', proto: true, forced: SKIPS_HOLES$1 || !USES_TO_LENGTH$3 }, {
               findIndex: function findIndex(callbackfn /* , that = undefined */) {
                 return $findIndex(this, callbackfn, arguments.length > 1 ? arguments[1] : undefined);
               }
@@ -2171,7 +2202,7 @@ function __processPageAndSerializePollForIE() {
             var flattenIntoArray = function (target, original, source, sourceLen, start, depth, mapper, thisArg) {
               var targetIndex = start;
               var sourceIndex = 0;
-              var mapFn = mapper ? bindContext(mapper, thisArg, 3) : false;
+              var mapFn = mapper ? functionBindContext(mapper, thisArg, 3) : false;
               var element;
 
               while (sourceIndex < sourceLen) {
@@ -2224,9 +2255,13 @@ function __processPageAndSerializePollForIE() {
             var $forEach$1 = arrayIteration.forEach;
 
 
+
+            var STRICT_METHOD$1 = arrayMethodIsStrict('forEach');
+            var USES_TO_LENGTH$4 = arrayMethodUsesToLength('forEach');
+
             // `Array.prototype.forEach` method implementation
             // https://tc39.github.io/ecma262/#sec-array.prototype.foreach
-            var arrayForEach = sloppyArrayMethod('forEach') ? function forEach(callbackfn /* , thisArg */) {
+            var arrayForEach = (!STRICT_METHOD$1 || !USES_TO_LENGTH$4) ? function forEach(callbackfn /* , thisArg */) {
               return $forEach$1(this, callbackfn, arguments.length > 1 ? arguments[1] : undefined);
             } : [].forEach;
 
@@ -2239,9 +2274,12 @@ function __processPageAndSerializePollForIE() {
             var $includes = arrayIncludes.includes;
 
 
+
+            var USES_TO_LENGTH$5 = arrayMethodUsesToLength('indexOf', { ACCESSORS: true, 1: 0 });
+
             // `Array.prototype.includes` method
             // https://tc39.github.io/ecma262/#sec-array.prototype.includes
-            _export({ target: 'Array', proto: true }, {
+            _export({ target: 'Array', proto: true, forced: !USES_TO_LENGTH$5 }, {
               includes: function includes(el /* , fromIndex = 0 */) {
                 return $includes(this, el, arguments.length > 1 ? arguments[1] : undefined);
               }
@@ -2253,14 +2291,16 @@ function __processPageAndSerializePollForIE() {
             var $indexOf = arrayIncludes.indexOf;
 
 
+
             var nativeIndexOf = [].indexOf;
 
             var NEGATIVE_ZERO = !!nativeIndexOf && 1 / [1].indexOf(1, -0) < 0;
-            var SLOPPY_METHOD = sloppyArrayMethod('indexOf');
+            var STRICT_METHOD$2 = arrayMethodIsStrict('indexOf');
+            var USES_TO_LENGTH$6 = arrayMethodUsesToLength('indexOf', { ACCESSORS: true, 1: 0 });
 
             // `Array.prototype.indexOf` method
             // https://tc39.github.io/ecma262/#sec-array.prototype.indexof
-            _export({ target: 'Array', proto: true, forced: NEGATIVE_ZERO || SLOPPY_METHOD }, {
+            _export({ target: 'Array', proto: true, forced: NEGATIVE_ZERO || !STRICT_METHOD$2 || !USES_TO_LENGTH$6 }, {
               indexOf: function indexOf(searchElement /* , fromIndex = 0 */) {
                 return NEGATIVE_ZERO
                   // convert -0 to +0
@@ -2272,11 +2312,11 @@ function __processPageAndSerializePollForIE() {
             var nativeJoin = [].join;
 
             var ES3_STRINGS = indexedObject != Object;
-            var SLOPPY_METHOD$1 = sloppyArrayMethod('join', ',');
+            var STRICT_METHOD$3 = arrayMethodIsStrict('join', ',');
 
             // `Array.prototype.join` method
             // https://tc39.github.io/ecma262/#sec-array.prototype.join
-            _export({ target: 'Array', proto: true, forced: ES3_STRINGS || SLOPPY_METHOD$1 }, {
+            _export({ target: 'Array', proto: true, forced: ES3_STRINGS || !STRICT_METHOD$3 }, {
               join: function join(separator) {
                 return nativeJoin.call(toIndexedObject(this), separator === undefined ? ',' : separator);
               }
@@ -2285,11 +2325,14 @@ function __processPageAndSerializePollForIE() {
             var min$3 = Math.min;
             var nativeLastIndexOf = [].lastIndexOf;
             var NEGATIVE_ZERO$1 = !!nativeLastIndexOf && 1 / [1].lastIndexOf(1, -0) < 0;
-            var SLOPPY_METHOD$2 = sloppyArrayMethod('lastIndexOf');
+            var STRICT_METHOD$4 = arrayMethodIsStrict('lastIndexOf');
+            // For preventing possible almost infinite loop in non-standard implementations, test the forward version of the method
+            var USES_TO_LENGTH$7 = arrayMethodUsesToLength('indexOf', { ACCESSORS: true, 1: 0 });
+            var FORCED$2 = NEGATIVE_ZERO$1 || !STRICT_METHOD$4 || !USES_TO_LENGTH$7;
 
             // `Array.prototype.lastIndexOf` method implementation
             // https://tc39.github.io/ecma262/#sec-array.prototype.lastindexof
-            var arrayLastIndexOf = (NEGATIVE_ZERO$1 || SLOPPY_METHOD$2) ? function lastIndexOf(searchElement /* , fromIndex = @[*-1] */) {
+            var arrayLastIndexOf = FORCED$2 ? function lastIndexOf(searchElement /* , fromIndex = @[*-1] */) {
               // convert -0 to +0
               if (NEGATIVE_ZERO$1) return nativeLastIndexOf.apply(this, arguments) || 0;
               var O = toIndexedObject(this);
@@ -2313,14 +2356,12 @@ function __processPageAndSerializePollForIE() {
 
             var HAS_SPECIES_SUPPORT$1 = arrayMethodHasSpeciesSupport('map');
             // FF49- issue
-            var USES_TO_LENGTH$1 = HAS_SPECIES_SUPPORT$1 && !fails(function () {
-              [].map.call({ length: -1, 0: 1 }, function (it) { throw it; });
-            });
+            var USES_TO_LENGTH$8 = arrayMethodUsesToLength('map');
 
             // `Array.prototype.map` method
             // https://tc39.github.io/ecma262/#sec-array.prototype.map
             // with adding support of @@species
-            _export({ target: 'Array', proto: true, forced: !HAS_SPECIES_SUPPORT$1 || !USES_TO_LENGTH$1 }, {
+            _export({ target: 'Array', proto: true, forced: !HAS_SPECIES_SUPPORT$1 || !USES_TO_LENGTH$8 }, {
               map: function map(callbackfn /* , thisArg */) {
                 return $map(this, callbackfn, arguments.length > 1 ? arguments[1] : undefined);
               }
@@ -2365,9 +2406,13 @@ function __processPageAndSerializePollForIE() {
             var $reduce = arrayReduce.left;
 
 
+
+            var STRICT_METHOD$5 = arrayMethodIsStrict('reduce');
+            var USES_TO_LENGTH$9 = arrayMethodUsesToLength('reduce', { 1: 0 });
+
             // `Array.prototype.reduce` method
             // https://tc39.github.io/ecma262/#sec-array.prototype.reduce
-            _export({ target: 'Array', proto: true, forced: sloppyArrayMethod('reduce') }, {
+            _export({ target: 'Array', proto: true, forced: !STRICT_METHOD$5 || !USES_TO_LENGTH$9 }, {
               reduce: function reduce(callbackfn /* , initialValue */) {
                 return $reduce(this, callbackfn, arguments.length, arguments.length > 1 ? arguments[1] : undefined);
               }
@@ -2376,9 +2421,14 @@ function __processPageAndSerializePollForIE() {
             var $reduceRight = arrayReduce.right;
 
 
+
+            var STRICT_METHOD$6 = arrayMethodIsStrict('reduceRight');
+            // For preventing possible almost infinite loop in non-standard implementations, test the forward version of the method
+            var USES_TO_LENGTH$a = arrayMethodUsesToLength('reduce', { 1: 0 });
+
             // `Array.prototype.reduceRight` method
             // https://tc39.github.io/ecma262/#sec-array.prototype.reduceright
-            _export({ target: 'Array', proto: true, forced: sloppyArrayMethod('reduceRight') }, {
+            _export({ target: 'Array', proto: true, forced: !STRICT_METHOD$6 || !USES_TO_LENGTH$a }, {
               reduceRight: function reduceRight(callbackfn /* , initialValue */) {
                 return $reduceRight(this, callbackfn, arguments.length, arguments.length > 1 ? arguments[1] : undefined);
               }
@@ -2399,6 +2449,9 @@ function __processPageAndSerializePollForIE() {
               }
             });
 
+            var HAS_SPECIES_SUPPORT$2 = arrayMethodHasSpeciesSupport('slice');
+            var USES_TO_LENGTH$b = arrayMethodUsesToLength('slice', { ACCESSORS: true, 0: 0, 1: 2 });
+
             var SPECIES$2 = wellKnownSymbol('species');
             var nativeSlice = [].slice;
             var max$1 = Math.max;
@@ -2406,7 +2459,7 @@ function __processPageAndSerializePollForIE() {
             // `Array.prototype.slice` method
             // https://tc39.github.io/ecma262/#sec-array.prototype.slice
             // fallback for not array-like ES3 strings and DOM objects
-            _export({ target: 'Array', proto: true, forced: !arrayMethodHasSpeciesSupport('slice') }, {
+            _export({ target: 'Array', proto: true, forced: !HAS_SPECIES_SUPPORT$2 || !USES_TO_LENGTH$b }, {
               slice: function slice(start, end) {
                 var O = toIndexedObject(this);
                 var length = toLength(O.length);
@@ -2437,9 +2490,13 @@ function __processPageAndSerializePollForIE() {
             var $some = arrayIteration.some;
 
 
+
+            var STRICT_METHOD$7 = arrayMethodIsStrict('some');
+            var USES_TO_LENGTH$c = arrayMethodUsesToLength('some');
+
             // `Array.prototype.some` method
             // https://tc39.github.io/ecma262/#sec-array.prototype.some
-            _export({ target: 'Array', proto: true, forced: sloppyArrayMethod('some') }, {
+            _export({ target: 'Array', proto: true, forced: !STRICT_METHOD$7 || !USES_TO_LENGTH$c }, {
               some: function some(callbackfn /* , thisArg */) {
                 return $some(this, callbackfn, arguments.length > 1 ? arguments[1] : undefined);
               }
@@ -2457,19 +2514,22 @@ function __processPageAndSerializePollForIE() {
               test$2.sort(null);
             });
             // Old WebKit
-            var SLOPPY_METHOD$3 = sloppyArrayMethod('sort');
+            var STRICT_METHOD$8 = arrayMethodIsStrict('sort');
 
-            var FORCED$2 = FAILS_ON_UNDEFINED || !FAILS_ON_NULL || SLOPPY_METHOD$3;
+            var FORCED$3 = FAILS_ON_UNDEFINED || !FAILS_ON_NULL || !STRICT_METHOD$8;
 
             // `Array.prototype.sort` method
             // https://tc39.github.io/ecma262/#sec-array.prototype.sort
-            _export({ target: 'Array', proto: true, forced: FORCED$2 }, {
+            _export({ target: 'Array', proto: true, forced: FORCED$3 }, {
               sort: function sort(comparefn) {
                 return comparefn === undefined
                   ? nativeSort.call(toObject(this))
                   : nativeSort.call(toObject(this), aFunction$1(comparefn));
               }
             });
+
+            var HAS_SPECIES_SUPPORT$3 = arrayMethodHasSpeciesSupport('splice');
+            var USES_TO_LENGTH$d = arrayMethodUsesToLength('splice', { ACCESSORS: true, 0: 0, 1: 2 });
 
             var max$2 = Math.max;
             var min$4 = Math.min;
@@ -2479,7 +2539,7 @@ function __processPageAndSerializePollForIE() {
             // `Array.prototype.splice` method
             // https://tc39.github.io/ecma262/#sec-array.prototype.splice
             // with adding support of @@species
-            _export({ target: 'Array', proto: true, forced: !arrayMethodHasSpeciesSupport('splice') }, {
+            _export({ target: 'Array', proto: true, forced: !HAS_SPECIES_SUPPORT$3 || !USES_TO_LENGTH$d }, {
               splice: function splice(start, deleteCount /* , ...items */) {
                 var O = toObject(this);
                 var len = toLength(O.length);
@@ -2999,6 +3059,18 @@ function __processPageAndSerializePollForIE() {
 
             var regexpExec = patchedExec;
 
+            _export({ target: 'RegExp', proto: true, forced: /./.exec !== regexpExec }, {
+              exec: regexpExec
+            });
+
+            // TODO: Remove from `core-js@4` since it's moved to entry points
+
+
+
+
+
+
+
             var SPECIES$4 = wellKnownSymbol('species');
 
             var REPLACE_SUPPORTS_NAMED_GROUPS = !fails(function () {
@@ -3018,6 +3090,15 @@ function __processPageAndSerializePollForIE() {
             // https://stackoverflow.com/questions/6024666/getting-ie-to-replace-a-regex-with-the-literal-string-0
             var REPLACE_KEEPS_$0 = (function () {
               return 'a'.replace(/./, '$0') === '$0';
+            })();
+
+            var REPLACE = wellKnownSymbol('replace');
+            // Safari <= 13.0.3(?) substitutes nth capture where n>m with an empty string
+            var REGEXP_REPLACE_SUBSTITUTES_UNDEFINED_CAPTURE = (function () {
+              if (/./[REPLACE]) {
+                return /./[REPLACE]('a', '$0') === '';
+              }
+              return false;
             })();
 
             // Chrome 51 has a buggy "split" implementation when RegExp#exec !== nativeExec
@@ -3067,7 +3148,11 @@ function __processPageAndSerializePollForIE() {
               if (
                 !DELEGATES_TO_SYMBOL ||
                 !DELEGATES_TO_EXEC ||
-                (KEY === 'replace' && !(REPLACE_SUPPORTS_NAMED_GROUPS && REPLACE_KEEPS_$0)) ||
+                (KEY === 'replace' && !(
+                  REPLACE_SUPPORTS_NAMED_GROUPS &&
+                  REPLACE_KEEPS_$0 &&
+                  !REGEXP_REPLACE_SUBSTITUTES_UNDEFINED_CAPTURE
+                )) ||
                 (KEY === 'split' && !SPLIT_WORKS_WITH_OVERWRITTEN_EXEC)
               ) {
                 var nativeRegExpMethod = /./[SYMBOL];
@@ -3082,7 +3167,10 @@ function __processPageAndSerializePollForIE() {
                     return { done: true, value: nativeMethod.call(str, regexp, arg2) };
                   }
                   return { done: false };
-                }, { REPLACE_KEEPS_$0: REPLACE_KEEPS_$0 });
+                }, {
+                  REPLACE_KEEPS_$0: REPLACE_KEEPS_$0,
+                  REGEXP_REPLACE_SUBSTITUTES_UNDEFINED_CAPTURE: REGEXP_REPLACE_SUBSTITUTES_UNDEFINED_CAPTURE
+                });
                 var stringMethod = methods[0];
                 var regexMethod = methods[1];
 
@@ -3313,14 +3401,14 @@ function __processPageAndSerializePollForIE() {
 
 
             // eslint-disable-next-line unicorn/no-unsafe-regex
-            var webkitStringPadBug = /Version\/10\.\d+(\.\d+)?( Mobile\/\w+)? Safari\//.test(userAgent);
+            var stringPadWebkitBug = /Version\/10\.\d+(\.\d+)?( Mobile\/\w+)? Safari\//.test(engineUserAgent);
 
             var $padEnd = stringPad.end;
 
 
             // `String.prototype.padEnd` method
             // https://tc39.github.io/ecma262/#sec-string.prototype.padend
-            _export({ target: 'String', proto: true, forced: webkitStringPadBug }, {
+            _export({ target: 'String', proto: true, forced: stringPadWebkitBug }, {
               padEnd: function padEnd(maxLength /* , fillString = ' ' */) {
                 return $padEnd(this, maxLength, arguments.length > 1 ? arguments[1] : undefined);
               }
@@ -3331,7 +3419,7 @@ function __processPageAndSerializePollForIE() {
 
             // `String.prototype.padStart` method
             // https://tc39.github.io/ecma262/#sec-string.prototype.padstart
-            _export({ target: 'String', proto: true, forced: webkitStringPadBug }, {
+            _export({ target: 'String', proto: true, forced: stringPadWebkitBug }, {
               padStart: function padStart(maxLength /* , fillString = ' ' */) {
                 return $padStart(this, maxLength, arguments.length > 1 ? arguments[1] : undefined);
               }
@@ -3355,6 +3443,10 @@ function __processPageAndSerializePollForIE() {
 
             // @@replace logic
             fixRegexpWellKnownSymbolLogic('replace', 2, function (REPLACE, nativeReplace, maybeCallNative, reason) {
+              var REGEXP_REPLACE_SUBSTITUTES_UNDEFINED_CAPTURE = reason.REGEXP_REPLACE_SUBSTITUTES_UNDEFINED_CAPTURE;
+              var REPLACE_KEEPS_$0 = reason.REPLACE_KEEPS_$0;
+              var UNSAFE_SUBSTITUTE = REGEXP_REPLACE_SUBSTITUTES_UNDEFINED_CAPTURE ? '$' : '$0';
+
               return [
                 // `String.prototype.replace` method
                 // https://tc39.github.io/ecma262/#sec-string.prototype.replace
@@ -3368,7 +3460,10 @@ function __processPageAndSerializePollForIE() {
                 // `RegExp.prototype[@@replace]` method
                 // https://tc39.github.io/ecma262/#sec-regexp.prototype-@@replace
                 function (regexp, replaceValue) {
-                  if (reason.REPLACE_KEEPS_$0 || (typeof replaceValue === 'string' && replaceValue.indexOf('$0') === -1)) {
+                  if (
+                    (!REGEXP_REPLACE_SUBSTITUTES_UNDEFINED_CAPTURE && REPLACE_KEEPS_$0) ||
+                    (typeof replaceValue === 'string' && replaceValue.indexOf(UNSAFE_SUBSTITUTE) === -1)
+                  ) {
                     var res = maybeCallNative(nativeReplace, regexp, this, replaceValue);
                     if (res.done) return res.value;
                   }
@@ -3678,7 +3773,7 @@ function __processPageAndSerializePollForIE() {
 
             // check that a method works with the correct list
             // of whitespaces and has a correct name
-            var forcedStringTrimMethod = function (METHOD_NAME) {
+            var stringTrimForced = function (METHOD_NAME) {
               return fails(function () {
                 return !!whitespaces[METHOD_NAME]() || non[METHOD_NAME]() != non || whitespaces[METHOD_NAME].name !== METHOD_NAME;
               });
@@ -3689,7 +3784,7 @@ function __processPageAndSerializePollForIE() {
 
             // `String.prototype.trim` method
             // https://tc39.github.io/ecma262/#sec-string.prototype.trim
-            _export({ target: 'String', proto: true, forced: forcedStringTrimMethod('trim') }, {
+            _export({ target: 'String', proto: true, forced: stringTrimForced('trim') }, {
               trim: function trim() {
                 return $trim(this);
               }
@@ -3698,15 +3793,15 @@ function __processPageAndSerializePollForIE() {
             var $trimStart = stringTrim.start;
 
 
-            var FORCED$3 = forcedStringTrimMethod('trimStart');
+            var FORCED$4 = stringTrimForced('trimStart');
 
-            var trimStart = FORCED$3 ? function trimStart() {
+            var trimStart = FORCED$4 ? function trimStart() {
               return $trimStart(this);
             } : ''.trimStart;
 
             // `String.prototype.{ trimStart, trimLeft }` methods
             // https://github.com/tc39/ecmascript-string-left-right-trim
-            _export({ target: 'String', proto: true, forced: FORCED$3 }, {
+            _export({ target: 'String', proto: true, forced: FORCED$4 }, {
               trimStart: trimStart,
               trimLeft: trimStart
             });
@@ -3714,15 +3809,15 @@ function __processPageAndSerializePollForIE() {
             var $trimEnd = stringTrim.end;
 
 
-            var FORCED$4 = forcedStringTrimMethod('trimEnd');
+            var FORCED$5 = stringTrimForced('trimEnd');
 
-            var trimEnd = FORCED$4 ? function trimEnd() {
+            var trimEnd = FORCED$5 ? function trimEnd() {
               return $trimEnd(this);
             } : ''.trimEnd;
 
             // `String.prototype.{ trimEnd, trimRight }` methods
             // https://github.com/tc39/ecmascript-string-left-right-trim
-            _export({ target: 'String', proto: true, forced: FORCED$4 }, {
+            _export({ target: 'String', proto: true, forced: FORCED$5 }, {
               trimEnd: trimEnd,
               trimRight: trimEnd
             });
@@ -3769,7 +3864,7 @@ function __processPageAndSerializePollForIE() {
 
             // check the existence of a method, lowercase
             // of a tag and escaping quotes in arguments
-            var forcedStringHtmlMethod = function (METHOD_NAME) {
+            var stringHtmlForced = function (METHOD_NAME) {
               return fails(function () {
                 var test = ''[METHOD_NAME]('"');
                 return test !== test.toLowerCase() || test.split('"').length > 3;
@@ -3778,7 +3873,7 @@ function __processPageAndSerializePollForIE() {
 
             // `String.prototype.anchor` method
             // https://tc39.github.io/ecma262/#sec-string.prototype.anchor
-            _export({ target: 'String', proto: true, forced: forcedStringHtmlMethod('anchor') }, {
+            _export({ target: 'String', proto: true, forced: stringHtmlForced('anchor') }, {
               anchor: function anchor(name) {
                 return createHtml(this, 'a', 'name', name);
               }
@@ -3786,7 +3881,7 @@ function __processPageAndSerializePollForIE() {
 
             // `String.prototype.big` method
             // https://tc39.github.io/ecma262/#sec-string.prototype.big
-            _export({ target: 'String', proto: true, forced: forcedStringHtmlMethod('big') }, {
+            _export({ target: 'String', proto: true, forced: stringHtmlForced('big') }, {
               big: function big() {
                 return createHtml(this, 'big', '', '');
               }
@@ -3794,7 +3889,7 @@ function __processPageAndSerializePollForIE() {
 
             // `String.prototype.blink` method
             // https://tc39.github.io/ecma262/#sec-string.prototype.blink
-            _export({ target: 'String', proto: true, forced: forcedStringHtmlMethod('blink') }, {
+            _export({ target: 'String', proto: true, forced: stringHtmlForced('blink') }, {
               blink: function blink() {
                 return createHtml(this, 'blink', '', '');
               }
@@ -3802,7 +3897,7 @@ function __processPageAndSerializePollForIE() {
 
             // `String.prototype.bold` method
             // https://tc39.github.io/ecma262/#sec-string.prototype.bold
-            _export({ target: 'String', proto: true, forced: forcedStringHtmlMethod('bold') }, {
+            _export({ target: 'String', proto: true, forced: stringHtmlForced('bold') }, {
               bold: function bold() {
                 return createHtml(this, 'b', '', '');
               }
@@ -3810,7 +3905,7 @@ function __processPageAndSerializePollForIE() {
 
             // `String.prototype.fixed` method
             // https://tc39.github.io/ecma262/#sec-string.prototype.fixed
-            _export({ target: 'String', proto: true, forced: forcedStringHtmlMethod('fixed') }, {
+            _export({ target: 'String', proto: true, forced: stringHtmlForced('fixed') }, {
               fixed: function fixed() {
                 return createHtml(this, 'tt', '', '');
               }
@@ -3818,7 +3913,7 @@ function __processPageAndSerializePollForIE() {
 
             // `String.prototype.fontcolor` method
             // https://tc39.github.io/ecma262/#sec-string.prototype.fontcolor
-            _export({ target: 'String', proto: true, forced: forcedStringHtmlMethod('fontcolor') }, {
+            _export({ target: 'String', proto: true, forced: stringHtmlForced('fontcolor') }, {
               fontcolor: function fontcolor(color) {
                 return createHtml(this, 'font', 'color', color);
               }
@@ -3826,7 +3921,7 @@ function __processPageAndSerializePollForIE() {
 
             // `String.prototype.fontsize` method
             // https://tc39.github.io/ecma262/#sec-string.prototype.fontsize
-            _export({ target: 'String', proto: true, forced: forcedStringHtmlMethod('fontsize') }, {
+            _export({ target: 'String', proto: true, forced: stringHtmlForced('fontsize') }, {
               fontsize: function fontsize(size) {
                 return createHtml(this, 'font', 'size', size);
               }
@@ -3834,7 +3929,7 @@ function __processPageAndSerializePollForIE() {
 
             // `String.prototype.italics` method
             // https://tc39.github.io/ecma262/#sec-string.prototype.italics
-            _export({ target: 'String', proto: true, forced: forcedStringHtmlMethod('italics') }, {
+            _export({ target: 'String', proto: true, forced: stringHtmlForced('italics') }, {
               italics: function italics() {
                 return createHtml(this, 'i', '', '');
               }
@@ -3842,7 +3937,7 @@ function __processPageAndSerializePollForIE() {
 
             // `String.prototype.link` method
             // https://tc39.github.io/ecma262/#sec-string.prototype.link
-            _export({ target: 'String', proto: true, forced: forcedStringHtmlMethod('link') }, {
+            _export({ target: 'String', proto: true, forced: stringHtmlForced('link') }, {
               link: function link(url) {
                 return createHtml(this, 'a', 'href', url);
               }
@@ -3850,7 +3945,7 @@ function __processPageAndSerializePollForIE() {
 
             // `String.prototype.small` method
             // https://tc39.github.io/ecma262/#sec-string.prototype.small
-            _export({ target: 'String', proto: true, forced: forcedStringHtmlMethod('small') }, {
+            _export({ target: 'String', proto: true, forced: stringHtmlForced('small') }, {
               small: function small() {
                 return createHtml(this, 'small', '', '');
               }
@@ -3858,7 +3953,7 @@ function __processPageAndSerializePollForIE() {
 
             // `String.prototype.strike` method
             // https://tc39.github.io/ecma262/#sec-string.prototype.strike
-            _export({ target: 'String', proto: true, forced: forcedStringHtmlMethod('strike') }, {
+            _export({ target: 'String', proto: true, forced: stringHtmlForced('strike') }, {
               strike: function strike() {
                 return createHtml(this, 'strike', '', '');
               }
@@ -3866,7 +3961,7 @@ function __processPageAndSerializePollForIE() {
 
             // `String.prototype.sub` method
             // https://tc39.github.io/ecma262/#sec-string.prototype.sub
-            _export({ target: 'String', proto: true, forced: forcedStringHtmlMethod('sub') }, {
+            _export({ target: 'String', proto: true, forced: stringHtmlForced('sub') }, {
               sub: function sub() {
                 return createHtml(this, 'sub', '', '');
               }
@@ -3874,7 +3969,7 @@ function __processPageAndSerializePollForIE() {
 
             // `String.prototype.sup` method
             // https://tc39.github.io/ecma262/#sec-string.prototype.sup
-            _export({ target: 'String', proto: true, forced: forcedStringHtmlMethod('sup') }, {
+            _export({ target: 'String', proto: true, forced: stringHtmlForced('sup') }, {
               sup: function sup() {
                 return createHtml(this, 'sup', '', '');
               }
@@ -3895,7 +3990,7 @@ function __processPageAndSerializePollForIE() {
               return $this;
             };
 
-            var defineProperty$5 = objectDefineProperty.f;
+            var defineProperty$6 = objectDefineProperty.f;
             var getOwnPropertyNames = objectGetOwnPropertyNames.f;
 
 
@@ -3917,7 +4012,7 @@ function __processPageAndSerializePollForIE() {
 
             var UNSUPPORTED_Y$2 = regexpStickyHelpers.UNSUPPORTED_Y;
 
-            var FORCED$5 = descriptors && isForced_1('RegExp', (!CORRECT_NEW || UNSUPPORTED_Y$2 || fails(function () {
+            var FORCED$6 = descriptors && isForced_1('RegExp', (!CORRECT_NEW || UNSUPPORTED_Y$2 || fails(function () {
               re2[MATCH$2] = false;
               // RegExp constructor can alter flags and IsRegExp works correct with @@match
               return NativeRegExp(re1) != re1 || NativeRegExp(re2) == re2 || NativeRegExp(re1, 'i') != '/a/i';
@@ -3925,7 +4020,7 @@ function __processPageAndSerializePollForIE() {
 
             // `RegExp` constructor
             // https://tc39.github.io/ecma262/#sec-regexp-constructor
-            if (FORCED$5) {
+            if (FORCED$6) {
               var RegExpWrapper = function RegExp(pattern, flags) {
                 var thisIsRegExp = this instanceof RegExpWrapper;
                 var patternIsRegExp = isRegexp(pattern);
@@ -3959,7 +4054,7 @@ function __processPageAndSerializePollForIE() {
                 return result;
               };
               var proxy = function (key) {
-                key in RegExpWrapper || defineProperty$5(RegExpWrapper, key, {
+                key in RegExpWrapper || defineProperty$6(RegExpWrapper, key, {
                   configurable: true,
                   get: function () { return NativeRegExp[key]; },
                   set: function (it) { NativeRegExp[key] = it; }
@@ -3976,10 +4071,6 @@ function __processPageAndSerializePollForIE() {
             // https://tc39.github.io/ecma262/#sec-get-regexp-@@species
             setSpecies('RegExp');
 
-            _export({ target: 'RegExp', proto: true, forced: /./.exec !== regexpExec }, {
-              exec: regexpExec
-            });
-
             var UNSUPPORTED_Y$3 = regexpStickyHelpers.UNSUPPORTED_Y;
 
             // `RegExp.prototype.flags` getter
@@ -3992,13 +4083,13 @@ function __processPageAndSerializePollForIE() {
             }
 
             var UNSUPPORTED_Y$4 = regexpStickyHelpers.UNSUPPORTED_Y;
-            var defineProperty$6 = objectDefineProperty.f;
+            var defineProperty$7 = objectDefineProperty.f;
             var getInternalState$4 = internalState.get;
             var RegExpPrototype$2 = RegExp.prototype;
 
             // `RegExp.prototype.sticky` getter
             if (descriptors && UNSUPPORTED_Y$4) {
-              defineProperty$6(RegExp.prototype, 'sticky', {
+              defineProperty$7(RegExp.prototype, 'sticky', {
                 configurable: true,
                 get: function () {
                   if (this === RegExpPrototype$2) return undefined;
@@ -4011,6 +4102,11 @@ function __processPageAndSerializePollForIE() {
                 }
               });
             }
+
+            // TODO: Remove from `core-js@4` since it's moved to entry points
+
+
+
 
             var DELEGATES_TO_EXEC = function () {
               var execCalled = false;
@@ -4060,46 +4156,46 @@ function __processPageAndSerializePollForIE() {
             var trim = stringTrim.trim;
 
 
-            var nativeParseInt = global_1.parseInt;
+            var $parseInt = global_1.parseInt;
             var hex = /^[+-]?0[Xx]/;
-            var FORCED$6 = nativeParseInt(whitespaces + '08') !== 8 || nativeParseInt(whitespaces + '0x16') !== 22;
+            var FORCED$7 = $parseInt(whitespaces + '08') !== 8 || $parseInt(whitespaces + '0x16') !== 22;
 
             // `parseInt` method
             // https://tc39.github.io/ecma262/#sec-parseint-string-radix
-            var _parseInt = FORCED$6 ? function parseInt(string, radix) {
+            var numberParseInt = FORCED$7 ? function parseInt(string, radix) {
               var S = trim(String(string));
-              return nativeParseInt(S, (radix >>> 0) || (hex.test(S) ? 16 : 10));
-            } : nativeParseInt;
+              return $parseInt(S, (radix >>> 0) || (hex.test(S) ? 16 : 10));
+            } : $parseInt;
 
             // `parseInt` method
             // https://tc39.github.io/ecma262/#sec-parseint-string-radix
-            _export({ global: true, forced: parseInt != _parseInt }, {
-              parseInt: _parseInt
+            _export({ global: true, forced: parseInt != numberParseInt }, {
+              parseInt: numberParseInt
             });
 
             var trim$1 = stringTrim.trim;
 
 
-            var nativeParseFloat = global_1.parseFloat;
-            var FORCED$7 = 1 / nativeParseFloat(whitespaces + '-0') !== -Infinity;
+            var $parseFloat = global_1.parseFloat;
+            var FORCED$8 = 1 / $parseFloat(whitespaces + '-0') !== -Infinity;
 
             // `parseFloat` method
             // https://tc39.github.io/ecma262/#sec-parsefloat-string
-            var _parseFloat = FORCED$7 ? function parseFloat(string) {
+            var numberParseFloat = FORCED$8 ? function parseFloat(string) {
               var trimmedString = trim$1(String(string));
-              var result = nativeParseFloat(trimmedString);
+              var result = $parseFloat(trimmedString);
               return result === 0 && trimmedString.charAt(0) == '-' ? -0 : result;
-            } : nativeParseFloat;
+            } : $parseFloat;
 
             // `parseFloat` method
             // https://tc39.github.io/ecma262/#sec-parsefloat-string
-            _export({ global: true, forced: parseFloat != _parseFloat }, {
-              parseFloat: _parseFloat
+            _export({ global: true, forced: parseFloat != numberParseFloat }, {
+              parseFloat: numberParseFloat
             });
 
             var getOwnPropertyNames$1 = objectGetOwnPropertyNames.f;
             var getOwnPropertyDescriptor$6 = objectGetOwnPropertyDescriptor.f;
-            var defineProperty$7 = objectDefineProperty.f;
+            var defineProperty$8 = objectDefineProperty.f;
             var trim$2 = stringTrim.trim;
 
             var NUMBER = 'Number';
@@ -4157,7 +4253,7 @@ function __processPageAndSerializePollForIE() {
                 'MIN_SAFE_INTEGER,parseFloat,parseInt,isInteger'
               ).split(','), j = 0, key; keys$2.length > j; j++) {
                 if (has(NativeNumber, key = keys$2[j]) && !has(NumberWrapper, key)) {
-                  defineProperty$7(NumberWrapper, key, getOwnPropertyDescriptor$6(NativeNumber, key));
+                  defineProperty$8(NumberWrapper, key, getOwnPropertyDescriptor$6(NativeNumber, key));
                 }
               }
               NumberWrapper.prototype = NumberPrototype;
@@ -4230,14 +4326,14 @@ function __processPageAndSerializePollForIE() {
 
             // `Number.parseFloat` method
             // https://tc39.github.io/ecma262/#sec-number.parseFloat
-            _export({ target: 'Number', stat: true, forced: Number.parseFloat != _parseFloat }, {
-              parseFloat: _parseFloat
+            _export({ target: 'Number', stat: true, forced: Number.parseFloat != numberParseFloat }, {
+              parseFloat: numberParseFloat
             });
 
             // `Number.parseInt` method
             // https://tc39.github.io/ecma262/#sec-number.parseint
-            _export({ target: 'Number', stat: true, forced: Number.parseInt != _parseInt }, {
-              parseInt: _parseInt
+            _export({ target: 'Number', stat: true, forced: Number.parseInt != numberParseInt }, {
+              parseInt: numberParseInt
             });
 
             // `thisNumberValue` abstract operation
@@ -4269,7 +4365,7 @@ function __processPageAndSerializePollForIE() {
               } return n;
             };
 
-            var FORCED$8 = nativeToFixed && (
+            var FORCED$9 = nativeToFixed && (
               0.00008.toFixed(3) !== '0.000' ||
               0.9.toFixed(0) !== '1' ||
               1.255.toFixed(2) !== '1.25' ||
@@ -4281,7 +4377,7 @@ function __processPageAndSerializePollForIE() {
 
             // `Number.prototype.toFixed` method
             // https://tc39.github.io/ecma262/#sec-number.prototype.tofixed
-            _export({ target: 'Number', proto: true, forced: FORCED$8 }, {
+            _export({ target: 'Number', proto: true, forced: FORCED$9 }, {
               // eslint-disable-next-line max-statements
               toFixed: function toFixed(fractionDigits) {
                 var number = thisNumberValue(this);
@@ -4371,7 +4467,7 @@ function __processPageAndSerializePollForIE() {
 
             var nativeToPrecision = 1.0.toPrecision;
 
-            var FORCED$9 = fails(function () {
+            var FORCED$a = fails(function () {
               // IE7-
               return nativeToPrecision.call(1, undefined) !== '1';
             }) || !fails(function () {
@@ -4381,7 +4477,7 @@ function __processPageAndSerializePollForIE() {
 
             // `Number.prototype.toPrecision` method
             // https://tc39.github.io/ecma262/#sec-number.prototype.toprecision
-            _export({ target: 'Number', proto: true, forced: FORCED$9 }, {
+            _export({ target: 'Number', proto: true, forced: FORCED$a }, {
               toPrecision: function toPrecision(precision) {
                 return precision === undefined
                   ? nativeToPrecision.call(thisNumberValue(this))
@@ -4402,7 +4498,7 @@ function __processPageAndSerializePollForIE() {
             var sqrt = Math.sqrt;
             var LN2 = Math.LN2;
 
-            var FORCED$a = !nativeAcosh
+            var FORCED$b = !nativeAcosh
               // V8 bug: https://code.google.com/p/v8/issues/detail?id=3509
               || Math.floor(nativeAcosh(Number.MAX_VALUE)) != 710
               // Tor Browser bug: Math.acosh(Infinity) -> NaN
@@ -4410,7 +4506,7 @@ function __processPageAndSerializePollForIE() {
 
             // `Math.acosh` method
             // https://tc39.github.io/ecma262/#sec-math.acosh
-            _export({ target: 'Math', stat: true, forced: FORCED$a }, {
+            _export({ target: 'Math', stat: true, forced: FORCED$b }, {
               acosh: function acosh(x) {
                 return (x = +x) < 1 ? NaN : x > 94906265.62425156
                   ? log$2(x) + LN2
@@ -4569,14 +4665,14 @@ function __processPageAndSerializePollForIE() {
 
             var nativeImul = Math.imul;
 
-            var FORCED$b = fails(function () {
+            var FORCED$c = fails(function () {
               return nativeImul(0xFFFFFFFF, 5) != -5 || nativeImul.length != 2;
             });
 
             // `Math.imul` method
             // https://tc39.github.io/ecma262/#sec-math.imul
             // some WebKit versions fails with big numbers, some has wrong arity
-            _export({ target: 'Math', stat: true, forced: FORCED$b }, {
+            _export({ target: 'Math', stat: true, forced: FORCED$c }, {
               imul: function imul(x, y) {
                 var UINT16 = 0xFFFF;
                 var xn = +x;
@@ -4623,14 +4719,14 @@ function __processPageAndSerializePollForIE() {
             var exp$1 = Math.exp;
             var E$1 = Math.E;
 
-            var FORCED$c = fails(function () {
+            var FORCED$d = fails(function () {
               return Math.sinh(-2e-17) != -2e-17;
             });
 
             // `Math.sinh` method
             // https://tc39.github.io/ecma262/#sec-math.sinh
             // V8 near Chromium 38 has a problem with very small numbers
-            _export({ target: 'Math', stat: true, forced: FORCED$c }, {
+            _export({ target: 'Math', stat: true, forced: FORCED$d }, {
               sinh: function sinh(x) {
                 return abs$5(x = +x) < 1 ? (mathExpm1(x) - mathExpm1(-x)) / 2 : (exp$1(x - 1) - exp$1(-x - 1)) * (E$1 / 2);
               }
@@ -4671,14 +4767,14 @@ function __processPageAndSerializePollForIE() {
               }
             });
 
-            var FORCED$d = fails(function () {
+            var FORCED$e = fails(function () {
               return new Date(NaN).toJSON() !== null
                 || Date.prototype.toJSON.call({ toISOString: function () { return 1; } }) !== 1;
             });
 
             // `Date.prototype.toJSON` method
             // https://tc39.github.io/ecma262/#sec-date.prototype.tojson
-            _export({ target: 'Date', proto: true, forced: FORCED$d }, {
+            _export({ target: 'Date', proto: true, forced: FORCED$e }, {
               // eslint-disable-next-line no-unused-vars
               toJSON: function toJSON(key) {
                 var O = toObject(this);
@@ -4768,14 +4864,14 @@ function __processPageAndSerializePollForIE() {
               } return match;
             };
 
-            var FORCED$e = fails(function () {
+            var FORCED$f = fails(function () {
               return $stringify$1('\uDF06\uD834') !== '"\\udf06\\ud834"'
                 || $stringify$1('\uDEAD') !== '"\\udead"';
             });
 
             if ($stringify$1) {
               // https://github.com/tc39/proposal-well-formed-stringify
-              _export({ target: 'JSON', stat: true, forced: FORCED$e }, {
+              _export({ target: 'JSON', stat: true, forced: FORCED$f }, {
                 // eslint-disable-next-line no-unused-vars
                 stringify: function stringify(it, replacer, space) {
                   var result = $stringify$1.apply(null, arguments);
@@ -4801,7 +4897,7 @@ function __processPageAndSerializePollForIE() {
               } return it;
             };
 
-            var isIos = /(iphone|ipod|ipad).*applewebkit/i.test(userAgent);
+            var engineIsIos = /(iphone|ipod|ipad).*applewebkit/i.test(engineUserAgent);
 
             var location = global_1.location;
             var set$1 = global_1.setImmediate;
@@ -4866,11 +4962,11 @@ function __processPageAndSerializePollForIE() {
                 };
               // Browsers with MessageChannel, includes WebWorkers
               // except iOS - https://github.com/zloirock/core-js/issues/624
-              } else if (MessageChannel && !isIos) {
+              } else if (MessageChannel && !engineIsIos) {
                 channel = new MessageChannel();
                 port = channel.port2;
                 channel.port1.onmessage = listener;
-                defer = bindContext(port.postMessage, port, 1);
+                defer = functionBindContext(port.postMessage, port, 1);
               // Browsers with postMessage, skip WebWorkers
               // IE8 has postMessage, but it's sync & typeof its postMessage is 'object'
               } else if (global_1.addEventListener && typeof postMessage == 'function' && !global_1.importScripts && !fails(post)) {
@@ -4937,7 +5033,7 @@ function __processPageAndSerializePollForIE() {
                   process$2.nextTick(flush);
                 };
               // browsers with MutationObserver, except iOS - https://github.com/zloirock/core-js/issues/339
-              } else if (MutationObserver && !isIos) {
+              } else if (MutationObserver && !engineIsIos) {
                 toggle = true;
                 node = document.createTextNode('');
                 new MutationObserver(flush).observe(node, { characterData: true });
@@ -5053,20 +5149,20 @@ function __processPageAndSerializePollForIE() {
             var UNHANDLED = 2;
             var Internal, OwnPromiseCapability, PromiseWrapper, nativeThen;
 
-            var FORCED$f = isForced_1(PROMISE, function () {
+            var FORCED$g = isForced_1(PROMISE, function () {
               var GLOBAL_CORE_JS_PROMISE = inspectSource(PromiseConstructor) !== String(PromiseConstructor);
               if (!GLOBAL_CORE_JS_PROMISE) {
                 // V8 6.6 (Node 10 and Chrome 66) have a bug with resolving custom thenables
                 // https://bugs.chromium.org/p/chromium/issues/detail?id=830565
                 // We can't detect it synchronously, so just check versions
-                if (v8Version === 66) return true;
+                if (engineV8Version === 66) return true;
                 // Unhandled rejections tracking support, NodeJS Promise without it fails @@species test
                 if (!IS_NODE$1 && typeof PromiseRejectionEvent != 'function') return true;
               }
               // We can't use @@species feature detection in V8 since it causes
               // deoptimization and performance degradation
               // https://github.com/zloirock/core-js/issues/679
-              if (v8Version >= 51 && /native code/.test(PromiseConstructor)) return false;
+              if (engineV8Version >= 51 && /native code/.test(PromiseConstructor)) return false;
               // Detect correctness of subclassing with @@species support
               var promise = PromiseConstructor.resolve(1);
               var FakePromise = function (exec) {
@@ -5077,7 +5173,7 @@ function __processPageAndSerializePollForIE() {
               return !(promise.then(function () { /* empty */ }) instanceof FakePromise);
             });
 
-            var INCORRECT_ITERATION$1 = FORCED$f || !checkCorrectnessOfIteration(function (iterable) {
+            var INCORRECT_ITERATION$1 = FORCED$g || !checkCorrectnessOfIteration(function (iterable) {
               PromiseConstructor.all(iterable)['catch'](function () { /* empty */ });
             });
 
@@ -5223,7 +5319,7 @@ function __processPageAndSerializePollForIE() {
             };
 
             // constructor polyfill
-            if (FORCED$f) {
+            if (FORCED$g) {
               // 25.4.3.1 Promise(executor)
               PromiseConstructor = function Promise(executor) {
                 anInstance(this, PromiseConstructor, PROMISE);
@@ -5304,7 +5400,7 @@ function __processPageAndSerializePollForIE() {
               }
             }
 
-            _export({ global: true, wrap: true, forced: FORCED$f }, {
+            _export({ global: true, wrap: true, forced: FORCED$g }, {
               Promise: PromiseConstructor
             });
 
@@ -5314,7 +5410,7 @@ function __processPageAndSerializePollForIE() {
             PromiseWrapper = getBuiltIn(PROMISE);
 
             // statics
-            _export({ target: PROMISE, stat: true, forced: FORCED$f }, {
+            _export({ target: PROMISE, stat: true, forced: FORCED$g }, {
               // `Promise.reject` method
               // https://tc39.github.io/ecma262/#sec-promise.reject
               reject: function reject(r) {
@@ -5324,7 +5420,7 @@ function __processPageAndSerializePollForIE() {
               }
             });
 
-            _export({ target: PROMISE, stat: true, forced: FORCED$f }, {
+            _export({ target: PROMISE, stat: true, forced: FORCED$g }, {
               // `Promise.resolve` method
               // https://tc39.github.io/ecma262/#sec-promise.resolve
               resolve: function resolve(x) {
@@ -5529,7 +5625,7 @@ function __processPageAndSerializePollForIE() {
               return Constructor;
             };
 
-            var defineProperty$8 = objectDefineProperty.f;
+            var defineProperty$9 = objectDefineProperty.f;
 
 
 
@@ -5640,7 +5736,7 @@ function __processPageAndSerializePollForIE() {
                   // 23.1.3.5 Map.prototype.forEach(callbackfn, thisArg = undefined)
                   forEach: function forEach(callbackfn /* , that = undefined */) {
                     var state = getInternalState(this);
-                    var boundFunction = bindContext(callbackfn, arguments.length > 1 ? arguments[1] : undefined, 3);
+                    var boundFunction = functionBindContext(callbackfn, arguments.length > 1 ? arguments[1] : undefined, 3);
                     var entry;
                     while (entry = entry ? entry.next : state.first) {
                       boundFunction(entry.value, entry.key, this);
@@ -5671,7 +5767,7 @@ function __processPageAndSerializePollForIE() {
                     return define(this, value = value === 0 ? 0 : value, value);
                   }
                 });
-                if (descriptors) defineProperty$8(C.prototype, 'size', {
+                if (descriptors) defineProperty$9(C.prototype, 'size', {
                   get: function () {
                     return getInternalState(this).size;
                   }
@@ -5922,162 +6018,7 @@ function __processPageAndSerializePollForIE() {
               return function WeakSet() { return init(this, arguments.length ? arguments[0] : undefined); };
             }, collectionWeak);
 
-            var defineProperty$9 = objectDefineProperty.f;
-
-
-
-
-
-            var DataView$1 = global_1.DataView;
-            var DataViewPrototype = DataView$1 && DataView$1.prototype;
-            var Int8Array$1 = global_1.Int8Array;
-            var Int8ArrayPrototype = Int8Array$1 && Int8Array$1.prototype;
-            var Uint8ClampedArray = global_1.Uint8ClampedArray;
-            var Uint8ClampedArrayPrototype = Uint8ClampedArray && Uint8ClampedArray.prototype;
-            var TypedArray = Int8Array$1 && objectGetPrototypeOf(Int8Array$1);
-            var TypedArrayPrototype = Int8ArrayPrototype && objectGetPrototypeOf(Int8ArrayPrototype);
-            var ObjectPrototype$2 = Object.prototype;
-            var isPrototypeOf = ObjectPrototype$2.isPrototypeOf;
-
-            var TO_STRING_TAG$3 = wellKnownSymbol('toStringTag');
-            var TYPED_ARRAY_TAG = uid('TYPED_ARRAY_TAG');
-            var NATIVE_ARRAY_BUFFER = !!(global_1.ArrayBuffer && DataView$1);
-            // Fixing native typed arrays in Opera Presto crashes the browser, see #595
-            var NATIVE_ARRAY_BUFFER_VIEWS = NATIVE_ARRAY_BUFFER && !!objectSetPrototypeOf && classof(global_1.opera) !== 'Opera';
-            var TYPED_ARRAY_TAG_REQIRED = false;
-            var NAME$1;
-
-            var TypedArrayConstructorsList = {
-              Int8Array: 1,
-              Uint8Array: 1,
-              Uint8ClampedArray: 1,
-              Int16Array: 2,
-              Uint16Array: 2,
-              Int32Array: 4,
-              Uint32Array: 4,
-              Float32Array: 4,
-              Float64Array: 8
-            };
-
-            var isView = function isView(it) {
-              var klass = classof(it);
-              return klass === 'DataView' || has(TypedArrayConstructorsList, klass);
-            };
-
-            var isTypedArray = function (it) {
-              return isObject(it) && has(TypedArrayConstructorsList, classof(it));
-            };
-
-            var aTypedArray = function (it) {
-              if (isTypedArray(it)) return it;
-              throw TypeError('Target is not a typed array');
-            };
-
-            var aTypedArrayConstructor = function (C) {
-              if (objectSetPrototypeOf) {
-                if (isPrototypeOf.call(TypedArray, C)) return C;
-              } else for (var ARRAY in TypedArrayConstructorsList) if (has(TypedArrayConstructorsList, NAME$1)) {
-                var TypedArrayConstructor = global_1[ARRAY];
-                if (TypedArrayConstructor && (C === TypedArrayConstructor || isPrototypeOf.call(TypedArrayConstructor, C))) {
-                  return C;
-                }
-              } throw TypeError('Target is not a typed array constructor');
-            };
-
-            var exportTypedArrayMethod = function (KEY, property, forced) {
-              if (!descriptors) return;
-              if (forced) for (var ARRAY in TypedArrayConstructorsList) {
-                var TypedArrayConstructor = global_1[ARRAY];
-                if (TypedArrayConstructor && has(TypedArrayConstructor.prototype, KEY)) {
-                  delete TypedArrayConstructor.prototype[KEY];
-                }
-              }
-              if (!TypedArrayPrototype[KEY] || forced) {
-                redefine(TypedArrayPrototype, KEY, forced ? property
-                  : NATIVE_ARRAY_BUFFER_VIEWS && Int8ArrayPrototype[KEY] || property);
-              }
-            };
-
-            var exportTypedArrayStaticMethod = function (KEY, property, forced) {
-              var ARRAY, TypedArrayConstructor;
-              if (!descriptors) return;
-              if (objectSetPrototypeOf) {
-                if (forced) for (ARRAY in TypedArrayConstructorsList) {
-                  TypedArrayConstructor = global_1[ARRAY];
-                  if (TypedArrayConstructor && has(TypedArrayConstructor, KEY)) {
-                    delete TypedArrayConstructor[KEY];
-                  }
-                }
-                if (!TypedArray[KEY] || forced) {
-                  // V8 ~ Chrome 49-50 `%TypedArray%` methods are non-writable non-configurable
-                  try {
-                    return redefine(TypedArray, KEY, forced ? property : NATIVE_ARRAY_BUFFER_VIEWS && Int8Array$1[KEY] || property);
-                  } catch (error) { /* empty */ }
-                } else return;
-              }
-              for (ARRAY in TypedArrayConstructorsList) {
-                TypedArrayConstructor = global_1[ARRAY];
-                if (TypedArrayConstructor && (!TypedArrayConstructor[KEY] || forced)) {
-                  redefine(TypedArrayConstructor, KEY, property);
-                }
-              }
-            };
-
-            for (NAME$1 in TypedArrayConstructorsList) {
-              if (!global_1[NAME$1]) NATIVE_ARRAY_BUFFER_VIEWS = false;
-            }
-
-            // WebKit bug - typed arrays constructors prototype is Object.prototype
-            if (!NATIVE_ARRAY_BUFFER_VIEWS || typeof TypedArray != 'function' || TypedArray === Function.prototype) {
-              // eslint-disable-next-line no-shadow
-              TypedArray = function TypedArray() {
-                throw TypeError('Incorrect invocation');
-              };
-              if (NATIVE_ARRAY_BUFFER_VIEWS) for (NAME$1 in TypedArrayConstructorsList) {
-                if (global_1[NAME$1]) objectSetPrototypeOf(global_1[NAME$1], TypedArray);
-              }
-            }
-
-            if (!NATIVE_ARRAY_BUFFER_VIEWS || !TypedArrayPrototype || TypedArrayPrototype === ObjectPrototype$2) {
-              TypedArrayPrototype = TypedArray.prototype;
-              if (NATIVE_ARRAY_BUFFER_VIEWS) for (NAME$1 in TypedArrayConstructorsList) {
-                if (global_1[NAME$1]) objectSetPrototypeOf(global_1[NAME$1].prototype, TypedArrayPrototype);
-              }
-            }
-
-            // WebKit bug - one more object in Uint8ClampedArray prototype chain
-            if (NATIVE_ARRAY_BUFFER_VIEWS && objectGetPrototypeOf(Uint8ClampedArrayPrototype) !== TypedArrayPrototype) {
-              objectSetPrototypeOf(Uint8ClampedArrayPrototype, TypedArrayPrototype);
-            }
-
-            if (descriptors && !has(TypedArrayPrototype, TO_STRING_TAG$3)) {
-              TYPED_ARRAY_TAG_REQIRED = true;
-              defineProperty$9(TypedArrayPrototype, TO_STRING_TAG$3, { get: function () {
-                return isObject(this) ? this[TYPED_ARRAY_TAG] : undefined;
-              } });
-              for (NAME$1 in TypedArrayConstructorsList) if (global_1[NAME$1]) {
-                createNonEnumerableProperty(global_1[NAME$1], TYPED_ARRAY_TAG, NAME$1);
-              }
-            }
-
-            // WebKit bug - the same parent prototype for typed arrays and data view
-            if (NATIVE_ARRAY_BUFFER && objectSetPrototypeOf && objectGetPrototypeOf(DataViewPrototype) !== ObjectPrototype$2) {
-              objectSetPrototypeOf(DataViewPrototype, ObjectPrototype$2);
-            }
-
-            var arrayBufferViewCore = {
-              NATIVE_ARRAY_BUFFER: NATIVE_ARRAY_BUFFER,
-              NATIVE_ARRAY_BUFFER_VIEWS: NATIVE_ARRAY_BUFFER_VIEWS,
-              TYPED_ARRAY_TAG: TYPED_ARRAY_TAG_REQIRED && TYPED_ARRAY_TAG,
-              aTypedArray: aTypedArray,
-              aTypedArrayConstructor: aTypedArrayConstructor,
-              exportTypedArrayMethod: exportTypedArrayMethod,
-              exportTypedArrayStaticMethod: exportTypedArrayStaticMethod,
-              isView: isView,
-              isTypedArray: isTypedArray,
-              TypedArray: TypedArray,
-              TypedArrayPrototype: TypedArrayPrototype
-            };
+            var arrayBufferNative = typeof ArrayBuffer !== 'undefined' && typeof DataView !== 'undefined';
 
             // `ToIndex` abstract operation
             // https://tc39.github.io/ecma262/#sec-toindex
@@ -6178,15 +6119,6 @@ function __processPageAndSerializePollForIE() {
               unpack: unpack
             };
 
-            var NATIVE_ARRAY_BUFFER$1 = arrayBufferViewCore.NATIVE_ARRAY_BUFFER;
-
-
-
-
-
-
-
-
             var getOwnPropertyNames$2 = objectGetOwnPropertyNames.f;
             var defineProperty$a = objectDefineProperty.f;
 
@@ -6203,6 +6135,8 @@ function __processPageAndSerializePollForIE() {
             var NativeArrayBuffer = global_1[ARRAY_BUFFER];
             var $ArrayBuffer = NativeArrayBuffer;
             var $DataView = global_1[DATA_VIEW];
+            var $DataViewPrototype = $DataView && $DataView[PROTOTYPE$2];
+            var ObjectPrototype$2 = Object.prototype;
             var RangeError$1 = global_1.RangeError;
 
             var packIEEE754 = ieee754.pack;
@@ -6256,7 +6190,7 @@ function __processPageAndSerializePollForIE() {
               for (var i = 0; i < count; i++) bytes[start + i] = pack[isLittleEndian ? i : count - i - 1];
             };
 
-            if (!NATIVE_ARRAY_BUFFER$1) {
+            if (!arrayBufferNative) {
               $ArrayBuffer = function ArrayBuffer(length) {
                 anInstance(this, $ArrayBuffer, ARRAY_BUFFER);
                 var byteLength = toIndex(length);
@@ -6369,12 +6303,18 @@ function __processPageAndSerializePollForIE() {
                 }
                 ArrayBufferPrototype.constructor = $ArrayBuffer;
               }
+
+              // WebKit bug - the same parent prototype for typed arrays and data view
+              if (objectSetPrototypeOf && objectGetPrototypeOf($DataViewPrototype) !== ObjectPrototype$2) {
+                objectSetPrototypeOf($DataViewPrototype, ObjectPrototype$2);
+              }
+
               // iOS Safari 7.x bug
               var testView = new $DataView(new $ArrayBuffer(2));
-              var nativeSetInt8 = $DataView[PROTOTYPE$2].setInt8;
+              var nativeSetInt8 = $DataViewPrototype.setInt8;
               testView.setInt8(0, 2147483648);
               testView.setInt8(1, 2147483649);
-              if (testView.getInt8(0) || !testView.getInt8(1)) redefineAll($DataView[PROTOTYPE$2], {
+              if (testView.getInt8(0) || !testView.getInt8(1)) redefineAll($DataViewPrototype, {
                 setInt8: function setInt8(byteOffset, value) {
                   nativeSetInt8.call(this, byteOffset, value << 24 >> 24);
                 },
@@ -6404,6 +6344,154 @@ function __processPageAndSerializePollForIE() {
 
             setSpecies(ARRAY_BUFFER$1);
 
+            var defineProperty$b = objectDefineProperty.f;
+
+
+
+
+
+            var Int8Array$1 = global_1.Int8Array;
+            var Int8ArrayPrototype = Int8Array$1 && Int8Array$1.prototype;
+            var Uint8ClampedArray = global_1.Uint8ClampedArray;
+            var Uint8ClampedArrayPrototype = Uint8ClampedArray && Uint8ClampedArray.prototype;
+            var TypedArray = Int8Array$1 && objectGetPrototypeOf(Int8Array$1);
+            var TypedArrayPrototype = Int8ArrayPrototype && objectGetPrototypeOf(Int8ArrayPrototype);
+            var ObjectPrototype$3 = Object.prototype;
+            var isPrototypeOf = ObjectPrototype$3.isPrototypeOf;
+
+            var TO_STRING_TAG$3 = wellKnownSymbol('toStringTag');
+            var TYPED_ARRAY_TAG = uid('TYPED_ARRAY_TAG');
+            // Fixing native typed arrays in Opera Presto crashes the browser, see #595
+            var NATIVE_ARRAY_BUFFER_VIEWS = arrayBufferNative && !!objectSetPrototypeOf && classof(global_1.opera) !== 'Opera';
+            var TYPED_ARRAY_TAG_REQIRED = false;
+            var NAME$1;
+
+            var TypedArrayConstructorsList = {
+              Int8Array: 1,
+              Uint8Array: 1,
+              Uint8ClampedArray: 1,
+              Int16Array: 2,
+              Uint16Array: 2,
+              Int32Array: 4,
+              Uint32Array: 4,
+              Float32Array: 4,
+              Float64Array: 8
+            };
+
+            var isView = function isView(it) {
+              var klass = classof(it);
+              return klass === 'DataView' || has(TypedArrayConstructorsList, klass);
+            };
+
+            var isTypedArray = function (it) {
+              return isObject(it) && has(TypedArrayConstructorsList, classof(it));
+            };
+
+            var aTypedArray = function (it) {
+              if (isTypedArray(it)) return it;
+              throw TypeError('Target is not a typed array');
+            };
+
+            var aTypedArrayConstructor = function (C) {
+              if (objectSetPrototypeOf) {
+                if (isPrototypeOf.call(TypedArray, C)) return C;
+              } else for (var ARRAY in TypedArrayConstructorsList) if (has(TypedArrayConstructorsList, NAME$1)) {
+                var TypedArrayConstructor = global_1[ARRAY];
+                if (TypedArrayConstructor && (C === TypedArrayConstructor || isPrototypeOf.call(TypedArrayConstructor, C))) {
+                  return C;
+                }
+              } throw TypeError('Target is not a typed array constructor');
+            };
+
+            var exportTypedArrayMethod = function (KEY, property, forced) {
+              if (!descriptors) return;
+              if (forced) for (var ARRAY in TypedArrayConstructorsList) {
+                var TypedArrayConstructor = global_1[ARRAY];
+                if (TypedArrayConstructor && has(TypedArrayConstructor.prototype, KEY)) {
+                  delete TypedArrayConstructor.prototype[KEY];
+                }
+              }
+              if (!TypedArrayPrototype[KEY] || forced) {
+                redefine(TypedArrayPrototype, KEY, forced ? property
+                  : NATIVE_ARRAY_BUFFER_VIEWS && Int8ArrayPrototype[KEY] || property);
+              }
+            };
+
+            var exportTypedArrayStaticMethod = function (KEY, property, forced) {
+              var ARRAY, TypedArrayConstructor;
+              if (!descriptors) return;
+              if (objectSetPrototypeOf) {
+                if (forced) for (ARRAY in TypedArrayConstructorsList) {
+                  TypedArrayConstructor = global_1[ARRAY];
+                  if (TypedArrayConstructor && has(TypedArrayConstructor, KEY)) {
+                    delete TypedArrayConstructor[KEY];
+                  }
+                }
+                if (!TypedArray[KEY] || forced) {
+                  // V8 ~ Chrome 49-50 `%TypedArray%` methods are non-writable non-configurable
+                  try {
+                    return redefine(TypedArray, KEY, forced ? property : NATIVE_ARRAY_BUFFER_VIEWS && Int8Array$1[KEY] || property);
+                  } catch (error) { /* empty */ }
+                } else return;
+              }
+              for (ARRAY in TypedArrayConstructorsList) {
+                TypedArrayConstructor = global_1[ARRAY];
+                if (TypedArrayConstructor && (!TypedArrayConstructor[KEY] || forced)) {
+                  redefine(TypedArrayConstructor, KEY, property);
+                }
+              }
+            };
+
+            for (NAME$1 in TypedArrayConstructorsList) {
+              if (!global_1[NAME$1]) NATIVE_ARRAY_BUFFER_VIEWS = false;
+            }
+
+            // WebKit bug - typed arrays constructors prototype is Object.prototype
+            if (!NATIVE_ARRAY_BUFFER_VIEWS || typeof TypedArray != 'function' || TypedArray === Function.prototype) {
+              // eslint-disable-next-line no-shadow
+              TypedArray = function TypedArray() {
+                throw TypeError('Incorrect invocation');
+              };
+              if (NATIVE_ARRAY_BUFFER_VIEWS) for (NAME$1 in TypedArrayConstructorsList) {
+                if (global_1[NAME$1]) objectSetPrototypeOf(global_1[NAME$1], TypedArray);
+              }
+            }
+
+            if (!NATIVE_ARRAY_BUFFER_VIEWS || !TypedArrayPrototype || TypedArrayPrototype === ObjectPrototype$3) {
+              TypedArrayPrototype = TypedArray.prototype;
+              if (NATIVE_ARRAY_BUFFER_VIEWS) for (NAME$1 in TypedArrayConstructorsList) {
+                if (global_1[NAME$1]) objectSetPrototypeOf(global_1[NAME$1].prototype, TypedArrayPrototype);
+              }
+            }
+
+            // WebKit bug - one more object in Uint8ClampedArray prototype chain
+            if (NATIVE_ARRAY_BUFFER_VIEWS && objectGetPrototypeOf(Uint8ClampedArrayPrototype) !== TypedArrayPrototype) {
+              objectSetPrototypeOf(Uint8ClampedArrayPrototype, TypedArrayPrototype);
+            }
+
+            if (descriptors && !has(TypedArrayPrototype, TO_STRING_TAG$3)) {
+              TYPED_ARRAY_TAG_REQIRED = true;
+              defineProperty$b(TypedArrayPrototype, TO_STRING_TAG$3, { get: function () {
+                return isObject(this) ? this[TYPED_ARRAY_TAG] : undefined;
+              } });
+              for (NAME$1 in TypedArrayConstructorsList) if (global_1[NAME$1]) {
+                createNonEnumerableProperty(global_1[NAME$1], TYPED_ARRAY_TAG, NAME$1);
+              }
+            }
+
+            var arrayBufferViewCore = {
+              NATIVE_ARRAY_BUFFER_VIEWS: NATIVE_ARRAY_BUFFER_VIEWS,
+              TYPED_ARRAY_TAG: TYPED_ARRAY_TAG_REQIRED && TYPED_ARRAY_TAG,
+              aTypedArray: aTypedArray,
+              aTypedArrayConstructor: aTypedArrayConstructor,
+              exportTypedArrayMethod: exportTypedArrayMethod,
+              exportTypedArrayStaticMethod: exportTypedArrayStaticMethod,
+              isView: isView,
+              isTypedArray: isTypedArray,
+              TypedArray: TypedArray,
+              TypedArrayPrototype: TypedArrayPrototype
+            };
+
             var NATIVE_ARRAY_BUFFER_VIEWS$1 = arrayBufferViewCore.NATIVE_ARRAY_BUFFER_VIEWS;
 
             // `ArrayBuffer.isView` method
@@ -6413,7 +6501,7 @@ function __processPageAndSerializePollForIE() {
             });
 
             var ArrayBuffer$2 = arrayBuffer.ArrayBuffer;
-            var DataView$2 = arrayBuffer.DataView;
+            var DataView$1 = arrayBuffer.DataView;
             var nativeArrayBufferSlice = ArrayBuffer$2.prototype.slice;
 
             var INCORRECT_SLICE = fails(function () {
@@ -6431,8 +6519,8 @@ function __processPageAndSerializePollForIE() {
                 var first = toAbsoluteIndex(start, length);
                 var fin = toAbsoluteIndex(end === undefined ? length : end, length);
                 var result = new (speciesConstructor(this, ArrayBuffer$2))(toLength(fin - first));
-                var viewSource = new DataView$2(this);
-                var viewTarget = new DataView$2(result);
+                var viewSource = new DataView$1(this);
+                var viewTarget = new DataView$1(result);
                 var index = 0;
                 while (first < fin) {
                   viewTarget.setUint8(index++, viewSource.getUint8(first++));
@@ -6440,11 +6528,9 @@ function __processPageAndSerializePollForIE() {
               }
             });
 
-            var NATIVE_ARRAY_BUFFER$2 = arrayBufferViewCore.NATIVE_ARRAY_BUFFER;
-
             // `DataView` constructor
             // https://tc39.github.io/ecma262/#sec-dataview-constructor
-            _export({ global: true, forced: !NATIVE_ARRAY_BUFFER$2 }, {
+            _export({ global: true, forced: !arrayBufferNative }, {
               DataView: arrayBuffer.DataView
             });
 
@@ -6457,7 +6543,7 @@ function __processPageAndSerializePollForIE() {
             var ArrayBuffer$3 = global_1.ArrayBuffer;
             var Int8Array$2 = global_1.Int8Array;
 
-            var typedArraysConstructorsRequiresWrappers = !NATIVE_ARRAY_BUFFER_VIEWS$2 || !fails(function () {
+            var typedArrayConstructorsRequireWrappers = !NATIVE_ARRAY_BUFFER_VIEWS$2 || !fails(function () {
               Int8Array$2(1);
             }) || !fails(function () {
               new Int8Array$2(-1);
@@ -6501,7 +6587,7 @@ function __processPageAndSerializePollForIE() {
                 }
               }
               if (mapping && argumentsLength > 2) {
-                mapfn = bindContext(mapfn, arguments[2], 2);
+                mapfn = functionBindContext(mapfn, arguments[2], 2);
               }
               length = toLength(O.length);
               result = new (aTypedArrayConstructor$1(this))(length);
@@ -6692,7 +6778,7 @@ function __processPageAndSerializePollForIE() {
 
                   if (objectSetPrototypeOf) objectSetPrototypeOf(TypedArrayConstructor, TypedArray);
                   TypedArrayConstructorPrototype = TypedArrayConstructor.prototype = objectCreate(TypedArrayPrototype);
-                } else if (typedArraysConstructorsRequiresWrappers) {
+                } else if (typedArrayConstructorsRequireWrappers) {
                   TypedArrayConstructor = wrapper(function (dummy, data, typedArrayOffset, $length) {
                     anInstance(dummy, TypedArrayConstructor, CONSTRUCTOR_NAME);
                     return inheritIfRequired(function () {
@@ -6820,7 +6906,7 @@ function __processPageAndSerializePollForIE() {
 
             // `%TypedArray%.from` method
             // https://tc39.github.io/ecma262/#sec-%typedarray%.from
-            exportTypedArrayStaticMethod$1('from', typedArrayFrom, typedArraysConstructorsRequiresWrappers);
+            exportTypedArrayStaticMethod$1('from', typedArrayFrom, typedArrayConstructorsRequireWrappers);
 
             var aTypedArrayConstructor$2 = arrayBufferViewCore.aTypedArrayConstructor;
             var exportTypedArrayStaticMethod$2 = arrayBufferViewCore.exportTypedArrayStaticMethod;
@@ -6833,7 +6919,7 @@ function __processPageAndSerializePollForIE() {
               var result = new (aTypedArrayConstructor$2(this))(length);
               while (length > index) result[index] = arguments[index++];
               return result;
-            }, typedArraysConstructorsRequiresWrappers);
+            }, typedArrayConstructorsRequireWrappers);
 
             var aTypedArray$1 = arrayBufferViewCore.aTypedArray;
             var exportTypedArrayMethod$1 = arrayBufferViewCore.exportTypedArrayMethod;
@@ -7052,7 +7138,7 @@ function __processPageAndSerializePollForIE() {
             var aTypedArray$h = arrayBufferViewCore.aTypedArray;
             var exportTypedArrayMethod$h = arrayBufferViewCore.exportTypedArrayMethod;
 
-            var FORCED$g = fails(function () {
+            var FORCED$h = fails(function () {
               // eslint-disable-next-line no-undef
               new Int8Array(1).set({});
             });
@@ -7068,14 +7154,14 @@ function __processPageAndSerializePollForIE() {
               var index = 0;
               if (len + offset > length) throw RangeError('Wrong length');
               while (index < len) this[offset + index] = src[index++];
-            }, FORCED$g);
+            }, FORCED$h);
 
             var aTypedArray$i = arrayBufferViewCore.aTypedArray;
             var aTypedArrayConstructor$5 = arrayBufferViewCore.aTypedArrayConstructor;
             var exportTypedArrayMethod$i = arrayBufferViewCore.exportTypedArrayMethod;
             var $slice = [].slice;
 
-            var FORCED$h = fails(function () {
+            var FORCED$i = fails(function () {
               // eslint-disable-next-line no-undef
               new Int8Array(1).slice();
             });
@@ -7090,7 +7176,7 @@ function __processPageAndSerializePollForIE() {
               var result = new (aTypedArrayConstructor$5(C))(length);
               while (length > index) result[index] = list[index++];
               return result;
-            }, FORCED$h);
+            }, FORCED$i);
 
             var $some$1 = arrayIteration.some;
 
@@ -7140,7 +7226,7 @@ function __processPageAndSerializePollForIE() {
               $toLocaleString.call(new Int8Array$3(1));
             });
 
-            var FORCED$i = fails(function () {
+            var FORCED$j = fails(function () {
               return [1, 2].toLocaleString() != new Int8Array$3([1, 2]).toLocaleString();
             }) || !fails(function () {
               Int8Array$3.prototype.toLocaleString.call([1, 2]);
@@ -7150,7 +7236,7 @@ function __processPageAndSerializePollForIE() {
             // https://tc39.github.io/ecma262/#sec-%typedarray%.prototype.tolocalestring
             exportTypedArrayMethod$m('toLocaleString', function toLocaleString() {
               return $toLocaleString.apply(TO_LOCALE_STRING_BUG ? $slice$1.call(aTypedArray$m(this)) : aTypedArray$m(this), arguments);
-            }, FORCED$i);
+            }, FORCED$j);
 
             var exportTypedArrayMethod$n = arrayBufferViewCore.exportTypedArrayMethod;
 
@@ -7206,9 +7292,9 @@ function __processPageAndSerializePollForIE() {
             var ARGS_BUG = !fails(function () {
               nativeConstruct(function () { /* empty */ });
             });
-            var FORCED$j = NEW_TARGET_BUG || ARGS_BUG;
+            var FORCED$k = NEW_TARGET_BUG || ARGS_BUG;
 
-            _export({ target: 'Reflect', stat: true, forced: FORCED$j, sham: FORCED$j }, {
+            _export({ target: 'Reflect', stat: true, forced: FORCED$k, sham: FORCED$k }, {
               construct: function construct(Target, args /* , newTarget */) {
                 aFunction$1(Target);
                 anObject(args);
@@ -7469,10 +7555,10 @@ function __processPageAndSerializePollForIE() {
               }
             }
 
-            var FORCED$k = !global_1.setImmediate || !global_1.clearImmediate;
+            var FORCED$l = !global_1.setImmediate || !global_1.clearImmediate;
 
             // http://w3c.github.io/setImmediate/
-            _export({ global: true, bind: true, enumerable: true, forced: FORCED$k }, {
+            _export({ global: true, bind: true, enumerable: true, forced: FORCED$l }, {
               // `setImmediate` method
               // http://w3c.github.io/setImmediate/#si-setImmediate
               setImmediate: task.set,
@@ -7494,7 +7580,7 @@ function __processPageAndSerializePollForIE() {
             });
 
             var slice$1 = [].slice;
-            var MSIE = /MSIE .\./.test(userAgent); // <- dirty ie9- check
+            var MSIE = /MSIE .\./.test(engineUserAgent); // <- dirty ie9- check
 
             var wrap$1 = function (scheduler) {
               return function (handler, timeout /* , ...arguments */) {
@@ -7704,7 +7790,7 @@ function __processPageAndSerializePollForIE() {
               return output.join('');
             };
 
-            var punycodeToAscii = function (input) {
+            var stringPunycodeToAscii = function (input) {
               var encoded = [];
               var labels = input.toLowerCase().replace(regexSeparators, '\u002E').split('.');
               var i, label;
@@ -7992,7 +8078,7 @@ function __processPageAndSerializePollForIE() {
               // `URLSearchParams.prototype.forEach` method
               forEach: function forEach(callback /* , thisArg */) {
                 var entries = getInternalParamsState(this).entries;
-                var boundFunction = bindContext(callback, arguments.length > 1 ? arguments[1] : undefined, 3);
+                var boundFunction = functionBindContext(callback, arguments.length > 1 ? arguments[1] : undefined, 3);
                 var index = 0;
                 var entry;
                 while (index < entries.length) {
@@ -8134,7 +8220,7 @@ function __processPageAndSerializePollForIE() {
                 }
                 url.host = result;
               } else {
-                input = punycodeToAscii(input);
+                input = stringPunycodeToAscii(input);
                 if (FORBIDDEN_HOST_CODE_POINT.test(input)) return INVALID_HOST;
                 result = parseIPv4(input);
                 if (result === null) return INVALID_HOST;
@@ -10180,9 +10266,10 @@ function __processPageAndSerializePollForIE() {
 
             function extractLinks() {
               var doc = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : document;
-              var srcsetUrls = Array.from(doc.querySelectorAll('img[srcset],source[srcset]')).map(function (srcsetEl) {
-                return srcsetEl.getAttribute('srcset').split(', ').map(function (str) {
-                  return str.trim().split(/\s+/)[0];
+              var srcsetRegexp = /(\S+)(?:\s+[\d.]+[wx])?(?:,|$)/g;
+              var srcsetUrls = Array.from(doc.querySelectorAll('img[srcset],source[srcset]'), function (srcsetEl) {
+                return execAll(srcsetRegexp, srcsetEl.getAttribute('srcset'), function (match) {
+                  return match[1];
                 });
               }).reduce(function (acc, urls) {
                 return acc.concat(urls);
@@ -10198,13 +10285,27 @@ function __processPageAndSerializePollForIE() {
               var objectUrls = Array.from(doc.querySelectorAll('object')).map(function (el) {
                 return el.getAttribute('data');
               }).filter(Boolean);
-              var cssUrls = Array.from(doc.querySelectorAll('link[rel="stylesheet"]')).map(function (link) {
+              var cssUrls = Array.from(doc.querySelectorAll('link[rel~="stylesheet"], link[as="stylesheet"]')).map(function (link) {
                 return link.getAttribute('href');
               });
               var videoPosterUrls = Array.from(doc.querySelectorAll('video[poster]')).map(function (videoEl) {
                 return videoEl.getAttribute('poster');
               });
-              return Array.from(srcsetUrls).concat(Array.from(srcUrls)).concat(Array.from(imageUrls)).concat(Array.from(cssUrls)).concat(Array.from(videoPosterUrls)).concat(Array.from(objectUrls));
+              return Array.from(srcsetUrls).concat(Array.from(srcUrls)).concat(Array.from(imageUrls)).concat(Array.from(cssUrls)).concat(Array.from(videoPosterUrls)).concat(Array.from(objectUrls)); // can be replaced with matchAll once Safari supports it
+
+              function execAll(regexp, string, mapper) {
+                var matches = [];
+                var clonedRegexp = new RegExp(regexp.source, regexp.flags);
+                var isGlobal = clonedRegexp.global;
+                var match;
+
+                while (match = clonedRegexp.exec(string)) {
+                  matches.push(mapper(match));
+                  if (!isGlobal) break;
+                }
+
+                return matches;
+              }
             }
 
             var extractLinks_1 = extractLinks;
@@ -10216,7 +10317,7 @@ function __processPageAndSerializePollForIE() {
             var uuid_1 = uuid;
 
             function isInlineFrame(frame) {
-              return !/^https?:.+/.test(frame.src) || frame.contentDocument && frame.contentDocument.location && frame.contentDocument.location.href === 'about:blank';
+              return !/^https?:.+/.test(frame.src) || frame.contentDocument && frame.contentDocument.location && ['about:blank', 'about:srcdoc'].includes(frame.contentDocument.location.href);
             }
 
             var isInlineFrame_1 = isInlineFrame;
@@ -10224,7 +10325,7 @@ function __processPageAndSerializePollForIE() {
             function isAccessibleFrame(frame) {
               try {
                 var doc = frame.contentDocument;
-                return !!(doc && doc.defaultView && doc.defaultView.frameElement);
+                return Boolean(doc && doc.defaultView && doc.defaultView.frameElement);
               } catch (err) {// for CORS frames
               }
             }
@@ -10953,7 +11054,7 @@ function __processPageAndSerializePollForIE() {
             function extractFrames() {
               var documents = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : [document];
               var iframes = flat_1(documents.map(function (d) {
-                return Array.from(d.querySelectorAll('iframe[src]:not([src=""])'));
+                return Array.from(d.querySelectorAll('iframe[src]:not([src=""]),iframe[srcdoc]:not([srcdoc=""])'));
               }));
               return iframes.filter(function (f) {
                 return isAccessibleFrame_1(f) && !isInlineFrame_1(f);
@@ -11089,7 +11190,7 @@ function __processPageAndSerializePollForIE() {
               });
               return doProcessPage(doc).then(function (result) {
                 log('processPage end');
-                result.scriptVersion = '3.2.2';
+                result.scriptVersion = '3.3.3';
                 return result;
               });
 
