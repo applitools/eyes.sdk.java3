@@ -26,11 +26,11 @@ public class TestCloseMethod {
         eyes.setBatch(batch);
         eyes.setViewportSize(RectangleSize.EMPTY);
 
-        eyes.open(this.getClass().getSimpleName(), new Object(){}.getClass().getEnclosingMethod().getName());//, RectangleSize.EMPTY);
+        eyes.open(this.getClass().getSimpleName(), new Object(){}.getClass().getEnclosingMethod().getName());
         eyes.checkImage(ImageUtils.imageFromFile("resources/gbg1.png"), "TestBitmap1");
         eyes.close(false);
 
-        eyes.open(this.getClass().getSimpleName(), new Object(){}.getClass().getEnclosingMethod().getName());//, RectangleSize.EMPTY);
+        eyes.open(this.getClass().getSimpleName(), new Object(){}.getClass().getEnclosingMethod().getName());
         eyes.checkImage(ImageUtils.imageFromFile("resources/twitter1d-s4.png"), "TestBitmap1");
         Assert.assertThrows(DiffsFoundException.class, new Assert.ThrowingRunnable() {
             @Override

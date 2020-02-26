@@ -2,14 +2,29 @@ package com.applitools.eyes.images;
 
 import com.applitools.eyes.*;
 import com.applitools.utils.ImageUtils;
+import org.testng.annotations.BeforeClass;
+import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 import java.awt.image.BufferedImage;
+import java.lang.reflect.Method;
 
 public class TestEyesImages {
-    private Eyes setup(){
-        Eyes eyes = new Eyes();
-        eyes.setBatch(new BatchInfo("TestEyesImages"));
-        return eyes;
+
+    private static final String TEST_SUITE_NAME = "Eyes Image SDK";
+    private static BatchInfo batchInfo;
+    private Eyes eyes;
+
+    @BeforeClass
+    public static void setUpOnce() {
+        batchInfo = new BatchInfo(TEST_SUITE_NAME);
+    }
+
+    @BeforeMethod
+    public void setup(Method method){
+        eyes = new Eyes();
+        eyes.setBatch(batchInfo);
+        String testName = method.getName();
+        eyes.setDebugScreenshotsPrefix("Java_Images_SDK_" + testName + "_");
     }
     private void teardown(Eyes eyes)
     {
@@ -27,7 +42,6 @@ public class TestEyesImages {
     @Test
     public void TestBitmap()
     {
-        Eyes eyes = setup();
         eyes.open("TestEyesImages", "CheckImage(Bitmap)");
 
         eyes.checkImage(ImageUtils.imageFromFile("resources/gbg1.png"), "TestBitmap1");
@@ -38,7 +52,6 @@ public class TestEyesImages {
     @Test
     public void TestBitmapWithDispose()
     {
-        Eyes eyes = setup();
         eyes.open("TestEyesImages", "CheckImage(Bitmap) With Dispose");
 
         BufferedImage image1 = ImageUtils.imageFromFile("resources/gbg1.png");
@@ -61,7 +74,6 @@ public class TestEyesImages {
     @Test
     public void TestBytes()
     {
-        Eyes eyes = setup();
         eyes.open("TestEyesImages", "CheckImage(byte[])", new RectangleSize(1024, 768));
 
         eyes.checkImage(ImageUtils.encodeAsPng(ImageUtils.imageFromFile("resources/gbg1.png")), "TestBytes1");
@@ -72,7 +84,6 @@ public class TestEyesImages {
     //@Test
     public void TestBase64()
     {
-        Eyes eyes = setup();
         eyes.open("TestEyesImages", "CheckImage(base64)", new RectangleSize(1024, 768));
 
         eyes.checkImage(ImageUtils.base64FromImage(ImageUtils.imageFromFile("resources/gbg1.png")), "TestBase64 1");
@@ -83,7 +94,6 @@ public class TestEyesImages {
     @Test
     public void TestFile()
     {
-        Eyes eyes = setup();
         eyes.open("TestEyesImages", "CheckImageFile", new RectangleSize(1024, 768));
 
         eyes.checkImage("resources/gbg1.png", "TestPath1");
@@ -94,7 +104,6 @@ public class TestEyesImages {
     @Test
     public void TestFluent_Path()
     {
-        Eyes eyes = setup();
         eyes.open("TestEyesImages", "CheckImage_Fluent", new RectangleSize(1024, 768));
         eyes.check("CheckImage_Fluent", Target.image("resources/gbg1.png"));
         teardown(eyes);
@@ -102,7 +111,6 @@ public class TestEyesImages {
     @Test
     public void TestFluent_Bitmap()
     {
-        Eyes eyes = setup();
         eyes.open("TestEyesImages", "CheckImage_Fluent", new RectangleSize(1024, 768));
         eyes.check("CheckImage_Fluent", Target.image(ImageUtils.imageFromFile("resources/gbg1.png")));
         teardown(eyes);
@@ -110,7 +118,6 @@ public class TestEyesImages {
     @Test
     public void TestFluent_WithIgnoreRegion()
     {
-        Eyes eyes = setup();
         eyes.open("TestEyesImages", "CheckImage_WithIgnoreRegion_Fluent", new RectangleSize(1024, 768));
         eyes.check("CheckImage_WithIgnoreRegion_Fluent", Target.image("resources/gbg1.png").ignore(new Region(10, 20, 30, 40)));
         teardown(eyes);
@@ -119,7 +126,6 @@ public class TestEyesImages {
     //@Test
     public void TestFluent_WithRegion()
     {
-        Eyes eyes = setup();
         eyes.open("TestEyesImages", "CheckImage_WithRegion_Fluent");
         eyes.check("CheckImage_WithRegion_Fluent", Target.image("resources/gbg1.png").content(new Region(10, 20, 30, 40)));
         teardown(eyes);
@@ -128,7 +134,6 @@ public class TestEyesImages {
     @Test
     public void TestLayout2()
     {
-        Eyes eyes = setup();
         eyes.setMatchLevel(MatchLevel.LAYOUT);
         eyes.open("CheckLayout2", "Check Layout2", new RectangleSize(1024, 768));
         eyes.checkImage("resources/yahoo1a.png", "resources/yahoo1a.png");
