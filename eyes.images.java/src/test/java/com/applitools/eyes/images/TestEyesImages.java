@@ -23,6 +23,8 @@ public class TestEyesImages {
     public void setup(Method method){
         eyes = new Eyes();
         eyes.setBatch(batchInfo);
+        LogHandler logHandler = new StdoutLogHandler(true);
+        eyes.setLogHandler(logHandler);
         String testName = method.getName();
         eyes.setDebugScreenshotsPrefix("Java_Images_SDK_" + testName + "_");
     }
