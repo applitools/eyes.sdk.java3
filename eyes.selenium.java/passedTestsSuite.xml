@@ -230,15 +230,6 @@
             </class>
         </classes>
     </test>
-    <test name="TestSpecialCharacters" parallel="methods">
-        <classes>
-            <class name="com.applitools.eyes.renderingGrid.TestSpecialCharacters">
-                <methods>
-                    <include name="TestRenderSpecialCharacters" />
-                </methods>
-            </class>
-        </classes>
-    </test>
     <test name="TestAbort" parallel="methods">
         <classes>
             <class name="com.applitools.eyes.api.TestAbort">
