@@ -1,7 +1,7 @@
 <!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd" >
 
 <suite name="passed tests" verbose="1" parallel="tests" thread-count="10">
-    <!--<test name="TestClassicApi">
+    <test name="TestClassicApi">
         <parameter name="dont_run" value="TestCheckInnerFrame+SCROLL, TestCheckInnerFrame+VG,TestCheckFrame+VG, TestCheckWindowFully+VG, TestDoubleCheckWindow+VG, TestCheckWindow+VG, TestCheckRegionInFrame+VG, TestCheckRegionInFrame+SCROLL"/>
         <classes>
             <class name="com.applitools.eyes.selenium.TestClassicApi">
@@ -19,7 +19,7 @@
                 </methods>
             </class>
         </classes>
-    </test>-->
+    </test>
     <test name="TestSimpleCases">
         <classes>
             <class name="com.applitools.eyes.selenium.TestSimpleCases">
@@ -30,7 +30,7 @@
         </classes>
     </test>
 
-    <!--<test name="TestPageWithHeader">
+    <test name="TestPageWithHeader">
         <classes>
             <class name="com.applitools.eyes.selenium.TestPageWithHeader">
                 <methods>
@@ -267,5 +267,23 @@
                 </methods>
             </class>
         </classes>
-    </test>-->
+    </test>
+    <test name="TestAbort2" parallel="methods">
+        <classes>
+            <class name="com.applitools.eyes.api.TestAbort2">
+                <methods>
+                    <include name="Test_GetAllResults" />
+                </methods>
+            </class>
+        </classes>
+    </test>
+    <test name="TestIEyesSelenium" parallel="methods">
+        <classes>
+            <class name="com.applitools.eyes.renderingGrid.TestIEyesSelenium">
+                <methods>
+                    <include name="Test_GetAllResults" />
+                </methods>
+            </class>
+        </classes>
+    </test>
 </suite>
