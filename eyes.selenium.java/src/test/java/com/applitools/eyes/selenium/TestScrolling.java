@@ -105,8 +105,11 @@ public class TestScrolling {
             mobileSettings.put("pixelRatio", 4);
             mobileSettings.put("width", 386);
             mobileSettings.put("height", 512);
-            mobileSettings.put("userAgent", "Mozilla/5.0 (Linux; Android 7.1.1; Nexus 9) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3538.110 Safari/537.36");
-            options.setExperimentalOption("mobileEmulation", mobileSettings);
+            Map<String, Object> mobileEmulation = new HashMap<>();
+            mobileEmulation.put("deviceMetrics", mobileSettings);
+            mobileEmulation.put("userAgent", "Mozilla/5.0 (Linux; Android 7.1.1; Nexus 9) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3538.110 Safari/537.36");
+            options.setExperimentalOption("mobileEmulation", mobileEmulation);
+
             driver = SeleniumUtils.createChromeDriver(options);
         } else {
             DesiredCapabilities capabilities = new DesiredCapabilities();
@@ -148,8 +151,12 @@ public class TestScrolling {
             mobileSettings.put("pixelRatio", 1);
             mobileSettings.put("width", 386);
             mobileSettings.put("height", 512);
-            mobileSettings.put("userAgent", "Mozilla/5.0 (Linux; Android 7.1.1; Nexus 9) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3538.110 Safari/537.36");
-            options.setExperimentalOption("mobileEmulation", mobileSettings);
+
+            Map<String, Object> mobileEmulation = new HashMap<>();
+            mobileEmulation.put("deviceMetrics", mobileSettings);
+            mobileEmulation.put("userAgent", "Mozilla/5.0 (Linux; Android 7.1.1; Nexus 9) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3538.110 Safari/537.36");
+            options.setExperimentalOption("mobileEmulation", mobileEmulation);
+
             driver = SeleniumUtils.createChromeDriver(options);
         } else {
 

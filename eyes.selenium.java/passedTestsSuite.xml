@@ -276,4 +276,14 @@
             </class>
         </classes>
     </test>
+    <test name="TestScrolling" parallel="methods">
+        <parameter name="dont_run" value="TestWebAppScrolling2+false"/>
+        <classes>
+            <class name="com.applitools.eyes.selenium.TestScrolling">
+                <methods>
+                    <include name="TestWebAppScrolling2" />
+                </methods>
+            </class>
+        </classes>
+    </test>
 </suite>
