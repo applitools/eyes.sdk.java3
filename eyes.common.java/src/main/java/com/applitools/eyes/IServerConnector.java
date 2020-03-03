@@ -110,19 +110,10 @@ public interface IServerConnector {
      *
      * @param uri            The URI from which the IServerConnector will download the string
      * @param userAgent      user agent to send to server
-     * @param resourceFuture
+     * @param resourceFuture The resource future task.
      * @return A future which will be resolved when the resources is downloaded.
      */
     IResourceFuture downloadResource(URL uri, String userAgent, ResourceFuture resourceFuture);
-
-
-    /**
-     * Posting the DOM snapshot to the server and returns
-     * @param domJson JSON as String.
-     * @return URL to the JSON that is stored by the server.
-     */
-    String postDomSnapshot(String domJson);
-
 
     /**
      * @return the render info from the server to be used later on.
@@ -183,5 +174,5 @@ public interface IServerConnector {
 
     boolean getDontCloseBatches();
 
-    int uploadImage(byte[] screenshotBytes, RenderingInfo renderingInfo, String imageTargetUrl);
+    int uploadData(byte[] bytes, RenderingInfo renderingInfo, String targetUrl, String contentType, String mediaType);
 }

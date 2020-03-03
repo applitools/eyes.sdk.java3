@@ -768,7 +768,7 @@ public abstract class EyesBase implements IEyesBase{
         if (GeneralUtils.configureSendDom(checkSettingsInternal, getConfigGetter())) {
             try {
                 String domJson = tryCaptureDom();
-                domUrl = tryPostDomSnapshot(domJson);
+                domUrl = tryPostDomCapture(domJson);
                 logger.verbose("domUrl: " + domUrl);
             } catch (Exception ex) {
                 logger.log("Error: " + ex);
@@ -824,9 +824,10 @@ public abstract class EyesBase implements IEyesBase{
         return result;
     }
 
-    private String tryPostDomSnapshot(String domJson) {
+    private String tryPostDomCapture(String domJson) {
         if (domJson != null) {
-            return serverConnector.postDomSnapshot(domJson);
+            byte[] resultStream = GeneralUtils.getGzipByteArrayOutputStream(domJson);
+            return matchWindowTask.tryUploadData(resultStream, "application/octet-stream", "application/json");
         }
         return null;
     }

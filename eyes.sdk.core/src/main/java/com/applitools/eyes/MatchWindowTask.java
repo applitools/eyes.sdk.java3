@@ -166,32 +166,37 @@ public class MatchWindowTask {
         return serverConnector.matchWindow(runningSession, data);
     }
 
-    private boolean tryUploadImage(MatchWindowData matchData) {
-        if (matchData.getAppOutput().getScreenshotUrl() != null) {
+    private boolean tryUploadImage(MatchWindowData data) {
+        AppOutput appOutput = data.getAppOutput();
+        if (appOutput.getScreenshotUrl() != null) {
             return true;
         }
 
-        String imageTargetUrl;
-
         // Getting the screenshot's bytes
-        byte[] screenshotBytes = matchData.getAppOutput().getScreenshotBytes();
+        byte[] bytes = appOutput.getScreenshotBytes();
+        String targetUrl = tryUploadData(bytes, "image/png", "image/png");
+        appOutput.setScreenshotUrl(targetUrl);
+        return targetUrl != null;
+    }
+
+    public String tryUploadData(byte[] bytes, String contentType, String mediaType) {
+        String targetUrl;
 
         RenderingInfo renderingInfo = serverConnector.getRenderInfo();
-        if (renderingInfo != null && (imageTargetUrl = renderingInfo.getResultsUrl()) != null) {
+        if (renderingInfo != null && (targetUrl = renderingInfo.getResultsUrl()) != null) {
             try {
                 UUID uuid = UUID.randomUUID();
-                imageTargetUrl = imageTargetUrl.replace("__random__", uuid.toString());
-                logger.verbose("uploading image to " + imageTargetUrl);
+                targetUrl = targetUrl.replace("__random__", uuid.toString());
+                logger.verbose("uploading " + mediaType + " to " + targetUrl);
 
                 int retriesLeft = 3;
                 int wait = 500;
                 while (retriesLeft-- > 0) {
                     try {
-                        int statusCode = serverConnector.uploadImage(screenshotBytes, renderingInfo, imageTargetUrl);
+                        int statusCode = serverConnector.uploadData(bytes, renderingInfo, targetUrl, contentType, mediaType);
                         if (statusCode == 200 || statusCode == 201) {
-                            matchData.getAppOutput().setScreenshotUrl(imageTargetUrl);
-                            logger.verbose("upload image guid " + uuid + "complete.");
-                            return true;
+                            logger.verbose("upload " + mediaType + " guid " + uuid + "complete.");
+                            return targetUrl;
                         }
                         if (statusCode < 500) {
                             break;
@@ -204,11 +209,11 @@ public class MatchWindowTask {
                     wait = Math.min(10000, wait);
                 }
             } catch (Exception e) {
-                logger.log("Error uploading image");
+                logger.log("Error uploading " + mediaType);
                 GeneralUtils.logExceptionStackTrace(logger, e);
             }
         }
-        return false;
+        return null;
     }
 
     private void collectRegions(ImageMatchSettings imageMatchSettings, ICheckSettingsInternal checkSettingsInternal) {

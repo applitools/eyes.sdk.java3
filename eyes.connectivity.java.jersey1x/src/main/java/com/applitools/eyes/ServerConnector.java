@@ -298,11 +298,11 @@ public class ServerConnector extends RestClient
     }
 
     @Override
-    public int uploadImage(byte[] screenshotBytes, RenderingInfo renderingInfo, String imageTargetUrl) {
-        WebResource target = restClient.resource(imageTargetUrl);
+    public int uploadData(byte[] bytes, RenderingInfo renderingInfo, String targetUrl, String contentType, String mediaType) {
+        WebResource target = restClient.resource(targetUrl);
         WebResource.Builder request = target
-                .accept("image/png")
-                .entity(screenshotBytes, "image/png")
+                .accept(mediaType)
+                .entity(bytes, contentType)
                 .header("X-Auth-Token", renderingInfo.getAccessToken())
                 .header("x-ms-blob-type", "BlockBlob");
 
@@ -418,29 +418,6 @@ public class ServerConnector extends RestClient
         newFuture.setResponseFuture(responseFuture);
 
         return newFuture;
-    }
-
-
-    @Override
-    public String postDomSnapshot(String domJson) {
-
-        WebResource target = restClient.resource(serverUrl).path((RUNNING_DATA_PATH)).queryParam("apiKey", getApiKey());
-
-        byte[] resultStream = GeneralUtils.getGzipByteArrayOutputStream(domJson);
-
-        WebResource.Builder request = target.accept(MediaType.APPLICATION_JSON).entity(resultStream, MediaType.APPLICATION_OCTET_STREAM_TYPE);
-
-        ClientResponse response = request.post(ClientResponse.class);
-
-        MultivaluedMap<String, String> headers = response.getHeaders();
-
-        List<String> location = headers.get("Location");
-        String entity = null;
-        if (!location.isEmpty()) {
-            entity = location.get(0);
-        }
-
-        return entity;
     }
 
     @Override

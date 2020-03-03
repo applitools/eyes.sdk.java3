@@ -297,15 +297,15 @@ public class ServerConnector extends RestClient
     }
 
     @Override
-    public int uploadImage(byte[] screenshotBytes, RenderingInfo renderingInfo, String imageTargetUrl) {
-        WebTarget target = restClient.target(imageTargetUrl);
+    public int uploadData(byte[] bytes, RenderingInfo renderingInfo, String targetUrl, String contentType, String mediaType) {
+        WebTarget target = restClient.target(targetUrl);
         Invocation.Builder request = target
-                .request("image/png")
-                .accept("image/png")
+                .request(contentType)
+                .accept(mediaType)
                 .header("X-Auth-Token", renderingInfo.getAccessToken())
                 .header("x-ms-blob-type", "BlockBlob");
 
-        Response response = request.put(Entity.entity(screenshotBytes, "image/png"));
+        Response response = request.put(Entity.entity(bytes, mediaType));
         int statusCode = response.getStatus();
         response.close();
         logger.verbose("Upload Status Code: " + statusCode);
@@ -410,21 +410,6 @@ public class ServerConnector extends RestClient
         newFuture.setResponseFuture(responseFuture);
 
         return newFuture;
-    }
-
-    @Override
-    public String postDomSnapshot(String domJson) {
-
-        WebTarget target = restClient.target(serverUrl).path((RUNNING_DATA_PATH)).queryParam("apiKey", getApiKey());
-        Invocation.Builder request = target.request(MediaType.APPLICATION_JSON);
-
-        byte[] resultStream = GeneralUtils.getGzipByteArrayOutputStream(domJson);
-
-        Response response = sendWithRetry(HttpMethod.POST, request, Entity.entity(resultStream,
-                MediaType.APPLICATION_OCTET_STREAM), null);
-        @SuppressWarnings("UnnecessaryLocalVariable")
-        String entity = response.getHeaderString("Location");
-        return entity;
     }
 
     private Response sendWithRetry(String method, Invocation.Builder request, Entity entity, AtomicInteger retiresCounter) {
