@@ -1,6 +1,7 @@
 ## [vNext]
 ### Updated
 - DOM Snapshot script to version 3.3.3. [Trello 1588](https://trello.com/c/ZS0Wb1FN)
+- Upload DOM directly to storage service on MatchWindow. [Trello 1592](https://trello.com/c/MXixwLnj)
 
 ## [3.160.2] - 2020-02-24
 ### Fixed
