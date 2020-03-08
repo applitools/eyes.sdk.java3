@@ -1,8 +1,11 @@
 package com.applitools.eyes.utils;
 
 import com.applitools.eyes.*;
+import com.applitools.eyes.metadata.ActualAppOutput;
 import com.applitools.eyes.metadata.SessionResults;
 import com.applitools.eyes.selenium.Eyes;
+import com.applitools.eyes.selenium.TestSendDom;
+import com.applitools.utils.ArgumentGuard;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -166,4 +169,19 @@ public class TestUtils {
         }
     }
 
+    public static String getStepDom(EyesBase eyes, ActualAppOutput actualAppOutput) {
+        ArgumentGuard.notNull(eyes, "eyes");
+        ArgumentGuard.notNull(actualAppOutput, "actualAppOutput");
+
+        String apiSessionUrl = eyes.getServerUrl().toString();
+        URI apiSessionUri = UriBuilder.fromUri(apiSessionUrl)
+                .path("api/images/dom")
+                .path(actualAppOutput.getImage().getDomId())
+                .queryParam("apiKey", eyes.getApiKey())
+                .build();
+
+        RestClient client = new RestClient(new Logger(), apiSessionUri);
+        String result = client.getString(apiSessionUri.toString(), MediaType.APPLICATION_JSON);
+        return result;
+    }
 }
