@@ -30,7 +30,9 @@ public final class TestSendDom {
         void initWebDriver(WebDriver webDriver);
     }
 
-    private static void captureDom(String url, String testName) {captureDom(url, null, testName);}
+    private static void captureDom(String url, String testName) {
+        captureDom(url, null, testName);
+    }
 
     private static void captureDom(String url, WebDriverInitializer initCode, String testName) {
         WebDriver webDriver = SeleniumUtils.createChromeDriver();
@@ -52,6 +54,7 @@ public final class TestSendDom {
             Assert.assertTrue(hasDom);
             //string actualDomJsonString = domCapture.GetFullWindowDom();
             //WriteDomJson(logger, actualDomJsonString);
+
         } catch (Exception ex) {
             GeneralUtils.logExceptionStackTrace(eyes.getLogger(), ex);
             throw ex;
@@ -112,12 +115,20 @@ public final class TestSendDom {
                 String expectedDomJson = GeneralUtils.readToEnd(TestSendDom.class.getResourceAsStream("/expected_dom1.json"));
                 JsonNode actual = mapper.readTree(actualDomJsonString);
                 JsonNode expected = mapper.readTree(expectedDomJson);
+                //noinspection SimplifiedTestNGAssertion
                 Assert.assertTrue(actual.equals(expected));
+
+                SessionResults sessionResults = TestUtils.getSessionResults(eyes.getApiKey(), results);
+                ActualAppOutput[] actualAppOutput = sessionResults.getActualAppOutput();
+                String downloadedDomJsonString = TestUtils.getStepDom(eyes, actualAppOutput[0]);
+                JsonNode downloaded = mapper.readTree(downloadedDomJsonString);
+                //noinspection SimplifiedTestNGAssertion
+                Assert.assertTrue(downloaded.equals(expected));
+
             } catch (IOException e) {
                 GeneralUtils.logExceptionStackTrace(eyes.getLogger(), e);
             }
-        }
-        finally {
+        } finally {
             eyes.abort();
             webDriver.quit();
         }
