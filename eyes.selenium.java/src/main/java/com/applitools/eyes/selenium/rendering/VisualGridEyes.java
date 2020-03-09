@@ -173,7 +173,7 @@ public class VisualGridEyes implements ISeleniumEyes, IRenderingEyes {
         String uaString = this.webDriver.getUserAgent();
         if (uaString != null) {
             logger.verbose(String.format("User-Agent: %s", uaString));
-            userAgent = UserAgent.ParseUserAgentString(uaString, true);
+            userAgent = UserAgent.parseUserAgentString(uaString, true);
         }
 
         setViewportSize(this.webDriver);

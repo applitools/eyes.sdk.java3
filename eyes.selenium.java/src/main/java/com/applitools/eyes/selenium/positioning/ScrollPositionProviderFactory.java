@@ -12,7 +12,7 @@ public class ScrollPositionProviderFactory {
                                                                    Logger logger,
                                                                    IEyesJsExecutor executor,
                                                                    WebElement scrollRootElement) {
-        UserAgent userAgent = UserAgent.ParseUserAgentString(uaString, true);
+        UserAgent userAgent = UserAgent.parseUserAgentString(uaString, true);
         return getScrollPositionProvider(userAgent, logger, executor, scrollRootElement);
     }
 

@@ -267,7 +267,7 @@ public class SeleniumEyes extends EyesBase implements ISeleniumEyes, IDriverProv
             if (uaString.startsWith("useragent:")) {
                 uaString = uaString.substring(10);
             }
-            userAgent = UserAgent.ParseUserAgentString(uaString, true);
+            userAgent = UserAgent.parseUserAgentString(uaString, true);
         }
 
         initDevicePixelRatio();
