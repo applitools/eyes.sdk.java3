@@ -3,6 +3,7 @@ package com.applitools.eyes.selenium.positioning;
 import com.applitools.eyes.*;
 import com.applitools.eyes.positioning.PositionMemento;
 import com.applitools.eyes.positioning.PositionProvider;
+import com.applitools.eyes.selenium.EyesSeleniumUtils;
 import com.applitools.utils.ArgumentGuard;
 import org.openqa.selenium.WebElement;
 
@@ -71,19 +72,10 @@ public class ScrollPositionProvider implements PositionProvider, ISeleniumPositi
      * to.
      */
     public RectangleSize getEntireSize() {
-
-        logger.verbose(String.format("enter (scrollRootElement: %s)", scrollRootElement));
-        String entireSizeStr = (String)executor.executeScript(JS_GET_ENTIRE_PAGE_SIZE, scrollRootElement);
-        String[] wh = entireSizeStr.split(",");
-        if (wh.length != 2)
-        {
-            throw new EyesException("Could not get entire size!");
-        }
-        float w = Float.parseFloat(wh[0]);
-        float h = Float.parseFloat(wh[1]);
-        RectangleSize result = new RectangleSize((int)Math.ceil(w), (int)Math.ceil(h));
-        logger.verbose("ScrollPositionProvider - Entire size: " + result);
-        return result;
+        RectangleSize entireSize =
+                EyesSeleniumUtils.getEntireElementSize(logger, executor, scrollRootElement);
+        logger.verbose("ScrollPositionProvider - Entire size: " + entireSize);
+        return entireSize;
     }
 
     public PositionMemento getState() {
