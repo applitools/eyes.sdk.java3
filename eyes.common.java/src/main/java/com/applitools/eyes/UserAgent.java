@@ -16,7 +16,7 @@ public class UserAgent {
 
     private static final Pattern VERSION_REGEX = Pattern.compile(String.format(PRODUCT, "Version"));
 
-    private static final Pattern[] BROWSER_REGEX = new Pattern[]{
+    private static final Pattern[] BROWSER_REGEXES = new Pattern[]{
             Pattern.compile(String.format(PRODUCT, "Opera")),
             Pattern.compile(String.format(PRODUCT, "Chrome")),
             Pattern.compile(String.format(PRODUCT, "Safari")),
@@ -25,7 +25,7 @@ public class UserAgent {
             Pattern.compile("(?:MS(?<product>IE) " + MAJOR_MINOR + ")")
     };
 
-    private static final Pattern[] OS_REGEX = new Pattern[]{
+    private static final Pattern[] OS_REGEXES = new Pattern[]{
             Pattern.compile("(?:(?<os>Windows NT) " + MAJOR_MINOR + ")"),
             Pattern.compile("(?:(?<os>Windows XP))"),
             Pattern.compile("(?:(?<os>Windows 2000))"),
@@ -54,34 +54,6 @@ public class UserAgent {
     private String browserMajorVersion;
     private String browserMinorVersion;
 
-    public String getOriginalUserAgentString() {
-        return originalUserAgentString;
-    }
-
-    public String getOS() {
-        return os;
-    }
-
-    public String getOSMajorVersion() {
-        return osMajorVersion;
-    }
-
-    public String getOSMinorVersion() {
-        return osMinorVersion;
-    }
-
-    public String getBrowser() {
-        return browser;
-    }
-
-    public String getBrowserMajorVersion() {
-        return browserMajorVersion;
-    }
-
-    public String getBrowserMinorVersion() {
-        return browserMinorVersion;
-    }
-
     /**
      * @param userAgent User agent string to parse
      * @return A representation of the user agent string.
@@ -106,7 +78,7 @@ public class UserAgent {
         Map<String, Matcher> oss = new HashMap<>();
         List<Matcher> matchers = new ArrayList<>();
 
-        for (Pattern osRegex : OS_REGEX) {
+        for (Pattern osRegex : OS_REGEXES) {
             Matcher matcher = osRegex.matcher(userAgent);
             if (matcher.find()) {
                 matchers.add(matcher);
@@ -182,7 +154,7 @@ public class UserAgent {
         // browser
         boolean browserOK = false;
 
-        for (Pattern browserRegex : BROWSER_REGEX) {
+        for (Pattern browserRegex : BROWSER_REGEXES) {
             Matcher matcher = browserRegex.matcher(userAgent);
             if (matcher.find()) {
                 result.browser = matcher.group("product");
@@ -231,5 +203,38 @@ public class UserAgent {
         }
 
         return result;
+    }
+
+    public String getOriginalUserAgentString() {
+        return originalUserAgentString;
+    }
+
+    public String getOS() {
+        return os;
+    }
+
+    public String getOSMajorVersion() {
+        return osMajorVersion;
+    }
+
+    public String getOSMinorVersion() {
+        return osMinorVersion;
+    }
+
+    public String getBrowser() {
+        return browser;
+    }
+
+    public String getBrowserMajorVersion() {
+        return browserMajorVersion;
+    }
+
+    public String getBrowserMinorVersion() {
+        return browserMinorVersion;
+    }
+
+    @Override
+    public String toString() {
+        return String.format("%s %s.%s / %s %s.%s", os, osMajorVersion, osMinorVersion, browser, browserMajorVersion, browserMinorVersion);
     }
 }
