@@ -23,7 +23,7 @@ public class PositionProviderFactory {
         {
             case CSS: return new CssTranslatePositionProvider(logger, executor, scrollRootElement);
             case SCROLL:
-                if (userAgent != null && userAgent.getBrowser().equalsIgnoreCase(BrowserNames.Edge))
+                if (userAgent != null && userAgent.getBrowser().equalsIgnoreCase(BrowserNames.EDGE))
                     return new EdgeBrowserScrollPositionProvider(logger, executor, scrollRootElement);
                 //else
                 return new ScrollPositionProvider(logger, executor, scrollRootElement);

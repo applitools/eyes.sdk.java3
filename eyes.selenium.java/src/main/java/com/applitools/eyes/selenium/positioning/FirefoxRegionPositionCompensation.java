@@ -25,7 +25,7 @@ public class FirefoxRegionPositionCompensation implements RegionPositionCompensa
         logger.verbose(userAgent.toString());
         logger.verbose("pixel ratio: " + pixelRatio);
 
-        if (userAgent.getOS().equalsIgnoreCase(OSNames.Windows) &&
+        if (userAgent.getOS().equalsIgnoreCase(OSNames.WINDOWS) &&
                 Integer.parseInt(userAgent.getOSMajorVersion()) <= 7) {
             logger.verbose("compensating by " + pixelRatio + " pixels");
             return region.offset(0, (int) pixelRatio);

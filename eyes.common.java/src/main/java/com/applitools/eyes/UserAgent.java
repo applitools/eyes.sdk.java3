@@ -96,7 +96,7 @@ public class UserAgent {
         Matcher osMatch;
         if (matchers.size() == 0) {
             if (unknowns) {
-                result.os = OSNames.Unknown;
+                result.os = OSNames.UNKNOWN;
             } else {
                 throw new NotSupportedException("Unknown os: " + userAgent);
             }
@@ -129,15 +129,15 @@ public class UserAgent {
         if (result.os.toUpperCase().startsWith("CPU")) {
             result.os = OSNames.IOS;
         } else if (result.os.equals("Windows XP")) {
-            result.os = OSNames.Windows;
+            result.os = OSNames.WINDOWS;
             result.osMajorVersion = "5";
             result.osMinorVersion = "1";
         } else if (result.os.equals("Windows 2000")) {
-            result.os = OSNames.Windows;
+            result.os = OSNames.WINDOWS;
             result.osMajorVersion = "5";
             result.osMinorVersion = "0";
         } else if (result.os.equals("Windows NT")) {
-            result.os = OSNames.Windows;
+            result.os = OSNames.WINDOWS;
             if (result.osMajorVersion.equals("6") && result.osMinorVersion.equals("1")) {
                 result.osMajorVersion = "7";
                 result.osMinorVersion = "0";
@@ -146,9 +146,9 @@ public class UserAgent {
                 result.osMinorVersion = "0";
             }
         } else if (result.os.equals("Mac_PowerPC")) {
-            result.os = OSNames.Macintosh;
+            result.os = OSNames.MACINTOSH;
         } else if (result.os.equals("CrOS")) {
-            result.os = OSNames.ChromeOS;
+            result.os = OSNames.CHROME_OS;
         }
 
         // browser
@@ -165,10 +165,10 @@ public class UserAgent {
             }
         }
 
-        if (result.os.equals(OSNames.Windows)) {
+        if (result.os.equals(OSNames.WINDOWS)) {
             Matcher edgeMatch = EDGE_REGEX.matcher(userAgent);
             if (edgeMatch.find()) {
-                result.browser = BrowserNames.Edge;
+                result.browser = BrowserNames.EDGE;
                 result.browserMajorVersion = edgeMatch.group("major");
                 result.browserMinorVersion = edgeMatch.group("minor");
             }

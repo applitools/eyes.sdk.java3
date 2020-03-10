@@ -10,7 +10,7 @@ public class RegionPositionCompensationFactory {
 
     public static RegionPositionCompensation getRegionPositionCompensation(UserAgent userAgent, SeleniumEyes eyes, Logger logger) {
         if (userAgent != null) {
-            if (userAgent.getBrowser().equals(BrowserNames.Firefox)) {
+            if (userAgent.getBrowser().equals(BrowserNames.FIREFOX)) {
                 try {
                     if (Integer.parseInt(userAgent.getBrowserMajorVersion()) >= 48) {
                         return new FirefoxRegionPositionCompensation(eyes, userAgent, logger);
@@ -18,7 +18,7 @@ public class RegionPositionCompensationFactory {
                 } catch (NumberFormatException e) {
                     return new NullRegionPositionCompensation();
                 }
-            } else if (userAgent.getBrowser().equals(BrowserNames.Safari) && userAgent.getOS().equals(OSNames.MacOSX)) {
+            } else if (userAgent.getBrowser().equals(BrowserNames.SAFARI) && userAgent.getOS().equals(OSNames.MAC_OS_X)) {
                 return new SafariRegionPositionCompensation();
             }
             else if (userAgent.getBrowser().equals(BrowserNames.IE))

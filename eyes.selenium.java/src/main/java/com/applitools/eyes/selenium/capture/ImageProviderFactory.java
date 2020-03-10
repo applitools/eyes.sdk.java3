@@ -13,7 +13,7 @@ public class ImageProviderFactory {
 
     public static ImageProvider getImageProvider(UserAgent ua, SeleniumEyes eyes, Logger logger, TakesScreenshot tsInstance) {
         if (ua != null) {
-            if (ua.getBrowser().equals(BrowserNames.Firefox)) {
+            if (ua.getBrowser().equals(BrowserNames.FIREFOX)) {
                 try {
                     if (Integer.parseInt(ua.getBrowserMajorVersion()) >= 48) {
                         return new FirefoxScreenshotImageProvider(eyes, logger, tsInstance);
@@ -21,11 +21,11 @@ public class ImageProviderFactory {
                 } catch (NumberFormatException e) {
                     return new TakesScreenshotImageProvider(logger, tsInstance);
                 }
-            } else if (ua.getBrowser().equals(BrowserNames.Safari)) {
+            } else if (ua.getBrowser().equals(BrowserNames.SAFARI)) {
                 return new SafariScreenshotImageProvider(eyes, logger, tsInstance, ua);
             } else if (ua.getBrowser().equals(BrowserNames.IE)) {
                 return new InternetExplorerScreenshotImageProvider(eyes, logger, tsInstance, ua);
-            } else if (ua.getOS().equals(OSNames.Android)) {
+            } else if (ua.getOS().equals(OSNames.ANDROID)) {
                 return new AndroidScreenshotImageProvider(eyes, logger, tsInstance, ua);
             }
         }
@@ -34,7 +34,7 @@ public class ImageProviderFactory {
 
     public static ISizeAdjuster getImageSizeAdjuster(UserAgent ua, SeleniumJavaScriptExecutor jsExecutor) {
 
-        if (ua != null && (ua.getOS().equals(OSNames.Android) || ua.getOS().equals(OSNames.IOS))) {
+        if (ua != null && (ua.getOS().equals(OSNames.ANDROID) || ua.getOS().equals(OSNames.IOS))) {
             return new MobileDeviceSizeAdjuster(jsExecutor);
         }
         return NullSizeAdjuster.getInstance();

@@ -21,7 +21,7 @@ public class ScrollPositionProviderFactory {
                                                                    IEyesJsExecutor executor,
                                                                    WebElement scrollRootElement) {
         if (userAgent != null) {
-            if (userAgent.getBrowser().equals(BrowserNames.Edge)) {
+            if (userAgent.getBrowser().equals(BrowserNames.EDGE)) {
                 return new EdgeBrowserScrollPositionProvider(logger, executor, scrollRootElement);
             }
         }

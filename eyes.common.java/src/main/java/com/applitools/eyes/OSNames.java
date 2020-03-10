@@ -2,12 +2,12 @@ package com.applitools.eyes;
 
 public class OSNames {
 
-    public final static String Unknown = "Unknown";
-    public final static String Linux = "Linux";
-    public final static String Windows = "Windows";
+    public final static String UNKNOWN = "Unknown";
+    public final static String LINUX = "Linux";
+    public final static String WINDOWS = "Windows";
     public final static String IOS = "IOS";
-    public final static String Macintosh = "Macintosh";
-    public final static String MacOSX = "Mac OS X";
-    public final static String ChromeOS = "ChromeOS";
-    public static final String Android = "Android";
+    public final static String MACINTOSH = "Macintosh";
+    public final static String MAC_OS_X = "Mac OS X";
+    public final static String CHROME_OS = "ChromeOS";
+    public static final String ANDROID = "Android";
 }
