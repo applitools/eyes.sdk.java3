@@ -68,7 +68,7 @@ public class UserAgent {
      * @return A representation of the user agent string.
      */
     public static UserAgent parseUserAgentString(String userAgent, boolean unknowns) {
-        ArgumentGuard.notNull(userAgent, "userAgent");
+        if (userAgent == null) return null;
 
         userAgent = userAgent.trim();
         UserAgent result = new UserAgent();
