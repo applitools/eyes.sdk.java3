@@ -1,6 +1,7 @@
 package com.applitools.eyes.selenium;
 
 import com.applitools.eyes.*;
+import com.applitools.eyes.utils.ReportingTestSuite;
 import com.applitools.eyes.utils.SeleniumUtils;
 import com.applitools.eyes.utils.TestUtils;
 import com.applitools.eyes.visualgrid.services.VisualGridRunner;
@@ -18,7 +19,7 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-public abstract class TestSetup implements ITest {
+public abstract class TestSetup extends ReportingTestSuite implements ITest {
 
     private static String testNameSuffix = System.getenv("TEST_NAME_SUFFIX");
     public final String mode;
@@ -35,15 +36,19 @@ public abstract class TestSetup implements ITest {
         this.testSuitName = testSuitName + testNameSuffix;
         this.options = options;
         this.mode = mode;
+        super.setGroupName("selenium");
         switch (mode) {
             case "VG":
                 this.useVisualGrid = true;
+                super.addSuiteArg("mode", "VisualGrid");
                 break;
             case "CSS":
                 this.stitchMode = StitchMode.CSS;
+                super.addSuiteArg("mode", "CSS");
                 break;
             case "SCROLL":
                 this.stitchMode = StitchMode.SCROLL;
+                super.addSuiteArg("mode", "Scroll");
                 break;
         }
     }

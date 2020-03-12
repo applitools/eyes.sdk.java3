@@ -4,8 +4,8 @@
 
     <listeners>
         <listener class-name="com.applitools.eyes.selenium.ExcludeFailingTestsListener"/>
-        <listener class-name="com.applitools.eyes.selenium.RetryListener" />
-        <listener class-name="com.applitools.eyes.selenium.PostTestResultsListener" />
+        <!--<listener class-name="com.applitools.eyes.utils.RetryListener" />-->
+        <!--<listener class-name="com.applitools.eyes.utils.PostTestResultsListener" />-->
     </listeners>
 
     <suite-files>

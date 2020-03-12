@@ -1,15 +1,12 @@
 package com.applitools.eyes.selenium;
-
-import com.applitools.eyes.utils.CommUtils;
-import com.google.gson.Gson;
-import com.google.gson.JsonArray;
-import com.google.gson.JsonObject;
+//
+//import com.applitools.eyes.TestResult;
+//import com.applitools.eyes.TestResultReportSummary;
 import org.testng.IInvokedMethod;
 import org.testng.IInvokedMethodListener2;
 import org.testng.ITestContext;
 import org.testng.ITestResult;
 
-import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -32,15 +29,15 @@ public class MethodListener implements IInvokedMethodListener2 {
 
     @Override
     public void afterInvocation(IInvokedMethod iInvokedMethod, ITestResult iTestResult, ITestContext iTestContext) {
-        if (iInvokedMethod.isConfigurationMethod()) {
-            JsonObject resultJson = getResultJson(iTestResult);
-            System.out.println("Unified report: sending JSON to report " + resultJson.toString());
-            try {
-                CommUtils.postJson("http://sdk-test-results.herokuapp.com/result", new Gson().fromJson(resultJson, Map.class), null);
-            } catch (Throwable t) {
-                CommUtils.postJson("http://sdk-test-results.herokuapp.com/result", new Gson().fromJson(resultJson, Map.class), null);
-            }
-        }
+//        if (iInvokedMethod.isConfigurationMethod()) {
+//            TestResultReportSummary reportSummary = getReportSummary(iTestResult);
+//            System.out.println("Unified report: sending JSON to report " + reportSummary.toString());
+//            try {
+//                CommUtils.postJson("http://sdk-test-results.herokuapp.com/result", reportSummary, null);
+//            } catch (Throwable t) {
+//                CommUtils.postJson("http://sdk-test-results.herokuapp.com/result", reportSummary, null);
+//            }
+//        }
     }
 
     @Override
@@ -52,21 +49,13 @@ public class MethodListener implements IInvokedMethodListener2 {
     public void afterInvocation(IInvokedMethod iInvokedMethod, ITestResult iTestResult) {
 
     }
-
-    private JsonObject getResultJson(ITestResult testResult){
-        JsonArray resultsJsonArray = new JsonArray();
-        JsonObject innerResultsJsonObject = new JsonObject();
-        innerResultsJsonObject.addProperty("test_name", testResult.getMethod().getMethodName());
-        innerResultsJsonObject.addProperty("passed", testResult.isSuccess());
-        resultsJsonArray.add(innerResultsJsonObject);
-        JsonObject finalJsonObject = new JsonObject();
-        finalJsonObject.addProperty("sdk", "java");
-        finalJsonObject.addProperty("id", suiteId.get());
-        String travisGitTag = System.getenv("TRAVIS_TAG");
-        if (travisGitTag == null || !travisGitTag.contains("RELEASE_CANDIDATE")){
-            finalJsonObject.addProperty("sandbox", true);
-        }
-        finalJsonObject.add("results", resultsJsonArray);
-        return finalJsonObject;
-    }
+//
+//    private TestResultReportSummary getReportSummary(ITestResult testResult) {
+//        TestResult result = new TestResult(testResult.getMethod().getMethodName(), testResult.isSuccess(), null);
+//        TestResultReportSummary summary = new TestResultReportSummary();
+//        summary.setGroup("selenium");
+//        summary.addResult(result);
+//        summary.setId(suiteId.get());
+//        return summary;
+//    }
 }

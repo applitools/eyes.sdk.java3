@@ -4,7 +4,7 @@ import com.applitools.eyes.BatchInfo;
 import com.applitools.eyes.EyesRunner;
 import com.applitools.eyes.FileLogger;
 import com.applitools.eyes.RectangleSize;
-import com.applitools.eyes.utils.CommUtils;
+import com.applitools.eyes.utils.CommunicationUtils;
 import com.applitools.eyes.utils.SeleniumUtils;
 import org.openqa.selenium.WebDriver;
 import org.testng.Assert;
@@ -47,7 +47,7 @@ public final class TestBatchAPI {
             eyes.open(driver, "Applitools Eyes Java SDK", "Classic Runner Test",
                     new RectangleSize(1200, 800));
 
-            BatchInfo batchBeforeDelete = CommUtils.getBatch(batchInfo.getId(), eyes.getServerUrl().toString(), eyes.getApiKey());
+            BatchInfo batchBeforeDelete = CommunicationUtils.getBatch(batchInfo.getId(), eyes.getServerUrl().toString(), eyes.getApiKey());
 
             Assert.assertFalse(batchBeforeDelete.isCompleted());
 
@@ -59,7 +59,7 @@ public final class TestBatchAPI {
             }
             runner.getAllTestResults(false);
         }
-        BatchInfo batch = CommUtils.getBatch(batchInfo.getId(), eyes.getServerUrl().toString(), eyes.getApiKey());
+        BatchInfo batch = CommunicationUtils.getBatch(batchInfo.getId(), eyes.getServerUrl().toString(), eyes.getApiKey());
         Assert.assertTrue(batch.isCompleted());
     }
 }

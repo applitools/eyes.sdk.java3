@@ -1,4 +1,4 @@
-package com.applitools.eyes.selenium;
+package com.applitools.eyes.utils;
 
 import org.testng.IAnnotationTransformer3;
 import org.testng.annotations.*;
