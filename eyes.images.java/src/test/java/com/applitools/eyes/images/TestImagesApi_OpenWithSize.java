@@ -1,6 +1,7 @@
 package com.applitools.eyes.images;
 
 import com.applitools.eyes.*;
+import com.applitools.eyes.utils.ReportingTestSuite;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.BeforeMethod;
@@ -8,10 +9,14 @@ import org.testng.annotations.Test;
 
 import java.lang.reflect.Method;
 
-public class TestImagesApi_OpenWithSize {
+public class TestImagesApi_OpenWithSize extends ReportingTestSuite {
     private Eyes eyes;
     private static final String TEST_SUITE_NAME = "Eyes Image SDK";
     private static BatchInfo batchInfo;
+
+    public TestImagesApi_OpenWithSize() {
+        super.setGroupName("images");
+    }
 
     @BeforeClass
     public static void setUpOnce() {

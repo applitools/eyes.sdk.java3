@@ -15,7 +15,7 @@ public class TestResultReportSummary {
 
     @JsonProperty("sdk")
     public String getSdkName() {
-        return "Java";
+        return "java";
     }
 
     @JsonProperty("id")

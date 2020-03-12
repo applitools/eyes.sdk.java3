@@ -3,6 +3,7 @@ package com.applitools.eyes.images;
 import com.applitools.eyes.LogHandler;
 import com.applitools.eyes.Logger;
 import com.applitools.eyes.Region;
+import com.applitools.eyes.utils.ReportingTestSuite;
 import com.applitools.utils.ImageUtils;
 import org.testng.Assert;
 import org.testng.annotations.Test;
@@ -10,7 +11,7 @@ import org.testng.annotations.Test;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 
-public class TestImageUtils {
+public class TestImageUtils extends ReportingTestSuite {
 
     public class TestLogHandler implements LogHandler {
 
@@ -35,6 +36,10 @@ public class TestImageUtils {
         public boolean contains (String message) {
             return messages.contains(message);
         }
+    }
+
+    public TestImageUtils() {
+        super.setGroupName("images");
     }
 
     @Test

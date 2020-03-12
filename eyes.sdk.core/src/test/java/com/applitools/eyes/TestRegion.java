@@ -1,11 +1,16 @@
 package com.applitools.eyes;
 
+import com.applitools.eyes.utils.ReportingTestSuite;
 import org.junit.Assert;
 import org.testng.annotations.Test;
 
 import java.awt.*;
 
-public class TestRegion {
+public class TestRegion extends ReportingTestSuite {
+
+    public TestRegion(){
+        super.setGroupName("core");
+    }
 
     @Test
     public void TestRegionSplitting_iPhone_XS_12_2_Portrait()

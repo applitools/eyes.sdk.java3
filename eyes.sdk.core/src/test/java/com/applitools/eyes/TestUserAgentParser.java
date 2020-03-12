@@ -1,10 +1,18 @@
 package com.applitools.eyes;
 
+import com.applitools.eyes.utils.ReportingTestSuite;
 import org.testng.Assert;
+import org.testng.ITestContext;
+import org.testng.annotations.BeforeMethod;
+import org.testng.annotations.BeforeTest;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
-public class TestUserAgentParser {
+public class TestUserAgentParser extends ReportingTestSuite {
+
+    public TestUserAgentParser() {
+        super.setGroupName("core");
+    }
 
     @DataProvider(name = "dp")
     public static Object[][] dp() {
@@ -32,13 +40,15 @@ public class TestUserAgentParser {
     }
 
     @Test(dataProvider = "dp")
-    public void TestUAParsing(String uaStr,
+    public void TestUAParsing(ITestContext testContext,
+                              String uaStr,
                               String expectedOs,
                               String expectedOsMajorVersion,
                               String expectedOsMinorVersion,
                               String expectedBrowser,
                               String expectedBrowserMajorVersion,
                               String expectedBrowserMinorVersion) {
+        super.addTestParameter(testContext,"UserAgent", uaStr);
         UserAgent ua = UserAgent.parseUserAgentString(uaStr);
         Assert.assertEquals(ua.getOS(), expectedOs, "OS");
         Assert.assertEquals(ua.getOSMajorVersion(), expectedOsMajorVersion, "OS Major Version");

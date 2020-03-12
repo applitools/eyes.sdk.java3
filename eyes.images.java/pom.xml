@@ -32,5 +32,12 @@
             <artifactId>eyes-sdk-core-java3</artifactId>
             <version>3.160.2</version>
         </dependency>
+        <dependency>
+            <groupId>com.applitools</groupId>
+            <artifactId>eyes-sdk-core-java3</artifactId>
+            <version>3.160.2</version>
+            <type>test-jar</type>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
 </project>
