@@ -28,8 +28,27 @@
         </dependency>
         <dependency>
             <groupId>com.applitools</groupId>
-                <artifactId>eyes-connectivity-java3-jersey2x</artifactId>
+            <artifactId>eyes-connectivity-java3-jersey2x</artifactId>
             <version>3.160.2</version>
         </dependency>
     </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <version>3.0.2</version>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>jar</goal>
+                            <goal>test-jar</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+
 </project>
