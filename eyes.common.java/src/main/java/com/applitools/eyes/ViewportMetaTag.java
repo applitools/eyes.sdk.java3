@@ -5,8 +5,11 @@ import java.util.regex.Pattern;
 
 public class ViewportMetaTag {
 
+    //private static final Pattern viewportParsingRegex = Pattern.compile(
+    //        "(width\\W*=\\W*(?<width>[a-zA-Z0-9\\.-]*))?,?\\W*(initial-scale\\W*=\\W*(?<initialScale>[a-zA-Z0-9\\.-]*))?");
+
     private static final Pattern viewportParsingRegex = Pattern.compile(
-            "(width\\W*=\\W*(?<width>[a-zA-Z0-9\\.-]*))?,?\\W*(initial-scale\\W*=\\W*(?<initialScale>[a-zA-Z0-9\\.-]*))?");
+            "(width\\W*=\\W*((?<width>[0-9]+)(px)?)|(?<deviceWidth>device-width))?,?\\W*(initial-scale\\W*=\\W*(?<initialScale>[a-zA-Z0-9\\.-]*))?");
 
     private float deviceWidth;
     private float initialScale;
@@ -32,7 +35,8 @@ public class ViewportMetaTag {
         Matcher match = viewportParsingRegex.matcher(viewportMetaTagContent);
         String widthStr = null;
         String initialScaleStr = null;
-        while (match.find() && (widthStr == null || initialScaleStr == null)) {
+        String isDeviceWidth = null;
+        while (match.find() && (widthStr == null || initialScaleStr == null || isDeviceWidth == null)) {
             String matchResult = match.group("width");
             if (widthStr == null && matchResult != null) {
                 widthStr = matchResult;
@@ -41,8 +45,12 @@ public class ViewportMetaTag {
             if (initialScaleStr == null && matchResult != null) {
                 initialScaleStr = matchResult;
             }
+            matchResult = match.group("deviceWidth");
+            if (isDeviceWidth == null && matchResult != null) {
+                isDeviceWidth = matchResult;
+            }
         }
-        viewportData.followDeviceWidth = "device-width".equalsIgnoreCase(widthStr);
+        viewportData.followDeviceWidth = isDeviceWidth != null;
         if (!viewportData.followDeviceWidth && widthStr != null) {
             try {
                 viewportData.deviceWidth = Float.parseFloat(widthStr);
