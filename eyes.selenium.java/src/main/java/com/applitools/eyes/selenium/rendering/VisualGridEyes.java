@@ -533,86 +533,24 @@ public class VisualGridEyes implements ISeleniumEyes, IRenderingEyes {
         try {
             FrameChain originalFC = webDriver.getFrameChain().clone();
             EyesTargetLocator switchTo = ((EyesTargetLocator) webDriver.switchTo());
-            ISeleniumCheckTarget seleniumCheckTarget = (ISeleniumCheckTarget) checkSettings;
-
-            int switchedToCount = switchToFrame(seleniumCheckTarget);
-
-            ICheckSettingsInternal checkSettingsInternal = (ICheckSettingsInternal) checkSettings;
-            boolean isFullPage = true;
-            Boolean b;
-            if ((b = checkSettingsInternal.isStitchContent()) != null) {
-                isFullPage = b;
-            } else if ((b = getConfigGetter().isForceFullPageScreenshot()) != null) {
-                isFullPage = b;
-            }
-            if (switchedToCount > 0 && isFullPage) {
-                FrameChain frameChain = webDriver.getFrameChain().clone();
-                Frame frame = frameChain.pop();
-                checkSettings = ((SeleniumCheckSettings) checkSettings).region(frame.getReference());
-                seleniumCheckTarget = (ISeleniumCheckTarget) checkSettings;
-
-                checkSettingsInternal = (ICheckSettingsInternal) checkSettings;
-                switchTo.parentFrame();
-            }
+            checkSettings = switchFramesAsNeeded(checkSettings, switchTo);
+            ICheckSettingsInternal  checkSettingsInternal = (ICheckSettingsInternal) checkSettings;
 
             isCheckTimerTimedOut.set(false);
 
             List<VisualGridTask> openVisualGridTasks = addOpenTaskToAllRunningTest();
-
             List<VisualGridTask> visualGridTaskList = new ArrayList<>();
 
-
-            logger.verbose("Dom extraction starting   (" + checkSettingsInternal.toString() + ")");
-            timer = new Timer("VG_Check_StopWatch", true);
-            timer.schedule(new TimeoutTask(), DOM_EXTRACTION_TIMEOUT);
-            String resultAsString;
-            ScriptResponse.Status status = null;
-            ScriptResponse scriptResponse = null;
-            do {
-                resultAsString = (String) this.webDriver.executeScript(PROCESS_RESOURCES + "return __processPageAndSerializePoll();");
-                try {
-                    scriptResponse = GeneralUtils.parseJsonToObject(resultAsString, ScriptResponse.class);
-                    logger.verbose("Dom extraction polling...");
-                    status = scriptResponse.getStatus();
-                } catch (IOException e) {
-                    GeneralUtils.logExceptionStackTrace(logger, e);
-                }
-                Thread.sleep(200);
-            } while (status == ScriptResponse.Status.WIP && !isCheckTimerTimedOut.get());
-
-            if (status == ScriptResponse.Status.ERROR) {
-                switchTo.frames(originalFC);
-                throw new EyesException("DomSnapshot Error: " + scriptResponse.getError());
-            }
-
-            if (isCheckTimerTimedOut.get()) {
-                switchTo.frames(originalFC);
-                throw new EyesException("Domsnapshot Timed out");
-            }
-            FrameData scriptResult = scriptResponse.getValue();
-
-            logger.verbose("Dom extracted  (" + checkSettingsInternal.toString() + ")");
+            FrameData scriptResult = captureDomSnapshot(originalFC, switchTo, checkSettingsInternal);
 
             List<VisualGridSelector[]> regionsXPaths = getRegionsXPaths(checkSettingsInternal);
-
             logger.verbose("regionXPaths : " + regionsXPaths);
 
             trySetTargetSelector((SeleniumCheckSettings)checkSettings);
 
-            List<RunningTest> filteredTests = new ArrayList<>();
-
             checkSettingsInternal = updateCheckSettings(checkSettings);
 
-            for (final RunningTest test : testList) {
-                List<VisualGridTask> taskList = test.getVisualGridTaskList();
-                if (!taskList.isEmpty()) {
-                    VisualGridTask visualGridTask = taskList.get(taskList.size() - 1);
-                    VisualGridTask.TaskType taskType = visualGridTask.getType();
-                    if ((taskType == null && test.isOpenTaskIssued() && !test.isCloseTaskIssued()) || taskType != VisualGridTask.TaskType.CLOSE && taskType != VisualGridTask.TaskType.ABORT) {
-                        filteredTests.add(test);
-                    }
-                }
-            }
+            List<RunningTest> filteredTests = collectFilteredTests();
 
             String source = webDriver.getCurrentUrl();
             for (RunningTest runningTest : filteredTests) {
@@ -623,7 +561,7 @@ public class VisualGridEyes implements ISeleniumEyes, IRenderingEyes {
             logger.verbose("added check tasks  (" + checkSettingsInternal.toString() + ")");
 
             this.renderingGridRunner.check((ICheckSettings) checkSettingsInternal, debugResourceWriter, scriptResult,
-                    this.VGEyesConnector, visualGridTaskList, openVisualGridTasks, resultAsString,
+                    this.VGEyesConnector, visualGridTaskList, openVisualGridTasks,
                     new VisualGridRunner.RenderListener() {
                         @Override
                         public void onRenderSuccess() {
@@ -650,6 +588,79 @@ public class VisualGridEyes implements ISeleniumEyes, IRenderingEyes {
                 timer.cancel();
             }
         }
+    }
+
+    private List<RunningTest> collectFilteredTests() {
+        List<RunningTest> filteredTests = new ArrayList<>();
+        for (final RunningTest test : testList) {
+            List<VisualGridTask> taskList = test.getVisualGridTaskList();
+            if (!taskList.isEmpty()) {
+                VisualGridTask visualGridTask = taskList.get(taskList.size() - 1);
+                VisualGridTask.TaskType taskType = visualGridTask.getType();
+                if ((taskType == null && test.isOpenTaskIssued() && !test.isCloseTaskIssued()) ||
+                        (taskType != VisualGridTask.TaskType.CLOSE && taskType != VisualGridTask.TaskType.ABORT)) {
+                    filteredTests.add(test);
+                }
+            }
+        }
+        return filteredTests;
+    }
+
+    private ICheckSettings switchFramesAsNeeded(ICheckSettings checkSettings, EyesTargetLocator switchTo) {
+        int switchedToCount = switchToFrame((ISeleniumCheckTarget) checkSettings);
+        boolean isFullPage = isFullPage((ICheckSettingsInternal)checkSettings);
+        if (switchedToCount > 0 && isFullPage) {
+            FrameChain frameChain = webDriver.getFrameChain().clone();
+            Frame frame = frameChain.pop();
+            checkSettings = ((SeleniumCheckSettings) checkSettings).region(frame.getReference());
+            switchTo.parentFrame();
+        }
+        return checkSettings;
+    }
+
+    private boolean isFullPage(ICheckSettingsInternal checkSettingsInternal) {
+        boolean isFullPage = true;
+        Boolean b;
+        if ((b = checkSettingsInternal.isStitchContent()) != null) {
+            isFullPage = b;
+        } else if ((b = getConfigGetter().isForceFullPageScreenshot()) != null) {
+            isFullPage = b;
+        }
+        return isFullPage;
+    }
+
+    private FrameData captureDomSnapshot(FrameChain originalFC, EyesTargetLocator switchTo, ICheckSettingsInternal checkSettingsInternal) throws InterruptedException {
+        logger.verbose("Dom extraction starting   (" + checkSettingsInternal.toString() + ")");
+        timer = new Timer("VG_Check_StopWatch", true);
+        timer.schedule(new TimeoutTask(), DOM_EXTRACTION_TIMEOUT);
+        String resultAsString;
+        ScriptResponse.Status status = null;
+        ScriptResponse scriptResponse = null;
+        do {
+            resultAsString = (String) this.webDriver.executeScript(PROCESS_RESOURCES + "return __processPageAndSerializePoll();");
+            try {
+                scriptResponse = GeneralUtils.parseJsonToObject(resultAsString, ScriptResponse.class);
+                logger.verbose("Dom extraction polling...");
+                status = scriptResponse.getStatus();
+            } catch (IOException e) {
+                GeneralUtils.logExceptionStackTrace(logger, e);
+            }
+            Thread.sleep(200);
+        } while (status == ScriptResponse.Status.WIP && !isCheckTimerTimedOut.get());
+
+        if (status == ScriptResponse.Status.ERROR) {
+            switchTo.frames(originalFC);
+            throw new EyesException("DomSnapshot Error: " + scriptResponse.getError());
+        }
+
+        if (isCheckTimerTimedOut.get()) {
+            switchTo.frames(originalFC);
+            throw new EyesException("Domsnapshot Timed out");
+        }
+        FrameData scriptResult = scriptResponse != null ? scriptResponse.getValue() : null;
+
+        logger.verbose("Dom extracted  (" + checkSettingsInternal.toString() + ")");
+        return scriptResult;
     }
 
     private void waitBeforeDomSnapshot() {

@@ -453,9 +453,9 @@ public class VisualGridRunner extends EyesRunner {
         notifyAllServices();
     }
 
-    public synchronized void check(ICheckSettings settings, IDebugResourceWriter debugResourceWriter, FrameData script,
+    public synchronized void check(ICheckSettings settings, IDebugResourceWriter debugResourceWriter, FrameData domData,
                                    IEyesConnector connector, List<VisualGridTask> visualGridTaskList,
-                                   List<VisualGridTask> openVisualGridTasks, String resultAsString, final RenderListener listener,
+                                   List<VisualGridTask> openVisualGridTasks, final RenderListener listener,
                                    List<VisualGridSelector[]> selectors, UserAgent userAgent) {
 
         if (debugResourceWriter == null) {
@@ -465,7 +465,7 @@ public class VisualGridRunner extends EyesRunner {
             debugResourceWriter = new NullDebugResourceWriter();
         }
 
-        RenderingTask renderingTask = new RenderingTask(connector, script, settings, visualGridTaskList,
+        RenderingTask renderingTask = new RenderingTask(connector, domData, settings, visualGridTaskList,
                 openVisualGridTasks, this, debugResourceWriter, new RenderingTask.RenderTaskListener() {
             @Override
             public void onRenderSuccess() {
@@ -486,12 +486,8 @@ public class VisualGridRunner extends EyesRunner {
             this.renderingTaskList.add(renderingTask);
         }
 
-        //Write all DomSnapshot data
-        debugResourceWriter.write(new RGridResource("http://THE_DOM_SNAPSHOT_RESULT.com", "DOM_SNAPSHOT", resultAsString.getBytes(), logger, ""));
-
-        logger.verbose("releasing renderingTaskList");
+       logger.verbose("releasing renderingTaskList");
         notifyAllServices();
-//        logger.verbose("exit");
     }
 
     private void notifyAllServices() {

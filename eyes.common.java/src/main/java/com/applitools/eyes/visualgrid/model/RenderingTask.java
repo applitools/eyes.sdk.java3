@@ -111,7 +111,7 @@ public class RenderingTask implements Callable<RenderStatusResults>, Completable
             RenderRequest[] requests = prepareDataForRG(result);
 
             logger.verbose("step 2");
-            boolean stillRunning = true;
+            boolean stillRunning;
             int fetchFails = 0;
             boolean isForcePutAlreadyDone = false;
             List<RunningRender> runningRenders = null;
