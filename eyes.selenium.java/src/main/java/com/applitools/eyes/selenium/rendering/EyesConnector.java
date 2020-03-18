@@ -11,12 +11,13 @@ import com.applitools.eyes.visualgrid.model.*;
 import com.applitools.eyes.visualgrid.services.IEyesConnector;
 import com.applitools.eyes.visualgrid.services.IResourceFuture;
 import com.applitools.eyes.visualgrid.services.VisualGridTask;
+import com.applitools.utils.ClassVersionGetter;
 
 import java.net.URI;
 import java.net.URL;
 import java.util.List;
 
-class EyesConnector extends EyesBase implements IEyesConnector , IBatchCloser {
+class EyesConnector extends EyesBase implements IEyesConnector, IBatchCloser {
 
     private final ISeleniumConfigurationProvider configProvider;
     private RenderBrowserInfo browserInfo;
@@ -85,7 +86,7 @@ class EyesConnector extends EyesBase implements IEyesConnector , IBatchCloser {
                                    String renderId, String source) {
 
         ICheckSettingsInternal checkSettingsInternal = (ICheckSettingsInternal) checkSettings;
-        if(checkSettingsInternal.getStitchContent() == null){
+        if (checkSettingsInternal.getStitchContent() == null) {
             checkSettings.fully();
         }
 
@@ -116,7 +117,7 @@ class EyesConnector extends EyesBase implements IEyesConnector , IBatchCloser {
 
     @Override
     protected String getBaseAgentId() {
-        return "eyes.selenium.visualgrid.java/3.160.3";
+        return "eyes.selenium.visualgrid.java/" + ClassVersionGetter.CURRENT_VERSION;
     }
 
     @Override
@@ -157,7 +158,7 @@ class EyesConnector extends EyesBase implements IEyesConnector , IBatchCloser {
 
     @Override
     protected IConfigurationSetter getConfigSetter() {
-        return (IConfigurationSetter)configurationGetter;
+        return (IConfigurationSetter) configurationGetter;
     }
 
     public void setRenderInfo(RenderingInfo renderInfo) {

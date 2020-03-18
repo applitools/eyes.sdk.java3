@@ -1,6 +1,7 @@
 package com.applitools.eyes.visualgrid.model;
 
 import com.applitools.eyes.visualgrid.services.VisualGridTask;
+import com.applitools.utils.ClassVersionGetter;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -9,7 +10,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class  RenderRequest {
+public class RenderRequest {
+
     @JsonInclude
     private String renderId;
 
@@ -17,7 +19,7 @@ public class  RenderRequest {
     private final VisualGridTask visualGridTask;
 
     @JsonInclude
-    private String agentId = "eyes.selenium.visualgrid.java/3.159.0";
+    private String agentId;
 
     @JsonInclude
     private String stitchingServiceUrl;
@@ -65,6 +67,7 @@ public class  RenderRequest {
         this.sendDom = sendDom;
         this.visualGridTask = visualGridTask;
         this.stitchingServiceUrl = stitchingServiceUrl;
+        this.agentId = "eyes.selenium.visualgrid.java/" + ClassVersionGetter.CURRENT_VERSION;
     }
 
     public String getUrl() {
@@ -141,8 +144,8 @@ public class  RenderRequest {
 
     @JsonProperty("browser")
     @JsonInclude(JsonInclude.Include.NON_NULL)
-    public Map<String,String> getBrowser(){
-        Map<String,String> map = new HashMap<>();
+    public Map<String, String> getBrowser() {
+        Map<String, String> map = new HashMap<>();
         map.put("name", this.browserName);
         map.put("platform", this.platform);
         return map;

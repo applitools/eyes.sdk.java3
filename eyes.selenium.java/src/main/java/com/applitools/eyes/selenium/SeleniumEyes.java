@@ -129,20 +129,21 @@ public class SeleniumEyes extends EyesBase implements ISeleniumEyes, IDriverProv
 
     @Override
     public String getBaseAgentId() {
-        return "eyes.selenium.java/3.160.3";
+        return "eyes.selenium.java/" + ClassVersionGetter.CURRENT_VERSION;
     }
 
-    public void apiKey(String apiKey){
+    public void apiKey(String apiKey) {
         setApiKey(apiKey);
     }
 
-    public void serverUrl(String serverUrl){
+    public void serverUrl(String serverUrl) {
         setServerUrl(serverUrl);
     }
 
-    public void serverUrl(URI serverUrl){
+    public void serverUrl(URI serverUrl) {
         setServerUrl(serverUrl);
     }
+
     /**
      * Gets driver.
      * @return the driver
@@ -234,9 +235,8 @@ public class SeleniumEyes extends EyesBase implements ISeleniumEyes, IDriverProv
 
     @Override
     public WebDriver open(WebDriver driver, String appName, String testName, RectangleSize viewportSize) throws EyesException {
-        IConfigurationSetter configSetter = (IConfigurationSetter)getConfigSetter().setAppName(appName).setTestName(testName);
-        if (viewportSize != null && !viewportSize.isEmpty())
-        {
+        IConfigurationSetter configSetter = (IConfigurationSetter) getConfigSetter().setAppName(appName).setTestName(testName);
+        if (viewportSize != null && !viewportSize.isEmpty()) {
             configSetter.setViewportSize(new RectangleSize(viewportSize));
         }
         return open(driver);
@@ -285,15 +285,11 @@ public class SeleniumEyes extends EyesBase implements ISeleniumEyes, IDriverProv
         return this.driver;
     }
 
-    private void initDevicePixelRatio()
-    {
+    private void initDevicePixelRatio() {
         logger.verbose("Trying to extract device pixel ratio...");
-        try
-        {
+        try {
             devicePixelRatio = EyesSeleniumUtils.getDevicePixelRatio(this.jsExecutor);
-        }
-        catch (Exception ex)
-        {
+        } catch (Exception ex) {
             logger.verbose("Failed to extract device pixel ratio! Using default.");
             devicePixelRatio = DEFAULT_DEVICE_PIXEL_RATIO;
         }

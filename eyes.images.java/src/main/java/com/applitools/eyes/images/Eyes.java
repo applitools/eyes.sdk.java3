@@ -16,6 +16,7 @@ import com.applitools.eyes.fluent.ICheckSettingsInternal;
 import com.applitools.eyes.positioning.RegionProvider;
 import com.applitools.eyes.triggers.MouseAction;
 import com.applitools.utils.ArgumentGuard;
+import com.applitools.utils.ClassVersionGetter;
 import com.applitools.utils.ImageUtils;
 
 import java.awt.image.BufferedImage;
@@ -37,7 +38,7 @@ public class Eyes extends EyesBase implements IConfigurationGetter, IConfigurati
      */
     @Override
     public String getBaseAgentId() {
-        return "eyes.images.java/3.160.3";
+        return "eyes.images.java/" + ClassVersionGetter.CURRENT_VERSION;
     }
 
     @Override
@@ -53,7 +54,7 @@ public class Eyes extends EyesBase implements IConfigurationGetter, IConfigurati
      *                   {@code null} will automatically grab the resolution from the image.
      */
     public void open(String appName, String testName,
-                     RectangleSize dimensions) throws EyesException{
+                     RectangleSize dimensions) throws EyesException {
         config.setAppName(appName);
         config.setTestName(testName);
         config.setViewportSize(dimensions);
