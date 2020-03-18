@@ -1,3 +1,7 @@
+## [vNext]
+### Fixed
+- Default versions reported in `AgentId` now automatically generated and match `pom.xml`.
+
 ## [3.160.3] - 2020-03-18
 ### Fixed
 - Fixed UserAgent parsing + tests. (Problem found in [Trello 1589](https://trello.com/c/3C2UTw5P))
