@@ -10,6 +10,15 @@
             </class>
         </classes>
     </test>
+    <test name="TestMobileDevicesAndroid">
+        <classes>
+            <class name="com.applitools.eyes.selenium.TestMobileDevicesAndroid">
+                <methods>
+                    <include name="TestAndroidStitch" />
+                </methods>
+            </class>
+        </classes>
+    </test>
     <test name="TestIOSCrop">
         <classes>
             <class name="com.applitools.eyes.selenium.TestIOSCrop">

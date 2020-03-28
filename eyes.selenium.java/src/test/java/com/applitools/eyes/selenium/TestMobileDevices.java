@@ -35,16 +35,6 @@ public class TestMobileDevices implements ITest {
         this.testName = initTestName(deviceName, platformVersion, deviceOrientation, this.page);
     }
 
-    @DataProvider(name = "androidDevices", parallel = true)
-    public static Object[][] androidDevices() {
-        List<Object[]> devices = Arrays.asList(new Object[][]{
-                {"Android Emulator", "8.0", ScreenOrientation.PORTRAIT, false},
-                {"Android Emulator", "8.0", ScreenOrientation.LANDSCAPE, true}
-        });
-        devices = addPageType(devices);
-        return devices.toArray(new Object[0][]);
-    }
-
     protected static void initEyes(String deviceName, String platformVersion, ScreenOrientation deviceOrientation, String platformName, String browserName, String page) {
         Eyes eyes = new Eyes();
 
