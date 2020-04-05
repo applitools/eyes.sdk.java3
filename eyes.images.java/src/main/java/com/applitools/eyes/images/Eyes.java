@@ -687,7 +687,7 @@ public class Eyes extends EyesBase implements IConfigurationGetter, IConfigurati
 
     @Override
     public IConfigurationSetter setEnablePatterns(boolean enablePatterns) {
-        return config.setUseDom(enablePatterns);
+        return config.setEnablePatterns(enablePatterns);
     }
 
     /**
