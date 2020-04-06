@@ -47,8 +47,8 @@ public class ServerConnector extends RestClient implements IServerConnector {
      * @param logger A logger instance.
      * @param serverUrl The URI of the Eyes server.
      */
-    public ServerConnector(Logger logger, URI serverUrl, String agentId) {
-        super(logger, serverUrl, TIMEOUT, agentId);
+    public ServerConnector(Logger logger, URI serverUrl) {
+        super(logger, serverUrl, TIMEOUT);
         endPoint = endPoint.path(API_PATH);
     }
 
@@ -62,12 +62,12 @@ public class ServerConnector extends RestClient implements IServerConnector {
     /***
      * @param serverUrl The URI of the Eyes server.
      */
-    public ServerConnector(URI serverUrl, String agentId) {
-        this(null, serverUrl, agentId);
+    public ServerConnector(URI serverUrl) {
+        this(null, serverUrl);
     }
 
-    public ServerConnector(String agentId) {
-        this((Logger) null, agentId);
+    public ServerConnector() {
+        this((Logger) null);
     }
 
     /**

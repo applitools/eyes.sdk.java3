@@ -13,7 +13,6 @@ import org.glassfish.jersey.client.RequestEntityProcessing;
 
 import javax.ws.rs.HttpMethod;
 import javax.ws.rs.client.*;
-import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.io.IOException;
 import java.net.URI;
@@ -87,7 +86,7 @@ public class RestClient {
      * @param serverUrl The URI of the rest server.
      * @param timeout Connect/Read timeout in milliseconds. 0 equals infinity.
      */
-    public RestClient(Logger logger, URI serverUrl, int timeout, String agentId) {
+    public RestClient(Logger logger, URI serverUrl, int timeout) {
         ArgumentGuard.notNull(serverUrl, "serverUrl");
         ArgumentGuard.greaterThanOrEqualToZero(timeout, "timeout");
 
@@ -100,7 +99,6 @@ public class RestClient {
 
         restClient = buildRestClient(timeout, abstractProxySettings);
         endPoint = restClient.target(serverUrl);
-        this.agentId = agentId;
     }
 
     public void setLogger(Logger logger) {
@@ -118,8 +116,8 @@ public class RestClient {
      * @param logger    A logger instance.
      * @param serverUrl The URI of the rest server.
      */
-    public RestClient(Logger logger, URI serverUrl, String agentId) {
-        this(logger, serverUrl, 1000 * 60 * 5, agentId);
+    public RestClient(Logger logger, URI serverUrl) {
+        this(logger, serverUrl, 1000 * 60 * 5);
     }
 
     /**
@@ -216,7 +214,8 @@ public class RestClient {
 
         logger.verbose("enter");
         String currentTime = GeneralUtils.toRfc1123(Calendar.getInstance(TimeZone.getTimeZone("UTC")));
-        invocationBuilder = invocationBuilder.header("Eyes-Expect", "202+location")
+        invocationBuilder = invocationBuilder
+                .header("Eyes-Expect", "202+location")
                 .header("Eyes-Date", currentTime)
                 .header(AGENT_ID_CUSTOM_HEADER, agentId);
         Response response = invocationBuilder.method(method, entity);
@@ -282,6 +281,7 @@ public class RestClient {
         // Building the request
         Invocation.Builder invocationBuilder = restClient.target(path).request(accept);
         invocationBuilder.header(AGENT_ID_CUSTOM_HEADER, agentId);
+
         // Actually perform the method call and return the result
         return invocationBuilder.method(method);
     }

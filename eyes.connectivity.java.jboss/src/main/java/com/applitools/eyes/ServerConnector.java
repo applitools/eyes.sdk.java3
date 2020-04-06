@@ -26,7 +26,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
 import java.net.URL;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.concurrent.Future;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -238,14 +240,11 @@ public class ServerConnector extends RestClient
                 .path("/api/sessions/batches/")
                 .path(testResults.getBatchId())
                 .path("/")
-                .path(testResults.getId());
-
-        Map<String, Object> queryParams = new HashMap<String, Object>(){{
-            put("apiKey", getApiKey());
-            put("AccessToken", testResults.getSecretToken());
-        }};
-
-        Invocation.Builder request = makeEyesRequest(target, queryParams);
+                .path(testResults.getId())
+                .queryParam("apiKey", getApiKey())
+                .queryParam("AccessToken", testResults.getSecretToken())
+                .request(MediaType.APPLICATION_JSON)
+                .header(AGENT_ID_CUSTOM_HEADER, agentId);
 
         Response response = request.delete();
 
@@ -408,6 +407,7 @@ public class ServerConnector extends RestClient
     }
 
     private Response sendWithRetry(String method, Invocation.Builder request, Entity entity, AtomicInteger retiresCounter) {
+        request.header(AGENT_ID_CUSTOM_HEADER, agentId);
         if (retiresCounter == null) {
 
             retiresCounter = new AtomicInteger(0);
@@ -450,11 +450,10 @@ public class ServerConnector extends RestClient
     @Override
     public RenderingInfo getRenderInfo() {
         if (renderingInfo == null) {
-            WebTarget target = restClient.target(serverUrl).path((RENDER_INFO_PATH));
-            Map<String, Object> queryParams = new HashMap<String, Object>(){{
-                put("apiKey", getApiKey());
-            }};
-            Invocation.Builder request = makeEyesRequest(target, queryParams);
+            String apiKey = getApiKey();
+            WebTarget target = restClient.target(serverUrl).path((RENDER_INFO_PATH)).queryParam("apiKey", apiKey);
+            Invocation.Builder request = target.request(MediaType.APPLICATION_JSON);
+            request.header(AGENT_ID_CUSTOM_HEADER, agentId);
 
             // Ok, let's create the running session from the response
             List<Integer> validStatusCodes = new ArrayList<>();
@@ -479,6 +478,7 @@ public class ServerConnector extends RestClient
         }
         Invocation.Builder request = makeEyesRequest(target);
         request.header("X-Auth-Token", renderingInfo.getAccessToken());
+        request.header(AGENT_ID_CUSTOM_HEADER, agentId);
 
         // Ok, let's create the running session from the response
         List<Integer> validStatusCodes = new ArrayList<>();
@@ -526,6 +526,7 @@ public class ServerConnector extends RestClient
         }};
         Invocation.Builder request = makeEyesRequest(target, queryParams);
         request.header("X-Auth-Token", renderingInfo.getAccessToken());
+        request.header(AGENT_ID_CUSTOM_HEADER, agentId);
 
         // Ok, let's create the running session from the response
         List<Integer> validStatusCodes = new ArrayList<>();
@@ -562,6 +563,7 @@ public class ServerConnector extends RestClient
         Invocation.Builder request = makeEyesRequest(target, queryParams, contentType);
         request.header("X-Auth-Token", renderingInfo.getAccessToken());
         request.header("User-Agent", userAgent);
+        request.header(AGENT_ID_CUSTOM_HEADER, agentId);
         Entity entity = null;
         if (contentType != null && !"None".equalsIgnoreCase(contentType)) {
             entity = Entity.entity(content, contentType);
@@ -605,6 +607,7 @@ public class ServerConnector extends RestClient
             WebTarget target = restClient.target(renderingInfo.getServiceUrl()).path((RENDER_STATUS));
             Invocation.Builder request = makeEyesRequest(target, null, MediaType.TEXT_PLAIN);
             request.header("X-Auth-Token", renderingInfo.getAccessToken());
+            request.header(AGENT_ID_CUSTOM_HEADER, agentId);
 
             // Ok, let's create the running session from the response
             List<Integer> validStatusCodes = new ArrayList<>();
@@ -666,11 +669,8 @@ public class ServerConnector extends RestClient
         this.logger.verbose("called with " + batchId);
 
         String url = String.format(CLOSE_BATCH, batchId);
-        WebTarget target = restClient.target(serverUrl).path(url);
-        Map<String, Object> queryParams = new HashMap<String, Object>(){{
-            put("apiKey", getApiKey());
-        }};
-        Response delete = makeEyesRequest(target, queryParams, (String) null).delete();
+        WebTarget target = restClient.target(serverUrl).path(url).queryParam("apiKey", getApiKey());
+        Response delete = target.request().header(AGENT_ID_CUSTOM_HEADER, agentId).delete();
         logger.verbose("delete batch is done with " + delete.getStatus() + " status");
         this.restClient.close();
     }
@@ -705,10 +705,14 @@ public class ServerConnector extends RestClient
 
     @Override
     protected Response sendHttpWebRequest(String path, final String method, String accept) {
-        Map<String, Object> queryParams = new HashMap<String, Object>(){{
-            put("apiKey", getApiKey());
-        }};
-        Invocation.Builder invocationBuilder = makeEyesRequest(restClient.target(path), queryParams, accept);
+        // Building the request
+        Invocation.Builder invocationBuilder = restClient
+                .target(path)
+                .queryParam("apikey", getApiKey())
+                .request(accept);
+
+        // Actually perform the method call and return the result
+        invocationBuilder.header(AGENT_ID_CUSTOM_HEADER, agentId);
         return invocationBuilder.method(method);
     }
 }
