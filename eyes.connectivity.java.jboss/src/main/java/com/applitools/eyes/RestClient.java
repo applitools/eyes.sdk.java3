@@ -48,6 +48,8 @@ public class RestClient {
         Response call();
     }
 
+    protected static final String AGENT_ID_CUSTOM_HEADER = "x-applitools-eyes-client";
+
     private AbstractProxySettings abstractProxySettings;
     private int timeout; // seconds
 
@@ -55,6 +57,7 @@ public class RestClient {
     protected Client restClient;
     protected URI serverUrl;
     protected WebTarget endPoint;
+    protected String agentId;
 
     // Used for JSON serialization/de-serialization.
     protected ObjectMapper jsonMapper;
@@ -230,7 +233,10 @@ public class RestClient {
 
         logger.verbose("enter");
         String currentTime = GeneralUtils.toRfc1123(Calendar.getInstance(TimeZone.getTimeZone("UTC")));
-        invocationBuilder = invocationBuilder.header("Eyes-Expect", "202+location").header("Eyes-Date", currentTime);
+        invocationBuilder = invocationBuilder
+                .header("Eyes-Expect", "202+location")
+                .header("Eyes-Date", currentTime)
+                .header(AGENT_ID_CUSTOM_HEADER, agentId);
         Response response = invocationBuilder.method(method, entity);
 
         String statusUrl = response.getHeaderString(HttpHeaders.LOCATION);
@@ -293,6 +299,7 @@ public class RestClient {
     protected Response sendHttpWebRequest(String path, final String method, String accept) {
         // Building the request
         Invocation.Builder invocationBuilder = restClient.target(path).request(accept);
+        invocationBuilder.header(AGENT_ID_CUSTOM_HEADER, agentId);
 
         // Actually perform the method call and return the result
         return invocationBuilder.method(method);

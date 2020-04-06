@@ -82,7 +82,7 @@ public abstract class EyesBase implements IEyesBase{
 
         initProviders();
 
-        setServerConnector(new ServerConnector(getBaseAgentId()));
+        setServerConnector(new ServerConnector());
 
         runningSession = null;
         userInputs = new ArrayDeque<>();
@@ -141,6 +141,18 @@ public abstract class EyesBase implements IEyesBase{
             serverConnector.setLogger(this.logger);
         }
         this.serverConnector = serverConnector;
+    }
+
+    public IServerConnector getServerConnector() {
+        if (serverConnector == null) {
+            return null;
+        }
+
+        if (serverConnector.getAgentId() == null) {
+            serverConnector.setAgentId(getFullAgentId());
+        }
+
+        return serverConnector;
     }
 
     /**
@@ -477,7 +489,7 @@ public abstract class EyesBase implements IEyesBase{
             boolean save = (isNewSession && getConfigGetter().getSaveNewTests())
                     || (!isNewSession && getConfigGetter().getSaveFailedTests());
             logger.verbose("Automatically save test? " + String.valueOf(save));
-            TestResults results = serverConnector.stopSession(runningSession, false, save);
+            TestResults results = getServerConnector().stopSession(runningSession, false, save);
 
             results.setNew(isNewSession);
             results.setUrl(runningSession.getUrl());
@@ -559,7 +571,7 @@ public abstract class EyesBase implements IEyesBase{
 
             logger.verbose("Automatically save test? " + String.valueOf(save));
             TestResults results =
-                    serverConnector.stopSession(runningSession, false,
+                    getServerConnector().stopSession(runningSession, false,
                             save);
 
             results.setNew(isNewSession);
@@ -629,7 +641,7 @@ public abstract class EyesBase implements IEyesBase{
             try {
                 // When aborting we do not save the test.
                 boolean isNewSession = runningSession.getIsNewSession();
-                TestResults results = serverConnector.stopSession(runningSession, true, false);
+                TestResults results = getServerConnector().stopSession(runningSession, true, false);
                 results.setNew(isNewSession);
                 results.setUrl(runningSession.getUrl());
                 logger.log("--- Test aborted.");
@@ -912,13 +924,13 @@ public abstract class EyesBase implements IEyesBase{
         MatchWindowDataWithScreenshot result;
         if (runningSession.getIsNewSession()) {
             ResponseTimeAlgorithm.runNewProgressionSession(logger,
-                    serverConnector, runningSession, appOutputProvider,
+                    getServerConnector(), runningSession, appOutputProvider,
                     regionProvider, startTime, deadline);
             // Since there's never a match for a new session..
             result = null;
         } else {
             result = ResponseTimeAlgorithm.runProgressionSessionForExistingBaseline(
-                    logger, serverConnector, runningSession, appOutputProvider, regionProvider, startTime,
+                    logger, getServerConnector(), runningSession, appOutputProvider, regionProvider, startTime,
                     deadline, timeout, matchInterval);
         }
 
@@ -960,7 +972,7 @@ public abstract class EyesBase implements IEyesBase{
             return;
         }
 
-        if (serverConnector == null) {
+        if (getServerConnector() == null) {
             throw new EyesException("server connector not set.");
         }
 
@@ -1278,7 +1290,7 @@ public abstract class EyesBase implements IEyesBase{
      */
     protected void startSession() {
         logger.verbose("startSession()");
-        if (serverConnector == null) {
+        if (getServerConnector() == null) {
             throw new EyesException("server connector not set.");
         }
         ensureViewportSize();
@@ -1436,7 +1448,7 @@ public abstract class EyesBase implements IEyesBase{
         if (this.renderInfo != null) {
             return this.renderInfo;
         }
-        this.renderInfo = this.serverConnector.getRenderInfo();
+        this.renderInfo = getServerConnector().getRenderInfo();
         return this.renderInfo;
     }
 
