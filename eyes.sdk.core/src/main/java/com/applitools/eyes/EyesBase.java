@@ -82,7 +82,7 @@ public abstract class EyesBase implements IEyesBase{
 
         initProviders();
 
-        setServerConnector(new ServerConnector());
+        setServerConnector(new ServerConnector(getBaseAgentId()));
 
         runningSession = null;
         userInputs = new ArrayDeque<>();
