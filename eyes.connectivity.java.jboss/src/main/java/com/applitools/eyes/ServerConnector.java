@@ -15,7 +15,6 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.MapperFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
-import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.io.IOUtils;
 import org.brotli.dec.BrotliInputStream;
 
@@ -23,13 +22,13 @@ import javax.ws.rs.HttpMethod;
 import javax.ws.rs.client.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import java.io.ByteArrayOutputStream;
-import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
 import java.net.URL;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.concurrent.Future;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -78,6 +77,16 @@ public class ServerConnector extends RestClient
      */
     public String getApiKey() {
         return this.apiKey != null ? this.apiKey : GeneralUtils.getEnvString("APPLITOOLS_API_KEY");
+    }
+
+    @Override
+    public void setAgentId(String agentId) {
+        this.agentId = agentId;
+    }
+
+    @Override
+    public String getAgentId() {
+        return this.agentId;
     }
 
     /**
@@ -240,7 +249,8 @@ public class ServerConnector extends RestClient
                 .path(testResults.getId())
                 .queryParam("apiKey", getApiKey())
                 .queryParam("AccessToken", testResults.getSecretToken())
-                .request(MediaType.APPLICATION_JSON);
+                .request(MediaType.APPLICATION_JSON)
+                .header(AGENT_ID_CUSTOM_HEADER, agentId);
 
         Response response = invocationBuilder.delete();
 
@@ -413,7 +423,7 @@ public class ServerConnector extends RestClient
     }
 
     private Response sendWithRetry(String method, Invocation.Builder request, Entity entity, AtomicInteger retiresCounter) {
-
+        request.header(AGENT_ID_CUSTOM_HEADER, agentId);
         if (retiresCounter == null) {
 
             retiresCounter = new AtomicInteger(0);
@@ -459,6 +469,7 @@ public class ServerConnector extends RestClient
             String apiKey = getApiKey();
             WebTarget target = restClient.target(serverUrl).path((RENDER_INFO_PATH)).queryParam("apiKey", apiKey);
             Invocation.Builder request = target.request(MediaType.APPLICATION_JSON);
+            request.header(AGENT_ID_CUSTOM_HEADER, agentId);
 
             // Ok, let's create the running session from the response
             List<Integer> validStatusCodes = new ArrayList<>();
@@ -483,6 +494,8 @@ public class ServerConnector extends RestClient
         }
         Invocation.Builder request = target.request(MediaType.APPLICATION_JSON);
         request.header("X-Auth-Token", renderingInfo.getAccessToken());
+        request.header(AGENT_ID_CUSTOM_HEADER, agentId);
+
         // Ok, let's create the running session from the response
         List<Integer> validStatusCodes = new ArrayList<>();
         validStatusCodes.add(Response.Status.OK.getStatusCode());
@@ -528,6 +541,7 @@ public class ServerConnector extends RestClient
         WebTarget target = restClient.target(renderingInfo.getServiceUrl()).path((RESOURCES_SHA_256) + resource.getSha256()).queryParam("render-id", runningRender.getRenderId());
         Invocation.Builder request = target.request(MediaType.APPLICATION_JSON);
         request.header("X-Auth-Token", renderingInfo.getAccessToken());
+        request.header(AGENT_ID_CUSTOM_HEADER, agentId);
 
         // Ok, let's create the running session from the response
         List<Integer> validStatusCodes = new ArrayList<>();
@@ -564,6 +578,7 @@ public class ServerConnector extends RestClient
         Invocation.Builder request = target.request(contentType);
         request.header("X-Auth-Token", renderingInfo.getAccessToken());
         request.header("User-Agent", userAgent);
+        request.header(AGENT_ID_CUSTOM_HEADER, agentId);
         Entity entity = null;
         if (contentType != null && !"None".equalsIgnoreCase(contentType)) {
             entity = Entity.entity(content, contentType);
@@ -607,6 +622,7 @@ public class ServerConnector extends RestClient
             WebTarget target = restClient.target(renderingInfo.getServiceUrl()).path((RENDER_STATUS));
             Invocation.Builder request = target.request(MediaType.TEXT_PLAIN);
             request.header("X-Auth-Token", renderingInfo.getAccessToken());
+            request.header(AGENT_ID_CUSTOM_HEADER, agentId);
 
             // Ok, let's create the running session from the response
             List<Integer> validStatusCodes = new ArrayList<>();
@@ -669,7 +685,7 @@ public class ServerConnector extends RestClient
 
         String url = String.format(CLOSE_BATCH, batchId);
         WebTarget target = restClient.target(serverUrl).path(url).queryParam("apiKey", getApiKey());
-        Response delete = target.request().delete();
+        Response delete = target.request().header(AGENT_ID_CUSTOM_HEADER, agentId).delete();
         logger.verbose("delete batch is done with " + delete.getStatus() + " status");
         this.restClient.close();
     }
@@ -711,6 +727,7 @@ public class ServerConnector extends RestClient
                 .request(accept);
 
         // Actually perform the method call and return the result
+        invocationBuilder.header(AGENT_ID_CUSTOM_HEADER, agentId);
         return invocationBuilder.method(method);
     }
 }

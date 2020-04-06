@@ -38,8 +38,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 /**
  * Provides an API for communication with the Applitools agent
  */
-public class ServerConnector extends RestClient
-        implements IServerConnector {
+public class ServerConnector extends RestClient implements IServerConnector {
 
     private String apiKey = null;
     private RenderingInfo renderingInfo;
@@ -48,27 +47,27 @@ public class ServerConnector extends RestClient
      * @param logger A logger instance.
      * @param serverUrl The URI of the Eyes server.
      */
-    public ServerConnector(Logger logger, URI serverUrl, String agentId) {
-        super(logger, serverUrl, TIMEOUT, agentId);
+    public ServerConnector(Logger logger, URI serverUrl) {
+        super(logger, serverUrl, TIMEOUT);
         endPoint = endPoint.path(API_PATH);
     }
 
     /***
      * @param logger A logger instance.
      */
-    public ServerConnector(Logger logger, String agentId) {
-        this(logger, GeneralUtils.geServerUrl(), agentId);
+    public ServerConnector(Logger logger) {
+        this(logger, GeneralUtils.geServerUrl());
     }
 
     /***
      * @param serverUrl The URI of the Eyes server.
      */
-    public ServerConnector(URI serverUrl, String agentId) {
-        this(null, serverUrl, agentId);
+    public ServerConnector(URI serverUrl) {
+        this(null, serverUrl);
     }
 
-    public ServerConnector(String agentId) {
-        this((Logger) null, agentId);
+    public ServerConnector() {
+        this((Logger) null);
     }
 
     /**
@@ -87,6 +86,16 @@ public class ServerConnector extends RestClient
         String apiKey = this.apiKey != null ? this.apiKey : GeneralUtils.getEnvString("APPLITOOLS_API_KEY");
         apiKey = apiKey == null ? GeneralUtils.getEnvString("bamboo_APPLITOOLS_API_KEY") : apiKey;
         return apiKey;
+    }
+
+    @Override
+    public void setAgentId(String agentId) {
+        this.agentId = agentId;
+    }
+
+    @Override
+    public String getAgentId() {
+        return this.agentId;
     }
 
     /**
@@ -711,5 +720,4 @@ public class ServerConnector extends RestClient
         invocationBuilder.header(AGENT_ID_CUSTOM_HEADER, agentId);
         return invocationBuilder.method(method);
     }
-
 }
