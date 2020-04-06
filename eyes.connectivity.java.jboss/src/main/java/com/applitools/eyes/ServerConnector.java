@@ -173,7 +173,7 @@ public class ServerConnector extends RestClient
                 put("apiKey", getApiKey());
             }};
             Invocation.Builder request = makeEyesRequest(endPoint, queryParams);
-            response = sendWithRetry(HttpMethod.POST, request, Entity.json(postData), null);
+            response = sendLongRequest(request, HttpMethod.POST, Entity.entity(postData, MediaType.APPLICATION_JSON));
         } catch (RuntimeException e) {
             logger.log("Server request failed: " + e.getMessage());
             throw e;
