@@ -2241,14 +2241,6 @@ public class SeleniumEyes extends EyesBase implements ISeleniumEyes, IDriverProv
         return new EyesSeleniumAgentSetup();
     }
 
-    /**
-     * Gets server connector.
-     * @return the server connector
-     */
-    public IServerConnector getServerConnector() {
-        return this.serverConnector;
-    }
-
     @Override
     public Boolean isSendDom() {
         return !EyesSeleniumUtils.isMobileDevice(driver) && super.isSendDom();
