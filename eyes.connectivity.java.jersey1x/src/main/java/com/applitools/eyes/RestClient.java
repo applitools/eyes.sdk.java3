@@ -4,16 +4,18 @@ import com.applitools.utils.ArgumentGuard;
 import com.applitools.utils.GeneralUtils;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.sun.jersey.api.client.Client;
+import com.sun.jersey.api.client.ClientResponse;
+import com.sun.jersey.api.client.WebResource;
+import com.sun.jersey.client.apache4.ApacheHttpClient4;
+import com.sun.jersey.client.apache4.config.ApacheHttpClient4Config;
+import com.sun.jersey.client.apache4.config.DefaultApacheHttpClient4Config;
 import org.apache.http.HttpHeaders;
 import org.apache.http.HttpStatus;
-import org.glassfish.jersey.apache.connector.ApacheConnectorProvider;
-import org.glassfish.jersey.client.ClientConfig;
-import org.glassfish.jersey.client.ClientProperties;
-import org.glassfish.jersey.client.RequestEntityProcessing;
 
 import javax.ws.rs.HttpMethod;
-import javax.ws.rs.client.*;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.UriBuilder;
 import java.io.IOException;
 import java.net.URI;
 import java.util.Calendar;
@@ -30,7 +32,7 @@ public class RestClient {
      * calls.
      */
     protected interface HttpMethodCall {
-        Response call();
+        ClientResponse call();
     }
 
     protected static final String AGENT_ID_CUSTOM_HEADER = "x-applitools-eyes-client";
@@ -41,7 +43,7 @@ public class RestClient {
     protected Logger logger;
     protected Client restClient;
     protected URI serverUrl;
-    protected WebTarget endPoint;
+    protected WebResource endPoint;
     protected String agentId;
 
     // Used for JSON serialization/de-serialization.
@@ -54,33 +56,43 @@ public class RestClient {
     static Client buildRestClient(int timeout,
                                   AbstractProxySettings abstractProxySettings) {
         // Creating the client configuration
-        ClientConfig cc = new ClientConfig();
-        cc.property(ClientProperties.CONNECT_TIMEOUT, timeout);
-        cc.property(ClientProperties.READ_TIMEOUT, timeout);
+        ApacheHttpClient4Config cc = new DefaultApacheHttpClient4Config();
+        cc.getProperties().put(ApacheHttpClient4Config.PROPERTY_CONNECT_TIMEOUT, timeout);
+        cc.getProperties().put(ApacheHttpClient4Config.PROPERTY_READ_TIMEOUT, timeout);
+
         if (abstractProxySettings != null) {
-            // URI is mandatory.
-            cc = cc.property(ClientProperties.PROXY_URI,
-                    abstractProxySettings.getUri());
-            // username/password are optional
-            if (abstractProxySettings.getUsername() != null) {
-                cc = cc.property(ClientProperties.PROXY_USERNAME,
-                        abstractProxySettings.getUsername());
+            URI uri = URI.create(abstractProxySettings.getUri());
+            UriBuilder uriBuilder = UriBuilder.fromUri(uri);
+            boolean changed = false;
+            if (uri.getScheme() == null && uri.getHost() == null && uri.getPath() != null) {
+                uriBuilder.scheme("http");
+                uriBuilder.host(uri.getPath());
+                uriBuilder.replacePath(null);
+                changed = true;
             }
-            if (abstractProxySettings.getPassword() != null) {
-                cc = cc.property(ClientProperties.PROXY_PASSWORD,
-                        abstractProxySettings.getPassword());
+            if (uri.getPort() != abstractProxySettings.getPort()) {
+                uriBuilder.port(abstractProxySettings.getPort());
+                changed = true;
             }
+            if (changed) {
+                uri = uriBuilder.build();
+            }
+            cc.getProperties().put(ApacheHttpClient4Config.PROPERTY_PROXY_URI, uri);
+            String username = abstractProxySettings.getUsername();
+            if (username != null) {
+                cc.getProperties().put(ApacheHttpClient4Config.PROPERTY_PROXY_USERNAME, username);
+            }
+            String password = abstractProxySettings.getPassword();
+            if (password != null) {
+                cc.getProperties().put(ApacheHttpClient4Config.PROPERTY_PROXY_PASSWORD, password);
+            }
+
+            ApacheHttpClient4 client = ApacheHttpClient4.create(cc);
+            return client;
+        } else {
+            // We ignore the proxy settings
+            return Client.create(cc);
         }
-
-        // This tells the connector NOT to use "chunked encoding" ,
-        // since Eyes server does not handle it.
-        cc.property(ClientProperties.REQUEST_ENTITY_PROCESSING,
-                RequestEntityProcessing.BUFFERED);
-        // We must use the Apache connector, since Jersey's default connector
-        // does not support proxy settings.
-        cc.connectorProvider(new ApacheConnectorProvider());
-
-        return ClientBuilder.newBuilder().withConfig(cc).build();
     }
 
     /***
@@ -100,7 +112,7 @@ public class RestClient {
         this.serverUrl = serverUrl;
 
         restClient = buildRestClient(timeout, abstractProxySettings);
-        endPoint = restClient.target(serverUrl);
+        endPoint = restClient.resource(serverUrl);
     }
 
     public void setLogger(Logger logger) {
@@ -122,6 +134,7 @@ public class RestClient {
         this(logger, serverUrl, 1000 * 60 * 5);
     }
 
+
     /**
      * Sets the proxy settings to be used by the rest client.
      * @param abstractProxySettings The proxy settings to be used by the rest client.
@@ -129,10 +142,10 @@ public class RestClient {
      */
     @SuppressWarnings("UnusedDeclaration")
     public void setProxyBase(AbstractProxySettings abstractProxySettings) {
-        this.abstractProxySettings = abstractProxySettings;
 
+        this.abstractProxySettings = abstractProxySettings;
         restClient = buildRestClient(timeout, abstractProxySettings);
-        endPoint = restClient.target(serverUrl);
+        endPoint = restClient.resource(serverUrl);
     }
 
     /**
@@ -153,7 +166,7 @@ public class RestClient {
         this.timeout = timeout;
 
         restClient = buildRestClient(timeout, abstractProxySettings);
-        endPoint = restClient.target(serverUrl);
+        endPoint = restClient.resource(serverUrl);
     }
 
     /**
@@ -173,7 +186,7 @@ public class RestClient {
         ArgumentGuard.notNull(serverUrl, "serverUrl");
         this.serverUrl = serverUrl;
 
-        endPoint = restClient.target(serverUrl);
+        endPoint = restClient.resource(serverUrl);
     }
 
     /**
@@ -183,7 +196,7 @@ public class RestClient {
         return serverUrl;
     }
 
-    protected Response sendLongRequest(Invocation.Builder invocationBuilder, String method, Entity<?> entity)
+    protected ClientResponse sendLongRequest(WebResource.Builder invocationBuilder, String method, Object entity, String mediaType)
             throws EyesException {
 
         logger.verbose("enter");
@@ -192,9 +205,16 @@ public class RestClient {
                 .header("Eyes-Expect", "202+location")
                 .header("Eyes-Date", currentTime)
                 .header(AGENT_ID_CUSTOM_HEADER, agentId);
-        Response response = invocationBuilder.method(method, entity);
 
-        String statusUrl = response.getHeaderString(HttpHeaders.LOCATION);
+        if (entity != null && mediaType != null) {
+            invocationBuilder = invocationBuilder.entity(entity, mediaType);
+        } else if (entity != null) {
+            invocationBuilder = invocationBuilder.entity(entity);
+        }
+
+        ClientResponse response = invocationBuilder.method(method, ClientResponse.class);
+
+        String statusUrl = response.getHeaders().getFirst(HttpHeaders.LOCATION);
         int status = response.getStatus();
         if (statusUrl != null && status == HttpStatus.SC_ACCEPTED) {
             response.close();
@@ -202,13 +222,13 @@ public class RestClient {
             int wait = 500;
             while (true) {
                 response = get(statusUrl);
-                if (response.getStatus() == HttpStatus.SC_CREATED) {
+                status = response.getStatus();
+                if (status == HttpStatus.SC_CREATED) {
                     logger.verbose("exit (CREATED)");
-                    return delete(response.getHeaderString(HttpHeaders.LOCATION));
+                    return delete(response.getHeaders().getFirst(HttpHeaders.LOCATION));
                 }
 
-                status = response.getStatus();
-                if (status == HttpStatus.SC_OK) {
+                if (response.getStatus() == HttpStatus.SC_OK) {
                     try {
                         Thread.sleep(wait);
                     } catch (InterruptedException e) {
@@ -217,7 +237,6 @@ public class RestClient {
                     wait *= 2;
                     wait = Math.min(10000, wait);
                     response.close();
-                    logger.verbose("polling...");
                     continue;
                 }
 
@@ -231,33 +250,33 @@ public class RestClient {
     }
 
     public String getString(String path, String accept) {
-        Response response = sendHttpWebRequest(path, HttpMethod.GET, accept);
-        return response.readEntity(String.class);
+        ClientResponse response = sendHttpWebRequest(path, HttpMethod.GET, accept);
+        return response.getEntity(String.class);
     }
 
-    private Response get(String path, String accept) {
+    private ClientResponse get(String path, String accept) {
         return sendHttpWebRequest(path, HttpMethod.GET, accept);
     }
 
-    private Response get(String path) {
+    private ClientResponse get(String path) {
         return get(path, null);
     }
 
-    private Response delete(String path, String accept) {
+    private ClientResponse delete(String path, String accept) {
         return sendHttpWebRequest(path, HttpMethod.DELETE, accept);
     }
 
-    private Response delete(String path) {
+    private ClientResponse delete(String path) {
         return delete(path, null);
     }
 
-    protected Response sendHttpWebRequest(String path, final String method, String accept) {
+    protected ClientResponse sendHttpWebRequest(String path, final String method, String accept) {
         // Building the request
-        Invocation.Builder invocationBuilder = restClient.target(path).request(accept);
+        WebResource.Builder invocationBuilder = restClient.resource(path).accept(accept);
         invocationBuilder.header(AGENT_ID_CUSTOM_HEADER, agentId);
 
         // Actually perform the method call and return the result
-        return invocationBuilder.method(method);
+        return invocationBuilder.method(method, ClientResponse.class);
     }
 
     /**
@@ -281,7 +300,8 @@ public class RestClient {
             responseBody = "";
         }
 
-        return errMsg + " [" + statusCode + " " + statusPhrase + "] " + responseBody;
+        return errMsg + " [" + statusCode + " " + statusPhrase + "] "
+                + responseBody;
     }
 
     /**
@@ -299,18 +319,16 @@ public class RestClient {
      * @throws EyesException For invalid status codes or if the response
      *                       parsing failed.
      */
-    protected <T> T parseResponseWithJsonData(Response response,
-                                              List<Integer> validHttpStatusCodes, Class<T> resultType)
-            throws EyesException {
+    protected <T> T parseResponseWithJsonData(ClientResponse response, List<Integer> validHttpStatusCodes,
+                                              Class<T> resultType) throws EyesException {
         ArgumentGuard.notNull(response, "response");
         ArgumentGuard.notNull(validHttpStatusCodes, "validHttpStatusCodes");
         ArgumentGuard.notNull(resultType, "resultType");
 
         T resultObject;
         int statusCode = response.getStatus();
-        String statusPhrase =
-                response.getStatusInfo().getReasonPhrase();
-        String data = response.readEntity(String.class);
+        String statusPhrase = ClientResponse.Status.fromStatusCode(response.getStatus()).getReasonPhrase();
+        String data = response.getEntity(String.class);
         response.close();
         // Validate the status code.
         if (!validHttpStatusCodes.contains(statusCode)) {
@@ -334,7 +352,6 @@ public class RestClient {
                     statusCode,
                     statusPhrase,
                     data);
-
             throw new EyesException(errorMessage, e);
         }
 

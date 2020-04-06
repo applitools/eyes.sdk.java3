@@ -19,10 +19,7 @@ import org.apache.commons.io.IOUtils;
 import org.brotli.dec.BrotliInputStream;
 
 import javax.ws.rs.HttpMethod;
-import javax.ws.rs.client.Entity;
-import javax.ws.rs.client.Invocation;
-import javax.ws.rs.client.InvocationCallback;
-import javax.ws.rs.client.WebTarget;
+import javax.ws.rs.client.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.io.IOException;
@@ -38,7 +35,9 @@ import java.util.concurrent.atomic.AtomicInteger;
 /**
  * Provides an API for communication with the Applitools agent
  */
-public class ServerConnector extends RestClient implements IServerConnector {
+@SuppressWarnings({"unused", "WeakerAccess"})
+public class ServerConnector extends RestClient
+        implements IServerConnector {
 
     private String apiKey = null;
     private RenderingInfo renderingInfo;
@@ -49,6 +48,7 @@ public class ServerConnector extends RestClient implements IServerConnector {
      */
     public ServerConnector(Logger logger, URI serverUrl) {
         super(logger, serverUrl, TIMEOUT);
+
         endPoint = endPoint.path(API_PATH);
     }
 
@@ -59,15 +59,8 @@ public class ServerConnector extends RestClient implements IServerConnector {
         this(logger, GeneralUtils.getServerUrl());
     }
 
-    /***
-     * @param serverUrl The URI of the Eyes server.
-     */
-    public ServerConnector(URI serverUrl) {
-        this(null, serverUrl);
-    }
-
     public ServerConnector() {
-        this((Logger) null);
+        this(null);
     }
 
     /**
@@ -83,9 +76,7 @@ public class ServerConnector extends RestClient implements IServerConnector {
      * @return The currently set API key or {@code null} if no key is set.
      */
     public String getApiKey() {
-        String apiKey = this.apiKey != null ? this.apiKey : GeneralUtils.getEnvString("APPLITOOLS_API_KEY");
-        apiKey = apiKey == null ? GeneralUtils.getEnvString("bamboo_APPLITOOLS_API_KEY") : apiKey;
-        return apiKey;
+        return this.apiKey != null ? this.apiKey : GeneralUtils.getEnvString("APPLITOOLS_API_KEY");
     }
 
     @Override
@@ -100,12 +91,12 @@ public class ServerConnector extends RestClient implements IServerConnector {
 
     /**
      * Sets the proxy settings to be used by the rest client.
-     * @param proxySettings The proxy settings to be used by the rest client.
-     *                      If {@code null} then no proxy is set.
+     * @param abstractProxySettings The proxy settings to be used by the rest client.
+     *                              If {@code null} then no proxy is set.
      */
     @SuppressWarnings("UnusedDeclaration")
-    public void setProxy(AbstractProxySettings proxySettings) {
-        setProxyBase(proxySettings);
+    public void setProxy(AbstractProxySettings abstractProxySettings) {
+        setProxyBase(abstractProxySettings);
         // After the server is updated we must make sure the endpoint refers
         // to the correct path.
         endPoint = endPoint.path(API_PATH);
@@ -155,12 +146,13 @@ public class ServerConnector extends RestClient implements IServerConnector {
 
         ArgumentGuard.notNull(sessionStartInfo, "sessionStartInfo");
 
-        logger.verbose("Using Jersey2 for REST API calls.");
+        logger.verbose("Using Jboss for REST API calls.");
 
         configureRestClient();
 
         String postData;
         Response response;
+
         try {
 
             // since the web API requires a root property for this message
@@ -188,12 +180,19 @@ public class ServerConnector extends RestClient implements IServerConnector {
         validStatusCodes.add(Response.Status.OK.getStatusCode());
         validStatusCodes.add(Response.Status.CREATED.getStatusCode());
 
+        // If this is a new session, we set this flag.
         RunningSession runningSession = parseResponseWithJsonData(response, validStatusCodes, RunningSession.class);
         if (runningSession.getIsNew() == null) {
             runningSession.setIsNew(response.getStatus() == Response.Status.CREATED.getStatusCode());
         }
 
         return runningSession;
+    }
+
+    private void configureRestClient() {
+        restClient = buildRestClient(getTimeout(), getProxy());
+        endPoint = restClient.target(serverUrl);
+        endPoint = endPoint.path(API_PATH);
     }
 
     /**
@@ -247,8 +246,9 @@ public class ServerConnector extends RestClient implements IServerConnector {
                 .request(MediaType.APPLICATION_JSON)
                 .header(AGENT_ID_CUSTOM_HEADER, agentId);
 
-        @SuppressWarnings("unused")
         Response response = invocationBuilder.delete();
+
+        this.restClient.close();
     }
 
     /**
@@ -270,10 +270,11 @@ public class ServerConnector extends RestClient implements IServerConnector {
         Response response;
         List<Integer> validStatusCodes;
         MatchResult result;
-        final String jsonData;
+        String jsonData;
 
         // since we rather not add an empty "tag" param
-        final WebTarget runningSessionsEndpoint = endPoint.path(runningSession.getId());
+        WebTarget runningSessionsEndpoint =
+                endPoint.path(runningSession.getId());
 
         // Serializing model into JSON (we'll treat it as binary later).
         try {
@@ -292,9 +293,11 @@ public class ServerConnector extends RestClient implements IServerConnector {
         validStatusCodes = new ArrayList<>(1);
         validStatusCodes.add(Response.Status.OK.getStatusCode());
 
-        result = parseResponseWithJsonData(response, validStatusCodes, MatchResult.class);
+        result = parseResponseWithJsonData(response, validStatusCodes,
+                MatchResult.class);
 
         return result;
+
     }
 
     @Override
@@ -352,13 +355,15 @@ public class ServerConnector extends RestClient implements IServerConnector {
 
     @Override
     public IResourceFuture downloadResource(final URL url, String userAgent, ResourceFuture resourceFuture) {
-        WebTarget target = restClient.target(url.toString());
+        Client client = RestClient.buildRestClient(getTimeout(), getProxy());
+
+        WebTarget target = client.target(url.toString());
 
         Invocation.Builder request = target.request(MediaType.WILDCARD);
 
         request.header("User-Agent", userAgent);
 
-        final IResourceFuture newFuture = new ResourceFuture(url.toString(), logger, this, userAgent);
+        final IResourceFuture newFuture = resourceFuture == null ? new ResourceFuture(url.toString(), logger, this, userAgent) : resourceFuture;
 
         Future<Response> responseFuture = request.async().get(new InvocationCallback<Response>() {
             @Override
@@ -414,6 +419,7 @@ public class ServerConnector extends RestClient implements IServerConnector {
     private Response sendWithRetry(String method, Invocation.Builder request, Entity entity, AtomicInteger retiresCounter) {
         request.header(AGENT_ID_CUSTOM_HEADER, agentId);
         if (retiresCounter == null) {
+
             retiresCounter = new AtomicInteger(0);
 
         }
@@ -421,12 +427,12 @@ public class ServerConnector extends RestClient implements IServerConnector {
         Response response = null;
         try {
             switch (method) {
-
                 case HttpMethod.POST:
                     response = request.post(entity);
                     break;
                 case HttpMethod.PUT:
                     response = request.put(entity);
+
             }
 
             return response;
@@ -450,7 +456,6 @@ public class ServerConnector extends RestClient implements IServerConnector {
         }
 
     }
-
 
     @Override
     public RenderingInfo getRenderInfo() {
@@ -490,12 +495,19 @@ public class ServerConnector extends RestClient implements IServerConnector {
         validStatusCodes.add(Response.Status.OK.getStatusCode());
         validStatusCodes.add(Response.Status.NOT_FOUND.getStatusCode());
 
+        Response response = null;
         try {
             ObjectMapper objectMapper = new ObjectMapper();
             objectMapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
             objectMapper.configure(MapperFeature.SORT_PROPERTIES_ALPHABETICALLY, true);
             String json = objectMapper.writeValueAsString(renderRequests);
-            Response response = request.post(Entity.json(json));
+            response = null;
+            try {
+                Entity<String> json1 = Entity.json(json);
+                response = request.post(json1);
+            } catch (Throwable e) {
+                e.printStackTrace();
+            }
             if (validStatusCodes.contains(response.getStatus())) {
                 RunningRender[] runningRenders = parseResponseWithJsonData(response, validStatusCodes, RunningRender[].class);
                 return Arrays.asList(runningRenders);
@@ -503,6 +515,10 @@ public class ServerConnector extends RestClient implements IServerConnector {
             throw new EyesException("Jersey2 ServerConnector.render - unexpected status (" + response.getStatus() + "), msg (" + response.readEntity(String.class) + ")");
         } catch (JsonProcessingException e) {
             GeneralUtils.logExceptionStackTrace(logger, e);
+        } finally {
+            if (response != null) {
+                response.close();
+            }
         }
 
         return null;
@@ -513,8 +529,8 @@ public class ServerConnector extends RestClient implements IServerConnector {
 
         ArgumentGuard.notNull(runningRender, "runningRender");
         ArgumentGuard.notNull(resource, "resource");
-        // eslint-disable-next-line max-len
         this.logger.verbose("called with resource#" + resource.getSha256() + " for render: " + runningRender.getRenderId());
+
 
         WebTarget target = restClient.target(renderingInfo.getServiceUrl()).path((RESOURCES_SHA_256) + resource.getSha256()).queryParam("render-id", runningRender.getRenderId());
         Invocation.Builder request = target.request(MediaType.APPLICATION_JSON);
@@ -526,14 +542,16 @@ public class ServerConnector extends RestClient implements IServerConnector {
         validStatusCodes.add(Response.Status.OK.getStatusCode());
         validStatusCodes.add(Response.Status.NOT_FOUND.getStatusCode());
 
+
         Response response = request.head();
         if (validStatusCodes.contains(response.getStatus())) {
             this.logger.verbose("request succeeded");
             return response.getStatus() == Response.Status.OK.getStatusCode();
         }
 
-        throw new EyesException("Jersey2 ServerConnector.renderCheckResource - unexpected status (" + response.getStatus() + ")");
+        throw new EyesException("JBoss ServerConnector.renderCheckResource - unexpected status (" + response.getStatus() + ")");
     }
+
 
     @Override
     public IPutFuture renderPutResource(final RunningRender runningRender, final RGridResource resource, String userAgent, final IResourceUploadListener listener) {
@@ -642,7 +660,6 @@ public class ServerConnector extends RestClient implements IServerConnector {
     @Override
     public IResourceFuture createResourceFuture(RGridResource gridResource, String userAgent) {
         return new ResourceFuture(gridResource, logger, this, userAgent);
-
     }
 
     @Override
@@ -652,14 +669,14 @@ public class ServerConnector extends RestClient implements IServerConnector {
 
     @Override
     public void closeBatch(String batchId) {
-        String dontCloseBatchesStr = GeneralUtils.getEnvString("APPLITOOLS_DONT_CLOSE_BATCHES");
-        if (Boolean.parseBoolean(dontCloseBatchesStr)) {
+        if (getDontCloseBatches()) {
             logger.log("APPLITOOLS_DONT_CLOSE_BATCHES environment variable set to true. Skipping batch close.");
             return;
         }
+        this.configureRestClient();
         ArgumentGuard.notNull(batchId, "batchId");
         this.logger.verbose("called with " + batchId);
-        this.configureRestClient();
+
         String url = String.format(CLOSE_BATCH, batchId);
         WebTarget target = restClient.target(serverUrl).path(url).queryParam("apiKey", getApiKey());
         Response delete = target.request().header(AGENT_ID_CUSTOM_HEADER, agentId).delete();
@@ -693,12 +710,6 @@ public class ServerConnector extends RestClient implements IServerConnector {
             GeneralUtils.logExceptionStackTrace(logger, e);
         }
         return bytes;
-    }
-
-    private void configureRestClient() {
-        restClient = buildRestClient(getTimeout(), getProxy());
-        endPoint = restClient.target(serverUrl);
-        endPoint = endPoint.path(API_PATH);
     }
 
     @Override

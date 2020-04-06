@@ -642,7 +642,7 @@ public abstract class EyesBase implements IEyesBase{
             try {
                 // When aborting we do not save the test.
                 boolean isNewSession = runningSession.getIsNew();
-                TestResults results = serverConnector.stopSession(runningSession, true, false);
+                TestResults results = getServerConnector().stopSession(runningSession, true, false);
                 results.setNew(isNewSession);
                 results.setUrl(runningSession.getUrl());
                 logger.log("--- Test aborted.");
