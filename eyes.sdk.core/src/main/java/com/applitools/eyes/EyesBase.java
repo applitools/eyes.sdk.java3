@@ -1286,6 +1286,7 @@ public abstract class EyesBase implements IEyesBase{
      */
     protected void startSession() {
         logger.verbose("startSession()");
+
         if (getServerConnector() == null) {
             throw new EyesException("server connector not set.");
         }
@@ -1314,7 +1315,7 @@ public abstract class EyesBase implements IEyesBase{
                 configGetter.getParentBranchName(), configGetter.getBaselineBranchName(), configGetter.getSaveDiffs(), properties);
 
         logger.verbose("Starting server session...");
-        runningSession = serverConnector.startSession(sessionStartInfo);
+        runningSession = getServerConnector().startSession(sessionStartInfo);
 
         logger.verbose("Server session ID is " + runningSession.getId());
 
