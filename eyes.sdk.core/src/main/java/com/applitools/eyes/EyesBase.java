@@ -146,11 +146,7 @@ public abstract class EyesBase implements IEyesBase{
     }
 
     public IServerConnector getServerConnector() {
-        if (serverConnector == null) {
-            return null;
-        }
-
-        if (serverConnector.getAgentId() == null) {
+        if (serverConnector != null && serverConnector.getAgentId() == null) {
             serverConnector.setAgentId(getFullAgentId());
         }
 
