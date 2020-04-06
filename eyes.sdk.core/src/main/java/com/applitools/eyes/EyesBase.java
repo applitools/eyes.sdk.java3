@@ -84,7 +84,7 @@ public abstract class EyesBase implements IEyesBase{
 
         initProviders();
 
-        setServerConnector(new ServerConnector(getBaseAgentId()));
+        setServerConnector(new ServerConnector());
 
         runningSession = null;
         userInputs = new ArrayDeque<>();
@@ -145,8 +145,12 @@ public abstract class EyesBase implements IEyesBase{
         this.serverConnector = serverConnector;
     }
 
-    public ServerConnector getServerConnector() {
-        if (serverConnector != null && serverConnector.getAgentId() == null) {
+    public IServerConnector getServerConnector() {
+        if (serverConnector == null) {
+            return null;
+        }
+
+        if (serverConnector.getAgentId() == null) {
             serverConnector.setAgentId(getFullAgentId());
         }
 
@@ -640,7 +644,7 @@ public abstract class EyesBase implements IEyesBase{
             logger.verbose("Aborting server session...");
             try {
                 // When aborting we do not save the test.
-                boolean isNewSession = runningSession.getIsNew();
+                boolean isNewSession = runningSession.getIsNewSession();
                 TestResults results = getServerConnector().stopSession(runningSession, true, false);
                 results.setNew(isNewSession);
                 results.setUrl(runningSession.getUrl());
@@ -1290,7 +1294,6 @@ public abstract class EyesBase implements IEyesBase{
      */
     protected void startSession() {
         logger.verbose("startSession()");
-
         if (getServerConnector() == null) {
             throw new EyesException("server connector not set.");
         }
