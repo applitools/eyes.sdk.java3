@@ -15,10 +15,8 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.MapperFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
-import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.io.IOUtils;
 import org.brotli.dec.BrotliInputStream;
-import org.glassfish.jersey.message.GZipEncoder;
 
 import javax.ws.rs.HttpMethod;
 import javax.ws.rs.client.Entity;
@@ -27,13 +25,13 @@ import javax.ws.rs.client.InvocationCallback;
 import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import java.io.ByteArrayOutputStream;
-import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
 import java.net.URL;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.concurrent.Future;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -50,27 +48,27 @@ public class ServerConnector extends RestClient
      * @param logger A logger instance.
      * @param serverUrl The URI of the Eyes server.
      */
-    public ServerConnector(Logger logger, URI serverUrl) {
-        super(logger, serverUrl, TIMEOUT);
+    public ServerConnector(Logger logger, URI serverUrl, String agentId) {
+        super(logger, serverUrl, TIMEOUT, agentId);
         endPoint = endPoint.path(API_PATH);
     }
 
     /***
      * @param logger A logger instance.
      */
-    public ServerConnector(Logger logger) {
-        this(logger, GeneralUtils.geServerUrl());
+    public ServerConnector(Logger logger, String agentId) {
+        this(logger, GeneralUtils.geServerUrl(), agentId);
     }
 
     /***
      * @param serverUrl The URI of the Eyes server.
      */
-    public ServerConnector(URI serverUrl) {
-        this(null, serverUrl);
+    public ServerConnector(URI serverUrl, String agentId) {
+        this(null, serverUrl, agentId);
     }
 
-    public ServerConnector() {
-        this((Logger) null);
+    public ServerConnector(String agentId) {
+        this((Logger) null, agentId);
     }
 
     /**
@@ -244,7 +242,8 @@ public class ServerConnector extends RestClient
                 .path(testResults.getId())
                 .queryParam("apiKey", getApiKey())
                 .queryParam("AccessToken", testResults.getSecretToken())
-                .request(MediaType.APPLICATION_JSON);
+                .request(MediaType.APPLICATION_JSON)
+                .header(AGENT_ID_CUSTOM_HEADER, agentId);
 
         @SuppressWarnings("unused")
         Response response = invocationBuilder.delete();
@@ -411,9 +410,8 @@ public class ServerConnector extends RestClient
     }
 
     private Response sendWithRetry(String method, Invocation.Builder request, Entity entity, AtomicInteger retiresCounter) {
-
+        request.header(AGENT_ID_CUSTOM_HEADER, agentId);
         if (retiresCounter == null) {
-
             retiresCounter = new AtomicInteger(0);
 
         }
@@ -458,6 +456,7 @@ public class ServerConnector extends RestClient
             String apiKey = getApiKey();
             WebTarget target = restClient.target(serverUrl).path((RENDER_INFO_PATH)).queryParam("apiKey", apiKey);
             Invocation.Builder request = target.request(MediaType.APPLICATION_JSON);
+            request.header(AGENT_ID_CUSTOM_HEADER, agentId);
 
             // Ok, let's create the running session from the response
             List<Integer> validStatusCodes = new ArrayList<>();
@@ -482,6 +481,7 @@ public class ServerConnector extends RestClient
         }
         Invocation.Builder request = target.request(MediaType.APPLICATION_JSON);
         request.header("X-Auth-Token", renderingInfo.getAccessToken());
+        request.header(AGENT_ID_CUSTOM_HEADER, agentId);
 
         // Ok, let's create the running session from the response
         List<Integer> validStatusCodes = new ArrayList<>();
@@ -517,6 +517,7 @@ public class ServerConnector extends RestClient
         WebTarget target = restClient.target(renderingInfo.getServiceUrl()).path((RESOURCES_SHA_256) + resource.getSha256()).queryParam("render-id", runningRender.getRenderId());
         Invocation.Builder request = target.request(MediaType.APPLICATION_JSON);
         request.header("X-Auth-Token", renderingInfo.getAccessToken());
+        request.header(AGENT_ID_CUSTOM_HEADER, agentId);
 
         // Ok, let's create the running session from the response
         List<Integer> validStatusCodes = new ArrayList<>();
@@ -551,6 +552,7 @@ public class ServerConnector extends RestClient
         Invocation.Builder request = target.request(contentType);
         request.header("X-Auth-Token", renderingInfo.getAccessToken());
         request.header("User-Agent", userAgent);
+        request.header(AGENT_ID_CUSTOM_HEADER, agentId);
         Entity entity = null;
         if (contentType != null && !"None".equalsIgnoreCase(contentType)) {
             entity = Entity.entity(content, contentType);
@@ -594,6 +596,7 @@ public class ServerConnector extends RestClient
             WebTarget target = restClient.target(renderingInfo.getServiceUrl()).path((RENDER_STATUS));
             Invocation.Builder request = target.request(MediaType.TEXT_PLAIN);
             request.header("X-Auth-Token", renderingInfo.getAccessToken());
+            request.header(AGENT_ID_CUSTOM_HEADER, agentId);
 
             // Ok, let's create the running session from the response
             List<Integer> validStatusCodes = new ArrayList<>();
@@ -657,7 +660,7 @@ public class ServerConnector extends RestClient
         this.configureRestClient();
         String url = String.format(CLOSE_BATCH, batchId);
         WebTarget target = restClient.target(serverUrl).path(url).queryParam("apiKey", getApiKey());
-        Response delete = target.request().delete();
+        Response delete = target.request().header(AGENT_ID_CUSTOM_HEADER, agentId).delete();
         logger.verbose("delete batch is done with " + delete.getStatus() + " status");
         this.restClient.close();
     }
@@ -705,6 +708,7 @@ public class ServerConnector extends RestClient
                 .request(accept);
 
         // Actually perform the method call and return the result
+        invocationBuilder.header(AGENT_ID_CUSTOM_HEADER, agentId);
         return invocationBuilder.method(method);
     }
 
