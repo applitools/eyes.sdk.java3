@@ -173,10 +173,8 @@ public class ServerConnector extends RestClient implements IServerConnector {
         }
 
         try {
-            Map<String, Object> queryParams = new HashMap<String, Object>(){{
-                put("apiKey", getApiKey());
-            }};
-            Invocation.Builder request = makeEyesRequest(endPoint, queryParams);
+            Invocation.Builder request = endPoint.queryParam("apiKey", getApiKey()).
+                    request(MediaType.APPLICATION_JSON);
             response = sendLongRequest(request, HttpMethod.POST, Entity.entity(postData, MediaType.APPLICATION_JSON));
         } catch (RuntimeException e) {
             logger.log("Server request failed: " + e.getMessage());
@@ -188,10 +186,27 @@ public class ServerConnector extends RestClient implements IServerConnector {
         validStatusCodes.add(Response.Status.OK.getStatusCode());
         validStatusCodes.add(Response.Status.CREATED.getStatusCode());
 
-        RunningSession runningSession = parseResponseWithJsonData(response, validStatusCodes, RunningSession.class);
-        if (runningSession.getIsNew() == null) {
-            runningSession.setIsNew(response.getStatus() == Response.Status.CREATED.getStatusCode());
+        runningSession = parseResponseWithJsonData(response, validStatusCodes,
+                RunningSession.class);
+
+        String responseDataString = response.readEntity(String.class);
+        Map<?,?> responseData;
+        try {
+            responseData = GeneralUtils.parseJsonToObject(responseDataString, Map.class);
+        } catch (IOException e) {
+            String errorMessage = getReadResponseError(
+                    "Failed to de-serialize response body",
+                    response.getStatus(),
+                    response.getStatusInfo().getReasonPhrase(),
+                    responseDataString);
+
+            throw new EyesException(errorMessage, e);
         }
+
+        // If this is a new session, we set this flag.
+        statusCode = response.getStatus();
+        isNewSession = (statusCode == Response.Status.CREATED.getStatusCode() || responseData.containsKey("is_new"));
+        runningSession.setIsNewSession(isNewSession);
 
         return runningSession;
     }
