@@ -181,7 +181,7 @@ public class ServerConnector extends RestClient implements IServerConnector {
                 put("apiKey", getApiKey());
             }};
             Invocation.Builder request = makeEyesRequest(endPoint, queryParams);
-            response = sendWithRetry(HttpMethod.POST, request, Entity.json(postData), null);
+            response = sendLongRequest(request, HttpMethod.POST, Entity.entity(postData, MediaType.APPLICATION_JSON));
         } catch (RuntimeException e) {
             logger.log("Server request failed: " + e.getMessage());
             throw e;
@@ -195,9 +195,23 @@ public class ServerConnector extends RestClient implements IServerConnector {
         runningSession = parseResponseWithJsonData(response, validStatusCodes,
                 RunningSession.class);
 
+        String responseDataString = response.readEntity(String.class);
+        Map<?,?> responseData;
+        try {
+            responseData = GeneralUtils.parseJsonToObject(responseDataString, Map.class);
+        } catch (IOException e) {
+            String errorMessage = getReadResponseError(
+                    "Failed to de-serialize response body",
+                    response.getStatus(),
+                    response.getStatusInfo().getReasonPhrase(),
+                    responseDataString);
+
+            throw new EyesException(errorMessage, e);
+        }
+
         // If this is a new session, we set this flag.
         statusCode = response.getStatus();
-        isNewSession = (statusCode == Response.Status.CREATED.getStatusCode());
+        isNewSession = (statusCode == Response.Status.CREATED.getStatusCode() || responseData.containsKey("is_new"));
         runningSession.setIsNewSession(isNewSession);
 
         return runningSession;
