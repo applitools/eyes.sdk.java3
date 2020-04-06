@@ -34,7 +34,7 @@ public class iOSNativeTest {
 
         // Initialize the VisualGridEyes SDK and set your private API key.
         Eyes eyes = new Eyes();
-        eyes.setServerConnector(new ServerConnector(new HttpClientImpl(ServerConnector.DEFAULT_CLIENT_TIMEOUT, null)));
+        eyes.setServerConnector(new ServerConnector(eyes.getFullAgentId()));
         LogHandler logHandler = new StdoutLogHandler(TestUtils.verboseLogs);
         eyes.setLogHandler(logHandler);
         eyes.setSaveDebugScreenshots(true);
