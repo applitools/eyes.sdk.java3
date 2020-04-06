@@ -559,7 +559,6 @@ public class ServerConnector extends RestClient
         }
         builder = builder
                 .header("X-Auth-Token", renderingInfo.getAccessToken())
-                .header(AGENT_ID_CUSTOM_HEADER, agentId)
                 .header(AGENT_ID_CUSTOM_HEADER, agentId);
         final Future<ClientResponse> future = builder.put(ClientResponse.class);
         logger.verbose("future created.");
