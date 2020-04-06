@@ -34,6 +34,10 @@ public interface IServerConnector {
 
     String getApiKey();
 
+    void setAgentId(String agentId);
+
+    String getAgentId();
+
     void setServerUrl(URI serverUrl);
 
     URI getServerUrl();

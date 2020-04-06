@@ -84,7 +84,7 @@ public class TestUtils {
                 .queryParam("apiKey", apiKey)
                 .build();
 
-        RestClient client = new RestClient(new Logger(), apiSessionUri, null);
+        RestClient client = new RestClient(new Logger(), apiSessionUri);
         String srStr = client.getString(apiSessionUri.toString(), MediaType.APPLICATION_JSON);
         ObjectMapper jsonMapper = new ObjectMapper();
         jsonMapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
@@ -180,7 +180,7 @@ public class TestUtils {
                 .queryParam("apiKey", eyes.getApiKey())
                 .build();
 
-        RestClient client = new RestClient(new Logger(), apiSessionUri, eyes.getFullAgentId());
+        RestClient client = new RestClient(new Logger(), apiSessionUri);
         String result = client.getString(apiSessionUri.toString(), MediaType.APPLICATION_JSON);
         return result;
     }

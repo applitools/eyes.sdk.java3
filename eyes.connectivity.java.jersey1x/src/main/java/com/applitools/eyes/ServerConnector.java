@@ -94,6 +94,16 @@ public class ServerConnector extends RestClient
         return this.apiKey != null ? this.apiKey : GeneralUtils.getEnvString("APPLITOOLS_API_KEY");
     }
 
+    @Override
+    public void setAgentId(String agentId) {
+        this.agentId = agentId;
+    }
+
+    @Override
+    public String getAgentId() {
+        return this.agentId;
+    }
+
     /**
      * Sets the proxy settings to be used by the rest client.
      * @param abstractProxySettings The proxy settings to be used by the rest client.
@@ -244,6 +254,7 @@ public class ServerConnector extends RestClient
                 .path(testResults.getId())
                 .queryParam("apiKey", getApiKey())
                 .queryParam("AccessToken", testResults.getSecretToken())
+                .header(AGENT_ID_CUSTOM_HEADER, agentId)
                 .accept(MediaType.APPLICATION_JSON);
 
         builder.delete();
@@ -477,7 +488,9 @@ public class ServerConnector extends RestClient
             GeneralUtils.logExceptionStackTrace(logger, e);
         }
         assert builder != null;
-        WebResource.Builder request = builder.accept(MediaType.APPLICATION_JSON).header("X-Auth-Token", renderingInfo.getAccessToken());
+        WebResource.Builder request = builder.accept(MediaType.APPLICATION_JSON)
+                .header("X-Auth-Token", renderingInfo.getAccessToken())
+                .header(AGENT_ID_CUSTOM_HEADER, agentId);
 
         // Ok, let's create the running session from the response
         List<Integer> validStatusCodes = new ArrayList<>();
@@ -522,7 +535,7 @@ public class ServerConnector extends RestClient
 //        validStatusCodes.add(ClientResponse.Status.OK.getStatusCode());
 //        validStatusCodes.add(ClientResponse.Status.NOT_FOUND.getStatusCode());
 
-        ClientResponse response = request.head();
+        ClientResponse response = request.header(AGENT_ID_CUSTOM_HEADER, agentId).head();
         return response.getStatus() == ClientResponse.Status.OK.getStatusCode();
     }
 
@@ -550,7 +563,10 @@ public class ServerConnector extends RestClient
         } else {
             builder = target.entity(content, MediaType.APPLICATION_OCTET_STREAM_TYPE);
         }
-        builder = builder.header("X-Auth-Token", renderingInfo.getAccessToken());
+        builder = builder
+                .header("X-Auth-Token", renderingInfo.getAccessToken())
+                .header(AGENT_ID_CUSTOM_HEADER, agentId)
+                .header(AGENT_ID_CUSTOM_HEADER, agentId);
         final Future<ClientResponse> future = builder.put(ClientResponse.class);
         logger.verbose("future created.");
         //noinspection UnnecessaryLocalVariable
@@ -573,7 +589,9 @@ public class ServerConnector extends RestClient
             ArgumentGuard.notNull(renderIds, "renderIds");
             this.logger.verbose("called for render: " + Arrays.toString(renderIds));
 
-            WebResource.Builder target = restClient.resource(renderingInfo.getServiceUrl()).path((RENDER_STATUS)).header("X-Auth-Token", renderingInfo.getAccessToken());
+            WebResource.Builder target = restClient.resource(renderingInfo.getServiceUrl()).path((RENDER_STATUS))
+                    .header("X-Auth-Token", renderingInfo.getAccessToken())
+                    .header(AGENT_ID_CUSTOM_HEADER, agentId);
 
             // Ok, let's create the running session from the response
             List<Integer> validStatusCodes = new ArrayList<>();
@@ -632,7 +650,7 @@ public class ServerConnector extends RestClient
 
         String url = String.format(CLOSE_BATCH, batchId);
         WebResource target = restClient.resource(serverUrl).path(url).queryParam("apiKey", getApiKey());
-        target.delete();
+        target.header(AGENT_ID_CUSTOM_HEADER, agentId).delete();
     }
 
     @Override
@@ -669,6 +687,7 @@ public class ServerConnector extends RestClient
                 .accept(accept);
 
         // Actually perform the method call and return the result
+        invocationBuilder.header(AGENT_ID_CUSTOM_HEADER, agentId);
         return invocationBuilder.method(method, ClientResponse.class);
     }
 }
