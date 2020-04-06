@@ -21,22 +21,22 @@ public class RemoteSessionEventHandler extends RestClient implements ISessionEve
     private boolean throwExceptions = true;
 
     @SuppressWarnings("WeakerAccess")
-    public RemoteSessionEventHandler(Logger logger, URI serverUrl, String accessKey, int timeout) {
-        super(logger, serverUrl, timeout);
+    public RemoteSessionEventHandler(Logger logger, URI serverUrl, String accessKey, int timeout, String agentId) {
+        super(logger, serverUrl, timeout, agentId);
         this.accessKey = accessKey;
         this.defaultEndPoint = endPoint.queryParam("accessKey", accessKey).path(SERVER_SUFFIX);
     }
 
-    public RemoteSessionEventHandler(Logger logger, URI serverUrl, String accessKey) {
-        this(logger, serverUrl, accessKey, 30 * 1000);
+    public RemoteSessionEventHandler(Logger logger, URI serverUrl, String accessKey, String agentId) {
+        this(logger, serverUrl, accessKey, 30 * 1000, agentId);
     }
 
-    public RemoteSessionEventHandler(URI serverUrl, String accessKey, int timeout) {
-        this(new Logger(), serverUrl, accessKey, timeout);
+    public RemoteSessionEventHandler(URI serverUrl, String accessKey, int timeout, String agentId) {
+        this(new Logger(), serverUrl, accessKey, timeout, agentId);
     }
 
-    public RemoteSessionEventHandler(URI serverUrl, String accessKey) {
-        this(new Logger(), serverUrl, accessKey);
+    public RemoteSessionEventHandler(URI serverUrl, String accessKey, String agentId) {
+        this(new Logger(), serverUrl, accessKey, agentId);
     }
 
     public void setProxy(AbstractProxySettings abstractProxySettings){
