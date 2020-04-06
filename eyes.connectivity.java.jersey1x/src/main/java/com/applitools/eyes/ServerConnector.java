@@ -180,10 +180,7 @@ public class ServerConnector extends RestClient
         }
 
         try {
-            Map<String, Object> queryParams = new HashMap<String, Object>(){{
-                put("apiKey", getApiKey());
-            }};
-            WebResource.Builder request = makeEyesRequest(endPoint, queryParams);
+            WebResource.Builder request = endPoint.queryParam("apiKey", getApiKey()).accept(MediaType.APPLICATION_JSON);
             response = sendLongRequest(request, HttpMethod.POST, postData, MediaType.APPLICATION_JSON);
         } catch (RuntimeException e) {
             logger.log("startSession(): Server request failed: " + e.getMessage());
