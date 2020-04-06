@@ -15,30 +15,37 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.MapperFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
+import com.sun.jersey.api.client.AsyncWebResource;
+import com.sun.jersey.api.client.Client;
+import com.sun.jersey.api.client.ClientResponse;
+import com.sun.jersey.api.client.WebResource;
+import com.sun.jersey.api.client.async.TypeListener;
+import com.sun.jersey.core.util.MultivaluedMapImpl;
 import org.apache.commons.io.IOUtils;
 import org.brotli.dec.BrotliInputStream;
 
 import javax.ws.rs.HttpMethod;
-import javax.ws.rs.client.Entity;
-import javax.ws.rs.client.Invocation;
-import javax.ws.rs.client.InvocationCallback;
-import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 import java.net.URI;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.nio.charset.StandardCharsets;
+import java.util.*;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
-import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * Provides an API for communication with the Applitools agent
  */
-public class ServerConnector extends RestClient implements IServerConnector {
+public class ServerConnector extends RestClient
+        implements IServerConnector {
+
+    private static final int TIMEOUT = 1000 * 60 * 5; // 5 Minutes
+    private static final String API_PATH = "/api/sessions/running";
+    private static final String DEFAULT_CHARSET_NAME = "UTF-8";
+    public static final String RENDER_ID = "render-id";
 
     private String apiKey = null;
     private RenderingInfo renderingInfo;
@@ -55,6 +62,7 @@ public class ServerConnector extends RestClient implements IServerConnector {
     /***
      * @param logger A logger instance.
      */
+    @SuppressWarnings("WeakerAccess")
     public ServerConnector(Logger logger) {
         this(logger, GeneralUtils.getServerUrl());
     }
@@ -83,9 +91,7 @@ public class ServerConnector extends RestClient implements IServerConnector {
      * @return The currently set API key or {@code null} if no key is set.
      */
     public String getApiKey() {
-        String apiKey = this.apiKey != null ? this.apiKey : GeneralUtils.getEnvString("APPLITOOLS_API_KEY");
-        apiKey = apiKey == null ? GeneralUtils.getEnvString("bamboo_APPLITOOLS_API_KEY") : apiKey;
-        return apiKey;
+        return this.apiKey != null ? this.apiKey : GeneralUtils.getEnvString("APPLITOOLS_API_KEY");
     }
 
     @Override
@@ -100,12 +106,12 @@ public class ServerConnector extends RestClient implements IServerConnector {
 
     /**
      * Sets the proxy settings to be used by the rest client.
-     * @param proxySettings The proxy settings to be used by the rest client.
-     *                      If {@code null} then no proxy is set.
+     * @param abstractProxySettings The proxy settings to be used by the rest client.
+     *                              If {@code null} then no proxy is set.
      */
     @SuppressWarnings("UnusedDeclaration")
-    public void setProxy(AbstractProxySettings proxySettings) {
-        setProxyBase(proxySettings);
+    public void setProxy(AbstractProxySettings abstractProxySettings) {
+        setProxyBase(abstractProxySettings);
         // After the server is updated we must make sure the endpoint refers
         // to the correct path.
         endPoint = endPoint.path(API_PATH);
@@ -155,12 +161,11 @@ public class ServerConnector extends RestClient implements IServerConnector {
 
         ArgumentGuard.notNull(sessionStartInfo, "sessionStartInfo");
 
-        logger.verbose("Using Jersey2 for REST API calls.");
-
-        configureRestClient();
+        logger.verbose("Using Jersey1 for REST API calls.");
 
         String postData;
-        Response response;
+        ClientResponse response;
+
         try {
 
             // since the web API requires a root property for this message
@@ -175,19 +180,19 @@ public class ServerConnector extends RestClient implements IServerConnector {
         }
 
         try {
-            Invocation.Builder request = endPoint.queryParam("apiKey", getApiKey()).
-                    request(MediaType.APPLICATION_JSON);
-            response = sendLongRequest(request, HttpMethod.POST, Entity.entity(postData, MediaType.APPLICATION_JSON));
+            WebResource.Builder request = endPoint.queryParam("apiKey", getApiKey()).accept(MediaType.APPLICATION_JSON);
+            response = sendLongRequest(request, HttpMethod.POST, postData, MediaType.APPLICATION_JSON);
         } catch (RuntimeException e) {
-            logger.log("Server request failed: " + e.getMessage());
+            logger.log("startSession(): Server request failed: " + e.getMessage());
             throw e;
         }
 
         // Ok, let's create the running session from the response
         List<Integer> validStatusCodes = new ArrayList<>();
-        validStatusCodes.add(Response.Status.OK.getStatusCode());
-        validStatusCodes.add(Response.Status.CREATED.getStatusCode());
+        validStatusCodes.add(ClientResponse.Status.OK.getStatusCode());
+        validStatusCodes.add(ClientResponse.Status.CREATED.getStatusCode());
 
+        // If this is a new session, we set this flag.
         RunningSession runningSession = parseResponseWithJsonData(response, validStatusCodes, RunningSession.class);
         if (runningSession.getIsNew() == null) {
             runningSession.setIsNew(response.getStatus() == Response.Status.CREATED.getStatusCode());
@@ -210,21 +215,21 @@ public class ServerConnector extends RestClient implements IServerConnector {
         ArgumentGuard.notNull(runningSession, "runningSession");
 
         final String sessionId = runningSession.getId();
-        Response response;
+        ClientResponse response;
         List<Integer> validStatusCodes;
         TestResults result;
 
-        Invocation.Builder invocationBuilder = endPoint.path(sessionId)
+        WebResource.Builder builder = endPoint.path(sessionId)
                 .queryParam("apiKey", getApiKey())
                 .queryParam("aborted", String.valueOf(isAborted))
                 .queryParam("updateBaseline", String.valueOf(save))
-                .request(MediaType.APPLICATION_JSON);
+                .accept(MediaType.APPLICATION_JSON);
 
-        response = sendLongRequest(invocationBuilder, HttpMethod.DELETE, null);
+        response = sendLongRequest(builder, "DELETE", null, null);
 
         // Ok, let's create the running session from the response
         validStatusCodes = new ArrayList<>();
-        validStatusCodes.add(Response.Status.OK.getStatusCode());
+        validStatusCodes.add(ClientResponse.Status.OK.getStatusCode());
 
         result = parseResponseWithJsonData(response, validStatusCodes,
                 TestResults.class);
@@ -235,20 +240,18 @@ public class ServerConnector extends RestClient implements IServerConnector {
     public void deleteSession(TestResults testResults) {
         ArgumentGuard.notNull(testResults, "testResults");
 
-        configureRestClient();
-
-        Invocation.Builder invocationBuilder = restClient.target(serverUrl)
+        WebResource sessionsResources = restClient.resource(serverUrl);
+        WebResource.Builder builder = sessionsResources
                 .path("/api/sessions/batches/")
                 .path(testResults.getBatchId())
                 .path("/")
                 .path(testResults.getId())
                 .queryParam("apiKey", getApiKey())
                 .queryParam("AccessToken", testResults.getSecretToken())
-                .request(MediaType.APPLICATION_JSON)
-                .header(AGENT_ID_CUSTOM_HEADER, agentId);
+                .header(AGENT_ID_CUSTOM_HEADER, agentId)
+                .accept(MediaType.APPLICATION_JSON);
 
-        @SuppressWarnings("unused")
-        Response response = invocationBuilder.delete();
+        builder.delete();
     }
 
     /**
@@ -267,13 +270,14 @@ public class ServerConnector extends RestClient implements IServerConnector {
         ArgumentGuard.notNull(runningSession, "runningSession");
         ArgumentGuard.notNull(matchData, "model");
 
-        Response response;
+        ClientResponse response;
         List<Integer> validStatusCodes;
         MatchResult result;
-        final String jsonData;
+        String jsonData;
 
         // since we rather not add an empty "tag" param
-        final WebTarget runningSessionsEndpoint = endPoint.path(runningSession.getId());
+        WebResource runningSessionsEndpoint =
+                endPoint.path(runningSession.getId());
 
         // Serializing model into JSON (we'll treat it as binary later).
         try {
@@ -283,30 +287,31 @@ public class ServerConnector extends RestClient implements IServerConnector {
         }
 
         // Sending the request
-        Invocation.Builder request = runningSessionsEndpoint.queryParam("apiKey", getApiKey())
-                .request(MediaType.APPLICATION_JSON);
+        WebResource.Builder request = runningSessionsEndpoint.queryParam("apiKey", getApiKey())
+                .accept(MediaType.APPLICATION_JSON);
 
-        response = sendLongRequest(request, HttpMethod.POST, Entity.entity(jsonData, MediaType.APPLICATION_JSON));
+        response = sendLongRequest(request, HttpMethod.POST, jsonData, MediaType.APPLICATION_JSON);
 
         // Ok, let's create the running session from the response
         validStatusCodes = new ArrayList<>(1);
-        validStatusCodes.add(Response.Status.OK.getStatusCode());
+        validStatusCodes.add(ClientResponse.Status.OK.getStatusCode());
 
         result = parseResponseWithJsonData(response, validStatusCodes, MatchResult.class);
 
         return result;
+
     }
 
     @Override
     public int uploadData(byte[] bytes, RenderingInfo renderingInfo, String targetUrl, String contentType, String mediaType) {
-        WebTarget target = restClient.target(targetUrl);
-        Invocation.Builder request = target
-                .request(contentType)
+        WebResource target = restClient.resource(targetUrl);
+        WebResource.Builder request = target
                 .accept(mediaType)
+                .entity(bytes, contentType)
                 .header("X-Auth-Token", renderingInfo.getAccessToken())
                 .header("x-ms-blob-type", "BlockBlob");
 
-        Response response = request.put(Entity.entity(bytes, mediaType));
+        ClientResponse response = request.put(ClientResponse.class);
         int statusCode = response.getStatus();
         response.close();
         logger.verbose("Upload Status Code: " + statusCode);
@@ -314,61 +319,74 @@ public class ServerConnector extends RestClient implements IServerConnector {
     }
 
     @Override
-    public void downloadString(final URL uri, final boolean isSecondRetry, final IDownloadListener<String> listener) {
+    public void downloadString(URL uri, boolean isSecondRetry, final IDownloadListener<String> listener) {
 
-        WebTarget target = this.restClient.target(uri.toString());
+        AsyncWebResource target = Client.create().asyncResource(uri.toString());
 
-        Invocation.Builder request = target.request(MediaType.WILDCARD);
+        AsyncWebResource.Builder request = target.accept(MediaType.WILDCARD);
 
-        logger.verbose("Firing async GET");
+        request.get(new TypeListener<ClientResponse>(ClientResponse.class) {
 
-        request.async().get(new InvocationCallback<Response>() {
-            @Override
-            public void completed(Response response) {
+            public void onComplete(Future<ClientResponse> f) {
+                int status = 0;
+                ClientResponse clientResponse = null;
                 try {
-                    byte[] resource = downloadFile(response);
-                    listener.onDownloadComplete(new String(resource), null);
-                    logger.verbose("response finished");
-                } catch (Throwable e) {
-                    logger.verbose(e.getMessage());
-                } finally {
-                    response.close();
-                }
-            }
+                    clientResponse = f.get();
+                    status = clientResponse.getStatus();
+                    if (status > 300) {
+                        logger.verbose("Got response status code - " + status);
+                        listener.onDownloadFailed();
+                        return;
+                    }
+                    InputStream entityInputStream = clientResponse.getEntityInputStream();
 
-            @Override
-            public void failed(Throwable throwable) {
-                // on fail
-                if (!isSecondRetry) {
-                    logger.verbose("Async GET failed - entering retry");
-                    downloadString(uri, true, listener);
-                } else {
+                    StringWriter writer = new StringWriter();
+
+                    IOUtils.copy(entityInputStream, writer, "UTF-8");
+
+                    String theString = writer.toString();
+
+                    listener.onDownloadComplete(theString, null);
+
+                } catch (Exception e) {
+                    GeneralUtils.logExceptionStackTrace(logger, e);
+                    logger.verbose("Failed to parse request(status= " + status + ") = " + clientResponse.getEntity(String.class));
                     listener.onDownloadFailed();
+
                 }
             }
-        });
 
+        });
     }
 
     @Override
     public IResourceFuture downloadResource(final URL url, String userAgent, ResourceFuture resourceFuture) {
-        WebTarget target = restClient.target(url.toString());
+        Client client = RestClient.buildRestClient(getTimeout(), getProxy());
 
-        Invocation.Builder request = target.request(MediaType.WILDCARD);
+        AsyncWebResource target = client.asyncResource(url.toString());
+
+        AsyncWebResource.Builder request = target.accept(MediaType.WILDCARD);
 
         request.header("User-Agent", userAgent);
 
         final IResourceFuture newFuture = new ResourceFuture(url.toString(), logger, this, userAgent);
 
-        Future<Response> responseFuture = request.async().get(new InvocationCallback<Response>() {
-            @Override
-            public void completed(Response response) {
+        Future<ClientResponse> responseFuture = request.get(new TypeListener<ClientResponse>(ClientResponse.class) {
+
+            public void onComplete(Future<ClientResponse> future) {
                 logger.verbose("GET callback  success");
+
+                ClientResponse response = null;
+                try {
+                    response = future.get();
+                } catch (InterruptedException | ExecutionException e) {
+                    GeneralUtils.logExceptionStackTrace(logger, e);
+                }
+                assert response != null;
                 int status = response.getStatus();
-                List<String> contentLengthHeaders = response.getStringHeaders().get("Content-length");
-                int contentLength = 0;
+                List<String> contentLengthHeaders = response.getHeaders().get("Content-length");
                 if (contentLengthHeaders != null) {
-                    contentLength = Integer.parseInt(contentLengthHeaders.get(0));
+                    int contentLength = Integer.parseInt(contentLengthHeaders.get(0));
                     logger.verbose("Content Length: " + contentLength);
                 }
 
@@ -400,10 +418,6 @@ public class ServerConnector extends RestClient implements IServerConnector {
                 logger.verbose("Response closed");
             }
 
-            @Override
-            public void failed(Throwable throwable) {
-                logger.verbose("PUT callback failed");
-            }
         });
 
         newFuture.setResponseFuture(responseFuture);
@@ -411,60 +425,18 @@ public class ServerConnector extends RestClient implements IServerConnector {
         return newFuture;
     }
 
-    private Response sendWithRetry(String method, Invocation.Builder request, Entity entity, AtomicInteger retiresCounter) {
-        request.header(AGENT_ID_CUSTOM_HEADER, agentId);
-        if (retiresCounter == null) {
-            retiresCounter = new AtomicInteger(0);
-
-        }
-
-        Response response = null;
-        try {
-            switch (method) {
-
-                case HttpMethod.POST:
-                    response = request.post(entity);
-                    break;
-                case HttpMethod.PUT:
-                    response = request.put(entity);
-            }
-
-            return response;
-        } catch (Exception e) {
-
-            GeneralUtils.logExceptionStackTrace(logger, e);
-            try {
-
-                Thread.sleep(THREAD_SLEEP_MILLIS);
-
-            } catch (InterruptedException e1) {
-                GeneralUtils.logExceptionStackTrace(logger, e1);
-            }
-
-            if (retiresCounter.incrementAndGet() < NUM_OF_RETRIES) {
-
-                return sendWithRetry(method, request, entity, retiresCounter);
-            } else {
-                throw e;
-            }
-        }
-
-    }
-
-
     @Override
     public RenderingInfo getRenderInfo() {
+        this.logger.verbose("enter");
         if (renderingInfo == null) {
-            String apiKey = getApiKey();
-            WebTarget target = restClient.target(serverUrl).path((RENDER_INFO_PATH)).queryParam("apiKey", apiKey);
-            Invocation.Builder request = target.request(MediaType.APPLICATION_JSON);
-            request.header(AGENT_ID_CUSTOM_HEADER, agentId);
+            WebResource target = restClient.resource(serverUrl).path(RENDER_INFO_PATH).queryParam("apiKey", getApiKey());
+            WebResource.Builder request = target.accept(MediaType.APPLICATION_JSON);
+            ClientResponse response = sendLongRequest(request, HttpMethod.GET, null, null);
 
             // Ok, let's create the running session from the response
-            List<Integer> validStatusCodes = new ArrayList<>();
-            validStatusCodes.add(Response.Status.OK.getStatusCode());
+            List<Integer> validStatusCodes = new ArrayList<>(1);
+            validStatusCodes.add(ClientResponse.Status.OK.getStatusCode());
 
-            Response response = request.get();
             renderingInfo = parseResponseWithJsonData(response, validStatusCodes, RenderingInfo.class);
         }
         return renderingInfo;
@@ -475,37 +447,69 @@ public class ServerConnector extends RestClient implements IServerConnector {
         ArgumentGuard.notNull(renderRequests, "renderRequests");
         this.logger.verbose("called with " + Arrays.toString(renderRequests));
 
-        WebTarget target = restClient.target(renderingInfo.getServiceUrl()).path((RENDER));
+        WebResource target = restClient.resource(renderingInfo.getServiceUrl()).path(RENDER);
+        WebResource webResource = null;
+
         if (renderRequests.length > 1) {
-            target.matrixParam("render-id", (Object) renderRequests);
+            MultivaluedMap<String, String> params = new MultivaluedMapImpl();
+            List<String> idsAsList = extractIdsFromRRequests(renderRequests);
+            if (idsAsList != null && !idsAsList.isEmpty()) {
+                params.put(RENDER_ID, idsAsList);
+                webResource = target.queryParams(params);
+            }
         } else if (renderRequests.length == 1) {
-            target.queryParam("render-id", (Object) renderRequests);
+            String renderId = renderRequests[0].getRenderId();
+            if (renderId != null) {
+                webResource = target.queryParam("render-id", renderId);
+            }
         }
-        Invocation.Builder request = target.request(MediaType.APPLICATION_JSON);
-        request.header("X-Auth-Token", renderingInfo.getAccessToken());
-        request.header(AGENT_ID_CUSTOM_HEADER, agentId);
+
+        WebResource.Builder builder = null;
+        try {
+            ObjectMapper objectMapper = new ObjectMapper();
+            objectMapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
+            objectMapper.configure(MapperFeature.SORT_PROPERTIES_ALPHABETICALLY, true);
+            byte[] bytes = objectMapper.writeValueAsString(renderRequests).getBytes(StandardCharsets.UTF_8);
+            if (webResource == null) {
+                builder = target.getRequestBuilder();
+                builder = builder.entity(bytes, MediaType.APPLICATION_JSON);
+            } else {
+
+                builder = webResource.entity(bytes, MediaType.APPLICATION_JSON);
+            }
+
+        } catch (JsonProcessingException e) {
+            GeneralUtils.logExceptionStackTrace(logger, e);
+        }
+        assert builder != null;
+        WebResource.Builder request = builder.accept(MediaType.APPLICATION_JSON)
+                .header("X-Auth-Token", renderingInfo.getAccessToken())
+                .header(AGENT_ID_CUSTOM_HEADER, agentId);
 
         // Ok, let's create the running session from the response
         List<Integer> validStatusCodes = new ArrayList<>();
         validStatusCodes.add(Response.Status.OK.getStatusCode());
         validStatusCodes.add(Response.Status.NOT_FOUND.getStatusCode());
+        ClientResponse response = request.post(ClientResponse.class);
 
-        try {
-            ObjectMapper objectMapper = new ObjectMapper();
-            objectMapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
-            objectMapper.configure(MapperFeature.SORT_PROPERTIES_ALPHABETICALLY, true);
-            String json = objectMapper.writeValueAsString(renderRequests);
-            Response response = request.post(Entity.json(json));
-            if (validStatusCodes.contains(response.getStatus())) {
-                RunningRender[] runningRenders = parseResponseWithJsonData(response, validStatusCodes, RunningRender[].class);
-                return Arrays.asList(runningRenders);
-            }
-            throw new EyesException("Jersey2 ServerConnector.render - unexpected status (" + response.getStatus() + "), msg (" + response.readEntity(String.class) + ")");
-        } catch (JsonProcessingException e) {
-            GeneralUtils.logExceptionStackTrace(logger, e);
+        if (validStatusCodes.contains(response.getStatus())) {
+            RunningRender[] runningRenders = parseResponseWithJsonData(response, validStatusCodes, RunningRender[].class);
+            return Arrays.asList(runningRenders);
         }
+//            throw new EyesException("Jersey2 ServerConnector.render - unexpected status (" + response.getStatus() + "), msg (" + new String(response + ")");
 
         return null;
+    }
+
+    private List<String> extractIdsFromRRequests(RenderRequest[] renderRequests) {
+        List<String> ids = new ArrayList<>();
+        for (RenderRequest renderRequest : renderRequests) {
+            String renderId = renderRequest.getRenderId();
+            if (renderId != null) {
+                ids.add(renderId);
+            }
+        }
+        return ids;
     }
 
     @Override
@@ -516,24 +520,19 @@ public class ServerConnector extends RestClient implements IServerConnector {
         // eslint-disable-next-line max-len
         this.logger.verbose("called with resource#" + resource.getSha256() + " for render: " + runningRender.getRenderId());
 
-        WebTarget target = restClient.target(renderingInfo.getServiceUrl()).path((RESOURCES_SHA_256) + resource.getSha256()).queryParam("render-id", runningRender.getRenderId());
-        Invocation.Builder request = target.request(MediaType.APPLICATION_JSON);
-        request.header("X-Auth-Token", renderingInfo.getAccessToken());
-        request.header(AGENT_ID_CUSTOM_HEADER, agentId);
+        WebResource target = restClient.resource(renderingInfo.getServiceUrl()).path((RESOURCES_SHA_256) + resource.getSha256()).queryParam("render-id", runningRender.getRenderId());
+
+        WebResource.Builder request = target.accept(MediaType.APPLICATION_JSON);
 
         // Ok, let's create the running session from the response
-        List<Integer> validStatusCodes = new ArrayList<>();
-        validStatusCodes.add(Response.Status.OK.getStatusCode());
-        validStatusCodes.add(Response.Status.NOT_FOUND.getStatusCode());
+//        List<Integer> validStatusCodes = new ArrayList<>();
+//        validStatusCodes.add(ClientResponse.Status.OK.getStatusCode());
+//        validStatusCodes.add(ClientResponse.Status.NOT_FOUND.getStatusCode());
 
-        Response response = request.head();
-        if (validStatusCodes.contains(response.getStatus())) {
-            this.logger.verbose("request succeeded");
-            return response.getStatus() == Response.Status.OK.getStatusCode();
-        }
-
-        throw new EyesException("Jersey2 ServerConnector.renderCheckResource - unexpected status (" + response.getStatus() + ")");
+        ClientResponse response = request.header(AGENT_ID_CUSTOM_HEADER, agentId).head();
+        return response.getStatus() == ClientResponse.Status.OK.getStatusCode();
     }
+
 
     @Override
     public IPutFuture renderPutResource(final RunningRender runningRender, final RGridResource resource, String userAgent, final IResourceUploadListener listener) {
@@ -546,59 +545,47 @@ public class ServerConnector extends RestClient implements IServerConnector {
         String renderId = runningRender.getRenderId();
         logger.verbose("resource hash:" + hash + " ; url: " + resource.getUrl() + " ; render id: " + renderId);
 
-        WebTarget target = restClient.target(renderingInfo.getServiceUrl())
+        AsyncWebResource target = restClient.asyncResource(renderingInfo.getServiceUrl())
                 .path(RESOURCES_SHA_256 + hash)
                 .queryParam("render-id", renderId);
 
         String contentType = resource.getContentType();
-        Invocation.Builder request = target.request(contentType);
-        request.header("X-Auth-Token", renderingInfo.getAccessToken());
-        request.header("User-Agent", userAgent);
-        request.header(AGENT_ID_CUSTOM_HEADER, agentId);
-        Entity entity = null;
+        AsyncWebResource.Builder builder;
         if (contentType != null && !"None".equalsIgnoreCase(contentType)) {
-            entity = Entity.entity(content, contentType);
+            builder = target.entity(content, contentType);
 
         } else {
-            entity = Entity.entity(content, MediaType.APPLICATION_OCTET_STREAM_TYPE);
+            builder = target.entity(content, MediaType.APPLICATION_OCTET_STREAM_TYPE);
         }
-        final Future<Response> future;
-        future = request.async().put(entity, new InvocationCallback<Response>() {
-            @Override
-            public void completed(Response response) {
-                logger.verbose("PUT callback  success");
-                response.close();
-                logger.verbose("Response closed");
-            }
-
-            @Override
-            public void failed(Throwable throwable) {
-                logger.verbose("PUT callback failed");
-            }
-        });
+        builder = builder
+                .header("X-Auth-Token", renderingInfo.getAccessToken())
+                .header(AGENT_ID_CUSTOM_HEADER, agentId)
+                .header(AGENT_ID_CUSTOM_HEADER, agentId);
+        final Future<ClientResponse> future = builder.put(ClientResponse.class);
         logger.verbose("future created.");
+        //noinspection UnnecessaryLocalVariable
         PutFuture putFuture = new PutFuture(future, resource, runningRender, this, logger, userAgent);
         return putFuture;
     }
 
-
     @Override
     public RenderStatusResults renderStatus(RunningRender runningRender) {
+        List<RenderStatusResults> renderStatusResults = renderStatusById(runningRender.getRenderId());
+        if (!renderStatusResults.isEmpty()) {
+            return renderStatusResults.get(0);
+        }
         return null;
     }
 
     @Override
     public List<RenderStatusResults> renderStatusById(String... renderIds) {
-
-        Response response = null;
         try {
             ArgumentGuard.notNull(renderIds, "renderIds");
             this.logger.verbose("called for render: " + Arrays.toString(renderIds));
 
-            WebTarget target = restClient.target(renderingInfo.getServiceUrl()).path((RENDER_STATUS));
-            Invocation.Builder request = target.request(MediaType.TEXT_PLAIN);
-            request.header("X-Auth-Token", renderingInfo.getAccessToken());
-            request.header(AGENT_ID_CUSTOM_HEADER, agentId);
+            WebResource.Builder target = restClient.resource(renderingInfo.getServiceUrl()).path((RENDER_STATUS))
+                    .header("X-Auth-Token", renderingInfo.getAccessToken())
+                    .header(AGENT_ID_CUSTOM_HEADER, agentId);
 
             // Ok, let's create the running session from the response
             List<Integer> validStatusCodes = new ArrayList<>();
@@ -610,11 +597,12 @@ public class ServerConnector extends RestClient implements IServerConnector {
             objectMapper.configure(MapperFeature.SORT_PROPERTIES_ALPHABETICALLY, true);
             try {
                 String json = objectMapper.writeValueAsString(renderIds);
-                Entity<String> entity = Entity.entity(json, MediaType.APPLICATION_JSON);
-                response = request.post(entity);
+                target = target.entity(json, MediaType.APPLICATION_JSON);
+                ClientResponse response = target.post(ClientResponse.class);
                 if (validStatusCodes.contains(response.getStatus())) {
                     this.logger.verbose("request succeeded");
                     RenderStatusResults[] renderStatusResults = parseResponseWithJsonData(response, validStatusCodes, RenderStatusResults[].class);
+                    //noinspection ForLoopReplaceableByForEach
                     for (int i = 0; i < renderStatusResults.length; i++) {
                         RenderStatusResults renderStatusResult = renderStatusResults[i];
                         if (renderStatusResult != null && renderStatusResult.getStatus() == RenderStatus.ERROR) {
@@ -630,19 +618,13 @@ public class ServerConnector extends RestClient implements IServerConnector {
             return null;
         } catch (Exception e) {
             GeneralUtils.logExceptionStackTrace(logger, e);
-        } finally {
-            if (response != null) {
-                response.close();
-            }
         }
         return null;
-
     }
 
     @Override
     public IResourceFuture createResourceFuture(RGridResource gridResource, String userAgent) {
         return new ResourceFuture(gridResource, logger, this, userAgent);
-
     }
 
     @Override
@@ -652,36 +634,30 @@ public class ServerConnector extends RestClient implements IServerConnector {
 
     @Override
     public void closeBatch(String batchId) {
-        String dontCloseBatchesStr = GeneralUtils.getEnvString("APPLITOOLS_DONT_CLOSE_BATCHES");
-        if (Boolean.parseBoolean(dontCloseBatchesStr)) {
+        boolean dontCloseBatchesStr = GeneralUtils.getDontCloseBatches();
+        if (dontCloseBatchesStr) {
             logger.log("APPLITOOLS_DONT_CLOSE_BATCHES environment variable set to true. Skipping batch close.");
             return;
         }
         ArgumentGuard.notNull(batchId, "batchId");
         this.logger.verbose("called with " + batchId);
-        this.configureRestClient();
+
         String url = String.format(CLOSE_BATCH, batchId);
-        WebTarget target = restClient.target(serverUrl).path(url).queryParam("apiKey", getApiKey());
-        Response delete = target.request().header(AGENT_ID_CUSTOM_HEADER, agentId).delete();
-        logger.verbose("delete batch is done with " + delete.getStatus() + " status");
-        this.restClient.close();
+        WebResource target = restClient.resource(serverUrl).path(url).queryParam("apiKey", getApiKey());
+        target.header(AGENT_ID_CUSTOM_HEADER, agentId).delete();
     }
 
     @Override
     public void closeConnector() {
-        if (restClient != null) {
-            restClient.close();
-        }
     }
 
-    @Override
     public boolean getDontCloseBatches() {
         return "true".equalsIgnoreCase(GeneralUtils.getEnvString("APPLITOOLS_DONT_CLOSE_BATCHES"));
     }
 
-    private byte[] downloadFile(Response response) {
+    private byte[] downloadFile(ClientResponse response) {
 
-        InputStream inputStream = response.readEntity(InputStream.class);
+        InputStream inputStream = response.getEntity(InputStream.class);
         Object contentEncoding = response.getHeaders().getFirst("Content-Encoding");
         byte[] bytes = new byte[0];
         try {
@@ -695,22 +671,17 @@ public class ServerConnector extends RestClient implements IServerConnector {
         return bytes;
     }
 
-    private void configureRestClient() {
-        restClient = buildRestClient(getTimeout(), getProxy());
-        endPoint = restClient.target(serverUrl);
-        endPoint = endPoint.path(API_PATH);
-    }
 
     @Override
-    protected Response sendHttpWebRequest(String path, final String method, String accept) {
+    protected ClientResponse sendHttpWebRequest(String path, final String method, String accept) {
         // Building the request
-        Invocation.Builder invocationBuilder = restClient
-                .target(path)
+        WebResource.Builder invocationBuilder = restClient
+                .resource(path)
                 .queryParam("apikey", getApiKey())
-                .request(accept);
+                .accept(accept);
 
         // Actually perform the method call and return the result
         invocationBuilder.header(AGENT_ID_CUSTOM_HEADER, agentId);
-        return invocationBuilder.method(method);
+        return invocationBuilder.method(method, ClientResponse.class);
     }
 }
