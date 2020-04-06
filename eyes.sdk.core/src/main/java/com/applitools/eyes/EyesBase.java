@@ -1286,6 +1286,7 @@ public abstract class EyesBase implements IEyesBase{
      */
     protected void startSession() {
         logger.verbose("startSession()");
+
         if (getServerConnector() == null) {
             throw new EyesException("server connector not set.");
         }
