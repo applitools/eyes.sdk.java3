@@ -244,7 +244,11 @@ public class ServerConnector extends RestClient
                 .path("/api/sessions/batches/")
                 .path(testResults.getBatchId())
                 .path("/")
-                .path(testResults.getId());
+                .path(testResults.getId())
+                .queryParam("apiKey", getApiKey())
+                .queryParam("AccessToken", testResults.getSecretToken())
+                .header(AGENT_ID_CUSTOM_HEADER, agentId)
+                .accept(MediaType.APPLICATION_JSON);
 
         Map<String, Object> queryParams = new HashMap<String, Object>(){{
             put("apiKey", getApiKey());
@@ -485,6 +489,22 @@ public class ServerConnector extends RestClient
         } catch (JsonProcessingException e) {
             GeneralUtils.logExceptionStackTrace(logger, e);
         }
+        assert builder != null;
+        WebResource.Builder request = builder.accept(MediaType.APPLICATION_JSON)
+                .header("X-Auth-Token", renderingInfo.getAccessToken())
+                .header(AGENT_ID_CUSTOM_HEADER, agentId);
+
+        // Ok, let's create the running session from the response
+        List<Integer> validStatusCodes = new ArrayList<>();
+        validStatusCodes.add(Response.Status.OK.getStatusCode());
+        validStatusCodes.add(Response.Status.NOT_FOUND.getStatusCode());
+        ClientResponse response = request.post(ClientResponse.class);
+
+        if (validStatusCodes.contains(response.getStatus())) {
+            RunningRender[] runningRenders = parseResponseWithJsonData(response, validStatusCodes, RunningRender[].class);
+            return Arrays.asList(runningRenders);
+        }
+//            throw new EyesException("Jersey2 ServerConnector.render - unexpected status (" + response.getStatus() + "), msg (" + new String(response + ")");
 
         return null;
     }
@@ -519,7 +539,7 @@ public class ServerConnector extends RestClient
 //        validStatusCodes.add(ClientResponse.Status.OK.getStatusCode());
 //        validStatusCodes.add(ClientResponse.Status.NOT_FOUND.getStatusCode());
 
-        ClientResponse response = request.head();
+        ClientResponse response = request.header(AGENT_ID_CUSTOM_HEADER, agentId).head();
         return response.getStatus() == ClientResponse.Status.OK.getStatusCode();
     }
 
@@ -549,6 +569,7 @@ public class ServerConnector extends RestClient
         }
         builder = builder
                 .header("X-Auth-Token", renderingInfo.getAccessToken())
+                .header(AGENT_ID_CUSTOM_HEADER, agentId)
                 .header(AGENT_ID_CUSTOM_HEADER, agentId);
         final Future<ClientResponse> future = builder.put(ClientResponse.class);
         logger.verbose("future created.");
@@ -632,11 +653,8 @@ public class ServerConnector extends RestClient
         this.logger.verbose("called with " + batchId);
 
         String url = String.format(CLOSE_BATCH, batchId);
-        WebResource target = restClient.resource(serverUrl).path(url);
-        Map<String, Object> queryParams = new HashMap<String, Object>(){{
-            put("apiKey", getApiKey());
-        }};
-        makeEyesRequest(target, queryParams, (String) null).delete();
+        WebResource target = restClient.resource(serverUrl).path(url).queryParam("apiKey", getApiKey());
+        target.header(AGENT_ID_CUSTOM_HEADER, agentId).delete();
     }
 
     @Override
@@ -666,10 +684,14 @@ public class ServerConnector extends RestClient
 
     @Override
     protected ClientResponse sendHttpWebRequest(String path, final String method, String accept) {
-        Map<String, Object> queryParams = new HashMap<String, Object>(){{
-            put("apiKey", getApiKey());
-        }};
-        WebResource.Builder invocationBuilder = makeEyesRequest(restClient.resource(path), queryParams, accept);
+        // Building the request
+        WebResource.Builder invocationBuilder = restClient
+                .resource(path)
+                .queryParam("apikey", getApiKey())
+                .accept(accept);
+
+        // Actually perform the method call and return the result
+        invocationBuilder.header(AGENT_ID_CUSTOM_HEADER, agentId);
         return invocationBuilder.method(method, ClientResponse.class);
     }
 }
