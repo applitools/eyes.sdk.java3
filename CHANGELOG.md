@@ -2,15 +2,8 @@
 ### Fixed
 - Default versions reported in `AgentId` now automatically generated and match `pom.xml`.
 - Method `setEnablePatterns` now works properly. [Trello 1714](https://trello.com/c/jQgW5dpz)
-- Fixed steps missing in certain cases in UltraFast Grid. [Trello 1717](https://trello.com/c/U1TTels2)
-- Now all requests include the Eyes-Date header when sending a long request
-- Fixed a bug where the Jeresy1 and Jboss connectivity modules didn't work with visual grid runner when running multiple tests simultaneously.
-
 ### Updated
-- The `startSession` method now uses long request. [Trello 1715](https://trello.com/c/DcVzWbeR)
-- Adding agent id to all requests headers. [Trello 1697](https://trello.com/c/CzhUxOqE)
-- Now all requests include the Eyes-Date header when sending a long request
-- Moved the logic from the connectivity modules and merged it into the common module to save a lot of code duplication. [Trello 1732](https://trello.com/c/mug8ARUc)
+- Adding agent id all requests headers. [Trello 1697](https://trello.com/c/CzhUxOqE)
 
 ## [3.160.3] - 2020-03-18
 ### Fixed

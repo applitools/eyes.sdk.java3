@@ -88,10 +88,8 @@ public class TestUtils {
                 .queryParam("apiKey", apiKey)
                 .build();
 
-        HttpClient httpClient = new HttpClientImpl(ServerConnector.DEFAULT_CLIENT_TIMEOUT, null);
-        RestClient client = new RestClient(httpClient, new Logger(), apiSessionUri);
-        String srStr = client.sendHttpWebRequest(apiSessionUri.toString(), HttpMethod.GET, MediaType.APPLICATION_JSON)
-                .readEntity(String.class);
+        RestClient client = new RestClient(new Logger(), apiSessionUri, null);
+        String srStr = client.getString(apiSessionUri.toString(), MediaType.APPLICATION_JSON);
         ObjectMapper jsonMapper = new ObjectMapper();
         jsonMapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
 
@@ -186,9 +184,8 @@ public class TestUtils {
                 .queryParam("apiKey", eyes.getApiKey())
                 .build();
 
-        HttpClient httpClient = new HttpClientImpl(ServerConnector.DEFAULT_CLIENT_TIMEOUT, null);
-        RestClient client = new RestClient(httpClient, new Logger(), apiSessionUri);
-        return client.sendHttpWebRequest(apiSessionUri.toString(), HttpMethod.GET, MediaType.APPLICATION_JSON)
-                .readEntity(String.class);
+        RestClient client = new RestClient(new Logger(), apiSessionUri, eyes.getFullAgentId());
+        String result = client.getString(apiSessionUri.toString(), MediaType.APPLICATION_JSON);
+        return result;
     }
 }

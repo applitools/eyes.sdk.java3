@@ -84,8 +84,7 @@ public abstract class EyesBase implements IEyesBase{
 
         initProviders();
 
-        HttpClientImpl client = new HttpClientImpl(ServerConnector.DEFAULT_CLIENT_TIMEOUT, null);
-        setServerConnector(new ServerConnector(client));
+        setServerConnector(new ServerConnector(getBaseAgentId()));
 
         runningSession = null;
         userInputs = new ArrayDeque<>();
