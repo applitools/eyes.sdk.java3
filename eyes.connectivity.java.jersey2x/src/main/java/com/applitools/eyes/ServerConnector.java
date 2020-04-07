@@ -159,10 +159,6 @@ public class ServerConnector extends RestClient implements IServerConnector {
 
         String postData;
         Response response;
-        int statusCode;
-        List<Integer> validStatusCodes;
-        boolean isNewSession;
-        RunningSession runningSession;
         try {
 
             // since the web API requires a root property for this message
@@ -188,13 +184,11 @@ public class ServerConnector extends RestClient implements IServerConnector {
         }
 
         // Ok, let's create the running session from the response
-        validStatusCodes = new ArrayList<>();
+        List<Integer> validStatusCodes = new ArrayList<>();
         validStatusCodes.add(Response.Status.OK.getStatusCode());
         validStatusCodes.add(Response.Status.CREATED.getStatusCode());
 
-        runningSession = parseResponseWithJsonData(response, validStatusCodes,
-                RunningSession.class);
-
+        response.bufferEntity();
         String responseDataString = response.readEntity(String.class);
         Map<?,?> responseData;
         try {
@@ -210,8 +204,8 @@ public class ServerConnector extends RestClient implements IServerConnector {
         }
 
         // If this is a new session, we set this flag.
-        statusCode = response.getStatus();
-        isNewSession = (statusCode == Response.Status.CREATED.getStatusCode() || responseData.containsKey("is_new"));
+        boolean isNewSession = (response.getStatus() == Response.Status.CREATED.getStatusCode() || responseData.containsKey("isNew"));
+        RunningSession runningSession = parseResponseWithJsonData(response, validStatusCodes, RunningSession.class);
         runningSession.setIsNewSession(isNewSession);
 
         return runningSession;
