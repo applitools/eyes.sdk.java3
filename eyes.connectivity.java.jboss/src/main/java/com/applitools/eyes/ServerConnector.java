@@ -150,10 +150,6 @@ public class ServerConnector extends RestClient
 
         String postData;
         Response response;
-        int statusCode;
-        List<Integer> validStatusCodes;
-        boolean isNewSession;
-        RunningSession runningSession;
 
         try {
 
@@ -180,16 +176,28 @@ public class ServerConnector extends RestClient
         }
 
         // Ok, let's create the running session from the response
-        validStatusCodes = new ArrayList<>();
+        List<Integer> validStatusCodes = new ArrayList<>();
         validStatusCodes.add(Response.Status.OK.getStatusCode());
         validStatusCodes.add(Response.Status.CREATED.getStatusCode());
 
-        runningSession = parseResponseWithJsonData(response, validStatusCodes,
-                RunningSession.class);
+        response.bufferEntity();
+        String responseDataString = response.readEntity(String.class);
+        Map<?,?> responseData;
+        try {
+            responseData = GeneralUtils.parseJsonToObject(responseDataString, Map.class);
+        } catch (IOException e) {
+            String errorMessage = getReadResponseError(
+                    "Failed to de-serialize response body",
+                    response.getStatus(),
+                    response.getStatusInfo().getReasonPhrase(),
+                    responseDataString);
+
+            throw new EyesException(errorMessage, e);
+        }
 
         // If this is a new session, we set this flag.
-        statusCode = response.getStatus();
-        isNewSession = (statusCode == Response.Status.CREATED.getStatusCode());
+        boolean isNewSession = (response.getStatus() == Response.Status.CREATED.getStatusCode() || responseData.containsKey("isNew"));
+        RunningSession runningSession = parseResponseWithJsonData(response, validStatusCodes, RunningSession.class);
         runningSession.setIsNewSession(isNewSession);
 
         return runningSession;
