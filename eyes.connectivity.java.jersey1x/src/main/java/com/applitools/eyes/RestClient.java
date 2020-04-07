@@ -343,6 +343,12 @@ public class RestClient {
      */
     protected <T> T parseResponseWithJsonData(ClientResponse response, List<Integer> validHttpStatusCodes,
                                               Class<T> resultType) throws EyesException {
+        String data = response.getEntity(String.class);
+        return parseResponseWithJsonData(response, data, validHttpStatusCodes, resultType);
+    }
+
+    protected <T> T parseResponseWithJsonData(ClientResponse response, String data, List<Integer> validHttpStatusCodes,
+                                              Class<T> resultType) throws EyesException {
         ArgumentGuard.notNull(response, "response");
         ArgumentGuard.notNull(validHttpStatusCodes, "validHttpStatusCodes");
         ArgumentGuard.notNull(resultType, "resultType");
@@ -350,7 +356,6 @@ public class RestClient {
         T resultObject;
         int statusCode = response.getStatus();
         String statusPhrase = ClientResponse.Status.fromStatusCode(response.getStatus()).getReasonPhrase();
-        String data = response.getEntity(String.class);
         response.close();
         // Validate the status code.
         if (!validHttpStatusCodes.contains(statusCode)) {
