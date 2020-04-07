@@ -186,9 +186,7 @@ public class ServerConnector extends RestClient implements IServerConnector {
         validStatusCodes.add(Response.Status.OK.getStatusCode());
         validStatusCodes.add(Response.Status.CREATED.getStatusCode());
 
-        runningSession = parseResponseWithJsonData(response, validStatusCodes,
-                RunningSession.class);
-
+        response.bufferEntity();
         String responseDataString = response.readEntity(String.class);
         Map<?,?> responseData;
         try {
@@ -204,8 +202,8 @@ public class ServerConnector extends RestClient implements IServerConnector {
         }
 
         // If this is a new session, we set this flag.
-        statusCode = response.getStatus();
-        isNewSession = (statusCode == Response.Status.CREATED.getStatusCode() || responseData.containsKey("is_new"));
+        boolean isNewSession = (response.getStatus() == Response.Status.CREATED.getStatusCode() || responseData.containsKey("isNew"));
+        RunningSession runningSession = parseResponseWithJsonData(response, validStatusCodes, RunningSession.class);
         runningSession.setIsNewSession(isNewSession);
 
         return runningSession;
