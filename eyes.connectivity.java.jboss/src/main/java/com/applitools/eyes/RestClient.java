@@ -261,8 +261,7 @@ public class RestClient {
         String currentTime = GeneralUtils.toRfc1123(Calendar.getInstance(TimeZone.getTimeZone("UTC")));
         invocationBuilder = invocationBuilder
                 .header("Eyes-Expect", "202+location")
-                .header("Eyes-Date", currentTime)
-                .header(AGENT_ID_CUSTOM_HEADER, agentId);
+                .header("Eyes-Date", currentTime);
         Response response = invocationBuilder.method(method, entity);
 
         String statusUrl = response.getHeaderString(HttpHeaders.LOCATION);
@@ -323,11 +322,7 @@ public class RestClient {
     }
 
     protected Response sendHttpWebRequest(String path, final String method, String accept) {
-        // Building the request
-        Invocation.Builder invocationBuilder = restClient.target(path).request(accept);
-        invocationBuilder.header(AGENT_ID_CUSTOM_HEADER, agentId);
-
-        // Actually perform the method call and return the result
+        Invocation.Builder invocationBuilder = makeEyesRequest(restClient.target(path), null, accept);
         return invocationBuilder.method(method);
     }
 
