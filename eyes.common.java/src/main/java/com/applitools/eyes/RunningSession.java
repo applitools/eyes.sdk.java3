@@ -10,7 +10,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
  */
 @JsonIgnoreProperties({"isNewSession", "$id", "steps"})
 public class RunningSession {
-    private boolean isNewSession;
+    private Boolean isNew;
     private String id;
     private String url;
     private String baselineId;
@@ -18,15 +18,15 @@ public class RunningSession {
     private String sessionId;
 
     public RunningSession() {
-        isNewSession = false;
+        isNew = false;
     }
 
-    public boolean getIsNewSession() {
-        return isNewSession;
+    public Boolean getIsNew() {
+        return isNew;
     }
 
-    public void setIsNewSession(boolean isNewSession) {
-        this.isNewSession = isNewSession;
+    public void setIsNew(boolean isNew) {
+        this.isNew = isNew;
     }
 
     public String getId() {

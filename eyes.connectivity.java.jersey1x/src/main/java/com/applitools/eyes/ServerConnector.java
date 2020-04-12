@@ -195,24 +195,11 @@ public class ServerConnector extends RestClient
         validStatusCodes.add(ClientResponse.Status.OK.getStatusCode());
         validStatusCodes.add(ClientResponse.Status.CREATED.getStatusCode());
 
-        String responseDataString = response.getEntity(String.class);
-        Map<?,?> responseData;
-        try {
-            responseData = GeneralUtils.parseJsonToObject(responseDataString, Map.class);
-        } catch (IOException e) {
-            String errorMessage = getReadResponseError(
-                    "Failed to de-serialize response body",
-                    response.getStatus(),
-                    response.getStatusInfo().getReasonPhrase(),
-                    responseDataString);
-
-            throw new EyesException(errorMessage, e);
-        }
-
         // If this is a new session, we set this flag.
-        boolean isNewSession = (response.getStatus() == Response.Status.CREATED.getStatusCode() || responseData.containsKey("isNew"));
-        RunningSession runningSession = parseResponseWithJsonData(response, responseDataString, validStatusCodes, RunningSession.class);
-        runningSession.setIsNewSession(isNewSession);
+        RunningSession runningSession = parseResponseWithJsonData(response, validStatusCodes, RunningSession.class);
+        if (runningSession.getIsNew() == null) {
+            runningSession.setIsNew(response.getStatus() == Response.Status.CREATED.getStatusCode());
+        }
 
         return runningSession;
     }
