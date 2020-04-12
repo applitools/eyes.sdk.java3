@@ -96,6 +96,8 @@ public class SessionStartInfo {
         this.properties = properties;
     }
 
+    public SessionStartInfo() {}
+
     public String getAgentId() {
         return agentId;
     }
