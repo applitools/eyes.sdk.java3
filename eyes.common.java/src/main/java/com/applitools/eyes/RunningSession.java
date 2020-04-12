@@ -25,7 +25,7 @@ public class RunningSession {
         return isNew;
     }
 
-    public void setIsNew(boolean isNew) {
+    public void setIsNew(Boolean isNew) {
         this.isNew = isNew;
     }
 
