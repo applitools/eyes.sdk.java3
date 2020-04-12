@@ -479,7 +479,7 @@ public abstract class EyesBase implements IEyesBase{
                 return new TestResults();
             }
 
-            boolean isNewSession = runningSession.getIsNewSession();
+            boolean isNewSession = runningSession.getIsNew();
 
             logger.verbose("Ending server session...");
             boolean save = (isNewSession && getConfigGetter().getSaveNewTests())
@@ -559,7 +559,7 @@ public abstract class EyesBase implements IEyesBase{
                 return;
             }
 
-            boolean isNewSession = runningSession.getIsNewSession();
+            boolean isNewSession = runningSession.getIsNew();
             String sessionResultsUrl = runningSession.getUrl();
 
             logger.verbose("Ending server session...");
@@ -636,7 +636,7 @@ public abstract class EyesBase implements IEyesBase{
             logger.verbose("Aborting server session...");
             try {
                 // When aborting we do not save the test.
-                boolean isNewSession = runningSession.getIsNewSession();
+                boolean isNewSession = runningSession.getIsNew();
                 TestResults results = getServerConnector().stopSession(runningSession, true, false);
                 results.setNew(isNewSession);
                 results.setUrl(runningSession.getUrl());
@@ -847,7 +847,7 @@ public abstract class EyesBase implements IEyesBase{
 
         shouldMatchWindowRunOnceOnTimeout = true;
 
-        if (!runningSession.getIsNewSession()) {
+        if (!runningSession.getIsNew()) {
             logger.log(String.format("Mismatch! (%s)", tag));
         }
 
@@ -918,7 +918,7 @@ public abstract class EyesBase implements IEyesBase{
         };
 
         MatchWindowDataWithScreenshot result;
-        if (runningSession.getIsNewSession()) {
+        if (runningSession.getIsNew()) {
             ResponseTimeAlgorithm.runNewProgressionSession(logger,
                     getServerConnector(), runningSession, appOutputProvider,
                     regionProvider, startTime, deadline);
@@ -1320,7 +1320,7 @@ public abstract class EyesBase implements IEyesBase{
         logger.verbose("Server session ID is " + runningSession.getId());
 
         String testInfo = "'" + getTestName() + "' of '" + appName + "' " + appEnv;
-        if (runningSession.getIsNewSession()) {
+        if (runningSession.getIsNew()) {
             logger.log("--- New test started - " + testInfo);
             shouldMatchWindowRunOnceOnTimeout = true;
         } else {
