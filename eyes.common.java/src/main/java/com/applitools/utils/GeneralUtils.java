@@ -229,7 +229,7 @@ public class GeneralUtils {
      * Gets default server url.
      * @return the default server url
      */
-    public static URI geServerUrl() {
+    public static URI getServerUrl() {
         String serverURL;
         try {
             serverURL = GeneralUtils.getEnvString("APPLITOOLS_SERVER_URL");
