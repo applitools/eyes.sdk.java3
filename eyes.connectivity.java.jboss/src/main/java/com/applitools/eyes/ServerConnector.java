@@ -54,7 +54,7 @@ public class ServerConnector extends RestClient
      * @param logger A logger instance.
      */
     public ServerConnector(Logger logger) {
-        this(logger, GeneralUtils.geServerUrl());
+        this(logger, GeneralUtils.getServerUrl());
     }
 
     public ServerConnector() {
