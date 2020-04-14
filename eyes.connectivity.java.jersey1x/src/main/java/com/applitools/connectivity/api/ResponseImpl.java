@@ -3,8 +3,6 @@ package com.applitools.connectivity.api;
 import com.applitools.utils.ArgumentGuard;
 import com.sun.jersey.api.client.ClientResponse;
 
-import javax.ws.rs.core.MultivaluedMap;
-
 public class ResponseImpl implements Response {
 
     ClientResponse response;
@@ -20,24 +18,13 @@ public class ResponseImpl implements Response {
 
     @Override
     public String getStatusPhrase() {
-        return ClientResponse.Status.fromStatusCode(response.getStatus()).getReasonPhrase();
+        return response.getStatusInfo().getReasonPhrase();
     }
 
     @Override
-    public String getHeader(String name, boolean ignoreCase) {
+    public String getHeader(String name) {
         ArgumentGuard.notNullOrEmpty(name, "name");
-        MultivaluedMap<String, String> headers = response.getHeaders();
-        if (!ignoreCase) {
-            return headers.getFirst(name);
-        }
-
-        for (String key : headers.keySet()) {
-            if (name.equalsIgnoreCase(key)) {
-                return headers.getFirst(key);
-            }
-        }
-
-        return null;
+        return response.getHeaders().getFirst(name);
     }
 
     @Override

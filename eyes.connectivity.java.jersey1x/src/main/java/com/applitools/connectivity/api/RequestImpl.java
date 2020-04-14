@@ -21,14 +21,16 @@ public class RequestImpl implements Request {
     }
 
     @Override
-    public Response method(String method, Object data, String contentType) {
+    public Response method(String method, String data, String mediaType) {
         ArgumentGuard.notNullOrEmpty(method, "method");
-        if (data != null) {
-            if (contentType == null) {
-                request = request.entity(data);
-            } else {
-                request = request.entity(data, contentType);
-            }
+        if (data == null) {
+            return new ResponseImpl(request.method(method, ClientResponse.class));
+        }
+
+        if (mediaType == null) {
+            request = request.entity(data);
+        } else {
+            request = request.entity(data, mediaType);
         }
 
         return new ResponseImpl(request.method(method, ClientResponse.class));
