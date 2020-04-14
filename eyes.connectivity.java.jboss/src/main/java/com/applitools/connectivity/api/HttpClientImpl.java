@@ -17,7 +17,7 @@ import org.jboss.resteasy.client.jaxrs.engines.ApacheHttpClient4Engine;
 import java.net.URI;
 import java.util.concurrent.TimeUnit;
 
-public class HttpClientImpl extends HttpClient {
+public class HttpClientImpl implements HttpClient {
 
     private static final int DEFAULT_HTTP_PROXY_PORT = 80;
     private static final int DEFAULT_HTTPS_PROXY_PORT = 443;
@@ -25,12 +25,9 @@ public class HttpClientImpl extends HttpClient {
     private final ResteasyClient client;
 
     public HttpClientImpl(int timeout, AbstractProxySettings abstractProxySettings) {
-        super(timeout, abstractProxySettings);
-
         ResteasyClientBuilder builder = new ResteasyClientBuilder();
-        builder = builder.establishConnectionTimeout(timeout, TimeUnit.MILLISECONDS)
-                .socketTimeout(timeout, TimeUnit.MILLISECONDS)
-                .connectionPoolSize(Integer.MAX_VALUE);
+
+        builder = builder.establishConnectionTimeout(timeout, TimeUnit.MILLISECONDS).socketTimeout(timeout, TimeUnit.MILLISECONDS);
         if (abstractProxySettings == null) {
             client = builder.build();
             return;
@@ -38,7 +35,7 @@ public class HttpClientImpl extends HttpClient {
 
         // Setting the proxy configuration
         String uri = abstractProxySettings.getUri();
-        String[] uriParts = uri.split(":", 3);
+        String[] uriParts = uri.split(":",3);
 
         // There must be at least http':'//...
         if (uriParts.length < 2) {
@@ -79,17 +76,7 @@ public class HttpClientImpl extends HttpClient {
     }
 
     @Override
-    public ConnectivityTarget target(URI baseUrl) {
-        return new ConnectivityTargetImpl(client.target(baseUrl));
-    }
-
-    @Override
-    public ConnectivityTarget target(String path) {
-        return new ConnectivityTargetImpl(client.target(path));
-    }
-
-    @Override
-    public void close() {
-        client.close();
+    public Target target(URI baseUrl) {
+        return new TargetImpl(client.target(baseUrl));
     }
 }
