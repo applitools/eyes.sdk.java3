@@ -17,7 +17,7 @@ public class MobileNativeSauceLabsTests {
 
     @Test
     public void AndroidNativeAppWindowTest() throws Exception {
-        Eyes eyes = initEyes();//(capabilities);
+        Eyes eyes = initEyes();
         WebDriver driver = new AndroidDriver(new URL(SAUCE_SELENIUM_URL), getAndroidCapabilities());
         try {
             eyes.open(driver, "AndroidNativeApp", "AndroidNativeApp checkWindow");
