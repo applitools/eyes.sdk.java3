@@ -15,5 +15,5 @@ public interface Request {
      * @param mediaType The data content type.  If null, no data will be sent.
      * @return Response from the server
      */
-    Response method(String method, String data, String mediaType);
+    Response method(String method, Object data, String mediaType);
 }

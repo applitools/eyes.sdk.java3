@@ -22,7 +22,7 @@ public class RequestImpl implements Request {
     }
 
     @Override
-    public Response method(String method, String data, String mediaType) {
+    public Response method(String method, Object data, String mediaType) {
         ArgumentGuard.notNullOrEmpty(method, "method");
         if (data == null || mediaType == null) {
             return new ResponseImpl(request.method(method));
