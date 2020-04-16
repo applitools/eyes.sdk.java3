@@ -1,6 +1,6 @@
 package com.applitools.connectivity.api;
 
-public interface Response extends AutoCloseable {
+public interface Response {
     int getStatusCode();
 
     String getStatusPhrase();
@@ -8,4 +8,6 @@ public interface Response extends AutoCloseable {
     String getHeader(String name);
 
     <T> T readEntity(Class<T> type);
+
+    void close();
 }
