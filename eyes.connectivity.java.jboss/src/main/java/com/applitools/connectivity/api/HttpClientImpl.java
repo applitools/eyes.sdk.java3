@@ -23,10 +23,14 @@ public class HttpClientImpl implements HttpClient {
     private static final int DEFAULT_HTTPS_PROXY_PORT = 443;
 
     private final ResteasyClient client;
+    private final AbstractProxySettings abstractProxySettings;
+    private final int timeout;
 
     public HttpClientImpl(int timeout, AbstractProxySettings abstractProxySettings) {
-        ResteasyClientBuilder builder = new ResteasyClientBuilder();
+        this.abstractProxySettings = abstractProxySettings;
+        this.timeout = timeout;
 
+        ResteasyClientBuilder builder = new ResteasyClientBuilder();
         builder = builder.establishConnectionTimeout(timeout, TimeUnit.MILLISECONDS).socketTimeout(timeout, TimeUnit.MILLISECONDS);
         if (abstractProxySettings == null) {
             client = builder.build();
@@ -78,5 +82,20 @@ public class HttpClientImpl implements HttpClient {
     @Override
     public Target target(URI baseUrl) {
         return new TargetImpl(client.target(baseUrl));
+    }
+
+    @Override
+    public Target target(String path) {
+        return new TargetImpl(client.target(path));
+    }
+
+    @Override
+    public AbstractProxySettings getProxySettings() {
+        return abstractProxySettings;
+    }
+
+    @Override
+    public int getTimeout() {
+        return timeout;
     }
 }

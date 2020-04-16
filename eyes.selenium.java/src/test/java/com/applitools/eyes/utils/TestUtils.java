@@ -9,6 +9,7 @@ import com.applitools.utils.ArgumentGuard;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import javax.ws.rs.HttpMethod;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.UriBuilder;
 import java.io.File;
@@ -85,7 +86,8 @@ public class TestUtils {
                 .build();
 
         RestClient client = new RestClient(new Logger(), apiSessionUri);
-        String srStr = client.getString(apiSessionUri.toString(), MediaType.APPLICATION_JSON);
+        String srStr = client.sendHttpWebRequest(apiSessionUri.toString(), HttpMethod.GET, MediaType.APPLICATION_JSON)
+                .readEntity(String.class);
         ObjectMapper jsonMapper = new ObjectMapper();
         jsonMapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
 
@@ -181,7 +183,7 @@ public class TestUtils {
                 .build();
 
         RestClient client = new RestClient(new Logger(), apiSessionUri);
-        String result = client.getString(apiSessionUri.toString(), MediaType.APPLICATION_JSON);
-        return result;
+        return client.sendHttpWebRequest(apiSessionUri.toString(), HttpMethod.GET, MediaType.APPLICATION_JSON)
+                .readEntity(String.class);
     }
 }
