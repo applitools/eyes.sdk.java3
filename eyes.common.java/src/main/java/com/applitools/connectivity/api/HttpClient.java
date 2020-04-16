@@ -22,4 +22,6 @@ public interface HttpClient {
     AbstractProxySettings getProxySettings();
 
     int getTimeout();
+
+    void close();
 }
