@@ -18,7 +18,7 @@ public class ResponseImpl implements Response {
 
     @Override
     public String getStatusPhrase() {
-        return response.getStatusInfo().getReasonPhrase();
+        return ClientResponse.Status.fromStatusCode(response.getStatus()).getReasonPhrase();
     }
 
     @Override
