@@ -1,10 +1,9 @@
 package com.applitools.connectivity;
 
-import com.applitools.connectivity.api.ConnectivityTarget;
 import com.applitools.connectivity.api.HttpClient;
 import com.applitools.connectivity.api.Request;
 import com.applitools.connectivity.api.Response;
-import com.applitools.eyes.AbstractProxySettings;
+import com.applitools.connectivity.api.Target;
 import com.applitools.eyes.EyesException;
 import com.applitools.eyes.Logger;
 import com.applitools.utils.ArgumentGuard;
@@ -14,11 +13,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.http.HttpHeaders;
 import org.apache.http.HttpStatus;
 
-import javax.ws.rs.HttpMethod;
-import java.io.IOException;
 import java.net.URI;
 import java.util.Calendar;
-import java.util.List;
 import java.util.TimeZone;
 
 public class RestClient {
@@ -31,16 +27,12 @@ public class RestClient {
         Response call();
     }
 
-    protected interface HttpRequestBuilder {
-        Request build();
-    }
-
-    private static final String AGENT_ID_CUSTOM_HEADER = "x-applitools-eyes-client";
+    public static final int DEFAULT_CLIENT_TIMEOUT = 1000 * 60 * 5; // 5 minutes
 
     protected Logger logger;
     protected HttpClient restClient;
     protected URI serverUrl;
-    protected String agentId;
+    protected Target endPoint;
 
     // Used for JSON serialization/de-serialization.
     protected ObjectMapper jsonMapper;
@@ -59,6 +51,7 @@ public class RestClient {
         jsonMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES,false);
         this.serverUrl = serverUrl;
         this.restClient = restClient;
+        endPoint = restClient.target(serverUrl);
     }
 
     public void setLogger(Logger logger) {
@@ -70,17 +63,10 @@ public class RestClient {
         return this.logger;
     }
 
-    public AbstractProxySettings getProxySettings() {
-        return restClient.getProxySettings();
-    }
-
-    public int getTimeout() {
-        return restClient.getTimeout();
-    }
-
     protected void setServerUrlBase(URI serverUrl) {
         ArgumentGuard.notNull(serverUrl, "serverUrl");
         this.serverUrl = serverUrl;
+        endPoint = restClient.target(serverUrl);
     }
 
     protected URI getServerUrlBase() {
@@ -90,6 +76,7 @@ public class RestClient {
     public void updateClient(HttpClient client) {
         ArgumentGuard.notNull(client, "client");
         restClient = client;
+        endPoint = restClient.target(serverUrl);
     }
 
     /**
@@ -99,34 +86,17 @@ public class RestClient {
      * @param accept Accepted response content types
      * @return The response from the server
      */
-    public Response sendHttpWebRequest(final String url, final String method, final String... accept) {
-        Request request = makeEyesRequest(new HttpRequestBuilder() {
-            @Override
-            public Request build() {
-                return restClient.target(url).request(accept);
-            }
-        });
-        String currentTime = GeneralUtils.toRfc1123(Calendar.getInstance(TimeZone.getTimeZone("UTC")));
-        return request
-                .header("Eyes-Date", currentTime)
-                .method(method, null, null);
+    public Response sendHttpWebRequest(String url, final String method, String... accept) {
+        Request request = restClient.target(url).request(accept);
+        return request.method(method, null, null);
     }
 
-    /**
-     * Creates a request for the eyes server
-     */
-    protected Request makeEyesRequest(HttpRequestBuilder builder) {
-        Request request = builder.build();
-        return request.header(AGENT_ID_CUSTOM_HEADER, agentId);
-    }
-
-    protected Response sendLongRequest(Request request, String method, String data, String mediaType) throws EyesException {
+    protected Response sendLongRequest(Request invocationBuilder, String method, String data) throws EyesException {
         String currentTime = GeneralUtils.toRfc1123(Calendar.getInstance(TimeZone.getTimeZone("UTC")));
-        request = request
-                .header("Eyes-Expect", "202+location")
-                .header("Eyes-Date", currentTime);
-        Response response = request.method(method, data, mediaType);
-        String statusUrl = response.getHeader(HttpHeaders.LOCATION, false);
+        invocationBuilder = invocationBuilder.header("Eyes-Expect", "202+location").header("Eyes-Date", currentTime);
+        Response response = invocationBuilder.method(method, data, null);
+
+        String statusUrl = response.getHeader(HttpHeaders.LOCATION);
         int status = response.getStatusCode();
         if (statusUrl != null && status == HttpStatus.SC_ACCEPTED) {
             response.close();
@@ -136,7 +106,7 @@ public class RestClient {
                 response = sendHttpWebRequest(statusUrl, HttpMethod.GET);
                 if (response.getStatusCode() == HttpStatus.SC_CREATED) {
                     logger.verbose("exit (CREATED)");
-                    return sendHttpWebRequest(response.getHeader(HttpHeaders.LOCATION, false), HttpMethod.DELETE);
+                    return sendHttpWebRequest(response.getHeader(HttpHeaders.LOCATION), HttpMethod.DELETE);
                 }
 
                 status = response.getStatusCode();
@@ -159,75 +129,5 @@ public class RestClient {
         }
         logger.verbose("exit (" + status + ")");
         return response;
-    }
-
-    /**
-     * Builds an error message which includes the response model.
-     * @param errMsg       The error message.
-     * @param statusCode   The response status code.
-     * @param statusPhrase The response status phrase.
-     * @param responseBody The response body.
-     * @return An error message which includes the response model.
-     */
-    protected String getReadResponseError(String errMsg, int statusCode, String statusPhrase, String responseBody) {
-        ArgumentGuard.notNull(statusPhrase, "statusPhrase");
-        if (errMsg == null) {
-            errMsg = "";
-        }
-
-        if (responseBody == null) {
-            responseBody = "";
-        }
-
-        return errMsg + " [" + statusCode + " " + statusPhrase + "] " + responseBody;
-    }
-
-    /**
-     * Generic handling of response with model. Response Handling includes the
-     * following:
-     * 1. Verify that we are able to read response model.
-     * 2. verify that the status code is valid
-     * 3. Parse the response model from JSON to the relevant type.
-     *
-     * @param response The response to parse.
-     * @param validHttpStatusCodes The list of acceptable status codes.
-     * @param resultType The class object of the type of result this response
-     *                   should be parsed to.
-     * @param <T> The return value type.
-     * @return The parse response of the type given in {@code resultType}.
-     * @throws EyesException For invalid status codes or if the response
-     * parsing failed.
-     */
-    protected <T> T parseResponseWithJsonData(Response response, List<Integer> validHttpStatusCodes, Class<T> resultType)
-            throws EyesException {
-        ArgumentGuard.notNull(response, "response");
-        ArgumentGuard.notNull(validHttpStatusCodes, "validHttpStatusCodes");
-        ArgumentGuard.notNull(resultType, "resultType");
-
-        T resultObject;
-        int statusCode = response.getStatusCode();
-        String statusPhrase = response.getStatusPhrase();
-        String data = response.readEntity(String.class);
-        response.close();
-
-        // Validate the status code.
-        if (!validHttpStatusCodes.contains(statusCode)) {
-            String errorMessage = getReadResponseError("Invalid status code", statusCode, statusPhrase, data);
-            if (statusCode == 401 || statusCode == 403) {
-                errorMessage += "\nThis is most likely due to an invalid API key.";
-            }
-            throw new EyesException(errorMessage);
-        }
-
-        // Parse model.
-        try {
-            resultObject = jsonMapper.readValue(data, resultType);
-        } catch (IOException e) {
-            String errorMessage = getReadResponseError("Failed deserialize response body",
-                    statusCode, statusPhrase, data);
-            throw new EyesException(errorMessage, e);
-        }
-
-        return resultObject;
     }
 }

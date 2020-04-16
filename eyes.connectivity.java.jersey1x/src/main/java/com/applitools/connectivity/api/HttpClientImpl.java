@@ -11,8 +11,13 @@ import java.net.URI;
 public class HttpClientImpl implements HttpClient {
 
     private final Client client;
+    private final AbstractProxySettings abstractProxySettings;
+    private final int timeout;
 
     public HttpClientImpl(int timeout, AbstractProxySettings abstractProxySettings) {
+        this.abstractProxySettings = abstractProxySettings;
+        this.timeout = timeout;
+
         // Creating the client configuration
         ApacheHttpClient4Config clientConfig = new DefaultApacheHttpClient4Config();
         clientConfig.getProperties().put(ApacheHttpClient4Config.PROPERTY_CONNECT_TIMEOUT, timeout);
@@ -54,5 +59,20 @@ public class HttpClientImpl implements HttpClient {
     @Override
     public Target target(URI baseUrl) {
         return new TargetImpl(client.resource(baseUrl));
+    }
+
+    @Override
+    public Target target(String path) {
+        return new TargetImpl(client.resource(path));
+    }
+
+    @Override
+    public AbstractProxySettings getProxySettings() {
+        return abstractProxySettings;
+    }
+
+    @Override
+    public int getTimeout() {
+        return timeout;
     }
 }
