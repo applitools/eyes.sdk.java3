@@ -75,4 +75,9 @@ public class HttpClientImpl extends HttpClient {
     public int getTimeout() {
         return timeout;
     }
+
+    @Override
+    public void close() {
+        client.close();
+    }
 }
