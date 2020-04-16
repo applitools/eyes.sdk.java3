@@ -1,6 +1,6 @@
 package com.applitools.eyes.visualgrid;
 
-import com.applitools.eyes.IServerConnector;
+import com.applitools.connectivity.ServerConnector;
 import com.applitools.eyes.Logger;
 import com.applitools.eyes.visualgrid.model.RGridResource;
 import com.applitools.eyes.visualgrid.services.IResourceFuture;
@@ -16,18 +16,18 @@ public class ResourceFuture implements IResourceFuture {
     private Future responseFuture;
     private String url;
     private Logger logger;
-    private IServerConnector serverConnector;
+    private ServerConnector serverConnector;
     private RGridResource rgResource;
     private String userAgent;
 
-    public ResourceFuture(String url, Logger logger, IServerConnector serverConnector, String userAgent) {
+    public ResourceFuture(String url, Logger logger, ServerConnector serverConnector, String userAgent) {
         this.url = url;
         this.logger = logger;
         this.serverConnector = serverConnector;
         this.userAgent = userAgent;
     }
 
-    public ResourceFuture(RGridResource rgResource, Logger logger, IServerConnector serverConnector, String userAgent) {
+    public ResourceFuture(RGridResource rgResource, Logger logger, ServerConnector serverConnector, String userAgent) {
         this.url = rgResource.getUrl();
         this.rgResource = rgResource;
         this.logger = logger;
