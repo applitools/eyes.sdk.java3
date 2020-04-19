@@ -389,7 +389,10 @@ public class RenderingTask implements Callable<RenderStatusResults>, Completable
                 IResourceFuture iResourceFuture = this.fetchedCacheMap.get(url);
                 if (iResourceFuture != null) {
                     RGridResource value = iResourceFuture.get();
-                    if (value.getContent() != null) resourceMapping.put(url, value);
+                    if (value.getContent() != null) {
+                        logger.verbose("adding url to map: " + url);
+                        resourceMapping.put(url, value);
+                    }
                 }
             } catch (Exception e) {
                 logger.verbose("Couldn't download url = " + url);
