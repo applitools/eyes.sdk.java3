@@ -22,7 +22,7 @@ public class TestSystemVariables extends EnvironmentModifier {
     @Test
     public void testApiKeySystemVariables() {
         setEnvironmentVariable("APPLITOOLS_API_KEY", "ApiKeyTest1234");
-        ServerConnector serverConnector = new ServerConnector(logger);
+        ServerConnector serverConnector = new ServerConnector(client, logger);
         Assert.assertEquals("ApiKeyTest1234", serverConnector.getApiKey());
         Assert.assertEquals("https://eyesapi.applitools.com", serverConnector.getServerUrl().toString());
         setEnvironmentVariable("bamboo_APPLITOOLS_API_KEY", "bambooApiKeyTest1234");
@@ -34,35 +34,35 @@ public class TestSystemVariables extends EnvironmentModifier {
     @Test
     public void testServerUrlSystemVariables() {
         setEnvironmentVariable("APPLITOOLS_SERVER_URL", "https://some.testurl.com/");
-        ServerConnector serverConnector = new ServerConnector(logger);
+        ServerConnector serverConnector = new ServerConnector(client, logger);
         Assert.assertEquals("https://some.testurl.com/", serverConnector.getServerUrl().toString());
 
         setEnvironmentVariable("bamboo_APPLITOOLS_SERVER_URL", "https://bamboo.testurl.com/");
-        serverConnector = new ServerConnector(logger);
+        serverConnector = new ServerConnector(client, logger);
         Assert.assertEquals("https://some.testurl.com/", serverConnector.getServerUrl().toString());
 
         setEnvironmentVariable("APPLITOOLS_SERVER_URL", null);
-        serverConnector = new ServerConnector(logger);
+        serverConnector = new ServerConnector(client, logger);
         Assert.assertEquals("https://bamboo.testurl.com/", serverConnector.getServerUrl().toString());
     }
 
     @Test
     public void testDontCloseBatchesSystemVariables() {
         setEnvironmentVariable("APPLITOOLS_DONT_CLOSE_BATCHES", "true");
-        ServerConnector serverConnector = new ServerConnector(logger);
-        Assert.assertEquals(true, serverConnector.getDontCloseBatches());
+        ServerConnector serverConnector = new ServerConnector(client, logger);
+        Assert.assertTrue(serverConnector.getDontCloseBatches());
 
         setEnvironmentVariable("bamboo_APPLITOOLS_DONT_CLOSE_BATCHES", "false");
-        serverConnector = new ServerConnector(logger);
-        Assert.assertEquals(true, serverConnector.getDontCloseBatches());
+        serverConnector = new ServerConnector(client, logger);
+        Assert.assertTrue(serverConnector.getDontCloseBatches());
 
         setEnvironmentVariable("APPLITOOLS_DONT_CLOSE_BATCHES", null);
-        serverConnector = new ServerConnector(logger);
-        Assert.assertEquals(false, serverConnector.getDontCloseBatches());
+        serverConnector = new ServerConnector(client, logger);
+        Assert.assertFalse(serverConnector.getDontCloseBatches());
 
         setEnvironmentVariable("bamboo_APPLITOOLS_DONT_CLOSE_BATCHES", "true");
-        serverConnector = new ServerConnector(logger);
-        Assert.assertEquals(true, serverConnector.getDontCloseBatches());
+        serverConnector = new ServerConnector(client, logger);
+        Assert.assertTrue(serverConnector.getDontCloseBatches());
     }
 
     @Test
