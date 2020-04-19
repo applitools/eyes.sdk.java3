@@ -1,5 +1,6 @@
 package com.applitools.eyes.selenium.capture;
 
+import com.applitools.connectivity.ServerConnector;
 import com.applitools.eyes.*;
 import com.applitools.eyes.positioning.PositionMemento;
 import com.applitools.eyes.positioning.PositionProvider;
@@ -44,7 +45,7 @@ public class DomCapture {
 
     private static long DOM_EXTRACTION_TIMEOUT = 5 * 60 * 1000;
 
-    private static IServerConnector mServerConnector = null;
+    private static ServerConnector mServerConnector = null;
     private EyesWebDriver driver;
     private final Logger logger;
     private String cssStartToken;

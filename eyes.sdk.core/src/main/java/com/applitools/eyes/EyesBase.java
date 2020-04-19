@@ -1,6 +1,8 @@
 package com.applitools.eyes;
 
 import com.applitools.ICheckSettings;
+import com.applitools.connectivity.ServerConnector;
+import com.applitools.connectivity.api.HttpClientImpl;
 import com.applitools.eyes.config.IConfigurationGetter;
 import com.applitools.eyes.config.IConfigurationSetter;
 import com.applitools.eyes.visualgrid.model.RenderingInfo;
@@ -45,7 +47,7 @@ public abstract class EyesBase implements IEyesBase{
 
     private MatchWindowTask matchWindowTask;
 
-    protected IServerConnector serverConnector;
+    protected ServerConnector serverConnector;
     protected RunningSession runningSession;
     protected SessionStartInfo sessionStartInfo;
     protected RectangleSize viewportSize;
@@ -82,7 +84,8 @@ public abstract class EyesBase implements IEyesBase{
 
         initProviders();
 
-        setServerConnector(new ServerConnector());
+        HttpClientImpl client = new HttpClientImpl(ServerConnector.DEFAULT_CLIENT_TIMEOUT, null);
+        setServerConnector(new ServerConnector(client));
 
         runningSession = null;
         userInputs = new ArrayDeque<>();
@@ -135,7 +138,7 @@ public abstract class EyesBase implements IEyesBase{
      * Sets the server connector to use. MUST BE SET IN ORDER FOR THE EYES OBJECT TO WORK!
      * @param serverConnector The server connector object to use.
      */
-    public void setServerConnector(IServerConnector serverConnector) {
+    public void setServerConnector(ServerConnector serverConnector) {
         ArgumentGuard.notNull(serverConnector, "serverConnector");
         if (serverConnector.getLogger() == null) {
             serverConnector.setLogger(this.logger);
@@ -143,7 +146,7 @@ public abstract class EyesBase implements IEyesBase{
         this.serverConnector = serverConnector;
     }
 
-    public IServerConnector getServerConnector() {
+    public ServerConnector getServerConnector() {
         if (serverConnector != null && serverConnector.getAgentId() == null) {
             serverConnector.setAgentId(getFullAgentId());
         }
@@ -222,7 +225,8 @@ public abstract class EyesBase implements IEyesBase{
             throw new EyesException("server connector not set.");
         }
         getConfigSetter().setProxy(abstractProxySettings);
-        serverConnector.setProxy(abstractProxySettings);
+        HttpClientImpl client = new HttpClientImpl(serverConnector.getTimeout(), abstractProxySettings);
+        serverConnector = new ServerConnector(client, serverConnector.getLogger(), serverConnector.getServerUrl(), serverConnector.getAgentId());
         return getConfigSetter();
     }
 
@@ -234,7 +238,7 @@ public abstract class EyesBase implements IEyesBase{
         if (serverConnector == null) {
             throw new EyesException("server connector not set.");
         }
-        return serverConnector.getProxy();
+        return serverConnector.getProxySettings();
     }
 
     /**

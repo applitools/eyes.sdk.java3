@@ -1,7 +1,8 @@
 package com.applitools.eyes.selenium;
 
+import com.applitools.connectivity.ServerConnector;
+import com.applitools.connectivity.api.HttpClientImpl;
 import com.applitools.eyes.FileLogger;
-import com.applitools.eyes.ServerConnector;
 import com.applitools.eyes.StdoutLogHandler;
 import com.applitools.eyes.selenium.fluent.Target;
 import com.applitools.eyes.utils.TestUtils;
@@ -88,7 +89,7 @@ public class IOSTest {
     @Test(dataProvider = "data")
     public void TestIOSSafariCrop(String deviceName, String deviceOrientation, String platformVersion, boolean fully) throws MalformedURLException {
         Eyes eyes = new Eyes();
-        eyes.setServerConnector(new ServerConnector());
+        eyes.setServerConnector(new ServerConnector(new HttpClientImpl(ServerConnector.DEFAULT_CLIENT_TIMEOUT, null)));
 
         eyes.setBatch(TestDataProvider.batchInfo);
 

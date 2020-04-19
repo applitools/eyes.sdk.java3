@@ -1,7 +1,7 @@
 package com.applitools.eyes.visualgrid;
 
+import com.applitools.connectivity.ServerConnector;
 import com.applitools.eyes.IPutFuture;
-import com.applitools.eyes.IServerConnector;
 import com.applitools.eyes.Logger;
 import com.applitools.eyes.visualgrid.model.RGridResource;
 import com.applitools.eyes.visualgrid.model.RunningRender;
@@ -17,14 +17,14 @@ public class PutFuture implements IPutFuture {
     private Future putFuture;
     private RGridResource resource;
     private RunningRender runningRender;
-    private IServerConnector serverConnector;
+    private ServerConnector serverConnector;
     private Logger logger;
 
     private boolean isSentAlready = false;
     private int retryCount = 5;
     private String userAgent;
 
-    public PutFuture(RGridResource resource, RunningRender runningRender, IServerConnector serverConnector, Logger logger, String userAgent) {
+    public PutFuture(RGridResource resource, RunningRender runningRender, ServerConnector serverConnector, Logger logger, String userAgent) {
         this.resource = resource;
         this.runningRender = runningRender;
         this.serverConnector = serverConnector;
@@ -32,7 +32,7 @@ public class PutFuture implements IPutFuture {
         this.userAgent = userAgent;
     }
 
-    public PutFuture(Future putFuture, RGridResource resource, RunningRender runningRender, IServerConnector serverConnector, Logger logger, String userAgent) {
+    public PutFuture(Future putFuture, RGridResource resource, RunningRender runningRender, ServerConnector serverConnector, Logger logger, String userAgent) {
         this(resource, runningRender, serverConnector, logger, userAgent);
         this.putFuture = putFuture;
     }

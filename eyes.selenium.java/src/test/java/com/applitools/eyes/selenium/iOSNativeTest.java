@@ -1,7 +1,8 @@
 package com.applitools.eyes.selenium;
 
+import com.applitools.connectivity.ServerConnector;
+import com.applitools.connectivity.api.HttpClientImpl;
 import com.applitools.eyes.LogHandler;
-import com.applitools.eyes.ServerConnector;
 import com.applitools.eyes.StdoutLogHandler;
 import com.applitools.eyes.utils.TestUtils;
 import io.appium.java_client.ios.IOSDriver;
@@ -33,7 +34,7 @@ public class iOSNativeTest {
 
         // Initialize the VisualGridEyes SDK and set your private API key.
         Eyes eyes = new Eyes();
-        eyes.setServerConnector(new ServerConnector());
+        eyes.setServerConnector(new ServerConnector(new HttpClientImpl(ServerConnector.DEFAULT_CLIENT_TIMEOUT, null)));
         LogHandler logHandler = new StdoutLogHandler(TestUtils.verboseLogs);
         eyes.setLogHandler(logHandler);
         eyes.setSaveDebugScreenshots(true);

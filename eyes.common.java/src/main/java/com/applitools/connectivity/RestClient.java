@@ -1,9 +1,9 @@
 package com.applitools.connectivity;
 
+import com.applitools.connectivity.api.ConnectivityTarget;
 import com.applitools.connectivity.api.HttpClient;
 import com.applitools.connectivity.api.Request;
 import com.applitools.connectivity.api.Response;
-import com.applitools.connectivity.api.Target;
 import com.applitools.eyes.AbstractProxySettings;
 import com.applitools.eyes.EyesException;
 import com.applitools.eyes.Logger;
@@ -15,10 +15,11 @@ import org.apache.http.HttpHeaders;
 import org.apache.http.HttpStatus;
 
 import javax.ws.rs.HttpMethod;
-import javax.ws.rs.core.MediaType;
 import java.io.IOException;
 import java.net.URI;
-import java.util.*;
+import java.util.Calendar;
+import java.util.List;
+import java.util.TimeZone;
 
 public class RestClient {
 
@@ -30,13 +31,16 @@ public class RestClient {
         Response call();
     }
 
-    public static final int DEFAULT_CLIENT_TIMEOUT = 1000 * 60 * 5; // 5 minutes
+    protected interface HttpRequestBuilder {
+        Request build();
+    }
+
     private static final String AGENT_ID_CUSTOM_HEADER = "x-applitools-eyes-client";
 
     protected Logger logger;
     protected HttpClient restClient;
     protected URI serverUrl;
-    protected Target endPoint;
+    protected ConnectivityTarget endPoint;
     protected String agentId;
 
     // Used for JSON serialization/de-serialization.
@@ -99,37 +103,22 @@ public class RestClient {
      * @param accept Accepted response content types
      * @return The response from the server
      */
-    protected Response sendHttpWebRequest(String url, final String method, String... accept) {
-        Request request = makeEyesRequest(restClient.target(url), null, accept);
+    public Response sendHttpWebRequest(final String url, final String method, final String... accept) {
+        Request request = makeEyesRequest(new HttpRequestBuilder() {
+            @Override
+            public Request build() {
+                return restClient.target(url).request(accept);
+            }
+        });
         return request.method(method, null, null);
     }
 
     /**
      * Creates a request for the eyes server
-     * @param target The target to start building from
-     * @param queryParams Query parameters for the URI
-     * @param responseTypes The accepted response type
-     * @return The created request
      */
-    protected Request makeEyesRequest(Target target, Map<String, Object> queryParams, String... responseTypes) {
-        if (queryParams == null) {
-            queryParams = Collections.emptyMap();
-        }
-
-        for (Map.Entry<String, Object> param : queryParams.entrySet()) {
-            target = target.queryParam(param.getKey(), (String) param.getValue());
-        }
-
-        Request request = target.request(responseTypes);
+    protected Request makeEyesRequest(HttpRequestBuilder builder) {
+        Request request = builder.build();
         return request.header(AGENT_ID_CUSTOM_HEADER, agentId);
-    }
-
-    protected Request makeEyesRequest(Target target, Map<String, Object> queryParams) {
-        return makeEyesRequest(target, queryParams, MediaType.APPLICATION_JSON);
-    }
-
-    protected Request makeEyesRequest(Target target) {
-        return makeEyesRequest(target, null);
     }
 
     protected Response sendLongRequest(Request invocationBuilder, String method, String data, String mediaType) throws EyesException {

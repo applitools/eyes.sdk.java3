@@ -1,10 +1,13 @@
 package com.applitools.eyes.utils;
 
+import com.applitools.connectivity.RestClient;
+import com.applitools.connectivity.ServerConnector;
+import com.applitools.connectivity.api.HttpClient;
+import com.applitools.connectivity.api.HttpClientImpl;
 import com.applitools.eyes.*;
 import com.applitools.eyes.metadata.ActualAppOutput;
 import com.applitools.eyes.metadata.SessionResults;
 import com.applitools.eyes.selenium.Eyes;
-import com.applitools.eyes.selenium.TestSendDom;
 import com.applitools.utils.ArgumentGuard;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -85,7 +88,8 @@ public class TestUtils {
                 .queryParam("apiKey", apiKey)
                 .build();
 
-        RestClient client = new RestClient(new Logger(), apiSessionUri);
+        HttpClient httpClient = new HttpClientImpl(ServerConnector.DEFAULT_CLIENT_TIMEOUT, null);
+        RestClient client = new RestClient(httpClient, new Logger(), apiSessionUri);
         String srStr = client.sendHttpWebRequest(apiSessionUri.toString(), HttpMethod.GET, MediaType.APPLICATION_JSON)
                 .readEntity(String.class);
         ObjectMapper jsonMapper = new ObjectMapper();
@@ -182,7 +186,8 @@ public class TestUtils {
                 .queryParam("apiKey", eyes.getApiKey())
                 .build();
 
-        RestClient client = new RestClient(new Logger(), apiSessionUri);
+        HttpClient httpClient = new HttpClientImpl(ServerConnector.DEFAULT_CLIENT_TIMEOUT, null);
+        RestClient client = new RestClient(httpClient, new Logger(), apiSessionUri);
         return client.sendHttpWebRequest(apiSessionUri.toString(), HttpMethod.GET, MediaType.APPLICATION_JSON)
                 .readEntity(String.class);
     }

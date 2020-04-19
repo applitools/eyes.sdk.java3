@@ -1,5 +1,6 @@
 package com.applitools.eyes.diagnostics;
 
+import com.applitools.connectivity.ServerConnector;
 import com.applitools.eyes.*;
 import com.applitools.eyes.capture.AppOutputProvider;
 import com.applitools.eyes.capture.AppOutputWithScreenshot;
@@ -87,7 +88,7 @@ public class ResponseTimeAlgorithm {
      * @param deadline          The expected time by which the application should have been loaded. (Seconds)
      */
     public static void runNewProgressionSession(Logger logger,
-                                                IServerConnector serverConnector, RunningSession runningSession,
+                                                ServerConnector serverConnector, RunningSession runningSession,
                                                 AppOutputProvider appOutputProvider, RegionProvider regionProvider,
                                                 long startTime, int deadline) {
         logger.verbose("New progression session detected.");
@@ -151,9 +152,9 @@ public class ResponseTimeAlgorithm {
      * @return The result of the initial search.
      */
     private static ResponseTimeInitialMatchSearchResult
-    responseTimeInitialMatchSearch(Logger logger, IServerConnector
+    responseTimeInitialMatchSearch(Logger logger, ServerConnector
             serverConnector, RunningSession runningSession, AppOutputProvider
-                                           appOutputProvider, RegionProvider regionProvider, long startTime,
+            appOutputProvider, RegionProvider regionProvider, long startTime,
                                    int deadline, int timeout, long matchInterval,
                                    List<MatchWindowDataWithScreenshot> collectedData) {
 
@@ -363,7 +364,7 @@ public class ResponseTimeAlgorithm {
      * @return The index of earliest match found.
      */
     private static int binarySearchEarliestMatch(Logger logger,
-                                                 IServerConnector serverConnector, RunningSession runningSession,
+                                                 ServerConnector serverConnector, RunningSession runningSession,
                                                  List<MatchWindowDataWithScreenshot> dataToSearch, int fromIndex,
                                                  int toIndex, int earliestMatchIndex) {
 
@@ -433,7 +434,7 @@ public class ResponseTimeAlgorithm {
      * @return The index of earliest match found.
      */
     private static int findEarliestMatchIndex(Logger logger,
-                                              IServerConnector serverConnector, RunningSession runningSession,
+                                              ServerConnector serverConnector, RunningSession runningSession,
                                               List<MatchWindowDataWithScreenshot> collectedData,
                                               MatchWindowDataWithScreenshot theMatch,
                                               MatchWindowDataWithScreenshot lastNonMatch) {
@@ -548,7 +549,7 @@ public class ResponseTimeAlgorithm {
      * @param theMatchIndex   The index of the match within {@code collectedData},
      *                        or {@code -1} if no match was found.
      */
-    private static void setProgressionImages(Logger logger, IServerConnector
+    private static void setProgressionImages(Logger logger, ServerConnector
             serverConnector, RunningSession runningSession,
                                              List<MatchWindowDataWithScreenshot> collectedData, int theMatchIndex) {
 
@@ -656,7 +657,7 @@ public class ResponseTimeAlgorithm {
      * @return The earliest match found, or {@code null} if no match is found.
      */
     public static MatchWindowDataWithScreenshot
-    runProgressionSessionForExistingBaseline(Logger logger, IServerConnector
+    runProgressionSessionForExistingBaseline(Logger logger, ServerConnector
             serverConnector, RunningSession runningSession, AppOutputProvider
                                                      appOutputProvider, RegionProvider regionProvider, long
                                                      startTime, int deadline, int timeout, long matchInterval) {
