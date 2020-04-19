@@ -3,7 +3,6 @@ package com.applitools.connectivity;
 import com.applitools.IResourceUploadListener;
 import com.applitools.connectivity.api.*;
 import com.applitools.eyes.*;
-import com.applitools.eyes.visualgrid.PutFuture;
 import com.applitools.eyes.visualgrid.ResourceFuture;
 import com.applitools.eyes.visualgrid.model.*;
 import com.applitools.eyes.visualgrid.services.IResourceFuture;
@@ -24,8 +23,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
 import java.net.URL;
-import java.util.*;
-import java.util.concurrent.Future;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 public class ServerConnector extends RestClient {
 
@@ -58,6 +58,12 @@ public class ServerConnector extends RestClient {
     public ServerConnector(HttpClient restClient, Logger logger, URI serverUrl, String agentId) {
         super(restClient, logger, serverUrl);
         this.agentId = agentId;
+    }
+
+    public ServerConnector(HttpClient restClient, Logger logger, URI serverUrl, String agentId) {
+        super(restClient, logger, serverUrl);
+        this.agentId = agentId;
+        endPoint = endPoint.path(API_PATH);
     }
 
     public ServerConnector(HttpClient restClient, Logger logger) {
