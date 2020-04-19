@@ -1,5 +1,6 @@
 package com.applitools.eyes.diagnostics;
 
+import com.applitools.connectivity.ServerConnector;
 import com.applitools.eyes.*;
 import com.applitools.utils.BlockingInstanceContainer;
 
@@ -10,7 +11,7 @@ import com.applitools.utils.BlockingInstanceContainer;
 public class ResponseTimeMatchFinderTask implements Runnable {
 
     private final long matchInterval;
-    private final IServerConnector serverConnector;
+    private final ServerConnector serverConnector;
     private final RunningSession runningSession;
     private final BlockingInstanceContainer<MatchWindowDataWithScreenshot>
             matchDataContainer;
@@ -29,9 +30,8 @@ public class ResponseTimeMatchFinderTask implements Runnable {
      *                       perform the match.
      */
     public ResponseTimeMatchFinderTask(
-            BlockingInstanceContainer<MatchWindowDataWithScreenshot>
-                    matchDataContainer,
-            long matchInterval, IServerConnector serverConnector,
+            BlockingInstanceContainer<MatchWindowDataWithScreenshot> matchDataContainer,
+            long matchInterval, ServerConnector serverConnector,
             RunningSession runningSession) {
 
         this.matchDataContainer = matchDataContainer;

@@ -3,6 +3,7 @@
  */
 package com.applitools.eyes;
 
+import com.applitools.connectivity.ServerConnector;
 import com.applitools.eyes.capture.AppOutputProvider;
 import com.applitools.eyes.capture.AppOutputWithScreenshot;
 import com.applitools.eyes.config.IConfigurationGetter;
@@ -27,7 +28,7 @@ public class MatchWindowTask {
     private int defaultRetryTimeout;
 
     protected Logger logger;
-    protected IServerConnector serverConnector;
+    protected ServerConnector serverConnector;
     protected RunningSession runningSession;
     protected AppOutputProvider appOutputProvider;
     protected MatchResult matchResult;
@@ -44,7 +45,7 @@ public class MatchWindowTask {
      * @param eyes              An EyesBase object.
      * @param appOutputProvider A callback for getting the application output when performing match.
      */
-    public MatchWindowTask(Logger logger, IServerConnector serverConnector,
+    public MatchWindowTask(Logger logger, ServerConnector serverConnector,
                            RunningSession runningSession, int retryTimeout,
                            EyesBase eyes, AppOutputProvider appOutputProvider) {
         ArgumentGuard.notNull(serverConnector, "serverConnector");
@@ -66,7 +67,7 @@ public class MatchWindowTask {
      * @param runningSession  The running session in which we should match the window
      * @param retryTimeout    The default total time to retry matching (ms).
      */
-    public MatchWindowTask(Logger logger, IServerConnector serverConnector,
+    public MatchWindowTask(Logger logger, ServerConnector serverConnector,
                            RunningSession runningSession, int retryTimeout,
                            EyesBase eyes) {
         ArgumentGuard.notNull(serverConnector, "serverConnector");

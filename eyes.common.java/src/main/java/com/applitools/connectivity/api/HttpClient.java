@@ -10,14 +10,14 @@ public interface HttpClient {
      * @param baseUrl The base url of the server.
      * @return The created target
      */
-    Target target(URI baseUrl);
+    ConnectivityTarget target(URI baseUrl);
 
     /**
      * Creates a new web resource target.
      * @param path The base url of the server.
      * @return The created target
      */
-    Target target(String path);
+    ConnectivityTarget target(String path);
 
     AbstractProxySettings getProxySettings();
 
