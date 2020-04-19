@@ -627,7 +627,7 @@ public class VisualGridEyes implements ISeleniumEyes, IRenderingEyes {
     }
 
     private FrameData captureDomSnapshot(FrameChain originalFC, EyesTargetLocator switchTo, ICheckSettingsInternal checkSettingsInternal) throws InterruptedException {
-        logger.verbose("Dom extraction starting   (" + checkSettingsInternal.toString() + ")");
+        logger.verbose("Dom extraction starting for url: " + webDriver.getCurrentUrl() + " (" + checkSettingsInternal.toString() + ")");
         timer = new Timer("VG_Check_StopWatch", true);
         timer.schedule(new TimeoutTask(), DOM_EXTRACTION_TIMEOUT);
         String resultAsString;
