@@ -96,8 +96,8 @@ public class HttpClientImpl extends HttpClient {
     }
 
     @Override
-    public Target target(String path) {
-        return new TargetImpl(client.target(path));
+    public ConnectivityTarget target(String path) {
+        return new ConnectivityTargetImpl(client.target(path));
     }
 
     @Override
