@@ -2,6 +2,7 @@ package com.applitools.eyes.selenium.rendering;
 
 import com.applitools.ICheckSettings;
 import com.applitools.ICheckSettingsInternal;
+import com.applitools.connectivity.ServerConnector;
 import com.applitools.eyes.*;
 import com.applitools.eyes.fluent.CheckSettings;
 import com.applitools.eyes.fluent.GetFloatingRegion;
@@ -53,7 +54,7 @@ public class VisualGridEyes implements ISeleniumEyes, IRenderingEyes {
     private String url;
     private Set<Future<TestResultContainer>> closeFuturesSet = new HashSet<>();
     private Boolean isDisabled = Boolean.FALSE;
-    private IServerConnector serverConnector = null;
+    private ServerConnector serverConnector = null;
     private ISeleniumConfigurationProvider configProvider;
     private UserAgent userAgent = null;
     private RectangleSize viewportSize;
@@ -834,7 +835,7 @@ public class VisualGridEyes implements ISeleniumEyes, IRenderingEyes {
         return "SeleniumVGEyes - url: " + url;
     }
 
-    public void setServerConnector(IServerConnector serverConnector) {
+    public void setServerConnector(ServerConnector serverConnector) {
         this.serverConnector = serverConnector;
     }
 

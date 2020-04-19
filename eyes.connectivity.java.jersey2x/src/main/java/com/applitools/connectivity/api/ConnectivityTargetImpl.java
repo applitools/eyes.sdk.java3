@@ -4,23 +4,23 @@ import com.applitools.utils.ArgumentGuard;
 
 import javax.ws.rs.client.WebTarget;
 
-public class TargetImpl implements Target {
+public class ConnectivityTargetImpl implements ConnectivityTarget {
 
     WebTarget target;
 
-    TargetImpl(WebTarget target) {
+    ConnectivityTargetImpl(WebTarget target) {
         this.target = target;
     }
 
     @Override
-    public Target path(String path) {
+    public ConnectivityTarget path(String path) {
         ArgumentGuard.notNull(path, "path");
         target = target.path(path);
         return this;
     }
 
     @Override
-    public Target queryParam(String name, String value) {
+    public ConnectivityTarget queryParam(String name, String value) {
         ArgumentGuard.notNullOrEmpty(name, "name");
         ArgumentGuard.notNullOrEmpty(value, "value");
         target = target.queryParam(name, value);
