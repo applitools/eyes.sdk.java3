@@ -88,7 +88,8 @@ public class TestUtils {
                 .queryParam("apiKey", apiKey)
                 .build();
 
-        RestClient client = new RestClient(new Logger(), apiSessionUri);
+        HttpClient httpClient = new HttpClientImpl(ServerConnector.DEFAULT_CLIENT_TIMEOUT, null);
+        RestClient client = new RestClient(httpClient, new Logger(), apiSessionUri);
         String srStr = client.sendHttpWebRequest(apiSessionUri.toString(), HttpMethod.GET, MediaType.APPLICATION_JSON)
                 .readEntity(String.class);
         ObjectMapper jsonMapper = new ObjectMapper();
@@ -185,7 +186,8 @@ public class TestUtils {
                 .queryParam("apiKey", eyes.getApiKey())
                 .build();
 
-        RestClient client = new RestClient(new Logger(), apiSessionUri);
+        HttpClient httpClient = new HttpClientImpl(ServerConnector.DEFAULT_CLIENT_TIMEOUT, null);
+        RestClient client = new RestClient(httpClient, new Logger(), apiSessionUri);
         return client.sendHttpWebRequest(apiSessionUri.toString(), HttpMethod.GET, MediaType.APPLICATION_JSON)
                 .readEntity(String.class);
     }

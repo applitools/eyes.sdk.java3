@@ -84,7 +84,8 @@ public abstract class EyesBase implements IEyesBase{
 
         initProviders();
 
-        setServerConnector(new ServerConnector());
+        HttpClientImpl client = new HttpClientImpl(ServerConnector.DEFAULT_CLIENT_TIMEOUT, null);
+        setServerConnector(new ServerConnector(client));
 
         runningSession = null;
         userInputs = new ArrayDeque<>();
@@ -145,7 +146,7 @@ public abstract class EyesBase implements IEyesBase{
         this.serverConnector = serverConnector;
     }
 
-    public IServerConnector getServerConnector() {
+    public ServerConnector getServerConnector() {
         if (serverConnector != null && serverConnector.getAgentId() == null) {
             serverConnector.setAgentId(getFullAgentId());
         }
@@ -225,7 +226,7 @@ public abstract class EyesBase implements IEyesBase{
         }
         getConfigSetter().setProxy(abstractProxySettings);
         HttpClientImpl client = new HttpClientImpl(serverConnector.getTimeout(), abstractProxySettings);
-        serverConnector = new ServerConnector(client, serverConnector.getLogger(), serverConnector.getServerUrl());
+        serverConnector = new ServerConnector(client, serverConnector.getLogger(), serverConnector.getServerUrl(), serverConnector.getAgentId());
         return getConfigSetter();
     }
 

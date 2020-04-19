@@ -57,13 +57,13 @@ public class HttpClientImpl implements HttpClient {
     }
 
     @Override
-    public Target target(URI baseUrl) {
-        return new TargetImpl(client.resource(baseUrl));
+    public ConnectivityTarget target(URI baseUrl) {
+        return new ConnectivityTargetImpl(client.resource(baseUrl));
     }
 
     @Override
-    public Target target(String path) {
-        return new TargetImpl(client.resource(path));
+    public ConnectivityTarget target(String path) {
+        return new ConnectivityTargetImpl(client.resource(path));
     }
 
     @Override
