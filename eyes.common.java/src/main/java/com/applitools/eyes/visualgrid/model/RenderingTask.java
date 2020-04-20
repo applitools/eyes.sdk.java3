@@ -431,6 +431,7 @@ public class RenderingTask implements Callable<RenderStatusResults>, Completable
         }
         logger.verbose("baseUrl: " + baseUrl);
         List<FrameData> allFrame = domData.getFrames();
+        logger.verbose("FrameData count: " + allFrame.size());
         Map<String, RGridResource> mapping = new HashMap<>();
         for (FrameData frameObj : allFrame) {
             List<BlobData> allFramesBlobs = frameObj.getBlobs();
@@ -461,7 +462,6 @@ public class RenderingTask implements Callable<RenderStatusResults>, Completable
             } catch (JsonProcessingException e) {
                 GeneralUtils.logExceptionStackTrace(logger, e);
             }
-
         }
     }
 
@@ -557,6 +557,9 @@ public class RenderingTask implements Callable<RenderStatusResults>, Completable
             regionSelectorsList.addAll(Arrays.asList(regionSelector));
         }
 
+        logger.verbose("region selectors count: " + regionSelectorsList.size());
+        logger.verbose("this.visualGridTaskList count: " + this.visualGridTaskList.size());
+
         for (VisualGridTask visualGridTask : this.visualGridTaskList) {
 
             RenderBrowserInfo browserInfo = visualGridTask.getBrowserInfo();
@@ -576,6 +579,8 @@ public class RenderingTask implements Callable<RenderStatusResults>, Completable
 
             allRequestsForRG.add(request);
         }
+
+        logger.verbose("count of all requests for RG: " + allRequestsForRG.size());
         return allRequestsForRG;
     }
 
