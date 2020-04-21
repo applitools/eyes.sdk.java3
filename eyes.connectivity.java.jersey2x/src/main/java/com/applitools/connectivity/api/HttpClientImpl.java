@@ -10,15 +10,12 @@ import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
 import java.net.URI;
 
-public class HttpClientImpl implements HttpClient {
+public class HttpClientImpl extends HttpClient {
 
     private final Client client;
-    private final AbstractProxySettings abstractProxySettings;
-    private final int timeout;
 
     public HttpClientImpl(int timeout, AbstractProxySettings abstractProxySettings) {
-        this.abstractProxySettings = abstractProxySettings;
-        this.timeout = timeout;
+        super(timeout, abstractProxySettings);
 
         // Creating the client configuration
         ClientConfig clientConfig = new ClientConfig();
@@ -55,16 +52,6 @@ public class HttpClientImpl implements HttpClient {
     @Override
     public ConnectivityTarget target(String path) {
         return new ConnectivityTargetImpl(client.target(path));
-    }
-
-    @Override
-    public AbstractProxySettings getProxySettings() {
-        return abstractProxySettings;
-    }
-
-    @Override
-    public int getTimeout() {
-        return timeout;
     }
 
     @Override

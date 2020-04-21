@@ -4,24 +4,37 @@ import com.applitools.eyes.AbstractProxySettings;
 
 import java.net.URI;
 
-public interface HttpClient {
+public abstract class HttpClient {
+
+    protected final int timeout;
+    protected final AbstractProxySettings abstractProxySettings;
+
+    public HttpClient(int timeout, AbstractProxySettings abstractProxySettings) {
+        this.timeout = timeout;
+        this.abstractProxySettings = abstractProxySettings;
+    }
+
     /**
      * Creates a new web resource target.
      * @param baseUrl The base url of the server.
      * @return The created target
      */
-    ConnectivityTarget target(URI baseUrl);
+    public abstract ConnectivityTarget target(URI baseUrl);
 
     /**
      * Creates a new web resource target.
      * @param path The base url of the server.
      * @return The created target
      */
-    ConnectivityTarget target(String path);
+    public abstract ConnectivityTarget target(String path);
 
-    AbstractProxySettings getProxySettings();
+    public AbstractProxySettings getProxySettings() {
+        return abstractProxySettings;
+    }
 
-    int getTimeout();
+    public int getTimeout() {
+        return timeout;
+    }
 
-    void close();
+    public abstract void close();
 }

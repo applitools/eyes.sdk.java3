@@ -5,7 +5,13 @@ public interface Response {
 
     String getStatusPhrase();
 
-    String getHeader(String name);
+    /**
+     * Get a response header
+     * @param name The name of the header
+     * @param ignoreCase If true, ignores case
+     * @return The value of the header
+     */
+    String getHeader(String name, boolean ignoreCase);
 
     <T> T readEntity(Class<T> type);
 
