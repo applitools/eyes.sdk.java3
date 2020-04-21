@@ -23,8 +23,6 @@ public class HttpClientImpl extends HttpClient {
     private static final int DEFAULT_HTTPS_PROXY_PORT = 443;
 
     private final ResteasyClient client;
-    private final AbstractProxySettings abstractProxySettings;
-    private final int timeout;
 
     public HttpClientImpl(int timeout, AbstractProxySettings abstractProxySettings) {
         super(timeout, abstractProxySettings);
