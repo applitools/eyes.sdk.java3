@@ -591,14 +591,18 @@ public class VisualGridEyes implements ISeleniumEyes, IRenderingEyes {
         List<RunningTest> filteredTests = new ArrayList<>();
         for (final RunningTest test : testList) {
             List<VisualGridTask> taskList = test.getVisualGridTaskList();
+            VisualGridTask visualGridTask = null;
             if (!taskList.isEmpty()) {
-                VisualGridTask visualGridTask = taskList.get(taskList.size() - 1);
-                VisualGridTask.TaskType taskType = visualGridTask.getType();
-                if ((taskType == null && test.isOpenTaskIssued() && !test.isCloseTaskIssued()) ||
-                        (taskType != VisualGridTask.TaskType.CLOSE && taskType != VisualGridTask.TaskType.ABORT)) {
-                    filteredTests.add(test);
-                }
-            } else if (!test.isCloseTaskIssued()) {
+                visualGridTask = taskList.get(taskList.size() - 1);
+            }
+
+            VisualGridTask.TaskType taskType = null;
+            if (visualGridTask != null) {
+                taskType = visualGridTask.getType();
+            }
+
+            if ((taskType == null && test.isOpenTaskIssued() && !test.isCloseTaskIssued()) ||
+                (taskType != VisualGridTask.TaskType.CLOSE && taskType != VisualGridTask.TaskType.ABORT)) {
                 filteredTests.add(test);
             }
         }
