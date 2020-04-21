@@ -178,20 +178,6 @@ public class VisualGridTask implements Callable<TestResultContainer>, Completabl
         return null;
     }
 
-    private String craftUserAgent(RenderBrowserInfo browserInfo) {
-        String browserType = browserInfo.getBrowserType();
-        String platform = toPascalCase(browserInfo.getPlatform());
-        if (!browserType.startsWith("ie")) {
-            browserType = toPascalCase(browserType);
-            return "Mozilla/5.0 (" + platform + ") " + browserType + "/0.0";
-        } else if (browserType.equals("ie")){
-            return "Mozilla/5.0 (" + platform + "; MSIE 11.0)";
-        } else if (browserType.equals("ie10")) {
-            return "Mozilla/5.0 (" + platform + "; MSIE 10.0)";
-        }
-        return "Mozilla/5.0 (" + platform + "; Unknown)";
-    }
-
     public static String toPascalCase(String str) {
         ArgumentGuard.notNullOrEmpty(str, "str");
         return str.substring(0, 1).toUpperCase() + str.substring(1).toLowerCase();
