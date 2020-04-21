@@ -34,7 +34,6 @@ public class RunningTest {
     private String testName;
     private Throwable error;
 
-
     /******** BEGIN - PUBLIC FOR TESTING PURPOSES ONLY ********/
     public void setCloseTask(VisualGridTask task) {
         this.closeTask = task;
@@ -50,7 +49,6 @@ public class RunningTest {
         this.logger = logger;
     }
     /******** END - PUBLIC FOR TESTING PURPOSES ONLY ********/
-
 
     public RunningTest(IEyesConnector eyes, ISeleniumConfigurationProvider configuration, RenderBrowserInfo browserInfo, Logger logger, RunningTestListener listener) {
         this.eyes = eyes;
