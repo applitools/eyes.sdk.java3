@@ -19,4 +19,11 @@ public interface ConnectivityTarget {
      * @return The request
      */
     Request request(String... acceptableResponseTypes);
+
+    /**
+     * Creates an async request for sending to the server
+     * @param acceptableResponseTypes Accepted response media types
+     * @return The request
+     */
+    AsyncRequest<?> asyncRequest(String... acceptableResponseTypes);
 }
