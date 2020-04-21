@@ -2,6 +2,7 @@
 ### Fixed
 - Default versions reported in `AgentId` now automatically generated and match `pom.xml`.
 - Method `setEnablePatterns` now works properly. [Trello 1714](https://trello.com/c/jQgW5dpz)
+- Fixed steps missing in certain cases in UltraFast Grid. [Trello 1717](https://trello.com/c/U1TTels2)
 
 ## [3.160.3] - 2020-03-18
 ### Fixed
