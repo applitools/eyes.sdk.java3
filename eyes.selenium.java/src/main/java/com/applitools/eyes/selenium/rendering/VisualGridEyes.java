@@ -598,6 +598,8 @@ public class VisualGridEyes implements ISeleniumEyes, IRenderingEyes {
                         (taskType != VisualGridTask.TaskType.CLOSE && taskType != VisualGridTask.TaskType.ABORT)) {
                     filteredTests.add(test);
                 }
+            } else if (!test.isCloseTaskIssued()) {
+                filteredTests.add(test);
             }
         }
         return filteredTests;
