@@ -24,12 +24,6 @@
             <groupId>com.applitools</groupId>
             <artifactId>eyes-common-java3</artifactId>
             <version>3.160.3</version>
-            <exclusions>
-                <exclusion>
-                    <groupId>jakarta.ws.rs</groupId>
-                    <artifactId>jakarta.ws.rs-api</artifactId>
-                </exclusion>
-            </exclusions>
         </dependency>
         <dependency>
             <groupId>org.glassfish.jersey.connectors</groupId>

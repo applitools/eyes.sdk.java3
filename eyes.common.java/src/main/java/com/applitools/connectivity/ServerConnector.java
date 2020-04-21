@@ -1,10 +1,9 @@
 package com.applitools.connectivity;
 
 import com.applitools.IResourceUploadListener;
-import com.applitools.connectivity.api.HttpClient;
-import com.applitools.connectivity.api.Request;
-import com.applitools.connectivity.api.Response;
+import com.applitools.connectivity.api.*;
 import com.applitools.eyes.*;
+import com.applitools.eyes.visualgrid.PutFuture;
 import com.applitools.eyes.visualgrid.ResourceFuture;
 import com.applitools.eyes.visualgrid.model.*;
 import com.applitools.eyes.visualgrid.services.IResourceFuture;
@@ -28,6 +27,7 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.Future;
 
 public class ServerConnector extends RestClient {
 
@@ -287,11 +287,88 @@ public class ServerConnector extends RestClient {
     }
 
     public void downloadString(final URL uri, final boolean isSecondRetry, final IDownloadListener<String> listener) {
+        AsyncRequest asyncRequest = restClient.target(uri.toString()).asyncRequest(MediaType.WILDCARD);
+        asyncRequest.method(HttpMethod.GET, new AsyncRequestCallback() {
+            @Override
+            public void onComplete(Response response) {
+                int statusCode = response.getStatusCode();
+                if (statusCode > 300) {
+                    logger.verbose("Got response status code - " + statusCode);
+                    listener.onDownloadFailed();
+                    return;
+                }
 
+                try {
+                    byte[] fileContent = downloadFile(response);
+                    listener.onDownloadComplete(new String(fileContent), null);
+                } catch (Throwable t) {
+                    logger.verbose(t.getMessage());
+                } finally {
+                    response.close();
+                }
+            }
+
+            @Override
+            public void onFail(Throwable throwable) {
+                GeneralUtils.logExceptionStackTrace(logger, throwable);
+                if (!isSecondRetry) {
+                    logger.verbose("Async GET failed - entering retry");
+                    downloadString(uri, true, listener);
+                } else {
+                    listener.onDownloadFailed();
+                }
+            }
+        }, null, null);
     }
 
     public IResourceFuture downloadResource(final URL url, String userAgent, ResourceFuture resourceFuture) {
-        return null;
+        AsyncRequest asyncRequest = restClient.target(url.toString()).asyncRequest(MediaType.WILDCARD);
+        asyncRequest.header("User-Agent", userAgent);
+
+        final ResourceFuture newFuture = resourceFuture != null ? resourceFuture : new ResourceFuture(url.toString(), logger, this, userAgent);
+        Future<?> responseFuture = asyncRequest.method(HttpMethod.GET, new AsyncRequestCallback() {
+            @Override
+            public void onComplete(Response response) {
+                try {
+                    String contentLengthStr = response.getHeader("Content-length", false);
+                    int contentLength = 0;
+                    if (contentLengthStr != null) {
+                        contentLength = Integer.parseInt(contentLengthStr);
+                    }
+                    logger.verbose("Content Length: " + contentLength);
+                    logger.verbose("downloading url - : " + url);
+
+                    int statusCode = response.getStatusCode();
+                    if (statusCode != HttpStatus.SC_OK && statusCode != HttpStatus.SC_CREATED) {
+                        logger.verbose(String.format("Status %d on url - %s", statusCode, url));
+                    }
+
+                    byte[] fileContent = downloadFile(response);
+                    String contentType = response.getHeader("Content-Type", true);
+                    String contentEncoding = response.getHeader("Content-Encoding", true);
+                    if (contentEncoding != null && contentEncoding.contains("gzip")) {
+                        try {
+                            fileContent = GeneralUtils.getUnGzipByteArrayOutputStream(fileContent);
+                        } catch (IOException e) {
+                            GeneralUtils.logExceptionStackTrace(logger, e);
+                        }
+                    }
+
+                    RGridResource rgResource = new RGridResource(url.toString(), contentType, fileContent, logger, "ResourceFuture");
+                    newFuture.setResource(rgResource);
+                } finally {
+                    response.close();
+                }
+            }
+
+            @Override
+            public void onFail(Throwable throwable) {
+                GeneralUtils.logExceptionStackTrace(logger, throwable);
+            }
+        }, null, null);
+
+        newFuture.setResponseFuture(responseFuture);
+        return newFuture;
     }
 
     public RenderingInfo getRenderInfo() {
@@ -350,7 +427,41 @@ public class ServerConnector extends RestClient {
     }
 
     public IPutFuture renderPutResource(final RunningRender runningRender, final RGridResource resource, String userAgent, final IResourceUploadListener listener) {
-        return null;
+        ArgumentGuard.notNull(runningRender, "runningRender");
+        ArgumentGuard.notNull(resource, "resource");
+        byte[] content = resource.getContent();
+        ArgumentGuard.notNull(content, "resource.getContent()");
+
+        String hash = resource.getSha256();
+        String renderId = runningRender.getRenderId();
+        logger.verbose("resource hash:" + hash + " ; url: " + resource.getUrl() + " ; render id: " + renderId);
+
+        AsyncRequest asyncRequest = restClient
+                .target(renderingInfo.getServiceUrl())
+                .path(RESOURCES_SHA_256 + hash)
+                .queryParam("render-id", renderId)
+                .asyncRequest(resource.getContentType());
+
+        asyncRequest.header("X-Auth-Token", renderingInfo.getAccessToken());
+        asyncRequest.header("User-Agent", userAgent);
+
+        String contentType = resource.getContentType();
+        if (contentType == null || "None".equalsIgnoreCase(contentType)) {
+            contentType = MediaType.APPLICATION_OCTET_STREAM;
+        }
+
+        Future<?> future = asyncRequest.method(HttpMethod.PUT, new AsyncRequestCallback() {
+            @Override
+            public void onComplete(Response response) {
+                response.close();
+            }
+
+            @Override
+            public void onFail(Throwable throwable) {
+                GeneralUtils.logExceptionStackTrace(logger, throwable);
+            }
+        }, content, contentType);
+        return new PutFuture(future, resource, runningRender, this, logger, userAgent);
     }
 
     public RenderStatusResults renderStatus(RunningRender runningRender) {
@@ -442,7 +553,7 @@ public class ServerConnector extends RestClient {
 
     private byte[] downloadFile(Response response) {
         InputStream inputStream = response.readEntity(InputStream.class);
-        String contentEncoding = response.getHeader("Content-Encoding");
+        String contentEncoding = response.getHeader("Content-Encoding", false);
         byte[] bytes = new byte[0];
         try {
             if ("br".equalsIgnoreCase(contentEncoding)) {

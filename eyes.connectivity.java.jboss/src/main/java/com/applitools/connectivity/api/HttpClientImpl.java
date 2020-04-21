@@ -17,18 +17,15 @@ import org.jboss.resteasy.client.jaxrs.engines.ApacheHttpClient4Engine;
 import java.net.URI;
 import java.util.concurrent.TimeUnit;
 
-public class HttpClientImpl implements HttpClient {
+public class HttpClientImpl extends HttpClient {
 
     private static final int DEFAULT_HTTP_PROXY_PORT = 80;
     private static final int DEFAULT_HTTPS_PROXY_PORT = 443;
 
     private final ResteasyClient client;
-    private final AbstractProxySettings abstractProxySettings;
-    private final int timeout;
 
     public HttpClientImpl(int timeout, AbstractProxySettings abstractProxySettings) {
-        this.abstractProxySettings = abstractProxySettings;
-        this.timeout = timeout;
+        super(timeout, abstractProxySettings);
 
         ResteasyClientBuilder builder = new ResteasyClientBuilder();
         builder = builder.establishConnectionTimeout(timeout, TimeUnit.MILLISECONDS).socketTimeout(timeout, TimeUnit.MILLISECONDS);
@@ -39,7 +36,7 @@ public class HttpClientImpl implements HttpClient {
 
         // Setting the proxy configuration
         String uri = abstractProxySettings.getUri();
-        String[] uriParts = uri.split(":",3);
+        String[] uriParts = uri.split(":", 3);
 
         // There must be at least http':'//...
         if (uriParts.length < 2) {
@@ -87,16 +84,6 @@ public class HttpClientImpl implements HttpClient {
     @Override
     public ConnectivityTarget target(String path) {
         return new ConnectivityTargetImpl(client.target(path));
-    }
-
-    @Override
-    public AbstractProxySettings getProxySettings() {
-        return abstractProxySettings;
-    }
-
-    @Override
-    public int getTimeout() {
-        return timeout;
     }
 
     @Override

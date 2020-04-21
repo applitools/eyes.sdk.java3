@@ -127,7 +127,7 @@ public class RestClient {
                 .header("Eyes-Expect", "202+location")
                 .header("Eyes-Date", currentTime);
         Response response = invocationBuilder.method(method, data, mediaType);
-        String statusUrl = response.getHeader(HttpHeaders.LOCATION);
+        String statusUrl = response.getHeader(HttpHeaders.LOCATION, false);
         int status = response.getStatusCode();
         if (statusUrl != null && status == HttpStatus.SC_ACCEPTED) {
             response.close();
@@ -137,7 +137,7 @@ public class RestClient {
                 response = sendHttpWebRequest(statusUrl, HttpMethod.GET);
                 if (response.getStatusCode() == HttpStatus.SC_CREATED) {
                     logger.verbose("exit (CREATED)");
-                    return sendHttpWebRequest(response.getHeader(HttpHeaders.LOCATION), HttpMethod.DELETE);
+                    return sendHttpWebRequest(response.getHeader(HttpHeaders.LOCATION, false), HttpMethod.DELETE);
                 }
 
                 status = response.getStatusCode();
