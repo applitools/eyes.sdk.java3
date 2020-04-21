@@ -14,8 +14,6 @@ import java.net.*;
 public class HttpClientImpl extends HttpClient {
 
     private final Client client;
-    private final AbstractProxySettings abstractProxySettings;
-    private final int timeout;
 
     public HttpClientImpl(int timeout, final AbstractProxySettings abstractProxySettings) {
         super(timeout, abstractProxySettings);
@@ -83,19 +81,10 @@ public class HttpClientImpl extends HttpClient {
 
     @Override
     public ConnectivityTarget target(String path) {
-        return new ConnectivityTargetImpl(client.resource(path));
+        return new ConnectivityTargetImpl(client.resource(path), client.asyncResource(path));
     }
 
     @Override
-    public AbstractProxySettings getProxySettings() {
-        return abstractProxySettings;
+    public void close() {
     }
-
-    @Override
-    public int getTimeout() {
-        return timeout;
-    }
-
-    @Override
-    public void close() {}
 }

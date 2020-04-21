@@ -3,6 +3,7 @@ package com.applitools.connectivity;
 import com.applitools.IResourceUploadListener;
 import com.applitools.connectivity.api.*;
 import com.applitools.eyes.*;
+import com.applitools.eyes.visualgrid.PutFuture;
 import com.applitools.eyes.visualgrid.ResourceFuture;
 import com.applitools.eyes.visualgrid.model.*;
 import com.applitools.eyes.visualgrid.services.IResourceFuture;
@@ -26,6 +27,7 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.Future;
 
 public class ServerConnector extends RestClient {
 

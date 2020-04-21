@@ -13,8 +13,6 @@ import java.net.URI;
 public class HttpClientImpl extends HttpClient {
 
     private final Client client;
-    private final AbstractProxySettings abstractProxySettings;
-    private final int timeout;
 
     public HttpClientImpl(int timeout, AbstractProxySettings abstractProxySettings) {
         super(timeout, abstractProxySettings);
