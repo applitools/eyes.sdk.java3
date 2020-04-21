@@ -5,18 +5,16 @@ import com.sun.jersey.api.client.Client;
 import com.sun.jersey.client.apache4.ApacheHttpClient4;
 import com.sun.jersey.client.apache4.config.ApacheHttpClient4Config;
 import com.sun.jersey.client.apache4.config.DefaultApacheHttpClient4Config;
+
 import javax.ws.rs.core.UriBuilder;
 import java.net.URI;
 
-public class HttpClientImpl implements HttpClient {
+public class HttpClientImpl extends HttpClient {
 
     private final Client client;
-    private final AbstractProxySettings abstractProxySettings;
-    private final int timeout;
 
     public HttpClientImpl(int timeout, AbstractProxySettings abstractProxySettings) {
-        this.abstractProxySettings = abstractProxySettings;
-        this.timeout = timeout;
+        super(timeout, abstractProxySettings);
 
         // Creating the client configuration
         ApacheHttpClient4Config clientConfig = new DefaultApacheHttpClient4Config();
@@ -58,24 +56,15 @@ public class HttpClientImpl implements HttpClient {
 
     @Override
     public ConnectivityTarget target(URI baseUrl) {
-        return new ConnectivityTargetImpl(client.resource(baseUrl));
+        return new ConnectivityTargetImpl(client.resource(baseUrl), client.asyncResource(baseUrl));
     }
 
     @Override
     public ConnectivityTarget target(String path) {
-        return new ConnectivityTargetImpl(client.resource(path));
+        return new ConnectivityTargetImpl(client.resource(path), client.asyncResource(path));
     }
 
     @Override
-    public AbstractProxySettings getProxySettings() {
-        return abstractProxySettings;
+    public void close() {
     }
-
-    @Override
-    public int getTimeout() {
-        return timeout;
-    }
-
-    @Override
-    public void close() {}
 }
