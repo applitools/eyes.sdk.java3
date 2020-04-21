@@ -110,7 +110,10 @@ public class RestClient {
                 return restClient.target(url).request(accept);
             }
         });
-        return request.method(method, null, null);
+        String currentTime = GeneralUtils.toRfc1123(Calendar.getInstance(TimeZone.getTimeZone("UTC")));
+        return request
+                .header("Eyes-Date", currentTime)
+                .method(method, null, null);
     }
 
     /**
