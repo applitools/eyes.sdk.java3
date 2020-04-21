@@ -389,7 +389,10 @@ public class RenderingTask implements Callable<RenderStatusResults>, Completable
                 IResourceFuture iResourceFuture = this.fetchedCacheMap.get(url);
                 if (iResourceFuture != null) {
                     RGridResource value = iResourceFuture.get();
-                    if (value.getContent() != null) resourceMapping.put(url, value);
+                    if (value.getContent() != null) {
+                        logger.verbose("adding url to map: " + url);
+                        resourceMapping.put(url, value);
+                    }
                 }
             } catch (Exception e) {
                 logger.verbose("Couldn't download url = " + url);
@@ -428,6 +431,7 @@ public class RenderingTask implements Callable<RenderStatusResults>, Completable
         }
         logger.verbose("baseUrl: " + baseUrl);
         List<FrameData> allFrame = domData.getFrames();
+        logger.verbose("FrameData count: " + allFrame.size());
         Map<String, RGridResource> mapping = new HashMap<>();
         for (FrameData frameObj : allFrame) {
             List<BlobData> allFramesBlobs = frameObj.getBlobs();
@@ -458,7 +462,6 @@ public class RenderingTask implements Callable<RenderStatusResults>, Completable
             } catch (JsonProcessingException e) {
                 GeneralUtils.logExceptionStackTrace(logger, e);
             }
-
         }
     }
 
@@ -554,6 +557,9 @@ public class RenderingTask implements Callable<RenderStatusResults>, Completable
             regionSelectorsList.addAll(Arrays.asList(regionSelector));
         }
 
+        logger.verbose("region selectors count: " + regionSelectorsList.size());
+        logger.verbose("this.visualGridTaskList count: " + this.visualGridTaskList.size());
+
         for (VisualGridTask visualGridTask : this.visualGridTaskList) {
 
             RenderBrowserInfo browserInfo = visualGridTask.getBrowserInfo();
@@ -573,6 +579,8 @@ public class RenderingTask implements Callable<RenderStatusResults>, Completable
 
             allRequestsForRG.add(request);
         }
+
+        logger.verbose("count of all requests for RG: " + allRequestsForRG.size());
         return allRequestsForRG;
     }
 
