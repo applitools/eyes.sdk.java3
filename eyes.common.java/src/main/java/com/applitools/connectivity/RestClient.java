@@ -40,7 +40,6 @@ public class RestClient {
     protected Logger logger;
     protected HttpClient restClient;
     protected URI serverUrl;
-    protected ConnectivityTarget endPoint;
     protected String agentId;
 
     // Used for JSON serialization/de-serialization.
@@ -60,7 +59,6 @@ public class RestClient {
         jsonMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES,false);
         this.serverUrl = serverUrl;
         this.restClient = restClient;
-        endPoint = restClient.target(serverUrl);
     }
 
     public void setLogger(Logger logger) {
@@ -83,7 +81,6 @@ public class RestClient {
     protected void setServerUrlBase(URI serverUrl) {
         ArgumentGuard.notNull(serverUrl, "serverUrl");
         this.serverUrl = serverUrl;
-        endPoint = restClient.target(serverUrl);
     }
 
     protected URI getServerUrlBase() {
@@ -93,7 +90,6 @@ public class RestClient {
     public void updateClient(HttpClient client) {
         ArgumentGuard.notNull(client, "client");
         restClient = client;
-        endPoint = restClient.target(serverUrl);
     }
 
     /**
@@ -124,12 +120,12 @@ public class RestClient {
         return request.header(AGENT_ID_CUSTOM_HEADER, agentId);
     }
 
-    protected Response sendLongRequest(Request invocationBuilder, String method, String data, String mediaType) throws EyesException {
+    protected Response sendLongRequest(Request request, String method, String data, String mediaType) throws EyesException {
         String currentTime = GeneralUtils.toRfc1123(Calendar.getInstance(TimeZone.getTimeZone("UTC")));
-        invocationBuilder = invocationBuilder
+        request = request
                 .header("Eyes-Expect", "202+location")
                 .header("Eyes-Date", currentTime);
-        Response response = invocationBuilder.method(method, data, mediaType);
+        Response response = request.method(method, data, mediaType);
         String statusUrl = response.getHeader(HttpHeaders.LOCATION, false);
         int status = response.getStatusCode();
         if (statusUrl != null && status == HttpStatus.SC_ACCEPTED) {
