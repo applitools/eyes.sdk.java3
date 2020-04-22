@@ -394,7 +394,34 @@ public class ServerConnector extends RestClient {
     }
 
     public List<RunningRender> render(RenderRequest... renderRequests) {
-        return null;
+        ArgumentGuard.notNull(renderRequests, "renderRequests");
+        this.logger.verbose("called with " + Arrays.toString(renderRequests));
+        Request request = restClient.target(renderingInfo.getServiceUrl()).path(RENDER).request(MediaType.APPLICATION_JSON);
+        request.header("X-Auth-Token", renderingInfo.getAccessToken());
+        List<Integer> validStatusCodes = new ArrayList<>();
+        validStatusCodes.add(HttpStatus.SC_OK);
+        validStatusCodes.add(HttpStatus.SC_NOT_FOUND);
+
+        Response response = null;
+        try {
+            ObjectMapper objectMapper = new ObjectMapper();
+            objectMapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
+            objectMapper.configure(MapperFeature.SORT_PROPERTIES_ALPHABETICALLY, true);
+            String json = objectMapper.writeValueAsString(renderRequests);
+            response = request.method(HttpMethod.POST, json, MediaType.APPLICATION_JSON);
+            if (validStatusCodes.contains(response.getStatusCode())) {
+                RunningRender[] runningRenders = parseResponseWithJsonData(response, validStatusCodes, RunningRender[].class);
+                return Arrays.asList(runningRenders);
+            }
+            throw new EyesException(String.format("Unexpected status %d, message: %s", response.getStatusCode(), response.readEntity(String.class)));
+        } catch (JsonProcessingException e) {
+            GeneralUtils.logExceptionStackTrace(logger, e);
+            return null;
+        } finally {
+            if (response != null) {
+                response.close();
+            }
+        }
     }
 
     public boolean renderCheckResource(final RunningRender runningRender, final RGridResource resource) {
