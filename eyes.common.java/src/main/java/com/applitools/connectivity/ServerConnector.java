@@ -63,7 +63,6 @@ public class ServerConnector extends RestClient {
     public ServerConnector(HttpClient restClient, Logger logger, URI serverUrl, String agentId) {
         super(restClient, logger, serverUrl);
         this.agentId = agentId;
-        endPoint = endPoint.path(API_PATH);
     }
 
     public ServerConnector(HttpClient restClient, Logger logger) {
