@@ -2,10 +2,12 @@
 ### Fixed
 - Default versions reported in `AgentId` now automatically generated and match `pom.xml`.
 - Method `setEnablePatterns` now works properly. [Trello 1714](https://trello.com/c/jQgW5dpz)
+- Fixed steps missing in certain cases in UltraFast Grid. [Trello 1717](https://trello.com/c/U1TTels2)
+
 ### Updated
 - The `startSession` method now uses long request. [Trello 1715](https://trello.com/c/DcVzWbeR)
 - Adding agent id to all requests headers. [Trello 1697](https://trello.com/c/CzhUxOqE)
-- Fixed steps missing in certain cases in UltraFast Grid. [Trello 1717](https://trello.com/c/U1TTels2)
+- Now all requests include the Eyes-Date header when sending a long request
 
 ## [3.160.3] - 2020-03-18
 ### Fixed
