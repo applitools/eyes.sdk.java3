@@ -24,9 +24,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 import java.util.concurrent.Future;
 
 public class ServerConnector extends RestClient {
@@ -126,7 +124,10 @@ public class ServerConnector extends RestClient {
                 return restClient.target(url).queryParam("apiKey", getApiKey()).request(accept);
             }
         });
-        return request.method(method, null, null);
+        String currentTime = GeneralUtils.toRfc1123(Calendar.getInstance(TimeZone.getTimeZone("UTC")));
+        return request
+                .header("Eyes-Date", currentTime)
+                .method(method, null, null);
     }
 
     /**
