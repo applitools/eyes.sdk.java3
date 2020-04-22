@@ -25,5 +25,5 @@ public interface ConnectivityTarget {
      * @param acceptableResponseTypes Accepted response media types
      * @return The request
      */
-    AsyncRequest<?> asyncRequest(String... acceptableResponseTypes);
+    AsyncRequest asyncRequest(String... acceptableResponseTypes);
 }
