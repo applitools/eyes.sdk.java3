@@ -37,7 +37,7 @@ public class ConnectivityTargetImpl implements ConnectivityTarget {
     }
 
     @Override
-    public AsyncRequest<?> asyncRequest(String... acceptableResponseTypes) {
+    public AsyncRequest asyncRequest(String... acceptableResponseTypes) {
         return new AsyncRequestImpl(asyncTarget.accept(acceptableResponseTypes));
     }
 }
