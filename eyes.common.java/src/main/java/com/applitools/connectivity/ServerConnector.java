@@ -53,13 +53,11 @@ public class ServerConnector extends RestClient {
      */
     public ServerConnector(HttpClient restClient, Logger logger, URI serverUrl) {
         super(restClient, logger, serverUrl);
-        endPoint = endPoint.path(API_PATH);
     }
 
     public ServerConnector(HttpClient restClient, Logger logger, URI serverUrl, String agentId) {
         super(restClient, logger, serverUrl);
         this.agentId = agentId;
-        endPoint = endPoint.path(API_PATH);
     }
 
     public ServerConnector(HttpClient restClient, Logger logger) {
@@ -104,7 +102,6 @@ public class ServerConnector extends RestClient {
      */
     public void setServerUrl(URI serverUrl) {
         setServerUrlBase(serverUrl);
-        endPoint = endPoint.path(API_PATH);
     }
 
     public URI getServerUrl() {
@@ -113,7 +110,6 @@ public class ServerConnector extends RestClient {
 
     public void updateClient(HttpClient client) {
         super.updateClient(client);
-        endPoint.path(API_PATH);
     }
 
     @Override
@@ -163,7 +159,8 @@ public class ServerConnector extends RestClient {
             Request request = makeEyesRequest(new HttpRequestBuilder() {
                 @Override
                 public Request build() {
-                    return endPoint.queryParam("apiKey", getApiKey()).request(MediaType.APPLICATION_JSON);
+                    return restClient.target(serverUrl).path(API_PATH)
+                            .queryParam("apiKey", getApiKey()).request(MediaType.APPLICATION_JSON);
                 }
             });
             response = sendLongRequest(request, HttpMethod.POST, postData, MediaType.APPLICATION_JSON);
@@ -199,7 +196,7 @@ public class ServerConnector extends RestClient {
         Request request = makeEyesRequest(new HttpRequestBuilder() {
             @Override
             public Request build() {
-                return endPoint.path(runningSession.getId())
+                return restClient.target(serverUrl).path(API_PATH).path(runningSession.getId())
                         .queryParam("apiKey", getApiKey())
                         .queryParam("aborted", String.valueOf(isAborted))
                         .queryParam("updateBaseline", String.valueOf(save))
@@ -256,7 +253,7 @@ public class ServerConnector extends RestClient {
         Request request = makeEyesRequest(new HttpRequestBuilder() {
             @Override
             public Request build() {
-                return endPoint.path(runningSession.getId())
+                return restClient.target(serverUrl).path(API_PATH).path(runningSession.getId())
                         .queryParam("apiKey", getApiKey())
                         .request(MediaType.APPLICATION_JSON);
             }
