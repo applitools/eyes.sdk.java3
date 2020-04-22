@@ -8,6 +8,7 @@
 - The `startSession` method now uses long request. [Trello 1715](https://trello.com/c/DcVzWbeR)
 - Adding agent id to all requests headers. [Trello 1697](https://trello.com/c/CzhUxOqE)
 - Now all requests include the Eyes-Date header when sending a long request
+- Moved the logic from the connectivity modules and merged it into the common module to save a lot of code duplication. [Trello 1732](https://trello.com/c/mug8ARUc)
 
 ## [3.160.3] - 2020-03-18
 ### Fixed
