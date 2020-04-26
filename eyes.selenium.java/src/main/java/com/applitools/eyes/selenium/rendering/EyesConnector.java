@@ -1,6 +1,7 @@
 package com.applitools.eyes.selenium.rendering;
 
 import com.applitools.ICheckSettings;
+import com.applitools.connectivity.api.HttpClientImpl;
 import com.applitools.eyes.*;
 import com.applitools.eyes.capture.AppOutputWithScreenshot;
 import com.applitools.eyes.config.IConfigurationSetter;
@@ -288,6 +289,6 @@ class EyesConnector extends EyesBase implements IEyesConnector, IBatchCloser {
 
     @Override
     public void closeBatch(String batchId) {
-        this.serverConnector.closeBatch(batchId);
+        this.serverConnector.closeBatch(new HttpClientImpl(serverConnector.getTimeout(), serverConnector.getProxySettings()), batchId);
     }
 }

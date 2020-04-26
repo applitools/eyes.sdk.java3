@@ -4,6 +4,7 @@
 package com.applitools.eyes.selenium;
 
 import com.applitools.ICheckSettings;
+import com.applitools.connectivity.api.HttpClientImpl;
 import com.applitools.eyes.*;
 import com.applitools.eyes.capture.AppOutputWithScreenshot;
 import com.applitools.eyes.capture.EyesScreenshotFactory;
@@ -810,7 +811,7 @@ public class SeleniumEyes extends EyesBase implements ISeleniumEyes, IDriverProv
 
     @Override
     public void closeBatch(String batchId) {
-        this.serverConnector.closeBatch(batchId);
+        this.serverConnector.closeBatch(new HttpClientImpl(serverConnector.getTimeout(), serverConnector.getProxySettings()), batchId);
     }
 
     /**
