@@ -544,7 +544,7 @@ public class ServerConnector extends RestClient {
         return new ResourceFuture(gridResource, logger, this, userAgent);
     }
 
-    public void closeBatch(String batchId) {
+    public void closeBatch(final HttpClient client, String batchId) {
         boolean dontCloseBatchesStr = GeneralUtils.getDontCloseBatches();
         if (dontCloseBatchesStr) {
             logger.log("APPLITOOLS_DONT_CLOSE_BATCHES environment variable set to true. Skipping batch close.");
@@ -557,13 +557,13 @@ public class ServerConnector extends RestClient {
         Request request = makeEyesRequest(new HttpRequestBuilder() {
             @Override
             public Request build() {
-                return restClient.target(serverUrl).path(url)
+                return client.target(serverUrl).path(url)
                         .queryParam("apiKey", getApiKey())
                         .request((String) null);
             }
         });
         request.method(HttpMethod.DELETE, null, null);
-        restClient.close();
+        client.close();
     }
 
     public void closeConnector() {
