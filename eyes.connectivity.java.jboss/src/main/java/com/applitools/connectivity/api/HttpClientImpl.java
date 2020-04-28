@@ -28,7 +28,7 @@ public class HttpClientImpl extends HttpClient {
         super(timeout, abstractProxySettings);
 
         ResteasyClientBuilder builder = new ResteasyClientBuilder();
-        builder = builder.establishConnectionTimeout(timeout, TimeUnit.MILLISECONDS).socketTimeout(timeout, TimeUnit.MILLISECONDS);
+        builder = builder.establishConnectionTimeout(timeout, TimeUnit.MILLISECONDS).socketTimeout(timeout, TimeUnit.MILLISECONDS).connectionPoolSize(10);
         if (abstractProxySettings == null) {
             client = builder.build();
             return;
