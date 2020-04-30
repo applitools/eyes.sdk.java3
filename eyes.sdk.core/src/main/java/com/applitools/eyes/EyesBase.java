@@ -316,6 +316,7 @@ public abstract class EyesBase implements IEyesBase{
      */
     public void setLogHandler(LogHandler logHandler) {
         logger.setLogHandler(logHandler);
+        serverConnector.setLogger(logger);
     }
 
     /**
