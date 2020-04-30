@@ -136,11 +136,8 @@ public class ServerConnector extends RestClient {
      * @throws EyesException For invalid status codes, or if response parsing
      *                       failed.
      */
-    public RunningSession startSession(SessionStartInfo sessionStartInfo)
-            throws EyesException {
-
+    public RunningSession startSession(SessionStartInfo sessionStartInfo) throws EyesException {
         ArgumentGuard.notNull(sessionStartInfo, "sessionStartInfo");
-        logger.verbose("Using Jersey1 for REST API calls.");
         String postData;
         try {
             // since the web API requires a root property for this message
@@ -421,7 +418,7 @@ public class ServerConnector extends RestClient {
             return statusCode == HttpStatus.SC_OK;
         }
 
-        throw new EyesException("JBoss ServerConnector.renderCheckResource - unexpected status (" + statusCode + ")");
+        throw new EyesException("ServerConnector.renderCheckResource - unexpected status (" + statusCode + ")");
     }
 
     public IPutFuture renderPutResource(final RunningRender runningRender, final RGridResource resource, String userAgent, final IResourceUploadListener listener) {
