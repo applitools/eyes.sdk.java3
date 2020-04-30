@@ -1,6 +1,12 @@
 package com.applitools.utils;
 
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.TrustManager;
+import javax.net.ssl.X509TrustManager;
 import java.net.*;
+import java.security.KeyManagementException;
+import java.security.NoSuchAlgorithmException;
+import java.security.cert.X509Certificate;
 import java.util.Enumeration;
 
 /**
@@ -72,5 +78,29 @@ public class NetworkUtils {
             e.printStackTrace();
             throw new RuntimeException(e);
         }
+    }
+
+    public static SSLContext getDisabledSSLContext() throws NoSuchAlgorithmException, KeyManagementException {
+        TrustManager[] trustManagers = new TrustManager[]{
+                new X509TrustManager() {
+
+                    @Override
+                    public X509Certificate[] getAcceptedIssuers() {
+                        return null;
+                    }
+
+                    @Override
+                    public void checkClientTrusted(java.security.cert.X509Certificate[] certs, String authType) {
+                    }
+
+                    @Override
+                    public void checkServerTrusted(java.security.cert.X509Certificate[] certs, String authType) {
+                    }
+                }
+        };
+
+        SSLContext sslContext = SSLContext.getInstance("ssl");
+        sslContext.init(null, trustManagers, null);
+        return sslContext;
     }
 }
