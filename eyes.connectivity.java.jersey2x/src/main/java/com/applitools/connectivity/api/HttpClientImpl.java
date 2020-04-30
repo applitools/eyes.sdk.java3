@@ -1,14 +1,18 @@
 package com.applitools.connectivity.api;
 
 import com.applitools.eyes.AbstractProxySettings;
+import com.applitools.utils.NetworkUtils;
 import org.glassfish.jersey.apache.connector.ApacheConnectorProvider;
 import org.glassfish.jersey.client.ClientConfig;
 import org.glassfish.jersey.client.ClientProperties;
 import org.glassfish.jersey.client.RequestEntityProcessing;
 
+import javax.net.ssl.SSLContext;
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
 import java.net.URI;
+import java.security.KeyManagementException;
+import java.security.NoSuchAlgorithmException;
 
 public class HttpClientImpl extends HttpClient {
 
@@ -41,7 +45,12 @@ public class HttpClientImpl extends HttpClient {
         // does not support proxy settings.
         clientConfig.connectorProvider(new ApacheConnectorProvider());
 
-        client = ClientBuilder.newBuilder().withConfig(clientConfig).build();
+        ClientBuilder builder = ClientBuilder.newBuilder().withConfig(clientConfig);
+        try {
+            SSLContext sslContext = NetworkUtils.getDisabledSSLContext();
+            builder.sslContext(sslContext);
+        } catch (NoSuchAlgorithmException | KeyManagementException ignored) {}
+        client = builder.build();
     }
 
     @Override

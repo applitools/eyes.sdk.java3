@@ -1,15 +1,21 @@
 package com.applitools.connectivity.api;
 
 import com.applitools.eyes.AbstractProxySettings;
+import com.applitools.utils.NetworkUtils;
 import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.config.ClientConfig;
 import com.sun.jersey.client.apache4.config.DefaultApacheHttpClient4Config;
+import com.sun.jersey.client.urlconnection.HTTPSProperties;
 import com.sun.jersey.client.urlconnection.HttpURLConnectionFactory;
 import com.sun.jersey.client.urlconnection.URLConnectionClientHandler;
 
+import javax.net.ssl.HttpsURLConnection;
+import javax.net.ssl.SSLContext;
 import javax.ws.rs.core.UriBuilder;
 import java.io.IOException;
 import java.net.*;
+import java.security.KeyManagementException;
+import java.security.NoSuchAlgorithmException;
 
 public class HttpClientImpl extends HttpClient {
 
@@ -22,6 +28,12 @@ public class HttpClientImpl extends HttpClient {
         ClientConfig clientConfig = new DefaultApacheHttpClient4Config();
         clientConfig.getProperties().put(ClientConfig.PROPERTY_CONNECT_TIMEOUT, timeout);
         clientConfig.getProperties().put(ClientConfig.PROPERTY_READ_TIMEOUT, timeout);
+        try {
+            SSLContext sslContext = NetworkUtils.getDisabledSSLContext();
+            HTTPSProperties props = new HTTPSProperties(HttpsURLConnection.getDefaultHostnameVerifier(), sslContext);
+            clientConfig.getProperties().put(HTTPSProperties.PROPERTY_HTTPS_PROPERTIES, props);
+        } catch (NoSuchAlgorithmException | KeyManagementException ignored) {}
+
         if (abstractProxySettings == null) {
             client = Client.create(clientConfig);
             return;
