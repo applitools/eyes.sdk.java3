@@ -34,6 +34,24 @@ public class RunningTest {
     private String testName;
     private Throwable error;
 
+
+    /******** BEGIN - PUBLIC FOR TESTING PURPOSES ONLY ********/
+    public void setCloseTask(VisualGridTask task) {
+        this.closeTask = task;
+    }
+
+    public void setOpenTask(VisualGridTask task) {
+        this.openTask = task;
+    }
+
+    public RunningTest(RenderBrowserInfo browserInfo, Logger logger)
+    {
+        this.browserInfo = browserInfo;
+        this.logger = logger;
+    }
+    /******** END - PUBLIC FOR TESTING PURPOSES ONLY ********/
+
+
     public RunningTest(IEyesConnector eyes, ISeleniumConfigurationProvider configuration, RenderBrowserInfo browserInfo, Logger logger, RunningTestListener listener) {
         this.eyes = eyes;
         this.browserInfo = browserInfo;
