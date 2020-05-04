@@ -7,6 +7,7 @@ import com.applitools.connectivity.api.Response;
 import com.applitools.eyes.Logger;
 import com.applitools.eyes.RunningSession;
 import com.applitools.eyes.SessionStartInfo;
+import com.applitools.eyes.utils.ReportingTestSuite;
 import com.applitools.utils.GeneralUtils;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
@@ -32,7 +33,7 @@ import static org.mockito.Mockito.when;
 
 @RunWith(PowerMockRunner.class)
 @PrepareForTest(RestClient.class)
-public class TestServerConnector {
+public class TestServerConnector extends ReportingTestSuite {
 
     @Rule
     public MockitoRule mockitoRule = MockitoJUnit.rule();
