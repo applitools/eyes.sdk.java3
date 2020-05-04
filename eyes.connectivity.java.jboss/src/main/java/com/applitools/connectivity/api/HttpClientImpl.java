@@ -92,24 +92,4 @@ public class HttpClientImpl extends HttpClient {
     public void close() {
         client.close();
     }
-
-    @Override
-    public ConnectivityTarget target(String path) {
-        return new ConnectivityTargetImpl(client.target(path));
-    }
-
-    @Override
-    public AbstractProxySettings getProxySettings() {
-        return abstractProxySettings;
-    }
-
-    @Override
-    public int getTimeout() {
-        return timeout;
-    }
-
-    @Override
-    public void close() {
-        client.close();
-    }
 }
