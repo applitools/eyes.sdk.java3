@@ -18,10 +18,13 @@ public class TestResultsSummary implements Iterable<TestResultContainer>{
     public TestResultsSummary(List<TestResultContainer> allResults) {
         this.allResults = allResults;
         for (TestResultContainer resultContainer : allResults) {
-            if (resultContainer != null && resultContainer.getException() != null){
-                this.exceptions++;
+            TestResults result = null;
+            if (resultContainer != null) {
+                if (resultContainer.getException() != null) {
+                    this.exceptions++;
+                    result = resultContainer.getTestResults();
+                }
             }
-            TestResults result = resultContainer.getTestResults();
             if (result == null) continue;
             if (result.getStatus() != null) {
                 switch (result.getStatus()) {
