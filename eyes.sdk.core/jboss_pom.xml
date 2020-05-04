@@ -1,0 +1,37 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <artifactId>eyes-sdk-core-java3</artifactId>
+    <name>eyes-sdk-core-java3</name>
+    <url>http://www.applitools.com</url>
+
+    <description>Applitools Eyes SDK base for Java</description>
+
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    </properties>
+
+    <parent>
+        <groupId>com.applitools</groupId>
+        <artifactId>eyes-sdk-java3-parent</artifactId>
+        <version>3.160.3</version>
+        <relativePath>../pom.xml</relativePath>
+    </parent>
+
+    <dependencies>
+        <dependency>
+            <groupId>com.applitools</groupId>
+            <artifactId>eyes-connectivity-java3-jboss</artifactId>
+            <version>3.160.3</version>
+        </dependency>
+        <dependency>
+            <groupId>com.applitools</groupId>
+            <artifactId>eyes-common-java3</artifactId>
+            <version>3.160.3</version>
+            <type>test-jar</type>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+</project>
