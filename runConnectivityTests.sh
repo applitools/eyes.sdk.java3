@@ -1,12 +1,12 @@
 #!/bin/bash
 
+default="jersey2x"
+
 runTest() {
-	mv eyes.sdk.core/pom.xml eyes.sdk.core/jersey2_pom.xml
-	mv eyes.sdk.core/$1_pom.xml eyes.sdk.core/pom.xml
+	sed -i "s/$default/$1/g" eyes.sdk.core/pom.xml
 	mvn -Dtest=BasicDemo -DfailIfNoTests=false test
-	mv eyes.sdk.core/pom.xml eyes.sdk.core/$1_pom.xml
-	mv eyes.sdk.core/jersey2_pom.xml eyes.sdk.core/pom.xml
+	sed -i "s/$1/$default/g" eyes.sdk.core/pom.xml
 }
 
 runTest "jboss"
-runTest "jersey1"
+runTest "jersey1x"
