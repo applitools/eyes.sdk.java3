@@ -226,7 +226,7 @@ public abstract class EyesBase implements IEyesBase{
         }
         getConfigSetter().setProxy(abstractProxySettings);
         HttpClientImpl client = new HttpClientImpl(serverConnector.getTimeout(), abstractProxySettings);
-        serverConnector = new ServerConnector(client, serverConnector.getLogger(), serverConnector.getServerUrl(), serverConnector.getAgentId());
+        serverConnector = new ServerConnector(client, serverConnector.getLogger(), serverConnector.getServerUrl());
         return getConfigSetter();
     }
 

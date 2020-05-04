@@ -78,13 +78,4 @@ public class HttpClientImpl extends HttpClient {
     @Override
     public void close() {
     }
-
-    @Override
-    public ConnectivityTarget target(String path) {
-        return new ConnectivityTargetImpl(client.resource(path), client.asyncResource(path));
-    }
-
-    @Override
-    public void close() {
-    }
 }
