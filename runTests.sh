@@ -30,6 +30,9 @@ PING_LOOP_PID=$!
 # your_build_command_2 >> $BUILD_OUTPUT 2>&1
 mvn test -e -X
 
+#Run tests with other connectivity packages
+./runConnectivityTests.sh
+
 # The build finished without returning an error so dump a tail of the output
 dump_output
 

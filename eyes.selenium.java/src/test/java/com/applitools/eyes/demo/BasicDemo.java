@@ -27,7 +27,7 @@ public class BasicDemo extends ReportingTestSuite {
     private Eyes eyes;
     private static BatchInfo batch;
     private WebDriver driver;
-    private final LogHandler logger = new StdoutLogHandler(true);
+    private final LogHandler logger = new StdoutLogHandler(false);
 
     private void initEyes() {
         currentRunner.setLogHandler(logger);
