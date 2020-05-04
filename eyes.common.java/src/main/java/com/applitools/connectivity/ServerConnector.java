@@ -55,16 +55,6 @@ public class ServerConnector extends RestClient {
         super(restClient, logger, serverUrl);
     }
 
-    public ServerConnector(HttpClient restClient, Logger logger, URI serverUrl, String agentId) {
-        super(restClient, logger, serverUrl);
-        this.agentId = agentId;
-    }
-
-    public ServerConnector(HttpClient restClient, Logger logger, URI serverUrl, String agentId) {
-        super(restClient, logger, serverUrl);
-        this.agentId = agentId;
-    }
-
     public ServerConnector(HttpClient restClient, Logger logger) {
         this(restClient, logger, GeneralUtils.getServerUrl());
     }
