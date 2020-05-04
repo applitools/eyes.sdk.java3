@@ -641,7 +641,7 @@ public abstract class EyesBase implements IEyesBase{
             logger.verbose("Aborting server session...");
             try {
                 // When aborting we do not save the test.
-                boolean isNewSession = runningSession.getIsNewSession();
+                boolean isNewSession = runningSession.getIsNew();
                 TestResults results = getServerConnector().stopSession(runningSession, true, false);
                 results.setNew(isNewSession);
                 results.setUrl(runningSession.getUrl());
