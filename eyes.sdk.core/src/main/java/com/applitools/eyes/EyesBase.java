@@ -144,6 +144,7 @@ public abstract class EyesBase implements IEyesBase{
             serverConnector.setLogger(this.logger);
         }
         this.serverConnector = serverConnector;
+        serverConnector.setLogger(logger);
     }
 
     public ServerConnector getServerConnector() {
@@ -316,7 +317,6 @@ public abstract class EyesBase implements IEyesBase{
      */
     public void setLogHandler(LogHandler logHandler) {
         logger.setLogHandler(logHandler);
-        serverConnector.setLogger(logger);
     }
 
     /**

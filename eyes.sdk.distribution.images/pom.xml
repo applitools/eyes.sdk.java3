@@ -33,6 +33,11 @@
         </dependency>
         <dependency>
             <groupId>com.applitools</groupId>
+            <artifactId>eyes-common-java3</artifactId>
+            <version>3.160.3</version>
+        </dependency>
+        <dependency>
+            <groupId>com.applitools</groupId>
             <artifactId>eyes-sdk-core-java3</artifactId>
             <version>3.160.3</version>
         </dependency>

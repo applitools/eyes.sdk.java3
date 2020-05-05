@@ -596,12 +596,19 @@ public class VisualGridEyes implements ISeleniumEyes, IRenderingEyes {
             VisualGridTask visualGridTask = null;
             if (!taskList.isEmpty()) {
                 visualGridTask = taskList.get(taskList.size() - 1);
-                VisualGridTask.TaskType taskType = visualGridTask.getType();
-                if ((taskType == null && test.isOpenTaskIssued() && !test.isCloseTaskIssued()) ||
-                        (taskType != null && taskType != VisualGridTask.TaskType.CLOSE && taskType != VisualGridTask.TaskType.ABORT)) {
-                    filteredTests.add(test);
-                }
-            } else if (!test.isCloseTaskIssued()) {
+            }
+
+            VisualGridTask.TaskType lastTaskType = null;
+            if (visualGridTask != null) {
+                lastTaskType = visualGridTask.getType();
+            }
+
+            boolean testIsOpenAndNotClosed = lastTaskType == null && test.isOpenTaskIssued() && !test.isCloseTaskIssued();
+            boolean lastTaskIsNotAClosingTask = lastTaskType != null && lastTaskType != VisualGridTask.TaskType.CLOSE && lastTaskType != VisualGridTask.TaskType.ABORT;
+
+            // We are interested in tests which should be opened or are open.
+            if (testIsOpenAndNotClosed || lastTaskIsNotAClosingTask)
+            {
                 filteredTests.add(test);
             }
         }
@@ -633,7 +640,7 @@ public class VisualGridEyes implements ISeleniumEyes, IRenderingEyes {
     }
 
     private FrameData captureDomSnapshot(FrameChain originalFC, EyesTargetLocator switchTo, ICheckSettingsInternal checkSettingsInternal) throws InterruptedException {
-        logger.verbose("Dom extraction starting for url: " + webDriver.getCurrentUrl() + " (" + checkSettingsInternal.toString() + ")");
+        logger.verbose("Dom extraction starting   (" + checkSettingsInternal.toString() + ")");
         timer = new Timer("VG_Check_StopWatch", true);
         timer.schedule(new TimeoutTask(), DOM_EXTRACTION_TIMEOUT);
         String resultAsString;
