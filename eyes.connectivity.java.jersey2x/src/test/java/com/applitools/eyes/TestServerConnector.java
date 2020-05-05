@@ -23,9 +23,7 @@ import javax.ws.rs.client.Entity;
 import javax.ws.rs.client.Invocation;
 import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.Response;
-import java.net.URI;
 
-import static org.mockito.Matchers.*;
 import static org.mockito.Mockito.*;
 
 @RunWith(PowerMockRunner.class)
@@ -94,12 +92,14 @@ public class TestServerConnector {
         when(restClient.target(deleteRequestUri)).thenReturn(deleteRequestTarget);
         when(deleteRequestTarget.queryParam(anyString(), any())).thenReturn(deleteRequestTarget);
         when(deleteRequestTarget.request((String) null)).thenReturn(deleteRequest);
+        when(deleteRequest.header(anyString(), any())).thenReturn(deleteRequest);
         when(deleteRequest.method(HttpMethod.DELETE)).thenReturn(deleteResponse);
 
         // Handle the second request in the long request - GET request
         when(restClient.target(getRequestUri)).thenReturn(getRequestTarget);
         when(getRequestTarget.queryParam(anyString(), any())).thenReturn(getRequestTarget);
         when(getRequestTarget.request((String) null)).thenReturn(getRequest);
+        when(getRequest.header(anyString(), any())).thenReturn(getRequest);
         when(getRequest.method(HttpMethod.GET)).thenReturn(getResponse);
         when(getResponse.getHeaderString(HttpHeaders.LOCATION)).thenReturn(deleteRequestUri);
         when(getResponse.getStatus()).thenReturn(Response.Status.CREATED.getStatusCode());
