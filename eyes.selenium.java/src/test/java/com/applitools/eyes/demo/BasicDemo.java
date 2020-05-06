@@ -1,7 +1,6 @@
 package com.applitools.eyes.demo;
 
 import com.applitools.eyes.*;
-import com.applitools.eyes.exceptions.DiffsFoundException;
 import com.applitools.eyes.selenium.ClassicRunner;
 import com.applitools.eyes.selenium.Eyes;
 import com.applitools.eyes.utils.ReportingTestSuite;
@@ -42,9 +41,9 @@ public class BasicDemo extends ReportingTestSuite {
         //eyes.setProxy(new ProxySettings("http://localhost:8888"));
     }
 
-    private void sanityTest() {
+    private void sanityTest(String testName) {
         initEyes();
-        eyes.open(driver, "Demo App", "Smoke Test", new RectangleSize(800, 800));
+        eyes.open(driver, "Demo App", testName, new RectangleSize(800, 800));
 
         // Navigate the browser to the "ACME" demo app.
         driver.get("https://demo.applitools.com");
@@ -61,7 +60,7 @@ public class BasicDemo extends ReportingTestSuite {
     @BeforeClass
     public static void setBatch() {
         // Must be before ALL tests (at Class-level)
-        batch = new BatchInfo("Demo batch");
+        batch = new BatchInfo("Basic Sanity");
     }
 
     @Before
@@ -72,23 +71,23 @@ public class BasicDemo extends ReportingTestSuite {
     @Test
     public void classicTest() {
         currentRunner = new ClassicRunner();
-        sanityTest();
+        try {
+            sanityTest("Classic Runner");
+        } finally {
+            eyes.abortIfNotClosed();
+        }
     }
 
     @Test
     public void visualGridTest() {
         currentRunner = new VisualGridRunner(10);
-        sanityTest();
+        sanityTest("Visual Grid Runner");
     }
 
     @After
     public void afterEach() {
         driver.quit();
-        try {
-            TestResultsSummary allTestResults = currentRunner.getAllTestResults();
-            System.out.println(allTestResults);
-        } catch (DiffsFoundException e) {
-            System.out.println("Diffs found");
-        }
+        TestResultsSummary allTestResults = currentRunner.getAllTestResults();
+        System.out.println(allTestResults);
     }
 }
