@@ -1,3 +1,13 @@
+## [vNext] - 
+### Fixed
+- Fixed a bug where the Jeresy1 and Jboss connectivity modules didn't work with visual grid runner when running multiple tests simultaneously.
+### Updated
+- Moved the logic from the connectivity modules and merged it into the common module to save a lot of code duplication. [Trello 1732](https://trello.com/c/mug8ARUc)
+### Added
+- Disabled SSL verification. Accept all certificates. [Trello 1777](https://trello.com/c/ZNSJZ1cf)
+- Added a script for running basic eyes tests for connectivity packages Jersey1 and Jsboss. [Trello 1782](https://trello.com/c/TA7v4Y4t)
+
+
 ## [3.161.0] - 2020-05-05
 ### Fixed
 - Default versions reported in `AgentId` now automatically generated and match `pom.xml`.
