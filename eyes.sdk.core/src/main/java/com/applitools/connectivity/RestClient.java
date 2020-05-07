@@ -78,6 +78,13 @@ public class RestClient {
         return restClient.getProxySettings();
     }
 
+    public void setTimeout(int timeout) {
+        ArgumentGuard.greaterThanOrEqualToZero(timeout, "timeout");
+        AbstractProxySettings proxySettings = restClient.getProxySettings();
+        restClient.close();
+        restClient = new HttpClientImpl(timeout, proxySettings);
+    }
+
     public int getTimeout() {
         return restClient.getTimeout();
     }

@@ -1,6 +1,7 @@
 package com.applitools.connectivity;
 
 import com.applitools.connectivity.api.ConnectivityTarget;
+import com.applitools.connectivity.api.HttpClientImpl;
 import com.applitools.connectivity.api.Request;
 import com.applitools.connectivity.api.Response;
 import com.applitools.eyes.AbstractProxySettings;
@@ -9,6 +10,7 @@ import com.applitools.eyes.RectangleSize;
 import com.applitools.eyes.TestResults;
 import com.applitools.eyes.events.ValidationInfo;
 import com.applitools.eyes.events.ValidationResult;
+import com.applitools.utils.ArgumentGuard;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -29,7 +31,7 @@ public class RemoteSessionEventHandler extends RestClient {
     public RemoteSessionEventHandler(Logger logger, URI serverUrl, String accessKey, int timeout) {
         super(logger, serverUrl, timeout);
         this.accessKey = accessKey;
-        this.defaultEndPoint = restClient.target(serverUrl).queryParam("accessKey", accessKey).path(SERVER_SUFFIX);
+        updateEndpoint();
     }
 
     public RemoteSessionEventHandler(Logger logger, URI serverUrl, String accessKey) {
@@ -40,9 +42,18 @@ public class RemoteSessionEventHandler extends RestClient {
         this(new Logger(), serverUrl, accessKey);
     }
 
+    private void updateEndpoint() {
+        this.defaultEndPoint = restClient.target(serverUrl).queryParam("accessKey", accessKey).path(SERVER_SUFFIX);
+    }
+
     public void setProxy(AbstractProxySettings abstractProxySettings) {
         super.setProxy(abstractProxySettings);
-        this.defaultEndPoint = restClient.target(serverUrl).queryParam("accessKey", accessKey).path(SERVER_SUFFIX);
+        updateEndpoint();
+    }
+
+    public void setTimeout(int timeout) {
+        super.setTimeout(timeout);
+        updateEndpoint();
     }
 
     private void sendMessage(HttpMethodCall method) {
