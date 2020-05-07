@@ -20,6 +20,7 @@ jobs:
     - stage: test
       script:
         - google-chrome --version
+        - chromium-browser --version
         - latestChromeDriverURL=$(wget http://chromedriver.storage.googleapis.com/LATEST_RELEASE_83 -q -O -)
         - wget "http://chromedriver.storage.googleapis.com/${latestChromeDriverURL}/chromedriver_linux64.zip"
         - unzip chromedriver_linux64.zip -d /home/travis/build/
