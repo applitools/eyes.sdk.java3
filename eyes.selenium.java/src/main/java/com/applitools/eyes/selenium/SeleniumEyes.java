@@ -811,7 +811,7 @@ public class SeleniumEyes extends EyesBase implements ISeleniumEyes, IDriverProv
 
     @Override
     public void closeBatch(String batchId) {
-        this.serverConnector.closeBatch(new HttpClientImpl(serverConnector.getTimeout(), serverConnector.getProxySettings()), batchId);
+        this.serverConnector.closeBatch(batchId);
     }
 
     /**

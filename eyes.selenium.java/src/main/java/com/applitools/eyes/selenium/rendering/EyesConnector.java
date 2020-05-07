@@ -289,6 +289,6 @@ class EyesConnector extends EyesBase implements IEyesConnector, IBatchCloser {
 
     @Override
     public void closeBatch(String batchId) {
-        this.serverConnector.closeBatch(new HttpClientImpl(serverConnector.getTimeout(), serverConnector.getProxySettings()), batchId);
+        this.serverConnector.closeBatch(batchId);
     }
 }

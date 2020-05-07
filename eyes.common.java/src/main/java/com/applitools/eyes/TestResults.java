@@ -1,6 +1,5 @@
 package com.applitools.eyes;
 
-import com.applitools.connectivity.ServerConnector;
 import com.applitools.utils.ArgumentGuard;
 import com.applitools.utils.Iso8610CalendarDeserializer;
 import com.fasterxml.jackson.annotation.JsonGetter;
@@ -46,7 +45,7 @@ public class TestResults {
     private SessionUrls appUrls;
     private SessionUrls apiUrls;
     private StepInfo[] stepsInfo;
-    private ServerConnector serverConnector;
+    private IServerConnector serverConnector;
 
     public StepInfo[] getStepsInfo() {
         return stepsInfo;
@@ -404,7 +403,7 @@ public class TestResults {
         this.status = status;
     }
 
-    void setServerConnector(ServerConnector serverConnector)
+    void setServerConnector(IServerConnector serverConnector)
     {
         this.serverConnector = serverConnector;
     }

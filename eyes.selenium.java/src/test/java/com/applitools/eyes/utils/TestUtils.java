@@ -2,8 +2,6 @@ package com.applitools.eyes.utils;
 
 import com.applitools.connectivity.RestClient;
 import com.applitools.connectivity.ServerConnector;
-import com.applitools.connectivity.api.HttpClient;
-import com.applitools.connectivity.api.HttpClientImpl;
 import com.applitools.eyes.*;
 import com.applitools.eyes.metadata.ActualAppOutput;
 import com.applitools.eyes.metadata.SessionResults;
@@ -88,8 +86,7 @@ public class TestUtils {
                 .queryParam("apiKey", apiKey)
                 .build();
 
-        HttpClient httpClient = new HttpClientImpl(ServerConnector.DEFAULT_CLIENT_TIMEOUT, null);
-        RestClient client = new RestClient(httpClient, new Logger(), apiSessionUri);
+        RestClient client = new RestClient(new Logger(), apiSessionUri, ServerConnector.DEFAULT_CLIENT_TIMEOUT);
         String srStr = client.sendHttpWebRequest(apiSessionUri.toString(), HttpMethod.GET, MediaType.APPLICATION_JSON)
                 .readEntity(String.class);
         ObjectMapper jsonMapper = new ObjectMapper();
@@ -186,8 +183,7 @@ public class TestUtils {
                 .queryParam("apiKey", eyes.getApiKey())
                 .build();
 
-        HttpClient httpClient = new HttpClientImpl(ServerConnector.DEFAULT_CLIENT_TIMEOUT, null);
-        RestClient client = new RestClient(httpClient, new Logger(), apiSessionUri);
+        RestClient client = new RestClient(new Logger(), apiSessionUri, ServerConnector.DEFAULT_CLIENT_TIMEOUT);
         return client.sendHttpWebRequest(apiSessionUri.toString(), HttpMethod.GET, MediaType.APPLICATION_JSON)
                 .readEntity(String.class);
     }

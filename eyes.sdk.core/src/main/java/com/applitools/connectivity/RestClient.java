@@ -1,6 +1,7 @@
 package com.applitools.connectivity;
 
 import com.applitools.connectivity.api.HttpClient;
+import com.applitools.connectivity.api.HttpClientImpl;
 import com.applitools.connectivity.api.Request;
 import com.applitools.connectivity.api.Response;
 import com.applitools.eyes.AbstractProxySettings;
@@ -45,19 +46,17 @@ public class RestClient {
     protected ObjectMapper jsonMapper;
 
     /***
-     * @param restClient The client for communication
      * @param logger    Logger instance.
      * @param serverUrl The URI of the rest server.
      */
-    public RestClient(HttpClient restClient, Logger logger, URI serverUrl) {
-        ArgumentGuard.notNull(restClient, "restClient");
+    public RestClient(Logger logger, URI serverUrl, int timeout) {
         ArgumentGuard.notNull(serverUrl, "serverUrl");
 
         this.logger = logger;
         jsonMapper = new ObjectMapper();
         jsonMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES,false);
         this.serverUrl = serverUrl;
-        this.restClient = restClient;
+        this.restClient = new HttpClientImpl(timeout, null);
     }
 
     public void setLogger(Logger logger) {
@@ -69,7 +68,13 @@ public class RestClient {
         return this.logger;
     }
 
-    public AbstractProxySettings getProxySettings() {
+    public void setProxy(AbstractProxySettings proxySettings) {
+        int timeout = restClient.getTimeout();
+        restClient.close();
+        restClient = new HttpClientImpl(timeout, proxySettings);
+    }
+
+    public AbstractProxySettings getProxy() {
         return restClient.getProxySettings();
     }
 
@@ -84,11 +89,6 @@ public class RestClient {
 
     protected URI getServerUrlBase() {
         return serverUrl;
-    }
-
-    public void updateClient(HttpClient client) {
-        ArgumentGuard.notNull(client, "client");
-        restClient = client;
     }
 
     /**

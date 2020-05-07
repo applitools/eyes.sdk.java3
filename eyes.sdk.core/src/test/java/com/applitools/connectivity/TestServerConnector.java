@@ -132,7 +132,8 @@ public class TestServerConnector extends ReportingTestSuite {
         Response response = mockLongRequest(HttpMethod.POST);
         when(response.getStatusPhrase()).thenReturn("");
 
-        ServerConnector connector = new ServerConnector(restClient);
+        ServerConnector connector = new ServerConnector();
+        connector.updateClient(restClient);
         connector.setLogger(new Logger());
         connector.setAgentId("agent_id");
 

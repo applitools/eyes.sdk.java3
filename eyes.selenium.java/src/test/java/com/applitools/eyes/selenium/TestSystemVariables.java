@@ -1,8 +1,6 @@
 package com.applitools.eyes.selenium;
 
 import com.applitools.connectivity.ServerConnector;
-import com.applitools.connectivity.api.HttpClient;
-import com.applitools.connectivity.api.HttpClientImpl;
 import com.applitools.eyes.BatchInfo;
 import com.applitools.eyes.Logger;
 import org.testng.Assert;
@@ -11,7 +9,6 @@ import org.testng.annotations.Test;
 
 public class TestSystemVariables extends EnvironmentModifier {
 
-    private final HttpClient client = new HttpClientImpl(ServerConnector.DEFAULT_CLIENT_TIMEOUT, null);
     private final Logger logger = new Logger();
 
     @BeforeClass
@@ -22,7 +19,7 @@ public class TestSystemVariables extends EnvironmentModifier {
     @Test
     public void testApiKeySystemVariables() {
         setEnvironmentVariable("APPLITOOLS_API_KEY", "ApiKeyTest1234");
-        ServerConnector serverConnector = new ServerConnector(client, logger);
+        ServerConnector serverConnector = new ServerConnector(logger);
         Assert.assertEquals("ApiKeyTest1234", serverConnector.getApiKey());
         Assert.assertEquals("https://eyesapi.applitools.com", serverConnector.getServerUrl().toString());
         setEnvironmentVariable("bamboo_APPLITOOLS_API_KEY", "bambooApiKeyTest1234");
@@ -34,34 +31,34 @@ public class TestSystemVariables extends EnvironmentModifier {
     @Test
     public void testServerUrlSystemVariables() {
         setEnvironmentVariable("APPLITOOLS_SERVER_URL", "https://some.testurl.com/");
-        ServerConnector serverConnector = new ServerConnector(client, logger);
+        ServerConnector serverConnector = new ServerConnector(logger);
         Assert.assertEquals("https://some.testurl.com/", serverConnector.getServerUrl().toString());
 
         setEnvironmentVariable("bamboo_APPLITOOLS_SERVER_URL", "https://bamboo.testurl.com/");
-        serverConnector = new ServerConnector(client, logger);
+        serverConnector = new ServerConnector(logger);
         Assert.assertEquals("https://some.testurl.com/", serverConnector.getServerUrl().toString());
 
         setEnvironmentVariable("APPLITOOLS_SERVER_URL", null);
-        serverConnector = new ServerConnector(client, logger);
+        serverConnector = new ServerConnector(logger);
         Assert.assertEquals("https://bamboo.testurl.com/", serverConnector.getServerUrl().toString());
     }
 
     @Test
     public void testDontCloseBatchesSystemVariables() {
         setEnvironmentVariable("APPLITOOLS_DONT_CLOSE_BATCHES", "true");
-        ServerConnector serverConnector = new ServerConnector(client, logger);
+        ServerConnector serverConnector = new ServerConnector(logger);
         Assert.assertTrue(serverConnector.getDontCloseBatches());
 
         setEnvironmentVariable("bamboo_APPLITOOLS_DONT_CLOSE_BATCHES", "false");
-        serverConnector = new ServerConnector(client, logger);
+        serverConnector = new ServerConnector(logger);
         Assert.assertTrue(serverConnector.getDontCloseBatches());
 
         setEnvironmentVariable("APPLITOOLS_DONT_CLOSE_BATCHES", null);
-        serverConnector = new ServerConnector(client, logger);
+        serverConnector = new ServerConnector(logger);
         Assert.assertFalse(serverConnector.getDontCloseBatches());
 
         setEnvironmentVariable("bamboo_APPLITOOLS_DONT_CLOSE_BATCHES", "true");
-        serverConnector = new ServerConnector(client, logger);
+        serverConnector = new ServerConnector(logger);
         Assert.assertTrue(serverConnector.getDontCloseBatches());
     }
 

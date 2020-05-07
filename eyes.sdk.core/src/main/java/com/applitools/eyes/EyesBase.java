@@ -2,12 +2,10 @@ package com.applitools.eyes;
 
 import com.applitools.ICheckSettings;
 import com.applitools.connectivity.ServerConnector;
-import com.applitools.connectivity.api.HttpClientImpl;
-import com.applitools.eyes.config.IConfigurationGetter;
-import com.applitools.eyes.config.IConfigurationSetter;
-import com.applitools.eyes.visualgrid.model.RenderingInfo;
 import com.applitools.eyes.capture.AppOutputProvider;
 import com.applitools.eyes.capture.AppOutputWithScreenshot;
+import com.applitools.eyes.config.IConfigurationGetter;
+import com.applitools.eyes.config.IConfigurationSetter;
 import com.applitools.eyes.debug.DebugScreenshotsProvider;
 import com.applitools.eyes.debug.FileDebugScreenshotsProvider;
 import com.applitools.eyes.debug.NullDebugScreenshotProvider;
@@ -18,13 +16,17 @@ import com.applitools.eyes.events.ValidationInfo;
 import com.applitools.eyes.exceptions.DiffsFoundException;
 import com.applitools.eyes.exceptions.NewTestException;
 import com.applitools.eyes.exceptions.TestFailedException;
-import com.applitools.eyes.fluent.*;
-import com.applitools.eyes.positioning.*;
+import com.applitools.eyes.fluent.CheckSettings;
+import com.applitools.eyes.fluent.ICheckSettingsInternal;
+import com.applitools.eyes.positioning.InvalidPositionProvider;
+import com.applitools.eyes.positioning.PositionProvider;
+import com.applitools.eyes.positioning.RegionProvider;
 import com.applitools.eyes.scaling.FixedScaleProvider;
 import com.applitools.eyes.scaling.NullScaleProvider;
 import com.applitools.eyes.triggers.MouseAction;
 import com.applitools.eyes.triggers.MouseTrigger;
 import com.applitools.eyes.triggers.TextTrigger;
+import com.applitools.eyes.visualgrid.model.RenderingInfo;
 import com.applitools.utils.*;
 
 import java.awt.image.BufferedImage;
@@ -84,8 +86,7 @@ public abstract class EyesBase implements IEyesBase{
 
         initProviders();
 
-        HttpClientImpl client = new HttpClientImpl(ServerConnector.DEFAULT_CLIENT_TIMEOUT, null);
-        setServerConnector(new ServerConnector(client));
+        setServerConnector(new ServerConnector());
 
         runningSession = null;
         userInputs = new ArrayDeque<>();
@@ -226,8 +227,7 @@ public abstract class EyesBase implements IEyesBase{
             throw new EyesException("server connector not set.");
         }
         getConfigSetter().setProxy(abstractProxySettings);
-        HttpClientImpl client = new HttpClientImpl(serverConnector.getTimeout(), abstractProxySettings);
-        serverConnector = new ServerConnector(client, serverConnector.getLogger(), serverConnector.getServerUrl());
+        serverConnector.setProxy(abstractProxySettings);
         return getConfigSetter();
     }
 
@@ -239,7 +239,7 @@ public abstract class EyesBase implements IEyesBase{
         if (serverConnector == null) {
             throw new EyesException("server connector not set.");
         }
-        return serverConnector.getProxySettings();
+        return serverConnector.getProxy();
     }
 
     /**

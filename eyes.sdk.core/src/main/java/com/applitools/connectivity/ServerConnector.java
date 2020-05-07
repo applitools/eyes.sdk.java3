@@ -27,7 +27,7 @@ import java.net.URL;
 import java.util.*;
 import java.util.concurrent.Future;
 
-public class ServerConnector extends RestClient {
+public class ServerConnector extends RestClient implements IServerConnector {
 
     public static final int DEFAULT_CLIENT_TIMEOUT = 1000 * 60 * 5; // 5 minutes
 
@@ -41,26 +41,24 @@ public class ServerConnector extends RestClient {
     String RENDER = "/render";
 
     public static final String API_PATH = "/api/sessions/running";
-    private static final String RENDER_ID = "render-id";
 
     private String apiKey = null;
     private RenderingInfo renderingInfo;
 
     /***
-     * @param restClient The client for communication
      * @param logger    Logger instance.
      * @param serverUrl The URI of the rest server.
      */
-    public ServerConnector(HttpClient restClient, Logger logger, URI serverUrl) {
-        super(restClient, logger, serverUrl);
+    public ServerConnector(Logger logger, URI serverUrl) {
+        super(logger, serverUrl, DEFAULT_CLIENT_TIMEOUT);
     }
 
-    public ServerConnector(HttpClient restClient, Logger logger) {
-        this(restClient, logger, GeneralUtils.getServerUrl());
+    public ServerConnector(Logger logger) {
+        this(logger, GeneralUtils.getServerUrl());
     }
 
-    public ServerConnector(HttpClient restClient) {
-        this(restClient, new Logger());
+    public ServerConnector() {
+        this(new Logger());
     }
 
     /**
@@ -103,8 +101,8 @@ public class ServerConnector extends RestClient {
         return getServerUrlBase();
     }
 
-    public void updateClient(HttpClient client) {
-        super.updateClient(client);
+    void updateClient(HttpClient client) {
+        restClient = client;
     }
 
     @Override
@@ -536,7 +534,7 @@ public class ServerConnector extends RestClient {
         return new ResourceFuture(gridResource, logger, this, userAgent);
     }
 
-    public void closeBatch(final HttpClient client, String batchId) {
+    public void closeBatch(String batchId) {
         boolean dontCloseBatchesStr = GeneralUtils.getDontCloseBatches();
         if (dontCloseBatchesStr) {
             logger.log("APPLITOOLS_DONT_CLOSE_BATCHES environment variable set to true. Skipping batch close.");
@@ -546,16 +544,17 @@ public class ServerConnector extends RestClient {
         this.logger.verbose("called with " + batchId);
 
         final String url = String.format(CLOSE_BATCH, batchId);
+        restClient = new HttpClientImpl(getTimeout(), getProxy());
         Request request = makeEyesRequest(new HttpRequestBuilder() {
             @Override
             public Request build() {
-                return client.target(serverUrl).path(url)
+                return restClient.target(serverUrl).path(url)
                         .queryParam("apiKey", getApiKey())
                         .request((String) null);
             }
         });
         request.method(HttpMethod.DELETE, null, null);
-        client.close();
+        restClient.close();
     }
 
     public void closeConnector() {

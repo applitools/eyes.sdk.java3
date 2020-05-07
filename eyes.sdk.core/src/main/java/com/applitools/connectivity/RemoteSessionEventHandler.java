@@ -26,19 +26,14 @@ public class RemoteSessionEventHandler extends RestClient {
     private ConnectivityTarget defaultEndPoint;
     private boolean throwExceptions = true;
 
-    public RemoteSessionEventHandler(HttpClient client, Logger logger, URI serverUrl, String accessKey) {
-        super(client, logger, serverUrl);
+    public RemoteSessionEventHandler(Logger logger, URI serverUrl, String accessKey) {
+        super(logger, serverUrl, DEFAULT_CLIENT_TIMEOUT);
         this.accessKey = accessKey;
         this.defaultEndPoint = restClient.target(serverUrl).queryParam("accessKey", accessKey).path(SERVER_SUFFIX);
     }
 
-    public RemoteSessionEventHandler(HttpClient client, URI serverUrl, String accessKey) {
-        this(client, new Logger(), serverUrl, accessKey);
-    }
-
-    public void updateClient(HttpClient client) {
-        super.updateClient(client);
-        this.defaultEndPoint = restClient.target(serverUrl).queryParam("accessKey", accessKey).path(SERVER_SUFFIX);
+    public RemoteSessionEventHandler(URI serverUrl, String accessKey) {
+        this(new Logger(), serverUrl, accessKey);
     }
 
     private void sendMessage(HttpMethodCall method) {
