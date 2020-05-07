@@ -17,10 +17,6 @@
 ### Updated
 - The `startSession` method now uses long request. [Trello 1715](https://trello.com/c/DcVzWbeR)
 - Adding agent id to all requests headers. [Trello 1697](https://trello.com/c/CzhUxOqE)
-- Moved the logic from the connectivity modules and merged it into the common module to save a lot of code duplication. [Trello 1732](https://trello.com/c/mug8ARUc)
-### Added
-- Disabled SSL verification. Accept all certificates. [Trello 1777](https://trello.com/c/ZNSJZ1cf)
-- Added a script for running basic eyes tests for connectivity packages Jersey1 and Jsboss. [Trello 1782](https://trello.com/c/TA7v4Y4t)
 
 ## [3.160.3] - 2020-03-18
 ### Fixed
