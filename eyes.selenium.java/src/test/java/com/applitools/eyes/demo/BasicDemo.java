@@ -74,7 +74,9 @@ public class BasicDemo extends ReportingTestSuite {
         try {
             sanityTest("Classic Runner");
         } finally {
-            eyes.abortIfNotClosed();
+            if (eyes != null) {
+                eyes.abortIfNotClosed();
+            }
         }
     }
 

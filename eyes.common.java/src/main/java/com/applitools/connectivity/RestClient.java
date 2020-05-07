@@ -1,6 +1,5 @@
 package com.applitools.connectivity;
 
-import com.applitools.connectivity.api.ConnectivityTarget;
 import com.applitools.connectivity.api.HttpClient;
 import com.applitools.connectivity.api.Request;
 import com.applitools.connectivity.api.Response;
