@@ -1,9 +1,9 @@
 package com.applitools.connectivity;
 
 import com.applitools.connectivity.api.ConnectivityTarget;
-import com.applitools.connectivity.api.HttpClient;
 import com.applitools.connectivity.api.Request;
 import com.applitools.connectivity.api.Response;
+import com.applitools.eyes.AbstractProxySettings;
 import com.applitools.eyes.Logger;
 import com.applitools.eyes.RectangleSize;
 import com.applitools.eyes.TestResults;
@@ -26,14 +26,23 @@ public class RemoteSessionEventHandler extends RestClient {
     private ConnectivityTarget defaultEndPoint;
     private boolean throwExceptions = true;
 
-    public RemoteSessionEventHandler(Logger logger, URI serverUrl, String accessKey) {
-        super(logger, serverUrl, DEFAULT_CLIENT_TIMEOUT);
+    public RemoteSessionEventHandler(Logger logger, URI serverUrl, String accessKey, int timeout) {
+        super(logger, serverUrl, timeout);
         this.accessKey = accessKey;
         this.defaultEndPoint = restClient.target(serverUrl).queryParam("accessKey", accessKey).path(SERVER_SUFFIX);
     }
 
+    public RemoteSessionEventHandler(Logger logger, URI serverUrl, String accessKey) {
+        this(logger, serverUrl, accessKey, DEFAULT_CLIENT_TIMEOUT);
+    }
+
     public RemoteSessionEventHandler(URI serverUrl, String accessKey) {
         this(new Logger(), serverUrl, accessKey);
+    }
+
+    public void setProxy(AbstractProxySettings abstractProxySettings) {
+        super.setProxy(abstractProxySettings);
+        this.defaultEndPoint = restClient.target(serverUrl).queryParam("accessKey", accessKey).path(SERVER_SUFFIX);
     }
 
     private void sendMessage(HttpMethodCall method) {

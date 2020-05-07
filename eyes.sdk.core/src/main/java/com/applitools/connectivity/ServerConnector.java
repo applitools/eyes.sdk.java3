@@ -49,8 +49,12 @@ public class ServerConnector extends RestClient implements IServerConnector {
      * @param logger    Logger instance.
      * @param serverUrl The URI of the rest server.
      */
+    public ServerConnector(Logger logger, URI serverUrl, int timeout) {
+        super(logger, serverUrl, timeout);
+    }
+
     public ServerConnector(Logger logger, URI serverUrl) {
-        super(logger, serverUrl, DEFAULT_CLIENT_TIMEOUT);
+        this(logger, serverUrl, DEFAULT_CLIENT_TIMEOUT);
     }
 
     public ServerConnector(Logger logger) {

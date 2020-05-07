@@ -4,7 +4,6 @@
 package com.applitools.eyes.selenium;
 
 import com.applitools.ICheckSettings;
-import com.applitools.connectivity.api.HttpClientImpl;
 import com.applitools.eyes.*;
 import com.applitools.eyes.capture.AppOutputWithScreenshot;
 import com.applitools.eyes.capture.EyesScreenshotFactory;
@@ -13,7 +12,9 @@ import com.applitools.eyes.exceptions.TestFailedException;
 import com.applitools.eyes.fluent.GetRegion;
 import com.applitools.eyes.fluent.ICheckSettingsInternal;
 import com.applitools.eyes.fluent.SimpleRegionByRectangle;
-import com.applitools.eyes.positioning.*;
+import com.applitools.eyes.positioning.PositionMemento;
+import com.applitools.eyes.positioning.PositionProvider;
+import com.applitools.eyes.positioning.RegionProvider;
 import com.applitools.eyes.scaling.FixedScaleProviderFactory;
 import com.applitools.eyes.scaling.NullScaleProvider;
 import com.applitools.eyes.selenium.capture.*;
@@ -31,13 +32,14 @@ import com.applitools.eyes.selenium.wrappers.EyesWebDriver;
 import com.applitools.eyes.triggers.MouseAction;
 import com.applitools.utils.*;
 import org.openqa.selenium.*;
-import org.openqa.selenium.Dimension;
-import org.openqa.selenium.Point;
 import org.openqa.selenium.remote.RemoteWebDriver;
 
 import java.awt.image.BufferedImage;
 import java.net.URI;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Dictionary;
+import java.util.Hashtable;
+import java.util.List;
 
 /**
  * The main API gateway for the SDK.

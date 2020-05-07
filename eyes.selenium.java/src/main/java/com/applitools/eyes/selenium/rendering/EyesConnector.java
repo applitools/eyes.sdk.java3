@@ -1,7 +1,6 @@
 package com.applitools.eyes.selenium.rendering;
 
 import com.applitools.ICheckSettings;
-import com.applitools.connectivity.api.HttpClientImpl;
 import com.applitools.eyes.*;
 import com.applitools.eyes.capture.AppOutputWithScreenshot;
 import com.applitools.eyes.config.IConfigurationSetter;

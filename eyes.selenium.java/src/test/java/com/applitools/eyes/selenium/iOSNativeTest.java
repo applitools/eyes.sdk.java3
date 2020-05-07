@@ -1,7 +1,6 @@
 package com.applitools.eyes.selenium;
 
 import com.applitools.connectivity.ServerConnector;
-import com.applitools.connectivity.api.HttpClientImpl;
 import com.applitools.eyes.LogHandler;
 import com.applitools.eyes.StdoutLogHandler;
 import com.applitools.eyes.utils.TestUtils;
