@@ -5,7 +5,7 @@ services:
 
 jdk: oraclejdk8
 
-dist: trusty
+dist: xenial
 
 addons:
   chrome: stable
