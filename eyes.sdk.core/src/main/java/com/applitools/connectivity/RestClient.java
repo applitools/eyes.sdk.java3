@@ -122,6 +122,11 @@ public class RestClient {
      */
     protected Request makeEyesRequest(HttpRequestBuilder builder) {
         Request request = builder.build();
+        if (agentId == null) {
+            logger.log("Sending a request without agent id");
+            return request;
+        }
+
         return request.header(AGENT_ID_CUSTOM_HEADER, agentId);
     }
 
