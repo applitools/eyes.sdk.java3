@@ -12,7 +12,6 @@ import com.applitools.eyes.visualgrid.services.VisualGridTask;
 import com.applitools.utils.GeneralUtils;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.MapperFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.helger.commons.collection.impl.ICommonsList;
 import com.helger.css.ECSSVersion;
@@ -424,8 +423,10 @@ public class RenderingTask implements Callable<RenderStatusResults>, Completable
 
     private void buildAllRGDoms(Map<String, RGridResource> resourceMapping, FrameData domData) {
         URL baseUrl = null;
+        String domDataUrl = domData.getUrl();
+        logger.verbose("url in DOM: " + domDataUrl);
         try {
-            baseUrl = new URL(domData.getUrl());
+            baseUrl = new URL(domDataUrl);
         } catch (MalformedURLException e) {
             GeneralUtils.logExceptionStackTrace(logger, e);
         }
@@ -635,7 +636,7 @@ public class RenderingTask implements Callable<RenderStatusResults>, Completable
                     href = element.attr("xlink:href");
                     if (href.startsWith("#")) continue;
                 }
-                CreateUriAndAddToList(allResourceUris, tdr.uri, href);
+                createUriAndAddToList(allResourceUris, tdr.uri, href);
             }
         } catch (Exception e) {
             GeneralUtils.logExceptionStackTrace(logger, e);
@@ -738,13 +739,13 @@ public class RenderingTask implements Callable<RenderStatusResults>, Completable
         ICommonsList<CSSImportRule> allImportRules = cascadingStyleSheet.getAllImportRules();
         for (CSSImportRule importRule : allImportRules) {
             String uri = importRule.getLocation().getURI();
-            CreateUriAndAddToList(allResourceUris, baseUrl, uri);
+            createUriAndAddToList(allResourceUris, baseUrl, uri);
         }
         logger.verbose("exit");
     }
 
-    private void CreateUriAndAddToList(Set<URL> allResourceUris, URL baseUrl, String uri) {
-        if (uri.toLowerCase().startsWith("data:")) return;
+    private void createUriAndAddToList(Set<URL> allResourceUris, URL baseUrl, String uri) {
+        if (uri.toLowerCase().startsWith("data:") || uri.toLowerCase().startsWith("javascript:")) return;
         try {
             URL url = new URL(baseUrl, uri);
             allResourceUris.add(url);
@@ -761,7 +762,7 @@ public class RenderingTask implements Callable<RenderStatusResults>, Completable
             ICommonsList<CSSExpressionMemberTermURI> allUriExpressions = allExpressionMembers.getAllInstanceOf(CSSExpressionMemberTermURI.class);
             for (CSSExpressionMemberTermURI uriExpression : allUriExpressions) {
                 String uri = uriExpression.getURIString();
-                CreateUriAndAddToList(allResourceUris, baseUrl, uri);
+                createUriAndAddToList(allResourceUris, baseUrl, uri);
             }
         }
     }
