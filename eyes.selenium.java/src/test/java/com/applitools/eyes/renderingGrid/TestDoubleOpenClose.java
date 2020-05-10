@@ -28,7 +28,7 @@ public class TestDoubleOpenClose {
 
     @Test(dataProvider = "booleanDP")
     public void TestDoubleOpenCheckClose(boolean useVisualGrid) {
-        runner = useVisualGrid ? new VisualGridRunner(10) : new ClassicRunner();
+        EyesRunner runner = useVisualGrid ? new VisualGridRunner(10, "TestDoubleOpenCheckClose") : new ClassicRunner();
         final WebDriver driver = SeleniumUtils.createChromeDriver();
         try {
             final Eyes eyes = new Eyes(runner);
@@ -52,7 +52,7 @@ public class TestDoubleOpenClose {
 
     @Test(dataProvider = "booleanDP")
     public void TestDoubleOpenCheckCloseAsync(boolean useVisualGrid) {
-        runner = useVisualGrid ? new VisualGridRunner(10) : new ClassicRunner();
+        EyesRunner runner = useVisualGrid ? new VisualGridRunner(10, "TestDoubleOpenCheckCloseAsync") : new ClassicRunner();
         final WebDriver driver = SeleniumUtils.createChromeDriver();
         try {
             final Eyes eyes = new Eyes(runner);
@@ -76,7 +76,6 @@ public class TestDoubleOpenClose {
 
     @Test(dataProvider = "booleanDP")
     public void TestDoubleOpenCheckCloseWithDifferentInstances(boolean useVisualGrid) {
-        runner = useVisualGrid ? new VisualGridRunner(10) : new ClassicRunner();
         final WebDriver driver = SeleniumUtils.createChromeDriver();
         try {
             driver.get("https://applitools.github.io/demo/TestPages/VisualGridTestPage/");
@@ -105,7 +104,7 @@ public class TestDoubleOpenClose {
 
     @Test(dataProvider = "booleanDP")
     public void TestDoubleOpenCheckCloseAsyncWithDifferentInstances(boolean useVisualGrid) {
-        runner = useVisualGrid ? new VisualGridRunner(10) : new ClassicRunner();
+        EyesRunner runner = useVisualGrid ? new VisualGridRunner(10, "TestDoubleOpenCheckCloseAsyncWithDifferentInstances") : new ClassicRunner();
         final WebDriver driver = SeleniumUtils.createChromeDriver();
         try {
             driver.get("https://applitools.github.io/demo/TestPages/VisualGridTestPage/");
@@ -132,7 +131,7 @@ public class TestDoubleOpenClose {
 
     //@Test(dataProvider = "booleanDP")
     public void TestDoubleCheckDontGetAllResults(boolean useVisualGrid) {
-        runner = useVisualGrid ? new VisualGridRunner(10) : new ClassicRunner();
+        EyesRunner runner = useVisualGrid ? new VisualGridRunner(10, "TestDoubleCheckDontGetAllResults") : new ClassicRunner();
         final WebDriver driver = SeleniumUtils.createChromeDriver();
         driver.get("https://applitools.com/helloworld");
 
