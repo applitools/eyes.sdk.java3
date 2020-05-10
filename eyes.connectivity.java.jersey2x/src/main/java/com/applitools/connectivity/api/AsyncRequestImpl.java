@@ -19,8 +19,8 @@ public class AsyncRequestImpl implements AsyncRequest {
 
     @Override
     public AsyncRequest header(String name, String value) {
-        ArgumentGuard.notNullOrEmpty(name, "name");
-        ArgumentGuard.notNullOrEmpty(value, "value");
+        ArgumentGuard.notNullOrEmpty(name, "header name");
+        ArgumentGuard.notNullOrEmpty(value, name+"'s value");
         request = request.header(name, value);
         return this;
     }
