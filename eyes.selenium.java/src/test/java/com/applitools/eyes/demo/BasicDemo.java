@@ -54,7 +54,6 @@ public class BasicDemo extends ReportingTestSuite {
         eyes.checkWindow("Login Window");
         driver.findElement(By.id("log-in")).click();
         eyes.checkWindow("App Window");
-        eyes.closeAsync();
     }
 
     @BeforeClass
@@ -73,6 +72,7 @@ public class BasicDemo extends ReportingTestSuite {
         currentRunner = new ClassicRunner();
         try {
             sanityTest("Classic Runner");
+            eyes.close();
         } finally {
             if (eyes != null) {
                 eyes.abortIfNotClosed();
@@ -83,7 +83,14 @@ public class BasicDemo extends ReportingTestSuite {
     @Test
     public void visualGridTest() {
         currentRunner = new VisualGridRunner(10);
-        sanityTest("Visual Grid Runner");
+        try {
+            sanityTest("Visual Grid Runner");
+            eyes.closeAsync();
+        } finally {
+            if (eyes != null) {
+                eyes.abortAsync();
+            }
+        }
     }
 
     @After

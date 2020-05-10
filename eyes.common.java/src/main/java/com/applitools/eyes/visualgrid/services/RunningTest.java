@@ -62,22 +62,24 @@ public class RunningTest {
 
     public Future<TestResultContainer> abort(boolean forceAbort, Throwable e) {
         logger.verbose("enter");
-        removeAllCheckTasks();
+        if (closeTask != null) {
+            if (forceAbort &&  closeTask.getType() == VisualGridTask.TaskType.CLOSE) {
+                closeTask.setExceptionAndAbort(e);
+            }
+            return taskToFutureMapping.get(closeTask);
+        }
+
         if (isOpenTaskIssued()) {
             openTask.setException(e);
         }
-        if (forceAbort && closeTask != null && closeTask.getType() == VisualGridTask.TaskType.CLOSE) {
-            closeTask.setExceptionAndAbort(e);
-        }
-        if (closeTask == null) {
-            VisualGridTask abortTask = new VisualGridTask(new Configuration(configurationProvider.get()), null,
-                    eyes, VisualGridTask.TaskType.ABORT, taskListener, null, this, null, null);
-            visualGridTaskList.add(abortTask);
-            this.closeTask = abortTask;
-            FutureTask<TestResultContainer> futureTask = new FutureTask<>(abortTask);
-            taskToFutureMapping.put(abortTask, futureTask);
-            this.isCloseTaskIssued.set(true);
-        }
+
+        VisualGridTask abortTask = new VisualGridTask(new Configuration(configurationProvider.get()), null,
+                eyes, VisualGridTask.TaskType.ABORT, taskListener, null, this, null, null);
+        visualGridTaskList.add(abortTask);
+        this.closeTask = abortTask;
+        FutureTask<TestResultContainer> futureTask = new FutureTask<>(abortTask);
+        taskToFutureMapping.put(abortTask, futureTask);
+        this.isCloseTaskIssued.set(true);
         return taskToFutureMapping.get(closeTask);
     }
 
