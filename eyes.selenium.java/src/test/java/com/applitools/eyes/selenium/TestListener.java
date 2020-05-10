@@ -19,8 +19,6 @@ import java.util.Map;
 
 public class TestListener implements ITestListener {
 
-
-
     @Override
     public void onTestStart(ITestResult result) {
         //System.out.println("onTestStart");
@@ -131,8 +129,6 @@ public class TestListener implements ITestListener {
         }
     }
 
-
-
     private void compareRegions(TestSetup testSetup, ImageMatchSettings imageMatchSettings) {
         FloatingMatchSettings[] floating = imageMatchSettings.getFloating();
         AccessibilityRegionByRectangle[] accessibility = imageMatchSettings.getAccessibility();
@@ -209,5 +205,10 @@ public class TestListener implements ITestListener {
     @Override
     public void onFinish(ITestContext context) {
         //System.out.println("onFinish");
+        Object instance = context.getAllTestMethods()[0].getInstance();
+        if (instance instanceof TestSetup) {
+            TestSetup testSetup = (TestSetup) instance;
+            testSetup.getRunner().getAllTestResults(false);
+        }
     }
 }

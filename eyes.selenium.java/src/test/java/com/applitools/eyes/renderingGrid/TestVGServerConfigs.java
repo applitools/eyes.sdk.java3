@@ -25,8 +25,8 @@ public class TestVGServerConfigs {
     @Test
     public void TestVGDoubleCloseNoCheck() {
         WebDriver driver = SeleniumUtils.createChromeDriver();
+        VisualGridRunner runner = new VisualGridRunner(10);
         try {
-            VisualGridRunner runner = new VisualGridRunner(10);
             final Eyes eyes = new Eyes(runner);
             Configuration conf = new Configuration();
             conf.setAppName("app").setTestName("test");
@@ -43,20 +43,20 @@ public class TestVGServerConfigs {
             Assert.assertEquals(ex.getMessage(), "java.lang.IllegalStateException: Eyes not open");
         } finally {
             driver.quit();
+            runner.getAllTestResults();
         }
     }
+
     @Test
-    public void TestVGChangeConfigAfterOpen()
-    {
+    public void TestVGChangeConfigAfterOpen() {
         WebDriver driver = new ChromeDriver();
         driver.get("https://applitools.com/helloworld");
-        try
-        {
-            VisualGridRunner runner = new VisualGridRunner(10);
+        VisualGridRunner runner = new VisualGridRunner(10);
+        try {
             Eyes eyes = new Eyes(runner);
-            eyes.setLogHandler(new FileLogger("fabric.log", true ,true));
+            eyes.setLogHandler(new FileLogger("fabric.log", true, true));
             Configuration conf = new Configuration();
-            conf.addBrowser(new RenderBrowserInfo(800,600, BrowserType.CHROME));
+            conf.addBrowser(new RenderBrowserInfo(800, 600, BrowserType.CHROME));
             conf.setServerUrl("https://eyesfabric4eyes.applitools.com");
             conf.setApiKey("CAE7aS103TDz7XyegELya3tHpEIXTFi0gBBwvgq104PSHIU110");
             conf.setAppName("app").setTestName("test");
@@ -100,10 +100,9 @@ public class TestVGServerConfigs {
             Assert.assertEquals(AccessibilityLevel.AA, sessionResults.getActualAppOutput()[1].getImageMatchSettings().getAccessibilityLevel());
             Assert.assertTrue(sessionResults.getActualAppOutput()[1].getImageMatchSettings().getIgnoreDisplacements());
             Assert.assertEquals(MatchLevel.LAYOUT2, sessionResults.getActualAppOutput()[1].getImageMatchSettings().getMatchLevel());
-        }
-        finally
-        {
+        } finally {
             driver.quit();
+            runner.getAllTestResults();
         }
     }
 }

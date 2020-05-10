@@ -42,6 +42,7 @@ public class TestAbort {
     @AfterClass
     public void TearDown() {
         driver.quit();
+        runner.getAllTestResults();
     }
 
     @Test

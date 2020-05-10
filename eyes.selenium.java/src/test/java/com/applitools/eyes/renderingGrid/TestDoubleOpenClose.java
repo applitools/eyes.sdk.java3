@@ -20,119 +20,118 @@ import org.testng.annotations.Test;
 public class TestDoubleOpenClose {
 
     EyesRunner runner = null;
-    @DataProvider(name="booleanDP")
+
+    @DataProvider(name = "booleanDP")
     public Object[] dp() {
-        return new Object[]{Boolean.TRUE, Boolean.FALSE};
+        return new Object[]{Boolean.TRUE};//, Boolean.FALSE};
     }
 
     @Test(dataProvider = "booleanDP")
-    public void TestDoubleOpenCheckClose(boolean useVisualGrid)
-    {
+    public void TestDoubleOpenCheckClose(boolean useVisualGrid) {
         runner = useVisualGrid ? new VisualGridRunner(10) : new ClassicRunner();
         final WebDriver driver = SeleniumUtils.createChromeDriver();
-        final Eyes eyes = new Eyes(runner);
-        driver.get("https://applitools.github.io/demo/TestPages/VisualGridTestPage/");
+        try {
+            final Eyes eyes = new Eyes(runner);
+            driver.get("https://applitools.github.io/demo/TestPages/VisualGridTestPage/");
 
-        String suffix = useVisualGrid ? "_VG" : "";
+            String suffix = useVisualGrid ? "_VG" : "";
 
-        eyes.open(driver, "Applitools Eyes SDK", "TestDoubleOpenCheckClose" + suffix, new RectangleSize(1200, 800));
-        eyes.check(Target.window().fully().ignoreDisplacements(false).withName("Step 1"));
-        eyes.close(false);
+            eyes.open(driver, "Applitools Eyes SDK", "TestDoubleOpenCheckClose" + suffix, new RectangleSize(1200, 800));
+            eyes.check(Target.window().fully().ignoreDisplacements(false).withName("Step 1"));
+            eyes.close(false);
 
-        eyes.open(driver, "Applitools Eyes SDK", "TestDoubleOpenCheckClose" + suffix, new RectangleSize(1200, 800));
-        eyes.check(Target.window().fully().ignoreDisplacements(false).withName("Step 2"));
-        eyes.close(false);
-
-        driver.quit();
-
-        TestResultsSummary allTestResults = runner.getAllTestResults(false);
-        Assert.assertEquals(2, allTestResults.getAllResults().length);
+            eyes.open(driver, "Applitools Eyes SDK", "TestDoubleOpenCheckClose" + suffix, new RectangleSize(1200, 800));
+            eyes.check(Target.window().fully().ignoreDisplacements(false).withName("Step 2"));
+            eyes.close(false);
+        } finally {
+            driver.quit();
+            TestResultsSummary allTestResults = runner.getAllTestResults(false);
+            Assert.assertEquals(2, allTestResults.getAllResults().length);
+        }
     }
 
     @Test(dataProvider = "booleanDP")
-    public void TestDoubleOpenCheckCloseAsync(boolean useVisualGrid)
-    {
+    public void TestDoubleOpenCheckCloseAsync(boolean useVisualGrid) {
         runner = useVisualGrid ? new VisualGridRunner(10) : new ClassicRunner();
         final WebDriver driver = SeleniumUtils.createChromeDriver();
-        final Eyes eyes = new Eyes(runner);
-        driver.get("https://applitools.github.io/demo/TestPages/VisualGridTestPage/");
+        try {
+            final Eyes eyes = new Eyes(runner);
+            driver.get("https://applitools.github.io/demo/TestPages/VisualGridTestPage/");
 
-        String suffix = useVisualGrid ? "_VG" : "";
+            String suffix = useVisualGrid ? "_VG" : "";
 
-        eyes.open(driver, "Applitools Eyes SDK", "TestDoubleOpenCheckCloseAsync" + suffix, new RectangleSize(1200, 800));
-        eyes.check(Target.window().fully().ignoreDisplacements(false).withName("Step 1"));
-        eyes.closeAsync();
+            eyes.open(driver, "Applitools Eyes SDK", "TestDoubleOpenCheckCloseAsync" + suffix, new RectangleSize(1200, 800));
+            eyes.check(Target.window().fully().ignoreDisplacements(false).withName("Step 1"));
+            eyes.closeAsync();
 
-        eyes.open(driver, "Applitools Eyes SDK", "TestDoubleOpenCheckCloseAsync" + suffix, new RectangleSize(1200, 800));
-        eyes.check(Target.window().fully().ignoreDisplacements(false).withName("Step 2"));
-        eyes.closeAsync();
-
-        driver.quit();
-
-        TestResultsSummary allTestResults = runner.getAllTestResults(false);
-        Assert.assertEquals(2, allTestResults.getAllResults().length);
+            eyes.open(driver, "Applitools Eyes SDK", "TestDoubleOpenCheckCloseAsync" + suffix, new RectangleSize(1200, 800));
+            eyes.check(Target.window().fully().ignoreDisplacements(false).withName("Step 2"));
+            eyes.closeAsync();
+        } finally {
+            driver.quit();
+            TestResultsSummary allTestResults = runner.getAllTestResults(false);
+            Assert.assertEquals(2, allTestResults.getAllResults().length);
+        }
     }
 
     @Test(dataProvider = "booleanDP")
-    public void TestDoubleOpenCheckCloseWithDifferentInstances(boolean useVisualGrid)
-    {
+    public void TestDoubleOpenCheckCloseWithDifferentInstances(boolean useVisualGrid) {
         runner = useVisualGrid ? new VisualGridRunner(10) : new ClassicRunner();
         final WebDriver driver = SeleniumUtils.createChromeDriver();
-        driver.get("https://applitools.github.io/demo/TestPages/VisualGridTestPage/");
+        try {
+            driver.get("https://applitools.github.io/demo/TestPages/VisualGridTestPage/");
 
-        String suffix = useVisualGrid ? "_VG" : "";
+            String suffix = useVisualGrid ? "_VG" : "";
 
-        EyesRunner runner = useVisualGrid ? (EyesRunner)new VisualGridRunner(10) : new ClassicRunner();
+            EyesRunner runner = useVisualGrid ? (EyesRunner) new VisualGridRunner(10) : new ClassicRunner();
 
-        Eyes eyes1 = new Eyes(runner);
-        eyes1.setBatch(TestDataProvider.batchInfo);
-        eyes1.open(driver, "Applitools Eyes SDK", "TestDoubleOpenCheckCloseWithDifferentInstances" + suffix, new RectangleSize(1200, 800));
-        eyes1.check(Target.window().fully().ignoreDisplacements(false).withName("Step 1"));
-        eyes1.close(false);
+            Eyes eyes1 = new Eyes(runner);
+            eyes1.setBatch(TestDataProvider.batchInfo);
+            eyes1.open(driver, "Applitools Eyes SDK", "TestDoubleOpenCheckCloseWithDifferentInstances" + suffix, new RectangleSize(1200, 800));
+            eyes1.check(Target.window().fully().ignoreDisplacements(false).withName("Step 1"));
+            eyes1.close(false);
 
-        Eyes eyes2 = new Eyes(runner);
-        eyes2.setBatch(TestDataProvider.batchInfo);
-        eyes2.open(driver, "Applitools Eyes SDK", "TestDoubleOpenCheckCloseWithDifferentInstances" + suffix, new RectangleSize(1200, 800));
-        eyes2.check(Target.window().fully().ignoreDisplacements(false).withName("Step 2"));
-        eyes2.close(false);
-
-        driver.quit();
-
-        TestResultsSummary allTestResults = runner.getAllTestResults(false);
-        Assert.assertEquals(2, allTestResults.getAllResults().length);
+            Eyes eyes2 = new Eyes(runner);
+            eyes2.setBatch(TestDataProvider.batchInfo);
+            eyes2.open(driver, "Applitools Eyes SDK", "TestDoubleOpenCheckCloseWithDifferentInstances" + suffix, new RectangleSize(1200, 800));
+            eyes2.check(Target.window().fully().ignoreDisplacements(false).withName("Step 2"));
+            eyes2.close(false);
+        } finally {
+            driver.quit();
+            TestResultsSummary allTestResults = runner.getAllTestResults(false);
+            Assert.assertEquals(2, allTestResults.getAllResults().length);
+        }
     }
 
     @Test(dataProvider = "booleanDP")
-    public void TestDoubleOpenCheckCloseAsyncWithDifferentInstances(boolean useVisualGrid)
-    {
+    public void TestDoubleOpenCheckCloseAsyncWithDifferentInstances(boolean useVisualGrid) {
         runner = useVisualGrid ? new VisualGridRunner(10) : new ClassicRunner();
         final WebDriver driver = SeleniumUtils.createChromeDriver();
-        driver.get("https://applitools.github.io/demo/TestPages/VisualGridTestPage/");
+        try {
+            driver.get("https://applitools.github.io/demo/TestPages/VisualGridTestPage/");
 
-        String suffix = useVisualGrid ? "_VG" : "";
+            String suffix = useVisualGrid ? "_VG" : "";
 
+            Eyes eyes1 = new Eyes(runner);
+            eyes1.setBatch(TestDataProvider.batchInfo);
+            eyes1.open(driver, "Applitools Eyes SDK", "TestDoubleOpenCheckCloseAsyncWithDifferentInstances" + suffix, new RectangleSize(1200, 800));
+            eyes1.check(Target.window().fully().ignoreDisplacements(false).withName("Step 1"));
+            eyes1.closeAsync();
 
-        Eyes eyes1 = new Eyes(runner);
-        eyes1.setBatch(TestDataProvider.batchInfo);
-        eyes1.open(driver, "Applitools Eyes SDK", "TestDoubleOpenCheckCloseAsyncWithDifferentInstances" + suffix, new RectangleSize(1200, 800));
-        eyes1.check(Target.window().fully().ignoreDisplacements(false).withName("Step 1"));
-        eyes1.closeAsync();
-
-        Eyes eyes2 = new Eyes(runner);
-        eyes2.setBatch(TestDataProvider.batchInfo);
-        eyes2.open(driver, "Applitools Eyes SDK", "TestDoubleOpenCheckCloseAsyncWithDifferentInstances" + suffix, new RectangleSize(1200, 800));
-        eyes2.check(Target.window().fully().ignoreDisplacements(false).withName("Step 2"));
-        eyes2.closeAsync();
-
-        driver.quit();
-
-        TestResultsSummary allTestResults = runner.getAllTestResults(false);
-        Assert.assertEquals(2, allTestResults.getAllResults().length);
+            Eyes eyes2 = new Eyes(runner);
+            eyes2.setBatch(TestDataProvider.batchInfo);
+            eyes2.open(driver, "Applitools Eyes SDK", "TestDoubleOpenCheckCloseAsyncWithDifferentInstances" + suffix, new RectangleSize(1200, 800));
+            eyes2.check(Target.window().fully().ignoreDisplacements(false).withName("Step 2"));
+            eyes2.closeAsync();
+        } finally {
+            driver.quit();
+            TestResultsSummary allTestResults = runner.getAllTestResults(false);
+            Assert.assertEquals(2, allTestResults.getAllResults().length);
+        }
     }
 
-    @Test(dataProvider = "booleanDP")
-    public void TestDoubleCheckDontGetAllResults(boolean useVisualGrid)
-    {
+    //@Test(dataProvider = "booleanDP")
+    public void TestDoubleCheckDontGetAllResults(boolean useVisualGrid) {
         runner = useVisualGrid ? new VisualGridRunner(10) : new ClassicRunner();
         final WebDriver driver = SeleniumUtils.createChromeDriver();
         driver.get("https://applitools.com/helloworld");
