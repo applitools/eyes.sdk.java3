@@ -45,6 +45,8 @@ public class VisualGridRunner extends EyesRunner {
     private boolean isDisabled;
     private boolean isServicesOn = false;
 
+    private String suiteName;
+
     public void setServerUrl(String serverUrl) {
         this.serverUrl = serverUrl;
     }
@@ -75,6 +77,14 @@ public class VisualGridRunner extends EyesRunner {
 
     private void setServicesOn(boolean servicesOn) {
         isServicesOn = servicesOn;
+    }
+
+    public String getSuiteName() {
+        return suiteName;
+    }
+
+    public void setSuiteName(String suiteName) {
+        this.suiteName = suiteName;
     }
 
     public interface RenderListener {
@@ -157,16 +167,24 @@ public class VisualGridRunner extends EyesRunner {
     };
 
     public VisualGridRunner(int concurrentOpenSessions) {
-        this(concurrentOpenSessions, null, null, null, null);
+        this(concurrentOpenSessions, Thread.currentThread().getStackTrace()[2].getClassName());
+    }
+
+    public VisualGridRunner(int concurrentOpenSessions, String suiteName) {
+        this(concurrentOpenSessions, suiteName, null, null, null, null);
 
     }
 
     public VisualGridRunner(int concurrentOpenSessions,
+                            String suiteName,
                             Object openerServiceDebugLock,
                             Object checkerServiceDebugLock,
                             Object closerServiceDebugLock,
                             Object renderServiceDebugLock) {
 
+        logger.log("runner created");
+        this.suiteName = suiteName;
+        this.logger = new IdPrintingLogger(suiteName);
         this.concurrentOpenSessions = concurrentOpenSessions;
         this.openerServiceDebugLock = openerServiceDebugLock;
         this.checkerServiceDebugLock = checkerServiceDebugLock;
@@ -398,7 +416,7 @@ public class VisualGridRunner extends EyesRunner {
     }
 
     public TestResultsSummary getAllTestResultsImpl(boolean throwException) {
-        logger.verbose("enter");
+        logger.log("enter");
         Map<IRenderingEyes, Collection<Future<TestResultContainer>>> allFutures = new HashMap<>();
         for (IRenderingEyes eyes : allEyes) {
             Collection<Future<TestResultContainer>> futureList = eyes.close();
@@ -419,7 +437,7 @@ public class VisualGridRunner extends EyesRunner {
             key.getAllTestResults().clear();
             logger.verbose("trying to call future.get on " + value.size() + " futures of " + key);
             for (Future<TestResultContainer> future : value) {
-                logger.verbose("calling future.get on " + key);
+                logger.log("calling future.get on " + key);
                 TestResultContainer obj = null;
                 try {
                     obj = future.get(10, TimeUnit.MINUTES);
@@ -432,7 +450,7 @@ public class VisualGridRunner extends EyesRunner {
                         exception = e;
                     }
                 }
-                logger.verbose("got TestResultContainer: " + obj);
+                logger.log("got TestResultContainer: " + obj);
                 allResults.add(obj);
                 key.getAllTestResults().add(obj);
             }
@@ -441,7 +459,7 @@ public class VisualGridRunner extends EyesRunner {
 
         stopServices();
         notifyAllServices();
-        logger.verbose("exit");
+        logger.log("exit");
         if (throwException && exception != null) {
             throw new Error(exception);
         }
@@ -566,6 +584,10 @@ public class VisualGridRunner extends EyesRunner {
         eyesCloserService.setLogger(logger);
         eyesOpenerService.setLogger(logger);
         renderingGridService.setLogger(logger);
-        this.logger = logger;
+        if (this.logger == null) {
+            this.logger = logger;
+        }else {
+            this.logger.setLogHandler(logger.getLogHandler());
+        }
     }
 }

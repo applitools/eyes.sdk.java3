@@ -20,7 +20,11 @@ public class EyesService extends Thread {
     protected Logger logger;
 
     public void setLogger(Logger logger) {
-        this.logger = logger;
+        if (this.logger == null) {
+            this.logger = logger;
+        } else {
+            this.logger.setLogHandler(logger.getLogHandler());
+        }
     }
 
     interface Tasker {

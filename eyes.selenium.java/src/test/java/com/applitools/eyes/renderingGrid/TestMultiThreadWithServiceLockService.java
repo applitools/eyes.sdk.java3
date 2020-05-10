@@ -38,7 +38,7 @@ public final class TestMultiThreadWithServiceLockService {
     @BeforeMethod
     public void Before(ITestContext testContext) {
         concurrentOpenSessions = 3;
-        renderingManager = new VisualGridRunner(concurrentOpenSessions, openerLock, checkerLock, closerLock, renderLock);
+        renderingManager = new VisualGridRunner(concurrentOpenSessions, "TestMultiThreadWithServiceLockService", openerLock, checkerLock, closerLock, renderLock);
         renderingManager.setLogHandler(new StdoutLogHandler(TestUtils.verboseLogs));
 
         webDriver = SeleniumUtils.createChromeDriver();
