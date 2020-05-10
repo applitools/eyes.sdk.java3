@@ -39,7 +39,7 @@ public class VisualGridRunner extends EyesRunner {
     private IDebugResourceWriter debugResourceWriter;
 
     private RateLimiter rateLimiter;
-    private String serverUrl = GeneralUtils.getEnvString("APPLITOOLS_SERVER_URL");;
+    private String serverUrl = GeneralUtils.getEnvString("APPLITOOLS_SERVER_URL");
     private static final String DEFAULT_API_KEY = GeneralUtils.getEnvString("APPLITOOLS_API_KEY");
     private String apiKey = DEFAULT_API_KEY;
     private boolean isDisabled;
@@ -504,7 +504,7 @@ public class VisualGridRunner extends EyesRunner {
             this.renderingTaskList.add(renderingTask);
         }
 
-       logger.verbose("releasing renderingTaskList");
+        logger.verbose("releasing renderingTaskList");
         notifyAllServices();
     }
 
@@ -586,7 +586,7 @@ public class VisualGridRunner extends EyesRunner {
         renderingGridService.setLogger(logger);
         if (this.logger == null) {
             this.logger = logger;
-        }else {
+        } else {
             this.logger.setLogHandler(logger.getLogHandler());
         }
     }
