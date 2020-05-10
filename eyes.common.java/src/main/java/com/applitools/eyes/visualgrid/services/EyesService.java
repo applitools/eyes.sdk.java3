@@ -49,6 +49,7 @@ public class EyesService extends Thread {
     @Override
     public void run() {
         try {
+            logger.log("Service '" + this.getName() + "' had started");
             while (isServiceOn) {
                 pauseIfNeeded();
                 runNextTask();
