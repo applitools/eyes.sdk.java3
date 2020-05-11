@@ -36,7 +36,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 @SuppressWarnings("WeakerAccess")
 public class RenderingTask implements Callable<RenderStatusResults>, CompletableTask {
 
-    private static final int MAX_FETCH_FAILS = 62;
+    private static final int FETCH_TIMEOUT_SECONDS = 60;
     public static final String FULLPAGE = "full-page";
     public static final String VIEWPORT = "viewport";
     public static final int HOUR = 60 * 60 * 1000;
@@ -113,7 +113,7 @@ public class RenderingTask implements Callable<RenderStatusResults>, Completable
 
             logger.verbose("step 2");
             boolean stillRunning;
-            int fetchFails = 0;
+            long elapsedTimeStart = System.currentTimeMillis();
             boolean isForcePutAlreadyDone = false;
             List<RunningRender> runningRenders = null;
             do {
@@ -134,7 +134,6 @@ public class RenderingTask implements Callable<RenderStatusResults>, Completable
 //                        this.isForcePutNeeded.set(true);
                     }
                     logger.verbose("ERROR " + e.getMessage());
-                    fetchFails++;
                 }
                 logger.verbose("step 3.1");
                 if (runningRenders == null || runningRenders.size() == 0) {
@@ -161,7 +160,8 @@ public class RenderingTask implements Callable<RenderStatusResults>, Completable
                 }
 
                 logger.verbose("step 3.3");
-                stillRunning = worstStatus == RenderStatus.NEED_MORE_RESOURCE || isNeedMoreDom || fetchFails > MAX_FETCH_FAILS;
+                double elapsedTime = (System.currentTimeMillis() - elapsedTimeStart) / 1000;
+                stillRunning = (worstStatus == RenderStatus.NEED_MORE_RESOURCE || isNeedMoreDom) && elapsedTime < FETCH_TIMEOUT_SECONDS;
                 if (stillRunning) {
                     sendMissingResources(runningRenders, requests[0].getDom(), requests[0].getResources(), isNeedMoreDom);
                 }
