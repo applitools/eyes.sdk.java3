@@ -1,5 +1,6 @@
 package com.applitools.eyes.visualgrid.model;
 
+import com.applitools.eyes.selenium.BrowserType;
 import com.applitools.eyes.visualgrid.services.VisualGridTask;
 import com.applitools.utils.ClassVersionGetter;
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -43,7 +44,7 @@ public class RenderRequest {
     private String platform;
 
     @JsonIgnore
-    private String browserName;
+    private BrowserType browserName;
 
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private Object scriptHooks;
@@ -54,7 +55,9 @@ public class RenderRequest {
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private boolean sendDom;
 
-    public RenderRequest(String webHook, String url, RGridDom dom, Map<String, RGridResource> resources, RenderInfo renderInfo, String platform, String browserName, Object scriptHooks, List<VisualGridSelector> selectorsToFindRegionsFor, boolean sendDom, VisualGridTask visualGridTask, String stitchingServiceUrl) {
+    public RenderRequest(String webHook, String url, RGridDom dom, Map<String, RGridResource> resources, RenderInfo renderInfo,
+                         String platform, BrowserType browserName, Object scriptHooks, List<VisualGridSelector> selectorsToFindRegionsFor,
+                         boolean sendDom, VisualGridTask visualGridTask, String stitchingServiceUrl) {
         this.webhook = webHook;
         this.url = url;
         this.dom = dom;
@@ -110,11 +113,11 @@ public class RenderRequest {
         this.platform = platform;
     }
 
-    public String getBrowserName() {
+    public BrowserType getBrowserName() {
         return browserName;
     }
 
-    public void setBrowserName(String browserName) {
+    public void setBrowserName(BrowserType browserName) {
         this.browserName = browserName;
     }
 
@@ -146,7 +149,7 @@ public class RenderRequest {
     @JsonInclude(JsonInclude.Include.NON_NULL)
     public Map<String, String> getBrowser() {
         Map<String, String> map = new HashMap<>();
-        map.put("name", this.browserName);
+        map.put("name", this.browserName.name());
         map.put("platform", this.platform);
         return map;
     }

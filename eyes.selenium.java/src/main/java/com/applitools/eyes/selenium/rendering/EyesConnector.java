@@ -5,6 +5,7 @@ import com.applitools.eyes.*;
 import com.applitools.eyes.capture.AppOutputWithScreenshot;
 import com.applitools.eyes.config.IConfigurationSetter;
 import com.applitools.eyes.fluent.ICheckSettingsInternal;
+import com.applitools.eyes.selenium.BrowserType;
 import com.applitools.eyes.selenium.IConfigurationGetter;
 import com.applitools.eyes.selenium.ISeleniumConfigurationProvider;
 import com.applitools.eyes.visualgrid.model.*;
@@ -217,14 +218,7 @@ class EyesConnector extends EyesBase implements IEyesConnector, IBatchCloser {
         appEnv.setDeviceInfo(device);
         if (userAgent == null) {
             appEnv.setOs(VisualGridTask.toPascalCase(browserInfo.getPlatform()));
-            String browserName = browserInfo.getBrowserType();
-            if (browserName.equals("ie")) {
-                browserName = "IE 11";
-            } else if (browserName.equals("ie10")) {
-                browserName = "IE 10";
-            } else {
-                browserName = VisualGridTask.toPascalCase(browserName);
-            }
+            String browserName = BrowserNames.getBrowserName(browserInfo.getBrowserType());
             appEnv.setHostingApp(browserName);
         }
         logger.log("Done!");
