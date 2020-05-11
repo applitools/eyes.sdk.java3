@@ -58,10 +58,9 @@ public class TestRunningTest {
         Exception exception = new Exception();
         runningTest.abort(true, exception);
 
-        Assert.assertEquals(3, tasks.size());
+        Assert.assertEquals(2, tasks.size());
         Assert.assertEquals(tasks.get(0), openTask);
-        Assert.assertEquals(tasks.get(1), checkTask);
-        Assert.assertEquals(tasks.get(2), closeTask);
+        Assert.assertEquals(tasks.get(1), closeTask);
         Assert.assertEquals(closeTask.getType(), VisualGridTask.TaskType.ABORT);
         Assert.assertEquals(closeTask.getException(), exception);
     }
@@ -76,12 +75,11 @@ public class TestRunningTest {
         Exception exception = new Exception();
         runningTest.abort(false, exception);
 
-        Assert.assertEquals(3, tasks.size());
+        Assert.assertEquals(2, tasks.size());
         Assert.assertEquals(tasks.get(0), openTask);
         Assert.assertEquals(openTask.getException(), exception);
-        Assert.assertEquals(tasks.get(1), checkTask);
 
-        VisualGridTask abortTask = tasks.get(2);
+        VisualGridTask abortTask = tasks.get(1);
         Assert.assertEquals(abortTask.getType(), VisualGridTask.TaskType.ABORT);
         Assert.assertEquals(runningTest.getCloseTask(), abortTask);
     }
@@ -96,12 +94,11 @@ public class TestRunningTest {
         Exception exception = new Exception();
         runningTest.abort(true, exception);
 
-        Assert.assertEquals(3, tasks.size());
+        Assert.assertEquals(2, tasks.size());
         Assert.assertEquals(tasks.get(0), openTask);
         Assert.assertEquals(openTask.getException(), exception);
-        Assert.assertEquals(tasks.get(1), checkTask);
 
-        VisualGridTask abortTask = tasks.get(2);
+        VisualGridTask abortTask = tasks.get(1);
         Assert.assertEquals(abortTask.getType(), VisualGridTask.TaskType.ABORT);
         Assert.assertEquals(runningTest.getCloseTask(), abortTask);
     }

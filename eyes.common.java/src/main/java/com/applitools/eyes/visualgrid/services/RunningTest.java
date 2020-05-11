@@ -75,6 +75,7 @@ public class RunningTest {
         logger.verbose("enter");
         if (closeTask != null) {
             if (forceAbort &&  closeTask.getType() == VisualGridTask.TaskType.CLOSE) {
+                removeAllCheckTasks();
                 closeTask.setExceptionAndAbort(e);
             }
             return taskToFutureMapping.get(closeTask);
@@ -84,6 +85,7 @@ public class RunningTest {
             openTask.setException(e);
         }
 
+        removeAllCheckTasks();
         VisualGridTask abortTask = new VisualGridTask(new Configuration(configurationProvider.get()), null,
                 eyes, VisualGridTask.TaskType.ABORT, taskListener, null, this, null, null);
         visualGridTaskList.add(abortTask);
