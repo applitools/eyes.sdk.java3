@@ -98,6 +98,10 @@ public class RestClient {
         return serverUrl;
     }
 
+    protected void initClient() {
+        this.restClient = new HttpClientImpl(getTimeout(), getProxy());
+    }
+
     /**
      * Sending HTTP request to a specific url
      * @param url The target url

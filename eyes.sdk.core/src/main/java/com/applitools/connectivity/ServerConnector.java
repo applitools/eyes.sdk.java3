@@ -135,6 +135,7 @@ public class ServerConnector extends RestClient implements IServerConnector {
      */
     public RunningSession startSession(SessionStartInfo sessionStartInfo) throws EyesException {
         ArgumentGuard.notNull(sessionStartInfo, "sessionStartInfo");
+        initClient();
         String postData;
         try {
             // since the web API requires a root property for this message
@@ -548,7 +549,7 @@ public class ServerConnector extends RestClient implements IServerConnector {
         this.logger.log("called with " + batchId);
 
         final String url = String.format(CLOSE_BATCH, batchId);
-        restClient = new HttpClientImpl(getTimeout(), getProxy());
+        initClient();
         Request request = makeEyesRequest(new HttpRequestBuilder() {
             @Override
             public Request build() {
