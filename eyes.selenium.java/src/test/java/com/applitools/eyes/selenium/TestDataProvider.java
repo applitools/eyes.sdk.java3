@@ -65,7 +65,8 @@ public class TestDataProvider {
         }));
         //lists.add(Arrays.asList(platforms));
         lists.add(Arrays.asList(new Object[]{
-                //"CSS", "SCROLL",
+                "CSS",
+                "SCROLL",
                 "VG"
         }));
 

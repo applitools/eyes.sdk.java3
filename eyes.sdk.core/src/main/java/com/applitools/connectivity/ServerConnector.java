@@ -545,7 +545,7 @@ public class ServerConnector extends RestClient implements IServerConnector {
             return;
         }
         ArgumentGuard.notNull(batchId, "batchId");
-        this.logger.verbose("called with " + batchId);
+        this.logger.log("called with " + batchId);
 
         final String url = String.format(CLOSE_BATCH, batchId);
         restClient = new HttpClientImpl(getTimeout(), getProxy());

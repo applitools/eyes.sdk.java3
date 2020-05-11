@@ -76,7 +76,7 @@ public class TestListener implements ITestListener {
         Eyes eyes = testSetup.getEyes();
         try {
             if (eyes.getIsOpen()) {
-                TestResults close = eyes.close(false);
+                eyes.closeAsync();
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -85,6 +85,7 @@ public class TestListener implements ITestListener {
             if (testSetup.getDriver() != null) {
                 testSetup.getDriver().quit();
             }
+            testSetup.getRunner().getAllTestResults();
         }
     }
 
@@ -95,9 +96,15 @@ public class TestListener implements ITestListener {
 
                 TestResults results = null;
                 try {
-                    results = eyes.close();
+                    eyes.closeAsync();
                 } catch (Throwable e) {
                     throw e;
+                } finally {
+                    TestResultsSummary testResultsSummary = testSetup.getRunner().getAllTestResults();
+                    if (testResultsSummary.size() > 0) {
+                        TestResultContainer[] testResultContainers = testResultsSummary.getAllResults();
+                        results = testResultContainers[0].getTestResults();
+                    }
                 }
                 if (eyes.getIsDisabled()) {
                     eyes.getLogger().log("eyes is disabled.");

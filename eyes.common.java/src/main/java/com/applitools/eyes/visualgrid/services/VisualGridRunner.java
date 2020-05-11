@@ -182,9 +182,9 @@ public class VisualGridRunner extends EyesRunner {
                             Object closerServiceDebugLock,
                             Object renderServiceDebugLock) {
 
+        this.logger = new IdPrintingLogger(suiteName);
         logger.log("runner created");
         this.suiteName = suiteName;
-        this.logger = new IdPrintingLogger(suiteName);
         this.concurrentOpenSessions = concurrentOpenSessions;
         this.openerServiceDebugLock = openerServiceDebugLock;
         this.checkerServiceDebugLock = checkerServiceDebugLock;

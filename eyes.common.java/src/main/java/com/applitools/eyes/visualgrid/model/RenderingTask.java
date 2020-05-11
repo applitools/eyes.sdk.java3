@@ -294,9 +294,9 @@ public class RenderingTask implements Callable<RenderStatusResults>, Completable
             } catch (Throwable e) {
                 GeneralUtils.logExceptionStackTrace(logger, e);
             }
-            logger.verbose("locking putResourceCache");
-            allPuts.add(future);
-            logger.verbose("releasing putResourceCache");
+            if (future != null) {
+                allPuts.add(future);
+            }
         }
 
         logger.verbose("creating PutFutures for " + runningRenders.size() + " runningRenders");
