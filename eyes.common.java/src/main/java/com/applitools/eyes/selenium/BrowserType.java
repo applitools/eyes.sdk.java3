@@ -15,6 +15,11 @@ public enum BrowserType {
     @JsonProperty("ie10") IE_10,
     @JsonProperty("ie11") IE_11,
 
+    /**
+     * @deprecated The 'EDGE' option that is being used in your browsers' configuration will soon be deprecated.
+     * Please change it to either "EDGE_LEGACY" for the legacy version or to "EDGE_CHROMIUM" for the new
+     * Chromium-based version.
+     */
     @Deprecated @JsonProperty("edge") EDGE,
 
     @JsonProperty("edgelegacy") EDGE_LEGACY,
