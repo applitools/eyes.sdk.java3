@@ -39,6 +39,10 @@ public class RunningTest {
         this.closeTask = task;
     }
 
+    public VisualGridTask getCloseTask() {
+        return this.closeTask;
+    }
+
     public void setOpenTask(VisualGridTask task) {
         this.openTask = task;
     }
@@ -48,6 +52,13 @@ public class RunningTest {
         this.browserInfo = browserInfo;
         this.logger = logger;
     }
+
+    public RunningTest(RenderBrowserInfo browserInfo, Logger logger, ISeleniumConfigurationProvider configuration) {
+        this.browserInfo = browserInfo;
+        this.configurationProvider = configuration;
+        this.logger = logger;
+    }
+
     /******** END - PUBLIC FOR TESTING PURPOSES ONLY ********/
 
     public RunningTest(IEyesConnector eyes, ISeleniumConfigurationProvider configuration, RenderBrowserInfo browserInfo, Logger logger, RunningTestListener listener) {
