@@ -261,10 +261,6 @@ public class VisualGridTask implements Callable<TestResultContainer>, Completabl
         if(type == TaskType.CLOSE){
             type = TaskType.ABORT;
         }
-        abortRunningTest(exception);
-    }
-
-    private void abortRunningTest(Throwable exception) {
         runningTest.abort(true, exception);
     }
 
