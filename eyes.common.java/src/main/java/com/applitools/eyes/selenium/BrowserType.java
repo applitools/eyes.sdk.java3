@@ -14,7 +14,9 @@ public enum BrowserType {
     @JsonProperty("safari-2") SAFARI_TWO_VERSIONS_BACK,
     @JsonProperty("ie10") IE_10,
     @JsonProperty("ie11") IE_11,
-    @JsonProperty("edge") EDGE,
+
+    @Deprecated @JsonProperty("edge") EDGE,
+
     @JsonProperty("edgelegacy") EDGE_LEGACY,
     @JsonProperty("edgechromium") EDGE_CHROMIUM,
     @JsonProperty("edgechromium-1") EDGE_CHROMIUM_ONE_VERSION_BACK,
