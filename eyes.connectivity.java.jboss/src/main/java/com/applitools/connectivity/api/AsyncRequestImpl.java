@@ -20,7 +20,7 @@ public class AsyncRequestImpl implements AsyncRequest {
     @Override
     public AsyncRequest header(String name, String value) {
         ArgumentGuard.notNullOrEmpty(name, "name");
-        ArgumentGuard.notNullOrEmpty(value, "value");
+        ArgumentGuard.notNullOrEmpty(value, String.format("value of %s", name));
         request = request.header(name, value);
         return this;
     }

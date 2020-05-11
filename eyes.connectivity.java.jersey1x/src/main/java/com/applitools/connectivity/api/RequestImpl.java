@@ -15,7 +15,7 @@ public class RequestImpl implements Request {
     @Override
     public Request header(String name, String value) {
         ArgumentGuard.notNullOrEmpty(name, "name");
-        ArgumentGuard.notNullOrEmpty(value, "value");
+        ArgumentGuard.notNullOrEmpty(value, String.format("value of %s", name));
         request = request.header(name, value);
         return this;
     }
