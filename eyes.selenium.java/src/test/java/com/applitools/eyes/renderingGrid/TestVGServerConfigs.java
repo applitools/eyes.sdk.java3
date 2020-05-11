@@ -43,7 +43,6 @@ public class TestVGServerConfigs {
             Assert.assertEquals(ex.getMessage(), "java.lang.IllegalStateException: Eyes not open");
         } finally {
             driver.quit();
-            runner.getAllTestResults();
         }
     }
 
