@@ -21,7 +21,7 @@ public class TestDoubleOpenClose {
 
     @DataProvider(name = "booleanDP")
     public Object[] dp() {
-        return new Object[]{Boolean.TRUE};//, Boolean.FALSE};
+        return new Object[]{Boolean.TRUE, Boolean.FALSE};
     }
 
     @Test(dataProvider = "booleanDP")
