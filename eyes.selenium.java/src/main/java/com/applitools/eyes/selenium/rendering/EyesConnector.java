@@ -60,7 +60,7 @@ class EyesConnector extends EyesBase implements IEyesConnector, IBatchCloser {
     }
 
     @Override
-    public IPutFuture renderPutResource(RunningRender runningRender, RGridResource resource, String UserAgent) {
+    public IPutFuture renderPutResource(RunningRender runningRender, RGridResource resource, String userAgent) {
         return this.serverConnector.renderPutResource(runningRender, resource, userAgent, null);
     }
 
