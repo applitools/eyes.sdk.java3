@@ -12,6 +12,9 @@ public class BrowserNames {
     public static final String EDGE_CHROMIUM = "Edge Chromium";
 
     public static String getBrowserName(BrowserType browserType) {
+        if (browserType == null) {
+            browserType = BrowserType.CHROME;
+        }
         switch (browserType) {
             case CHROME:
             case CHROME_ONE_VERSION_BACK:

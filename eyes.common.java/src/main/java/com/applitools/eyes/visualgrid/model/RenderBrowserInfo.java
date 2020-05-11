@@ -27,6 +27,7 @@ public class RenderBrowserInfo {
     public RenderBrowserInfo(EmulationBaseInfo emulationInfo, String baselineEnvName) {
         this.emulationInfo = emulationInfo;
         this.baselineEnvName = baselineEnvName;
+        this.browserType = BrowserType.CHROME;
     }
 
     public RenderBrowserInfo(int width, int height) {
@@ -35,6 +36,7 @@ public class RenderBrowserInfo {
 
     public RenderBrowserInfo(EmulationBaseInfo emulationInfo) {
         this.emulationInfo = emulationInfo;
+        this.browserType = BrowserType.CHROME;
     }
 
     public RenderBrowserInfo(int width, int height, BrowserType browserType, String baselineEnvName) {
