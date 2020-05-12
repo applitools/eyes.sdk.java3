@@ -99,7 +99,9 @@ public class RestClient {
     }
 
     protected void initClient() {
-        this.restClient = new HttpClientImpl(getTimeout(), getProxy());
+        if (restClient.isClosed()) {
+            restClient = new HttpClientImpl(getTimeout(), getProxy());
+        }
     }
 
     /**

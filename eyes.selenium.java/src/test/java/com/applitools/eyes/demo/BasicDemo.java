@@ -5,44 +5,32 @@ import com.applitools.eyes.selenium.ClassicRunner;
 import com.applitools.eyes.selenium.Eyes;
 import com.applitools.eyes.utils.ReportingTestSuite;
 import com.applitools.eyes.visualgrid.services.VisualGridRunner;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.JUnit4;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
-
-import static com.google.common.base.Strings.isNullOrEmpty;
+import org.testng.annotations.BeforeClass;
+import org.testng.annotations.BeforeMethod;
+import org.testng.annotations.Test;
 
 /**
  * Runs Applitools test for the demo app https://demo.applitools.com
  */
-@RunWith(JUnit4.class)
 public class BasicDemo extends ReportingTestSuite {
-    private EyesRunner currentRunner;
-    private Eyes eyes;
     private static BatchInfo batch;
     private WebDriver driver;
     private final LogHandler logger = new StdoutLogHandler(false);
 
-    private void initEyes() {
-        currentRunner.setLogHandler(logger);
-        eyes = new Eyes(currentRunner);
+    private Eyes initEyes(EyesRunner runner) {
+        runner.setLogHandler(logger);
+        Eyes eyes = new Eyes(runner);
         eyes.setLogHandler(logger);
-        if(isNullOrEmpty(System.getenv("APPLITOOLS_API_KEY"))) {
-            throw new RuntimeException("No API Key found; Please set environment variable 'APPLITOOLS_API_KEY'.");
-        }
-
-        eyes.setApiKey(System.getenv("APPLITOOLS_API_KEY"));
         eyes.setBatch(batch);
         //eyes.setProxy(new ProxySettings("http://localhost:8888"));
+        return eyes;
     }
 
-    private void sanityTest(String testName) {
-        initEyes();
+    private Eyes sanityTest(String testName, EyesRunner runner) {
+        Eyes eyes = initEyes(runner);
         eyes.open(driver, "Demo App", testName, new RectangleSize(800, 800));
 
         // Navigate the browser to the "ACME" demo app.
@@ -54,6 +42,8 @@ public class BasicDemo extends ReportingTestSuite {
         eyes.checkWindow("Login Window");
         driver.findElement(By.id("log-in")).click();
         eyes.checkWindow("App Window");
+        eyes.closeAsync();
+        return eyes;
     }
 
     @BeforeClass
@@ -62,41 +52,44 @@ public class BasicDemo extends ReportingTestSuite {
         batch = new BatchInfo("Basic Sanity");
     }
 
-    @Before
+    @BeforeMethod
     public void beforeEach() {
         driver = new ChromeDriver();
     }
 
     @Test
     public void classicTest() {
-        currentRunner = new ClassicRunner();
+        EyesRunner runner = new ClassicRunner();
+        Eyes eyes = null;
         try {
-            sanityTest("Classic Runner");
-            eyes.close();
+            eyes = sanityTest("Classic Runner", runner);
         } finally {
             if (eyes != null) {
                 eyes.abortIfNotClosed();
             }
+
+            afterEach(runner);
         }
     }
 
     @Test
     public void visualGridTest() {
-        currentRunner = new VisualGridRunner(10);
+        EyesRunner runner = new VisualGridRunner(10);
+        Eyes eyes = null;
         try {
-            sanityTest("Visual Grid Runner");
-            eyes.closeAsync();
+            eyes = sanityTest("Visual Grid Runner", runner);
         } finally {
             if (eyes != null) {
                 eyes.abortAsync();
             }
+
+            afterEach(runner);
         }
     }
 
-    @After
-    public void afterEach() {
+    public void afterEach(EyesRunner runner) {
         driver.quit();
-        TestResultsSummary allTestResults = currentRunner.getAllTestResults();
+        TestResultsSummary allTestResults = runner.getAllTestResults();
         System.out.println(allTestResults);
     }
 }

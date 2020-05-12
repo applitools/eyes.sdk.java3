@@ -89,5 +89,6 @@ public class HttpClientImpl extends HttpClient {
 
     @Override
     public void close() {
+        isClosed = true;
     }
 }

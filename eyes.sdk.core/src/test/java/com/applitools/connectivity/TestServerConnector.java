@@ -14,16 +14,11 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.http.HttpHeaders;
 import org.apache.http.HttpStatus;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnit;
-import org.mockito.junit.MockitoRule;
-import org.powermock.core.classloader.annotations.PrepareForTest;
-import org.powermock.modules.junit4.PowerMockRunner;
+import org.mockito.MockitoAnnotations;
+import org.testng.Assert;
+import org.testng.annotations.BeforeMethod;
+import org.testng.annotations.Test;
 
 import javax.ws.rs.HttpMethod;
 
@@ -31,12 +26,7 @@ import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-@RunWith(PowerMockRunner.class)
-@PrepareForTest(RestClient.class)
 public class TestServerConnector extends ReportingTestSuite {
-
-    @Rule
-    public MockitoRule mockitoRule = MockitoJUnit.rule();
 
     @Mock
     HttpClient restClient;
@@ -71,8 +61,9 @@ public class TestServerConnector extends ReportingTestSuite {
     @Mock
     Response deleteResponse;
 
-    @Before
+    @BeforeMethod
     public void setMocks() {
+        MockitoAnnotations.initMocks(this);
         when(restClient.target(GeneralUtils.getServerUrl())).thenReturn(endPoint);
         when(endPoint.path(anyString())).thenReturn(endPoint);
         when(endPoint.queryParam(anyString(), anyString())).thenReturn(endPoint);

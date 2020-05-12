@@ -92,5 +92,6 @@ public class HttpClientImpl extends HttpClient {
     @Override
     public void close() {
         client.close();
+        isClosed = true;
     }
 }

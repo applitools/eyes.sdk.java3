@@ -8,6 +8,7 @@ public abstract class HttpClient {
 
     protected final int timeout;
     protected final AbstractProxySettings abstractProxySettings;
+    protected boolean isClosed = false;
 
     public HttpClient(int timeout, AbstractProxySettings abstractProxySettings) {
         this.timeout = timeout;
@@ -37,4 +38,8 @@ public abstract class HttpClient {
     }
 
     public abstract void close();
+
+    public boolean isClosed() {
+        return isClosed;
+    }
 }
