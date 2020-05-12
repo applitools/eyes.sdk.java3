@@ -4,6 +4,7 @@ import com.applitools.eyes.*;
 import com.applitools.eyes.selenium.ClassicRunner;
 import com.applitools.eyes.selenium.Eyes;
 import com.applitools.eyes.utils.ReportingTestSuite;
+import com.applitools.eyes.utils.TestUtils;
 import com.applitools.eyes.visualgrid.services.VisualGridRunner;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
@@ -47,7 +48,11 @@ public class BasicDemo extends ReportingTestSuite {
     }
 
     @BeforeClass
-    public static void setBatch() {
+    public static void beforeAll() {
+        if (TestUtils.runOnCI && System.getenv("TRAVIS") != null) {
+            System.setProperty("webdriver.chrome.driver", "/home/travis/build/chromedriver"); // for travis build.
+        }
+
         // Must be before ALL tests (at Class-level)
         batch = new BatchInfo("Basic Sanity");
     }
