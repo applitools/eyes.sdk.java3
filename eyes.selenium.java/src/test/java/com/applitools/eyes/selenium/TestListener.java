@@ -99,12 +99,6 @@ public class TestListener implements ITestListener {
                     eyes.closeAsync();
                 } catch (Throwable e) {
                     throw e;
-                } finally {
-                    TestResultsSummary testResultsSummary = testSetup.getRunner().getAllTestResults();
-                    if (testResultsSummary.size() > 0) {
-                        TestResultContainer[] testResultContainers = testResultsSummary.getAllResults();
-                        results = testResultContainers[0].getTestResults();
-                    }
                 }
                 if (eyes.getIsDisabled()) {
                     eyes.getLogger().log("eyes is disabled.");
