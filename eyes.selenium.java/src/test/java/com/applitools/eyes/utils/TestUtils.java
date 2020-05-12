@@ -46,6 +46,7 @@ public class TestUtils {
     public static LogHandler initLogger() {
         return initLogger(Thread.currentThread().getStackTrace()[2].getMethodName());
     }
+
     public static LogHandler initLogger(String testName, String logPath) {
 //FIXME - 
         //        if (!TestUtils.runOnCI)
@@ -87,6 +88,9 @@ public class TestUtils {
                 .build();
 
         RestClient client = new RestClient(new Logger(), apiSessionUri, ServerConnector.DEFAULT_CLIENT_TIMEOUT);
+        if (System.getenv("APPLITOOLS_USE_PROXY") != null) {
+            client.setProxy(new ProxySettings("http://127.0.0.1", 8888));
+        }
         String srStr = client.sendHttpWebRequest(apiSessionUri.toString(), HttpMethod.GET, MediaType.APPLICATION_JSON)
                 .readEntity(String.class);
         ObjectMapper jsonMapper = new ObjectMapper();
@@ -100,7 +104,7 @@ public class TestUtils {
     }
 
     public static Object getFinalStatic(Field field) throws Exception {
-        return getFieldValue(field, (Object)null);
+        return getFieldValue(field, (Object) null);
     }
 
     public static Object getFieldValue(Object instance, String fieldName) throws Exception {
