@@ -25,7 +25,7 @@ public class TestVGServerConfigs {
     @Test
     public void TestVGDoubleCloseNoCheck() {
         WebDriver driver = SeleniumUtils.createChromeDriver();
-        VisualGridRunner runner = new VisualGridRunner(10,"TestVGDoubleCloseNoCheck");
+        final VisualGridRunner runner = new VisualGridRunner(10,"TestVGDoubleCloseNoCheck");
         try {
             final Eyes eyes = new Eyes(runner);
             Configuration conf = new Configuration();
@@ -42,7 +42,12 @@ public class TestVGServerConfigs {
             });
             Assert.assertEquals(ex.getMessage(), "java.lang.IllegalStateException: Eyes not open");
         } finally {
-            runner.getAllTestResults();
+            Assert.expectThrows(Error.class, new Assert.ThrowingRunnable() {
+                @Override
+                public void run() throws Throwable {
+                    runner.getAllTestResults();
+                }
+            });
             driver.quit();
         }
     }
