@@ -20,10 +20,10 @@ public class TestRunningTest extends ReportingTestSuite {
     Logger logger = mock(Logger.class);
     ISeleniumConfigurationProvider configurationProvider = mock(ISeleniumConfigurationProvider.class);
 
-    RunningTest runningTest = new RunningTest(browserInfo, logger, configurationProvider);
-    VisualGridTask openTask = new VisualGridTask(VisualGridTask.TaskType.OPEN, logger, runningTest);
-    VisualGridTask checkTask = new VisualGridTask(VisualGridTask.TaskType.CHECK, logger, runningTest);
-    VisualGridTask closeTask = new VisualGridTask(VisualGridTask.TaskType.CLOSE, logger, runningTest);
+    RunningTest runningTest;
+    VisualGridTask openTask;
+    VisualGridTask checkTask;
+    VisualGridTask closeTask;
 
     @BeforeMethod
     public void beforeEach() {
