@@ -25,7 +25,7 @@ public class TestVGServerConfigs {
     @Test
     public void TestVGDoubleCloseNoCheck() {
         WebDriver driver = SeleniumUtils.createChromeDriver();
-        VisualGridRunner runner = new VisualGridRunner(10);
+        VisualGridRunner runner = new VisualGridRunner(10,"TestVGDoubleCloseNoCheck");
         try {
             final Eyes eyes = new Eyes(runner);
             Configuration conf = new Configuration();
@@ -42,6 +42,7 @@ public class TestVGServerConfigs {
             });
             Assert.assertEquals(ex.getMessage(), "java.lang.IllegalStateException: Eyes not open");
         } finally {
+            runner.getAllTestResults();
             driver.quit();
         }
     }
@@ -50,7 +51,7 @@ public class TestVGServerConfigs {
     public void TestVGChangeConfigAfterOpen() {
         WebDriver driver = new ChromeDriver();
         driver.get("https://applitools.com/helloworld");
-        VisualGridRunner runner = new VisualGridRunner(10);
+        VisualGridRunner runner = new VisualGridRunner(10,"TestVGChangeConfigAfterOpen");
         try {
             Eyes eyes = new Eyes(runner);
             eyes.setLogHandler(new FileLogger("fabric.log", true, true));
