@@ -96,7 +96,7 @@ public class TestListener implements ITestListener {
 
                 TestResults results = null;
                 try {
-                    eyes.closeAsync();
+                    results = eyes.close();
                 } catch (Throwable e) {
                     throw e;
                 }
