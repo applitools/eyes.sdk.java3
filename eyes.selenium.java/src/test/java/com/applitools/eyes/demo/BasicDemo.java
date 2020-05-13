@@ -49,11 +49,6 @@ public class BasicDemo extends ReportingTestSuite {
 
     @BeforeClass
     public static void beforeAll() {
-        System.getenv();
-        System.out.println("Environment variables");
-        for (String key : System.getenv().keySet()) {
-            System.out.println(String.format("%s:%s", key, System.getenv(key)));
-        }
         if (TestUtils.runOnCI && System.getenv("TRAVIS") != null) {
             System.setProperty("webdriver.chrome.driver", "/home/travis/build/chromedriver"); // for travis build.
         }

@@ -19,7 +19,7 @@ error_handler() {
 }
 
 exit_clean() {
-	if ["$?" != 0]; then
+	if [ "$?" != "0" ]; then
 		echo "Tests failed with exit code $?"
 		dump_output
 		kill $PING_LOOP_PID
