@@ -76,7 +76,6 @@ public class BasicDemo extends ReportingTestSuite {
 
             afterEach(runner);
         }
-        Assert.assertEquals(1, 2);
     }
 
     @Test
