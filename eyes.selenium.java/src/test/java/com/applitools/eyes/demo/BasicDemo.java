@@ -4,6 +4,7 @@ import com.applitools.eyes.*;
 import com.applitools.eyes.selenium.ClassicRunner;
 import com.applitools.eyes.selenium.Eyes;
 import com.applitools.eyes.utils.ReportingTestSuite;
+import com.applitools.eyes.utils.SeleniumUtils;
 import com.applitools.eyes.utils.TestUtils;
 import com.applitools.eyes.visualgrid.services.VisualGridRunner;
 import org.openqa.selenium.By;
@@ -60,7 +61,7 @@ public class BasicDemo extends ReportingTestSuite {
 
     @BeforeMethod
     public void beforeEach() {
-        driver = new ChromeDriver();
+        driver = SeleniumUtils.createChromeDriver();
     }
 
     @Test
