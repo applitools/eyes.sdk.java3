@@ -8,6 +8,7 @@
 ### Fixed
 - Fixed a bug where the Jeresy1 and Jboss connectivity modules didn't work with visual grid runner when running multiple tests simultaneously.
 - Fixed a bug where calling abortAsync when running tests with Visual Grid would cancel all previous `check` calls. [Trello 1762](https://trello.com/c/UrYlQavt)
+- Better handle `data:` URIs.
 ### Updated
 - Moved the logic from the connectivity modules and merged it into the common module to save a lot of code duplication. [Trello 1732](https://trello.com/c/mug8ARUc)
 ### Added
