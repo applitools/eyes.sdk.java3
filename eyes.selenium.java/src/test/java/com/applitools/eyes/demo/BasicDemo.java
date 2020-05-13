@@ -51,11 +51,6 @@ public class BasicDemo extends ReportingTestSuite {
 
     @BeforeClass
     public static void beforeAll() {
-        if (TestUtils.runOnCI && System.getenv("TRAVIS") != null) {
-            System.setProperty("webdriver.chrome.driver", "/home/travis/build/chromedriver"); // for travis build.
-        }
-
-        // Must be before ALL tests (at Class-level)
         batch = new BatchInfo("Basic Sanity");
     }
 

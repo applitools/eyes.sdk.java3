@@ -8,9 +8,11 @@ runTest() {
 	RESULT="$?"
 	sed -i "s/$1/$default/g" eyes.sdk.core/pom.xml
 	if [ "$RESULT" != "0" ]; then
+		"Connectivity tests failed"
 		exit "$RESULT"
 	fi
 }
 
 runTest "jboss"
 runTest "jersey1x"
+"Connectivity tests passed"
