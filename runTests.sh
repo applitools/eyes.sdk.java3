@@ -5,6 +5,7 @@ set -e
 export PING_SLEEP=30s
 export WORKDIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 export BUILD_OUTPUT=$WORKDIR/build.out
+export RESULT="0"
 
 touch $BUILD_OUTPUT
 
@@ -19,7 +20,7 @@ error_handler() {
 }
 
 exit_clean() {
-	if [ "$?" != "0" ]; then
+	if [ "$RESULT" != "0" ]; then
 		echo "Tests failed with exit code $?"
 		dump_output
 		kill $PING_LOOP_PID
@@ -38,9 +39,13 @@ PING_LOOP_PID=$!
 # My build is using maven, but you could build anything with this, E.g.
 # your_build_command_1 >> $BUILD_OUTPUT 2>&1
 # your_build_command_2 >> $BUILD_OUTPUT 2>&1
-#mvn test -e -X
-#exit_clean
+mvn test -e -X
+RESULT="$?"
+echo "Result is $RESULT"
+exit_clean
 
 #Run tests with other connectivity packages
 ./runConnectivityTests.sh
+RESULT="$?"
+echo "Result is $RESULT"
 exit_clean

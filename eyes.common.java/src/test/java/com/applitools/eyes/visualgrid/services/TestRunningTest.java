@@ -27,6 +27,7 @@ public class TestRunningTest extends ReportingTestSuite {
 
     @BeforeMethod
     public void beforeEach() {
+        System.out.println("Running TestRunningTest");
         doNothing().when(logger).verbose(anyString());
         doNothing().when(logger).log(anyString());
 
@@ -40,6 +41,7 @@ public class TestRunningTest extends ReportingTestSuite {
 
     @Test
     public void testAbortWhenCloseCalled() {
+        System.out.println("Running testAbortWhenCloseCalled");
         List<VisualGridTask> tasks = runningTest.getVisualGridTaskList();
         tasks.add(openTask);
         tasks.add(checkTask);
