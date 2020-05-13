@@ -7,7 +7,6 @@ import org.testng.annotations.Test;
 public class TestConfiguration extends ReportingTestSuite {
     @Test
     public void TestSetEnablePatterns() {
-        System.out.println("Running TestConfiguration");
         Eyes e = new Eyes();
 
         e.setEnablePatterns(true);

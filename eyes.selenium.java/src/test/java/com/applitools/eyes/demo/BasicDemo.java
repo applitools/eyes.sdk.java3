@@ -9,6 +9,7 @@ import com.applitools.eyes.visualgrid.services.VisualGridRunner;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
+import org.testng.Assert;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
@@ -75,6 +76,7 @@ public class BasicDemo extends ReportingTestSuite {
 
             afterEach(runner);
         }
+        Assert.assertEquals(1, 2);
     }
 
     @Test

@@ -5,7 +5,6 @@ set -e
 export PING_SLEEP=30s
 export WORKDIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 export BUILD_OUTPUT=$WORKDIR/build.out
-export RESULT="0"
 
 touch $BUILD_OUTPUT
 
@@ -18,16 +17,6 @@ error_handler() {
   dump_output
   exit 1
 }
-
-exit_clean() {
-	if [ "$RESULT" != "0" ]; then
-		echo "Tests failed with exit code $?"
-		dump_output
-		kill $PING_LOOP_PID
-		exit "$?"
-	fi
-}
-
 # If an error occurs, run our error handler to output a tail of the build
 trap 'error_handler' ERR
 
@@ -39,13 +28,13 @@ PING_LOOP_PID=$!
 # My build is using maven, but you could build anything with this, E.g.
 # your_build_command_1 >> $BUILD_OUTPUT 2>&1
 # your_build_command_2 >> $BUILD_OUTPUT 2>&1
-mvn test -e -X
-RESULT="$?"
-echo "Result is $RESULT"
-exit_clean
+#mvn test -e -X
 
 #Run tests with other connectivity packages
 ./runConnectivityTests.sh
-RESULT="$?"
-echo "Result is $RESULT"
-exit_clean
+
+# The build finished without returning an error so dump a tail of the output
+dump_output
+
+# nicely terminate the ping output loop
+kill $PING_LOOP_PID

@@ -8,7 +8,7 @@ runTest() {
 	RESULT="$?"
 	sed -i "s/$1/$default/g" eyes.sdk.core/pom.xml
 	if [ "$RESULT" != "0" ]; then
-		exit "$?"
+		exit "$RESULT"
 	fi
 }
 
