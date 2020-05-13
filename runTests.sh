@@ -17,6 +17,16 @@ error_handler() {
   dump_output
   exit 1
 }
+
+exit_clean() {
+	if ["$?" != 0]; then
+		echo "Tests failed with exit code $?"
+		dump_output
+		kill $PING_LOOP_PID
+		exit "$?"
+	fi
+}
+
 # If an error occurs, run our error handler to output a tail of the build
 trap 'error_handler' ERR
 
@@ -28,13 +38,9 @@ PING_LOOP_PID=$!
 # My build is using maven, but you could build anything with this, E.g.
 # your_build_command_1 >> $BUILD_OUTPUT 2>&1
 # your_build_command_2 >> $BUILD_OUTPUT 2>&1
-mvn test -e -X
+#mvn test -e -X
+#exit_clean
 
 #Run tests with other connectivity packages
 ./runConnectivityTests.sh
-
-# The build finished without returning an error so dump a tail of the output
-dump_output
-
-# nicely terminate the ping output loop
-kill $PING_LOOP_PID
+exit_clean
