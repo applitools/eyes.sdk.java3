@@ -285,4 +285,25 @@
             </class>
         </classes>
     </test>
+    <test name="TestRunningTest" parallel="methods">
+        <classes>
+            <class name="com.applitools.eyes.visualgrid.services.TestRunningTest">
+                <methods>
+                    <include name="testAbortWhenCloseCalled"/>
+                    <include name="testForceAbortWhenCloseCalled"/>
+                    <include name="testAbortWhenCloseNotCalled"/>
+                    <include name="testForceAbortWhenCloseNotCalled"/>
+                </methods>
+            </class>
+        </classes>
+    </test>
+    <test name="TestServerConnector" parallel="methods">
+        <classes>
+            <class name="com.applitools.connectivity.TestServerConnector">
+                <methods>
+                    <include name="TestStartSessionGotIsNew"/>
+                </methods>
+            </class>
+        </classes>
+    </test>
 </suite>

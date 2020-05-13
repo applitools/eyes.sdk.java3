@@ -28,7 +28,7 @@ PING_LOOP_PID=$!
 # My build is using maven, but you could build anything with this, E.g.
 # your_build_command_1 >> $BUILD_OUTPUT 2>&1
 # your_build_command_2 >> $BUILD_OUTPUT 2>&1
-mvn test -e -X
+#mvn test -e -X
 
 #Run tests with other connectivity packages
 ./runConnectivityTests.sh
