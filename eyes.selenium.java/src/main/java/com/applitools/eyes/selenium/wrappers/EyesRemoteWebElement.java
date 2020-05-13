@@ -612,10 +612,10 @@ public class EyesRemoteWebElement extends RemoteWebElement {
         return new SizeAndBorders(
                 ((Long) esAsList.get(0)).intValue(),
                 ((Long) esAsList.get(1)).intValue(),
-                Integer.parseInt(((String) esAsList.get(2)).replace("px", "")),
-                Integer.parseInt(((String) esAsList.get(3)).replace("px", "")),
-                Integer.parseInt(((String) esAsList.get(4)).replace("px", "")),
-                Integer.parseInt(((String) esAsList.get(5)).replace("px", "")));
+                Math.round(Float.parseFloat(((String) esAsList.get(2)).replace("px", ""))),
+                Math.round(Float.parseFloat(((String) esAsList.get(3)).replace("px", ""))),
+                Math.round(Float.parseFloat(((String) esAsList.get(4)).replace("px", ""))),
+                Math.round(Float.parseFloat(((String) esAsList.get(5)).replace("px", ""))));
     }
 
     public Rectangle getBoundingClientRect() {
