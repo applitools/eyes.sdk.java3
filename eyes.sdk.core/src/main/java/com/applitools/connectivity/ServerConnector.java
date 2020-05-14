@@ -343,7 +343,7 @@ public class ServerConnector extends RestClient implements IServerConnector {
             public void onComplete(Response response) {
                 RGridResource rgResource = null;
                 try {
-                    String contentLengthStr = response.getHeader("Content-length", false);
+                    String contentLengthStr = response.getHeader(Request.CONTENT_LENGTH_HEADER, false);
                     int contentLength = 0;
                     if (contentLengthStr != null) {
                         contentLength = Integer.parseInt(contentLengthStr);
@@ -357,7 +357,7 @@ public class ServerConnector extends RestClient implements IServerConnector {
                     }
 
                     byte[] fileContent = downloadFile(response);
-                    String contentType = response.getHeader("Content-Type", true);
+                    String contentType = response.getHeader(Request.CONTENT_TYPE_HEADER, true);
                     String contentEncoding = response.getHeader("Content-Encoding", true);
                     if (contentEncoding != null && contentEncoding.contains("gzip")) {
                         try {
@@ -428,7 +428,7 @@ public class ServerConnector extends RestClient implements IServerConnector {
             objectMapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
             objectMapper.configure(MapperFeature.SORT_PROPERTIES_ALPHABETICALLY, true);
             String json = objectMapper.writeValueAsString(renderRequests);
-            response = request.method(HttpMethod.POST, json, MediaType.APPLICATION_JSON);
+            response = request.method(HttpMethod.POST, json.getBytes(), MediaType.APPLICATION_JSON);
             if (validStatusCodes.contains(response.getStatusCode())) {
                 RunningRender[] runningRenders = parseResponseWithJsonData(response, validStatusCodes, new TypeReference<RunningRender[]>() {});
                 return Arrays.asList(runningRenders);
@@ -588,7 +588,7 @@ public class ServerConnector extends RestClient implements IServerConnector {
             Response response = null;
             try {
                 String json = objectMapper.writeValueAsString(renderIds);
-                response = request.method(HttpMethod.POST, json, MediaType.APPLICATION_JSON);
+                response = request.method(HttpMethod.POST, json.getBytes(), MediaType.APPLICATION_JSON);
                 if (validStatusCodes.contains(response.getStatusCode())) {
                     this.logger.verbose("request succeeded");
                     RenderStatusResults[] renderStatusResults = parseResponseWithJsonData(response, validStatusCodes, new TypeReference<RenderStatusResults[]>(){});

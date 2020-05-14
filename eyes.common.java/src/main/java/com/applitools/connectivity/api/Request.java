@@ -1,6 +1,10 @@
 package com.applitools.connectivity.api;
 
 public interface Request {
+
+    String CONTENT_LENGTH_HEADER = "Content-Length";
+    String CONTENT_TYPE_HEADER = "Content-Type";
+
     /**
      * Add a new http header to the request
      * @param name The header name
@@ -15,5 +19,5 @@ public interface Request {
      * @param contentType The data content type.  If null, no data will be sent.
      * @return Response from the server
      */
-    Response method(String method, Object data, String contentType);
+    Response method(String method, byte[] data, String contentType);
 }

@@ -142,7 +142,9 @@ public class RestClient {
         request = request
                 .header("Eyes-Expect", "202+location")
                 .header("Eyes-Date", currentTime);
-        Response response = request.method(method, data, mediaType);
+
+        byte[] dataBytes = data == null ? null : data.getBytes();
+        Response response = request.method(method, dataBytes, mediaType);
         String statusUrl = response.getHeader(HttpHeaders.LOCATION, false);
         int status = response.getStatusCode();
         if (statusUrl != null && status == HttpStatus.SC_ACCEPTED) {

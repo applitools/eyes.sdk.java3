@@ -21,11 +21,11 @@ public class RequestImpl implements Request {
     }
 
     @Override
-    public Response method(String method, Object data, String contentType) {
+    public Response method(String method, byte[] data, String contentType) {
         ArgumentGuard.notNullOrEmpty(method, "method");
         if (data != null) {
             if (contentType == null) {
-                request = request.entity(data);
+                throw new IllegalArgumentException("Content type can't be null");
             } else {
                 request = request.entity(data, contentType);
             }

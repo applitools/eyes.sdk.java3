@@ -1,7 +1,6 @@
 package com.applitools.connectivity;
 
 import com.applitools.connectivity.api.ConnectivityTarget;
-import com.applitools.connectivity.api.HttpClientImpl;
 import com.applitools.connectivity.api.Request;
 import com.applitools.connectivity.api.Response;
 import com.applitools.eyes.AbstractProxySettings;
@@ -10,7 +9,6 @@ import com.applitools.eyes.RectangleSize;
 import com.applitools.eyes.TestResults;
 import com.applitools.eyes.events.ValidationInfo;
 import com.applitools.eyes.events.ValidationResult;
-import com.applitools.utils.ArgumentGuard;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -87,7 +85,7 @@ public class RemoteSessionEventHandler extends RestClient {
         sendMessage(new HttpMethodCall() {
             public Response call() {
                 Request request = defaultEndPoint.path(autSessionId).request(MediaType.APPLICATION_JSON);
-                return request.method(HttpMethod.PUT, "{\"action\": \"initStart\"}", MediaType.APPLICATION_JSON);
+                return request.method(HttpMethod.PUT, "{\"action\": \"initStart\"}".getBytes(), MediaType.APPLICATION_JSON);
             }
         });
     }
@@ -96,7 +94,7 @@ public class RemoteSessionEventHandler extends RestClient {
         sendMessage(new HttpMethodCall() {
             public Response call() {
                 Request request = defaultEndPoint.path(autSessionId).request(MediaType.APPLICATION_JSON);
-                return request.method(HttpMethod.PUT, "{\"action\": \"initEnd\"}", MediaType.APPLICATION_JSON);
+                return request.method(HttpMethod.PUT, "{\"action\": \"initEnd\"}".getBytes(), MediaType.APPLICATION_JSON);
             }
         });
     }
@@ -105,8 +103,9 @@ public class RemoteSessionEventHandler extends RestClient {
         final RectangleSize size = sizeToSet;
         sendMessage(new HttpMethodCall() {
             public Response call() {
+                String data = "{\"action\": \"setSizeStart\", \"size\":{\"width\": " + size.getWidth() + ", \"height\": " + size.getHeight() + "}}";
                 Request request = defaultEndPoint.path(autSessionId).request(MediaType.APPLICATION_JSON);
-                return request.method(HttpMethod.PUT, "{\"action\": \"setSizeStart\", \"size\":{\"width\": " + size.getWidth() + ", \"height\": " + size.getHeight() + "}}", MediaType.APPLICATION_JSON);
+                return request.method(HttpMethod.PUT, data.getBytes(), MediaType.APPLICATION_JSON);
             }
         });
     }
@@ -115,7 +114,7 @@ public class RemoteSessionEventHandler extends RestClient {
         sendMessage(new HttpMethodCall() {
             public Response call() {
                 Request request = defaultEndPoint.path(autSessionId).request(MediaType.APPLICATION_JSON);
-                return request.method(HttpMethod.PUT, "{\"action\": \"setSizeEnd\"}", MediaType.APPLICATION_JSON);
+                return request.method(HttpMethod.PUT, "{\"action\": \"setSizeEnd\"}".getBytes(), MediaType.APPLICATION_JSON);
             }
         });
     }
@@ -125,7 +124,8 @@ public class RemoteSessionEventHandler extends RestClient {
         sendMessage(new HttpMethodCall() {
             public Response call() {
                 Request request = defaultEndPoint.request(MediaType.APPLICATION_JSON);
-                return request.method(HttpMethod.POST, "{\"autSessionId\": \"" + autSessionIdFinal + "\"}", MediaType.APPLICATION_JSON);
+                String data = "{\"autSessionId\": \"" + autSessionIdFinal + "\"}";
+                return request.method(HttpMethod.POST, data.getBytes(), MediaType.APPLICATION_JSON);
             }
         });
         this.autSessionId = autSessionId;
@@ -146,7 +146,8 @@ public class RemoteSessionEventHandler extends RestClient {
                     e.printStackTrace();
                 }
 
-                return invocationBuilder.method(HttpMethod.PUT, "{\"action\": \"testEnd\", \"testResults\":" + testResultJson + "}", MediaType.APPLICATION_JSON);
+                String data = "{\"action\": \"testEnd\", \"testResults\":" + testResultJson + "}";
+                return invocationBuilder.method(HttpMethod.PUT, data.getBytes(), MediaType.APPLICATION_JSON);
             }
         });
     }
@@ -158,7 +159,7 @@ public class RemoteSessionEventHandler extends RestClient {
                 Request request = defaultEndPoint.path(autSessionIdFinal).path("validations")
                         .request(MediaType.APPLICATION_JSON);
 
-                return request.method(HttpMethod.POST, validationInfo.toJsonString(), MediaType.APPLICATION_JSON);
+                return request.method(HttpMethod.POST, validationInfo.toJsonString().getBytes(), MediaType.APPLICATION_JSON);
             }
         });
     }
@@ -171,7 +172,8 @@ public class RemoteSessionEventHandler extends RestClient {
                         .path(autSessionIdFinal).path("validations").path(validationId)
                         .request(MediaType.APPLICATION_JSON);
 
-                return request.method(HttpMethod.PUT, "{\"action\":\"validationEnd\", \"asExpected\":" + validationResult.isAsExpected() + "}", MediaType.APPLICATION_JSON);
+                String data = "{\"action\":\"validationEnd\", \"asExpected\":" + validationResult.isAsExpected() + "}";
+                return request.method(HttpMethod.PUT, data.getBytes(), MediaType.APPLICATION_JSON);
             }
         });
     }
