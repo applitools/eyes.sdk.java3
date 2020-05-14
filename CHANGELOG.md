@@ -1,4 +1,6 @@
 ## [vNext]
+### Added
+- Edge Chromium support. [Trello 1757](https://trello.com/c/LUe43aee)
 ### Fixed
 - Better handle `data:` URIs.
 - Updated the logic of collecting resources to fix buggy behaviour. [Trello 1822](https://trello.com/c/NE50kV8P)
@@ -8,7 +10,6 @@
 - Updating configuration now updates the default match settings. [Trello 1810](https://trello.com/c/dAdD9AkN)
 ### Updated
 - Accessibility guidelines version support [Trello 1767](https://trello.com/c/gq69woeK)
-
 
 ## [3.162.0] - 2020-05-13
 ### Fixed
