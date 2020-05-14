@@ -525,9 +525,13 @@ public class RenderingTask implements Callable<RenderStatusResults>, Completable
 
     private void parseResourceUrls(FrameData result, Set<URI> resourceUrls, URI baseUrl) {
         List<String> list = result.getResourceUrls();
-        for (String url : list)
-        {
-            resourceUrls.add(baseUrl.resolve(url));
+        for (String url : list) {
+            try {
+                resourceUrls.add(baseUrl.resolve(url));
+            } catch (Exception e) {
+                logger.log("Error resolving url:" + url);
+                GeneralUtils.logExceptionStackTrace(logger, e);
+            }
         }
 
         logger.verbose("exit");
@@ -592,8 +596,13 @@ public class RenderingTask implements Callable<RenderStatusResults>, Completable
         String contentAsString = blobAsMap.getValue();
         byte[] content = codec.decode(contentAsString);
         String urlAsString = blobAsMap.getUrl();
-        URI url = baseUrl.resolve(urlAsString);
-        urlAsString = url.toString();
+        try {
+            URI url = baseUrl.resolve(urlAsString);
+            urlAsString = url.toString();
+        } catch (Exception e) {
+            logger.log("Error resolving uri:" + urlAsString);
+            GeneralUtils.logExceptionStackTrace(logger, e);
+        }
 
         @SuppressWarnings("UnnecessaryLocalVariable")
         RGridResource resource = new RGridResource(urlAsString, blobAsMap.getType(), content, logger, "parseBlobToGridResource");
@@ -679,10 +688,12 @@ public class RenderingTask implements Callable<RenderStatusResults>, Completable
             GeneralUtils.logExceptionStackTrace(logger, e);
         }
 
+        URI uri = null;
         try {
-            URI uri = new URI(GeneralUtils.sanitizeURL(blob.getUrl(), logger));
+            uri = new URI(GeneralUtils.sanitizeURL(blob.getUrl(), logger));
             tdr.uri = new URI(baseUrl).resolve(uri);
-        } catch (URISyntaxException e) {
+        } catch (Exception e) {
+            logger.log("Error resolving uri:" + uri);
             GeneralUtils.logExceptionStackTrace(logger, e);
         }
 
@@ -742,8 +753,13 @@ public class RenderingTask implements Callable<RenderStatusResults>, Completable
 
     private void createUriAndAddToList(Set<URI> allResourceUris, URI baseUrl, String uri) {
         if (uri.toLowerCase().startsWith("data:") || uri.toLowerCase().startsWith("javascript:")) return;
-        URI url = baseUrl.resolve(uri);
-        allResourceUris.add(url);
+        try {
+            URI url = baseUrl.resolve(uri);
+            allResourceUris.add(url);
+        } catch (Exception e) {
+            logger.log("Error resolving uri:" + uri);
+            GeneralUtils.logExceptionStackTrace(logger, e);
+        }
     }
 
     private <T extends IHasCSSDeclarations<T>> void getAllResourcesUrisFromDeclarations(Set<URI> allResourceUris, IHasCSSDeclarations<T> rule, String propertyName, URI baseUrl) {
