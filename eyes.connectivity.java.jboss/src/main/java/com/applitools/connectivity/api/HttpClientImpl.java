@@ -2,6 +2,7 @@ package com.applitools.connectivity.api;
 
 import com.applitools.eyes.AbstractProxySettings;
 import com.applitools.eyes.EyesException;
+import com.applitools.eyes.Logger;
 import org.apache.http.auth.AuthScope;
 import org.apache.http.auth.Credentials;
 import org.apache.http.auth.UsernamePasswordCredentials;
@@ -24,8 +25,8 @@ public class HttpClientImpl extends HttpClient {
 
     private final ResteasyClient client;
 
-    public HttpClientImpl(int timeout, AbstractProxySettings abstractProxySettings) {
-        super(timeout, abstractProxySettings);
+    public HttpClientImpl(Logger logger, int timeout, AbstractProxySettings abstractProxySettings) {
+        super(logger, timeout, abstractProxySettings);
 
         ResteasyClientBuilder builder = new ResteasyClientBuilder();
         builder = builder.establishConnectionTimeout(timeout, TimeUnit.MILLISECONDS)
@@ -81,12 +82,12 @@ public class HttpClientImpl extends HttpClient {
 
     @Override
     public ConnectivityTarget target(URI baseUrl) {
-        return new ConnectivityTargetImpl(client.target(baseUrl));
+        return new ConnectivityTargetImpl(client.target(baseUrl), logger);
     }
 
     @Override
     public ConnectivityTarget target(String path) {
-        return new ConnectivityTargetImpl(client.target(path));
+        return new ConnectivityTargetImpl(client.target(path), logger);
     }
 
     @Override

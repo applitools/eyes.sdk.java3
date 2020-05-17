@@ -1,5 +1,6 @@
 package com.applitools.connectivity.api;
 
+import com.applitools.eyes.Logger;
 import com.applitools.utils.ArgumentGuard;
 import com.sun.jersey.api.client.AsyncWebResource;
 import com.sun.jersey.api.client.ClientResponse;
@@ -8,11 +9,12 @@ import com.sun.jersey.api.client.async.TypeListener;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
-public class AsyncRequestImpl implements AsyncRequest {
+public class AsyncRequestImpl extends AsyncRequest {
 
     AsyncWebResource.Builder request;
 
-    AsyncRequestImpl(AsyncWebResource.Builder request) {
+    AsyncRequestImpl(AsyncWebResource.Builder request, Logger logger) {
+        super(logger);
         this.request = request;
     }
 
@@ -39,7 +41,7 @@ public class AsyncRequestImpl implements AsyncRequest {
             @Override
             public void onComplete(Future<ClientResponse> f) throws InterruptedException {
                 try {
-                    callback.onComplete(new ResponseImpl(f.get()));
+                    callback.onComplete(new ResponseImpl(f.get(), logger));
                 } catch (ExecutionException e) {
                     callback.onFail(e);
                 }

@@ -1,14 +1,16 @@
 package com.applitools.connectivity.api;
 
+import com.applitools.eyes.Logger;
 import com.applitools.utils.ArgumentGuard;
 
 import javax.ws.rs.client.WebTarget;
 
-public class ConnectivityTargetImpl implements ConnectivityTarget {
+public class ConnectivityTargetImpl extends ConnectivityTarget {
 
     WebTarget target;
 
-    ConnectivityTargetImpl(WebTarget target) {
+    ConnectivityTargetImpl(WebTarget target, Logger logger) {
+        super(logger);
         this.target = target;
     }
 
@@ -29,11 +31,11 @@ public class ConnectivityTargetImpl implements ConnectivityTarget {
 
     @Override
     public Request request(String... acceptableResponseTypes) {
-        return new RequestImpl(target.request(acceptableResponseTypes));
+        return new RequestImpl(target.request(acceptableResponseTypes), logger);
     }
 
     @Override
     public AsyncRequest asyncRequest(String... acceptableResponseTypes) {
-        return new AsyncRequestImpl(target.request(acceptableResponseTypes));
+        return new AsyncRequestImpl(target.request(acceptableResponseTypes), logger);
     }
 }

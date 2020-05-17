@@ -1,6 +1,7 @@
 package com.applitools.connectivity.api;
 
 import com.applitools.eyes.AbstractProxySettings;
+import com.applitools.eyes.Logger;
 import com.applitools.utils.NetworkUtils;
 import org.glassfish.jersey.apache.connector.ApacheConnectorProvider;
 import org.glassfish.jersey.client.ClientConfig;
@@ -18,8 +19,8 @@ public class HttpClientImpl extends HttpClient {
 
     private final Client client;
 
-    public HttpClientImpl(int timeout, AbstractProxySettings abstractProxySettings) {
-        super(timeout, abstractProxySettings);
+    public HttpClientImpl(Logger logger, int timeout, AbstractProxySettings abstractProxySettings) {
+        super(logger, timeout, abstractProxySettings);
 
         // Creating the client configuration
         ClientConfig clientConfig = new ClientConfig();
@@ -55,12 +56,12 @@ public class HttpClientImpl extends HttpClient {
 
     @Override
     public ConnectivityTarget target(URI baseUrl) {
-        return new ConnectivityTargetImpl(client.target(baseUrl));
+        return new ConnectivityTargetImpl(client.target(baseUrl), logger);
     }
 
     @Override
     public ConnectivityTarget target(String path) {
-        return new ConnectivityTargetImpl(client.target(path));
+        return new ConnectivityTargetImpl(client.target(path), logger);
     }
 
     @Override

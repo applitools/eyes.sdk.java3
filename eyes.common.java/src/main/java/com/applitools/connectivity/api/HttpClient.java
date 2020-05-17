@@ -1,16 +1,19 @@
 package com.applitools.connectivity.api;
 
 import com.applitools.eyes.AbstractProxySettings;
+import com.applitools.eyes.Logger;
 
 import java.net.URI;
 
 public abstract class HttpClient {
 
+    protected final Logger logger;
     protected final int timeout;
     protected final AbstractProxySettings abstractProxySettings;
     protected boolean isClosed = false;
 
-    public HttpClient(int timeout, AbstractProxySettings abstractProxySettings) {
+    public HttpClient(Logger logger, int timeout, AbstractProxySettings abstractProxySettings) {
+        this.logger = logger;
         this.timeout = timeout;
         this.abstractProxySettings = abstractProxySettings;
     }

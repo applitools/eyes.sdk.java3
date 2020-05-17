@@ -1,15 +1,17 @@
 package com.applitools.connectivity.api;
 
+import com.applitools.eyes.Logger;
 import com.applitools.utils.ArgumentGuard;
 
 import javax.ws.rs.client.Entity;
 import javax.ws.rs.client.Invocation;
 
-public class RequestImpl implements Request {
+public class RequestImpl extends Request {
 
     Invocation.Builder request;
 
-    RequestImpl(Invocation.Builder request) {
+    RequestImpl(Invocation.Builder request, Logger logger) {
+        super(logger);
         this.request = request;
     }
 
@@ -25,13 +27,13 @@ public class RequestImpl implements Request {
     public Response method(String method, byte[] data, String contentType) {
         ArgumentGuard.notNullOrEmpty(method, "method");
         if (data == null) {
-            return new ResponseImpl(request.method(method));
+            return new ResponseImpl(request.method(method), logger);
         }
 
         if (contentType == null) {
             throw new IllegalArgumentException("Content type can't be null");
         }
 
-        return new ResponseImpl(request.method(method, Entity.entity(data, contentType)));
+        return new ResponseImpl(request.method(method, Entity.entity(data, contentType)), logger);
     }
 }

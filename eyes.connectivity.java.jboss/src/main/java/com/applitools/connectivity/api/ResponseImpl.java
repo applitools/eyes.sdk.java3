@@ -1,15 +1,18 @@
 package com.applitools.connectivity.api;
 
+import com.applitools.eyes.Logger;
 import com.applitools.utils.ArgumentGuard;
 
 import javax.ws.rs.core.MultivaluedMap;
 
-public class ResponseImpl implements Response {
+public class ResponseImpl extends Response {
 
     javax.ws.rs.core.Response response;
 
-    ResponseImpl(javax.ws.rs.core.Response response) {
+    ResponseImpl(javax.ws.rs.core.Response response, Logger logger) {
+        super(logger);
         this.response = response;
+        logIfError();
     }
 
     @Override

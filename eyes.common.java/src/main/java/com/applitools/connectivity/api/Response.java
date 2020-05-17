@@ -1,9 +1,18 @@
 package com.applitools.connectivity.api;
 
-public interface Response {
-    int getStatusCode();
+import com.applitools.eyes.Logger;
 
-    String getStatusPhrase();
+public abstract class Response {
+
+    protected Logger logger;
+
+    public Response(Logger logger) {
+        this.logger = logger;
+    }
+
+    public abstract int getStatusCode();
+
+    public abstract String getStatusPhrase();
 
     /**
      * Get a response header
@@ -11,9 +20,20 @@ public interface Response {
      * @param ignoreCase If true, ignores case
      * @return The value of the header
      */
-    String getHeader(String name, boolean ignoreCase);
+    public abstract String getHeader(String name, boolean ignoreCase);
 
-    <T> T readEntity(Class<T> type);
+    public abstract <T> T readEntity(Class<T> type);
 
-    void close();
+    public abstract void close();
+
+    public void logIfError() {
+        try {
+            if (getStatusCode() > 300) {
+                logger.log(String.format("Got invalid response from the server. Status code: %s. Status Phrase: %s. Response body: %s",
+                        getStatusCode(), getStatusPhrase(), readEntity(String.class)));
+            }
+        } catch (Exception e) {
+            logger.log(String.format("Failed logging the response body. Status code: %s", getStatusCode()));
+        }
+    }
 }

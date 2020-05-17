@@ -1,5 +1,6 @@
 package com.applitools.connectivity.api;
 
+import com.applitools.eyes.Logger;
 import com.applitools.utils.ArgumentGuard;
 
 import javax.ws.rs.client.Entity;
@@ -8,11 +9,12 @@ import javax.ws.rs.client.InvocationCallback;
 import javax.ws.rs.core.Response;
 import java.util.concurrent.Future;
 
-public class AsyncRequestImpl implements AsyncRequest {
+public class AsyncRequestImpl extends AsyncRequest {
 
     Invocation.Builder request;
 
-    AsyncRequestImpl(Invocation.Builder request) {
+    AsyncRequestImpl(Invocation.Builder request, Logger logger) {
+        super(logger);
         this.request = request;
     }
 
@@ -32,7 +34,7 @@ public class AsyncRequestImpl implements AsyncRequest {
         InvocationCallback<Response> invocationCallback = new InvocationCallback<Response>() {
             @Override
             public void completed(Response response) {
-                callback.onComplete(new ResponseImpl(response));
+                callback.onComplete(new ResponseImpl(response, logger));
             }
 
             @Override

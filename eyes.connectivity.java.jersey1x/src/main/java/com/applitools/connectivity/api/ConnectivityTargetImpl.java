@@ -1,15 +1,17 @@
 package com.applitools.connectivity.api;
 
+import com.applitools.eyes.Logger;
 import com.applitools.utils.ArgumentGuard;
 import com.sun.jersey.api.client.AsyncWebResource;
 import com.sun.jersey.api.client.WebResource;
 
-public class ConnectivityTargetImpl implements ConnectivityTarget {
+public class ConnectivityTargetImpl extends ConnectivityTarget {
 
     WebResource target;
     AsyncWebResource asyncTarget;
 
-    ConnectivityTargetImpl(WebResource target, AsyncWebResource asyncTarget) {
+    ConnectivityTargetImpl(WebResource target, AsyncWebResource asyncTarget, Logger logger) {
+        super(logger);
         this.target = target;
         this.asyncTarget = asyncTarget;
     }
@@ -33,11 +35,11 @@ public class ConnectivityTargetImpl implements ConnectivityTarget {
 
     @Override
     public Request request(String... acceptableResponseTypes) {
-        return new RequestImpl(target.accept(acceptableResponseTypes));
+        return new RequestImpl(target.accept(acceptableResponseTypes), logger);
     }
 
     @Override
     public AsyncRequest asyncRequest(String... acceptableResponseTypes) {
-        return new AsyncRequestImpl(asyncTarget.accept(acceptableResponseTypes));
+        return new AsyncRequestImpl(asyncTarget.accept(acceptableResponseTypes), logger);
     }
 }

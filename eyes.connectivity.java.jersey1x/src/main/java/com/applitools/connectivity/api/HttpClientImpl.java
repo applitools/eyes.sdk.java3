@@ -1,6 +1,7 @@
 package com.applitools.connectivity.api;
 
 import com.applitools.eyes.AbstractProxySettings;
+import com.applitools.eyes.Logger;
 import com.applitools.utils.NetworkUtils;
 import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.config.ClientConfig;
@@ -21,8 +22,8 @@ public class HttpClientImpl extends HttpClient {
 
     private final Client client;
 
-    public HttpClientImpl(int timeout, final AbstractProxySettings abstractProxySettings) {
-        super(timeout, abstractProxySettings);
+    public HttpClientImpl(Logger logger, int timeout, final AbstractProxySettings abstractProxySettings) {
+        super(logger, timeout, abstractProxySettings);
 
         // Creating the client configuration
         ClientConfig clientConfig = new DefaultApacheHttpClient4Config();
@@ -79,12 +80,12 @@ public class HttpClientImpl extends HttpClient {
 
     @Override
     public ConnectivityTarget target(URI baseUrl) {
-        return new ConnectivityTargetImpl(client.resource(baseUrl), client.asyncResource(baseUrl));
+        return new ConnectivityTargetImpl(client.resource(baseUrl), client.asyncResource(baseUrl), logger);
     }
 
     @Override
     public ConnectivityTarget target(String path) {
-        return new ConnectivityTargetImpl(client.resource(path), client.asyncResource(path));
+        return new ConnectivityTargetImpl(client.resource(path), client.asyncResource(path), logger);
     }
 
     @Override

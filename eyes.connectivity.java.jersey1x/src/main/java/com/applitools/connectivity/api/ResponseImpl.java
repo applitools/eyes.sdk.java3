@@ -1,16 +1,19 @@
 package com.applitools.connectivity.api;
 
+import com.applitools.eyes.Logger;
 import com.applitools.utils.ArgumentGuard;
 import com.sun.jersey.api.client.ClientResponse;
 
 import javax.ws.rs.core.MultivaluedMap;
 
-public class ResponseImpl implements Response {
+public class ResponseImpl extends Response {
 
     ClientResponse response;
 
-    ResponseImpl(ClientResponse response) {
+    ResponseImpl(ClientResponse response, Logger logger) {
+        super(logger);
         this.response = response;
+        logIfError();
     }
 
     @Override

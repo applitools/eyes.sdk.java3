@@ -57,7 +57,7 @@ public class RestClient {
         jsonMapper = new ObjectMapper();
         jsonMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES,false);
         this.serverUrl = serverUrl;
-        this.restClient = new HttpClientImpl(timeout, null);
+        this.restClient = new HttpClientImpl(logger, timeout, null);
     }
 
     public void setLogger(Logger logger) {
@@ -72,7 +72,7 @@ public class RestClient {
     public void setProxy(AbstractProxySettings proxySettings) {
         int timeout = restClient.getTimeout();
         restClient.close();
-        restClient = new HttpClientImpl(timeout, proxySettings);
+        restClient = new HttpClientImpl(logger, timeout, proxySettings);
     }
 
     public AbstractProxySettings getProxy() {
@@ -83,7 +83,7 @@ public class RestClient {
         ArgumentGuard.greaterThanOrEqualToZero(timeout, "timeout");
         AbstractProxySettings proxySettings = restClient.getProxySettings();
         restClient.close();
-        restClient = new HttpClientImpl(timeout, proxySettings);
+        restClient = new HttpClientImpl(logger, timeout, proxySettings);
     }
 
     public int getTimeout() {
@@ -101,7 +101,7 @@ public class RestClient {
 
     protected void initClient() {
         if (restClient.isClosed()) {
-            restClient = new HttpClientImpl(getTimeout(), getProxy());
+            restClient = new HttpClientImpl(logger, getTimeout(), getProxy());
         }
     }
 
