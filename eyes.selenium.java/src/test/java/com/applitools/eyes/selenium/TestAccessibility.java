@@ -27,6 +27,7 @@ public class TestAccessibility extends ReportingTestSuite {
 
     @Test(dataProvider = "booleanDP")
     public void testAccessibility(boolean useVisualGrid) throws IOException {
+        System.out.println("Starting testAccessibility");
         EyesRunner runner = useVisualGrid ? new VisualGridRunner(10) : new ClassicRunner();
         String suffix = useVisualGrid ? "_VG" : "";
         Eyes eyes = new Eyes(runner);

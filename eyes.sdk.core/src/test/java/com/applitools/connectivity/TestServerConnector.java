@@ -120,6 +120,7 @@ public class TestServerConnector extends ReportingTestSuite {
 
     @Test
     public void TestStartSessionGotIsNew() throws JsonProcessingException {
+        System.out.println("Starting testServerConnector");
         Response response = mockLongRequest(HttpMethod.POST);
         when(response.getStatusPhrase()).thenReturn("");
 
