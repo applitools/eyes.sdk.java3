@@ -496,9 +496,10 @@ public class RenderingTask implements Callable<RenderStatusResults>, Completable
         URI baseUrl = null;
         try {
             baseUrl = new URI(baseUrlStr);
-        } catch (URISyntaxException e) {
+        } catch (Exception e) {
             GeneralUtils.logExceptionStackTrace(logger, e);
         }
+
         parseBlobs(allBlobs, codec, baseUrl, domData.getBlobs());
 
         parseResourceUrls(domData, resourceUrls, baseUrl);
@@ -616,7 +617,8 @@ public class RenderingTask implements Callable<RenderStatusResults>, Completable
     }
 
     private void getAndParseResource(RGridResource blob, String baseUrl, Set<URI> resourceUrls) {
-        TextualDataResource tdr = tryGetTextualData(blob, baseUrl);
+        URI baseUri = URI.create(baseUrl);
+        TextualDataResource tdr = tryGetTextualData(blob, baseUri);
         if (tdr == null) return;
         switch (tdr.mimeType) {
             case TEXT_CSS:
@@ -656,7 +658,7 @@ public class RenderingTask implements Callable<RenderStatusResults>, Completable
         byte[] originalData;
     }
 
-    private TextualDataResource tryGetTextualData(RGridResource blob, String baseUrl) {
+    private TextualDataResource tryGetTextualData(RGridResource blob, URI baseUrl) {
         byte[] contentBytes = blob.getContent();
 //        logger.verbose(String.format("enter - content length: %d ; content type: %s", contentBytes.length , contentTypeStr));
         String contentTypeStr = blob.getContentType();
@@ -691,7 +693,7 @@ public class RenderingTask implements Callable<RenderStatusResults>, Completable
         URI uri = null;
         try {
             uri = new URI(GeneralUtils.sanitizeURL(blob.getUrl(), logger));
-            tdr.uri = new URI(baseUrl).resolve(uri);
+            tdr.uri = baseUrl.resolve(uri);
         } catch (Exception e) {
             logger.log("Error resolving uri:" + uri);
             GeneralUtils.logExceptionStackTrace(logger, e);
