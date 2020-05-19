@@ -81,6 +81,7 @@ public class TestAccessibility extends ReportingTestSuite {
                     new AccessibilityRegionByRectangle(8, 1270, 690, 206, AccessibilityRegionType.LargeText),
                     new AccessibilityRegionByRectangle(10, 284, 800, 500, AccessibilityRegionType.LargeText)
             )));
+            System.out.println("Finished testAccessibility");
         }
     }
 }
