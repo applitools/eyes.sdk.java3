@@ -104,12 +104,11 @@
 
     <test name="TestFluentApi">
         <parameter name="dont_run"
-                   value="TestCheckFullWindowWithMultipleIgnoreRegionsBySelector_Fluent+VG, TestCheckWindow_Fluent+VG, TestCheckWindowWithFloatingByRegion_Fluent+VG, TestCheckWindowWithFloatingBySelector_Fluent+VG, TestCheckWindowWithIgnoreBySelector_Centered_Fluent+VG, TestCheckWindowWithIgnoreBySelector_Fluent+VG, TestCheckWindowWithIgnoreBySelector_Stretched_Fluent+VG, TestCheckWindowWithIgnoreRegion_Fluent+VG, TestIgnoreDisplacements+VG, TestAccessibilityRegions+VG, TestCheckMany+VG, TestScrollbarsHiddenAndReturned_Fluent+VG, TestScrollbarsHiddenAndReturned_Fluent+SCROLL"/>
+                   value="TestCheckFullWindowWithMultipleIgnoreRegionsBySelector_Fluent+VG, TestCheckWindow_Fluent+VG, TestCheckWindowWithFloatingByRegion_Fluent+VG, TestCheckWindowWithFloatingBySelector_Fluent+VG, TestCheckWindowWithIgnoreBySelector_Centered_Fluent+VG, TestCheckWindowWithIgnoreBySelector_Fluent+VG, TestCheckWindowWithIgnoreBySelector_Stretched_Fluent+VG, TestCheckWindowWithIgnoreRegion_Fluent+VG, TestIgnoreDisplacements+VG, TestCheckMany+VG, TestScrollbarsHiddenAndReturned_Fluent+VG, TestScrollbarsHiddenAndReturned_Fluent+SCROLL"/>
         <classes>
             <class name="com.applitools.eyes.selenium.TestFluentApi">
                 <methods>
                     <include name="TestIgnoreDisplacements" />
-                    <include name="TestAccessibilityRegions" />
                     <include name="TestCheckElementFully_Fluent" />
                     <include name="TestCheckElementWithIgnoreRegionByElementOutsideTheViewport_Fluent" />
                     <include name="TestCheckFullWindowWithMultipleIgnoreRegionsBySelector_Fluent" />
@@ -281,6 +280,15 @@
             <class name="com.applitools.eyes.renderingGrid.TestVGNoMissingSteps">
                 <methods>
                     <include name="TestNoMissingSteps_UT"/>
+                </methods>
+            </class>
+        </classes>
+    </test>
+    <test name="TestAccessibility" parallel="methods">
+        <classes>
+            <class name="com.applitools.eyes.selenium.TestAccessibility">
+                <methods>
+                    <include name="testAccessibility"/>
                 </methods>
             </class>
         </classes>
