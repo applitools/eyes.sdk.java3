@@ -25,7 +25,7 @@ public class TestFluentApi extends TestSetup {
         super.getWebDriver().findElement(By.tagName("input")).sendKeys("My Input");
         getEyes().check("Fluent - Window with Ignore region", Target.window()
                 .fully()
-                .timeout(5000)
+                .timeout(0) // FIXME: removed retry to avoid a bug.
                 .ignoreCaret()
                 .ignore(new Region(50, 50, 100, 100)));
 
