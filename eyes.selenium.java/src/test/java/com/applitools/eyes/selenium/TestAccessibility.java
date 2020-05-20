@@ -27,8 +27,8 @@ public class TestAccessibility extends ReportingTestSuite {
 
     @Test(dataProvider = "booleanDP")
     public void testAccessibility(boolean useVisualGrid) throws IOException {
-        System.out.println("Starting testAccessibility");
         EyesRunner runner = useVisualGrid ? new VisualGridRunner(10) : new ClassicRunner();
+        runner.setLogHandler(new StdoutLogHandler());
         String suffix = useVisualGrid ? "_VG" : "";
         Eyes eyes = new Eyes(runner);
         AccessibilitySettings settings = new AccessibilitySettings(AccessibilityLevel.AA, AccessibilityGuidelinesVersion.WCAG_2_0);
@@ -81,7 +81,6 @@ public class TestAccessibility extends ReportingTestSuite {
                     new AccessibilityRegionByRectangle(8, 1270, 690, 206, AccessibilityRegionType.LargeText),
                     new AccessibilityRegionByRectangle(10, 284, 800, 500, AccessibilityRegionType.LargeText)
             )));
-            System.out.println("Finished testAccessibility");
         }
     }
 }
