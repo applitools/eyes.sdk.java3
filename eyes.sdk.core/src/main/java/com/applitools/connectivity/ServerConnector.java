@@ -28,6 +28,7 @@ import java.util.concurrent.Future;
 public class ServerConnector extends RestClient implements IServerConnector {
 
     public static final int DEFAULT_CLIENT_TIMEOUT = 1000 * 60 * 5; // 5 minutes
+    private static final int MAX_CONNECTION_RETRIES = 3;
 
     String API_SESSIONS = "api/sessions";
     String CLOSE_BATCH = "api/sessions/batches/%s/close/bypointerid";
@@ -277,7 +278,11 @@ public class ServerConnector extends RestClient implements IServerConnector {
         return statusCode;
     }
 
-    public void downloadString(final URL uri, final boolean isSecondRetry, final IDownloadListener<String> listener) {
+    public void downloadString(final URL uri, final IDownloadListener<String> listener) {
+        downloadString(uri, listener, 1);
+    }
+
+    public void downloadString(final URL uri, final IDownloadListener<String> listener, final int attemptNumber) {
         AsyncRequest asyncRequest = restClient.target(uri.toString()).asyncRequest(MediaType.WILDCARD);
         asyncRequest.method(HttpMethod.GET, new AsyncRequestCallback() {
             @Override
@@ -302,9 +307,9 @@ public class ServerConnector extends RestClient implements IServerConnector {
             @Override
             public void onFail(Throwable throwable) {
                 GeneralUtils.logExceptionStackTrace(logger, throwable);
-                if (!isSecondRetry) {
-                    logger.verbose("Async GET failed - entering retry");
-                    downloadString(uri, true, listener);
+                if (attemptNumber < MAX_CONNECTION_RETRIES) {
+                    logger.verbose(String.format("Failed downloading resource %s - trying again", uri));
+                    downloadString(uri, listener, attemptNumber + 1);
                 } else {
                     listener.onDownloadFailed();
                 }
@@ -312,7 +317,11 @@ public class ServerConnector extends RestClient implements IServerConnector {
         }, null, null);
     }
 
-    public Future<?> downloadResource(final URL url, String userAgent, final IDownloadListener<RGridResource> listener) {
+    public Future<?> downloadResource(final URL url, final String userAgent, final IDownloadListener<RGridResource> listener) {
+        return downloadResource(url, userAgent, listener, 1);
+    }
+
+    public Future<?> downloadResource(final URL url, final String userAgent, final IDownloadListener<RGridResource> listener, final int attemptNumber) {
         AsyncRequest asyncRequest = restClient.target(url.toString()).asyncRequest(MediaType.WILDCARD);
         asyncRequest.header("User-Agent", userAgent);
 
@@ -355,7 +364,12 @@ public class ServerConnector extends RestClient implements IServerConnector {
             @Override
             public void onFail(Throwable throwable) {
                 GeneralUtils.logExceptionStackTrace(logger, throwable);
-                listener.onDownloadFailed();
+                if (attemptNumber < MAX_CONNECTION_RETRIES) {
+                    logger.verbose(String.format("Failed downloading resource %s - trying again", url));
+                    downloadResource(url, userAgent, listener, attemptNumber + 1);
+                } else {
+                    listener.onDownloadFailed();
+                }
             }
         }, null, null);
     }

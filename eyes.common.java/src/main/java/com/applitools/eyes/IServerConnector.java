@@ -103,10 +103,9 @@ public interface IServerConnector {
      * Downloads string from a given Url
      *
      * @param uri The URI from which the IServerConnector will download the string
-     * @param isSecondRetry Indicates if a retry is mandatory onFailed - 2 retries per request
      * @param listener the listener will be called when the request will be resolved.
      */
-    void downloadString(URL uri, boolean isSecondRetry, IDownloadListener<String> listener);
+    void downloadString(URL uri, IDownloadListener<String> listener);
 
     /**
      * Downloads string from a given Url.

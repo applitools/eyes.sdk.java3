@@ -354,7 +354,7 @@ public class DomCapture {
     private void downloadCss(final CssTreeNode node, final IDownloadListener<String> listener) {
         cssPhaser.register();
         logger.verbose("Given URL to download: " + node.url);
-        mServerConnector.downloadString(node.url, false, new IDownloadListener<String>() {
+        mServerConnector.downloadString(node.url, new IDownloadListener<String>() {
             @Override
             public void onDownloadComplete(String downloadedResource) {
                 try {
