@@ -211,6 +211,10 @@ public class RenderingTask implements Callable<RenderStatusResults>, Completable
             try {
                 logger.verbose("trying to get url from map - " + url);
                 RGridResource resource = fetchedCacheMap.get(url);
+                if (resource == null) {
+                    logger.log(String.format("Illegal state: resource is null for url %s", url));
+                    continue;
+                }
                 IPutFuture future = this.eyesConnector.renderPutResource(runningRender, resource, userAgent.getOriginalUserAgentString());
                 logger.verbose("locking putResourceCache");
                 synchronized (putResourceCache) {
@@ -321,6 +325,10 @@ public class RenderingTask implements Callable<RenderStatusResults>, Completable
             }
 
             RGridResource resource = fetchedCacheMap.get(url);
+            if (resource == null) {
+                logger.log(String.format("Illegal state: resource is null for url %s", url));
+                continue;
+            }
             logger.verbose("resource(" + resource.getUrl() + ") hash : " + resource.getSha256());
             IPutFuture future = this.eyesConnector.renderPutResource(runningRender, resource, userAgent.getOriginalUserAgentString());
             String contentType = resource.getContentType();
@@ -364,10 +372,14 @@ public class RenderingTask implements Callable<RenderStatusResults>, Completable
         for (String url : allBlobs.keySet()) {
             try {
                 logger.verbose("trying to fetch - " + url);
-                RGridResource value = this.fetchedCacheMap.get(url);
-                if (value.getContent() != null) {
+                RGridResource resource = this.fetchedCacheMap.get(url);
+                if (resource == null) {
+                    logger.log(String.format("Illegal state: resource is null for url %s", url));
+                    continue;
+                }
+                if (resource.getContent() != null) {
                     logger.verbose("adding url to map: " + url);
-                    resourceMapping.put(url, value);
+                    resourceMapping.put(url, resource);
                 }
             } catch (Exception e) {
                 logger.verbose("Couldn't download url = " + url);
@@ -834,12 +846,8 @@ public class RenderingTask implements Callable<RenderStatusResults>, Completable
             GeneralUtils.logExceptionStackTrace(logger, e);
         }
         logger.verbose("done writing to debugWriter");
-        if (resource.isResourceParsed()) {
-            return newResourceUrls;
-        }
 
         allBlobs.put(resource.getUrl(), resource);
-
         String contentType = resource.getContentType();
         logger.verbose("handling " + contentType + " resource from URL: " + url);
         getAndParseResource(resource, result.getUrl(), newResourceUrls);
