@@ -9,13 +9,13 @@ import com.applitools.eyes.selenium.IConfigurationGetter;
 import com.applitools.eyes.selenium.ISeleniumConfigurationProvider;
 import com.applitools.eyes.visualgrid.model.*;
 import com.applitools.eyes.visualgrid.services.IEyesConnector;
-import com.applitools.eyes.visualgrid.services.IResourceFuture;
 import com.applitools.eyes.visualgrid.services.VisualGridTask;
 import com.applitools.utils.ClassVersionGetter;
 
 import java.net.URI;
 import java.net.URL;
 import java.util.List;
+import java.util.concurrent.Future;
 
 class EyesConnector extends EyesBase implements IEyesConnector, IBatchCloser {
 
@@ -55,8 +55,8 @@ class EyesConnector extends EyesBase implements IEyesConnector, IBatchCloser {
     }
 
     @Override
-    public IResourceFuture getResource(URL url, String userAgent) {
-        return this.serverConnector.downloadResource(url, userAgent, null);
+    public Future<?> getResource(URL url, String userAgent, IDownloadListener<RGridResource> listener) {
+        return this.serverConnector.downloadResource(url, userAgent, listener);
     }
 
     @Override
@@ -73,11 +73,6 @@ class EyesConnector extends EyesBase implements IEyesConnector, IBatchCloser {
     @Override
     public List<RenderStatusResults> renderStatusById(String... renderIds) {
         return this.serverConnector.renderStatusById(renderIds);
-    }
-
-    @Override
-    public IResourceFuture createResourceFuture(RGridResource rg) {
-        return this.serverConnector.createResourceFuture(rg, userAgent);
     }
 
     @Override

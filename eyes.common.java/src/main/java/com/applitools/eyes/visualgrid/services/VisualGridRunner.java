@@ -25,7 +25,7 @@ public class VisualGridRunner extends EyesRunner {
     private ThreadGroup servicesGroup = new ThreadGroup("Services Group");
     private final List<IRenderingEyes> eyesToOpenList = Collections.synchronizedList(new ArrayList<IRenderingEyes>(200));
     private final Set<IRenderingEyes> allEyes = Collections.synchronizedSet(new HashSet<IRenderingEyes>());
-    private Map<String, IResourceFuture> cachedResources = Collections.synchronizedMap(new HashMap<String, IResourceFuture>());
+    private Map<String, RGridResource> cachedResources = Collections.synchronizedMap(new HashMap<String, RGridResource>());
     private Map<String, IPutFuture> putResourceCache = Collections.synchronizedMap(new HashMap<String, IPutFuture>());
 
     private final Object openerServiceConcurrencyLock = new Object();
@@ -196,7 +196,7 @@ public class VisualGridRunner extends EyesRunner {
         logger.verbose("rendering grid manager is built");
     }
 
-    public Map<String, IResourceFuture> getCachedResources() {
+    public Map<String, RGridResource> getCachedResources() {
         return cachedResources;
     }
 

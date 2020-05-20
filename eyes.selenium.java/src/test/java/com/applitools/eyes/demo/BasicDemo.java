@@ -22,7 +22,6 @@ public class BasicDemo extends ReportingTestSuite {
     private final LogHandler logger = new StdoutLogHandler(false);
 
     private Eyes initEyes(EyesRunner runner) {
-        runner.setLogHandler(logger);
         Eyes eyes = new Eyes(runner);
         eyes.setLogHandler(logger);
         eyes.setBatch(batch);

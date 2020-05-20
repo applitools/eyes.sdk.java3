@@ -2,11 +2,11 @@ package com.applitools.eyes.visualgrid.model;
 
 import com.applitools.ICheckSettings;
 import com.applitools.ICheckSettingsInternal;
+import com.applitools.eyes.IDownloadListener;
 import com.applitools.eyes.IPutFuture;
 import com.applitools.eyes.Logger;
 import com.applitools.eyes.UserAgent;
 import com.applitools.eyes.visualgrid.services.IEyesConnector;
-import com.applitools.eyes.visualgrid.services.IResourceFuture;
 import com.applitools.eyes.visualgrid.services.VisualGridRunner;
 import com.applitools.eyes.visualgrid.services.VisualGridTask;
 import com.applitools.utils.GeneralUtils;
@@ -27,9 +27,7 @@ import org.jsoup.select.Elements;
 import java.io.UnsupportedEncodingException;
 import java.net.*;
 import java.util.*;
-import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -50,7 +48,7 @@ public class RenderingTask implements Callable<RenderStatusResults>, Completable
     private List<VisualGridTask> openVisualGridTaskList;
     private RenderingInfo renderingInfo;
     private UserAgent userAgent;
-    private final Map<String, IResourceFuture> fetchedCacheMap;
+    private final Map<String, RGridResource> fetchedCacheMap;
     private final Map<String, IPutFuture> putResourceCache;
     private Logger logger;
     private AtomicBoolean isTaskComplete = new AtomicBoolean(false);
@@ -62,6 +60,9 @@ public class RenderingTask implements Callable<RenderStatusResults>, Completable
     private RGridDom dom = null;
     private Timer timer = new Timer("VG_StopWatch", true);
     private AtomicBoolean isTimeElapsed = new AtomicBoolean(false);
+
+    // Phaser for syncing all futures downloading resources
+    private Phaser resourcesPhaser = new Phaser();
 
     @SuppressWarnings({"unused", "FieldCanBeLocal"})
     private boolean isTaskStarted = false;
@@ -201,7 +202,6 @@ public class RenderingTask implements Callable<RenderStatusResults>, Completable
     }
 
     private void forcePutAllResources(Map<String, RGridResource> resources, RGridDom dom, RunningRender runningRender) {
-        RGridResource resource;
         List<IPutFuture> allPuts = new ArrayList<>();
         Set<String> strings = resources.keySet();
         try {
@@ -212,26 +212,15 @@ public class RenderingTask implements Callable<RenderStatusResults>, Completable
         for (String url : strings) {
             try {
                 logger.verbose("trying to get url from map - " + url);
-                IResourceFuture resourceFuture = fetchedCacheMap.get(url);
-                if (resourceFuture == null) {
-                    logger.verbose("fetchedCacheMap.get(url) == null trying dom");
-                    if (url.equals(this.dom.getUrl())) {
-                        resource = this.dom.asResource();
-                    } else {
-                        logger.verbose("Resource not found Exiting...");
-                        return;
+                RGridResource resource = fetchedCacheMap.get(url);
+                IPutFuture future = this.eyesConnector.renderPutResource(runningRender, resource, userAgent.getOriginalUserAgentString());
+                logger.verbose("locking putResourceCache");
+                synchronized (putResourceCache) {
+                    String contentType = resource.getContentType();
+                    if (contentType != null && !contentType.equalsIgnoreCase(RGridDom.CONTENT_TYPE)) {
+                        putResourceCache.put(this.dom.getUrl(), future);
                     }
-                } else {
-                    resource = resourceFuture.get();
-                    IPutFuture future = this.eyesConnector.renderPutResource(runningRender, resource, userAgent.getOriginalUserAgentString());
-                    logger.verbose("locking putResourceCache");
-                    synchronized (putResourceCache) {
-                        String contentType = resource.getContentType();
-                        if (contentType != null && !contentType.equalsIgnoreCase(RGridDom.CONTENT_TYPE)) {
-                            putResourceCache.put(this.dom.getUrl(), future);
-                        }
-                        allPuts.add(future);
-                    }
+                    allPuts.add(future);
                 }
             } catch (Exception e) {
                 GeneralUtils.logExceptionStackTrace(logger, e);
@@ -324,7 +313,6 @@ public class RenderingTask implements Callable<RenderStatusResults>, Completable
 
     private void createPutFutures(List<IPutFuture> allPuts, RunningRender runningRender, Map<String, RGridResource> resources) {
         List<String> needMoreResources = runningRender.getNeedMoreResources();
-        RGridResource resource;
         for (String url : needMoreResources) {
             if (putResourceCache.containsKey(url)) {
                 IPutFuture putFuture = putResourceCache.get(url);
@@ -334,21 +322,7 @@ public class RenderingTask implements Callable<RenderStatusResults>, Completable
                 continue;
             }
 
-            //                    logger.verbose("trying to get url from map - " + url);
-            IResourceFuture resourceFuture = fetchedCacheMap.get(url);
-            if (resourceFuture == null) {
-                logger.verbose("fetchedCacheMap.get(url) == null - " + url);
-                logger.verbose("Resource put requested but never downloaded(maybe a Frame)");
-                resource = resources.get(url);
-            } else {
-                try {
-                    resource = resourceFuture.get();
-                } catch (InterruptedException | ExecutionException e) {
-                    GeneralUtils.logExceptionStackTrace(logger, e);
-                    continue;
-                }
-//
-            }
+            RGridResource resource = fetchedCacheMap.get(url);
             logger.verbose("resource(" + resource.getUrl() + ") hash : " + resource.getSha256());
             IPutFuture future = this.eyesConnector.renderPutResource(runningRender, resource, userAgent.getOriginalUserAgentString());
             String contentType = resource.getContentType();
@@ -358,13 +332,10 @@ public class RenderingTask implements Callable<RenderStatusResults>, Completable
                 }
             }
             allPuts.add(future);
-
         }
-
     }
 
     private RenderRequest[] prepareDataForRG(FrameData domData) {
-
         final Map<String, RGridResource> allBlobs = Collections.synchronizedMap(new HashMap<String, RGridResource>());
         Set<URI> resourceUrls = new HashSet<>();
 
@@ -376,6 +347,11 @@ public class RenderingTask implements Callable<RenderStatusResults>, Completable
 
         //Fetch all resources
         fetchAllResources(allBlobs, resourceUrls, domData);
+        try {
+            resourcesPhaser.awaitAdvanceInterruptibly(0, 30, TimeUnit.SECONDS);
+        } catch (InterruptedException | TimeoutException e) {
+            GeneralUtils.logExceptionStackTrace(logger, e);
+        }
         if (!resourceUrls.isEmpty()) {
             logger.verbose("ERROR resourceUrl is not empty!!!!!***************************");
         }
@@ -390,13 +366,10 @@ public class RenderingTask implements Callable<RenderStatusResults>, Completable
         for (String url : allBlobs.keySet()) {
             try {
                 logger.verbose("trying to fetch - " + url);
-                IResourceFuture iResourceFuture = this.fetchedCacheMap.get(url);
-                if (iResourceFuture != null) {
-                    RGridResource value = iResourceFuture.get();
-                    if (value.getContent() != null) {
-                        logger.verbose("adding url to map: " + url);
-                        resourceMapping.put(url, value);
-                    }
+                RGridResource value = this.fetchedCacheMap.get(url);
+                if (value.getContent() != null) {
+                    logger.verbose("adding url to map: " + url);
+                    resourceMapping.put(url, value);
                 }
             } catch (Exception e) {
                 logger.verbose("Couldn't download url = " + url);
@@ -484,9 +457,7 @@ public class RenderingTask implements Callable<RenderStatusResults>, Completable
         }
     }
 
-    @SuppressWarnings("unchecked")
     private void parseScriptResult(FrameData domData, Map<String, RGridResource> allBlobs, Set<URI> resourceUrls) {
-
         Base64 codec = new Base64();
 
         String baseUrlStr = domData.getUrl();
@@ -776,29 +747,8 @@ public class RenderingTask implements Callable<RenderStatusResults>, Completable
             }
         }
     }
-//
-//    private <T extends IHasCSSDeclarations<T>> void getAllFontResourcesUrisFromDeclarations(Set<URL> allResourceUris, IHasCSSDeclarations<CSSFontFaceRule> rule, String propertyName, URL baseUrl) {
-//        ICommonsList<CSSDeclaration> sourcesList = rule.getAllDeclarationsOfPropertyName(propertyName);
-//        for (CSSDeclaration cssDeclaration : sourcesList) {
-//            CSSExpression cssDeclarationExpression = cssDeclaration.getExpression();
-//            ICommonsList<ICSSExpressionMember> allExpressionMembers = cssDeclarationExpression.getAllMembers();
-//            ICommonsList<CSSExpressionMemberTermURI> allUriExpressions = allExpressionMembers.getAllInstanceOf(CSSExpressionMemberTermURI.class);
-//            for (CSSExpressionMemberTermURI uriExpression : allUriExpressions) {
-//                try {
-//                    String uri = uriExpression.getURIString();
-//                    if (uri.toLowerCase().startsWith("data:")) continue;
-//                    URL url = new URL(baseUrl, uri);
-//                    allResourceUris.add(url);
-//                } catch (MalformedURLException e) {
-//                    GeneralUtils.logExceptionStackTrace(logger, e);
-//                }
-//            }
-//        }
-//    }
-//
 
     private List<RGridResource> addBlobsToCache(Map<String, RGridResource> allBlobs) {
-
         logger.verbose(String.format("trying to add %d blobs to cache", allBlobs.size()));
         logger.verbose(String.format("current fetchedCacheMap size: %d", fetchedCacheMap.size()));
         List<RGridResource> unparsedResources = new ArrayList<>();
@@ -808,8 +758,7 @@ public class RenderingTask implements Callable<RenderStatusResults>, Completable
             String contentType = blob.getContentType();
             try {
                 if (contentType == null || !contentType.equalsIgnoreCase(RGridDom.CONTENT_TYPE)) {
-                    IResourceFuture resourceFuture = this.eyesConnector.createResourceFuture(blob);
-                    fetchedCacheMap.put(url, resourceFuture);
+                    fetchedCacheMap.put(url, blob);
                 }
             } catch (Throwable e) {
                 e.printStackTrace();
@@ -819,87 +768,91 @@ public class RenderingTask implements Callable<RenderStatusResults>, Completable
         return unparsedResources;
     }
 
-    private void fetchAllResources(final Map<String, RGridResource> allBlobs, Set<URI> resourceUrls, FrameData result) {
+    private void fetchAllResources(final Map<String, RGridResource> allBlobs, final Set<URI> resourceUrls, final FrameData result) {
         logger.verbose("enter");
         if (resourceUrls.isEmpty()) {
             return;
         }
-        List<IResourceFuture> allFetches = new ArrayList<>();
-        final Iterator<URI> iterator = resourceUrls.iterator();
-        while (iterator.hasNext()) {
-            URI link = iterator.next();
-            String url = link.toString();
-            url = GeneralUtils.sanitizeURL(url, logger);
+
+        for (final URI uri : resourceUrls) {
+            final String uriStr = GeneralUtils.sanitizeURL(uri.toString(), logger);
+
             synchronized (this.fetchedCacheMap) {
                 // If resource is already being fetched, remove it from the list, and use the future.
-                IResourceFuture fetch = fetchedCacheMap.get(url);
-                if (fetch != null) {
-                    logger.verbose("cache hit for url " + url);
-                    allFetches.add(fetch);
+                if (fetchedCacheMap.containsKey(uriStr)) {
+                    logger.verbose("this.fetchedCacheMap.containsKey(" + uriStr + ")");
                     continue;
                 }
 
                 // If resource is not being fetched yet (limited guarantee)
                 IEyesConnector eyesConnector = this.visualGridTaskList.get(0).getEyesConnector();
-                IResourceFuture future;
                 try {
-                    future = eyesConnector.getResource(link.toURL(), userAgent.getOriginalUserAgentString());
-                } catch (Exception e) {
-                    logger.log("error converting " + link + " to url");
-                    GeneralUtils.logExceptionStackTrace(logger, e);
-                    iterator.remove();
-                    continue;
-                }
+                    resourcesPhaser.register();
+                    logger.log(String.format("Registered for url %s", uriStr));
+                    eyesConnector.getResource(uri.toURL(), userAgent.getOriginalUserAgentString(), new IDownloadListener<RGridResource>() {
+                        @Override
+                        public void onDownloadComplete(RGridResource downloadedResource) {
+                            synchronized (fetchedCacheMap) {
+                                try {
+                                    if (downloadedResource == null) {
+                                        logger.log(String.format("Resource is null for url %s", uriStr));
+                                        return;
+                                    }
 
-                if (!this.fetchedCacheMap.containsKey(url)) {
-                    this.fetchedCacheMap.put(url, future);
-                    allFetches.add(future);
-                    logger.verbose("this.fetchedCacheMap.put(" + url + ")");
-                } else {
-                    logger.verbose("this.fetchedCacheMap.containsKey(" + url + ")");
+                                    Set<URI> newResourceUrls = handleCollectedResource(uriStr, downloadedResource, allBlobs, resourceUrls, result);
+                                    if (newResourceUrls.isEmpty()) {
+                                        return;
+                                    }
+
+                                    fetchAllResources(allBlobs, newResourceUrls, result);
+                                } finally {
+                                    resourcesPhaser.arriveAndDeregister();
+                                }
+                            }
+                        }
+
+                        @Override
+                        public void onDownloadFailed() {
+                            resourcesPhaser.arriveAndDeregister();
+                            logger.log(String.format("Failed downloading from uri %s", uriStr));
+                        }
+                    });
+                } catch (Exception e) {
+                    logger.log("error converting " + uri + " to url");
+                    GeneralUtils.logExceptionStackTrace(logger, e);
+                    resourceUrls.remove(uri);
                 }
             }
         }
-
-        logger.verbose("starting to fetch( " + allFetches.size() + ") fetched resources");
-        for (IResourceFuture future : allFetches) {
-            try {
-                RGridResource resource;
-                String url = future.getUrl();
-                logger.verbose("trying future.get() for resource " + url + " ...");
-                resource = future.get();
-
-
-                logger.verbose("finishing future.get() for resource " + url + " ...");
-                logger.verbose("done getting resource " + url);
-                try {
-                    this.debugResourceWriter.write(resource);
-                } catch (Exception e) {
-                    GeneralUtils.logExceptionStackTrace(logger, e);
-                }
-                logger.verbose("done writing to debugWriter");
-                if (resource == null) {
-                    logger.verbose("Resource is null (" + url + ") ");
-                    continue;
-                }
-                if (resource.isResourceParsed()) continue;
-
-                removeUrlFromList(url, resourceUrls);
-                allBlobs.put(resource.getUrl(), resource);
-
-                String contentType = resource.getContentType();
-                logger.verbose("handling " + contentType + " resource from URL: " + url);
-                Set<URI> newResourceUrls = new HashSet<>();
-                getAndParseResource(resource, result.getUrl(), newResourceUrls);
-                resource.setIsResourceParsed(true);
-                fetchAllResources(allBlobs, newResourceUrls, result);
-            } catch (Throwable e) {
-                e.printStackTrace();
-            }
-
-        }
-        logger.verbose("finished fetching(" + allFetches.size() + ")");
         logger.verbose("exit");
+    }
+
+    /**
+     * Handles collected resources
+     * @return A set of new resources to keep collecting recursively
+     */
+    private Set<URI> handleCollectedResource(String url, RGridResource resource, Map<String, RGridResource> allBlobs,
+                                         Set<URI> resourceUrls, FrameData result) {
+        Set<URI> newResourceUrls = new HashSet<>();
+        try {
+            fetchedCacheMap.put(url, resource);
+            this.debugResourceWriter.write(resource);
+        } catch (Exception e) {
+            GeneralUtils.logExceptionStackTrace(logger, e);
+        }
+        logger.verbose("done writing to debugWriter");
+        if (resource.isResourceParsed()) {
+            return newResourceUrls;
+        }
+
+        removeUrlFromList(url, resourceUrls);
+        allBlobs.put(resource.getUrl(), resource);
+
+        String contentType = resource.getContentType();
+        logger.verbose("handling " + contentType + " resource from URL: " + url);
+        getAndParseResource(resource, result.getUrl(), newResourceUrls);
+        resource.setIsResourceParsed(true);
+        return newResourceUrls;
     }
 
     private void removeUrlFromList(String url, Set<URI> resourceUrls) {

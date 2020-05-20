@@ -4,9 +4,7 @@ import com.applitools.IResourceUploadListener;
 import com.applitools.connectivity.api.*;
 import com.applitools.eyes.*;
 import com.applitools.eyes.visualgrid.PutFuture;
-import com.applitools.eyes.visualgrid.ResourceFuture;
 import com.applitools.eyes.visualgrid.model.*;
-import com.applitools.eyes.visualgrid.services.IResourceFuture;
 import com.applitools.utils.ArgumentGuard;
 import com.applitools.utils.GeneralUtils;
 import com.fasterxml.jackson.annotation.JsonInclude;
@@ -293,7 +291,7 @@ public class ServerConnector extends RestClient implements IServerConnector {
 
                 try {
                     byte[] fileContent = downloadFile(response);
-                    listener.onDownloadComplete(new String(fileContent), null);
+                    listener.onDownloadComplete(new String(fileContent));
                 } catch (Throwable t) {
                     logger.verbose(t.getMessage());
                 } finally {
@@ -314,14 +312,14 @@ public class ServerConnector extends RestClient implements IServerConnector {
         }, null, null);
     }
 
-    public IResourceFuture downloadResource(final URL url, String userAgent, ResourceFuture resourceFuture) {
+    public Future<?> downloadResource(final URL url, String userAgent, final IDownloadListener<RGridResource> listener) {
         AsyncRequest asyncRequest = restClient.target(url.toString()).asyncRequest(MediaType.WILDCARD);
         asyncRequest.header("User-Agent", userAgent);
 
-        final ResourceFuture newFuture = resourceFuture != null ? resourceFuture : new ResourceFuture(url.toString(), logger, this, userAgent);
-        Future<?> responseFuture = asyncRequest.method(HttpMethod.GET, new AsyncRequestCallback() {
+        return asyncRequest.method(HttpMethod.GET, new AsyncRequestCallback() {
             @Override
             public void onComplete(Response response) {
+                RGridResource rgResource = null;
                 try {
                     String contentLengthStr = response.getHeader("Content-length", false);
                     int contentLength = 0;
@@ -347,9 +345,9 @@ public class ServerConnector extends RestClient implements IServerConnector {
                         }
                     }
 
-                    RGridResource rgResource = new RGridResource(url.toString(), contentType, fileContent, logger, "ResourceFuture");
-                    newFuture.setResource(rgResource);
+                    rgResource = new RGridResource(url.toString(), contentType, fileContent, logger, "ResourceFuture");
                 } finally {
+                    listener.onDownloadComplete(rgResource);
                     response.close();
                 }
             }
@@ -357,11 +355,9 @@ public class ServerConnector extends RestClient implements IServerConnector {
             @Override
             public void onFail(Throwable throwable) {
                 GeneralUtils.logExceptionStackTrace(logger, throwable);
+                listener.onDownloadFailed();
             }
         }, null, null);
-
-        newFuture.setResponseFuture(responseFuture);
-        return newFuture;
     }
 
     public RenderingInfo getRenderInfo() {
@@ -533,10 +529,6 @@ public class ServerConnector extends RestClient implements IServerConnector {
             GeneralUtils.logExceptionStackTrace(logger, e);
         }
         return null;
-    }
-
-    public IResourceFuture createResourceFuture(RGridResource gridResource, String userAgent) {
-        return new ResourceFuture(gridResource, logger, this, userAgent);
     }
 
     public void closeBatch(String batchId) {

@@ -206,10 +206,10 @@ public class DomCapture {
                 final CssTreeNode cssTreeNode = new CssTreeNode(new URL(missingCssUrl));
                 downloadCss(cssTreeNode, new IDownloadListener<String>() {
                     @Override
-                    public void onDownloadComplete(String downloadedString, String contentType) {
+                    public void onDownloadComplete(String downloadedResource) {
                         try {
                             logger.verbose("DomCapture.onDownloadComplete  - finished");
-                            parseCSS(cssTreeNode, downloadedString);
+                            parseCSS(cssTreeNode, downloadedResource);
                             if (cssTreeNode.allImportRules != null && !cssTreeNode.allImportRules.isEmpty()) {
                                 cssTreeNode.downloadNodeCss();
                             }
@@ -305,8 +305,8 @@ public class DomCapture {
                         cssTreeNode.setUrl(uri);
                         downloadCss(cssTreeNode, new IDownloadListener<String>() {
                             @Override
-                            public void onDownloadComplete(String downloadedString, String contentType) {
-                                parseCSS(cssTreeNode, EfficientStringReplace.CleanForJSON(downloadedString));
+                            public void onDownloadComplete(String downloadedResource) {
+                                parseCSS(cssTreeNode, EfficientStringReplace.CleanForJSON(downloadedResource));
                                 if (!cssTreeNode.allImportRules.isEmpty()) {
                                     cssTreeNode.downloadNodeCss();
 
@@ -356,11 +356,11 @@ public class DomCapture {
         logger.verbose("Given URL to download: " + node.url);
         mServerConnector.downloadString(node.url, false, new IDownloadListener<String>() {
             @Override
-            public void onDownloadComplete(String downloadedString, String contentType) {
+            public void onDownloadComplete(String downloadedResource) {
                 try {
                     logger.verbose("Download Complete");
-                    node.setCss(downloadedString);
-                    listener.onDownloadComplete(downloadedString, "String");
+                    node.setCss(downloadedResource);
+                    listener.onDownloadComplete(downloadedResource);
 
                 } catch (Throwable e) {
                     GeneralUtils.logExceptionStackTrace(logger, e);
@@ -373,7 +373,7 @@ public class DomCapture {
 
             @Override
             public void onDownloadFailed() {
-                listener.onDownloadComplete("", "String");
+                listener.onDownloadComplete("");
                 cssPhaser.arriveAndDeregister();
                 logger.verbose("Download Failed");
                 logger.verbose("cssPhaser.arriveAndDeregister(); " + node.url);

@@ -10,6 +10,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.List;
+import java.util.concurrent.Future;
 
 public interface IEyesConnector {
     void log(String massage);
@@ -28,7 +29,7 @@ public interface IEyesConnector {
 
     TestResults abortIfNotClosed();
 
-    IResourceFuture getResource(URL url, String userAgent);
+    Future<?> getResource(URL url, String userAgent, IDownloadListener<RGridResource> listener);
 
     RenderingInfo getRenderingInfo();
 
@@ -37,8 +38,6 @@ public interface IEyesConnector {
     List<RunningRender> render(RenderRequest... renderRequests);
 
     List<RenderStatusResults> renderStatusById(String... renderIds);
-
-    IResourceFuture createResourceFuture(RGridResource rg);
 
     MatchResult matchWindow(String resultImageURL, String domLocation, ICheckSettings checkSettings,
                             List<? extends IRegion> regions, List<VisualGridSelector[]> regionSelectors, Location location,

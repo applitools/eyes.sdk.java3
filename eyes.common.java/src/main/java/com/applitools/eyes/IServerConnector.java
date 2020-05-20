@@ -1,13 +1,12 @@
 package com.applitools.eyes;
 
 import com.applitools.IResourceUploadListener;
-import com.applitools.eyes.visualgrid.ResourceFuture;
 import com.applitools.eyes.visualgrid.model.*;
-import com.applitools.eyes.visualgrid.services.IResourceFuture;
 
 import java.net.URI;
 import java.net.URL;
 import java.util.List;
+import java.util.concurrent.Future;
 
 /**
  * Defines the interface which should be implemented by a ServerConnector.
@@ -114,10 +113,9 @@ public interface IServerConnector {
      *
      * @param uri            The URI from which the IServerConnector will download the string
      * @param userAgent      user agent to send to server
-     * @param resourceFuture The resource future task.
      * @return A future which will be resolved when the resources is downloaded.
      */
-    IResourceFuture downloadResource(URL uri, String userAgent, ResourceFuture resourceFuture);
+    Future<?> downloadResource(URL uri, String userAgent, IDownloadListener<RGridResource> listener);
 
     /**
      * @return the render info from the server to be used later on.
@@ -167,8 +165,6 @@ public interface IServerConnector {
      * @return The render's status
      */
     List<RenderStatusResults> renderStatusById(String... renderIds);
-
-    IResourceFuture createResourceFuture(RGridResource gridResource, String userAgent);
 
     void setRenderingInfo(RenderingInfo renderInfo);
 
