@@ -124,9 +124,7 @@ public class RenderingTask implements Callable<RenderStatusResults>, Completable
             List<RunningRender> runningRenders = null;
             do {
                 try {
-
                     runningRenders = this.eyesConnector.render(requests);
-
                 } catch (Exception e) {
 
                     Thread.sleep(1500);
@@ -354,14 +352,12 @@ public class RenderingTask implements Callable<RenderStatusResults>, Completable
         } catch (InterruptedException | TimeoutException e) {
             GeneralUtils.logExceptionStackTrace(logger, e);
         }
-        if (!resourceUrls.isEmpty()) {
-            logger.verbose("ERROR resourceUrl is not empty!!!!!***************************");
-        }
 
         logger.verbose("done fetching resources.");
 
         List<RGridResource> unparsedResources = addBlobsToCache(allBlobs);
 
+        resourceUrls = new HashSet<>();
         parseAndCollectExternalResources(unparsedResources, domData.getUrl(), resourceUrls);
         //Parse allBlobs to mapping
         Map<String, RGridResource> resourceMapping = new HashMap<>();
@@ -624,7 +620,7 @@ public class RenderingTask implements Callable<RenderStatusResults>, Completable
     }
 
 
-    class TextualDataResource {
+    static class TextualDataResource {
         String mimeType;
         URI uri;
         String data;
@@ -633,7 +629,6 @@ public class RenderingTask implements Callable<RenderStatusResults>, Completable
 
     private TextualDataResource tryGetTextualData(RGridResource blob, URI baseUrl) {
         byte[] contentBytes = blob.getContent();
-//        logger.verbose(String.format("enter - content length: %d ; content type: %s", contentBytes.length , contentTypeStr));
         String contentTypeStr = blob.getContentType();
         if (contentTypeStr == null) return null;
         if (contentBytes.length == 0) return null;
@@ -679,7 +674,6 @@ public class RenderingTask implements Callable<RenderStatusResults>, Completable
 
 
     private void parseCSS(TextualDataResource css, Set<URI> resourceUrls) {
-//        logger.verbose("enter");
         try {
             String data = css.data;
             if (data == null) return;
@@ -694,7 +688,6 @@ public class RenderingTask implements Callable<RenderStatusResults>, Completable
         } catch (Throwable e) {
             GeneralUtils.logExceptionStackTrace(logger, e);
         }
-//        logger.verbose("exit");
     }
 
     private void collectAllFontFaceUris(CascadingStyleSheet cascadingStyleSheet, Set<URI> allResourceUris, URI baseUrl) {
@@ -793,22 +786,20 @@ public class RenderingTask implements Callable<RenderStatusResults>, Completable
                     eyesConnector.getResource(uri.toURL(), userAgent.getOriginalUserAgentString(), new IDownloadListener<RGridResource>() {
                         @Override
                         public void onDownloadComplete(RGridResource downloadedResource) {
-                            synchronized (fetchedCacheMap) {
-                                try {
-                                    if (downloadedResource == null) {
-                                        logger.log(String.format("Resource is null for url %s", uriStr));
-                                        return;
-                                    }
-
-                                    Set<URI> newResourceUrls = handleCollectedResource(uriStr, downloadedResource, allBlobs, resourceUrls, result);
-                                    if (newResourceUrls.isEmpty()) {
-                                        return;
-                                    }
-
-                                    fetchAllResources(allBlobs, newResourceUrls, result);
-                                } finally {
-                                    resourcesPhaser.arriveAndDeregister();
+                            try {
+                                if (downloadedResource == null) {
+                                    logger.log(String.format("Resource is null for url %s", uriStr));
+                                    return;
                                 }
+
+                                Set<URI> newResourceUrls = handleCollectedResource(uri, downloadedResource, allBlobs, resourceUrls, result);
+                                if (newResourceUrls.isEmpty()) {
+                                    return;
+                                }
+
+                                fetchAllResources(allBlobs, newResourceUrls, result);
+                            } finally {
+                                resourcesPhaser.arriveAndDeregister();
                             }
                         }
 
@@ -821,7 +812,6 @@ public class RenderingTask implements Callable<RenderStatusResults>, Completable
                 } catch (Exception e) {
                     logger.log("error converting " + uri + " to url");
                     GeneralUtils.logExceptionStackTrace(logger, e);
-                    resourceUrls.remove(uri);
                 }
             }
         }
@@ -832,11 +822,13 @@ public class RenderingTask implements Callable<RenderStatusResults>, Completable
      * Handles collected resources
      * @return A set of new resources to keep collecting recursively
      */
-    private Set<URI> handleCollectedResource(String url, RGridResource resource, Map<String, RGridResource> allBlobs,
+    private Set<URI> handleCollectedResource(URI url, RGridResource resource, Map<String, RGridResource> allBlobs,
                                          Set<URI> resourceUrls, FrameData result) {
         Set<URI> newResourceUrls = new HashSet<>();
         try {
-            fetchedCacheMap.put(url, resource);
+            synchronized (fetchedCacheMap) {
+                fetchedCacheMap.put(url.toString(), resource);
+            }
             this.debugResourceWriter.write(resource);
         } catch (Exception e) {
             GeneralUtils.logExceptionStackTrace(logger, e);
@@ -846,7 +838,6 @@ public class RenderingTask implements Callable<RenderStatusResults>, Completable
             return newResourceUrls;
         }
 
-        removeUrlFromList(url, resourceUrls);
         allBlobs.put(resource.getUrl(), resource);
 
         String contentType = resource.getContentType();
@@ -854,16 +845,6 @@ public class RenderingTask implements Callable<RenderStatusResults>, Completable
         getAndParseResource(resource, result.getUrl(), newResourceUrls);
         resource.setIsResourceParsed(true);
         return newResourceUrls;
-    }
-
-    private void removeUrlFromList(String url, Set<URI> resourceUrls) {
-        Iterator<URI> iterator = resourceUrls.iterator();
-        while (iterator.hasNext()) {
-            URI resourceUrl = iterator.next();
-            if (resourceUrl.toString().equalsIgnoreCase(url)) {
-                iterator.remove();
-            }
-        }
     }
 
     private void pollRenderingStatus(Map<RunningRender, RenderRequest> runningRenders) {
