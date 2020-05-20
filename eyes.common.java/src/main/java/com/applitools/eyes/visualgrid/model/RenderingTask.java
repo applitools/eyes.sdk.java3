@@ -348,7 +348,9 @@ public class RenderingTask implements Callable<RenderStatusResults>, Completable
         //Fetch all resources
         fetchAllResources(allBlobs, resourceUrls, domData);
         try {
-            resourcesPhaser.awaitAdvanceInterruptibly(0, 30, TimeUnit.SECONDS);
+            if (resourcesPhaser.getRegisteredParties() > 0) {
+                resourcesPhaser.awaitAdvanceInterruptibly(0, 30, TimeUnit.SECONDS);
+            }
         } catch (InterruptedException | TimeoutException e) {
             GeneralUtils.logExceptionStackTrace(logger, e);
         }
