@@ -1,6 +1,7 @@
 ## [vNext]
 ### Fixed
 - Better handle `data:` URIs.
+- Updated the logic of collecting resources to fix buggy behaviour. [Trello 1822](https://trello.com/c/NE50kV8P)
 
 ## [3.163.0] - 2020-05-18
 ### Fixed

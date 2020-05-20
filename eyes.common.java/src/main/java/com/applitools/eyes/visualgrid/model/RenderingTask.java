@@ -788,7 +788,6 @@ public class RenderingTask implements Callable<RenderStatusResults>, Completable
                 IEyesConnector eyesConnector = this.visualGridTaskList.get(0).getEyesConnector();
                 try {
                     resourcesPhaser.register();
-                    logger.log(String.format("Registered for url %s", uriStr));
                     eyesConnector.getResource(uri.toURL(), userAgent.getOriginalUserAgentString(), new IDownloadListener<RGridResource>() {
                         @Override
                         public void onDownloadComplete(RGridResource downloadedResource) {
