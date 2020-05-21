@@ -293,4 +293,13 @@
             </class>
         </classes>
     </test>
+    <test name="BasicDemo" parallel="methods">
+        <classes>
+            <class name="com.applitools.eyes.demo.BasicDemo">
+                <methods>
+                    <include name="basicDemo"/>
+                </methods>
+            </class>
+        </classes>
+    </test>
 </suite>

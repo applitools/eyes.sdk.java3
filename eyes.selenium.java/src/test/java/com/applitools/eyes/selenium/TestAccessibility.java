@@ -20,6 +20,10 @@ import java.util.HashSet;
 import java.util.List;
 
 public class TestAccessibility extends ReportingTestSuite {
+    public TestAccessibility(){
+        super.setGroupName("selenium");
+    }
+
     @DataProvider(name = "booleanDP")
     public Object[] dp() {
         return new Object[]{Boolean.TRUE, Boolean.FALSE};

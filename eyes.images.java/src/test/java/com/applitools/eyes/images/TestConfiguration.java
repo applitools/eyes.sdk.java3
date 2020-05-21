@@ -4,7 +4,7 @@ import com.applitools.eyes.utils.ReportingTestSuite;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
-public class TestConfiguration extends ReportingTestSuite {
+public class TestConfiguration {
     @Test
     public void TestSetEnablePatterns() {
         Eyes e = new Eyes();

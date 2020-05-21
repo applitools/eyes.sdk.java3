@@ -25,6 +25,10 @@ public class TestRunningTest extends ReportingTestSuite {
     VisualGridTask checkTask;
     VisualGridTask closeTask;
 
+    public TestRunningTest() {
+        super.setGroupName("core");
+    }
+
     @BeforeMethod
     public void beforeEach() {
         doNothing().when(logger).verbose(anyString());

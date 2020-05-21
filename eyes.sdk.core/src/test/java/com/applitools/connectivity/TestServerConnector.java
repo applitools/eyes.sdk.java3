@@ -28,6 +28,10 @@ import static org.mockito.Mockito.when;
 
 public class TestServerConnector extends ReportingTestSuite {
 
+    public TestServerConnector(){
+        super.setGroupName("core");
+    }
+
     @Mock
     HttpClient restClient;
 
