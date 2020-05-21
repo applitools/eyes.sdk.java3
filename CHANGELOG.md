@@ -2,8 +2,8 @@
 ### Added
 - Edge Chromium support. [Trello 1757](https://trello.com/c/LUe43aee)
 ### Fixed
-- Better handle `data:` URIs.
 - Updated the logic of collecting resources to fix buggy behaviour. [Trello 1822](https://trello.com/c/NE50kV8P)
+- Added the `Referer` header to every request for downloading resources. [Trello 1801](https://trello.com/c/oexcxdyL)
 
 ## [3.163.0] - 2020-05-18
 ### Fixed

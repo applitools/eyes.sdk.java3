@@ -56,8 +56,8 @@ class EyesConnector extends EyesBase implements IEyesConnector, IBatchCloser {
     }
 
     @Override
-    public Future<?> getResource(URL url, String userAgent, IDownloadListener<RGridResource> listener) {
-        return this.serverConnector.downloadResource(url, userAgent, listener);
+    public Future<?> getResource(URL url, String userAgent, String refererUrl, IDownloadListener<RGridResource> listener) {
+        return this.serverConnector.downloadResource(url, userAgent, refererUrl, listener);
     }
 
     @Override

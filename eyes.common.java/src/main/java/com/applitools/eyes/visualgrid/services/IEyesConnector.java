@@ -29,7 +29,7 @@ public interface IEyesConnector {
 
     TestResults abortIfNotClosed();
 
-    Future<?> getResource(URL url, String userAgent, IDownloadListener<RGridResource> listener);
+    Future<?> getResource(URL url, String userAgent, String refererUrl, IDownloadListener<RGridResource> listener);
 
     RenderingInfo getRenderingInfo();
 

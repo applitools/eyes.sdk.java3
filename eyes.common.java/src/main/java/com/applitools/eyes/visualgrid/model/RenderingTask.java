@@ -210,11 +210,20 @@ public class RenderingTask implements Callable<RenderStatusResults>, Completable
         for (String url : strings) {
             try {
                 logger.verbose("trying to get url from map - " + url);
-                RGridResource resource = fetchedCacheMap.get(url);
+                RGridResource resource = null;
+                if (!fetchedCacheMap.containsKey(url)) {
+                    if (url.equals(this.dom.getUrl())) {
+                        resource = this.dom.asResource();
+                    }
+                } else {
+                    resource = fetchedCacheMap.get(url);
+                }
+
                 if (resource == null) {
                     logger.log(String.format("Illegal state: resource is null for url %s", url));
                     continue;
                 }
+
                 IPutFuture future = this.eyesConnector.renderPutResource(runningRender, resource, userAgent.getOriginalUserAgentString());
                 logger.verbose("locking putResourceCache");
                 synchronized (putResourceCache) {
@@ -324,7 +333,14 @@ public class RenderingTask implements Callable<RenderStatusResults>, Completable
                 continue;
             }
 
-            RGridResource resource = fetchedCacheMap.get(url);
+            RGridResource resource;
+            if (!fetchedCacheMap.containsKey(url)) {
+                logger.verbose(String.format("Resource %s requested but never downloaded (maybe a Frame)", url));
+                resource = resources.get(url);
+            } else {
+                resource = fetchedCacheMap.get(url);
+            }
+
             if (resource == null) {
                 logger.log(String.format("Illegal state: resource is null for url %s", url));
                 continue;
@@ -600,7 +616,9 @@ public class RenderingTask implements Callable<RenderStatusResults>, Completable
     private void getAndParseResource(RGridResource blob, String baseUrl, Set<URI> resourceUrls) {
         URI baseUri = URI.create(baseUrl);
         TextualDataResource tdr = tryGetTextualData(blob, baseUri);
-        if (tdr == null) return;
+        if (tdr == null) {
+            return;
+        }
         switch (tdr.mimeType) {
             case TEXT_CSS:
                 parseCSS(tdr, resourceUrls);
@@ -622,7 +640,9 @@ public class RenderingTask implements Callable<RenderStatusResults>, Completable
                 String href = element.attr("href");
                 if (href.isEmpty()) {
                     href = element.attr("xlink:href");
-                    if (href.startsWith("#")) continue;
+                    if (href.startsWith("#")) {
+                        continue;
+                    }
                 }
                 createUriAndAddToList(allResourceUris, tdr.uri, href);
             }
@@ -688,7 +708,9 @@ public class RenderingTask implements Callable<RenderStatusResults>, Completable
     private void parseCSS(TextualDataResource css, Set<URI> resourceUrls) {
         try {
             String data = css.data;
-            if (data == null) return;
+            if (data == null) {
+                return;
+            }
             CascadingStyleSheet cascadingStyleSheet = CSSReader.readFromString(data, ECSSVersion.CSS30);
             if (cascadingStyleSheet == null) {
                 logger.verbose("exit - failed to read CSS String");
@@ -795,7 +817,8 @@ public class RenderingTask implements Callable<RenderStatusResults>, Completable
                 IEyesConnector eyesConnector = this.visualGridTaskList.get(0).getEyesConnector();
                 try {
                     resourcesPhaser.register();
-                    eyesConnector.getResource(uri.toURL(), userAgent.getOriginalUserAgentString(), new IDownloadListener<RGridResource>() {
+                    eyesConnector.getResource(uri.toURL(), userAgent.getOriginalUserAgentString(), result.getUrl(),
+                            new IDownloadListener<RGridResource>() {
                         @Override
                         public void onDownloadComplete(RGridResource downloadedResource) {
                             try {
@@ -804,7 +827,7 @@ public class RenderingTask implements Callable<RenderStatusResults>, Completable
                                     return;
                                 }
 
-                                Set<URI> newResourceUrls = handleCollectedResource(uri, downloadedResource, allBlobs, resourceUrls, result);
+                                Set<URI> newResourceUrls = handleCollectedResource(uri, downloadedResource, allBlobs, result);
                                 if (newResourceUrls.isEmpty()) {
                                     return;
                                 }
@@ -834,8 +857,7 @@ public class RenderingTask implements Callable<RenderStatusResults>, Completable
      * Handles collected resources
      * @return A set of new resources to keep collecting recursively
      */
-    private Set<URI> handleCollectedResource(URI url, RGridResource resource, Map<String, RGridResource> allBlobs,
-                                         Set<URI> resourceUrls, FrameData result) {
+    private Set<URI> handleCollectedResource(URI url, RGridResource resource, Map<String, RGridResource> allBlobs, FrameData result) {
         Set<URI> newResourceUrls = new HashSet<>();
         try {
             synchronized (fetchedCacheMap) {

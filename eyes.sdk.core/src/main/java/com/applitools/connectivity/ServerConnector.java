@@ -317,13 +317,16 @@ public class ServerConnector extends RestClient implements IServerConnector {
         }, null, null);
     }
 
-    public Future<?> downloadResource(final URL url, final String userAgent, final IDownloadListener<RGridResource> listener) {
-        return downloadResource(url, userAgent, listener, 1);
+    public Future<?> downloadResource(final URL url, final String userAgent, final String refererUrl,
+                                      final IDownloadListener<RGridResource> listener) {
+        return downloadResource(url, userAgent, refererUrl, listener, 1);
     }
 
-    public Future<?> downloadResource(final URL url, final String userAgent, final IDownloadListener<RGridResource> listener, final int attemptNumber) {
+    public Future<?> downloadResource(final URL url, final String userAgent, final String refererUrl,
+                                      final IDownloadListener<RGridResource> listener, final int attemptNumber) {
         AsyncRequest asyncRequest = restClient.target(url.toString()).asyncRequest(MediaType.WILDCARD);
         asyncRequest.header("User-Agent", userAgent);
+        asyncRequest.header("Referer", refererUrl);
 
         return asyncRequest.method(HttpMethod.GET, new AsyncRequestCallback() {
             @Override
@@ -340,7 +343,7 @@ public class ServerConnector extends RestClient implements IServerConnector {
 
                     int statusCode = response.getStatusCode();
                     if (statusCode != HttpStatus.SC_OK && statusCode != HttpStatus.SC_CREATED) {
-                        logger.verbose(String.format("Status %d on url - %s", statusCode, url));
+                        logger.log(String.format("Error: Status %d on url %s", statusCode, url));
                     }
 
                     byte[] fileContent = downloadFile(response);
@@ -366,7 +369,7 @@ public class ServerConnector extends RestClient implements IServerConnector {
                 GeneralUtils.logExceptionStackTrace(logger, throwable);
                 if (attemptNumber < MAX_CONNECTION_RETRIES) {
                     logger.verbose(String.format("Failed downloading resource %s - trying again", url));
-                    downloadResource(url, userAgent, listener, attemptNumber + 1);
+                    downloadResource(url, userAgent, refererUrl, listener, attemptNumber + 1);
                 } else {
                     listener.onDownloadFailed();
                 }
