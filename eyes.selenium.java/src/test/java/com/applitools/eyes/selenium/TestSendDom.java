@@ -21,6 +21,7 @@ import org.testng.annotations.Listeners;
 import org.testng.annotations.Test;
 
 import java.io.IOException;
+import java.util.Comparator;
 
 @Listeners(TestListener.class)
 public final class TestSendDom {
@@ -94,6 +95,25 @@ public final class TestSendDom {
         }
     }
 
+    // This is used for rhe
+    public static class DiffPrintingNotARealComparator implements Comparator<JsonNode> {
+
+        private JsonNode lastObject;
+
+        @Override
+        public int compare(JsonNode o1, JsonNode o2) {
+            if (o1.equals(o2)) {
+                lastObject = o1;
+                return 0;
+            }
+            else {
+                System.out.println(String.format("JSON diff found! Parent: %s, o1: %s , o2: %s", lastObject, o1, o2));
+                lastObject = o1;
+                return 0;
+            }
+        }
+    }
+
     @Test
     public void TestSendDOM_FullWindow() {
         WebDriver webDriver = SeleniumUtils.createChromeDriver();
@@ -115,7 +135,7 @@ public final class TestSendDom {
                 JsonNode actual = mapper.readTree(actualDomJsonString);
                 JsonNode expected = mapper.readTree(expectedDomJson);
                 //noinspection SimplifiedTestNGAssertion
-                Assert.assertTrue(actual.equals(expected));
+                Assert.assertTrue(actual.equals(new DiffPrintingNotARealComparator(), expected));
 
                 SessionResults sessionResults = TestUtils.getSessionResults(eyes.getApiKey(), results);
                 ActualAppOutput[] actualAppOutput = sessionResults.getActualAppOutput();
