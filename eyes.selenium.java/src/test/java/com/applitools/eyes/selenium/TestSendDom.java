@@ -108,19 +108,24 @@ public final class TestSendDom {
     public static class DiffPrintingNotARealComparator implements Comparator<JsonNode> {
 
         private JsonNode lastObject;
+        private Logger logger;
+        public DiffPrintingNotARealComparator(Logger logger) {
+            this.logger = logger;
+        }
 
         @Override
         public int compare(JsonNode o1, JsonNode o2) {
             if (o1 == null) {
-                System.out.println(String.format("O1 IS NULL! o2: %s, parent: %s", o2, lastObject));
+                logger.log(String.format("O1 IS NULL! o2: %s, parent: %s", o2, lastObject));
             }
 
             if (o2 == null) {
-                System.out.println(String.format("O2 IS NULL! o1: %s, parent: %s", o1, lastObject));
+                logger.log(String.format("O2 IS NULL! o1: %s, parent: %s", o1, lastObject));
             }
 
             if (!o1.equals(o2)) {
-                System.out.println(String.format("JSON diff found! Parent: %s, o1: %s , o2: %s", lastObject, o1, o2));
+                logger.log(String.format("JSON diff found! Parent: %s, o1: %s , o2: %s", lastObject, o1, o2));
+                return 1;
             }
             lastObject = o1;
             return 0;
@@ -149,12 +154,12 @@ public final class TestSendDom {
                 JsonNode expected = mapper.readTree(expectedDomJson);
                 //noinspection SimplifiedTestNGAssertion
                 if (actual == null) {
-                    System.out.println("ACTUAL DOM IS NULL!");
+                    eyes.getLogger().log("ACTUAL DOM IS NULL!");
                 }
                 if (expected == null) {
-                    System.out.println("EXPECTED DOM IS NULL!");
+                    eyes.getLogger().log("EXPECTED DOM IS NULL!");
                 }
-                Assert.assertTrue(actual.equals(new DiffPrintingNotARealComparator(), expected));
+                Assert.assertTrue(actual.equals(new DiffPrintingNotARealComparator(eyes.getLogger()), expected));
 
                 SessionResults sessionResults = TestUtils.getSessionResults(eyes.getApiKey(), results);
                 ActualAppOutput[] actualAppOutput = sessionResults.getActualAppOutput();
@@ -162,7 +167,7 @@ public final class TestSendDom {
                 JsonNode downloaded = mapper.readTree(downloadedDomJsonString);
                 //noinspection SimplifiedTestNGAssertion
                 if (downloaded == null) {
-                    System.out.println("Downloaded DOM IS NULL!");
+                    eyes.getLogger().log("Downloaded DOM IS NULL!");
                 }
                 Assert.assertTrue(downloaded.equals(expected));
 
