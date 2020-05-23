@@ -187,8 +187,6 @@ public class TestUtils {
                 .queryParam("apiKey", eyes.getApiKey())
                 .build();
 
-        System.out.println(String.format("The DOM download URI: %s", apiSessionUrl));
-
         RestClient client = new RestClient(new Logger(), apiSessionUri, ServerConnector.DEFAULT_CLIENT_TIMEOUT);
         return client.sendHttpWebRequest(apiSessionUri.toString(), HttpMethod.GET, MediaType.APPLICATION_JSON)
                 .readEntity(String.class);
