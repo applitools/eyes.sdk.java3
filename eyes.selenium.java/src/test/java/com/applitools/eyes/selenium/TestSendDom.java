@@ -161,6 +161,9 @@ public final class TestSendDom {
                 String downloadedDomJsonString = TestUtils.getStepDom(eyes, actualAppOutput[0]);
                 JsonNode downloaded = mapper.readTree(downloadedDomJsonString);
                 //noinspection SimplifiedTestNGAssertion
+                if (downloaded == null) {
+                    System.out.println("Downloaded DOM IS NULL!");
+                }
                 Assert.assertTrue(downloaded.equals(expected));
 
             } catch (IOException e) {
