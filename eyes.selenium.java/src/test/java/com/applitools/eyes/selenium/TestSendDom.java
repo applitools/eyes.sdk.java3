@@ -111,15 +111,19 @@ public final class TestSendDom {
 
         @Override
         public int compare(JsonNode o1, JsonNode o2) {
-            if (o1.equals(o2)) {
-                lastObject = o1;
-                return 0;
+            if (o1 == null) {
+                System.out.println(String.format("O1 IS NULL! o2: %s, parent: %s", o2, lastObject));
             }
-            else {
+
+            if (o2 == null) {
+                System.out.println(String.format("O2 IS NULL! o1: %s, parent: %s", o1, lastObject));
+            }
+
+            if (!o1.equals(o2)) {
                 System.out.println(String.format("JSON diff found! Parent: %s, o1: %s , o2: %s", lastObject, o1, o2));
-                lastObject = o1;
-                return 0;
             }
+            lastObject = o1;
+            return 0;
         }
     }
 
@@ -144,6 +148,12 @@ public final class TestSendDom {
                 JsonNode actual = mapper.readTree(actualDomJsonString);
                 JsonNode expected = mapper.readTree(expectedDomJson);
                 //noinspection SimplifiedTestNGAssertion
+                if (actual == null) {
+                    System.out.println("ACTUAL DOM IS NULL!");
+                }
+                if (expected == null) {
+                    System.out.println("EXPECTED DOM IS NULL!");
+                }
                 Assert.assertTrue(actual.equals(new DiffPrintingNotARealComparator(), expected));
 
                 SessionResults sessionResults = TestUtils.getSessionResults(eyes.getApiKey(), results);
