@@ -11,12 +11,14 @@ import com.applitools.eyes.selenium.wrappers.EyesWebDriver;
 import com.applitools.eyes.utils.CommunicationUtils;
 import com.applitools.eyes.utils.SeleniumUtils;
 import com.applitools.eyes.utils.TestUtils;
+import com.applitools.eyes.visualgrid.services.VisualGridRunner;
 import com.applitools.utils.GeneralUtils;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.testng.Assert;
+import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Listeners;
 import org.testng.annotations.Test;
 
@@ -25,6 +27,13 @@ import java.util.Comparator;
 
 @Listeners(TestListener.class)
 public final class TestSendDom {
+
+    @BeforeClass(alwaysRun = true)
+    public void OneTimeSetUp() {
+        if (TestUtils.runOnCI && System.getenv("TRAVIS") != null) {
+            System.setProperty("webdriver.chrome.driver", "/home/travis/build/chromedriver"); // for travis build.
+        }
+    }
 
     private interface WebDriverInitializer {
         void initWebDriver(WebDriver webDriver);
