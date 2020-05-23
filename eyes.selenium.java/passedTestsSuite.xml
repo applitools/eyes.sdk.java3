@@ -1,288 +1,288 @@
 <!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd" >
 
 <suite name="passed tests" verbose="1" parallel="tests" thread-count="10">
-    <test name="TestClassicApi">
-        <parameter name="dont_run" value="TestCheckInnerFrame+SCROLL, TestCheckInnerFrame+VG,TestCheckFrame+VG, TestCheckWindowFully+VG, TestDoubleCheckWindow+VG, TestCheckWindow+VG, TestCheckRegionInFrame+VG, TestCheckRegionInFrame+SCROLL"/>
-        <classes>
-            <class name="com.applitools.eyes.selenium.TestClassicApi">
-                <methods>
-                    <include name="TestCheckFrame" />
-                    <include name="TestCheckRegion" />
-                    <include name="TestCheckInnerFrame" />
-                    <include name="TestCheckRegion2" />
-                    <include name="TestCheckRegionInFrame" />
-                    <include name="TestCheckWindow" />
-                    <include name="TestCheckWindowViewport" />
-                    <include name="TestCheckWindowAfterScroll" />
-                    <include name="TestCheckWindowFully" />
-                    <include name="TestDoubleCheckWindow" />
-                </methods>
-            </class>
-        </classes>
-    </test>
-    <test name="TestSimpleCases">
-        <classes>
-            <class name="com.applitools.eyes.selenium.TestSimpleCases">
-                <methods>
-                    <include name="TestCheckDivOverflowingThePage" />
-                </methods>
-            </class>
-        </classes>
-    </test>
+<!--    <test name="TestClassicApi">-->
+<!--        <parameter name="dont_run" value="TestCheckInnerFrame+SCROLL, TestCheckInnerFrame+VG,TestCheckFrame+VG, TestCheckWindowFully+VG, TestDoubleCheckWindow+VG, TestCheckWindow+VG, TestCheckRegionInFrame+VG, TestCheckRegionInFrame+SCROLL"/>-->
+<!--        <classes>-->
+<!--            <class name="com.applitools.eyes.selenium.TestClassicApi">-->
+<!--                <methods>-->
+<!--                    <include name="TestCheckFrame" />-->
+<!--                    <include name="TestCheckRegion" />-->
+<!--                    <include name="TestCheckInnerFrame" />-->
+<!--                    <include name="TestCheckRegion2" />-->
+<!--                    <include name="TestCheckRegionInFrame" />-->
+<!--                    <include name="TestCheckWindow" />-->
+<!--                    <include name="TestCheckWindowViewport" />-->
+<!--                    <include name="TestCheckWindowAfterScroll" />-->
+<!--                    <include name="TestCheckWindowFully" />-->
+<!--                    <include name="TestDoubleCheckWindow" />-->
+<!--                </methods>-->
+<!--            </class>-->
+<!--        </classes>-->
+<!--    </test>-->
+<!--    <test name="TestSimpleCases">-->
+<!--        <classes>-->
+<!--            <class name="com.applitools.eyes.selenium.TestSimpleCases">-->
+<!--                <methods>-->
+<!--                    <include name="TestCheckDivOverflowingThePage" />-->
+<!--                </methods>-->
+<!--            </class>-->
+<!--        </classes>-->
+<!--    </test>-->
 
-    <test name="TestPageWithHeader">
-        <classes>
-            <class name="com.applitools.eyes.selenium.TestPageWithHeader">
-                <methods>
-                    <include name="TestCheckPageWithHeader_Region" />
-                    <include name="TestCheckPageWithHeader_Region_Fully" />
-                    <include name="TestCheckPageWithHeader_Window" />
-                    <include name="TestCheckPageWithHeader_Window_Fully" />
-                </methods>
-            </class>
-        </classes>
-    </test>
+<!--    <test name="TestPageWithHeader">-->
+<!--        <classes>-->
+<!--            <class name="com.applitools.eyes.selenium.TestPageWithHeader">-->
+<!--                <methods>-->
+<!--                    <include name="TestCheckPageWithHeader_Region" />-->
+<!--                    <include name="TestCheckPageWithHeader_Region_Fully" />-->
+<!--                    <include name="TestCheckPageWithHeader_Window" />-->
+<!--                    <include name="TestCheckPageWithHeader_Window_Fully" />-->
+<!--                </methods>-->
+<!--            </class>-->
+<!--        </classes>-->
+<!--    </test>-->
 
-    <test name="TestScrollRootElementOnSimplePage">
-        <classes>
-            <class name="com.applitools.eyes.selenium.TestScrollRootElementOnSimplePage">
-                <methods>
-                    <include name="TestCheckWindowSimpleHtml" />
-                </methods>
-            </class>
-        </classes>
-    </test>
+<!--    <test name="TestScrollRootElementOnSimplePage">-->
+<!--        <classes>-->
+<!--            <class name="com.applitools.eyes.selenium.TestScrollRootElementOnSimplePage">-->
+<!--                <methods>-->
+<!--                    <include name="TestCheckWindowSimpleHtml" />-->
+<!--                </methods>-->
+<!--            </class>-->
+<!--        </classes>-->
+<!--    </test>-->
 
-    <test name="TestSpecialCases">
-        <parameter name="dont_run" value="TestCheckRegionInAVeryBigFrame+VG"/>
-        <classes>
-            <class name="com.applitools.eyes.selenium.TestSpecialCases">
-                <methods>
-                    <include name="TestCheckRegionInAVeryBigFrame" />
-                    <include name="TestCheckRegionInAVeryBigFrameAfterManualSwitchToFrame" />
-                </methods>
-            </class>
-        </classes>
-    </test>
+<!--    <test name="TestSpecialCases">-->
+<!--        <parameter name="dont_run" value="TestCheckRegionInAVeryBigFrame+VG"/>-->
+<!--        <classes>-->
+<!--            <class name="com.applitools.eyes.selenium.TestSpecialCases">-->
+<!--                <methods>-->
+<!--                    <include name="TestCheckRegionInAVeryBigFrame" />-->
+<!--                    <include name="TestCheckRegionInAVeryBigFrameAfterManualSwitchToFrame" />-->
+<!--                </methods>-->
+<!--            </class>-->
+<!--        </classes>-->
+<!--    </test>-->
 
-    <test name="TestAcme">
-        <classes>
-            <class name="com.applitools.eyes.selenium.TestAcme">
-                <methods>
-                    <include name="TestAcmeLogin"/>
-                    <include name="TestCodedRegions"/>
-                </methods>
-            </class>
-        </classes>
-    </test>
+<!--    <test name="TestAcme">-->
+<!--        <classes>-->
+<!--            <class name="com.applitools.eyes.selenium.TestAcme">-->
+<!--                <methods>-->
+<!--                    <include name="TestAcmeLogin"/>-->
+<!--                    <include name="TestCodedRegions"/>-->
+<!--                </methods>-->
+<!--            </class>-->
+<!--        </classes>-->
+<!--    </test>-->
     <test name="TestSendDom">
         <classes>
             <class name="com.applitools.eyes.selenium.TestSendDom">
                 <methods>
-                    <include name="TestSendDOM_Selector"/>
-                    <include name="TestNotSendDOM"/>
-                    <include name="TestSendDOM_1"/>
-                    <include name="TestSendDOM_2"/>
+<!--                    <include name="TestSendDOM_Selector"/>-->
+<!--                    <include name="TestNotSendDOM"/>-->
+<!--                    <include name="TestSendDOM_1"/>-->
+<!--                    <include name="TestSendDOM_2"/>-->
                     <include name="TestSendDOM_FullWindow"/>
                 </methods>
             </class>
         </classes>
     </test>
-    <test name="TestDoubleOpenClose">
-        <classes>
-            <class name="com.applitools.eyes.renderingGrid.TestDoubleOpenClose">
-                <methods>
-                    <include name="TestDoubleOpenCheckClose"/>
-                    <include name="TestDoubleOpenCheckCloseAsync"/>
-                    <include name="TestDoubleOpenCheckCloseWithDifferentInstances"/>
-                    <include name="TestDoubleOpenCheckCloseAsyncWithDifferentInstances"/>
-                    <include name="TestDoubleCheckDontGetAllResults"/>
-                </methods>
-            </class>
-        </classes>
-    </test>
+<!--    <test name="TestDoubleOpenClose">-->
+<!--        <classes>-->
+<!--            <class name="com.applitools.eyes.renderingGrid.TestDoubleOpenClose">-->
+<!--                <methods>-->
+<!--                    <include name="TestDoubleOpenCheckClose"/>-->
+<!--                    <include name="TestDoubleOpenCheckCloseAsync"/>-->
+<!--                    <include name="TestDoubleOpenCheckCloseWithDifferentInstances"/>-->
+<!--                    <include name="TestDoubleOpenCheckCloseAsyncWithDifferentInstances"/>-->
+<!--                    <include name="TestDoubleCheckDontGetAllResults"/>-->
+<!--                </methods>-->
+<!--            </class>-->
+<!--        </classes>-->
+<!--    </test>-->
 
-    <test name="TestFluentApi">
-        <parameter name="dont_run"
-                   value="TestCheckFullWindowWithMultipleIgnoreRegionsBySelector_Fluent+VG, TestCheckWindow_Fluent+VG, TestCheckWindowWithFloatingByRegion_Fluent+VG, TestCheckWindowWithFloatingBySelector_Fluent+VG, TestCheckWindowWithIgnoreBySelector_Centered_Fluent+VG, TestCheckWindowWithIgnoreBySelector_Fluent+VG, TestCheckWindowWithIgnoreBySelector_Stretched_Fluent+VG, TestCheckWindowWithIgnoreRegion_Fluent+VG, TestIgnoreDisplacements+VG, TestAccessibilityRegions+VG, TestCheckMany+VG, TestScrollbarsHiddenAndReturned_Fluent+VG, TestScrollbarsHiddenAndReturned_Fluent+SCROLL"/>
-        <classes>
-            <class name="com.applitools.eyes.selenium.TestFluentApi">
-                <methods>
-                    <include name="TestIgnoreDisplacements" />
-                    <include name="TestAccessibilityRegions" />
-                    <include name="TestCheckElementFully_Fluent" />
-                    <include name="TestCheckElementWithIgnoreRegionByElementOutsideTheViewport_Fluent" />
-                    <include name="TestCheckFullWindowWithMultipleIgnoreRegionsBySelector_Fluent" />
-                    <include name="TestCheckMany" />
-                    <include name="TestCheckElementWithIgnoreRegionBySameElement_Fluent" />
-                    <include name="TestCheckOverflowingRegionByCoordinates_Fluent" />
-                    <include name="TestCheckRegionByCoordinates_Fluent" />
-                    <include name="TestCheckRegionBySelectorAfterManualScroll_Fluent" />
-                    <include name="TestCheckWindow_Fluent" />
-                    <include name="TestCheckWindowWithFloatingByRegion_Fluent" />
-                    <include name="TestCheckRegionWithIgnoreRegion_Fluent" />
-                    <include name="TestCheckWindowWithFloatingBySelector_Fluent" />
-                    <include name="TestCheckWindowWithIgnoreBySelector_Centered_Fluent" />
-                    <include name="TestCheckScrollableModal" />
-                    <include name="TestCheckWindowWithIgnoreBySelector_Fluent" />
-                    <include name="TestCheckWindowWithIgnoreBySelector_Stretched_Fluent" />
-                    <include name="TestSimpleRegion" />
-                    <include name="TestCheckWindowWithIgnoreRegion_Fluent" />
-                    <include name="TestScrollbarsHiddenAndReturned_Fluent" />
-                </methods>
-            </class>
-        </classes>
-    </test>
+<!--    <test name="TestFluentApi">-->
+<!--        <parameter name="dont_run"-->
+<!--                   value="TestCheckFullWindowWithMultipleIgnoreRegionsBySelector_Fluent+VG, TestCheckWindow_Fluent+VG, TestCheckWindowWithFloatingByRegion_Fluent+VG, TestCheckWindowWithFloatingBySelector_Fluent+VG, TestCheckWindowWithIgnoreBySelector_Centered_Fluent+VG, TestCheckWindowWithIgnoreBySelector_Fluent+VG, TestCheckWindowWithIgnoreBySelector_Stretched_Fluent+VG, TestCheckWindowWithIgnoreRegion_Fluent+VG, TestIgnoreDisplacements+VG, TestAccessibilityRegions+VG, TestCheckMany+VG, TestScrollbarsHiddenAndReturned_Fluent+VG, TestScrollbarsHiddenAndReturned_Fluent+SCROLL"/>-->
+<!--        <classes>-->
+<!--            <class name="com.applitools.eyes.selenium.TestFluentApi">-->
+<!--                <methods>-->
+<!--                    <include name="TestIgnoreDisplacements" />-->
+<!--                    <include name="TestAccessibilityRegions" />-->
+<!--                    <include name="TestCheckElementFully_Fluent" />-->
+<!--                    <include name="TestCheckElementWithIgnoreRegionByElementOutsideTheViewport_Fluent" />-->
+<!--                    <include name="TestCheckFullWindowWithMultipleIgnoreRegionsBySelector_Fluent" />-->
+<!--                    <include name="TestCheckMany" />-->
+<!--                    <include name="TestCheckElementWithIgnoreRegionBySameElement_Fluent" />-->
+<!--                    <include name="TestCheckOverflowingRegionByCoordinates_Fluent" />-->
+<!--                    <include name="TestCheckRegionByCoordinates_Fluent" />-->
+<!--                    <include name="TestCheckRegionBySelectorAfterManualScroll_Fluent" />-->
+<!--                    <include name="TestCheckWindow_Fluent" />-->
+<!--                    <include name="TestCheckWindowWithFloatingByRegion_Fluent" />-->
+<!--                    <include name="TestCheckRegionWithIgnoreRegion_Fluent" />-->
+<!--                    <include name="TestCheckWindowWithFloatingBySelector_Fluent" />-->
+<!--                    <include name="TestCheckWindowWithIgnoreBySelector_Centered_Fluent" />-->
+<!--                    <include name="TestCheckScrollableModal" />-->
+<!--                    <include name="TestCheckWindowWithIgnoreBySelector_Fluent" />-->
+<!--                    <include name="TestCheckWindowWithIgnoreBySelector_Stretched_Fluent" />-->
+<!--                    <include name="TestSimpleRegion" />-->
+<!--                    <include name="TestCheckWindowWithIgnoreRegion_Fluent" />-->
+<!--                    <include name="TestScrollbarsHiddenAndReturned_Fluent" />-->
+<!--                </methods>-->
+<!--            </class>-->
+<!--        </classes>-->
+<!--    </test>-->
 
-    <test name="TestFluentApi_Frames">
-        <parameter name="dont_run"
-                   value="TestCheckFrameInFrame_Fully_Fluent+SCROLL, TestCheckFrameInFrame_Fully_Fluent+VG, TestCheckFrameInFrame_Fully_Fluent2+VG, TestCheckFrameInFrame_Fully_Fluent2+SCROLL, TestCheckFrame_Fluent+VG, TestCheckFrame_Fully_Fluent+VG, TestCheckRegionByCoordinateInFrame_Fluent+VG, TestCheckRegionByCoordinateInFrameFully_Fluent+VG, TestCheckRegionInFrame_Fluent+VG, TestCheckRegionInFrame_Fluent+SCROLL, TestCheckRegionInFrame3_Fluent+VG, TestCheckRegionInFrameInFrame_Fluent+VG, TestCheckRegionInFrameInFrame_Fluent+SCROLL, TestCheckRegionInFrame2_Fluent+VG, TestCheckRegionInFrame2_Fluent+SCROLL"/>
-        <classes>
-            <class name="com.applitools.eyes.selenium.TestFluentApi_Frames">
-                <methods>
-                    <include name="TestCheckFrame_Fluent" />
-                    <include name="TestCheckFrame_Fully_Fluent" />
-                    <include name="TestCheckFrameInFrame_Fully_Fluent" />
-                    <include name="TestCheckRegionByCoordinateInFrame_Fluent" />
-                    <include name="TestCheckRegionByCoordinateInFrameFully_Fluent" />
-                    <include name="TestCheckFrameInFrame_Fully_Fluent2" />
-                    <include name="TestCheckRegionInFrame_Fluent" />
-                    <include name="TestCheckRegionInFrame3_Fluent" />
-                    <include name="TestCheckRegionInFrameInFrame_Fluent" />
-                    <include name="TestCheckLongOutOfBoundsIFrameModal" />
-                    <include name="TestCheckRegionInFrame2_Fluent" />
-                    <include name="TestCheckLongIFrameModal" />
-                </methods>
-            </class>
-        </classes>
-    </test>
-    <test name="Proxy_Test">
-        <classes>
-            <class name="com.applitools.eyes.selenium.TestProxy">
-                <methods>
-                    <include name="testNetworkThroughProxy" />
-                </methods>
-            </class>
-        </classes>
-    </test>
-    <test name="TestScrollRootElementInCenter_Test">
-        <parameter name="dont_run" value="TestCheckScrollRootElement+VG"/>
-        <classes>
-            <class name="com.applitools.eyes.selenium.TestScrollRootElementInCenter"/>
-        </classes>
-    </test>
-    <test name="TestDuplicates" parallel="methods">
-        <classes>
-            <class name="com.applitools.eyes.selenium.TestDuplicates">
-                <methods>
-                    <include name="TestDuplicatedIFrames" />
-                </methods>
-            </class>
-        </classes>
-    </test>
-    <test name="TestScrollRootElement" parallel="methods">
-        <classes>
-            <class name="com.applitools.eyes.selenium.TestScrollRootElement">
-                <methods>
-                    <include name="TestCheckWindow_Body" />
-                    <include name="TestCheckWindow_Html" />
-                </methods>
-            </class>
-        </classes>
-    </test>
-    <test name="TestSpecialCharacters" parallel="methods">
-        <classes>
-            <class name="com.applitools.eyes.renderingGrid.TestSpecialCharacters">
-                <methods>
-                    <include name="TestRenderSpecialCharacters" />
-                </methods>
-            </class>
-        </classes>
-    </test>
-    <test name="TestVGCloseAsync" parallel="methods">
-        <classes>
-            <class name="com.applitools.eyes.renderingGrid.TestVGCloseAsync">
-                <methods>
-                    <include name="TestCloseAsync"/>
-                </methods>
-            </class>
-        </classes>
-    </test>
-    <test name="TestCounts" parallel="methods">
-        <classes>
-            <class name="com.applitools.eyes.selenium.TestCounts">
-                <methods>
-                    <include name="Test_VGTestsCount_1" />
-                    <include name="Test_VGTestsCount_2" />
-                    <include name="Test_VGTestsCount_3" />
-                    <include name="Test_VGTestsCount_4" />
-                    <include name="Test_VGTestsCount_5" />
-                </methods>
-            </class>
-        </classes>
-    </test>
-    <test name="TestVGServerConfigs" parallel="methods">
-        <classes>
-            <class name="com.applitools.eyes.renderingGrid.TestVGServerConfigs">
-                <methods>
-                    <include name="TestVGDoubleCloseNoCheck" />
-                </methods>
-            </class>
-        </classes>
-    </test>
-    <test name="TestAbort" parallel="methods">
-        <classes>
-            <class name="com.applitools.eyes.api.TestAbort">
-                <methods>
-                    <include name="TestAbortIfNotClosed" />
-                </methods>
-            </class>
-        </classes>
-    </test>
-    <test name="TestApiMethods" parallel="methods">
-        <parameter name="dont_run" value="TestCloseAsync+false"/>
-        <classes>
-            <class name="com.applitools.eyes.api.TestApiMethods">
-                <methods>
-                    <include name="TestCloseAsync" />
-                </methods>
-            </class>
-        </classes>
-    </test>
-    <test name="TestConfigurationSentCorrectlyToServer" parallel="methods">
-        <classes>
-            <class name="com.applitools.eyes.selenium.TestConfigurationSentCorrectlyToServer">
-                <methods>
-                    <include name="TestEyesConfiguration" />
-                </methods>
-            </class>
-        </classes>
-    </test>
-    <test name="TestAbort2" parallel="methods">
-        <classes>
-            <class name="com.applitools.eyes.api.TestAbort2">
-                <methods>
-                    <include name="Test_GetAllResults" />
-                </methods>
-            </class>
-        </classes>
-    </test>
-    <test name="TestIEyesSelenium" parallel="methods">
-        <classes>
-            <class name="com.applitools.eyes.renderingGrid.TestIEyesSelenium">
-                <methods>
-                    <include name="Test_GetAllResults" />
-                </methods>
-            </class>
-        </classes>
-    </test>
-    <test name="TestVGNoMissingSteps" parallel="methods">
-        <classes>
-            <class name="com.applitools.eyes.renderingGrid.TestVGNoMissingSteps">
-                <methods>
-                    <include name="TestNoMissingSteps_UT"/>
-                </methods>
-            </class>
-        </classes>
-    </test>
+<!--    <test name="TestFluentApi_Frames">-->
+<!--        <parameter name="dont_run"-->
+<!--                   value="TestCheckFrameInFrame_Fully_Fluent+SCROLL, TestCheckFrameInFrame_Fully_Fluent+VG, TestCheckFrameInFrame_Fully_Fluent2+VG, TestCheckFrameInFrame_Fully_Fluent2+SCROLL, TestCheckFrame_Fluent+VG, TestCheckFrame_Fully_Fluent+VG, TestCheckRegionByCoordinateInFrame_Fluent+VG, TestCheckRegionByCoordinateInFrameFully_Fluent+VG, TestCheckRegionInFrame_Fluent+VG, TestCheckRegionInFrame_Fluent+SCROLL, TestCheckRegionInFrame3_Fluent+VG, TestCheckRegionInFrameInFrame_Fluent+VG, TestCheckRegionInFrameInFrame_Fluent+SCROLL, TestCheckRegionInFrame2_Fluent+VG, TestCheckRegionInFrame2_Fluent+SCROLL"/>-->
+<!--        <classes>-->
+<!--            <class name="com.applitools.eyes.selenium.TestFluentApi_Frames">-->
+<!--                <methods>-->
+<!--                    <include name="TestCheckFrame_Fluent" />-->
+<!--                    <include name="TestCheckFrame_Fully_Fluent" />-->
+<!--                    <include name="TestCheckFrameInFrame_Fully_Fluent" />-->
+<!--                    <include name="TestCheckRegionByCoordinateInFrame_Fluent" />-->
+<!--                    <include name="TestCheckRegionByCoordinateInFrameFully_Fluent" />-->
+<!--                    <include name="TestCheckFrameInFrame_Fully_Fluent2" />-->
+<!--                    <include name="TestCheckRegionInFrame_Fluent" />-->
+<!--                    <include name="TestCheckRegionInFrame3_Fluent" />-->
+<!--                    <include name="TestCheckRegionInFrameInFrame_Fluent" />-->
+<!--                    <include name="TestCheckLongOutOfBoundsIFrameModal" />-->
+<!--                    <include name="TestCheckRegionInFrame2_Fluent" />-->
+<!--                    <include name="TestCheckLongIFrameModal" />-->
+<!--                </methods>-->
+<!--            </class>-->
+<!--        </classes>-->
+<!--    </test>-->
+<!--    <test name="Proxy_Test">-->
+<!--        <classes>-->
+<!--            <class name="com.applitools.eyes.selenium.TestProxy">-->
+<!--                <methods>-->
+<!--                    <include name="testNetworkThroughProxy" />-->
+<!--                </methods>-->
+<!--            </class>-->
+<!--        </classes>-->
+<!--    </test>-->
+<!--    <test name="TestScrollRootElementInCenter_Test">-->
+<!--        <parameter name="dont_run" value="TestCheckScrollRootElement+VG"/>-->
+<!--        <classes>-->
+<!--            <class name="com.applitools.eyes.selenium.TestScrollRootElementInCenter"/>-->
+<!--        </classes>-->
+<!--    </test>-->
+<!--    <test name="TestDuplicates" parallel="methods">-->
+<!--        <classes>-->
+<!--            <class name="com.applitools.eyes.selenium.TestDuplicates">-->
+<!--                <methods>-->
+<!--                    <include name="TestDuplicatedIFrames" />-->
+<!--                </methods>-->
+<!--            </class>-->
+<!--        </classes>-->
+<!--    </test>-->
+<!--    <test name="TestScrollRootElement" parallel="methods">-->
+<!--        <classes>-->
+<!--            <class name="com.applitools.eyes.selenium.TestScrollRootElement">-->
+<!--                <methods>-->
+<!--                    <include name="TestCheckWindow_Body" />-->
+<!--                    <include name="TestCheckWindow_Html" />-->
+<!--                </methods>-->
+<!--            </class>-->
+<!--        </classes>-->
+<!--    </test>-->
+<!--    <test name="TestSpecialCharacters" parallel="methods">-->
+<!--        <classes>-->
+<!--            <class name="com.applitools.eyes.renderingGrid.TestSpecialCharacters">-->
+<!--                <methods>-->
+<!--                    <include name="TestRenderSpecialCharacters" />-->
+<!--                </methods>-->
+<!--            </class>-->
+<!--        </classes>-->
+<!--    </test>-->
+<!--    <test name="TestVGCloseAsync" parallel="methods">-->
+<!--        <classes>-->
+<!--            <class name="com.applitools.eyes.renderingGrid.TestVGCloseAsync">-->
+<!--                <methods>-->
+<!--                    <include name="TestCloseAsync"/>-->
+<!--                </methods>-->
+<!--            </class>-->
+<!--        </classes>-->
+<!--    </test>-->
+<!--    <test name="TestCounts" parallel="methods">-->
+<!--        <classes>-->
+<!--            <class name="com.applitools.eyes.selenium.TestCounts">-->
+<!--                <methods>-->
+<!--                    <include name="Test_VGTestsCount_1" />-->
+<!--                    <include name="Test_VGTestsCount_2" />-->
+<!--                    <include name="Test_VGTestsCount_3" />-->
+<!--                    <include name="Test_VGTestsCount_4" />-->
+<!--                    <include name="Test_VGTestsCount_5" />-->
+<!--                </methods>-->
+<!--            </class>-->
+<!--        </classes>-->
+<!--    </test>-->
+<!--    <test name="TestVGServerConfigs" parallel="methods">-->
+<!--        <classes>-->
+<!--            <class name="com.applitools.eyes.renderingGrid.TestVGServerConfigs">-->
+<!--                <methods>-->
+<!--                    <include name="TestVGDoubleCloseNoCheck" />-->
+<!--                </methods>-->
+<!--            </class>-->
+<!--        </classes>-->
+<!--    </test>-->
+<!--    <test name="TestAbort" parallel="methods">-->
+<!--        <classes>-->
+<!--            <class name="com.applitools.eyes.api.TestAbort">-->
+<!--                <methods>-->
+<!--                    <include name="TestAbortIfNotClosed" />-->
+<!--                </methods>-->
+<!--            </class>-->
+<!--        </classes>-->
+<!--    </test>-->
+<!--    <test name="TestApiMethods" parallel="methods">-->
+<!--        <parameter name="dont_run" value="TestCloseAsync+false"/>-->
+<!--        <classes>-->
+<!--            <class name="com.applitools.eyes.api.TestApiMethods">-->
+<!--                <methods>-->
+<!--                    <include name="TestCloseAsync" />-->
+<!--                </methods>-->
+<!--            </class>-->
+<!--        </classes>-->
+<!--    </test>-->
+<!--    <test name="TestConfigurationSentCorrectlyToServer" parallel="methods">-->
+<!--        <classes>-->
+<!--            <class name="com.applitools.eyes.selenium.TestConfigurationSentCorrectlyToServer">-->
+<!--                <methods>-->
+<!--                    <include name="TestEyesConfiguration" />-->
+<!--                </methods>-->
+<!--            </class>-->
+<!--        </classes>-->
+<!--    </test>-->
+<!--    <test name="TestAbort2" parallel="methods">-->
+<!--        <classes>-->
+<!--            <class name="com.applitools.eyes.api.TestAbort2">-->
+<!--                <methods>-->
+<!--                    <include name="Test_GetAllResults" />-->
+<!--                </methods>-->
+<!--            </class>-->
+<!--        </classes>-->
+<!--    </test>-->
+<!--    <test name="TestIEyesSelenium" parallel="methods">-->
+<!--        <classes>-->
+<!--            <class name="com.applitools.eyes.renderingGrid.TestIEyesSelenium">-->
+<!--                <methods>-->
+<!--                    <include name="Test_GetAllResults" />-->
+<!--                </methods>-->
+<!--            </class>-->
+<!--        </classes>-->
+<!--    </test>-->
+<!--    <test name="TestVGNoMissingSteps" parallel="methods">-->
+<!--        <classes>-->
+<!--            <class name="com.applitools.eyes.renderingGrid.TestVGNoMissingSteps">-->
+<!--                <methods>-->
+<!--                    <include name="TestNoMissingSteps_UT"/>-->
+<!--                </methods>-->
+<!--            </class>-->
+<!--        </classes>-->
+<!--    </test>-->
 </suite>
