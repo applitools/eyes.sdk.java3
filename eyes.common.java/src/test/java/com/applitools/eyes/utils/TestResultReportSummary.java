@@ -38,7 +38,7 @@ public class TestResultReportSummary {
     public boolean getSandbox() {
         String isSandbox = System.getenv("APPLITOOLS_REPORT_TO_SANDBOX");
         String travisTag = System.getenv("TRAVIS_TAG");
-        return "true".equalsIgnoreCase(isSandbox) || travisTag == null || travisTag.contains("RELEASE_CANDIDATE");
+        return "true".equalsIgnoreCase(isSandbox) || travisTag == null || !travisTag.contains("RELEASE_CANDIDATE");
 
     }
 
