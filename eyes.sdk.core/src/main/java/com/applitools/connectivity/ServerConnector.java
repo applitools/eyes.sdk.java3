@@ -2,6 +2,7 @@ package com.applitools.connectivity;
 
 import com.applitools.connectivity.api.*;
 import com.applitools.eyes.*;
+import com.applitools.eyes.locators.VisualLocatorsData;
 import com.applitools.eyes.visualgrid.model.*;
 import com.applitools.utils.ArgumentGuard;
 import com.applitools.utils.GeneralUtils;
@@ -614,6 +615,25 @@ public class ServerConnector extends RestClient implements IServerConnector {
             GeneralUtils.logExceptionStackTrace(logger, e);
         }
         return null;
+    }
+
+    public Map<String, List<Region>> postLocators(VisualLocatorsData visualLocatorsData) {
+        String postData;
+        try {
+            jsonMapper.configure(SerializationFeature.WRAP_ROOT_VALUE, false);
+            postData = jsonMapper.writeValueAsString(visualLocatorsData);
+        } catch (IOException e) {
+            throw new EyesException("Failed to convert " +
+                    "visualLocatorsData into Json string!", e);
+        }
+
+        ConnectivityTarget target = restClient.target(serverUrl).path(("api/locators/locate")).queryParam("apiKey", getApiKey());
+        Request request = target.request(MediaType.APPLICATION_JSON);
+        Response response = sendLongRequest(request, HttpMethod.POST, postData, MediaType.APPLICATION_JSON);
+        List<Integer> validStatusCodes = new ArrayList<>();
+        validStatusCodes.add(javax.ws.rs.core.Response.Status.OK.getStatusCode());
+
+        return parseResponseWithJsonData(response, validStatusCodes, Map.class);
     }
 
     public void closeBatch(String batchId) {

@@ -7,6 +7,8 @@ import com.applitools.eyes.config.IConfigurationSetter;
 import com.applitools.eyes.fluent.ICheckSettingsInternal;
 import com.applitools.eyes.selenium.IConfigurationGetter;
 import com.applitools.eyes.selenium.ISeleniumConfigurationProvider;
+import com.applitools.eyes.selenium.locators.SeleniumVisualLocatorProvider;
+import com.applitools.eyes.selenium.wrappers.EyesWebDriver;
 import com.applitools.eyes.visualgrid.model.*;
 import com.applitools.eyes.visualgrid.model.DesktopBrowserInfo;
 import com.applitools.eyes.visualgrid.model.EmulationDevice;
@@ -20,8 +22,8 @@ import java.util.concurrent.Future;
 
 class EyesConnector extends EyesBase implements IEyesConnector, IBatchCloser {
 
-    private final ISeleniumConfigurationProvider configProvider;
-    private DesktopBrowserInfo browserInfo;
+    private final DesktopBrowserInfo browserInfo;;
+    private final EyesWebDriver driver;
     private String userAgent;
     private String device;
     private RectangleSize deviceSize;
@@ -29,8 +31,8 @@ class EyesConnector extends EyesBase implements IEyesConnector, IBatchCloser {
     private String appName;
     private String testName;
 
-    public EyesConnector(ISeleniumConfigurationProvider configProvider, List<PropertyData> properties, DesktopBrowserInfo browserInfo) {
-        this.configProvider = configProvider;
+    public EyesConnector(ISeleniumConfigurationProvider configProvider, List<PropertyData> properties, DesktopBrowserInfo browserInfo, EyesWebDriver driver) {
+        this.driver = driver;
         configurationGetter = configProvider.get();
         this.browserInfo = browserInfo;
         if (properties != null) {
@@ -278,5 +280,10 @@ class EyesConnector extends EyesBase implements IEyesConnector, IBatchCloser {
     @Override
     public void closeBatch(String batchId) {
         this.serverConnector.closeBatch(batchId);
+    }
+
+    @Override
+    protected void initVisualLocatorProvider() {
+        visualLocatorProvider = new SeleniumVisualLocatorProvider(driver, serverConnector, logger, debugScreenshotsProvider);
     }
 }

@@ -18,6 +18,7 @@ import com.applitools.eyes.exceptions.NewTestException;
 import com.applitools.eyes.exceptions.TestFailedException;
 import com.applitools.eyes.fluent.CheckSettings;
 import com.applitools.eyes.fluent.ICheckSettingsInternal;
+import com.applitools.eyes.locators.VisualLocatorProvider;
 import com.applitools.eyes.positioning.InvalidPositionProvider;
 import com.applitools.eyes.positioning.PositionProvider;
 import com.applitools.eyes.positioning.RegionProvider;
@@ -57,6 +58,8 @@ public abstract class EyesBase implements IEyesBase{
     protected PropertyHandler<ScaleProvider> scaleProviderHandler;
     protected PropertyHandler<CutProvider> cutProviderHandler;
     protected PropertyHandler<PositionProvider> positionProviderHandler;
+
+    protected VisualLocatorProvider visualLocatorProvider;
 
     // Will be checked <b>before</b> any argument validation. If true,
     // all method will immediately return without performing any action.
@@ -125,6 +128,8 @@ public abstract class EyesBase implements IEyesBase{
             positionProviderHandler = new SimplePropertyHandler<>();
             positionProviderHandler.set(new InvalidPositionProvider());
         }
+
+        initVisualLocatorProvider();
     }
 
     /**
@@ -1477,4 +1482,6 @@ public abstract class EyesBase implements IEyesBase{
     public void abortAsync() {
         abort();
     }
+
+    protected void initVisualLocatorProvider() {}
 }

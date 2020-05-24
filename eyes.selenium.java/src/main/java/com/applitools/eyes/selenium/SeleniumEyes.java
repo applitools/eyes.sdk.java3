@@ -12,6 +12,7 @@ import com.applitools.eyes.exceptions.TestFailedException;
 import com.applitools.eyes.fluent.GetRegion;
 import com.applitools.eyes.fluent.ICheckSettingsInternal;
 import com.applitools.eyes.fluent.SimpleRegionByRectangle;
+import com.applitools.eyes.locators.VisualLocatorSettings;
 import com.applitools.eyes.positioning.PositionMemento;
 import com.applitools.eyes.positioning.PositionProvider;
 import com.applitools.eyes.positioning.RegionProvider;
@@ -22,6 +23,7 @@ import com.applitools.eyes.selenium.exceptions.EyesDriverOperationException;
 import com.applitools.eyes.selenium.fluent.*;
 import com.applitools.eyes.selenium.frames.Frame;
 import com.applitools.eyes.selenium.frames.FrameChain;
+import com.applitools.eyes.selenium.locators.SeleniumVisualLocatorProvider;
 import com.applitools.eyes.selenium.positioning.*;
 import com.applitools.eyes.selenium.regionVisibility.MoveToRegionVisibilityStrategy;
 import com.applitools.eyes.selenium.regionVisibility.NopRegionVisibilityStrategy;
@@ -36,10 +38,7 @@ import org.openqa.selenium.remote.RemoteWebDriver;
 
 import java.awt.image.BufferedImage;
 import java.net.URI;
-import java.util.ArrayList;
-import java.util.Dictionary;
-import java.util.Hashtable;
-import java.util.List;
+import java.util.*;
 
 /**
  * The main API gateway for the SDK.
@@ -2260,5 +2259,13 @@ public class SeleniumEyes extends EyesBase implements ISeleniumEyes, IDriverProv
         return this.configurationProvider.set();
     }
 
+    @Override
+    protected void initVisualLocatorProvider() {
+        visualLocatorProvider = new SeleniumVisualLocatorProvider(driver, serverConnector, logger, debugScreenshotsProvider);
+    }
 
+    public Map<String, List<Region>> locate(VisualLocatorSettings visualLocatorSettings) {
+        ArgumentGuard.notNull(visualLocatorSettings, "visualLocatorSettings");
+        return visualLocatorProvider.getLocators(visualLocatorSettings);
+    }
 }
