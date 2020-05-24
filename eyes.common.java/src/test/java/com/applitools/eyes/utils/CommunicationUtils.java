@@ -2,7 +2,6 @@ package com.applitools.eyes.utils;
 
 import com.applitools.eyes.BatchInfo;
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.io.IOUtils;
@@ -16,33 +15,11 @@ import org.apache.http.impl.client.HttpClients;
 
 import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.URI;
+import java.nio.charset.StandardCharsets;
 
 public class CommunicationUtils {
-
-    public static <Tout> Tout parseJsonResponse(HttpResponse httpResponse) {
-
-        HttpEntity entity = httpResponse.getEntity();
-
-        if (entity != null) {
-            try {
-                ObjectMapper jsonMapper = new ObjectMapper();
-                InputStream inputStream = null;
-                inputStream = entity.getContent();
-
-                @SuppressWarnings("UnnecessaryLocalVariable")
-                Tout result = jsonMapper.readValue(inputStream, new TypeReference<Tout>() {
-                });
-                ((CloseableHttpResponse) httpResponse).close();
-                return result;
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-        return null;
-    }
 
     public static String getString(String url) {
         return getString(url, null);
@@ -70,43 +47,25 @@ public class CommunicationUtils {
         return null;
     }
 
-    public static <Tout> Tout getJson(String url) {
-        return getJson(url, null);
+    public static <Tin> void putJson(String url, Tin data, HttpAuth creds) {
+        jsonRequest(url, data, creds, new HttpPut());
     }
 
-    public static <Tout> Tout getJson(String url, HttpAuth creds) {
-        try (CloseableHttpClient httpClient = HttpClients.custom().build()) {
-            HttpGet request = new HttpGet(url);
-            setCredentials(creds, request);
-            HttpResponse httpResponse = httpClient.execute(request);
-            return parseJsonResponse(httpResponse);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return null;
+    public static <Tin> void postJson(String url, Tin data, HttpAuth creds) {
+        jsonRequest(url, data, creds, new HttpPost());
     }
 
-    public static <Tin, Tout> Tout putJson(String url, Tin data, HttpAuth creds) {
-        return jsonRequest(url, data, creds, new HttpPut());
-    }
-
-    public static <Tin, Tout> Tout postJson(String url, Tin data, HttpAuth creds) {
-        return jsonRequest(url, data, creds, new HttpPost());
-    }
-
-    public static <Tin, Tout> Tout jsonRequest(String url, Tin data, HttpAuth creds, HttpEntityEnclosingRequestBase request) {
+    public static <Tin> void jsonRequest(String url, Tin data, HttpAuth creds, HttpEntityEnclosingRequestBase request) {
         try (CloseableHttpClient httpClient = HttpClients.custom().build()) {
             request.setURI(new URI(url));
             setCredentials(creds, request);
             String json = createJsonString(data);
             request.setEntity(new StringEntity(json, ContentType.APPLICATION_JSON));
 
-            HttpResponse httpResponse = httpClient.execute(request);
-            return parseJsonResponse(httpResponse);
+            httpClient.execute(request);
         } catch (Exception e) {
             e.printStackTrace();
         }
-        return null;
     }
 
     private static void setCredentials(HttpAuth creds, HttpRequestBase request) {
@@ -141,9 +100,9 @@ public class CommunicationUtils {
                 byte[] bytes = new byte[0];
                 try {
                     bytes = IOUtils.toByteArray(response.getEntity().getContent());
-                    String s = new String(bytes, "UTF-8");
+                    String s = new String(bytes, StandardCharsets.UTF_8);
                     System.out.println(s);
-                } catch (IOException e) {
+                } catch (IOException ignored) {
                 }
                 batchInfo = objectMapper.readValue(bytes, BatchInfo.class);
             }
