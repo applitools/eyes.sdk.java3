@@ -20,9 +20,12 @@ public class TestResultReportSummary {
 
     @JsonProperty("id")
     public String getId() {
-        if (this.id == null)
+        if (this.id == null) {
             this.id = System.getenv("APPLITOOLS_REPORT_ID");
-        if (this.id == null) return "0000-0000";
+        }
+        if (this.id == null) {
+            return "0000-0000";
+        }
         return this.id;
     }
 
