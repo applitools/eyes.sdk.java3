@@ -4,7 +4,12 @@ import com.applitools.eyes.utils.ReportingTestSuite;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
-public class TestConfiguration {
+public class TestConfiguration extends ReportingTestSuite {
+
+    public TestConfiguration() {
+        super.setGroupName("images");
+    }
+
     @Test
     public void TestSetEnablePatterns() {
         Eyes e = new Eyes();
