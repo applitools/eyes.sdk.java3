@@ -343,7 +343,7 @@ public class ServerConnector extends RestClient implements IServerConnector {
 
                     int statusCode = response.getStatusCode();
                     if (statusCode != HttpStatus.SC_OK && statusCode != HttpStatus.SC_CREATED) {
-                        logger.log(String.format("Error: Status %d on url %s", statusCode, url));
+                        logger.verbose(String.format("Error: Status %d on url %s", statusCode, url));
                     }
 
                     byte[] fileContent = downloadFile(response);
