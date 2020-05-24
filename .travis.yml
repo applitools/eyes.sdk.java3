@@ -30,6 +30,7 @@ jobs:
         - chmod +x /home/travis/build/chromedriver
         - /home/travis/build/chromedriver --version
         - env webdriver.chrome.driver=/home/travis/build/
+        - export APPLITOOLS_REPORT_ID=${TRAVIS_COMMIT:0:7}-$TRAVIS_BUILD_NUMBER
         - SDK_VERSION=$(echo $TRAVIS_TAG | sed 's/[^.0-9]*//g')
         - chmod +x ./extractChangeLog.sh
         - TMP_CHANGELOG=$(./extractChangeLog.sh "$SDK_VERSION" "CHANGELOG.md")
