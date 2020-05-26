@@ -702,6 +702,8 @@ public class SeleniumEyes extends EyesBase implements ISeleniumEyes, IDriverProv
             logger.verbose(String.format("check(\"%s\", checkSettings) - begin", name));
 
             this.stitchContent = checkSettingsInternal.getStitchContent() == null ? false : checkSettingsInternal.getStitchContent();
+            boolean forceFullPageScreenshot = getConfigGetter().getForceFullPageScreenshot() == null ? false : getConfigGetter().getForceFullPageScreenshot();
+            this.stitchContent |= forceFullPageScreenshot;
             final Region targetRegion = checkSettingsInternal.getTargetRegion();
 
             logger.verbose("setting scrollRootElement...");

@@ -29,6 +29,15 @@ public class TestClassicApi extends TestSetup {
     }
 
     @Test
+    public void TestCheckWindow_ForceFullPageScreenshot()
+    {
+        boolean originalForceFullPageScreenshot = getEyes().getForceFullPageScreenshot();
+        getEyes().setForceFullPageScreenshot(true);
+        getEyes().checkWindow("Window");
+        getEyes().setForceFullPageScreenshot(originalForceFullPageScreenshot);
+    }
+
+    @Test
     public void TestCheckWindowViewport() {
         getEyes().checkWindow("Viewport Window", false);
     }
