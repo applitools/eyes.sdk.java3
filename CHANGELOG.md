@@ -1,3 +1,7 @@
+## [vNext]
+### Fixed
+- `ForceFullPageScreenshot` didn't work in some cases. [Trello 1761](https://trello.com/c/YUzhu656)
+
 ## [3.164.0] - 2020-05-24
 ### Added
 - Edge Chromium support. [Trello 1757](https://trello.com/c/LUe43aee)
