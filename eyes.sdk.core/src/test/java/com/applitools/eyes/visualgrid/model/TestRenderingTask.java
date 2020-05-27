@@ -65,8 +65,13 @@ public class TestRenderingTask extends ReportingTestSuite {
                     synchronized (counter) {
                         counter.getAndIncrement();
                         URI url = invocationOnMock.getArgument(0);
-                        System.out.println(url);
                         Map innerUrls = getInnerMap(urls, url.toString());
+                        try {
+                            // Sleeping so the async tasks will take some time to finish
+                            Thread.sleep(1000);
+                        } catch (InterruptedException e) {
+                            throw new IllegalStateException(e);
+                        }
                         if (!Objects.requireNonNull(innerUrls).isEmpty()) {
                             try {
                                 renderingTask.fetchAllResources(allBlobs, stringsToUris(innerUrls.keySet()), frameData);
