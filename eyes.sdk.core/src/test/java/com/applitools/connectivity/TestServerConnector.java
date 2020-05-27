@@ -1,13 +1,12 @@
 package com.applitools.connectivity;
 
-import com.applitools.connectivity.api.ConnectivityTarget;
-import com.applitools.connectivity.api.HttpClient;
-import com.applitools.connectivity.api.Request;
-import com.applitools.connectivity.api.Response;
+import com.applitools.connectivity.api.*;
+import com.applitools.eyes.IDownloadListener;
 import com.applitools.eyes.Logger;
 import com.applitools.eyes.RunningSession;
 import com.applitools.eyes.SessionStartInfo;
 import com.applitools.eyes.utils.ReportingTestSuite;
+import com.applitools.eyes.visualgrid.model.RGridResource;
 import com.applitools.utils.GeneralUtils;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
@@ -21,10 +20,14 @@ import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
 import javax.ws.rs.HttpMethod;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.concurrent.Future;
 
 import static org.mockito.ArgumentMatchers.*;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 public class TestServerConnector extends ReportingTestSuite {
 
@@ -64,6 +67,21 @@ public class TestServerConnector extends ReportingTestSuite {
     Response getResponse;
     @Mock
     Response deleteResponse;
+
+    static class MockedAsyncRequest implements AsyncRequest {
+        final Map<String,String> headers = new HashMap<>();
+
+        @Override
+        public AsyncRequest header(String name, String value) {
+            headers.put(name, value);
+            return this;
+        }
+
+        @Override
+        public Future<?> method(String method, AsyncRequestCallback callback, Object data, String contentType) {
+            return null;
+        }
+    }
 
     @BeforeMethod
     public void setMocks() {
@@ -123,7 +141,7 @@ public class TestServerConnector extends ReportingTestSuite {
     }
 
     @Test
-    public void TestStartSessionGotIsNew() throws JsonProcessingException {
+    public void testStartSessionGotIsNew() throws JsonProcessingException {
         Response response = mockLongRequest(HttpMethod.POST);
         when(response.getStatusPhrase()).thenReturn("");
 
@@ -152,5 +170,32 @@ public class TestServerConnector extends ReportingTestSuite {
         when(response.getStatusCode()).thenReturn(HttpStatus.SC_CREATED);
         session = connector.startSession(new SessionStartInfo());
         Assert.assertTrue(session.getIsNew());
+    }
+
+    @Test
+    public void testDownloadResourceRequestHeaders() throws MalformedURLException {
+        String userAgent = "userAgent";
+        String referer = "referer";
+        URL url = new URL("http://downloadResource.com");
+        ConnectivityTarget target = mock(ConnectivityTarget.class);
+        MockedAsyncRequest mockedAsyncRequest = new MockedAsyncRequest();
+
+        when(restClient.target(url.toString())).thenReturn(target);
+        when(target.asyncRequest(anyString())).thenReturn(mockedAsyncRequest);
+
+        ServerConnector connector = new ServerConnector();
+        connector.updateClient(restClient);
+        connector.downloadResource(url, userAgent, referer, new IDownloadListener<RGridResource>() {
+            @Override
+            public void onDownloadComplete(RGridResource downloadedResource) {}
+
+            @Override
+            public void onDownloadFailed() {}
+        });
+
+        Map<String, String> expectedHeaders = new HashMap<>();
+        expectedHeaders.put("User-Agent", userAgent);
+        expectedHeaders.put("Referer", referer);
+        Assert.assertEquals(mockedAsyncRequest.headers, expectedHeaders);
     }
 }
