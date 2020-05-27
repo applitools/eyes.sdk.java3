@@ -136,17 +136,14 @@ public class RenderingTask implements Callable<RenderStatusResults>, Completable
                 try {
                     runningRenders = this.eyesConnector.render(requests);
                 } catch (Exception e) {
-
                     Thread.sleep(1500);
                     logger.verbose("/render throws exception... sleeping for 1.5s");
-                    GeneralUtils.logExceptionStackTrace(logger, e);
-                    if (e.getMessage().contains("Second request, yet still some resources were not PUT in renderId")) {
-                        if (isSecondRequestAlreadyHappened) {
-                            logger.verbose("Second request already happened");
-                        }
-                        isSecondRequestAlreadyHappened = true;
-//                        this.isForcePutNeeded.set(true);
+                    if (isSecondRequestAlreadyHappened) {
+                        logger.verbose("Second request already happened");
+                        throw e;
                     }
+                    isSecondRequestAlreadyHappened = true;;
+                    GeneralUtils.logExceptionStackTrace(logger, e);
                     logger.verbose("ERROR " + e.getMessage());
                 }
                 logger.verbose("step 3.1");
@@ -335,14 +332,6 @@ public class RenderingTask implements Callable<RenderStatusResults>, Completable
     private void createPutFutures(List<IPutFuture> allPuts, RunningRender runningRender, Map<String, RGridResource> resources) {
         List<String> needMoreResources = runningRender.getNeedMoreResources();
         for (String url : needMoreResources) {
-            if (putResourceCache.containsKey(url)) {
-                IPutFuture putFuture = putResourceCache.get(url);
-                if (!allPuts.contains(putFuture)) {
-                    allPuts.add(putFuture);
-                }
-                continue;
-            }
-
             RGridResource resource;
             if (!fetchedCacheMap.containsKey(url)) {
                 logger.verbose(String.format("Resource %s requested but never downloaded (maybe a Frame)", url));
