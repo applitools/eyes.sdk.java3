@@ -20,8 +20,7 @@ import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
 import javax.ws.rs.HttpMethod;
-import java.net.MalformedURLException;
-import java.net.URL;
+import java.net.URI;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.Future;
@@ -173,10 +172,10 @@ public class TestServerConnector extends ReportingTestSuite {
     }
 
     @Test
-    public void testDownloadResourceRequestHeaders() throws MalformedURLException {
+    public void testDownloadResourceRequestHeaders() throws Exception {
         String userAgent = "userAgent";
         String referer = "referer";
-        URL url = new URL("http://downloadResource.com");
+        URI url = new URI("http://downloadResource.com");
         ConnectivityTarget target = mock(ConnectivityTarget.class);
         MockedAsyncRequest mockedAsyncRequest = new MockedAsyncRequest();
 

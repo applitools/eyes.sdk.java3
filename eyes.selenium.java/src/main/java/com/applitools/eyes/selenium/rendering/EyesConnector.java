@@ -5,7 +5,6 @@ import com.applitools.eyes.*;
 import com.applitools.eyes.capture.AppOutputWithScreenshot;
 import com.applitools.eyes.config.IConfigurationSetter;
 import com.applitools.eyes.fluent.ICheckSettingsInternal;
-import com.applitools.eyes.selenium.BrowserType;
 import com.applitools.eyes.selenium.IConfigurationGetter;
 import com.applitools.eyes.selenium.ISeleniumConfigurationProvider;
 import com.applitools.eyes.visualgrid.model.*;
@@ -14,7 +13,6 @@ import com.applitools.eyes.visualgrid.services.VisualGridTask;
 import com.applitools.utils.ClassVersionGetter;
 
 import java.net.URI;
-import java.net.URL;
 import java.util.List;
 import java.util.concurrent.Future;
 
@@ -56,7 +54,7 @@ class EyesConnector extends EyesBase implements IEyesConnector, IBatchCloser {
     }
 
     @Override
-    public Future<?> getResource(URL url, String userAgent, String refererUrl, IDownloadListener<RGridResource> listener) {
+    public Future<?> getResource(URI url, String userAgent, String refererUrl, IDownloadListener<RGridResource> listener) {
         return this.serverConnector.downloadResource(url, userAgent, refererUrl, listener);
     }
 

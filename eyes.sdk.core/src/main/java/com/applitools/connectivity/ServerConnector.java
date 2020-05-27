@@ -317,12 +317,12 @@ public class ServerConnector extends RestClient implements IServerConnector {
         }, null, null);
     }
 
-    public Future<?> downloadResource(final URL url, final String userAgent, final String refererUrl,
+    public Future<?> downloadResource(final URI url, final String userAgent, final String refererUrl,
                                       final IDownloadListener<RGridResource> listener) {
         return downloadResource(url, userAgent, refererUrl, listener, 1);
     }
 
-    public Future<?> downloadResource(final URL url, final String userAgent, final String refererUrl,
+    public Future<?> downloadResource(final URI url, final String userAgent, final String refererUrl,
                                       final IDownloadListener<RGridResource> listener, final int attemptNumber) {
         AsyncRequest asyncRequest = restClient.target(url.toString()).asyncRequest(MediaType.WILDCARD);
         asyncRequest.header("User-Agent", userAgent);

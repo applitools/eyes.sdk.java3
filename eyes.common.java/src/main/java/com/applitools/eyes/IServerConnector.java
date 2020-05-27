@@ -114,7 +114,7 @@ public interface IServerConnector {
      * @param userAgent      user agent to send to server
      * @return A future which will be resolved when the resources is downloaded.
      */
-    Future<?> downloadResource(URL uri, String userAgent, final String refererUrl, IDownloadListener<RGridResource> listener);
+    Future<?> downloadResource(URI uri, String userAgent, final String refererUrl, IDownloadListener<RGridResource> listener);
 
     /**
      * @return the render info from the server to be used later on.

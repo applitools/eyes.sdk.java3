@@ -8,7 +8,6 @@ import com.applitools.eyes.visualgrid.model.*;
 
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.net.URL;
 import java.util.List;
 import java.util.concurrent.Future;
 
@@ -29,7 +28,7 @@ public interface IEyesConnector {
 
     TestResults abortIfNotClosed();
 
-    Future<?> getResource(URL url, String userAgent, String refererUrl, IDownloadListener<RGridResource> listener);
+    Future<?> getResource(URI url, String userAgent, String refererUrl, IDownloadListener<RGridResource> listener);
 
     RenderingInfo getRenderingInfo();
 

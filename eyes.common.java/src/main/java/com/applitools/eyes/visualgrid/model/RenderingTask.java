@@ -62,7 +62,7 @@ public class RenderingTask implements Callable<RenderStatusResults>, Completable
     private AtomicBoolean isTimeElapsed = new AtomicBoolean(false);
 
     // Phaser for syncing all futures downloading resources
-    private Phaser resourcesPhaser = new Phaser();
+    Phaser resourcesPhaser = new Phaser();
 
     @SuppressWarnings({"unused", "FieldCanBeLocal"})
     private boolean isTaskStarted = false;
@@ -77,6 +77,16 @@ public class RenderingTask implements Callable<RenderStatusResults>, Completable
         void onRenderSuccess();
 
         void onRenderFailed(Exception e);
+    }
+
+    RenderingTask(IEyesConnector eyesConnector, List<VisualGridTask> visualGridTaskList, UserAgent userAgent) {
+        this.eyesConnector = eyesConnector;
+        this.visualGridTaskList = visualGridTaskList;
+        this.userAgent = userAgent;
+        fetchedCacheMap = new HashMap<>();
+        logger = new Logger();
+        regionSelectors = new ArrayList<>();
+        putResourceCache = new HashMap<>();
     }
 
     public RenderingTask(IEyesConnector eyesConnector, FrameData domData, ICheckSettings checkSettings,
@@ -797,7 +807,7 @@ public class RenderingTask implements Callable<RenderStatusResults>, Completable
         return unparsedResources;
     }
 
-    private void fetchAllResources(final Map<String, RGridResource> allBlobs, final Set<URI> resourceUrls, final FrameData result) {
+    void fetchAllResources(final Map<String, RGridResource> allBlobs, final Set<URI> resourceUrls, final FrameData result) {
         logger.verbose("enter");
         if (resourceUrls.isEmpty()) {
             return;
@@ -817,7 +827,7 @@ public class RenderingTask implements Callable<RenderStatusResults>, Completable
                 IEyesConnector eyesConnector = this.visualGridTaskList.get(0).getEyesConnector();
                 try {
                     resourcesPhaser.register();
-                    eyesConnector.getResource(uri.toURL(), userAgent.getOriginalUserAgentString(), result.getUrl(),
+                    eyesConnector.getResource(uri, userAgent.getOriginalUserAgentString(), result.getUrl(),
                             new IDownloadListener<RGridResource>() {
                         @Override
                         public void onDownloadComplete(RGridResource downloadedResource) {
