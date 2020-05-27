@@ -6,6 +6,8 @@ public abstract class Response {
 
     protected Logger logger;
 
+    protected byte[] body;
+
     public Response(Logger logger) {
         this.logger = logger;
     }
@@ -22,15 +24,23 @@ public abstract class Response {
      */
     public abstract String getHeader(String name, boolean ignoreCase);
 
-    public abstract <T> T readEntity(Class<T> type);
+    protected abstract void readEntity();
+
+    public byte[] getBody() {
+        return body;
+    }
+
+    public String getBodyString() {
+        return new String(body);
+    }
 
     public abstract void close();
 
     public void logIfError() {
         try {
-            if (getStatusCode() > 300) {
+            if (getStatusCode() > 400 && getStatusCode() < 500) {
                 logger.log(String.format("Got invalid response from the server. Status code: %s. Status Phrase: %s. Response body: %s",
-                        getStatusCode(), getStatusPhrase(), readEntity(String.class)));
+                        getStatusCode(), getStatusPhrase(), getBodyString()));
             }
         } catch (Exception e) {
             logger.log(String.format("Failed logging the response body. Status code: %s", getStatusCode()));

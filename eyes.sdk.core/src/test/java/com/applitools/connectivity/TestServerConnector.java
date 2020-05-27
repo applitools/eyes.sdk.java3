@@ -67,8 +67,12 @@ public class TestServerConnector extends ReportingTestSuite {
     @Mock
     Response deleteResponse;
 
-    static class MockedAsyncRequest implements AsyncRequest {
+    static class MockedAsyncRequest extends AsyncRequest {
         final Map<String,String> headers = new HashMap<>();
+
+        public MockedAsyncRequest(Logger logger) {
+            super(logger);
+        }
 
         @Override
         public AsyncRequest header(String name, String value) {
@@ -151,18 +155,18 @@ public class TestServerConnector extends ReportingTestSuite {
 
         when(response.getStatusCode()).thenReturn(HttpStatus.SC_OK);
         runningSession.setIsNew(true);
-        when(response.readEntity(String.class)).thenReturn(jsonMapper.writeValueAsString(runningSession));
+        when(response.getBodyString()).thenReturn(jsonMapper.writeValueAsString(runningSession));
         RunningSession session = connector.startSession(new SessionStartInfo());
         Assert.assertTrue(session.getIsNew());
         verifyLongRequest();
 
         runningSession.setIsNew(false);
-        when(response.readEntity(String.class)).thenReturn(jsonMapper.writeValueAsString(runningSession));
+        when(response.getBodyString()).thenReturn(jsonMapper.writeValueAsString(runningSession));
         session = connector.startSession(new SessionStartInfo());
         Assert.assertFalse(session.getIsNew());
 
         runningSession.setIsNew(null);
-        when(response.readEntity(String.class)).thenReturn(jsonMapper.writeValueAsString(runningSession));
+        when(response.getBodyString()).thenReturn(jsonMapper.writeValueAsString(runningSession));
         session = connector.startSession(new SessionStartInfo());
         Assert.assertFalse(session.getIsNew());
 
@@ -177,7 +181,7 @@ public class TestServerConnector extends ReportingTestSuite {
         String referer = "referer";
         URI url = new URI("http://downloadResource.com");
         ConnectivityTarget target = mock(ConnectivityTarget.class);
-        MockedAsyncRequest mockedAsyncRequest = new MockedAsyncRequest();
+        MockedAsyncRequest mockedAsyncRequest = new MockedAsyncRequest(new Logger());
 
         when(restClient.target(url.toString())).thenReturn(target);
         when(target.asyncRequest(anyString())).thenReturn(mockedAsyncRequest);

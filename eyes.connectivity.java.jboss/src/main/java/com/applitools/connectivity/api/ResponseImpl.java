@@ -12,6 +12,7 @@ public class ResponseImpl extends Response {
     ResponseImpl(javax.ws.rs.core.Response response, Logger logger) {
         super(logger);
         this.response = response;
+        readEntity();
         logIfError();
     }
 
@@ -43,8 +44,8 @@ public class ResponseImpl extends Response {
     }
 
     @Override
-    public <T> T readEntity(Class<T> type) {
-        return response.readEntity(type);
+    public void readEntity() {
+        body = response.readEntity(byte[].class);
     }
 
     @Override

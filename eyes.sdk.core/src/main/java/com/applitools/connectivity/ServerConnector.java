@@ -19,8 +19,8 @@ import org.brotli.dec.BrotliInputStream;
 
 import javax.ws.rs.HttpMethod;
 import javax.ws.rs.core.MediaType;
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.net.URI;
 import java.net.URL;
 import java.util.*;
@@ -433,7 +433,7 @@ public class ServerConnector extends RestClient implements IServerConnector {
                 RunningRender[] runningRenders = parseResponseWithJsonData(response, validStatusCodes, new TypeReference<RunningRender[]>() {});
                 return Arrays.asList(runningRenders);
             }
-            throw new EyesException(String.format("Unexpected status %d, message: %s", response.getStatusCode(), response.readEntity(String.class)));
+            throw new EyesException(String.format("Unexpected status %d, message: %s", response.getStatusCode(), response.getBodyString()));
         } catch (JsonProcessingException e) {
             GeneralUtils.logExceptionStackTrace(logger, e);
             return null;
@@ -523,7 +523,7 @@ public class ServerConnector extends RestClient implements IServerConnector {
                         return;
                     }
 
-                    String responseData = response.readEntity(String.class);
+                    String responseData = response.getBodyString();
                     try {
                         JsonNode jsonObject = jsonMapper.readTree(responseData);
                         JsonNode value = jsonObject.get("hash");
@@ -709,23 +709,17 @@ public class ServerConnector extends RestClient implements IServerConnector {
     }
 
     private byte[] downloadFile(Response response) {
-        InputStream inputStream = response.readEntity(InputStream.class);
+        byte[] responseBody = response.getBody();
         String contentEncoding = response.getHeader("Content-Encoding", false);
-        byte[] bytes = new byte[0];
+        if (!"br".equalsIgnoreCase(contentEncoding)) {
+            return responseBody;
+        }
+
         try {
-            if ("br".equalsIgnoreCase(contentEncoding)) {
-                inputStream = new BrotliInputStream(inputStream);
-            }
-            bytes = IOUtils.toByteArray(inputStream);
+            return IOUtils.toByteArray(new BrotliInputStream(new ByteArrayInputStream(responseBody)));
         } catch (IOException e) {
             GeneralUtils.logExceptionStackTrace(logger, e);
-        } finally {
-            try {
-                inputStream.close();
-            } catch (IOException e) {
-                GeneralUtils.logExceptionStackTrace(logger, e);
-            }
         }
-        return bytes;
+        return new byte[0];
     }
 }
