@@ -1,3 +1,7 @@
+## [vNext]
+### Fixed
+- When render fails twice the test fails instead of running endlessly. Fixed downloaded resource caching. [Trello 1850](https://trello.com/c/R6MYtCX6)
+
 ## [3.164.0] - 2020-05-24
 ### Added
 - Edge Chromium support. [Trello 1757](https://trello.com/c/LUe43aee)
