@@ -26,7 +26,7 @@ public class VisualGridRunner extends EyesRunner {
     private final List<IRenderingEyes> eyesToOpenList = Collections.synchronizedList(new ArrayList<IRenderingEyes>(200));
     private final Set<IRenderingEyes> allEyes = Collections.synchronizedSet(new HashSet<IRenderingEyes>());
     private Map<String, RGridResource> cachedResources = Collections.synchronizedMap(new HashMap<String, RGridResource>());
-    private Map<String, IPutFuture> putResourceCache = Collections.synchronizedMap(new HashMap<String, IPutFuture>());
+    private Map<String, RGridResource> putResourceCache = Collections.synchronizedMap(new HashMap<String, RGridResource>());
 
     private final Object openerServiceConcurrencyLock = new Object();
     private final Object openerServiceLock = new Object();
@@ -38,7 +38,6 @@ public class VisualGridRunner extends EyesRunner {
     private RenderingInfo renderingInfo;
     private IDebugResourceWriter debugResourceWriter;
 
-    private RateLimiter rateLimiter;
     private String serverUrl = GeneralUtils.getEnvString("APPLITOOLS_SERVER_URL");
     private static final String DEFAULT_API_KEY = GeneralUtils.getEnvString("APPLITOOLS_API_KEY");
     private String apiKey = DEFAULT_API_KEY;
@@ -190,7 +189,6 @@ public class VisualGridRunner extends EyesRunner {
         this.checkerServiceDebugLock = checkerServiceDebugLock;
         this.closerServiceDebugLock = closerServiceDebugLock;
         this.renderServiceDebugLock = renderServiceDebugLock;
-        this.rateLimiter = new RateLimiter(logger, 20);
         init();
         startServices();
         logger.verbose("rendering grid manager is built");
@@ -200,7 +198,7 @@ public class VisualGridRunner extends EyesRunner {
         return cachedResources;
     }
 
-    public Map<String, IPutFuture> getPutResourceCache() {
+    public Map<String, RGridResource> getPutResourceCache() {
         return putResourceCache;
     }
 
@@ -573,10 +571,6 @@ public class VisualGridRunner extends EyesRunner {
 
     public IDebugResourceWriter getDebugResourceWriter() {
         return this.debugResourceWriter;
-    }
-
-    public RateLimiter getRateLimiter() {
-        return rateLimiter;
     }
 
     public void setLogger(Logger logger) {

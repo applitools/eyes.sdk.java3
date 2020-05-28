@@ -204,12 +204,12 @@ public class DomCapture {
             try {
                 logger.verbose("DomCapture.fetchCssFiles() downloading");
                 final CssTreeNode cssTreeNode = new CssTreeNode(new URL(missingCssUrl));
-                downloadCss(cssTreeNode, new IDownloadListener<String>() {
+                downloadCss(cssTreeNode, new TaskListener<String>() {
                     @Override
-                    public void onDownloadComplete(String downloadedResource) {
+                    public void onComplete(String taskResponse) {
                         try {
                             logger.verbose("DomCapture.onDownloadComplete  - finished");
-                            parseCSS(cssTreeNode, downloadedResource);
+                            parseCSS(cssTreeNode, taskResponse);
                             if (cssTreeNode.allImportRules != null && !cssTreeNode.allImportRules.isEmpty()) {
                                 cssTreeNode.downloadNodeCss();
                             }
@@ -220,7 +220,7 @@ public class DomCapture {
                     }
 
                     @Override
-                    public void onDownloadFailed() {
+                    public void onFail() {
                         logger.verbose("DomCapture.onDownloadFailed");
                         cssData.put(missingCssUrl, "");
                     }
@@ -303,10 +303,10 @@ public class DomCapture {
                         cssTreeNode = new CssTreeNode(new URL(importRule.getLocation().getURI()));
                         String uri = importRule.getLocation().getURI();
                         cssTreeNode.setUrl(uri);
-                        downloadCss(cssTreeNode, new IDownloadListener<String>() {
+                        downloadCss(cssTreeNode, new TaskListener<String>() {
                             @Override
-                            public void onDownloadComplete(String downloadedResource) {
-                                parseCSS(cssTreeNode, EfficientStringReplace.CleanForJSON(downloadedResource));
+                            public void onComplete(String taskResponse) {
+                                parseCSS(cssTreeNode, EfficientStringReplace.CleanForJSON(taskResponse));
                                 if (!cssTreeNode.allImportRules.isEmpty()) {
                                     cssTreeNode.downloadNodeCss();
 
@@ -314,7 +314,7 @@ public class DomCapture {
                             }
 
                             @Override
-                            public void onDownloadFailed() {
+                            public void onFail() {
                                 logger.verbose("Download Failed");
                             }
                         });
@@ -351,16 +351,16 @@ public class DomCapture {
 
     }
 
-    private void downloadCss(final CssTreeNode node, final IDownloadListener<String> listener) {
+    private void downloadCss(final CssTreeNode node, final TaskListener<String> listener) {
         cssPhaser.register();
         logger.verbose("Given URL to download: " + node.url);
-        mServerConnector.downloadString(node.url, new IDownloadListener<String>() {
+        mServerConnector.downloadString(node.url, new TaskListener<String>() {
             @Override
-            public void onDownloadComplete(String downloadedResource) {
+            public void onComplete(String taskResponse) {
                 try {
                     logger.verbose("Download Complete");
-                    node.setCss(downloadedResource);
-                    listener.onDownloadComplete(downloadedResource);
+                    node.setCss(taskResponse);
+                    listener.onComplete(taskResponse);
 
                 } catch (Throwable e) {
                     GeneralUtils.logExceptionStackTrace(logger, e);
@@ -372,8 +372,8 @@ public class DomCapture {
             }
 
             @Override
-            public void onDownloadFailed() {
-                listener.onDownloadComplete("");
+            public void onFail() {
+                listener.onComplete("");
                 cssPhaser.arriveAndDeregister();
                 logger.verbose("Download Failed");
                 logger.verbose("cssPhaser.arriveAndDeregister(); " + node.url);

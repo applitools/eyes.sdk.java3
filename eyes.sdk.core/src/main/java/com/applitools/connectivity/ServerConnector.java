@@ -1,14 +1,13 @@
 package com.applitools.connectivity;
 
-import com.applitools.IResourceUploadListener;
 import com.applitools.connectivity.api.*;
 import com.applitools.eyes.*;
-import com.applitools.eyes.visualgrid.PutFuture;
 import com.applitools.eyes.visualgrid.model.*;
 import com.applitools.utils.ArgumentGuard;
 import com.applitools.utils.GeneralUtils;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.MapperFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
@@ -278,11 +277,11 @@ public class ServerConnector extends RestClient implements IServerConnector {
         return statusCode;
     }
 
-    public void downloadString(final URL uri, final IDownloadListener<String> listener) {
+    public void downloadString(final URL uri, final TaskListener<String> listener) {
         downloadString(uri, listener, 1);
     }
 
-    public void downloadString(final URL uri, final IDownloadListener<String> listener, final int attemptNumber) {
+    public void downloadString(final URL uri, final TaskListener<String> listener, final int attemptNumber) {
         AsyncRequest asyncRequest = restClient.target(uri.toString()).asyncRequest(MediaType.WILDCARD);
         asyncRequest.method(HttpMethod.GET, new AsyncRequestCallback() {
             @Override
@@ -290,13 +289,13 @@ public class ServerConnector extends RestClient implements IServerConnector {
                 int statusCode = response.getStatusCode();
                 if (statusCode > 300) {
                     logger.verbose("Got response status code - " + statusCode);
-                    listener.onDownloadFailed();
+                    listener.onFail();
                     return;
                 }
 
                 try {
                     byte[] fileContent = downloadFile(response);
-                    listener.onDownloadComplete(new String(fileContent));
+                    listener.onComplete(new String(fileContent));
                 } catch (Throwable t) {
                     logger.verbose(t.getMessage());
                 } finally {
@@ -311,19 +310,19 @@ public class ServerConnector extends RestClient implements IServerConnector {
                     logger.verbose(String.format("Failed downloading resource %s - trying again", uri));
                     downloadString(uri, listener, attemptNumber + 1);
                 } else {
-                    listener.onDownloadFailed();
+                    listener.onFail();
                 }
             }
         }, null, null);
     }
 
     public Future<?> downloadResource(final URI url, final String userAgent, final String refererUrl,
-                                      final IDownloadListener<RGridResource> listener) {
+                                      final TaskListener<RGridResource> listener) {
         return downloadResource(url, userAgent, refererUrl, listener, 1);
     }
 
     public Future<?> downloadResource(final URI url, final String userAgent, final String refererUrl,
-                                      final IDownloadListener<RGridResource> listener, final int attemptNumber) {
+                                      final TaskListener<RGridResource> listener, final int attemptNumber) {
         AsyncRequest asyncRequest = restClient.target(url.toString()).asyncRequest(MediaType.WILDCARD);
         asyncRequest.header("User-Agent", userAgent);
         asyncRequest.header("Referer", refererUrl);
@@ -359,7 +358,7 @@ public class ServerConnector extends RestClient implements IServerConnector {
 
                     rgResource = new RGridResource(url.toString(), contentType, fileContent, logger, "ResourceFuture");
                 } finally {
-                    listener.onDownloadComplete(rgResource);
+                    listener.onComplete(rgResource);
                     response.close();
                 }
             }
@@ -371,7 +370,7 @@ public class ServerConnector extends RestClient implements IServerConnector {
                     logger.verbose(String.format("Failed downloading resource %s - trying again", url));
                     downloadResource(url, userAgent, refererUrl, listener, attemptNumber + 1);
                 } else {
-                    listener.onDownloadFailed();
+                    listener.onFail();
                 }
             }
         }, null, null);
@@ -459,7 +458,13 @@ public class ServerConnector extends RestClient implements IServerConnector {
         throw new EyesException("ServerConnector.renderCheckResource - unexpected status (" + statusCode + ")");
     }
 
-    public IPutFuture renderPutResource(final RunningRender runningRender, final RGridResource resource, String userAgent, final IResourceUploadListener listener) {
+    public Future<?> renderPutResource(final RunningRender runningRender, final RGridResource resource,
+                                        final String userAgent, final TaskListener<Boolean> listener) {
+        return renderPutResource(runningRender, resource, userAgent, listener, 1);
+    }
+
+    public Future<?> renderPutResource(final RunningRender runningRender, final RGridResource resource,
+                                        final String userAgent, final TaskListener<Boolean> listener, final int attemptNumber) {
         ArgumentGuard.notNull(runningRender, "runningRender");
         ArgumentGuard.notNull(resource, "resource");
         byte[] content = resource.getContent();
@@ -483,18 +488,48 @@ public class ServerConnector extends RestClient implements IServerConnector {
             contentType = MediaType.APPLICATION_OCTET_STREAM;
         }
 
-        Future<?> future = asyncRequest.method(HttpMethod.PUT, new AsyncRequestCallback() {
+        return asyncRequest.method(HttpMethod.PUT, new AsyncRequestCallback() {
             @Override
             public void onComplete(Response response) {
-                response.close();
+                boolean isSucceeded = false;
+                try {
+                    int statusCode = response.getStatusCode();
+                    if (statusCode != HttpStatus.SC_OK) {
+                        logger.verbose(String.format("Error: Status %d on url %s", statusCode, resource.getUrl()));
+                        return;
+                    }
+
+                    String responseData = response.readEntity(String.class);
+                    try {
+                        JsonNode jsonObject = jsonMapper.readTree(responseData);
+                        JsonNode value = jsonObject.get("hash");
+                        if (value == null) {
+                            return;
+                        }
+
+                        if (value.isValueNode() && value.asText().equals(resource.getSha256())) {
+                            isSucceeded = true;
+                        }
+                    } catch (IOException e) {
+                        GeneralUtils.logExceptionStackTrace(logger, e);
+                    }
+                } finally {
+                    listener.onComplete(isSucceeded);
+                    response.close();
+                }
             }
 
             @Override
             public void onFail(Throwable throwable) {
                 GeneralUtils.logExceptionStackTrace(logger, throwable);
+                if (attemptNumber < MAX_CONNECTION_RETRIES) {
+                    logger.verbose(String.format("Failed putting resource %s - trying again", resource.getUrl()));
+                    renderPutResource(runningRender, resource, userAgent, listener, attemptNumber + 1);
+                } else {
+                    listener.onFail();
+                }
             }
         }, content, contentType);
-        return new PutFuture(future, resource, runningRender, this, logger, userAgent);
     }
 
     public RenderStatusResults renderStatus(RunningRender runningRender) {
