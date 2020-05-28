@@ -28,11 +28,11 @@ public interface IEyesConnector {
 
     TestResults abortIfNotClosed();
 
-    Future<?> getResource(URI url, String userAgent, String refererUrl, IDownloadListener<RGridResource> listener);
+    Future<?> getResource(URI url, String userAgent, String refererUrl, TaskListener<RGridResource> listener);
 
     RenderingInfo getRenderingInfo();
 
-    IPutFuture renderPutResource(RunningRender runningRender, RGridResource resource, String userAgent);
+    Future<?> renderPutResource(RunningRender runningRender, RGridResource resource, String userAgent, TaskListener<Boolean> listener);
 
     List<RunningRender> render(RenderRequest... renderRequests);
 

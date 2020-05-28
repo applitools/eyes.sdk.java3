@@ -1,6 +1,5 @@
 package com.applitools.eyes;
 
-import com.applitools.IResourceUploadListener;
 import com.applitools.eyes.visualgrid.model.*;
 
 import java.net.URI;
@@ -105,7 +104,7 @@ public interface IServerConnector {
      * @param uri The URI from which the IServerConnector will download the string
      * @param listener the listener will be called when the request will be resolved.
      */
-    void downloadString(URL uri, IDownloadListener<String> listener);
+    void downloadString(URL uri, TaskListener<String> listener);
 
     /**
      * Downloads string from a given Url.
@@ -114,7 +113,7 @@ public interface IServerConnector {
      * @param userAgent      user agent to send to server
      * @return A future which will be resolved when the resources is downloaded.
      */
-    Future<?> downloadResource(URI uri, String userAgent, final String refererUrl, IDownloadListener<RGridResource> listener);
+    Future<?> downloadResource(URI uri, String userAgent, final String refererUrl, TaskListener<RGridResource> listener);
 
     /**
      * @return the render info from the server to be used later on.
@@ -147,7 +146,7 @@ public interface IServerConnector {
      * @param userAgent the userAgent to send to server
      * @return true if resource was uploaded
      */
-    IPutFuture renderPutResource(RunningRender runningRender, RGridResource resource, String userAgent, IResourceUploadListener listener);
+    Future<?> renderPutResource(RunningRender runningRender, RGridResource resource, String userAgent, TaskListener<Boolean> listener);
 
     /**
      * Get the rendering status for current render

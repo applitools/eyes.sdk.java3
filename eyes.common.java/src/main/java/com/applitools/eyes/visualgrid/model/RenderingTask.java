@@ -2,9 +2,8 @@ package com.applitools.eyes.visualgrid.model;
 
 import com.applitools.ICheckSettings;
 import com.applitools.ICheckSettingsInternal;
-import com.applitools.eyes.IDownloadListener;
-import com.applitools.eyes.IPutFuture;
 import com.applitools.eyes.Logger;
+import com.applitools.eyes.TaskListener;
 import com.applitools.eyes.UserAgent;
 import com.applitools.eyes.visualgrid.services.IEyesConnector;
 import com.applitools.eyes.visualgrid.services.VisualGridRunner;
@@ -25,9 +24,14 @@ import org.jsoup.parser.Parser;
 import org.jsoup.select.Elements;
 
 import java.io.UnsupportedEncodingException;
-import java.net.*;
+import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URL;
 import java.util.*;
-import java.util.concurrent.*;
+import java.util.concurrent.Callable;
+import java.util.concurrent.Phaser;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -49,7 +53,7 @@ public class RenderingTask implements Callable<RenderStatusResults>, Completable
     private RenderingInfo renderingInfo;
     private UserAgent userAgent;
     private final Map<String, RGridResource> fetchedCacheMap;
-    private final Map<String, IPutFuture> putResourceCache;
+    private final Map<String, RGridResource> putResourceCache;
     private Logger logger;
     private AtomicBoolean isTaskComplete = new AtomicBoolean(false);
     private AtomicBoolean isForcePutNeeded;
@@ -62,7 +66,27 @@ public class RenderingTask implements Callable<RenderStatusResults>, Completable
     private AtomicBoolean isTimeElapsed = new AtomicBoolean(false);
 
     // Phaser for syncing all futures downloading resources
-    Phaser resourcesPhaser = new Phaser();
+    Phaser resourcesPhaser;
+
+    // Listener for putResource tasks
+    private TaskListener<Boolean> putListener = new TaskListener<Boolean>() {
+        @Override
+        public void onComplete(Boolean isSucceeded) {
+            try {
+                if (!isSucceeded) {
+                    logger.log("Failed putting resource");
+                }
+            } finally {
+                resourcesPhaser.arriveAndDeregister();
+            }
+        }
+
+        @Override
+        public void onFail() {
+            resourcesPhaser.arriveAndDeregister();
+            logger.log("Failed putting resource");
+        }
+    };
 
     @SuppressWarnings({"unused", "FieldCanBeLocal"})
     private boolean isTaskStarted = false;
@@ -168,6 +192,14 @@ public class RenderingTask implements Callable<RenderStatusResults>, Completable
                 if (isForcePutNeeded.get() && !isForcePutAlreadyDone) {
                     forcePutAllResources(requests[0].getResources(), requests[0].getDom(), runningRender);
                     isForcePutAlreadyDone = true;
+                    try {
+                        if (resourcesPhaser.getRegisteredParties() > 0) {
+                            resourcesPhaser.awaitAdvanceInterruptibly(0, 30, TimeUnit.SECONDS);
+                        }
+                    } catch (InterruptedException | TimeoutException e) {
+                        GeneralUtils.logExceptionStackTrace(logger, e);
+                        resourcesPhaser.forceTermination();
+                    }
                 }
 
                 logger.verbose("step 3.3");
@@ -175,6 +207,14 @@ public class RenderingTask implements Callable<RenderStatusResults>, Completable
                 stillRunning = (worstStatus == RenderStatus.NEED_MORE_RESOURCE || isNeedMoreDom) && elapsedTime < FETCH_TIMEOUT_SECONDS;
                 if (stillRunning) {
                     sendMissingResources(runningRenders, requests[0].getDom(), requests[0].getResources(), isNeedMoreDom);
+                    try {
+                        if (resourcesPhaser.getRegisteredParties() > 0) {
+                            resourcesPhaser.awaitAdvanceInterruptibly(0, 30, TimeUnit.SECONDS);
+                        }
+                    } catch (InterruptedException | TimeoutException e) {
+                        GeneralUtils.logExceptionStackTrace(logger, e);
+                        resourcesPhaser.forceTermination();
+                    }
                 }
 
                 logger.verbose("step 3.4");
@@ -207,10 +247,11 @@ public class RenderingTask implements Callable<RenderStatusResults>, Completable
     }
 
     private void forcePutAllResources(Map<String, RGridResource> resources, RGridDom dom, RunningRender runningRender) {
-        List<IPutFuture> allPuts = new ArrayList<>();
+        resourcesPhaser = new Phaser();
         Set<String> strings = resources.keySet();
         try {
-            allPuts.add(this.eyesConnector.renderPutResource(runningRender, dom.asResource(), userAgent.getOriginalUserAgentString()));
+            resourcesPhaser.register();
+            this.eyesConnector.renderPutResource(runningRender, dom.asResource(), userAgent.getOriginalUserAgentString(), putListener);
         } catch (JsonProcessingException e) {
             e.printStackTrace();
         }
@@ -231,27 +272,19 @@ public class RenderingTask implements Callable<RenderStatusResults>, Completable
                     continue;
                 }
 
-                IPutFuture future = this.eyesConnector.renderPutResource(runningRender, resource, userAgent.getOriginalUserAgentString());
+                resourcesPhaser.register();
+                this.eyesConnector.renderPutResource(runningRender, resource, userAgent.getOriginalUserAgentString(), putListener);
                 logger.verbose("locking putResourceCache");
                 synchronized (putResourceCache) {
                     String contentType = resource.getContentType();
                     if (contentType != null && !contentType.equalsIgnoreCase(RGridDom.CONTENT_TYPE)) {
-                        putResourceCache.put(this.dom.getUrl(), future);
+                        putResourceCache.put(this.dom.getUrl(), resource);
                     }
-                    allPuts.add(future);
                 }
             } catch (Exception e) {
                 GeneralUtils.logExceptionStackTrace(logger, e);
             }
         }
-        for (IPutFuture put : allPuts) {
-            try {
-                put.get();
-            } catch (InterruptedException | ExecutionException e) {
-                GeneralUtils.logExceptionStackTrace(logger, e);
-            }
-        }
-
     }
 
     private void notifySuccessAllListeners() {
@@ -297,46 +330,29 @@ public class RenderingTask implements Callable<RenderStatusResults>, Completable
 
     private void sendMissingResources(List<RunningRender> runningRenders, RGridDom dom, Map<String, RGridResource> resources, boolean isNeedMoreDom) {
         logger.verbose("enter");
-        List<IPutFuture> allPuts = new ArrayList<>();
+        resourcesPhaser = new Phaser();
         if (isNeedMoreDom) {
             RunningRender runningRender = runningRenders.get(0);
-            IPutFuture future = null;
             try {
-                future = this.eyesConnector.renderPutResource(runningRender, dom.asResource(), userAgent.getOriginalUserAgentString());
+                resourcesPhaser.register();
+                this.eyesConnector.renderPutResource(runningRender, dom.asResource(), userAgent.getOriginalUserAgentString(), putListener);
             } catch (Throwable e) {
                 GeneralUtils.logExceptionStackTrace(logger, e);
-            }
-            if (future != null) {
-                allPuts.add(future);
             }
         }
 
         logger.verbose("creating PutFutures for " + runningRenders.size() + " runningRenders");
 
         for (RunningRender runningRender : runningRenders) {
-            createPutFutures(allPuts, runningRender, resources);
-        }
-
-        logger.verbose("calling future.get on " + allPuts.size() + " PutFutures");
-        for (IPutFuture future : allPuts) {
-            logger.verbose("calling future.get on " + future.toString());
-            try {
-                future.get(2, TimeUnit.MINUTES);
-            } catch (Exception e) {
-                GeneralUtils.logExceptionStackTrace(logger, e);
-            }
+            createPutFutures(runningRender, resources);
         }
         logger.verbose("exit");
     }
 
-    private void createPutFutures(List<IPutFuture> allPuts, RunningRender runningRender, Map<String, RGridResource> resources) {
+    private void createPutFutures(RunningRender runningRender, Map<String, RGridResource> resources) {
         List<String> needMoreResources = runningRender.getNeedMoreResources();
         for (String url : needMoreResources) {
             if (putResourceCache.containsKey(url)) {
-                IPutFuture putFuture = putResourceCache.get(url);
-                if (!allPuts.contains(putFuture)) {
-                    allPuts.add(putFuture);
-                }
                 continue;
             }
 
@@ -353,14 +369,14 @@ public class RenderingTask implements Callable<RenderStatusResults>, Completable
                 continue;
             }
             logger.verbose("resource(" + resource.getUrl() + ") hash : " + resource.getSha256());
-            IPutFuture future = this.eyesConnector.renderPutResource(runningRender, resource, userAgent.getOriginalUserAgentString());
+            resourcesPhaser.register();
+            this.eyesConnector.renderPutResource(runningRender, resource, userAgent.getOriginalUserAgentString(), putListener);
             String contentType = resource.getContentType();
             if (!putResourceCache.containsKey(url) && (contentType != null && !contentType.equalsIgnoreCase(RGridDom.CONTENT_TYPE))) {
                 synchronized (putResourceCache) {
-                    putResourceCache.put(url, future);
+                    putResourceCache.put(url, resource);
                 }
             }
-            allPuts.add(future);
         }
     }
 
@@ -375,6 +391,7 @@ public class RenderingTask implements Callable<RenderStatusResults>, Completable
         logger.verbose("fetching " + resourceUrls.size() + " resources...");
 
         //Fetch all resources
+        resourcesPhaser = new Phaser();
         fetchAllResources(allBlobs, resourceUrls, domData);
         try {
             if (resourcesPhaser.getRegisteredParties() > 0) {
@@ -382,6 +399,7 @@ public class RenderingTask implements Callable<RenderStatusResults>, Completable
             }
         } catch (InterruptedException | TimeoutException e) {
             GeneralUtils.logExceptionStackTrace(logger, e);
+            resourcesPhaser.forceTermination();
         }
 
         logger.verbose("done fetching resources.");
@@ -829,16 +847,16 @@ public class RenderingTask implements Callable<RenderStatusResults>, Completable
                 try {
                     resourcesPhaser.register();
                     eyesConnector.getResource(uri, userAgent.getOriginalUserAgentString(), result.getUrl(),
-                            new IDownloadListener<RGridResource>() {
+                            new TaskListener<RGridResource>() {
                         @Override
-                        public void onDownloadComplete(RGridResource downloadedResource) {
+                        public void onComplete(RGridResource taskResponse) {
                             try {
-                                if (downloadedResource == null) {
+                                if (taskResponse == null) {
                                     logger.log(String.format("Resource is null for url %s", uriStr));
                                     return;
                                 }
 
-                                Set<URI> newResourceUrls = handleCollectedResource(uri, downloadedResource, allBlobs, result);
+                                Set<URI> newResourceUrls = handleCollectedResource(uri, taskResponse, allBlobs, result);
                                 if (newResourceUrls.isEmpty()) {
                                     return;
                                 }
@@ -850,7 +868,7 @@ public class RenderingTask implements Callable<RenderStatusResults>, Completable
                         }
 
                         @Override
-                        public void onDownloadFailed() {
+                        public void onFail() {
                             resourcesPhaser.arriveAndDeregister();
                             logger.log(String.format("Failed downloading from uri %s", uriStr));
                         }
