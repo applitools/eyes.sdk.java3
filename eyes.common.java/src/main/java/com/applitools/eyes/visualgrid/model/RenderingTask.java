@@ -332,6 +332,14 @@ public class RenderingTask implements Callable<RenderStatusResults>, Completable
     private void createPutFutures(List<IPutFuture> allPuts, RunningRender runningRender, Map<String, RGridResource> resources) {
         List<String> needMoreResources = runningRender.getNeedMoreResources();
         for (String url : needMoreResources) {
+            if (putResourceCache.containsKey(url)) {
+                IPutFuture putFuture = putResourceCache.get(url);
+                if (!allPuts.contains(putFuture)) {
+                    allPuts.add(putFuture);
+                }
+                continue;
+            }
+
             RGridResource resource;
             if (!fetchedCacheMap.containsKey(url)) {
                 logger.verbose(String.format("Resource %s requested but never downloaded (maybe a Frame)", url));
@@ -783,6 +791,10 @@ public class RenderingTask implements Callable<RenderStatusResults>, Completable
         String url;
         for (RGridResource blob : allBlobs.values()) {
             url = blob.getUrl();
+            if (fetchedCacheMap.containsKey(url)) {
+                allBlobs.put(url, fetchedCacheMap.get(url));
+                continue;
+            }
             String contentType = blob.getContentType();
             try {
                 if (contentType == null || !contentType.equalsIgnoreCase(RGridDom.CONTENT_TYPE)) {
