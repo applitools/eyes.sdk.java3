@@ -66,7 +66,7 @@ public class RenderingTask implements Callable<RenderStatusResults>, Completable
     private AtomicBoolean isTimeElapsed = new AtomicBoolean(false);
 
     // Phaser for syncing all futures downloading resources
-    Phaser resourcesPhaser;
+    Phaser resourcesPhaser = new Phaser();
 
     // Listener for putResource tasks
     private TaskListener<Boolean> putListener = new TaskListener<Boolean>() {

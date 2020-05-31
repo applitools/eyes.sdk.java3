@@ -1,10 +1,10 @@
 package com.applitools.connectivity;
 
 import com.applitools.connectivity.api.*;
-import com.applitools.eyes.IDownloadListener;
 import com.applitools.eyes.Logger;
 import com.applitools.eyes.RunningSession;
 import com.applitools.eyes.SessionStartInfo;
+import com.applitools.eyes.TaskListener;
 import com.applitools.eyes.utils.ReportingTestSuite;
 import com.applitools.eyes.visualgrid.model.RGridResource;
 import com.applitools.utils.GeneralUtils;
@@ -184,12 +184,12 @@ public class TestServerConnector extends ReportingTestSuite {
 
         ServerConnector connector = new ServerConnector();
         connector.updateClient(restClient);
-        connector.downloadResource(url, userAgent, referer, new IDownloadListener<RGridResource>() {
+        connector.downloadResource(url, userAgent, referer, new TaskListener<RGridResource>() {
             @Override
-            public void onDownloadComplete(RGridResource downloadedResource) {}
+            public void onComplete(RGridResource taskResponse) {}
 
             @Override
-            public void onDownloadFailed() {}
+            public void onFail() {}
         });
 
         Map<String, String> expectedHeaders = new HashMap<>();
