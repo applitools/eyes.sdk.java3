@@ -278,7 +278,7 @@ public class RenderingTask implements Callable<RenderStatusResults>, Completable
                 synchronized (putResourceCache) {
                     String contentType = resource.getContentType();
                     if (contentType != null && !contentType.equalsIgnoreCase(RGridDom.CONTENT_TYPE)) {
-                        putResourceCache.put(this.dom.getUrl(), resource);
+                        putResourceCache.put(url, resource);
                     }
                 }
             } catch (Exception e) {
