@@ -6,7 +6,6 @@ import com.applitools.eyes.*;
 import com.applitools.eyes.debug.DebugScreenshotsProvider;
 import com.applitools.eyes.events.ISessionEventHandler;
 import com.applitools.eyes.exceptions.TestFailedException;
-import com.applitools.eyes.locators.VisualLocatorSettings;
 import com.applitools.eyes.positioning.PositionProvider;
 import com.applitools.eyes.selenium.fluent.SeleniumCheckSettings;
 import com.applitools.eyes.selenium.fluent.Target;
@@ -16,7 +15,6 @@ import com.applitools.eyes.selenium.rendering.VisualGridEyes;
 import com.applitools.eyes.selenium.wrappers.EyesWebDriver;
 import com.applitools.eyes.triggers.MouseAction;
 import com.applitools.eyes.visualgrid.model.RenderingInfo;
-import com.applitools.eyes.EyesRunner;
 import com.applitools.eyes.visualgrid.services.VisualGridRunner;
 import com.applitools.utils.ArgumentGuard;
 import org.openqa.selenium.By;
@@ -24,8 +22,6 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
 import java.net.URI;
-import java.util.List;
-import java.util.Map;
 
 /**
  * The type Eyes.
@@ -1907,11 +1903,6 @@ public class Eyes implements ISeleniumConfigurationProvider, IEyesBase {
         }
         this.configuration = new Configuration(configuration);
 
-    }
-
-    public Map<String, List<Region>> locate(VisualLocatorSettings visualLocatorSettings) {
-        ArgumentGuard.notNull(visualLocatorSettings, "visualLocatorSettings");
-        return activeEyes.locate(visualLocatorSettings);
     }
 
     public void closeAsync() {

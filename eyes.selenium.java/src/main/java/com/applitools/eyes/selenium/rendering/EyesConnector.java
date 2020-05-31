@@ -7,7 +7,6 @@ import com.applitools.eyes.config.IConfigurationSetter;
 import com.applitools.eyes.fluent.ICheckSettingsInternal;
 import com.applitools.eyes.selenium.IConfigurationGetter;
 import com.applitools.eyes.selenium.ISeleniumConfigurationProvider;
-import com.applitools.eyes.selenium.locators.SeleniumVisualLocatorProvider;
 import com.applitools.eyes.selenium.wrappers.EyesWebDriver;
 import com.applitools.eyes.visualgrid.model.*;
 import com.applitools.eyes.visualgrid.model.DesktopBrowserInfo;
@@ -280,10 +279,5 @@ class EyesConnector extends EyesBase implements IEyesConnector, IBatchCloser {
     @Override
     public void closeBatch(String batchId) {
         this.serverConnector.closeBatch(batchId);
-    }
-
-    @Override
-    protected void initVisualLocatorProvider() {
-        visualLocatorProvider = new SeleniumVisualLocatorProvider(driver, serverConnector, logger, debugScreenshotsProvider);
     }
 }

@@ -6,7 +6,7 @@ import java.util.List;
 public class VisualLocatorSettings {
 
     private List<String> names = new ArrayList<>();
-    private boolean firsOnly = true;
+    private boolean firstOnly = true;
 
     public VisualLocatorSettings() {
     }
@@ -21,13 +21,13 @@ public class VisualLocatorSettings {
 
     public VisualLocatorSettings first() {
         VisualLocatorSettings clone = clone();
-        clone.firsOnly = true;
+        clone.firstOnly = true;
         return clone;
     }
 
     public VisualLocatorSettings all() {
         VisualLocatorSettings clone = clone();
-        clone.firsOnly = false;
+        clone.firstOnly = false;
         return clone;
     }
 
@@ -51,7 +51,7 @@ public class VisualLocatorSettings {
 
     private void populateClone(VisualLocatorSettings clone) {
         clone.names = this.names;
-        clone.firsOnly = this.firsOnly;
+        clone.firstOnly = this.firstOnly;
     }
 
     public List<String> getNames() {
@@ -59,6 +59,6 @@ public class VisualLocatorSettings {
     }
 
     public boolean isFirstOnly() {
-        return firsOnly;
+        return firstOnly;
     }
 }
