@@ -491,11 +491,17 @@ public class ServerConnector extends RestClient implements IServerConnector {
         return asyncRequest.method(HttpMethod.PUT, new AsyncRequestCallback() {
             @Override
             public void onComplete(Response response) {
-                boolean isSucceeded = false;
                 try {
                     int statusCode = response.getStatusCode();
                     if (statusCode != HttpStatus.SC_OK) {
                         logger.verbose(String.format("Error: Status %d on url %s", statusCode, resource.getUrl()));
+                        if (statusCode > 500 && attemptNumber < MAX_CONNECTION_RETRIES) {
+                            logger.verbose("Trying again");
+                            renderPutResource(runningRender, resource, userAgent, listener, attemptNumber + 1);
+                            return;
+                        }
+
+                        listener.onComplete(false);
                         return;
                     }
 
@@ -504,17 +510,18 @@ public class ServerConnector extends RestClient implements IServerConnector {
                         JsonNode jsonObject = jsonMapper.readTree(responseData);
                         JsonNode value = jsonObject.get("hash");
                         if (value == null) {
+                            listener.onComplete(false);
                             return;
                         }
 
                         if (value.isValueNode() && value.asText().equals(resource.getSha256())) {
-                            isSucceeded = true;
+                            listener.onComplete(true);
                         }
                     } catch (IOException e) {
                         GeneralUtils.logExceptionStackTrace(logger, e);
+                        listener.onComplete(false);
                     }
                 } finally {
-                    listener.onComplete(isSucceeded);
                     response.close();
                 }
             }
