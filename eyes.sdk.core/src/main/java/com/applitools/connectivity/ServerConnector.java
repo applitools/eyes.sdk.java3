@@ -287,7 +287,7 @@ public class ServerConnector extends RestClient implements IServerConnector {
             @Override
             public void onComplete(Response response) {
                 int statusCode = response.getStatusCode();
-                if (statusCode > 300) {
+                if (statusCode >= 300) {
                     logger.verbose("Got response status code - " + statusCode);
                     listener.onFail();
                     return;
@@ -495,7 +495,7 @@ public class ServerConnector extends RestClient implements IServerConnector {
                     int statusCode = response.getStatusCode();
                     if (statusCode != HttpStatus.SC_OK) {
                         logger.verbose(String.format("Error: Status %d on url %s", statusCode, resource.getUrl()));
-                        if (statusCode > 500 && attemptNumber < MAX_CONNECTION_RETRIES) {
+                        if (statusCode >= 500 && attemptNumber < MAX_CONNECTION_RETRIES) {
                             logger.verbose("Trying again");
                             renderPutResource(runningRender, resource, userAgent, listener, attemptNumber + 1);
                             return;
