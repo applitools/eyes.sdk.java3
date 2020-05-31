@@ -1,6 +1,6 @@
 package com.applitools.eyes.visualgrid.model;
 
-import com.applitools.eyes.IDownloadListener;
+import com.applitools.eyes.TaskListener;
 import com.applitools.eyes.UserAgent;
 import com.applitools.eyes.utils.ReportingTestSuite;
 import com.applitools.eyes.visualgrid.services.IEyesConnector;
@@ -64,7 +64,7 @@ public class TestRenderingTask extends ReportingTestSuite {
         final RenderingTask renderingTask = new RenderingTask(eyesConnector, Collections.singletonList(visualGridTask), userAgent);
 
         // When RenderingTask tries to get a new resource, this task will be submitted to the ExecutorService
-        when(eyesConnector.getResource(ArgumentMatchers.<URI>any(), anyString(), anyString(), ArgumentMatchers.<IDownloadListener<RGridResource>>any()))
+        when(eyesConnector.getResource(ArgumentMatchers.<URI>any(), anyString(), anyString(), ArgumentMatchers.<TaskListener<RGridResource>>any()))
                 .thenAnswer(new Answer<Object>() {
             @Override
             public Object answer(final InvocationOnMock invocationOnMock) throws Throwable {
