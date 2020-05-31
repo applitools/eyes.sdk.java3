@@ -38,7 +38,7 @@ public class TestRenderingTask extends ReportingTestSuite {
     public void testAsyncDownloadResources() throws Exception {
         final ExecutorService service = Executors.newCachedThreadPool();
 
-        // get urls json
+        // Get a json of uris simulating the real resource uris structure
         File file = new File(Objects.requireNonNull(getClass().getClassLoader().getResource("resource_urls.json")).getFile());
         String jsonString = GeneralUtils.readToEnd(new FileInputStream(file));
         ObjectMapper jsonMapper = new ObjectMapper();
@@ -63,7 +63,7 @@ public class TestRenderingTask extends ReportingTestSuite {
         final AtomicInteger counter = new AtomicInteger();
         final RenderingTask renderingTask = new RenderingTask(eyesConnector, Collections.singletonList(visualGridTask), userAgent);
 
-        // When RenderingTask tries to get new resource, this task will be submitted to the ExecutorService
+        // When RenderingTask tries to get a new resource, this task will be submitted to the ExecutorService
         when(eyesConnector.getResource(ArgumentMatchers.<URI>any(), anyString(), anyString(), ArgumentMatchers.<IDownloadListener<RGridResource>>any()))
                 .thenAnswer(new Answer<Object>() {
             @Override
@@ -100,11 +100,15 @@ public class TestRenderingTask extends ReportingTestSuite {
             }
         });
 
+        // We call the method which activates the process of collecting resources and wait to see if it ends properly.
         renderingTask.fetchAllResources(allBlobs, resourceUrls, frameData);
         renderingTask.resourcesPhaser.awaitAdvanceInterruptibly(0, 30, TimeUnit.SECONDS);
         Assert.assertEquals(counter.get(), 8);
     }
 
+    /**
+     * This method searches recursively for a key in a map and returns its value
+     */
     private Map getInnerMap(Map<String, Map> outerMap, String key) {
         if (outerMap.containsKey(key)) {
             return outerMap.get(key);
@@ -124,9 +128,12 @@ public class TestRenderingTask extends ReportingTestSuite {
         return null;
     }
 
-    private Set<URI> stringsToUris(Set<String> urls) throws URISyntaxException {
+    /**
+     * This method converts a collection of string uris to a collection of URIs
+     */
+    private Set<URI> stringsToUris(Set<String> strUris) throws URISyntaxException {
         Set<URI> uris = new HashSet<>();
-        for (String url : urls) {
+        for (String url : strUris) {
             uris.add(new URI(url));
         }
 
