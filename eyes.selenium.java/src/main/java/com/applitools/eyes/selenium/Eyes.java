@@ -42,7 +42,6 @@ public class Eyes implements ISeleniumConfigurationProvider, IEyesBase {
     private ISeleniumEyes activeEyes;
     private EyesRunner runner = null;
     private Configuration configuration = new Configuration();
-    private EyesWebDriver driver;
     private ImageRotation rotation;
     VisualLocatorProvider visualLocatorProvider;
 
@@ -50,7 +49,7 @@ public class Eyes implements ISeleniumConfigurationProvider, IEyesBase {
      * Instantiates a new Eyes.
      */
     public Eyes() {
-        seleniumEyes = new SeleniumEyes(this, (ClassicRunner) runner);
+        seleniumEyes = new SeleniumEyes(this, new ClassicRunner());
         activeEyes = seleniumEyes;
     }
 
@@ -65,11 +64,14 @@ public class Eyes implements ISeleniumConfigurationProvider, IEyesBase {
             visualGridEyes = new VisualGridEyes((VisualGridRunner) this.runner, this);
             activeEyes = visualGridEyes;
             isVisualGridEyes = true;
+        } else {
+            seleniumEyes = new SeleniumEyes(this, (ClassicRunner) runner);
+            activeEyes = seleniumEyes;
         }
     }
 
     public void initLocatorProvider(RemoteWebDriver webDriver) {
-        this.driver = new EyesWebDriver(getLogger(), null, webDriver);
+        EyesWebDriver driver = new EyesWebDriver(getLogger(), null, webDriver);
         visualLocatorProvider = new SeleniumVisualLocatorProvider(
                 seleniumEyes,
                 driver,

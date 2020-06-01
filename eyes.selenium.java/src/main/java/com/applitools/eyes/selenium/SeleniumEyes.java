@@ -127,7 +127,7 @@ public class SeleniumEyes extends EyesBase implements ISeleniumEyes, IDriverProv
         devicePixelRatio = UNKNOWN_DEVICE_PIXEL_RATIO;
         regionVisibilityStrategyHandler = new SimplePropertyHandler<>();
         regionVisibilityStrategyHandler.set(new MoveToRegionVisibilityStrategy(logger));
-        this.runner = runner != null ? runner : new ClassicRunner();
+        this.runner = runner;
     }
 
     @Override

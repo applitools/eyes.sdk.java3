@@ -27,6 +27,7 @@ class EyesConnector extends EyesBase implements IEyesConnector, IBatchCloser {
     private String appName;
     private String testName;
 
+
     public EyesConnector(ISeleniumConfigurationProvider configProvider, List<PropertyData> properties, DesktopBrowserInfo browserInfo) {
         configurationGetter = configProvider.get();
         this.browserInfo = browserInfo;
