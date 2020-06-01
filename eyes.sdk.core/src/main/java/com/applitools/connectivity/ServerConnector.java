@@ -28,7 +28,7 @@ import java.util.concurrent.Future;
 public class ServerConnector extends RestClient implements IServerConnector {
 
     public static final int DEFAULT_CLIENT_TIMEOUT = 1000 * 60 * 5; // 5 minutes
-    private static final int MAX_CONNECTION_RETRIES = 3;
+    public static final int MAX_CONNECTION_RETRIES = 3;
 
     String API_SESSIONS = "api/sessions";
     String CLOSE_BATCH = "api/sessions/batches/%s/close/bypointerid";

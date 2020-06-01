@@ -49,17 +49,9 @@ public class Eyes implements ISeleniumConfigurationProvider, IEyesBase {
     /**
      * Instantiates a new Eyes.
      */
-    public Eyes(RemoteWebDriver driver) {
+    public Eyes() {
         seleniumEyes = new SeleniumEyes(this, (ClassicRunner) runner);
         activeEyes = seleniumEyes;
-
-        this.driver = new EyesWebDriver(getLogger(), null, driver);
-        visualLocatorProvider = new SeleniumVisualLocatorProvider(
-                this.driver,
-                new ServerConnector(),
-                null,
-                getLogger(),
-                getDebugScreenshotsProvider());
     }
 
     /**
@@ -67,15 +59,22 @@ public class Eyes implements ISeleniumConfigurationProvider, IEyesBase {
      * @param runner the runner
      */
     public Eyes(EyesRunner runner) {
+        this();
         this.runner = runner == null ? new ClassicRunner() : runner;
         if (this.runner instanceof VisualGridRunner) {
             visualGridEyes = new VisualGridEyes((VisualGridRunner) this.runner, this);
             activeEyes = visualGridEyes;
             isVisualGridEyes = true;
-        } else {
-            seleniumEyes = new SeleniumEyes(this, (ClassicRunner) runner);
-            activeEyes = seleniumEyes;
         }
+    }
+
+    public void initLocatorProvider(RemoteWebDriver webDriver) {
+        this.driver = new EyesWebDriver(getLogger(), null, webDriver);
+        visualLocatorProvider = new SeleniumVisualLocatorProvider(
+                seleniumEyes,
+                driver,
+                getLogger(),
+                getDebugScreenshotsProvider());
     }
 
     /**

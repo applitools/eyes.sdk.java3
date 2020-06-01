@@ -9,15 +9,16 @@ import com.applitools.eyes.debug.DebugScreenshotsProvider;
 import com.applitools.eyes.locators.VisualLocatorProvider;
 import com.applitools.eyes.locators.VisualLocatorSettings;
 import com.applitools.eyes.locators.VisualLocatorsData;
+import com.applitools.eyes.selenium.SeleniumEyes;
 import com.applitools.eyes.selenium.capture.ImageProviderFactory;
 import com.applitools.eyes.selenium.wrappers.EyesWebDriver;
 import com.applitools.eyes.visualgrid.model.RenderingInfo;
 import com.applitools.utils.ArgumentGuard;
 import com.applitools.utils.GeneralUtils;
 import com.applitools.utils.ImageUtils;
-import org.openqa.selenium.OutputType;
 
 import java.awt.image.BufferedImage;
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -27,26 +28,23 @@ public class SeleniumVisualLocatorProvider implements VisualLocatorProvider {
 
     protected Logger logger;
     private final ServerConnector serverConnector;
-    private final UserAgent userAgent;
-    protected EyesWebDriver driver;
-    private final double devicePixelRatio;
+    private final SeleniumEyes eyes;
+    private final  EyesWebDriver driver;
     private final DebugScreenshotsProvider debugScreenshotsProvider;
 
-    public SeleniumVisualLocatorProvider(EyesWebDriver driver, ServerConnector serverConnector, UserAgent userAgent, Logger logger, DebugScreenshotsProvider debugScreenshotsProvider) {
+    public SeleniumVisualLocatorProvider(SeleniumEyes eyes, EyesWebDriver driver, Logger logger, DebugScreenshotsProvider debugScreenshotsProvider) {
         this.driver = driver;
-        this.serverConnector = serverConnector;
-        this.userAgent = userAgent;
+        this.eyes = eyes;
+        this.serverConnector = eyes.getServerConnector();
         this.logger = logger;
-        this.devicePixelRatio = driver.getEyes().getDevicePixelRatio();
         this.debugScreenshotsProvider = debugScreenshotsProvider;
     }
 
     private BufferedImage getViewPortScreenshot() {
-        ImageProvider provider = ImageProviderFactory.getImageProvider(userAgent, null, logger, driver);
+        UserAgent userAgent = UserAgent.parseUserAgentString(driver.getUserAgent());
+        ImageProvider provider = ImageProviderFactory.getImageProvider(userAgent, eyes, logger, driver);
         BufferedImage image = provider.getImage();
-
-        logger.verbose("Scale image with the scale ratio - " + 1/getDevicePixelRatio());
-        return ImageUtils.scaleImage(image, 1/getDevicePixelRatio());
+        return ImageUtils.scaleImage(image, 1 / eyes.getDevicePixelRatio());
     }
 
     @Override
@@ -73,10 +71,6 @@ public class SeleniumVisualLocatorProvider implements VisualLocatorProvider {
         return serverConnector.postLocators(data);
     }
 
-    double getDevicePixelRatio() {
-        return devicePixelRatio;
-    }
-
     private String postViewportImage(byte[] bytes) {
         String targetUrl;
         RenderingInfo renderingInfo = serverConnector.getRenderInfo();
@@ -86,24 +80,15 @@ public class SeleniumVisualLocatorProvider implements VisualLocatorProvider {
                 targetUrl = targetUrl.replace("__random__", uuid.toString());
                 logger.verbose("uploading viewport image to " + targetUrl);
 
-                int retriesLeft = 3;
-                int wait = 500;
-                while (retriesLeft-- > 0) {
-                    try {
-                        int statusCode = serverConnector.uploadData(bytes, renderingInfo, targetUrl, "image/png", "image/png");
-                        if (statusCode == 200 || statusCode == 201) {
-                            logger.verbose("upload viewport image guid " + uuid + "complete.");
-                            return targetUrl;
-                        }
-                        if (statusCode < 500) {
-                            break;
-                        }
-                    } catch (Exception e) {
-                        if (retriesLeft == 0) throw e;
+                for (int i = 0; i < ServerConnector.MAX_CONNECTION_RETRIES; i++) {
+                    int statusCode = serverConnector.uploadData(bytes, renderingInfo, targetUrl, "image/png", "image/png");
+                    if (statusCode == 200 || statusCode == 201) {
+                        return targetUrl;
                     }
-                    Thread.sleep(wait);
-                    wait *= 2;
-                    wait = Math.min(10000, wait);
+                    if (statusCode < 500) {
+                        throw new IOException(String.format("Failed uploading image. Status code %d", statusCode));
+                    }
+                    Thread.sleep(1000);
                 }
             } catch (Exception e) {
                 logger.log("Error uploading viewport image");
