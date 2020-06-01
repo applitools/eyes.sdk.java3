@@ -244,7 +244,7 @@ public class VisualGridEyes implements ISeleniumEyes, IRenderingEyes {
 
     private IEyesConnector createVGEyesConnector(DesktopBrowserInfo browserInfo) {
         logger.verbose("creating VisualGridEyes server connector");
-        EyesConnector VGEyesConnector = new EyesConnector(this.configProvider, this.properties, browserInfo, webDriver);
+        EyesConnector VGEyesConnector = new EyesConnector(this.configProvider, this.properties, browserInfo);
         if (browserInfo.getEmulationInfo() != null) {
             VGEyesConnector.setDevice(browserInfo.getEmulationInfo().getDeviceName());
         }

@@ -6,10 +6,13 @@ import com.applitools.eyes.*;
 import com.applitools.eyes.debug.DebugScreenshotsProvider;
 import com.applitools.eyes.events.ISessionEventHandler;
 import com.applitools.eyes.exceptions.TestFailedException;
+import com.applitools.eyes.locators.VisualLocatorProvider;
+import com.applitools.eyes.locators.VisualLocatorSettings;
 import com.applitools.eyes.positioning.PositionProvider;
 import com.applitools.eyes.selenium.fluent.SeleniumCheckSettings;
 import com.applitools.eyes.selenium.fluent.Target;
 import com.applitools.eyes.selenium.frames.FrameChain;
+import com.applitools.eyes.selenium.locators.SeleniumVisualLocatorProvider;
 import com.applitools.eyes.selenium.positioning.ImageRotation;
 import com.applitools.eyes.selenium.rendering.VisualGridEyes;
 import com.applitools.eyes.selenium.wrappers.EyesWebDriver;
@@ -20,8 +23,11 @@ import com.applitools.utils.ArgumentGuard;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.remote.RemoteWebDriver;
 
 import java.net.URI;
+import java.util.List;
+import java.util.Map;
 
 /**
  * The type Eyes.
@@ -38,13 +44,22 @@ public class Eyes implements ISeleniumConfigurationProvider, IEyesBase {
     private Configuration configuration = new Configuration();
     private EyesWebDriver driver;
     private ImageRotation rotation;
+    VisualLocatorProvider visualLocatorProvider;
 
     /**
      * Instantiates a new Eyes.
      */
-    public Eyes() {
+    public Eyes(RemoteWebDriver driver) {
         seleniumEyes = new SeleniumEyes(this, (ClassicRunner) runner);
         activeEyes = seleniumEyes;
+
+        this.driver = new EyesWebDriver(getLogger(), null, driver);
+        visualLocatorProvider = new SeleniumVisualLocatorProvider(
+                this.driver,
+                new ServerConnector(),
+                null,
+                getLogger(),
+                getDebugScreenshotsProvider());
     }
 
     /**
@@ -1911,5 +1926,10 @@ public class Eyes implements ISeleniumConfigurationProvider, IEyesBase {
         } else {
             seleniumEyes.close(false);
         }
+    }
+
+    public Map<String, List<Region>> locate(VisualLocatorSettings visualLocatorSettings) {
+        ArgumentGuard.notNull(visualLocatorSettings, "visualLocatorSettings");
+        return visualLocatorProvider.getLocators(visualLocatorSettings);
     }
 }

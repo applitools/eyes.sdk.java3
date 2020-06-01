@@ -3,10 +3,13 @@ package com.applitools.eyes.selenium.locators;
 import com.applitools.connectivity.ServerConnector;
 import com.applitools.eyes.Logger;
 import com.applitools.eyes.Region;
+import com.applitools.eyes.UserAgent;
+import com.applitools.eyes.capture.ImageProvider;
 import com.applitools.eyes.debug.DebugScreenshotsProvider;
 import com.applitools.eyes.locators.VisualLocatorProvider;
 import com.applitools.eyes.locators.VisualLocatorSettings;
 import com.applitools.eyes.locators.VisualLocatorsData;
+import com.applitools.eyes.selenium.capture.ImageProviderFactory;
 import com.applitools.eyes.selenium.wrappers.EyesWebDriver;
 import com.applitools.eyes.visualgrid.model.RenderingInfo;
 import com.applitools.utils.ArgumentGuard;
@@ -24,24 +27,23 @@ public class SeleniumVisualLocatorProvider implements VisualLocatorProvider {
 
     protected Logger logger;
     private final ServerConnector serverConnector;
+    private final UserAgent userAgent;
     protected EyesWebDriver driver;
     private final double devicePixelRatio;
     private final DebugScreenshotsProvider debugScreenshotsProvider;
 
-    public SeleniumVisualLocatorProvider(EyesWebDriver driver, ServerConnector serverConnector, Logger logger, DebugScreenshotsProvider debugScreenshotsProvider) {
+    public SeleniumVisualLocatorProvider(EyesWebDriver driver, ServerConnector serverConnector, UserAgent userAgent, Logger logger, DebugScreenshotsProvider debugScreenshotsProvider) {
         this.driver = driver;
         this.serverConnector = serverConnector;
+        this.userAgent = userAgent;
         this.logger = logger;
         this.devicePixelRatio = driver.getEyes().getDevicePixelRatio();
         this.debugScreenshotsProvider = debugScreenshotsProvider;
     }
 
     private BufferedImage getViewPortScreenshot() {
-        logger.verbose("Getting screenshot as base64...");
-        String base64Image = driver.getScreenshotAs(OutputType.BASE64);
-
-        logger.verbose("Done getting base64! Creating BufferedImage...");
-        BufferedImage image = ImageUtils.imageFromBase64(base64Image);
+        ImageProvider provider = ImageProviderFactory.getImageProvider(userAgent, null, logger, driver);
+        BufferedImage image = provider.getImage();
 
         logger.verbose("Scale image with the scale ratio - " + 1/getDevicePixelRatio());
         return ImageUtils.scaleImage(image, 1/getDevicePixelRatio());

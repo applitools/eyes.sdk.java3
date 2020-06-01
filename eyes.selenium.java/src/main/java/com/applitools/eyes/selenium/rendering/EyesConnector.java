@@ -7,10 +7,7 @@ import com.applitools.eyes.config.IConfigurationSetter;
 import com.applitools.eyes.fluent.ICheckSettingsInternal;
 import com.applitools.eyes.selenium.IConfigurationGetter;
 import com.applitools.eyes.selenium.ISeleniumConfigurationProvider;
-import com.applitools.eyes.selenium.wrappers.EyesWebDriver;
 import com.applitools.eyes.visualgrid.model.*;
-import com.applitools.eyes.visualgrid.model.DesktopBrowserInfo;
-import com.applitools.eyes.visualgrid.model.EmulationDevice;
 import com.applitools.eyes.visualgrid.services.IEyesConnector;
 import com.applitools.eyes.visualgrid.services.VisualGridTask;
 import com.applitools.utils.ClassVersionGetter;
@@ -21,8 +18,8 @@ import java.util.concurrent.Future;
 
 class EyesConnector extends EyesBase implements IEyesConnector, IBatchCloser {
 
-    private final DesktopBrowserInfo browserInfo;;
-    private final EyesWebDriver driver;
+
+    private final DesktopBrowserInfo browserInfo;
     private String userAgent;
     private String device;
     private RectangleSize deviceSize;
@@ -30,8 +27,7 @@ class EyesConnector extends EyesBase implements IEyesConnector, IBatchCloser {
     private String appName;
     private String testName;
 
-    public EyesConnector(ISeleniumConfigurationProvider configProvider, List<PropertyData> properties, DesktopBrowserInfo browserInfo, EyesWebDriver driver) {
-        this.driver = driver;
+    public EyesConnector(ISeleniumConfigurationProvider configProvider, List<PropertyData> properties, DesktopBrowserInfo browserInfo) {
         configurationGetter = configProvider.get();
         this.browserInfo = browserInfo;
         if (properties != null) {
