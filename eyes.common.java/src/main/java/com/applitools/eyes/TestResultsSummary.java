@@ -22,10 +22,12 @@ public class TestResultsSummary implements Iterable<TestResultContainer>{
             if (resultContainer != null) {
                 if (resultContainer.getException() != null) {
                     this.exceptions++;
-                    result = resultContainer.getTestResults();
                 }
+                result = resultContainer.getTestResults();
             }
-            if (result == null) continue;
+            if (result == null) {
+                continue;
+            }
             if (result.getStatus() != null) {
                 switch (result.getStatus()) {
                     case Failed:
