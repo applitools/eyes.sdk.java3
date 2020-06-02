@@ -2,6 +2,7 @@
 ### Fixed
 - When render fails twice the test fails instead of running endlessly. Fixed downloaded resource caching. [Trello 1850](https://trello.com/c/R6MYtCX6)
 - Updated the logic of putting resources to fix buggy behaviour. [Trello 1858](https://trello.com/c/rExcJAQy)
+- Fixed resource management problems that caused an out-of-memory error. [Trello 1805](https://trello.com/c/PmxMgn4W)
 
 ## [3.164.0] - 2020-05-24
 ### Added

@@ -162,18 +162,22 @@ public class ServerConnector extends RestClient implements IServerConnector {
             throw e;
         }
 
-        // Ok, let's create the running session from the response
-        List<Integer> validStatusCodes = new ArrayList<>();
-        validStatusCodes.add(HttpStatus.SC_OK);
-        validStatusCodes.add(HttpStatus.SC_CREATED);
+        try {
+            // Ok, let's create the running session from the response
+            List<Integer> validStatusCodes = new ArrayList<>();
+            validStatusCodes.add(HttpStatus.SC_OK);
+            validStatusCodes.add(HttpStatus.SC_CREATED);
 
-        // If this is a new session, we set this flag.
-        RunningSession runningSession = parseResponseWithJsonData(response, validStatusCodes, RunningSession.class);
-        if (runningSession.getIsNew() == null) {
-            runningSession.setIsNew(response.getStatusCode() == HttpStatus.SC_CREATED);
+            // If this is a new session, we set this flag.
+            RunningSession runningSession = parseResponseWithJsonData(response, validStatusCodes, RunningSession.class);
+            if (runningSession.getIsNew() == null) {
+                runningSession.setIsNew(response.getStatusCode() == HttpStatus.SC_CREATED);
+            }
+
+            return runningSession;
+        } finally {
+            response.close();
         }
-
-        return runningSession;
     }
 
     /**
@@ -198,10 +202,14 @@ public class ServerConnector extends RestClient implements IServerConnector {
         });
         Response response = sendLongRequest(request, HttpMethod.DELETE, null, null);
 
-        // Ok, let's create the running session from the response
-        List<Integer> validStatusCodes = new ArrayList<>();
-        validStatusCodes.add(HttpStatus.SC_OK);
-        return parseResponseWithJsonData(response, validStatusCodes, TestResults.class);
+        try {
+            // Ok, let's create the running session from the response
+            List<Integer> validStatusCodes = new ArrayList<>();
+            validStatusCodes.add(HttpStatus.SC_OK);
+            return parseResponseWithJsonData(response, validStatusCodes, TestResults.class);
+        } finally {
+            response.close();
+        }
     }
 
     public void deleteSession(final TestResults testResults) {
@@ -219,7 +227,9 @@ public class ServerConnector extends RestClient implements IServerConnector {
                         .request(MediaType.APPLICATION_JSON);
             }
         });
-        request.method(HttpMethod.DELETE, null, null);
+
+        Response response = request.method(HttpMethod.DELETE, null, null);
+        response.close();
     }
 
     /**
@@ -258,7 +268,11 @@ public class ServerConnector extends RestClient implements IServerConnector {
         List<Integer> validStatusCodes = new ArrayList<>(1);
         validStatusCodes.add(HttpStatus.SC_OK);
 
-        return parseResponseWithJsonData(response, validStatusCodes, MatchResult.class);
+        try {
+            return parseResponseWithJsonData(response, validStatusCodes, MatchResult.class);
+        } finally {
+            response.close();
+        }
     }
 
     public int uploadData(byte[] bytes, RenderingInfo renderingInfo, final String targetUrl, String contentType, final String mediaType) {
@@ -286,14 +300,14 @@ public class ServerConnector extends RestClient implements IServerConnector {
         asyncRequest.method(HttpMethod.GET, new AsyncRequestCallback() {
             @Override
             public void onComplete(Response response) {
-                int statusCode = response.getStatusCode();
-                if (statusCode >= 300) {
-                    logger.verbose("Got response status code - " + statusCode);
-                    listener.onFail();
-                    return;
-                }
-
                 try {
+                    int statusCode = response.getStatusCode();
+                    if (statusCode >= 300) {
+                        logger.verbose("Got response status code - " + statusCode);
+                        listener.onFail();
+                        return;
+                    }
+
                     byte[] fileContent = downloadFile(response);
                     listener.onComplete(new String(fileContent));
                 } catch (Throwable t) {
@@ -356,7 +370,7 @@ public class ServerConnector extends RestClient implements IServerConnector {
                         }
                     }
 
-                    rgResource = new RGridResource(url.toString(), contentType, fileContent, logger, "ResourceFuture");
+                    rgResource = new RGridResource(url.toString(), contentType, fileContent);
                 } finally {
                     listener.onComplete(rgResource);
                     response.close();
@@ -394,8 +408,12 @@ public class ServerConnector extends RestClient implements IServerConnector {
         List<Integer> validStatusCodes = new ArrayList<>(1);
         validStatusCodes.add(HttpStatus.SC_OK);
 
-        renderingInfo = parseResponseWithJsonData(response, validStatusCodes, RenderingInfo.class);
-        return renderingInfo;
+        try {
+            renderingInfo = parseResponseWithJsonData(response, validStatusCodes, RenderingInfo.class);
+            return renderingInfo;
+        } finally {
+            response.close();
+        }
     }
 
     public List<RunningRender> render(RenderRequest... renderRequests) {
@@ -449,13 +467,16 @@ public class ServerConnector extends RestClient implements IServerConnector {
         validStatusCodes.add(HttpStatus.SC_NOT_FOUND);
 
         Response response = request.method(HttpMethod.HEAD, null, null);
-        int statusCode = response.getStatusCode();
-        if (validStatusCodes.contains(statusCode)) {
-            this.logger.verbose("request succeeded");
-            return statusCode == HttpStatus.SC_OK;
+        try {
+            int statusCode = response.getStatusCode();
+            if (validStatusCodes.contains(statusCode)) {
+                this.logger.verbose("request succeeded");
+                return statusCode == HttpStatus.SC_OK;
+            }
+            throw new EyesException("ServerConnector.renderCheckResource - unexpected status (" + statusCode + ")");
+        } finally {
+            response.close();
         }
-
-        throw new EyesException("ServerConnector.renderCheckResource - unexpected status (" + statusCode + ")");
     }
 
     public Future<?> renderPutResource(final RunningRender runningRender, final RGridResource resource,
@@ -567,9 +588,10 @@ public class ServerConnector extends RestClient implements IServerConnector {
             ObjectMapper objectMapper = new ObjectMapper();
             objectMapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
             objectMapper.configure(MapperFeature.SORT_PROPERTIES_ALPHABETICALLY, true);
+            Response response = null;
             try {
                 String json = objectMapper.writeValueAsString(renderIds);
-                Response response = request.method(HttpMethod.POST, json, MediaType.APPLICATION_JSON);
+                response = request.method(HttpMethod.POST, json, MediaType.APPLICATION_JSON);
                 if (validStatusCodes.contains(response.getStatusCode())) {
                     this.logger.verbose("request succeeded");
                     RenderStatusResults[] renderStatusResults = parseResponseWithJsonData(response, validStatusCodes, RenderStatusResults[].class);
@@ -583,6 +605,10 @@ public class ServerConnector extends RestClient implements IServerConnector {
             } catch (JsonProcessingException e) {
                 logger.log("exception in render status");
                 GeneralUtils.logExceptionStackTrace(logger, e);
+            } finally {
+                if (response != null) {
+                    response.close();
+                }
             }
         } catch (Exception e) {
             GeneralUtils.logExceptionStackTrace(logger, e);
@@ -599,18 +625,26 @@ public class ServerConnector extends RestClient implements IServerConnector {
         ArgumentGuard.notNull(batchId, "batchId");
         this.logger.log("called with " + batchId);
 
-        final String url = String.format(CLOSE_BATCH, batchId);
-        initClient();
-        Request request = makeEyesRequest(new HttpRequestBuilder() {
-            @Override
-            public Request build() {
-                return restClient.target(serverUrl).path(url)
-                        .queryParam("apiKey", getApiKey())
-                        .request((String) null);
+        Response response = null;
+        try {
+            final String url = String.format(CLOSE_BATCH, batchId);
+            initClient();
+            Request request = makeEyesRequest(new HttpRequestBuilder() {
+                @Override
+                public Request build() {
+                    return restClient.target(serverUrl).path(url)
+                            .queryParam("apiKey", getApiKey())
+                            .request((String) null);
+                }
+            });
+             response = request.method(HttpMethod.DELETE, null, null);
+        } finally {
+            if (response != null) {
+                response.close();
             }
-        });
-        request.method(HttpMethod.DELETE, null, null);
-        restClient.close();
+
+            restClient.close();
+        }
     }
 
     public void closeConnector() {
@@ -634,6 +668,12 @@ public class ServerConnector extends RestClient implements IServerConnector {
             bytes = IOUtils.toByteArray(inputStream);
         } catch (IOException e) {
             GeneralUtils.logExceptionStackTrace(logger, e);
+        } finally {
+            try {
+                inputStream.close();
+            } catch (IOException e) {
+                GeneralUtils.logExceptionStackTrace(logger, e);
+            }
         }
         return bytes;
     }

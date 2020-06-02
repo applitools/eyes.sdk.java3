@@ -120,6 +120,7 @@ public class DomCapture {
                 Thread.sleep(200);
 
             } while (status == ScriptResponse.Status.WIP && !isCheckTimerTimedOut.get());
+            timer.cancel();
 
             if (status == ScriptResponse.Status.ERROR) {
                 throw new EyesException("DomCapture Error: " + scriptResponse.getError());

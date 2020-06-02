@@ -501,7 +501,7 @@ public class RenderingTask implements Callable<RenderStatusResults>, Completable
             ObjectMapper objectMapper = new ObjectMapper();
             objectMapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
             byte[] content = objectMapper.writeValueAsBytes(domData);
-            RGridResource resource = new RGridResource(domData.getUrl(), RGridDom.CONTENT_TYPE, content, logger, "Main Frame");
+            RGridResource resource = new RGridResource(domData.getUrl(), RGridDom.CONTENT_TYPE, content);
             debugResourceWriter.write(resource);
         } catch (JsonProcessingException e) {
             GeneralUtils.logExceptionStackTrace(logger, e);
@@ -628,7 +628,7 @@ public class RenderingTask implements Callable<RenderStatusResults>, Completable
         }
 
         @SuppressWarnings("UnnecessaryLocalVariable")
-        RGridResource resource = new RGridResource(urlAsString, blobAsMap.getType(), content, logger, "parseBlobToGridResource");
+        RGridResource resource = new RGridResource(urlAsString, blobAsMap.getType(), content);
         return resource;
     }
 
@@ -940,6 +940,7 @@ public class RenderingTask implements Callable<RenderStatusResults>, Completable
 
         } while (!ids.isEmpty() && !isTimeElapsed.get());
 
+        timer.cancel();
         if (!ids.isEmpty()) {
             logger.verbose("Render ids that didn't complete in time : ");
             logger.verbose(ids.toString());

@@ -657,6 +657,7 @@ public class VisualGridEyes implements ISeleniumEyes, IRenderingEyes {
             }
             Thread.sleep(200);
         } while (status == ScriptResponse.Status.WIP && !isCheckTimerTimedOut.get());
+        timer.cancel();
 
         if (status == ScriptResponse.Status.ERROR) {
             switchTo.frames(originalFC);
