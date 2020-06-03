@@ -9,6 +9,7 @@ import com.applitools.eyes.EyesException;
 import com.applitools.eyes.Logger;
 import com.applitools.utils.ArgumentGuard;
 import com.applitools.utils.GeneralUtils;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.http.HttpHeaders;
@@ -214,7 +215,7 @@ public class RestClient {
      * @throws EyesException For invalid status codes or if the response
      * parsing failed.
      */
-    protected <T> T parseResponseWithJsonData(Response response, List<Integer> validHttpStatusCodes, Class<T> resultType)
+    protected <T> T parseResponseWithJsonData(Response response, List<Integer> validHttpStatusCodes, TypeReference<T> resultType)
             throws EyesException {
         ArgumentGuard.notNull(response, "response");
         ArgumentGuard.notNull(validHttpStatusCodes, "validHttpStatusCodes");

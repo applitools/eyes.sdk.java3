@@ -27,7 +27,7 @@ public class TestVisualLocators extends ReportingTestSuite {
 
     @DataProvider(name = "booleanDP")
     public Object[] dp() {
-        return new Object[]{Boolean.FALSE};
+        return new Object[]{Boolean.TRUE, Boolean.FALSE};
     }
 
     @BeforeMethod
@@ -42,16 +42,21 @@ public class TestVisualLocators extends ReportingTestSuite {
         String suffix = useVisualGrid ? "_VG" : "";
         Eyes eyes = new Eyes(runner);
         eyes.setLogHandler(new StdoutLogHandler());
+        eyes.setSaveDebugScreenshots(true);
+        eyes.setDebugScreenshotsPath("/home/tal/Desktop/resources");
         eyes.setProxy(new ProxySettings("http://localhost:8888"));
         driver.get("https://applitools.github.io/demo/TestPages/FramesTestPage/");
         try {
             eyes.initLocatorProvider(driver);
-            eyes.open(driver, "Applitools Eyes SDK", "testVisualLocators");
-            Map<String, List<Region>> result = eyes.locate(VisualLocator.name("letters"));
+            eyes.open(driver, "Applitools Eyes SDK", "testVisualLocators" + suffix);
+            Map<String, List<Region>> result = eyes.locate(VisualLocator.name("applitools_title"));
+            Region region = result.get("applitools_title").get(0);
+            System.out.println(region.toString());
             eyes.closeAsync();
             Assert.assertEquals(result.size(), 1);
         } finally {
             driver.quit();
+            eyes.abortAsync();
         }
     }
 }

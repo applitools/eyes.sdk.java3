@@ -8,6 +8,7 @@ import com.applitools.utils.ArgumentGuard;
 import com.applitools.utils.GeneralUtils;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.MapperFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -170,11 +171,10 @@ public class ServerConnector extends RestClient implements IServerConnector {
             validStatusCodes.add(HttpStatus.SC_CREATED);
 
             // If this is a new session, we set this flag.
-            RunningSession runningSession = parseResponseWithJsonData(response, validStatusCodes, RunningSession.class);
+            RunningSession runningSession = parseResponseWithJsonData(response, validStatusCodes, new TypeReference<RunningSession>() {});
             if (runningSession.getIsNew() == null) {
                 runningSession.setIsNew(response.getStatusCode() == HttpStatus.SC_CREATED);
             }
-
             return runningSession;
         } finally {
             response.close();
@@ -207,7 +207,7 @@ public class ServerConnector extends RestClient implements IServerConnector {
             // Ok, let's create the running session from the response
             List<Integer> validStatusCodes = new ArrayList<>();
             validStatusCodes.add(HttpStatus.SC_OK);
-            return parseResponseWithJsonData(response, validStatusCodes, TestResults.class);
+            return parseResponseWithJsonData(response, validStatusCodes, new TypeReference<TestResults>() {});
         } finally {
             response.close();
         }
@@ -270,7 +270,7 @@ public class ServerConnector extends RestClient implements IServerConnector {
         validStatusCodes.add(HttpStatus.SC_OK);
 
         try {
-            return parseResponseWithJsonData(response, validStatusCodes, MatchResult.class);
+            return parseResponseWithJsonData(response, validStatusCodes, new TypeReference<MatchResult>() {});
         } finally {
             response.close();
         }
@@ -410,7 +410,7 @@ public class ServerConnector extends RestClient implements IServerConnector {
         validStatusCodes.add(HttpStatus.SC_OK);
 
         try {
-            renderingInfo = parseResponseWithJsonData(response, validStatusCodes, RenderingInfo.class);
+            renderingInfo = parseResponseWithJsonData(response, validStatusCodes, new TypeReference<RenderingInfo>() {});
             return renderingInfo;
         } finally {
             response.close();
@@ -434,7 +434,7 @@ public class ServerConnector extends RestClient implements IServerConnector {
             String json = objectMapper.writeValueAsString(renderRequests);
             response = request.method(HttpMethod.POST, json, MediaType.APPLICATION_JSON);
             if (validStatusCodes.contains(response.getStatusCode())) {
-                RunningRender[] runningRenders = parseResponseWithJsonData(response, validStatusCodes, RunningRender[].class);
+                RunningRender[] runningRenders = parseResponseWithJsonData(response, validStatusCodes, new TypeReference<RunningRender[]>() {});
                 return Arrays.asList(runningRenders);
             }
             throw new EyesException(String.format("Unexpected status %d, message: %s", response.getStatusCode(), response.readEntity(String.class)));
@@ -595,7 +595,7 @@ public class ServerConnector extends RestClient implements IServerConnector {
                 response = request.method(HttpMethod.POST, json, MediaType.APPLICATION_JSON);
                 if (validStatusCodes.contains(response.getStatusCode())) {
                     this.logger.verbose("request succeeded");
-                    RenderStatusResults[] renderStatusResults = parseResponseWithJsonData(response, validStatusCodes, RenderStatusResults[].class);
+                    RenderStatusResults[] renderStatusResults = parseResponseWithJsonData(response, validStatusCodes, new TypeReference<RenderStatusResults[]>(){});
                     for (RenderStatusResults renderStatusResult : renderStatusResults) {
                         if (renderStatusResult != null && renderStatusResult.getStatus() == RenderStatus.ERROR) {
                             logger.verbose("error on render id - " + renderStatusResult);
@@ -633,7 +633,7 @@ public class ServerConnector extends RestClient implements IServerConnector {
         List<Integer> validStatusCodes = new ArrayList<>();
         validStatusCodes.add(javax.ws.rs.core.Response.Status.OK.getStatusCode());
 
-        return parseResponseWithJsonData(response, validStatusCodes, Map.class);
+        return parseResponseWithJsonData(response, validStatusCodes, new TypeReference<Map<String, List<Region>>>(){});
     }
 
     public void closeBatch(String batchId) {
