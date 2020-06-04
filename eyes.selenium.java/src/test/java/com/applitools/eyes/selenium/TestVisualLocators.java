@@ -52,11 +52,11 @@ public class TestVisualLocators extends ReportingTestSuite {
             Map<String, List<Region>> result = eyes.locate(VisualLocator.name("applitools_title"));
             Region region = result.get("applitools_title").get(0);
             System.out.println(region.toString());
-            eyes.closeAsync();
             Assert.assertEquals(result.size(), 1);
         } finally {
             driver.quit();
             eyes.abortAsync();
+            runner.getAllTestResults();
         }
     }
 }

@@ -279,7 +279,9 @@ public class SeleniumEyes extends EyesBase implements ISeleniumEyes, IDriverProv
         imageProvider = ImageProviderFactory.getImageProvider(userAgent, this, logger, this.driver);
         regionPositionCompensation = RegionPositionCompensationFactory.getRegionPositionCompensation(userAgent, this, logger);
 
-        openBase();
+        if (!getConfigGetter().isVisualGrid()) {
+            openBase();
+        }
 
         //updateScalingParams();
 

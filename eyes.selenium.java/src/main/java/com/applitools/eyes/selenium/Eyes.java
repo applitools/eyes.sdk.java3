@@ -64,6 +64,7 @@ public class Eyes implements ISeleniumConfigurationProvider, IEyesBase {
             visualGridEyes = new VisualGridEyes((VisualGridRunner) this.runner, this);
             activeEyes = visualGridEyes;
             isVisualGridEyes = true;
+            configuration.setIsVisualGrid(true);
         } else {
             seleniumEyes = new SeleniumEyes(this, (ClassicRunner) runner);
             activeEyes = seleniumEyes;
@@ -1127,6 +1128,9 @@ public class Eyes implements ISeleniumConfigurationProvider, IEyesBase {
      * @return A wrapped WebDriver which enables SeleniumEyes trigger recording and frame handling.
      */
     public WebDriver open(WebDriver driver, String appName, String testName) {
+        if (activeEyes != seleniumEyes) {
+            seleniumEyes.open(driver);
+        }
         return activeEyes.open(driver, appName, testName, null);
     }
 
@@ -1140,6 +1144,9 @@ public class Eyes implements ISeleniumConfigurationProvider, IEyesBase {
      */
     public WebDriver open(WebDriver driver, String appName, String testName,
                           RectangleSize viewportSize) {
+        if (activeEyes != seleniumEyes) {
+            seleniumEyes.open(driver);
+        }
         return activeEyes.open(driver, appName, testName, viewportSize);
     }
 

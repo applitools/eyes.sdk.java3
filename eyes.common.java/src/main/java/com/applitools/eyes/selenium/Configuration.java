@@ -16,6 +16,7 @@ public class Configuration extends com.applitools.eyes.config.Configuration impl
     private StitchMode stitchMode = StitchMode.SCROLL;
     private boolean hideScrollbars = true;
     private boolean hideCaret = true;
+    private boolean isVisualGrid = false;
 
     //Rendering Configuration
     private Boolean isRenderingConfig = false;
@@ -277,5 +278,15 @@ public class Configuration extends com.applitools.eyes.config.Configuration impl
     public IConfigurationSetter setIgnoreDisplacements(boolean ignoreDisplacements) {
         super.setIgnoreDisplacements(ignoreDisplacements);
         return this;
+    }
+
+    public IConfigurationSetter setIsVisualGrid(boolean isVisualGrid) {
+        this.isVisualGrid = isVisualGrid;
+        return this;
+    }
+
+    @Override
+    public boolean isVisualGrid() {
+        return isVisualGrid;
     }
 }

@@ -293,6 +293,15 @@
             </class>
         </classes>
     </test>
+    <test name="TestVisualLocators" parallel="methods">
+        <classes>
+            <class name="com.applitools.eyes.selenium.TestVisualLocators">
+                <methods>
+                    <include name="testVisualLocators"/>
+                </methods>
+            </class>
+        </classes>
+    </test>
     <test name="BasicDemo" parallel="methods">
         <classes>
             <class name="com.applitools.eyes.demo.BasicDemo">

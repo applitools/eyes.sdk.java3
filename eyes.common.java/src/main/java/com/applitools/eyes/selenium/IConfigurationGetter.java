@@ -26,4 +26,6 @@ public interface IConfigurationGetter extends com.applitools.eyes.config.IConfig
     boolean isRenderingConfig();
 
     Configuration cloneConfig();
+
+    boolean isVisualGrid();
 }
