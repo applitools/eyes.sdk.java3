@@ -1,22 +1,25 @@
 package com.applitools.eyes.visualgrid.model.deviceinfo;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 public class IosDeviceInfo implements DeviceInfo {
 
-    private final IosDeviceName name;
+    @JsonProperty("name")
+    private final IosDeviceName deviceName;
     private final IosScreenOrientation screenOrientation;
 
-    public IosDeviceInfo(IosDeviceName name) {
-        this.name = name;
+    public IosDeviceInfo(IosDeviceName deviceName) {
+        this.deviceName = deviceName;
         this.screenOrientation = IosScreenOrientation.PORTRAIT;
     }
 
-    public IosDeviceInfo(IosDeviceName name, IosScreenOrientation screenOrientation) {
-        this.name = name;
+    public IosDeviceInfo(IosDeviceName deviceName, IosScreenOrientation screenOrientation) {
+        this.deviceName = deviceName;
         this.screenOrientation = screenOrientation;
     }
 
-    public IosDeviceName getName() {
-        return name;
+    public IosDeviceName getDeviceName() {
+        return deviceName;
     }
 
     public IosScreenOrientation getScreenOrientation() {
@@ -26,7 +29,7 @@ public class IosDeviceInfo implements DeviceInfo {
     @Override
     public String toString() {
         return "IosDeviceInfo{" +
-                "deviceName=" + name +
+                "deviceName=" + deviceName +
                 ", screenOrientation=" + screenOrientation +
                 '}';
     }
