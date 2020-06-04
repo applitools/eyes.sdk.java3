@@ -6,7 +6,7 @@ import com.applitools.eyes.selenium.*;
 import com.applitools.eyes.selenium.fluent.Target;
 import com.applitools.eyes.utils.SeleniumUtils;
 import com.applitools.eyes.utils.TestUtils;
-import com.applitools.eyes.visualgrid.model.DeviceName;
+import com.applitools.eyes.visualgrid.model.deviceinfo.*;
 import com.applitools.eyes.visualgrid.model.FileDebugResourceWriter;
 import com.applitools.eyes.visualgrid.services.VisualGridRunner;
 import com.applitools.utils.GeneralUtils;
@@ -175,5 +175,49 @@ public class TestRenderings {
         driver.quit();
         eyes.close(false);
         TestResultsSummary allResults = runner.getAllTestResults(false);
+    }
+
+    @Test
+    public void testRenderingIosSimulator() {
+        VisualGridRunner runner = new VisualGridRunner(10);
+        Eyes eyes = new Eyes(runner);
+        Configuration conf = eyes.getConfiguration();
+        conf.addBrowser(new IosDeviceInfo(IosDeviceName.iPhone_7));
+        eyes.setConfiguration(conf);
+        eyes.setLogHandler(new StdoutLogHandler());
+        ChromeDriver driver = SeleniumUtils.createChromeDriver();
+        driver.get("https://applitools.github.io/demo/TestPages/FramesTestPage/");
+        try {
+            eyes.open(driver, "Applitools Eyes SDK", "testRenderingIosSimulator", new RectangleSize(800, 800));
+            eyes.checkWindow();
+            eyes.closeAsync();
+        } finally {
+            driver.quit();
+            eyes.abortAsync();
+            runner.getAllTestResults();
+        }
+    }
+
+    @Test
+    public void testRenderingMultipleBrowsers() {
+        VisualGridRunner runner = new VisualGridRunner(10);
+        Eyes eyes = new Eyes(runner);
+        Configuration conf = eyes.getConfiguration();
+        conf.addBrowser(new IosDeviceInfo(IosDeviceName.iPhone_7, IosScreenOrientation.LANDSCAPE_LEFT));
+        conf.addBrowser(new DesktopBrowserInfo(new RectangleSize(800, 800), BrowserType.SAFARI));
+        eyes.setConfiguration(conf);
+        eyes.setLogHandler(new StdoutLogHandler());
+        eyes.setProxy(new ProxySettings("http://localhost:8888"));
+        ChromeDriver driver = SeleniumUtils.createChromeDriver();
+        driver.get("https://applitools.github.io/demo/TestPages/FramesTestPage/");
+        try {
+            eyes.open(driver, "Applitools Eyes SDK", "testRenderingMultipleBrowsers", new RectangleSize(800, 800));
+            eyes.checkWindow();
+            eyes.closeAsync();
+        } finally {
+            driver.quit();
+            eyes.abortAsync();
+            runner.getAllTestResults();
+        }
     }
 }

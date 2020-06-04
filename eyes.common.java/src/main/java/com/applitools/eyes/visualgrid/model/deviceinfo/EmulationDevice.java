@@ -1,4 +1,4 @@
-package com.applitools.eyes.visualgrid.model;
+package com.applitools.eyes.visualgrid.model.deviceinfo;
 
 public class EmulationDevice extends EmulationBaseInfo{
 

@@ -5,6 +5,7 @@ import com.applitools.ICheckSettingsInternal;
 import com.applitools.eyes.Logger;
 import com.applitools.eyes.TaskListener;
 import com.applitools.eyes.UserAgent;
+import com.applitools.eyes.visualgrid.model.deviceinfo.DesktopBrowserInfo;
 import com.applitools.eyes.visualgrid.services.IEyesConnector;
 import com.applitools.eyes.visualgrid.services.VisualGridRunner;
 import com.applitools.eyes.visualgrid.services.VisualGridTask;
@@ -592,7 +593,7 @@ public class RenderingTask implements Callable<RenderStatusResults>, Completable
 
         for (VisualGridTask visualGridTask : this.visualGridTaskList) {
 
-            RenderBrowserInfo browserInfo = visualGridTask.getBrowserInfo();
+            DesktopBrowserInfo browserInfo = visualGridTask.getBrowserInfo();
 
             String sizeMode = checkSettingsInternal.getSizeMode();
 
@@ -601,7 +602,8 @@ public class RenderingTask implements Callable<RenderStatusResults>, Completable
             }
 
             RenderInfo renderInfo = new RenderInfo(browserInfo.getWidth(), browserInfo.getHeight(),
-                    sizeMode, checkSettingsInternal.getTargetRegion(), checkSettingsInternal.getVGTargetSelector(), browserInfo.getEmulationInfo());
+                    sizeMode, checkSettingsInternal.getTargetRegion(), checkSettingsInternal.getVGTargetSelector(),
+                    browserInfo.getEmulationInfo(), browserInfo.getIosDeviceInfo());
 
             RenderRequest request = new RenderRequest(this.renderingInfo.getResultsUrl(), result.getUrl(), dom,
                     resourceMapping, renderInfo, browserInfo.getPlatform(), browserInfo.getBrowserType(),

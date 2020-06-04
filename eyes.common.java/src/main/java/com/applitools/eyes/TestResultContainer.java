@@ -1,14 +1,14 @@
 package com.applitools.eyes;
 
-import com.applitools.eyes.visualgrid.model.RenderBrowserInfo;
+import com.applitools.eyes.visualgrid.model.deviceinfo.DesktopBrowserInfo;
 
 public class TestResultContainer {
 
     private TestResults testResults;
-    private RenderBrowserInfo browserInfo;
+    private DesktopBrowserInfo browserInfo;
     private Throwable exception;
 
-    public TestResultContainer(TestResults testResults, RenderBrowserInfo browserInfo, Throwable exception) {
+    public TestResultContainer(TestResults testResults, DesktopBrowserInfo browserInfo, Throwable exception) {
         this.testResults = testResults;
         this.browserInfo = browserInfo;
         this.exception = exception;
@@ -22,7 +22,7 @@ public class TestResultContainer {
         return exception;
     }
 
-    public RenderBrowserInfo getBrowserInfo() {
+    public DesktopBrowserInfo getBrowserInfo() {
         return browserInfo;
     }
 

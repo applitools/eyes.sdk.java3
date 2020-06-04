@@ -14,6 +14,7 @@ import com.applitools.eyes.selenium.frames.FrameChain;
 import com.applitools.eyes.selenium.wrappers.EyesTargetLocator;
 import com.applitools.eyes.selenium.wrappers.EyesWebDriver;
 import com.applitools.eyes.visualgrid.model.*;
+import com.applitools.eyes.visualgrid.model.deviceinfo.DesktopBrowserInfo;
 import com.applitools.eyes.visualgrid.services.*;
 import com.applitools.utils.ArgumentGuard;
 import com.applitools.utils.ClassVersionGetter;
@@ -184,17 +185,17 @@ public class VisualGridEyes implements ISeleniumEyes, IRenderingEyes {
             getConfigSetter().setBatch(new BatchInfo(null));
         }
         logger.verbose("getting all browsers info...");
-        List<RenderBrowserInfo> browserInfoList = getConfigGetter().getBrowsersInfo();
+        List<DesktopBrowserInfo> browserInfoList = getConfigGetter().getBrowsersInfo();
         logger.verbose("creating test descriptors for each browser info...");
         IConfigurationSetter configurationSetter = configProvider.set();
         configurationSetter.setViewportSize(viewportSize);
 
         if (getConfigGetter().getBrowsersInfo() == null) {
             RectangleSize viewportSize = getConfigGetter().getViewportSize();
-            configurationSetter.addBrowser(new RenderBrowserInfo(viewportSize.getWidth(), viewportSize.getHeight(), BrowserType.CHROME, getConfigGetter().getBaselineEnvName()));
+            configurationSetter.addBrowser(new DesktopBrowserInfo(viewportSize.getWidth(), viewportSize.getHeight(), BrowserType.CHROME, getConfigGetter().getBaselineEnvName()));
         }
 
-        for (RenderBrowserInfo browserInfo : browserInfoList) {
+        for (DesktopBrowserInfo browserInfo : browserInfoList) {
             logger.verbose("creating test descriptor");
             RunningTest test = new RunningTest(createVGEyesConnector(browserInfo), configProvider, browserInfo, logger, testListener);
             this.testList.add(test);
@@ -208,7 +209,7 @@ public class VisualGridEyes implements ISeleniumEyes, IRenderingEyes {
 
     private void ensureBrowsers() {
         if (this.configProvider.get().getBrowsersInfo().isEmpty()) {
-            this.configProvider.get().getBrowsersInfo().add(new RenderBrowserInfo(viewportSize, BrowserType.CHROME));
+            this.configProvider.get().getBrowsersInfo().add(new DesktopBrowserInfo(viewportSize, BrowserType.CHROME));
         }
     }
 
@@ -216,11 +217,13 @@ public class VisualGridEyes implements ISeleniumEyes, IRenderingEyes {
         viewportSize = configProvider.get().getViewportSize();
 
         if (viewportSize == null) {
-            List<RenderBrowserInfo> browserInfoList = getConfigGetter().getBrowsersInfo();
+            List<DesktopBrowserInfo> browserInfoList = getConfigGetter().getBrowsersInfo();
             if (browserInfoList != null && !browserInfoList.isEmpty()) {
-                for (RenderBrowserInfo renderBrowserInfo : browserInfoList) {
-                    if (renderBrowserInfo.getEmulationInfo() != null) continue;
-                    viewportSize = new RectangleSize(renderBrowserInfo.getWidth(), renderBrowserInfo.getHeight());
+                for (DesktopBrowserInfo deviceInfo : browserInfoList) {
+                    if (deviceInfo.getEmulationInfo() != null) {
+                        continue;
+                    }
+                    viewportSize = new RectangleSize(deviceInfo.getWidth(), deviceInfo.getHeight());
                 }
             }
         }
@@ -239,7 +242,7 @@ public class VisualGridEyes implements ISeleniumEyes, IRenderingEyes {
         }
     }
 
-    private IEyesConnector createVGEyesConnector(RenderBrowserInfo browserInfo) {
+    private IEyesConnector createVGEyesConnector(DesktopBrowserInfo browserInfo) {
         logger.verbose("creating VisualGridEyes server connector");
         EyesConnector VGEyesConnector = new EyesConnector(this.configProvider, this.properties, browserInfo);
         if (browserInfo.getEmulationInfo() != null) {

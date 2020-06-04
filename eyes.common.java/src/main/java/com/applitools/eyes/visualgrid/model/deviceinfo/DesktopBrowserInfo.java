@@ -1,50 +1,62 @@
-package com.applitools.eyes.visualgrid.model;
+package com.applitools.eyes.visualgrid.model.deviceinfo;
 
 import com.applitools.eyes.RectangleSize;
 import com.applitools.eyes.selenium.BrowserType;
 
-public class RenderBrowserInfo {
+public class DesktopBrowserInfo implements DeviceInfo {
 
     private RectangleSize viewportSize;
     private BrowserType browserType;
     private final String platform = "linux";
     private EmulationBaseInfo emulationInfo;
+    private IosDeviceInfo iosDeviceInfo;
     private final String sizeMode = "full-page";
     private String baselineEnvName;
 
 
-    public RenderBrowserInfo(RectangleSize viewportSize, BrowserType browserType, String baselineEnvName) {
+    public DesktopBrowserInfo(RectangleSize viewportSize, BrowserType browserType, String baselineEnvName) {
         this.viewportSize = viewportSize;
         this.browserType = browserType;
         this.baselineEnvName = baselineEnvName;
     }
 
-    public RenderBrowserInfo(RectangleSize viewportSize, BrowserType browserType) {
+    public DesktopBrowserInfo(RectangleSize viewportSize, BrowserType browserType) {
         this.viewportSize = viewportSize;
         this.browserType = browserType;
     }
 
-    public RenderBrowserInfo(EmulationBaseInfo emulationInfo, String baselineEnvName) {
+    public DesktopBrowserInfo(EmulationBaseInfo emulationInfo, String baselineEnvName) {
         this.emulationInfo = emulationInfo;
         this.baselineEnvName = baselineEnvName;
         this.browserType = BrowserType.CHROME;
     }
 
-    public RenderBrowserInfo(int width, int height) {
+    public DesktopBrowserInfo(int width, int height) {
         this(new RectangleSize(width, height), BrowserType.CHROME, null);
     }
 
-    public RenderBrowserInfo(EmulationBaseInfo emulationInfo) {
+    public DesktopBrowserInfo(EmulationBaseInfo emulationInfo) {
         this.emulationInfo = emulationInfo;
         this.browserType = BrowserType.CHROME;
     }
 
-    public RenderBrowserInfo(int width, int height, BrowserType browserType, String baselineEnvName) {
+    public DesktopBrowserInfo(int width, int height, BrowserType browserType, String baselineEnvName) {
         this(new RectangleSize(width, height), browserType, baselineEnvName);
     }
 
-    public RenderBrowserInfo(int width, int height, BrowserType browserType) {
+    public DesktopBrowserInfo(int width, int height, BrowserType browserType) {
         this(new RectangleSize(width, height), browserType, null);
+    }
+
+    public DesktopBrowserInfo(IosDeviceInfo deviceInfo) {
+        this.iosDeviceInfo = deviceInfo;
+        this.browserType = BrowserType.SAFARI;
+    }
+
+    public DesktopBrowserInfo(IosDeviceInfo deviceInfo, String baselineEnvName) {
+        this.iosDeviceInfo = deviceInfo;
+        this.baselineEnvName = baselineEnvName;
+        this.browserType = BrowserType.SAFARI;
     }
 
     public int getWidth() {
@@ -70,6 +82,10 @@ public class RenderBrowserInfo {
     }
 
     public String getPlatform() {
+        if (iosDeviceInfo != null) {
+            return "ios";
+        }
+
         if (browserType != null) {
             switch (this.browserType) {
                 case CHROME:
@@ -99,6 +115,10 @@ public class RenderBrowserInfo {
         return emulationInfo;
     }
 
+    public IosDeviceInfo getIosDeviceInfo() {
+        return iosDeviceInfo;
+    }
+
     public String getSizeMode() {
         return this.sizeMode;
     }
@@ -110,6 +130,7 @@ public class RenderBrowserInfo {
                 ", browserType=" + browserType +
                 ", platform='" + platform + '\'' +
                 ", emulationInfo=" + emulationInfo +
+                ", iosDeviceInfo=" + iosDeviceInfo +
                 ", sizeMode='" + sizeMode + '\'' +
                 '}';
     }

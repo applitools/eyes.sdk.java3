@@ -1,7 +1,6 @@
 package com.applitools.eyes.renderingGrid;
 
 import com.applitools.eyes.EyesRunner;
-import com.applitools.eyes.TestResultContainer;
 import com.applitools.eyes.selenium.BrowserType;
 import com.applitools.eyes.selenium.Configuration;
 import com.applitools.eyes.selenium.Eyes;
@@ -9,16 +8,10 @@ import com.applitools.eyes.selenium.TestDataProvider;
 import com.applitools.eyes.selenium.rendering.VisualGridEyes;
 import com.applitools.eyes.utils.SeleniumUtils;
 import com.applitools.eyes.utils.TestUtils;
-import com.applitools.eyes.visualgrid.model.RenderBrowserInfo;
 import com.applitools.eyes.visualgrid.services.VisualGridRunner;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
-import org.testng.Assert;
 import org.testng.annotations.Test;
-
-import java.util.Collection;
-import java.util.List;
-import java.util.concurrent.Future;
 
 public class TestVGCloseAsync {
 

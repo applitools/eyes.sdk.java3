@@ -147,10 +147,17 @@ public class RenderRequest {
 
     @JsonProperty("browser")
     @JsonInclude(JsonInclude.Include.NON_NULL)
-    public Map<String, Object> getBrowser() {
+    public Map<String, Object> Browser() {
         Map<String, Object> map = new HashMap<>();
         map.put("name", this.browserName);
-        map.put("platform", this.platform);
+        return map;
+    }
+
+    @JsonProperty("platform")
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    public Map<String, Object> Platform() {
+        Map<String, Object> map = new HashMap<>();
+        map.put("name", this.platform);
         return map;
     }
 

@@ -6,6 +6,7 @@ import com.applitools.eyes.*;
 import com.applitools.eyes.exceptions.DiffsFoundException;
 import com.applitools.eyes.selenium.IConfigurationGetter;
 import com.applitools.eyes.visualgrid.model.*;
+import com.applitools.eyes.visualgrid.model.deviceinfo.DesktopBrowserInfo;
 import com.applitools.utils.ArgumentGuard;
 import com.applitools.utils.GeneralUtils;
 
@@ -78,7 +79,7 @@ public class VisualGridTask implements Callable<TestResultContainer>, Completabl
         this.runningTest = runningTest;
     }
 
-    public RenderBrowserInfo getBrowserInfo() {
+    public DesktopBrowserInfo getBrowserInfo() {
         return runningTest.getBrowserInfo();
     }
 
@@ -108,7 +109,7 @@ public class VisualGridTask implements Callable<TestResultContainer>, Completabl
                         eyesConnector.setDeviceSize(deviceSize);
                     } else {
                         // We are in exception mode - trying to do eyes.open() without first render
-                        RenderBrowserInfo browserInfo = runningTest.getBrowserInfo();
+                        DesktopBrowserInfo browserInfo = runningTest.getBrowserInfo();
                         //eyesConnector.setUserAgent(craftUserAgent(browserInfo));
                         eyesConnector.setDeviceSize(browserInfo.getViewportSize());
                     }

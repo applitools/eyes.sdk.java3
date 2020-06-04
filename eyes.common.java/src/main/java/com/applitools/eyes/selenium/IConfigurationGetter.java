@@ -1,7 +1,7 @@
 package com.applitools.eyes.selenium;
 
 import com.applitools.eyes.config.Configuration;
-import com.applitools.eyes.visualgrid.model.RenderBrowserInfo;
+import com.applitools.eyes.visualgrid.model.deviceinfo.DesktopBrowserInfo;
 
 import java.util.List;
 
@@ -17,7 +17,7 @@ public interface IConfigurationGetter extends com.applitools.eyes.config.IConfig
 
     boolean getHideCaret();
 
-    List<RenderBrowserInfo> getBrowsersInfo();
+    List<DesktopBrowserInfo> getBrowsersInfo();
 
     String getTestName();
 

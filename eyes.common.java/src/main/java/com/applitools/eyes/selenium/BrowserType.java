@@ -9,7 +9,7 @@ public enum BrowserType {
     @JsonProperty("firefox-0") FIREFOX,
     @JsonProperty("firefox-1") FIREFOX_ONE_VERSION_BACK,
     @JsonProperty("firefox-2") FIREFOX_TWO_VERSIONS_BACK,
-    @JsonProperty("safari-0") SAFARI,
+    @JsonProperty("safari") SAFARI,
     @JsonProperty("safari-1") SAFARI_ONE_VERSION_BACK,
     @JsonProperty("safari-2") SAFARI_TWO_VERSIONS_BACK,
     @JsonProperty("ie10") IE_10,

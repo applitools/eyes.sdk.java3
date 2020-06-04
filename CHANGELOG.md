@@ -1,3 +1,7 @@
+## [vNext]
+### Added
+- Supported rendering on ios simulators. [Trello 1872](https://trello.com/c/bykk2rzB)
+
 ## [3.164.1]
 ### Fixed
 - Fixed the reporting of the TestResultsSummary. [Trello 1860](https://trello.com/c/X9xtbgXr)
