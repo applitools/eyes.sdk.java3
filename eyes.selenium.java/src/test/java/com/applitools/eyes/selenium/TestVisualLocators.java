@@ -10,7 +10,6 @@ import com.applitools.eyes.utils.SeleniumUtils;
 import com.applitools.eyes.visualgrid.services.VisualGridRunner;
 import org.openqa.selenium.remote.RemoteWebDriver;
 import org.testng.Assert;
-import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
@@ -18,8 +17,6 @@ import java.util.List;
 import java.util.Map;
 
 public class TestVisualLocators extends ReportingTestSuite {
-
-    private RemoteWebDriver driver;
 
     public TestVisualLocators() {
         super.setGroupName("selenium");
@@ -30,11 +27,6 @@ public class TestVisualLocators extends ReportingTestSuite {
         return new Object[]{Boolean.TRUE, Boolean.FALSE};
     }
 
-    @BeforeMethod
-    public void beforeEach() {
-        driver = SeleniumUtils.createChromeDriver();
-    }
-
     @Test(dataProvider = "booleanDP")
     public void testVisualLocators(boolean useVisualGrid) {
         EyesRunner runner = useVisualGrid ? new VisualGridRunner(10) : new ClassicRunner();
@@ -42,17 +34,23 @@ public class TestVisualLocators extends ReportingTestSuite {
         String suffix = useVisualGrid ? "_VG" : "";
         Eyes eyes = new Eyes(runner);
         eyes.setLogHandler(new StdoutLogHandler());
-        eyes.setSaveDebugScreenshots(true);
-        eyes.setDebugScreenshotsPath("/home/tal/Desktop/resources");
-        eyes.setProxy(new ProxySettings("http://localhost:8888"));
+        eyes.setForceFullPageScreenshot(true);
+
+        RemoteWebDriver driver = SeleniumUtils.createChromeDriver();
         driver.get("https://applitools.github.io/demo/TestPages/FramesTestPage/");
         try {
             eyes.initLocatorProvider(driver);
             eyes.open(driver, "Applitools Eyes SDK", "testVisualLocators" + suffix);
             Map<String, List<Region>> result = eyes.locate(VisualLocator.name("applitools_title"));
-            Region region = result.get("applitools_title").get(0);
-            System.out.println(region.toString());
             Assert.assertEquals(result.size(), 1);
+            List<Region> regionList = result.get("applitools_title");
+            Assert.assertEquals(regionList.size(), 1);
+            Region region = regionList.get(0);
+            Assert.assertEquals(region.getLeft(), 7);
+            Assert.assertEquals(region.getTop(), 24);
+            Assert.assertEquals(region.getWidth(), 144);
+            Assert.assertEquals(region.getHeight(), 38);
+            eyes.closeAsync();
         } finally {
             driver.quit();
             eyes.abortAsync();

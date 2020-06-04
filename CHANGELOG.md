@@ -1,6 +1,7 @@
 ## [vNext]
 ### Added
 - Supported rendering on ios simulators. [Trello 1872](https://trello.com/c/bykk2rzB)
+- Added support in visual locators. [Trello 1788](https://trello.com/c/dEeEDiIY)
 
 ## [3.164.1]
 ### Fixed
