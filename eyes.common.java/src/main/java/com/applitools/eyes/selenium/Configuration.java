@@ -116,20 +116,20 @@ public class Configuration extends com.applitools.eyes.config.Configuration impl
     }
 
     @Override
-    public IConfigurationSetter addBrowsers(DeviceInfo... deviceInfos) {
-        for (DeviceInfo deviceInfo : deviceInfos) {
-            addBrowser(deviceInfo);
+    public IConfigurationSetter addBrowsers(BrowserInfo... browserInfos) {
+        for (BrowserInfo browserInfo : browserInfos) {
+            addBrowser(browserInfo);
         }
         return this;
     }
 
-    private void addBrowser(DeviceInfo deviceInfo) {
-        if (deviceInfo instanceof DesktopBrowserInfo) {
-            addBrowser((DesktopBrowserInfo) deviceInfo);
-        } else if(deviceInfo instanceof ChromeEmulationInfo) {
-            addBrowser((ChromeEmulationInfo) deviceInfo);
-        } else if(deviceInfo instanceof IosDeviceInfo) {
-            addBrowser((IosDeviceInfo) deviceInfo);
+    private void addBrowser(BrowserInfo browserInfo) {
+        if (browserInfo instanceof DesktopBrowserInfo) {
+            addBrowser((DesktopBrowserInfo) browserInfo);
+        } else if(browserInfo instanceof ChromeEmulationInfo) {
+            addBrowser((ChromeEmulationInfo) browserInfo);
+        } else if(browserInfo instanceof IosDeviceInfo) {
+            addBrowser((IosDeviceInfo) browserInfo);
         }
     }
 
