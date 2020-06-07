@@ -182,13 +182,14 @@ public class TestRenderings {
         VisualGridRunner runner = new VisualGridRunner(10);
         Eyes eyes = new Eyes(runner);
         Configuration conf = eyes.getConfiguration();
-        conf.addBrowser(new IosDeviceInfo(IosDeviceName.iPhone_7));
+        conf.addBrowser(new IosDeviceInfo(IosDeviceName.iPhone_XR, IosScreenOrientation.LANDSCAPE_LEFT));
+        conf.setSaveFailedTests(false);
         eyes.setConfiguration(conf);
         eyes.setLogHandler(new StdoutLogHandler());
         ChromeDriver driver = SeleniumUtils.createChromeDriver();
-        driver.get("https://applitools.github.io/demo/TestPages/FramesTestPage/");
+        driver.get("http://applitools.github.io/demo");
         try {
-            eyes.open(driver, "Applitools Eyes SDK", "testRenderingIosSimulator", new RectangleSize(800, 800));
+            eyes.open(driver, "Eyes SDK", "UFG Mobile Web Happy Flow", new RectangleSize(800, 600));
             eyes.checkWindow();
             eyes.closeAsync();
         } finally {
@@ -203,15 +204,14 @@ public class TestRenderings {
         VisualGridRunner runner = new VisualGridRunner(10);
         Eyes eyes = new Eyes(runner);
         Configuration conf = eyes.getConfiguration();
-        conf.addBrowser(new IosDeviceInfo(IosDeviceName.iPhone_7, IosScreenOrientation.LANDSCAPE_LEFT));
+        conf.addBrowser(new IosDeviceInfo(IosDeviceName.iPhone_7));
         conf.addBrowser(new DesktopBrowserInfo(new RectangleSize(800, 800), BrowserType.SAFARI));
         eyes.setConfiguration(conf);
         eyes.setLogHandler(new StdoutLogHandler());
-        eyes.setProxy(new ProxySettings("http://localhost:8888"));
         ChromeDriver driver = SeleniumUtils.createChromeDriver();
-        driver.get("https://applitools.github.io/demo/TestPages/FramesTestPage/");
+        driver.get("http://applitools.github.io/demo");
         try {
-            eyes.open(driver, "Applitools Eyes SDK", "testRenderingMultipleBrowsers", new RectangleSize(800, 800));
+            eyes.open(driver, "Eyes SDK", "UFG Mobile Web Multiple Browsers", new RectangleSize(800, 800));
             eyes.checkWindow();
             eyes.closeAsync();
         } finally {
