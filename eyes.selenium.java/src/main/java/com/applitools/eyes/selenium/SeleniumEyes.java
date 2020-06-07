@@ -91,7 +91,7 @@ public class SeleniumEyes extends EyesBase implements ISeleniumEyes, IDriverProv
     private EyesScreenshotFactory screenshotFactory;
     private String cachedAUTSessionId;
     private Region fullRegionToCheck;
-    private Configuration configuration;
+    private final SeleniumConfigurationProvider configurationProvider;
     private boolean stitchContent;
     private ClassicRunner runner;
 
@@ -119,9 +119,9 @@ public class SeleniumEyes extends EyesBase implements ISeleniumEyes, IDriverProv
      * Creates a new SeleniumEyes instance that interacts with the SeleniumEyes cloud
      * service.
      */
-    public SeleniumEyes(Configuration configuration, ClassicRunner runner) {
+    public SeleniumEyes(SeleniumConfigurationProvider configurationProvider, ClassicRunner runner) {
         super();
-        this.configuration = configuration;
+        this.configurationProvider = configurationProvider;
         checkFrameOrElement = false;
         doNotGetTitle = false;
         devicePixelRatio = UNKNOWN_DEVICE_PIXEL_RATIO;
@@ -2254,6 +2254,6 @@ public class SeleniumEyes extends EyesBase implements ISeleniumEyes, IDriverProv
 
     @Override
     public Configuration getConfiguration() {
-        return configuration;
+        return configurationProvider.getConfiguration();
     }
 }

@@ -56,7 +56,7 @@ public class VisualGridEyes implements ISeleniumEyes, IRenderingEyes {
     private Set<Future<TestResultContainer>> closeFuturesSet = new HashSet<>();
     private Boolean isDisabled = Boolean.FALSE;
     private ServerConnector serverConnector = null;
-    private Configuration configuration;
+    private SeleniumConfigurationProvider configurationProvider;
     private UserAgent userAgent = null;
     private RectangleSize viewportSize;
     private AtomicBoolean isCheckTimerTimedOut = new AtomicBoolean(false);
@@ -91,8 +91,8 @@ public class VisualGridEyes implements ISeleniumEyes, IRenderingEyes {
         }
     }
 
-    public VisualGridEyes(VisualGridRunner renderingGridManager, Configuration configProvider) {
-        this.configuration = configProvider;
+    public VisualGridEyes(VisualGridRunner renderingGridManager, SeleniumConfigurationProvider configurationProvider) {
+        this.configurationProvider = configurationProvider;
         ArgumentGuard.notNull(renderingGridManager, "renderingGridRunner");
         this.renderingGridRunner = renderingGridManager;
         this.logger = renderingGridManager.getLogger();
@@ -187,15 +187,15 @@ public class VisualGridEyes implements ISeleniumEyes, IRenderingEyes {
         logger.verbose("getting all browsers info...");
         List<RenderBrowserInfo> browserInfoList = getConfiguration().getBrowsersInfo();
         logger.verbose("creating test descriptors for each browser info...");
-        configuration.setViewportSize(viewportSize);
+        getConfiguration().setViewportSize(viewportSize);
         if (getConfiguration().getBrowsersInfo() == null) {
             RectangleSize viewportSize = getConfiguration().getViewportSize();
-            configuration.addBrowser(new RenderBrowserInfo(viewportSize.getWidth(), viewportSize.getHeight(), BrowserType.CHROME, getConfiguration().getBaselineEnvName()));
+            getConfiguration().addBrowser(new RenderBrowserInfo(viewportSize.getWidth(), viewportSize.getHeight(), BrowserType.CHROME, getConfiguration().getBaselineEnvName()));
         }
 
         for (RenderBrowserInfo browserInfo : browserInfoList) {
             logger.verbose("creating test descriptor");
-            RunningTest test = new RunningTest(createVGEyesConnector(browserInfo), configuration, browserInfo, logger, testListener);
+            RunningTest test = new RunningTest(createVGEyesConnector(browserInfo), getConfiguration(), browserInfo, logger, testListener);
             this.testList.add(test);
         }
 
@@ -242,7 +242,7 @@ public class VisualGridEyes implements ISeleniumEyes, IRenderingEyes {
 
     private IEyesConnector createVGEyesConnector(RenderBrowserInfo browserInfo) {
         logger.verbose("creating VisualGridEyes server connector");
-        EyesConnector VGEyesConnector = new EyesConnector(configuration, this.properties, browserInfo);
+        EyesConnector VGEyesConnector = new EyesConnector(getConfiguration(), this.properties, browserInfo);
         if (browserInfo.getEmulationInfo() != null) {
             VGEyesConnector.setDevice(browserInfo.getEmulationInfo().getDeviceName() + " (Chrome emulation)");
         } else if (browserInfo.getIosDeviceInfo() != null) {
@@ -861,7 +861,7 @@ public class VisualGridEyes implements ISeleniumEyes, IRenderingEyes {
     }
 
     private Configuration getConfiguration() {
-        return configuration;
+        return configurationProvider.getConfiguration();
     }
 
     @SuppressWarnings("WeakerAccess")

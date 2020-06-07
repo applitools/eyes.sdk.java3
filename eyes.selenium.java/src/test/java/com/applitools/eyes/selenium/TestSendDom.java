@@ -79,7 +79,14 @@ public final class TestSendDom extends ReportingTestSuite {
         private String domJson;
 
         public DomInterceptingEyes() {
-            super(new Configuration(), new ClassicRunner());
+            super(new SeleniumConfigurationProvider() {
+                final Configuration configuration = new Configuration();
+
+                @Override
+                public Configuration getConfiguration() {
+                    return configuration;
+                }
+            }, new ClassicRunner());
         }
 
         public String getDomJson() {

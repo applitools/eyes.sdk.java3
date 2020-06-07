@@ -32,7 +32,7 @@ import java.util.Map;
 /**
  * The type Eyes.
  */
-public class Eyes implements IEyesBase {
+public class Eyes implements IEyesBase, SeleniumConfigurationProvider {
 
     private static final int USE_DEFAULT_MATCH_TIMEOUT = -1;
 
@@ -49,7 +49,7 @@ public class Eyes implements IEyesBase {
      * Instantiates a new Eyes.
      */
     public Eyes() {
-        seleniumEyes = new SeleniumEyes(configuration, new ClassicRunner());
+        seleniumEyes = new SeleniumEyes(this, new ClassicRunner());
         activeEyes = seleniumEyes;
     }
 
@@ -61,11 +61,11 @@ public class Eyes implements IEyesBase {
         this();
         this.runner = runner == null ? new ClassicRunner() : runner;
         if (this.runner instanceof VisualGridRunner) {
-            visualGridEyes = new VisualGridEyes((VisualGridRunner) this.runner, configuration);
+            visualGridEyes = new VisualGridEyes((VisualGridRunner) this.runner, this);
             activeEyes = visualGridEyes;
             isVisualGridEyes = true;
         } else {
-            seleniumEyes = new SeleniumEyes(configuration, (ClassicRunner) runner);
+            seleniumEyes = new SeleniumEyes(this, (ClassicRunner) runner);
             activeEyes = seleniumEyes;
         }
     }
@@ -1816,6 +1816,7 @@ public class Eyes implements IEyesBase {
         return this.seleniumEyes.getServerConnector();
     }
 
+    @Override
     public Configuration getConfiguration() {
         return new Configuration(configuration);
     }

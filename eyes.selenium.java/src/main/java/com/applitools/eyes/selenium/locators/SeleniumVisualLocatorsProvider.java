@@ -66,7 +66,7 @@ public class SeleniumVisualLocatorsProvider implements VisualLocatorsProvider {
 
         logger.verbose("Screenshot URL: " + viewportScreenshotUrl);
 
-        VisualLocatorsData data = new VisualLocatorsData(eyes.getConfigGetter().getAppName(), viewportScreenshotUrl, visualLocatorSettings.isFirstOnly(), visualLocatorSettings.getNames());
+        VisualLocatorsData data = new VisualLocatorsData(eyes.getConfiguration().getAppName(), viewportScreenshotUrl, visualLocatorSettings.isFirstOnly(), visualLocatorSettings.getNames());
 
         logger.verbose("Post visual locators: " + data.toString());
         return serverConnector.postLocators(data);
