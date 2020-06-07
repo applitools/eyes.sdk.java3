@@ -1817,6 +1817,10 @@ public class Eyes implements IEyesBase, SeleniumConfigurationProvider {
     }
 
     @Override
+    public Configuration get() {
+        return configuration;
+    }
+
     public Configuration getConfiguration() {
         return new Configuration(configuration);
     }

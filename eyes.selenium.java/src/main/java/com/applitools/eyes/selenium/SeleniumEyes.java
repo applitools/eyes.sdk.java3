@@ -2254,6 +2254,6 @@ public class SeleniumEyes extends EyesBase implements ISeleniumEyes, IDriverProv
 
     @Override
     public Configuration getConfiguration() {
-        return configurationProvider.getConfiguration();
+        return configurationProvider.get();
     }
 }

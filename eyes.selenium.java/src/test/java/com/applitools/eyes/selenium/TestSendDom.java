@@ -83,7 +83,7 @@ public final class TestSendDom extends ReportingTestSuite {
                 final Configuration configuration = new Configuration();
 
                 @Override
-                public Configuration getConfiguration() {
+                public Configuration get() {
                     return configuration;
                 }
             }, new ClassicRunner());

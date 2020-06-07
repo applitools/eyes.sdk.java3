@@ -34,7 +34,7 @@ public class TestRunningTest extends ReportingTestSuite {
         doNothing().when(logger).verbose(anyString());
         doNothing().when(logger).log(anyString());
 
-        when(configurationProvider.getConfiguration()).thenReturn(new Configuration());
+        when(configurationProvider.get()).thenReturn(new Configuration());
 
         runningTest = new RunningTest(browserInfo, logger, configurationProvider);
         openTask = new VisualGridTask(VisualGridTask.TaskType.OPEN, logger, runningTest);

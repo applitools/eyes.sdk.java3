@@ -861,7 +861,7 @@ public class VisualGridEyes implements ISeleniumEyes, IRenderingEyes {
     }
 
     private Configuration getConfiguration() {
-        return configurationProvider.getConfiguration();
+        return configurationProvider.get();
     }
 
     @SuppressWarnings("WeakerAccess")
