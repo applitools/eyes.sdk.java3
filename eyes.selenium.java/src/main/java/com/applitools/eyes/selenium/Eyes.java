@@ -211,6 +211,9 @@ public class Eyes implements ISeleniumConfigurationProvider, IEyesBase {
      * @param apiKey the api key
      */
     public void setApiKey(String apiKey) {
+        if (seleniumEyes != activeEyes) {
+            seleniumEyes.apiKey(apiKey);
+        }
         activeEyes.apiKey(apiKey);
     }
 
