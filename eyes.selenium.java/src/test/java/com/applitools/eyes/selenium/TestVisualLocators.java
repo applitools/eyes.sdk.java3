@@ -34,7 +34,6 @@ public class TestVisualLocators extends ReportingTestSuite {
         String suffix = useVisualGrid ? "_VG" : "";
         Eyes eyes = new Eyes(runner);
         eyes.setLogHandler(new StdoutLogHandler());
-        eyes.setForceFullPageScreenshot(true);
 
         RemoteWebDriver driver = SeleniumUtils.createChromeDriver();
         driver.get("https://applitools.github.io/demo/TestPages/FramesTestPage/");

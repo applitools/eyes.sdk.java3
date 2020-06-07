@@ -64,7 +64,6 @@ public class Eyes implements ISeleniumConfigurationProvider, IEyesBase {
             visualGridEyes = new VisualGridEyes((VisualGridRunner) this.runner, this);
             activeEyes = visualGridEyes;
             isVisualGridEyes = true;
-            configuration.setIsVisualGrid(true);
         } else {
             seleniumEyes = new SeleniumEyes(this, (ClassicRunner) runner);
             activeEyes = seleniumEyes;
@@ -86,7 +85,43 @@ public class Eyes implements ISeleniumConfigurationProvider, IEyesBase {
      * @return the web driver
      */
     public WebDriver open(WebDriver webDriver) {
+        if (activeEyes != seleniumEyes) {
+            configuration.setIsVisualGrid(true);
+            seleniumEyes.open(webDriver);
+        }
         return activeEyes.open(webDriver);
+    }
+
+    /**
+     * Starts a test.
+     * @param driver   The web driver that controls the browser hosting the application under test.
+     * @param appName  The name of the application under test.
+     * @param testName The test name. (i.e., the visible part of the document's body) or {@code null} to use the current window's viewport.
+     * @return A wrapped WebDriver which enables SeleniumEyes trigger recording and frame handling.
+     */
+    public WebDriver open(WebDriver driver, String appName, String testName) {
+        if (activeEyes != seleniumEyes) {
+            configuration.setIsVisualGrid(true);
+            seleniumEyes.open(driver);
+        }
+        return activeEyes.open(driver, appName, testName, null);
+    }
+
+    /**
+     * Starts a test.
+     * @param driver       The web driver that controls the browser hosting the application under test.
+     * @param appName      The name of the application under test.
+     * @param testName     The test name.
+     * @param viewportSize The required browser's viewport size (i.e., the visible part of the document's body) or {@code null} to use the current window's viewport.
+     * @return A wrapped WebDriver which enables SeleniumEyes trigger recording and frame handling. {@code sessionType} defaults to {@code null}.
+     */
+    public WebDriver open(WebDriver driver, String appName, String testName,
+                          RectangleSize viewportSize) {
+        if (activeEyes != seleniumEyes) {
+            configuration.setIsVisualGrid(true);
+            seleniumEyes.open(driver);
+        }
+        return activeEyes.open(driver, appName, testName, viewportSize);
     }
 
     /**
@@ -1118,36 +1153,6 @@ public class Eyes implements ISeleniumConfigurationProvider, IEyesBase {
     public static void setViewportSize(WebDriver driver, RectangleSize size) {
         ArgumentGuard.notNull(driver, "driver");
         EyesSeleniumUtils.setViewportSize(new Logger(), driver, size);
-    }
-
-    /**
-     * Starts a test.
-     * @param driver   The web driver that controls the browser hosting the application under test.
-     * @param appName  The name of the application under test.
-     * @param testName The test name. (i.e., the visible part of the document's body) or {@code null} to use the current window's viewport.
-     * @return A wrapped WebDriver which enables SeleniumEyes trigger recording and frame handling.
-     */
-    public WebDriver open(WebDriver driver, String appName, String testName) {
-        if (activeEyes != seleniumEyes) {
-            seleniumEyes.open(driver);
-        }
-        return activeEyes.open(driver, appName, testName, null);
-    }
-
-    /**
-     * Starts a test.
-     * @param driver       The web driver that controls the browser hosting the application under test.
-     * @param appName      The name of the application under test.
-     * @param testName     The test name.
-     * @param viewportSize The required browser's viewport size (i.e., the visible part of the document's body) or {@code null} to use the current window's viewport.
-     * @return A wrapped WebDriver which enables SeleniumEyes trigger recording and frame handling. {@code sessionType} defaults to {@code null}.
-     */
-    public WebDriver open(WebDriver driver, String appName, String testName,
-                          RectangleSize viewportSize) {
-        if (activeEyes != seleniumEyes) {
-            seleniumEyes.open(driver);
-        }
-        return activeEyes.open(driver, appName, testName, viewportSize);
     }
 
     /**
