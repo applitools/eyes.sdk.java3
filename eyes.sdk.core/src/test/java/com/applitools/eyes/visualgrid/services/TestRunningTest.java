@@ -2,7 +2,6 @@ package com.applitools.eyes.visualgrid.services;
 
 import com.applitools.eyes.Logger;
 import com.applitools.eyes.selenium.Configuration;
-import com.applitools.eyes.selenium.ISeleniumConfigurationProvider;
 import com.applitools.eyes.utils.ReportingTestSuite;
 import com.applitools.eyes.visualgrid.model.RenderBrowserInfo;
 import org.testng.Assert;
@@ -12,13 +11,13 @@ import org.testng.annotations.Test;
 import java.util.List;
 
 import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.mock;
 
 public class TestRunningTest extends ReportingTestSuite {
 
     RenderBrowserInfo browserInfo = mock(RenderBrowserInfo.class);
     Logger logger = mock(Logger.class);
-    ISeleniumConfigurationProvider configurationProvider = mock(ISeleniumConfigurationProvider.class);
 
     RunningTest runningTest;
     VisualGridTask openTask;
@@ -34,9 +33,7 @@ public class TestRunningTest extends ReportingTestSuite {
         doNothing().when(logger).verbose(anyString());
         doNothing().when(logger).log(anyString());
 
-        when(configurationProvider.get()).thenReturn(new Configuration());
-
-        runningTest = new RunningTest(browserInfo, logger, configurationProvider);
+        runningTest = new RunningTest(browserInfo, logger, new Configuration());
         openTask = new VisualGridTask(VisualGridTask.TaskType.OPEN, logger, runningTest);
         checkTask = new VisualGridTask(VisualGridTask.TaskType.CHECK, logger, runningTest);
         closeTask = new VisualGridTask(VisualGridTask.TaskType.CLOSE, logger, runningTest);

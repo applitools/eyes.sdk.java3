@@ -4,8 +4,7 @@ import com.applitools.ICheckSettings;
 import com.applitools.connectivity.ServerConnector;
 import com.applitools.eyes.capture.AppOutputProvider;
 import com.applitools.eyes.capture.AppOutputWithScreenshot;
-import com.applitools.eyes.config.IConfigurationGetter;
-import com.applitools.eyes.config.IConfigurationSetter;
+import com.applitools.eyes.config.Configuration;
 import com.applitools.eyes.debug.DebugScreenshotsProvider;
 import com.applitools.eyes.debug.FileDebugScreenshotsProvider;
 import com.applitools.eyes.debug.NullDebugScreenshotProvider;
@@ -160,13 +159,13 @@ public abstract class EyesBase implements IEyesBase{
      * Sets the API key of your applitools Eyes account.
      * @param apiKey The api key to set.
      */
-    public IConfigurationSetter setApiKey(String apiKey) {
+    public Configuration setApiKey(String apiKey) {
         ArgumentGuard.notNull(apiKey, "apiKey");
         if (serverConnector == null) {
             throw new EyesException("server connector not set.");
         }
         serverConnector.setApiKey(apiKey);
-        return this.getConfigSetter();
+        return this.getConfiguration();
     }
 
     /**
@@ -185,9 +184,9 @@ public abstract class EyesBase implements IEyesBase{
      * @param serverUrl The URI of the rest server, or {@code null} to use
      *                  the default server.
      */
-    public IConfigurationSetter setServerUrl(String serverUrl) {
+    public Configuration setServerUrl(String serverUrl) {
         setServerUrl(URI.create(serverUrl));
-        return this.getConfigSetter();
+        return this.getConfiguration();
     }
 
     /**
@@ -195,7 +194,7 @@ public abstract class EyesBase implements IEyesBase{
      * @param serverUrl The URI of the rest server, or {@code null} to use
      *                  the default server.
      */
-    public IConfigurationSetter setServerUrl(URI serverUrl) {
+    public Configuration setServerUrl(URI serverUrl) {
         if (serverConnector == null) {
             throw new EyesException("server connector not set.");
         }
@@ -204,7 +203,7 @@ public abstract class EyesBase implements IEyesBase{
         } else {
             serverConnector.setServerUrl(serverUrl);
         }
-        return this.getConfigSetter();
+        return this.getConfiguration();
     }
 
     /**
@@ -222,13 +221,13 @@ public abstract class EyesBase implements IEyesBase{
      * @param abstractProxySettings The proxy settings to be used by the rest client.
      *                              If {@code null} then no proxy is set.
      */
-    public IConfigurationSetter setProxy(AbstractProxySettings abstractProxySettings) {
+    public Configuration setProxy(AbstractProxySettings abstractProxySettings) {
         if (serverConnector == null) {
             throw new EyesException("server connector not set.");
         }
-        getConfigSetter().setProxy(abstractProxySettings);
+        getConfiguration().setProxy(abstractProxySettings);
         serverConnector.setProxy(abstractProxySettings);
-        return getConfigSetter();
+        return getConfiguration();
     }
 
     /**
@@ -289,7 +288,7 @@ public abstract class EyesBase implements IEyesBase{
      * user given agent id.
      */
     public String getFullAgentId() {
-        String agentId = getConfigGetter().getAgentId();
+        String agentId = getConfiguration().getAgentId();
         if (agentId == null) {
             return getBaseAgentId();
         }
@@ -487,8 +486,8 @@ public abstract class EyesBase implements IEyesBase{
             boolean isNewSession = runningSession.getIsNew();
 
             logger.verbose("Ending server session...");
-            boolean save = (isNewSession && getConfigGetter().getSaveNewTests())
-                    || (!isNewSession && getConfigGetter().getSaveFailedTests());
+            boolean save = (isNewSession && getConfiguration().getSaveNewTests())
+                    || (!isNewSession && getConfiguration().getSaveFailedTests());
             logger.verbose("Automatically save test? " + String.valueOf(save));
             TestResults results = getServerConnector().stopSession(runningSession, false, save);
 
@@ -568,7 +567,7 @@ public abstract class EyesBase implements IEyesBase{
             String sessionResultsUrl = runningSession.getUrl();
 
             logger.verbose("Ending server session...");
-            boolean save = (isNewSession && getConfigGetter().getSaveNewTests());
+            boolean save = (isNewSession && getConfiguration().getSaveNewTests());
 
             logger.verbose("Automatically save test? " + String.valueOf(save));
             TestResults results =
@@ -778,7 +777,7 @@ public abstract class EyesBase implements IEyesBase{
 
     protected String tryCaptureAndPostDom(ICheckSettingsInternal checkSettingsInternal) {
         String domUrl = null;
-        if (GeneralUtils.configureSendDom(checkSettingsInternal, getConfigGetter())) {
+        if (GeneralUtils.configureSendDom(checkSettingsInternal, getConfiguration())) {
             try {
                 String domJson = tryCaptureDom();
                 domUrl = tryPostDomCapture(domJson);
@@ -808,7 +807,7 @@ public abstract class EyesBase implements IEyesBase{
         MatchResult result;
         ICheckSettingsInternal checkSettingsInternal = (checkSettings instanceof ICheckSettingsInternal) ? (ICheckSettingsInternal) checkSettings : null;
 
-        ImageMatchSettings defaultMatchSettings = getConfigGetter().getDefaultMatchSettings();
+        ImageMatchSettings defaultMatchSettings = getConfiguration().getDefaultMatchSettings();
 
         // Update retry timeout if it wasn't specified.
         int retryTimeout = -1;
@@ -856,7 +855,7 @@ public abstract class EyesBase implements IEyesBase{
             logger.log(String.format("Mismatch! (%s)", tag));
         }
 
-        if (getConfigGetter().getFailureReports() == FailureReports.IMMEDIATE) {
+        if (getConfiguration().getFailureReports() == FailureReports.IMMEDIATE) {
             throw new TestFailedException(String.format(
                     "Mismatch found in '%s' of '%s'",
                     sessionStartInfo.getScenarioIdOrName(),
@@ -980,18 +979,18 @@ public abstract class EyesBase implements IEyesBase{
         // If there's no default application name, one must be provided for the current test.
         if (getAppName() == null) {
             ArgumentGuard.notNull(appName, "appName");
-            this.getConfigSetter().setAppName(appName);
+            this.getConfiguration().setAppName(appName);
         }
 
         ArgumentGuard.notNull(testName, "testName");
-        this.getConfigSetter().setTestName(testName);
+        this.getConfiguration().setTestName(testName);
 
         logger.log("Agent = " + getFullAgentId());
         logger.verbose(String.format("openBase('%s', '%s', '%s')", appName,
                 testName, viewportSize));
 
-        getConfigSetter().setSessionType(sessionType != null ? sessionType : SessionType.SEQUENTIAL);
-        getConfigSetter().setViewportSize(viewportSize);
+        getConfiguration().setSessionType(sessionType != null ? sessionType : SessionType.SEQUENTIAL);
+        getConfiguration().setViewportSize(viewportSize);
 
         openBase();
     }
@@ -1048,7 +1047,7 @@ public abstract class EyesBase implements IEyesBase{
     }
 
     protected RectangleSize getViewportSizeForOpen() {
-        return getConfigGetter().getViewportSize();
+        return getConfiguration().getViewportSize();
     }
 
     protected void ensureRunningSession() {
@@ -1066,7 +1065,7 @@ public abstract class EyesBase implements IEyesBase{
                 logger,
                 serverConnector,
                 runningSession,
-                getConfigGetter().getMatchTimeout(),
+                getConfiguration().getMatchTimeout(),
                 this,
                 // A callback which will call getAppOutput
                 new AppOutputProvider() {
@@ -1091,9 +1090,9 @@ public abstract class EyesBase implements IEyesBase{
     private void logOpenBase() {
         logger.log(String.format("Eyes server URL is '%s'", serverConnector.getServerUrl()));
         logger.verbose(String.format("Timeout = '%d'", serverConnector.getTimeout()));
-        logger.log(String.format("matchTimeout = '%d' ", getConfigGetter().getMatchTimeout()));
-        logger.log(String.format("Default match settings = '%s' ", getConfigGetter().getDefaultMatchSettings()));
-        logger.log(String.format("FailureReports = '%s' ", getConfigGetter().getFailureReports()));
+        logger.log(String.format("matchTimeout = '%d' ", getConfiguration().getMatchTimeout()));
+        logger.log(String.format("Default match settings = '%s' ", getConfiguration().getDefaultMatchSettings()));
+        logger.log(String.format("FailureReports = '%s' ", getConfiguration().getFailureReports()));
     }
 
     private void validateSessionOpen() {
@@ -1113,7 +1112,7 @@ public abstract class EyesBase implements IEyesBase{
     /**
      * @param size The required viewport size.
      */
-    protected abstract IConfigurationSetter setViewportSize(RectangleSize size);
+    protected abstract Configuration setViewportSize(RectangleSize size);
 
     protected void setEffectiveViewportSize(RectangleSize size) { }
 
@@ -1273,12 +1272,12 @@ public abstract class EyesBase implements IEyesBase{
         AppEnvironment appEnv = new AppEnvironment();
 
         // If hostOS isn't set, we'll try and extract and OS ourselves.
-        if (getConfigGetter().getHostOS() != null) {
-            appEnv.setOs(getConfigGetter().getHostOS());
+        if (getConfiguration().getHostOS() != null) {
+            appEnv.setOs(getConfiguration().getHostOS());
         }
 
-        if (getConfigGetter().getHostApp() != null) {
-            appEnv.setHostingApp(getConfigGetter().getHostApp());
+        if (getConfiguration().getHostApp() != null) {
+            appEnv.setHostingApp(getConfiguration().getHostApp());
         }
 
         appEnv.setInferred(getInferredEnvironment());
@@ -1296,11 +1295,11 @@ public abstract class EyesBase implements IEyesBase{
         }
         ensureViewportSize();
 
-        IConfigurationGetter configGetter = getConfigGetter();
+        Configuration configGetter = getConfiguration();
         BatchInfo testBatch = configGetter.getBatch();
         if (testBatch == null) {
             logger.verbose("No batch set");
-            getConfigSetter().setBatch(new BatchInfo(null));
+            getConfiguration().setBatch(new BatchInfo(null));
         } else {
             logger.verbose("Batch is " + testBatch);
         }
@@ -1334,15 +1333,15 @@ public abstract class EyesBase implements IEyesBase{
     }
 
     protected String getTestName() {
-        return getConfigGetter().getTestName();
+        return getConfiguration().getTestName();
     }
 
     protected String getAppName() {
-        return getConfigGetter().getAppName();
+        return getConfiguration().getAppName();
     }
 
     protected String getBaselineEnvName() {
-        return getConfigGetter().getBaselineEnvName();
+        return getConfiguration().getBaselineEnvName();
     }
 
     public Object getAgentSetup() {
@@ -1437,12 +1436,12 @@ public abstract class EyesBase implements IEyesBase{
     protected abstract String getAUTSessionId();
 
     public Boolean isSendDom() {
-        return getConfigGetter().isSendDom();
+        return getConfiguration().isSendDom();
     }
 
-    public IConfigurationSetter setSendDom(boolean isSendDom) {
-        this.getConfigSetter().setSendDom(isSendDom);
-        return getConfigSetter();
+    public Configuration setSendDom(boolean isSendDom) {
+        this.getConfiguration().setSendDom(isSendDom);
+        return getConfiguration();
     }
 
     public RenderingInfo getRenderingInfo() {
@@ -1458,21 +1457,19 @@ public abstract class EyesBase implements IEyesBase{
      * if tests are to run standalone.
      * @param batch The batch info to set.
      */
-    public IConfigurationSetter setBatch(BatchInfo batch) {
+    public Configuration setBatch(BatchInfo batch) {
         if (isDisabled) {
             logger.verbose("Ignored");
-            return getConfigSetter();
+            return getConfiguration();
         }
 
         logger.verbose("setBatch(" + batch + ")");
 
-        this.getConfigSetter().setBatch(batch);
-        return getConfigSetter();
+        this.getConfiguration().setBatch(batch);
+        return getConfiguration();
     }
 
-    protected abstract IConfigurationGetter getConfigGetter();
-
-    protected abstract IConfigurationSetter getConfigSetter();
+    protected abstract Configuration getConfiguration();
 
     public void abortAsync() {
         abort();

@@ -5,7 +5,7 @@ import com.applitools.utils.GeneralUtils;
 
 import java.net.URI;
 
-public class Configuration implements IConfigurationSetter, IConfigurationGetter {
+public class Configuration {
     private static final int DEFAULT_MATCH_TIMEOUT = 2000; // Milliseconds;
 
     private String branchName = GeneralUtils.getEnvString("APPLITOOLS_BRANCH");
@@ -38,7 +38,7 @@ public class Configuration implements IConfigurationSetter, IConfigurationGetter
     private boolean enablePatterns;
     private boolean useDom;
 
-    public Configuration(IConfigurationGetter other) {
+    public Configuration(Configuration other) {
         this.branchName = other.getBranchName();
         this.parentBranchName = other.getParentBranchName();
         this.baselineBranchName = other.getBaselineBranchName();
@@ -83,213 +83,173 @@ public class Configuration implements IConfigurationSetter, IConfigurationGetter
 
     }
 
-    @Override
     public boolean getSaveNewTests() {
         return saveNewTests;
     }
 
-    @Override
-    public IConfigurationSetter setSaveNewTests(boolean saveNewTests) {
+    public Configuration setSaveNewTests(boolean saveNewTests) {
         this.saveNewTests = saveNewTests;
         return this;
     }
 
-    @Override
     public boolean getSaveFailedTests() {
         return saveFailedTests;
     }
 
-    @Override
-    public IConfigurationSetter setSaveFailedTests(boolean saveFailedTests) {
+    public Configuration setSaveFailedTests(boolean saveFailedTests) {
         this.saveFailedTests = saveFailedTests;
         return this;
     }
 
-
-    @Override
     public ImageMatchSettings getDefaultMatchSettings() {
         return defaultMatchSettings;
     }
 
-    @Override
-    public IConfigurationSetter setDefaultMatchSettings(ImageMatchSettings defaultMatchSettings) {
+    public Configuration setDefaultMatchSettings(ImageMatchSettings defaultMatchSettings) {
         this.defaultMatchSettings = defaultMatchSettings;
         return this;
     }
 
-    @Override
     public int getMatchTimeout() {
         return matchTimeout;
     }
 
-    @Override
-    public IConfigurationSetter setMatchTimeout(int matchTimeout) {
+    public Configuration setMatchTimeout(int matchTimeout) {
         this.matchTimeout = matchTimeout;
         return this;
     }
 
-    @Override
     public String getHostApp() {
         return hostApp;
     }
 
-    @Override
-    public IConfigurationSetter setHostApp(String hostApp) {
+    public Configuration setHostApp(String hostApp) {
         this.hostApp = hostApp;
         return this;
     }
 
-    @Override
     public String getHostOS() {
         return hostOS;
     }
 
-    @Override
-    public IConfigurationSetter setHostOS(String hostOS) {
+    public Configuration setHostOS(String hostOS) {
         this.hostOS = hostOS;
         return this;
     }
 
-    @Override
     public int getStitchOverlap() {
         return stitchOverlap;
     }
 
-
-    @Override
-    public IConfigurationSetter setStitchOverlap(int stitchOverlap) {
+    public Configuration setStitchOverlap(int stitchOverlap) {
         this.stitchOverlap = stitchOverlap;
         return this;
     }
 
-    @Override
-    public IConfigurationSetter setBatch(BatchInfo batch) {
+    public Configuration setBatch(BatchInfo batch) {
         this.batch = batch;
         return this;
     }
 
-    @Override
     public BatchInfo getBatch() {
         return batch;
     }
 
-    @Override
-    public IConfigurationSetter setBranchName(String branchName) {
+    public Configuration setBranchName(String branchName) {
         this.branchName = branchName;
         return this;
     }
 
-    @Override
     public String getBranchName() {
         return branchName;
     }
 
-    @Override
     public String getAgentId() {
         return agentId;
     }
 
-    @Override
-    public IConfigurationSetter setAgentId(String agentId) {
+    public Configuration setAgentId(String agentId) {
         this.agentId = agentId;
         return this;
     }
 
-    @Override
     public String getParentBranchName() {
         return parentBranchName;
     }
 
-    @Override
-    public IConfigurationSetter setParentBranchName(String parentBranchName) {
+    public Configuration setParentBranchName(String parentBranchName) {
         this.parentBranchName = parentBranchName;
         return this;
     }
 
-    @Override
     public String getBaselineBranchName() {
         return baselineBranchName;
     }
 
-    @Override
-    public IConfigurationSetter setBaselineBranchName(String baselineBranchName) {
+    public Configuration setBaselineBranchName(String baselineBranchName) {
         this.baselineBranchName = baselineBranchName;
         return this;
     }
 
-    @Override
     public String getBaselineEnvName() {
         return baselineEnvName;
     }
 
-    @Override
-    public IConfigurationSetter setBaselineEnvName(String baselineEnvName) {
+    public Configuration setBaselineEnvName(String baselineEnvName) {
         this.baselineEnvName = baselineEnvName;
         return this;
     }
 
-    @Override
     public String getEnvironmentName() {
         return environmentName;
     }
 
-    @Override
-    public IConfigurationSetter setEnvironmentName(String environmentName) {
+    public Configuration setEnvironmentName(String environmentName) {
         this.environmentName = environmentName;
         return this;
     }
 
-    @Override
     public Boolean getSaveDiffs() {
         return saveDiffs;
     }
 
-    @Override
-    public IConfigurationSetter setSaveDiffs(Boolean saveDiffs) {
+    public Configuration setSaveDiffs(Boolean saveDiffs) {
         this.saveDiffs = saveDiffs;
         return this;
     }
 
-    @Override
     public String getAppName() {
         return appName;
     }
 
-    @Override
-    public IConfigurationSetter setAppName(String appName) {
+    public Configuration setAppName(String appName) {
         this.appName = appName;
         return this;
     }
 
-    @Override
     public String getTestName() {
         return testName;
     }
 
-    @Override
-    public IConfigurationSetter setTestName(String testName) {
+    public Configuration setTestName(String testName) {
         this.testName = testName;
         return this;
     }
 
-    @Override
     public RectangleSize getViewportSize() {
         return viewportSize;
     }
 
-    @Override
-    public IConfigurationSetter setViewportSize(RectangleSize viewportSize) {
+    public Configuration setViewportSize(RectangleSize viewportSize) {
         this.viewportSize = viewportSize;
         return this;
     }
 
-    @Override
     public SessionType getSessionType() {
         return sessionType;
     }
 
-    @Override
-    public IConfigurationSetter setSessionType(SessionType sessionType) {
+    public Configuration setSessionType(SessionType sessionType) {
         this.sessionType = sessionType;
         return this;
     }
@@ -302,8 +262,8 @@ public class Configuration implements IConfigurationSetter, IConfigurationGetter
      * @param failureReports The failure reports setting.
      * @see FailureReports
      */
-    @Override
-    public IConfigurationSetter setFailureReports(FailureReports failureReports) {
+
+    public Configuration setFailureReports(FailureReports failureReports) {
         this.failureReports = failureReports;
         return this;
     }
@@ -311,12 +271,11 @@ public class Configuration implements IConfigurationSetter, IConfigurationGetter
     /**
      * @return the failure reports setting.
      */
-    @Override
+
     public FailureReports getFailureReports() {
         return failureReports;
     }
 
-    @Override
     public String toString() {
         return super.toString() +
                 "\n\tbatch = " + batch +
@@ -332,13 +291,11 @@ public class Configuration implements IConfigurationSetter, IConfigurationGetter
                 "\n\tsessionType = " + sessionType;
     }
 
-    @Override
     public Boolean isSendDom() {
         return isSendDom;
     }
 
-    @Override
-    public IConfigurationSetter setSendDom(boolean sendDom) {
+    public Configuration setSendDom(boolean sendDom) {
         isSendDom = sendDom;
         return this;
     }
@@ -346,7 +303,7 @@ public class Configuration implements IConfigurationSetter, IConfigurationGetter
     /**
      * @return Whether to ignore or the blinking caret or not when comparing images.
      */
-    @Override
+
     public boolean getIgnoreCaret() {
         Boolean ignoreCaret = getDefaultMatchSettings().getIgnoreCaret();
         return ignoreCaret == null ? true : ignoreCaret;
@@ -356,25 +313,21 @@ public class Configuration implements IConfigurationSetter, IConfigurationGetter
      * Sets the ignore blinking caret value.
      * @param value The ignore value.
      */
-    @Override
-    public IConfigurationSetter setIgnoreCaret(boolean value) {
+
+    public Configuration setIgnoreCaret(boolean value) {
         defaultMatchSettings.setIgnoreCaret(value);
         return this;
     }
 
-
-    @Override
     public String getApiKey() {
         return apiKey;
     }
 
-    @Override
-    public IConfigurationSetter setApiKey(String apiKey) {
+    public Configuration setApiKey(String apiKey) {
         this.apiKey = apiKey;
         return this;
     }
 
-    @Override
     public URI getServerUrl() {
         if (this.serverUrl != null) {
             return URI.create(serverUrl);
@@ -382,53 +335,44 @@ public class Configuration implements IConfigurationSetter, IConfigurationGetter
         return null;
     }
 
-    @Override
-    public IConfigurationSetter setServerUrl(String serverUrl) {
+    public Configuration setServerUrl(String serverUrl) {
         this.serverUrl = serverUrl;
         return this;
     }
 
-    @Override
     public AbstractProxySettings getProxy() {
         return proxy;
     }
 
-    @Override
-    public IConfigurationSetter setProxy(AbstractProxySettings proxy) {
+    public Configuration setProxy(AbstractProxySettings proxy) {
         this.proxy = proxy;
         return this;
     }
 
-    @Override
     public MatchLevel getMatchLevel() {
         return this.defaultMatchSettings.getMatchLevel();
     }
 
-    @Override
     public boolean getIgnoreDisplacements() {
         return this.ignoreDisplacements;
     }
 
-    @Override
-    public IConfigurationSetter setMatchLevel(MatchLevel matchLevel) {
+    public Configuration setMatchLevel(MatchLevel matchLevel) {
         this.defaultMatchSettings.setMatchLevel(matchLevel);
         return this;
     }
 
-    @Override
-    public IConfigurationSetter setIgnoreDisplacements(boolean isIgnoreDisplacements) {
+    public Configuration setIgnoreDisplacements(boolean isIgnoreDisplacements) {
         this.defaultMatchSettings.setIgnoreDisplacements(isIgnoreDisplacements);
         this.ignoreDisplacements = isIgnoreDisplacements;
         return this;
     }
 
-    @Override
     public AccessibilitySettings getAccessibilityValidation() {
         return this.accessibilitySettings != null ? this.accessibilitySettings : getDefaultMatchSettings().getAccessibilitySettings();
     }
 
-    @Override
-    public IConfigurationSetter setAccessibilityValidation(AccessibilitySettings accessibilitySettings) {
+    public Configuration setAccessibilityValidation(AccessibilitySettings accessibilitySettings) {
         if (accessibilitySettings == null) {
             this.defaultMatchSettings.setAccessibilitySettings(null);
             this.accessibilitySettings = null;
@@ -444,26 +388,22 @@ public class Configuration implements IConfigurationSetter, IConfigurationGetter
         return this;
     }
 
-    @Override
-    public IConfigurationSetter setUseDom(boolean useDom) {
+    public Configuration setUseDom(boolean useDom) {
         this.defaultMatchSettings.setUseDom(useDom);
         this.useDom = useDom;
         return this;
     }
 
-    @Override
     public boolean getUseDom() {
         return useDom;
     }
 
-    @Override
-    public IConfigurationSetter setEnablePatterns(boolean enablePatterns) {
+    public Configuration setEnablePatterns(boolean enablePatterns) {
         this.defaultMatchSettings.setEnablePatterns(enablePatterns);
         this.enablePatterns = enablePatterns;
         return this;
     }
 
-    @Override
     public boolean getEnablePatterns() {
         return enablePatterns;
     }

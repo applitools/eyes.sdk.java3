@@ -3,7 +3,7 @@
  */
 package com.applitools.eyes;
 
-import com.applitools.eyes.config.IConfigurationGetter;
+import com.applitools.eyes.config.Configuration;
 import com.applitools.utils.ArgumentGuard;
 import com.fasterxml.jackson.annotation.JsonRootName;
 
@@ -69,7 +69,7 @@ public class SessionStartInfo {
     }
 
 
-    public SessionStartInfo(IConfigurationGetter config,
+    public SessionStartInfo(Configuration config,
                             String agentId,
                             String verId,
                             AppEnvironment environment,

@@ -4,7 +4,6 @@ import com.applitools.eyes.EyesBase;
 import com.applitools.eyes.EyesScreenshot;
 import com.applitools.eyes.ImageMatchSettings;
 import com.applitools.eyes.RectangleSize;
-import com.applitools.eyes.config.IConfigurationSetter;
 import com.applitools.eyes.fluent.ICheckSettingsInternal;
 
 public class TestEyes extends EyesBase {
@@ -33,12 +32,7 @@ public class TestEyes extends EyesBase {
     }
 
     @Override
-    public IConfigurationGetter getConfigGetter() {
-        return configuration;
-    }
-
-    @Override
-    public IConfigurationSetter getConfigSetter() {
+    public Configuration getConfiguration() {
         return configuration;
     }
 
@@ -72,7 +66,7 @@ public class TestEyes extends EyesBase {
     }
 
     @Override
-    protected IConfigurationSetter setViewportSize(RectangleSize size)
+    protected Configuration setViewportSize(RectangleSize size)
     {
         return configuration;
     }

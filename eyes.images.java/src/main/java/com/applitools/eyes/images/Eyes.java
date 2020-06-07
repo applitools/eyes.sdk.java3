@@ -6,8 +6,6 @@ package com.applitools.eyes.images;
 import com.applitools.ICheckSettings;
 import com.applitools.eyes.*;
 import com.applitools.eyes.config.Configuration;
-import com.applitools.eyes.config.IConfigurationGetter;
-import com.applitools.eyes.config.IConfigurationSetter;
 import com.applitools.eyes.events.ValidationInfo;
 import com.applitools.eyes.events.ValidationResult;
 import com.applitools.eyes.exceptions.TestFailedException;
@@ -22,7 +20,7 @@ import com.applitools.utils.ImageUtils;
 import java.awt.image.BufferedImage;
 
 @SuppressWarnings({"WeakerAccess", "UnusedReturnValue"})
-public class Eyes extends EyesBase implements IConfigurationGetter, IConfigurationSetter {
+public class Eyes extends EyesBase {
 
     private String title;
     private EyesImagesScreenshot screenshot;
@@ -36,12 +34,10 @@ public class Eyes extends EyesBase implements IConfigurationGetter, IConfigurati
      * Get the base agent id.
      * @return Base agent id.
      */
-    @Override
     public String getBaseAgentId() {
         return "eyes.images.java/" + ClassVersionGetter.CURRENT_VERSION;
     }
 
-    @Override
     public String tryCaptureDom() {
         return null;
     }
@@ -293,17 +289,14 @@ public class Eyes extends EyesBase implements IConfigurationGetter, IConfigurati
     /**
      * {@inheritDoc}
      */
-    @Override
     public RectangleSize getViewportSize() {
         return viewportSize;
     }
 
-    @Override
     public SessionType getSessionType() {
         return config.getSessionType();
     }
 
-    @Override
     public FailureReports getFailureReports() {
         return config.getFailureReports();
     }
@@ -312,21 +305,18 @@ public class Eyes extends EyesBase implements IConfigurationGetter, IConfigurati
      * Set the viewport size.
      * @param size The required viewport size.
      */
-    @Override
-    public IConfigurationSetter setViewportSize(RectangleSize size) {
+    public Configuration setViewportSize(RectangleSize size) {
         ArgumentGuard.notNull(size, "size");
         viewportSize = new RectangleSize(size.getWidth(), size.getHeight());
         return config;
     }
 
-    @Override
-    public IConfigurationSetter setSessionType(SessionType sessionType) {
+    public Configuration setSessionType(SessionType sessionType) {
         config.setSessionType(sessionType);
         return config;
     }
 
-    @Override
-    public IConfigurationSetter setFailureReports(FailureReports failureReports) {
+    public Configuration setFailureReports(FailureReports failureReports) {
         config.setFailureReports(failureReports);
         return config;
     }
@@ -335,7 +325,6 @@ public class Eyes extends EyesBase implements IConfigurationGetter, IConfigurati
      * Get the inferred environment.
      * @return Inferred environment.
      */
-    @Override
     protected String getInferredEnvironment() {
         return inferred != null ? inferred : "";
     }
@@ -352,7 +341,6 @@ public class Eyes extends EyesBase implements IConfigurationGetter, IConfigurati
      * Get the screenshot.
      * @return The screenshot.
      */
-    @Override
     public EyesScreenshot getScreenshot(ICheckSettingsInternal checkSettingsInternal) {
         return screenshot;
     }
@@ -361,12 +349,10 @@ public class Eyes extends EyesBase implements IConfigurationGetter, IConfigurati
      * Get the title.
      * @return The title.
      */
-    @Override
     protected String getTitle() {
         return title;
     }
 
-    @Override
     protected String getAUTSessionId() {
         return "";
     }
@@ -433,13 +419,12 @@ public class Eyes extends EyesBase implements IConfigurationGetter, IConfigurati
     /**
      * @param appName The name of the application under test.
      */
-    public IConfigurationSetter setAppName(String appName) {
+    public Configuration setAppName(String appName) {
         this.config.setAppName(appName);
         return config;
     }
 
-    @Override
-    public IConfigurationSetter setTestName(String testName) {
+    public Configuration setTestName(String testName) {
 
         return config.setTestName(testName);
     }
@@ -451,9 +436,8 @@ public class Eyes extends EyesBase implements IConfigurationGetter, IConfigurati
         return config.getAppName();
     }
 
-    @Override
     public String getTestName() {
-        return getConfigGetter().getTestName();
+        return getConfiguration().getTestName();
     }
 
     /**
@@ -464,13 +448,12 @@ public class Eyes extends EyesBase implements IConfigurationGetter, IConfigurati
      * branches.
      * @param branchName Branch name or {@code null} to specify the default branch.
      */
-    public IConfigurationSetter setBranchName(String branchName) {
+    public Configuration setBranchName(String branchName) {
         this.config.setBranchName(branchName);
         return config;
     }
 
-    @Override
-    public IConfigurationSetter setAgentId(String agentId) {
+    public Configuration setAgentId(String agentId) {
 
         return config;
     }
@@ -482,7 +465,6 @@ public class Eyes extends EyesBase implements IConfigurationGetter, IConfigurati
         return config.getBranchName();
     }
 
-    @Override
     public String getAgentId() {
         return null;
     }
@@ -492,7 +474,7 @@ public class Eyes extends EyesBase implements IConfigurationGetter, IConfigurati
      * #setBranchName(String)}.
      * @param branchName Branch name or {@code null} to specify the default branch.
      */
-    public IConfigurationSetter setParentBranchName(String branchName) {
+    public Configuration setParentBranchName(String branchName) {
         this.config.setParentBranchName(branchName);
         return config;
     }
@@ -510,7 +492,7 @@ public class Eyes extends EyesBase implements IConfigurationGetter, IConfigurati
      * #setBranchName(String)}.
      * @param branchName Branch name or {@code null} to specify the default branch.
      */
-    public IConfigurationSetter setBaselineBranchName(String branchName) {
+    public Configuration setBaselineBranchName(String branchName) {
         this.config.setBaselineBranchName(branchName);
         return config;
     }
@@ -527,7 +509,7 @@ public class Eyes extends EyesBase implements IConfigurationGetter, IConfigurati
      * Automatically save differences as a baseline.
      * @param saveDiffs Sets whether to automatically save differences as baseline.
      */
-    public IConfigurationSetter setSaveDiffs(Boolean saveDiffs) {
+    public Configuration setSaveDiffs(Boolean saveDiffs) {
         this.config.setSaveDiffs(saveDiffs);
         return config;
     }
@@ -544,7 +526,7 @@ public class Eyes extends EyesBase implements IConfigurationGetter, IConfigurati
      * Sets the maximum time (in ms) a match operation tries to perform a match.
      * @param ms Total number of ms to wait for a match.
      */
-    public IConfigurationSetter setMatchTimeout(int ms) {
+    public Configuration setMatchTimeout(int ms) {
         final int MIN_MATCH_TIMEOUT = 500;
         if (getIsDisabled()) {
             logger.verbose("Ignored");
@@ -574,7 +556,7 @@ public class Eyes extends EyesBase implements IConfigurationGetter, IConfigurati
      * Set whether or not new tests are saved by default.
      * @param saveNewTests True if new tests should be saved by default. False otherwise.
      */
-    public IConfigurationSetter setSaveNewTests(boolean saveNewTests) {
+    public Configuration setSaveNewTests(boolean saveNewTests) {
         this.config.setSaveNewTests(saveNewTests);
         return config;
     }
@@ -590,7 +572,7 @@ public class Eyes extends EyesBase implements IConfigurationGetter, IConfigurati
      * Set whether or not failed tests are saved by default.
      * @param saveFailedTests True if failed tests should be saved by default, false otherwise.
      */
-    public IConfigurationSetter setSaveFailedTests(boolean saveFailedTests) {
+    public Configuration setSaveFailedTests(boolean saveFailedTests) {
         this.config.setSaveFailedTests(saveFailedTests);
         return config;
     }
@@ -607,7 +589,7 @@ public class Eyes extends EyesBase implements IConfigurationGetter, IConfigurati
      * if tests are to run standalone.
      * @param batch The batch info to set.
      */
-    public IConfigurationSetter setBatch(BatchInfo batch) {
+    public Configuration setBatch(BatchInfo batch) {
         if (getIsDisabled()) {
             logger.verbose("Ignored");
             return config;
@@ -616,16 +598,6 @@ public class Eyes extends EyesBase implements IConfigurationGetter, IConfigurati
         logger.verbose("setBatch(" + batch + ")");
 
         this.config.setBatch(batch);
-        return config;
-    }
-
-    @Override
-    protected IConfigurationGetter getConfigGetter() {
-        return config;
-    }
-
-    @Override
-    protected IConfigurationSetter getConfigSetter() {
         return config;
     }
 
@@ -641,7 +613,7 @@ public class Eyes extends EyesBase implements IConfigurationGetter, IConfigurati
      * Updates the match settings to be used for the session.
      * @param defaultMatchSettings The match settings to be used for the session.
      */
-    public IConfigurationSetter setDefaultMatchSettings(ImageMatchSettings
+    public Configuration setDefaultMatchSettings(ImageMatchSettings
                                                 defaultMatchSettings) {
         ArgumentGuard.notNull(defaultMatchSettings, "defaultMatchSettings");
         config.setDefaultMatchSettings(defaultMatchSettings);
@@ -664,29 +636,25 @@ public class Eyes extends EyesBase implements IConfigurationGetter, IConfigurati
      * @return The match settings used for the session.
      * @see com.applitools.eyes.MatchLevel
      */
-    public IConfigurationSetter setMatchLevel(MatchLevel matchLevel) {
+    public Configuration setMatchLevel(MatchLevel matchLevel) {
         config.getDefaultMatchSettings().setMatchLevel(matchLevel);
         return config;
     }
 
-    @Override
-    public IConfigurationSetter setIgnoreDisplacements(boolean isIgnoreDisplacements) {
+    public Configuration setIgnoreDisplacements(boolean isIgnoreDisplacements) {
         this.config.setIgnoreDisplacements(isIgnoreDisplacements);
         return config;
     }
 
-    @Override
-    public IConfigurationSetter setAccessibilityValidation(AccessibilitySettings accessibilityValidation) {
+    public Configuration setAccessibilityValidation(AccessibilitySettings accessibilityValidation) {
         return this.config.setAccessibilityValidation(accessibilityValidation);
     }
 
-    @Override
-    public IConfigurationSetter setUseDom(boolean useDom) {
+    public Configuration setUseDom(boolean useDom) {
         return config.setUseDom(useDom);
     }
 
-    @Override
-    public IConfigurationSetter setEnablePatterns(boolean enablePatterns) {
+    public Configuration setEnablePatterns(boolean enablePatterns) {
         return config.setEnablePatterns(enablePatterns);
     }
 
@@ -698,22 +666,18 @@ public class Eyes extends EyesBase implements IConfigurationGetter, IConfigurati
         return config.getDefaultMatchSettings().getMatchLevel();
     }
 
-    @Override
     public boolean getIgnoreDisplacements() {
         return config.getIgnoreDisplacements();
     }
 
-    @Override
     public AccessibilitySettings getAccessibilityValidation() {
         return config.getAccessibilityValidation();
     }
 
-    @Override
     public boolean getUseDom() {
         return config.getUseDom();
     }
 
-    @Override
     public boolean getEnablePatterns() {
         return config.getEnablePatterns();
     }
@@ -730,7 +694,7 @@ public class Eyes extends EyesBase implements IConfigurationGetter, IConfigurati
      * Sets the ignore blinking caret value.
      * @param value The ignore value.
      */
-    public IConfigurationSetter setIgnoreCaret(boolean value) {
+    public Configuration setIgnoreCaret(boolean value) {
         config.getDefaultMatchSettings().setIgnoreCaret(value);
         return config;
     }
@@ -746,7 +710,7 @@ public class Eyes extends EyesBase implements IConfigurationGetter, IConfigurati
      * Sets the stitching overlap in pixels.
      * @param pixels The width (in pixels) of the overlap.
      */
-    public IConfigurationSetter setStitchOverlap(int pixels) {
+    public Configuration setStitchOverlap(int pixels) {
         this.config.setStitchOverlap(pixels);
         return config;
     }
@@ -754,7 +718,7 @@ public class Eyes extends EyesBase implements IConfigurationGetter, IConfigurati
     /**
      * @param hostOS The host OS running the AUT.
      */
-    public IConfigurationSetter setHostOS(String hostOS) {
+    public Configuration setHostOS(String hostOS) {
 
         logger.log("Host OS: " + hostOS);
 
@@ -776,7 +740,7 @@ public class Eyes extends EyesBase implements IConfigurationGetter, IConfigurati
     /**
      * @param hostApp The application running the AUT (e.g., Chrome).
      */
-    public IConfigurationSetter setHostApp(String hostApp) {
+    public Configuration setHostApp(String hostApp) {
 
         logger.log("Host App: " + hostApp);
 
@@ -817,7 +781,7 @@ public class Eyes extends EyesBase implements IConfigurationGetter, IConfigurati
      * If not {@code null}, determines the name of the environment of the baseline.
      * @param baselineEnvName The name of the baseline's environment.
      */
-    public IConfigurationSetter setBaselineEnvName(String baselineEnvName) {
+    public Configuration setBaselineEnvName(String baselineEnvName) {
 
         logger.log("Baseline environment name: " + baselineEnvName);
 
@@ -829,8 +793,7 @@ public class Eyes extends EyesBase implements IConfigurationGetter, IConfigurati
         return config;
     }
 
-    @Override
-    public IConfigurationSetter setEnvironmentName(String environmentName) {
+    public Configuration setEnvironmentName(String environmentName) {
         return config;
     }
 
@@ -842,7 +805,6 @@ public class Eyes extends EyesBase implements IConfigurationGetter, IConfigurati
         return config.getBaselineEnvName();
     }
 
-    @Override
     public String getEnvironmentName() {
         return null;
     }
@@ -892,17 +854,15 @@ public class Eyes extends EyesBase implements IConfigurationGetter, IConfigurati
         setHostApp(hostApp);
     }
 
-    @Override
     public String getApiKey() {
         return super.getApiKey();
     }
 
     public Configuration getConfiguration() {
-        return config;
+        return new Configuration(config);
     }
 
     public void setConfiguration(Configuration config) {
         this.config = new Configuration(config);
-        //this.config = config;
     }
 }

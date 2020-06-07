@@ -4,7 +4,7 @@ import com.applitools.ICheckSettings;
 import com.applitools.ICheckSettingsInternal;
 import com.applitools.eyes.*;
 import com.applitools.eyes.exceptions.DiffsFoundException;
-import com.applitools.eyes.selenium.IConfigurationGetter;
+import com.applitools.eyes.selenium.Configuration;
 import com.applitools.eyes.visualgrid.model.*;
 import com.applitools.eyes.visualgrid.model.RenderBrowserInfo;
 import com.applitools.utils.ArgumentGuard;
@@ -25,7 +25,7 @@ public class VisualGridTask implements Callable<TestResultContainer>, Completabl
 
     public enum TaskType {OPEN, CHECK, CLOSE, ABORT}
 
-    private IConfigurationGetter configurationGetter;
+    private Configuration configuration;
     private TestResults testResults;
 
     private IEyesConnector eyesConnector;
@@ -62,9 +62,9 @@ public class VisualGridTask implements Callable<TestResultContainer>, Completabl
     }
     /******** END - PUBLIC FOR TESTING PURPOSES ONLY ********/
 
-    public VisualGridTask(IConfigurationGetter seleniumConfigurationProvider, TestResults testResults, IEyesConnector eyesConnector, TaskType type, TaskListener runningTestListener,
+    public VisualGridTask(Configuration configuration, TestResults testResults, IEyesConnector eyesConnector, TaskType type, TaskListener runningTestListener,
                           ICheckSettings checkSettings, RunningTest runningTest, List<VisualGridSelector[]> regionSelectors, String source) {
-        this.configurationGetter = seleniumConfigurationProvider;
+        this.configuration = configuration;
         this.testResults = testResults;
         this.eyesConnector = eyesConnector;
         this.type = type;
@@ -113,7 +113,7 @@ public class VisualGridTask implements Callable<TestResultContainer>, Completabl
                         //eyesConnector.setUserAgent(craftUserAgent(browserInfo));
                         eyesConnector.setDeviceSize(browserInfo.getViewportSize());
                     }
-                    eyesConnector.open(configurationGetter, runningTest.getAppName(), runningTest.getTestName());
+                    eyesConnector.open(configuration, runningTest.getAppName(), runningTest.getTestName());
                     logger.verbose("Eyes Open Done.");
                     break;
 

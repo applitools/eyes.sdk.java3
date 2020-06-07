@@ -56,7 +56,7 @@ public class VisualGridEyes implements ISeleniumEyes, IRenderingEyes {
     private Set<Future<TestResultContainer>> closeFuturesSet = new HashSet<>();
     private Boolean isDisabled = Boolean.FALSE;
     private ServerConnector serverConnector = null;
-    private ISeleniumConfigurationProvider configProvider;
+    private Configuration configuration;
     private UserAgent userAgent = null;
     private RectangleSize viewportSize;
     private AtomicBoolean isCheckTimerTimedOut = new AtomicBoolean(false);
@@ -91,8 +91,8 @@ public class VisualGridEyes implements ISeleniumEyes, IRenderingEyes {
         }
     }
 
-    public VisualGridEyes(VisualGridRunner renderingGridManager, ISeleniumConfigurationProvider configProvider) {
-        this.configProvider = configProvider;
+    public VisualGridEyes(VisualGridRunner renderingGridManager, Configuration configProvider) {
+        this.configuration = configProvider;
         ArgumentGuard.notNull(renderingGridManager, "renderingGridRunner");
         this.renderingGridRunner = renderingGridManager;
         this.logger = renderingGridManager.getLogger();
@@ -153,9 +153,9 @@ public class VisualGridEyes implements ISeleniumEyes, IRenderingEyes {
 
     @Override
     public WebDriver open(WebDriver driver, String appName, String testName, RectangleSize viewportSize) throws EyesException {
-        IConfigurationSetter configSetter = (IConfigurationSetter) getConfigSetter().setAppName(appName).setTestName(testName);
+        getConfiguration().setAppName(appName).setTestName(testName);
         if (viewportSize != null && !viewportSize.isEmpty()) {
-            configSetter.setViewportSize(new RectangleSize(viewportSize));
+            getConfiguration().setViewportSize(new RectangleSize(viewportSize));
         }
         return open(driver);
     }
@@ -166,8 +166,8 @@ public class VisualGridEyes implements ISeleniumEyes, IRenderingEyes {
         if (!validateEyes()) return webDriver;
 
         ArgumentGuard.notNull(webDriver, "webDriver");
-        ArgumentGuard.notNull(getConfigGetter().getTestName(), "testName");
-        ArgumentGuard.notNull(getConfigGetter().getAppName(), "appName");
+        ArgumentGuard.notNull(getConfiguration().getTestName(), "testName");
+        ArgumentGuard.notNull(getConfiguration().getAppName(), "appName");
 
         initDriver(webDriver);
 
@@ -181,23 +181,21 @@ public class VisualGridEyes implements ISeleniumEyes, IRenderingEyes {
 
         ensureBrowsers();
 
-        if (getConfigGetter().getBatch() == null) {
-            getConfigSetter().setBatch(new BatchInfo(null));
+        if (getConfiguration().getBatch() == null) {
+            getConfiguration().setBatch(new BatchInfo(null));
         }
         logger.verbose("getting all browsers info...");
-        List<RenderBrowserInfo> browserInfoList = getConfigGetter().getBrowsersInfo();
+        List<RenderBrowserInfo> browserInfoList = getConfiguration().getBrowsersInfo();
         logger.verbose("creating test descriptors for each browser info...");
-        IConfigurationSetter configurationSetter = configProvider.set();
-        configurationSetter.setViewportSize(viewportSize);
-
-        if (getConfigGetter().getBrowsersInfo() == null) {
-            RectangleSize viewportSize = getConfigGetter().getViewportSize();
-            configurationSetter.addBrowser(new RenderBrowserInfo(viewportSize.getWidth(), viewportSize.getHeight(), BrowserType.CHROME, getConfigGetter().getBaselineEnvName()));
+        configuration.setViewportSize(viewportSize);
+        if (getConfiguration().getBrowsersInfo() == null) {
+            RectangleSize viewportSize = getConfiguration().getViewportSize();
+            configuration.addBrowser(new RenderBrowserInfo(viewportSize.getWidth(), viewportSize.getHeight(), BrowserType.CHROME, getConfiguration().getBaselineEnvName()));
         }
 
         for (RenderBrowserInfo browserInfo : browserInfoList) {
             logger.verbose("creating test descriptor");
-            RunningTest test = new RunningTest(createVGEyesConnector(browserInfo), configProvider, browserInfo, logger, testListener);
+            RunningTest test = new RunningTest(createVGEyesConnector(browserInfo), configuration, browserInfo, logger, testListener);
             this.testList.add(test);
         }
 
@@ -208,16 +206,16 @@ public class VisualGridEyes implements ISeleniumEyes, IRenderingEyes {
     }
 
     private void ensureBrowsers() {
-        if (this.configProvider.get().getBrowsersInfo().isEmpty()) {
-            this.configProvider.get().getBrowsersInfo().add(new RenderBrowserInfo(viewportSize, BrowserType.CHROME));
+        if (this.getConfiguration().getBrowsersInfo().isEmpty()) {
+            getConfiguration().getBrowsersInfo().add(new RenderBrowserInfo(viewportSize, BrowserType.CHROME));
         }
     }
 
     private void setViewportSize(EyesWebDriver webDriver) {
-        viewportSize = configProvider.get().getViewportSize();
+        viewportSize = getConfiguration().getViewportSize();
 
         if (viewportSize == null) {
-            List<RenderBrowserInfo> browserInfoList = getConfigGetter().getBrowsersInfo();
+            List<RenderBrowserInfo> browserInfoList = getConfiguration().getBrowsersInfo();
             if (browserInfoList != null && !browserInfoList.isEmpty()) {
                 for (RenderBrowserInfo deviceInfo : browserInfoList) {
                     if (deviceInfo.getEmulationInfo() != null) {
@@ -244,7 +242,7 @@ public class VisualGridEyes implements ISeleniumEyes, IRenderingEyes {
 
     private IEyesConnector createVGEyesConnector(RenderBrowserInfo browserInfo) {
         logger.verbose("creating VisualGridEyes server connector");
-        EyesConnector VGEyesConnector = new EyesConnector(this.configProvider, this.properties, browserInfo);
+        EyesConnector VGEyesConnector = new EyesConnector(configuration, this.properties, browserInfo);
         if (browserInfo.getEmulationInfo() != null) {
             VGEyesConnector.setDevice(browserInfo.getEmulationInfo().getDeviceName() + " (Chrome emulation)");
         } else if (browserInfo.getIosDeviceInfo() != null) {
@@ -252,7 +250,7 @@ public class VisualGridEyes implements ISeleniumEyes, IRenderingEyes {
         }
 
         VGEyesConnector.setLogHandler(this.logger.getLogHandler());
-        VGEyesConnector.setProxy(this.getConfigGetter().getProxy());
+        VGEyesConnector.setProxy(this.getConfiguration().getProxy());
         if (serverConnector != null) {
             VGEyesConnector.setServerConnector(serverConnector);
         }
@@ -389,7 +387,7 @@ public class VisualGridEyes implements ISeleniumEyes, IRenderingEyes {
             closeFuturesSet = new HashSet<>();
         }
         Throwable exception = null;
-        logger.verbose("enter " + getConfigGetter().getBatch());
+        logger.verbose("enter " + getConfiguration().getBatch());
         try {
             Collection<Future<TestResultContainer>> futureList = closeAsync();
             this.renderingGridRunner.close(this);
@@ -423,7 +421,7 @@ public class VisualGridEyes implements ISeleniumEyes, IRenderingEyes {
         try {
             futureList = new ArrayList<>();
             for (RunningTest runningTest : testList) {
-                logger.verbose("running test name: " + getConfigGetter().getTestName());
+                logger.verbose("running test name: " + getConfiguration().getTestName());
                 logger.verbose("is current running test open: " + runningTest.isTestOpen());
                 logger.verbose("is current running test ready to close: " + runningTest.isTestReadyToClose());
                 logger.verbose("is current running test closed: " + runningTest.isTestClose());
@@ -642,7 +640,7 @@ public class VisualGridEyes implements ISeleniumEyes, IRenderingEyes {
         Boolean b;
         if ((b = checkSettingsInternal.isStitchContent()) != null) {
             isFullPage = b;
-        } else if ((b = getConfigGetter().isForceFullPageScreenshot()) != null) {
+        } else if ((b = getConfiguration().isForceFullPageScreenshot()) != null) {
             isFullPage = b;
         }
         return isFullPage;
@@ -684,7 +682,7 @@ public class VisualGridEyes implements ISeleniumEyes, IRenderingEyes {
     }
 
     private void waitBeforeDomSnapshot() {
-        int waitBeforeScreenshots = this.getConfigGetter().getWaitBeforeScreenshots();
+        int waitBeforeScreenshots = this.getConfiguration().getWaitBeforeScreenshots();
         try {
             Thread.sleep(waitBeforeScreenshots);
         } catch (InterruptedException e) {
@@ -704,19 +702,19 @@ public class VisualGridEyes implements ISeleniumEyes, IRenderingEyes {
         Boolean b;
 
         if (matchLevel == null) {
-            checkSettings = checkSettings.matchLevel(getConfigGetter().getMatchLevel());
+            checkSettings = checkSettings.matchLevel(getConfiguration().getMatchLevel());
         }
 
         if (fully == null) {
-            checkSettings = checkSettings.fully((b = getConfigGetter().isForceFullPageScreenshot()) == null ? true : b);
+            checkSettings = checkSettings.fully((b = getConfiguration().isForceFullPageScreenshot()) == null ? true : b);
         }
 
         if (sendDom == null) {
-            checkSettings = checkSettings.sendDom((b = getConfigGetter().isSendDom()) == null ? true : b);
+            checkSettings = checkSettings.sendDom((b = getConfiguration().isSendDom()) == null ? true : b);
         }
 
         if (ignoreDisplacements == null) {
-            checkSettings = checkSettings.ignoreDisplacements(getConfigGetter().getIgnoreDisplacements());
+            checkSettings = checkSettings.ignoreDisplacements(getConfiguration().getIgnoreDisplacements());
         }
 
         return (ICheckSettingsInternal) checkSettings;
@@ -855,19 +853,15 @@ public class VisualGridEyes implements ISeleniumEyes, IRenderingEyes {
      * user given agent id.
      */
     public String getFullAgentId() {
-        String agentId = getConfigGetter().getAgentId();
+        String agentId = getConfiguration().getAgentId();
         if (agentId == null) {
             return getBaseAgentId();
         }
         return String.format("%s [%s]", agentId, getBaseAgentId());
     }
 
-    private IConfigurationGetter getConfigGetter() {
-        return this.configProvider.get();
-    }
-
-    private IConfigurationSetter getConfigSetter() {
-        return this.configProvider.set();
+    private Configuration getConfiguration() {
+        return configuration;
     }
 
     @SuppressWarnings("WeakerAccess")
@@ -889,7 +883,7 @@ public class VisualGridEyes implements ISeleniumEyes, IRenderingEyes {
 
         logger.verbose("setBatch(" + batch + ")");
 
-        this.getConfigSetter().setBatch(batch);
+        this.getConfiguration().setBatch(batch);
     }
 
     private List<VisualGridSelector[]> getRegionsXPaths(ICheckSettingsInternal csInternal) {
@@ -1012,7 +1006,7 @@ public class VisualGridEyes implements ISeleniumEyes, IRenderingEyes {
 
     @Override
     public String getBatchId() {
-        return this.getConfigGetter().getBatch().getId();
+        return this.getConfiguration().getBatch().getId();
     }
 
     private void abort(Throwable e) {

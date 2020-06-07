@@ -91,7 +91,7 @@ public class SeleniumEyes extends EyesBase implements ISeleniumEyes, IDriverProv
     private EyesScreenshotFactory screenshotFactory;
     private String cachedAUTSessionId;
     private Region fullRegionToCheck;
-    private ISeleniumConfigurationProvider configurationProvider;
+    private Configuration configuration;
     private boolean stitchContent;
     private ClassicRunner runner;
 
@@ -119,9 +119,9 @@ public class SeleniumEyes extends EyesBase implements ISeleniumEyes, IDriverProv
      * Creates a new SeleniumEyes instance that interacts with the SeleniumEyes cloud
      * service.
      */
-    public SeleniumEyes(ISeleniumConfigurationProvider configurationProvider, ClassicRunner runner) {
+    public SeleniumEyes(Configuration configuration, ClassicRunner runner) {
         super();
-        this.configurationProvider = configurationProvider;
+        this.configuration = configuration;
         checkFrameOrElement = false;
         doNotGetTitle = false;
         devicePixelRatio = UNKNOWN_DEVICE_PIXEL_RATIO;
@@ -238,9 +238,9 @@ public class SeleniumEyes extends EyesBase implements ISeleniumEyes, IDriverProv
 
     @Override
     public WebDriver open(WebDriver driver, String appName, String testName, RectangleSize viewportSize) throws EyesException {
-        IConfigurationSetter configSetter = (IConfigurationSetter) getConfigSetter().setAppName(appName).setTestName(testName);
+        getConfiguration().setAppName(appName).setTestName(testName);
         if (viewportSize != null && !viewportSize.isEmpty()) {
-            configSetter.setViewportSize(new RectangleSize(viewportSize));
+            getConfiguration().setViewportSize(new RectangleSize(viewportSize));
         }
         return open(driver);
     }
@@ -279,14 +279,14 @@ public class SeleniumEyes extends EyesBase implements ISeleniumEyes, IDriverProv
         imageProvider = ImageProviderFactory.getImageProvider(userAgent, this, logger, this.driver);
         regionPositionCompensation = RegionPositionCompensationFactory.getRegionPositionCompensation(userAgent, this, logger);
 
-        if (!getConfigGetter().isVisualGrid()) {
+        if (!getConfiguration().isVisualGrid()) {
             openBase();
         }
 
         //updateScalingParams();
 
         this.driver.setRotation(rotation);
-        this.runner.addBatch(this.getConfigGetter().getBatch().getId(), this);
+        this.runner.addBatch(this.getConfiguration().getBatch().getId(), this);
         return this.driver;
     }
 
@@ -302,8 +302,8 @@ public class SeleniumEyes extends EyesBase implements ISeleniumEyes, IDriverProv
     }
 
     private void ensureViewportSize() {
-        if (this.getConfigGetter().getViewportSize() == null) {
-            this.getConfigSetter().setViewportSize(driver.getDefaultContentViewportSize());
+        if (this.getConfiguration().getViewportSize() == null) {
+            this.getConfiguration().setViewportSize(driver.getDefaultContentViewportSize());
         }
     }
 
@@ -340,7 +340,7 @@ public class SeleniumEyes extends EyesBase implements ISeleniumEyes, IDriverProv
 
     private PositionProvider createPositionProvider(WebElement scrollRootElement) {
         // Setting the correct position provider.
-        StitchMode stitchMode = getConfigGetter().getStitchMode();
+        StitchMode stitchMode = getConfiguration().getStitchMode();
         logger.verbose("initializing position provider. stitchMode: " + stitchMode);
         switch (stitchMode) {
             case CSS:
@@ -392,14 +392,14 @@ public class SeleniumEyes extends EyesBase implements ISeleniumEyes, IDriverProv
             return;
         }
 
-        Boolean forceFullPageScreenshot = getConfigGetter().getForceFullPageScreenshot();
+        Boolean forceFullPageScreenshot = getConfiguration().getForceFullPageScreenshot();
         boolean originalForceFPS = forceFullPageScreenshot == null ? false : forceFullPageScreenshot;
 
         if (checkSettings.length > 1) {
-            getConfigSetter().setForceFullPageScreenshot(true);
+            getConfiguration().setForceFullPageScreenshot(true);
         }
 
-        logger.verbose(getConfigGetter().toString());
+        logger.verbose(getConfiguration().toString());
 
         Dictionary<Integer, GetRegion> getRegions = new Hashtable<>();
         Dictionary<Integer, ICheckSettingsInternal> checkSettingsInternalDictionary = new Hashtable<>();
@@ -438,7 +438,7 @@ public class SeleniumEyes extends EyesBase implements ISeleniumEyes, IDriverProv
         setPositionProvider(createPositionProvider());
 
         matchRegions(getRegions, checkSettingsInternalDictionary, checkSettings);
-        getConfigSetter().setForceFullPageScreenshot(originalForceFPS);
+        getConfiguration().setForceFullPageScreenshot(originalForceFPS);
     }
 
     private void matchRegions(Dictionary<Integer, GetRegion> getRegions,
@@ -451,13 +451,13 @@ public class SeleniumEyes extends EyesBase implements ISeleniumEyes, IDriverProv
 
         Region bBox = findBoundingBox(getRegions, checkSettings);
 
-        MatchWindowTask mwt = new MatchWindowTask(logger, serverConnector, runningSession, getConfigGetter().getMatchTimeout(), this);
+        MatchWindowTask mwt = new MatchWindowTask(logger, serverConnector, runningSession, getConfiguration().getMatchTimeout(), this);
 
         ScaleProviderFactory scaleProviderFactory = updateScalingParams();
         FullPageCaptureAlgorithm algo = createFullPageCaptureAlgorithm(scaleProviderFactory);
 
         Object activeElement = null;
-        if (getConfigGetter().getHideCaret()) {
+        if (getConfiguration().getHideCaret()) {
             try {
                 activeElement = driver.executeScript("var activeElement = document.activeElement; activeElement && activeElement.blur(); return activeElement;");
             } catch (WebDriverException e) {
@@ -508,7 +508,7 @@ public class SeleniumEyes extends EyesBase implements ISeleniumEyes, IDriverProv
             }
         }
 
-        if (getConfigGetter().getHideCaret() && activeElement != null) {
+        if (getConfiguration().getHideCaret() && activeElement != null) {
             try {
                 driver.executeScript("arguments[0].focus();", activeElement);
             } catch (WebDriverException e) {
@@ -716,7 +716,7 @@ public class SeleniumEyes extends EyesBase implements ISeleniumEyes, IDriverProv
 
             this.elementPositionProvider = null;
             this.currentFramePositionProvider = null;
-            this.positionProviderHandler.set(PositionProviderFactory.getPositionProvider(logger, getConfigGetter().getStitchMode(), jsExecutor, scrollRootElement, userAgent));
+            this.positionProviderHandler.set(PositionProviderFactory.getPositionProvider(logger, getConfiguration().getStitchMode(), jsExecutor, scrollRootElement, userAgent));
 
             this.originalFC = driver.getFrameChain().clone();
 
@@ -770,7 +770,7 @@ public class SeleniumEyes extends EyesBase implements ISeleniumEyes, IDriverProv
                         switchTo.defaultContent();
                     }
                     Location curPos = null;
-                    currentFramePositionProvider = PositionProviderFactory.getPositionProvider(logger, getConfigGetter().getStitchMode(), jsExecutor, scrollRootElement, userAgent);
+                    currentFramePositionProvider = PositionProviderFactory.getPositionProvider(logger, getConfiguration().getStitchMode(), jsExecutor, scrollRootElement, userAgent);
                     if (!isMobileDevice && this.stitchContent) {
                         String curPosStr = (String) driver.executeScript("var e = document.documentElement; var curPos = e.scrollLeft+';'+e.scrollTop; if (e.scrollTo) {e.scrollTo(0,0);} else {e.scrollTop=0;e.scrollLeft=0;} return curPos;");
                         curPos = ScrollPositionProvider.parseLocationString(curPosStr);
@@ -1710,7 +1710,7 @@ public class SeleniumEyes extends EyesBase implements ISeleniumEyes, IDriverProv
      * {@inheritDoc}
      */
     @Override
-    protected IConfigurationSetter setViewportSize(RectangleSize size) {
+    protected Configuration setViewportSize(RectangleSize size) {
         if (!EyesSeleniumUtils.isMobileDevice(driver)) {
             FrameChain originalFrame = driver.getFrameChain();
             driver.switchTo().defaultContent();
@@ -1728,7 +1728,7 @@ public class SeleniumEyes extends EyesBase implements ISeleniumEyes, IDriverProv
         }
 
         viewportSize = new RectangleSize(size.getWidth(), size.getHeight());
-        return getConfigSetter();
+        return getConfiguration();
     }
 
     /**
@@ -1759,7 +1759,7 @@ public class SeleniumEyes extends EyesBase implements ISeleniumEyes, IDriverProv
         if (EyesSeleniumUtils.isMobileDevice(driver)) {
             return new FrameChain(logger);
         }
-        if (getConfigGetter().getHideScrollbars() || (getConfigGetter().getStitchMode() == StitchMode.CSS && stitchContent)) {
+        if (getConfiguration().getHideScrollbars() || (getConfiguration().getStitchMode() == StitchMode.CSS && stitchContent)) {
             FrameChain originalFC = driver.getFrameChain().clone();
             FrameChain fc = driver.getFrameChain().clone();
             Frame frame = fc.peek();
@@ -1794,7 +1794,7 @@ public class SeleniumEyes extends EyesBase implements ISeleniumEyes, IDriverProv
         if (EyesSeleniumUtils.isMobileDevice(driver)) {
             return;
         }
-        if (getConfigGetter().getHideScrollbars() || (getConfigGetter().getStitchMode() == StitchMode.CSS && stitchContent)) {
+        if (getConfiguration().getHideScrollbars() || (getConfiguration().getStitchMode() == StitchMode.CSS && stitchContent)) {
             ((EyesTargetLocator) driver.switchTo()).frames(frameChain);
             FrameChain originalFC = frameChain.clone();
             FrameChain fc = frameChain.clone();
@@ -1863,11 +1863,11 @@ public class SeleniumEyes extends EyesBase implements ISeleniumEyes, IDriverProv
         EyesWebDriverScreenshot result = null;
 
         Object activeElement = null;
-        if (getConfigGetter().getHideCaret() && !isMobileDevice) {
+        if (getConfiguration().getHideCaret() && !isMobileDevice) {
             activeElement = driver.executeScript("var activeElement = document.activeElement; activeElement && activeElement.blur(); return activeElement;");
         }
 
-        Boolean forceFullPageScreenshot = getConfigGetter().getForceFullPageScreenshot();
+        Boolean forceFullPageScreenshot = getConfiguration().getForceFullPageScreenshot();
         if (forceFullPageScreenshot == null) forceFullPageScreenshot = false;
 
         if ((this.targetElement != null || forceFullPageScreenshot || this.stitchContent) && !isMobileDevice) {
@@ -1876,7 +1876,7 @@ public class SeleniumEyes extends EyesBase implements ISeleniumEyes, IDriverProv
             result = getElementScreenshot(scaleProviderFactory, switchTo);
         }
 
-        if (getConfigGetter().getHideCaret() && activeElement != null) {
+        if (getConfiguration().getHideCaret() && activeElement != null) {
             switchTo.frames(originalFrameChain);
             driver.executeScript("arguments[0].focus();", activeElement);
         }
@@ -1965,7 +1965,7 @@ public class SeleniumEyes extends EyesBase implements ISeleniumEyes, IDriverProv
     }
 
     private long getWaitBeforeScreenshots() {
-        return getConfigGetter().getWaitBeforeScreenshots();
+        return getConfiguration().getWaitBeforeScreenshots();
     }
 
     private void markElementForLayoutRCA(PositionProvider elemPositionProvider) {
@@ -1986,11 +1986,11 @@ public class SeleniumEyes extends EyesBase implements ISeleniumEyes, IDriverProv
         ISizeAdjuster sizeAdjuster = ImageProviderFactory.getImageSizeAdjuster(userAgent, jsExecutor);
 
         return new FullPageCaptureAlgorithm(logger, regionPositionCompensation,
-                getConfigGetter().getWaitBeforeScreenshots(), debugScreenshotsProvider, screenshotFactory,
+                getConfiguration().getWaitBeforeScreenshots(), debugScreenshotsProvider, screenshotFactory,
                 originProvider,
                 scaleProviderFactory,
                 cutProviderHandler.get(),
-                getConfigGetter().getStitchOverlap(),
+                getConfiguration().getStitchOverlap(),
                 imageProvider, sizeAdjuster);
     }
 
@@ -2096,7 +2096,7 @@ public class SeleniumEyes extends EyesBase implements ISeleniumEyes, IDriverProv
         if (positionProvider == null) {
             logger.verbose("creating a new position provider.");
             if (scrollRootElement.getTagName().equalsIgnoreCase("html")) {
-                positionProvider = PositionProviderFactory.getPositionProvider(logger, configurationProvider.get().getStitchMode(), jsExecutor, scrollRootElement, userAgent);
+                positionProvider = PositionProviderFactory.getPositionProvider(logger, getConfiguration().getStitchMode(), jsExecutor, scrollRootElement, userAgent);
             } else {
                 positionProvider = new ElementPositionProvider(logger, driver, eyesScrollRootElement);
             }
@@ -2220,7 +2220,7 @@ public class SeleniumEyes extends EyesBase implements ISeleniumEyes, IDriverProv
          * @return the stitch mode
          */
         public StitchMode getStitchMode() {
-            return SeleniumEyes.this.getConfigGetter().getStitchMode();
+            return SeleniumEyes.this.getConfiguration().getStitchMode();
         }
 
         /**
@@ -2228,7 +2228,7 @@ public class SeleniumEyes extends EyesBase implements ISeleniumEyes, IDriverProv
          * @return the hide scrollbars
          */
         public boolean getHideScrollbars() {
-            return SeleniumEyes.this.getConfigGetter().getHideScrollbars();
+            return SeleniumEyes.this.getConfiguration().getHideScrollbars();
         }
 
         /**
@@ -2236,7 +2236,7 @@ public class SeleniumEyes extends EyesBase implements ISeleniumEyes, IDriverProv
          * @return the force full page screenshot
          */
         public boolean getForceFullPageScreenshot() {
-            Boolean forceFullPageScreenshot = getConfigGetter().getForceFullPageScreenshot();
+            Boolean forceFullPageScreenshot = getConfiguration().getForceFullPageScreenshot();
             if (forceFullPageScreenshot == null) return false;
             return forceFullPageScreenshot;
         }
@@ -2253,12 +2253,7 @@ public class SeleniumEyes extends EyesBase implements ISeleniumEyes, IDriverProv
     }
 
     @Override
-    public IConfigurationGetter getConfigGetter() {
-        return configurationProvider.get();
-    }
-
-    @Override
-    protected IConfigurationSetter getConfigSetter() {
-        return this.configurationProvider.set();
+    public Configuration getConfiguration() {
+        return configuration;
     }
 }

@@ -44,7 +44,7 @@ public class SafariScreenshotImageProvider extends MobileScreenshotImageProvider
         if (userAgent.getOS().equals(OSNames.IOS)) {
             image = cropIOSImage(image, originalViewportSize, logger);
         } else {
-            Boolean forceFullPageScreenshot = eyes.getConfigGetter().getForceFullPageScreenshot();
+            Boolean forceFullPageScreenshot = eyes.getConfiguration().getForceFullPageScreenshot();
             if (forceFullPageScreenshot != null && !forceFullPageScreenshot) {
 
                 Location loc;

@@ -7,7 +7,7 @@ import com.applitools.connectivity.ServerConnector;
 import com.applitools.connectivity.api.Response;
 import com.applitools.eyes.capture.AppOutputProvider;
 import com.applitools.eyes.capture.AppOutputWithScreenshot;
-import com.applitools.eyes.config.IConfigurationGetter;
+import com.applitools.eyes.config.Configuration;
 import com.applitools.eyes.fluent.*;
 import com.applitools.eyes.visualgrid.model.IGetFloatingRegionOffsets;
 import com.applitools.eyes.visualgrid.model.MutableRegion;
@@ -503,7 +503,7 @@ public class MatchWindowTask {
         ImageMatchSettings imageMatchSettings = null;
         if (checkSettingsInternal != null) {
 
-            IConfigurationGetter configGetter = eyes.getConfigGetter();
+            Configuration configGetter = eyes.getConfiguration();
             ImageMatchSettings defaultMatchSettings = configGetter.getDefaultMatchSettings();
 
             imageMatchSettings = new ImageMatchSettings(defaultMatchSettings); // clone default match settings

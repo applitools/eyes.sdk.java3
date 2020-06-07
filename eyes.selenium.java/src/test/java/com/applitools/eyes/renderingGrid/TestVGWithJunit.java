@@ -18,8 +18,6 @@ import org.openqa.selenium.WebDriver;
 import java.util.HashMap;
 import java.util.Map;
 
-//import com.applitools.eyes.visualgrid.services.EyesRunner;
-
 public class TestVGWithJunit {
     private WebDriver driver;
     private Map<String, Object> vars;

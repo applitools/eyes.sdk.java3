@@ -1,8 +1,6 @@
 package com.applitools.eyes;
 
 import com.applitools.eyes.config.Configuration;
-import com.applitools.eyes.config.IConfigurationGetter;
-import com.applitools.eyes.config.IConfigurationSetter;
 import com.applitools.eyes.fluent.ICheckSettingsInternal;
 
 public class TestEyes extends EyesBase {
@@ -19,10 +17,6 @@ public class TestEyes extends EyesBase {
     @Override
     protected String tryCaptureDom() {
         return null;
-    }
-
-    public Configuration getConfigurationGetter() {
-        return this.configuration;
     }
 
     public void setConfiguration(Configuration configuration) {
@@ -50,15 +44,9 @@ public class TestEyes extends EyesBase {
     }
 
     @Override
-    protected Configuration getConfigGetter() {
+    protected Configuration getConfiguration() {
         return configuration;
     }
-
-    @Override
-    protected Configuration getConfigSetter() {
-        return configuration;
-    }
-
 
     @Override
     protected RectangleSize getViewportSize() {
@@ -68,10 +56,6 @@ public class TestEyes extends EyesBase {
     @Override
     protected Configuration setViewportSize(RectangleSize size) {
         return this.configuration;
-    }
-
-    protected Configuration getConfiguration() {
-        return configuration;
     }
 }
 

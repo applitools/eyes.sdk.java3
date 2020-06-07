@@ -75,23 +75,11 @@ public final class TestSendDom extends ReportingTestSuite {
     }
 
 
-    class DomInterceptingEyes extends SeleniumEyes {
+    static class DomInterceptingEyes extends SeleniumEyes {
         private String domJson;
 
         public DomInterceptingEyes() {
-            super(new ISeleniumConfigurationProvider() {
-                private Configuration configuration = new Configuration();
-
-                @Override
-                public IConfigurationGetter get() {
-                    return configuration;
-                }
-
-                @Override
-                public IConfigurationSetter set() {
-                    return configuration;
-                }
-            }, new ClassicRunner());
+            super(new Configuration(), new ClassicRunner());
         }
 
         public String getDomJson() {
@@ -139,7 +127,7 @@ public final class TestSendDom extends ReportingTestSuite {
         webDriver.get("https://applitools.github.io/demo/TestPages/FramesTestPage/");
         DomInterceptingEyes eyes = new DomInterceptingEyes();
         eyes.setBatch(TestDataProvider.batchInfo);
-        eyes.getConfigSetter().setAppName("Test Send DOM").setTestName("Full Window").setViewportSize(new RectangleSize(1024, 768));
+        eyes.getConfiguration().setAppName("Test Send DOM").setTestName("Full Window").setViewportSize(new RectangleSize(1024, 768));
         EyesWebDriver eyesWebDriver = (EyesWebDriver) eyes.open(webDriver);
         try {
             eyes.check("Window", Target.window().fully());

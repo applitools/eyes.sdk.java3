@@ -32,7 +32,7 @@ import java.util.Map;
 /**
  * The type Eyes.
  */
-public class Eyes implements ISeleniumConfigurationProvider, IEyesBase {
+public class Eyes implements IEyesBase {
 
     private static final int USE_DEFAULT_MATCH_TIMEOUT = -1;
 
@@ -49,7 +49,7 @@ public class Eyes implements ISeleniumConfigurationProvider, IEyesBase {
      * Instantiates a new Eyes.
      */
     public Eyes() {
-        seleniumEyes = new SeleniumEyes(this, new ClassicRunner());
+        seleniumEyes = new SeleniumEyes(configuration, new ClassicRunner());
         activeEyes = seleniumEyes;
     }
 
@@ -61,11 +61,11 @@ public class Eyes implements ISeleniumConfigurationProvider, IEyesBase {
         this();
         this.runner = runner == null ? new ClassicRunner() : runner;
         if (this.runner instanceof VisualGridRunner) {
-            visualGridEyes = new VisualGridEyes((VisualGridRunner) this.runner, this);
+            visualGridEyes = new VisualGridEyes((VisualGridRunner) this.runner, configuration);
             activeEyes = visualGridEyes;
             isVisualGridEyes = true;
         } else {
-            seleniumEyes = new SeleniumEyes(this, (ClassicRunner) runner);
+            seleniumEyes = new SeleniumEyes(configuration, (ClassicRunner) runner);
             activeEyes = seleniumEyes;
         }
     }
@@ -1815,17 +1815,6 @@ public class Eyes implements ISeleniumConfigurationProvider, IEyesBase {
     public ServerConnector getServerConnector() {
         return this.seleniumEyes.getServerConnector();
     }
-
-    @Override
-    public IConfigurationGetter get() {
-        return configuration;
-    }
-
-    @Override
-    public IConfigurationSetter set() {
-        return configuration;
-    }
-
 
     public Configuration getConfiguration() {
         return new Configuration(configuration);

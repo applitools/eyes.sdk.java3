@@ -3,10 +3,8 @@ package com.applitools.eyes.selenium.rendering;
 import com.applitools.ICheckSettings;
 import com.applitools.eyes.*;
 import com.applitools.eyes.capture.AppOutputWithScreenshot;
-import com.applitools.eyes.config.IConfigurationSetter;
 import com.applitools.eyes.fluent.ICheckSettingsInternal;
-import com.applitools.eyes.selenium.IConfigurationGetter;
-import com.applitools.eyes.selenium.ISeleniumConfigurationProvider;
+import com.applitools.eyes.selenium.Configuration;
 import com.applitools.eyes.visualgrid.model.*;
 import com.applitools.eyes.visualgrid.services.IEyesConnector;
 import com.applitools.eyes.visualgrid.services.VisualGridTask;
@@ -17,64 +15,51 @@ import java.util.List;
 import java.util.concurrent.Future;
 
 class EyesConnector extends EyesBase implements IEyesConnector, IBatchCloser {
-
-
     private final RenderBrowserInfo browserInfo;
     private String userAgent;
     private String device;
     private RectangleSize deviceSize;
-    private IConfigurationGetter configurationGetter;
+    private Configuration configuration;
     private String appName;
     private String testName;
 
-
-    public EyesConnector(ISeleniumConfigurationProvider configProvider, List<PropertyData> properties, RenderBrowserInfo browserInfo) {
-        configurationGetter = configProvider.get();
+    public EyesConnector(Configuration configuration, List<PropertyData> properties, RenderBrowserInfo browserInfo) {
+        this.configuration = configuration;
         this.browserInfo = browserInfo;
         if (properties != null) {
             for (PropertyData property : properties) {
                 this.addProperty(property);
             }
         }
-        //this.setServerConnector(new ThrottlingServerConnector(this.serverConnector, rateLimiter));
     }
 
     /**
      * ﻿Starts a new test without setting the viewport size of the AUT.
-     * @param config
-     * @param appName
-     * @param testName
      */
-    public void open(IConfigurationGetter config, String appName, String testName) {
-        this.configurationGetter = config;
+    public void open(Configuration config, String appName, String testName) {
+        this.configuration = config;
         this.appName = appName;
         this.testName = testName;
         logger.verbose("opening EyesConnector with viewport size: " + browserInfo.getViewportSize());
         openBase();
     }
 
-    @Override
     public Future<?> getResource(URI url, String userAgent, String refererUrl, TaskListener<RGridResource> listener) {
         return this.serverConnector.downloadResource(url, userAgent, refererUrl, listener);
     }
 
-    @Override
     public Future<?> renderPutResource(RunningRender runningRender, RGridResource resource, String userAgent, TaskListener<Boolean> listener) {
         return this.serverConnector.renderPutResource(runningRender, resource, userAgent, listener);
     }
 
-
-    @Override
     public List<RunningRender> render(RenderRequest... renderRequests) {
         return this.serverConnector.render(renderRequests);
     }
 
-    @Override
     public List<RenderStatusResults> renderStatusById(String... renderIds) {
         return this.serverConnector.renderStatusById(renderIds);
     }
 
-    @Override
     public MatchResult matchWindow(String resultImageURL, String domLocation, ICheckSettings checkSettings,
                                    List<? extends IRegion> regions, List<VisualGridSelector[]> regionSelectors, Location location,
                                    String renderId, String source) {
@@ -85,7 +70,7 @@ class EyesConnector extends EyesBase implements IEyesConnector, IBatchCloser {
         }
 
 
-        MatchWindowTask matchWindowTask = new MatchWindowTask(this.logger, this.serverConnector, this.runningSession, getConfigGetter().getMatchTimeout(), this);
+        MatchWindowTask matchWindowTask = new MatchWindowTask(this.logger, this.serverConnector, this.runningSession, getConfiguration().getMatchTimeout(), this);
 
         ImageMatchSettings imageMatchSettings = MatchWindowTask.createImageMatchSettings(checkSettingsInternal, this);
 
@@ -109,50 +94,37 @@ class EyesConnector extends EyesBase implements IEyesConnector, IBatchCloser {
         openBase(appName, testName, dimensions, null);
     }
 
-    @Override
     protected String getBaseAgentId() {
         return "eyes.selenium.visualgrid.java/" + ClassVersionGetter.CURRENT_VERSION;
     }
 
-    @Override
     protected RectangleSize getViewportSize() {
         return null;
     }
 
-    @Override
-    protected IConfigurationSetter setViewportSize(RectangleSize size) {
+    protected Configuration setViewportSize(RectangleSize size) {
         logger.log("WARNING setViewportSize() was called in Visual-Grid context");
-        return getConfigSetter();
+        return getConfiguration();
     }
 
-    @Override
     protected String getInferredEnvironment() {
         return "useragent:" + userAgent;
     }
 
-    @Override
     protected EyesScreenshot getScreenshot(ICheckSettingsInternal checkSettingsInternal) {
         return null;
     }
 
-    @Override
     protected String getTitle() {
         return null;
     }
 
-    @Override
     protected String getAUTSessionId() {
         return null;
     }
 
-    @Override
-    protected com.applitools.eyes.config.IConfigurationGetter getConfigGetter() {
-        return configurationGetter;
-    }
-
-    @Override
-    protected IConfigurationSetter getConfigSetter() {
-        return (IConfigurationSetter) configurationGetter;
+    protected Configuration getConfiguration() {
+        return configuration;
     }
 
     public void setRenderInfo(RenderingInfo renderInfo) {
@@ -160,47 +132,38 @@ class EyesConnector extends EyesBase implements IEyesConnector, IBatchCloser {
         this.serverConnector.setRenderingInfo(renderInfo);
     }
 
-    @Override
     public void setUserAgent(String userAgent) {
         this.userAgent = userAgent;
     }
 
-    @Override
     protected void openLogger() {
         // do nothing.
     }
 
-    @Override
     protected void closeLogger() {
         // do nothing.
     }
 
-    @Override
     public String tryCaptureDom() {
         return null;
     }
 
-    @Override
-    public IConfigurationSetter setApiKey(String apiKey) {
+    public com.applitools.eyes.config.Configuration setApiKey(String apiKey) {
         return super.setApiKey(apiKey);
     }
 
-    @Override
-    public IConfigurationSetter setServerUrl(URI serverUrl) {
+    public com.applitools.eyes.config.Configuration setServerUrl(URI serverUrl) {
         return super.setServerUrl(serverUrl);
     }
 
-    @Override
     public void setBranchName(String branchName) {
-        getConfigSetter().setBranchName(branchName);
+        getConfiguration().setBranchName(branchName);
     }
 
-    @Override
     public void setParentBranchName(String parentBranchName) {
-        getConfigSetter().setParentBranchName(parentBranchName);
+        getConfiguration().setParentBranchName(parentBranchName);
     }
 
-    @Override
     public void setDevice(String device) {
         this.device = device;
     }
@@ -210,7 +173,7 @@ class EyesConnector extends EyesBase implements IEyesConnector, IBatchCloser {
      * <p>
      * This override also checks for mobile operating system.
      */
-    @Override
+
     protected AppEnvironment getAppEnvironment() {
         AppEnvironment appEnv = super.getAppEnvironment();
         appEnv.setDeviceInfo(device);
@@ -223,22 +186,18 @@ class EyesConnector extends EyesBase implements IEyesConnector, IBatchCloser {
         return appEnv;
     }
 
-    @Override
     public RectangleSize getDeviceSize() {
         return deviceSize;
     }
 
-    @Override
     public void setDeviceSize(RectangleSize deviceSize) {
         this.deviceSize = deviceSize;
     }
 
-    @Override
     public RunningSession getSession() {
         return this.runningSession;
     }
 
-    @Override
     protected RectangleSize getViewportSizeForOpen() {
         if (device != null) {
             return deviceSize;
@@ -254,26 +213,22 @@ class EyesConnector extends EyesBase implements IEyesConnector, IBatchCloser {
         return super.getViewportSizeForOpen();
     }
 
-    @Override
     protected String getBaselineEnvName() {
         String baselineEnvName = this.browserInfo.getBaselineEnvName();
         if (baselineEnvName != null) {
             return baselineEnvName;
         }
-        return getConfigGetter().getBaselineEnvName();
+        return getConfiguration().getBaselineEnvName();
     }
 
-    @Override
     protected String getAppName() {
         return this.appName;
     }
 
-    @Override
     protected String getTestName() {
         return this.testName;
     }
 
-    @Override
     public void closeBatch(String batchId) {
         this.serverConnector.closeBatch(batchId);
     }
