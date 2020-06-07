@@ -56,7 +56,7 @@ public class VisualGridEyes implements ISeleniumEyes, IRenderingEyes {
     private Set<Future<TestResultContainer>> closeFuturesSet = new HashSet<>();
     private Boolean isDisabled = Boolean.FALSE;
     private ServerConnector serverConnector = null;
-    private SeleniumConfigurationProvider configurationProvider;
+    private final SeleniumConfigurationProvider configurationProvider;
     private UserAgent userAgent = null;
     private RectangleSize viewportSize;
     private AtomicBoolean isCheckTimerTimedOut = new AtomicBoolean(false);
@@ -195,7 +195,7 @@ public class VisualGridEyes implements ISeleniumEyes, IRenderingEyes {
 
         for (RenderBrowserInfo browserInfo : browserInfoList) {
             logger.verbose("creating test descriptor");
-            RunningTest test = new RunningTest(createVGEyesConnector(browserInfo), getConfiguration(), browserInfo, logger, testListener);
+            RunningTest test = new RunningTest(createVGEyesConnector(browserInfo), configurationProvider, browserInfo, logger, testListener);
             this.testList.add(test);
         }
 
