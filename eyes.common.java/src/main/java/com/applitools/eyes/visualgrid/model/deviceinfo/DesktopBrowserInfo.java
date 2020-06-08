@@ -3,7 +3,7 @@ package com.applitools.eyes.visualgrid.model.deviceinfo;
 import com.applitools.eyes.RectangleSize;
 import com.applitools.eyes.selenium.BrowserType;
 
-public class DesktopBrowserInfo implements BrowserInfo {
+public class DesktopBrowserInfo implements IRenderingBrowserInfo {
 
     private RectangleSize viewportSize;
     private BrowserType browserType;

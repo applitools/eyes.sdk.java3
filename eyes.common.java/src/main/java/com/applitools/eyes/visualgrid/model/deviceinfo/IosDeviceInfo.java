@@ -2,7 +2,7 @@ package com.applitools.eyes.visualgrid.model.deviceinfo;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-public class IosDeviceInfo implements BrowserInfo {
+public class IosDeviceInfo implements IRenderingBrowserInfo {
 
     @JsonProperty("name")
     private final IosDeviceName deviceName;

@@ -13,7 +13,7 @@ public interface IConfigurationSetter extends com.applitools.eyes.config.IConfig
 
     IConfigurationSetter setHideCaret(boolean hideCaret);
 
-    IConfigurationSetter addBrowsers(BrowserInfo... browserInfos);
+    IConfigurationSetter addBrowsers(IRenderingBrowserInfo... browserInfos);
 
     IConfigurationSetter addBrowser(DesktopBrowserInfo browserInfo);
 

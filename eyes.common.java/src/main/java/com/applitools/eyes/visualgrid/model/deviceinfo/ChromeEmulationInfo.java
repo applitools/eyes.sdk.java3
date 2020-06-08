@@ -1,6 +1,6 @@
 package com.applitools.eyes.visualgrid.model.deviceinfo;
 
-public class ChromeEmulationInfo extends EmulationBaseInfo implements BrowserInfo {
+public class ChromeEmulationInfo extends EmulationBaseInfo implements IRenderingBrowserInfo {
 
     private DeviceName deviceName;
 
