@@ -6,7 +6,7 @@ import com.applitools.eyes.*;
 import com.applitools.eyes.exceptions.DiffsFoundException;
 import com.applitools.eyes.selenium.IConfigurationGetter;
 import com.applitools.eyes.visualgrid.model.*;
-import com.applitools.eyes.visualgrid.model.deviceinfo.DesktopBrowserInfo;
+import com.applitools.eyes.visualgrid.model.DesktopBrowserInfo;
 import com.applitools.utils.ArgumentGuard;
 import com.applitools.utils.GeneralUtils;
 

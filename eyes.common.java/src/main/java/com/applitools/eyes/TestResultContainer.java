@@ -1,6 +1,6 @@
 package com.applitools.eyes;
 
-import com.applitools.eyes.visualgrid.model.deviceinfo.DesktopBrowserInfo;
+import com.applitools.eyes.visualgrid.model.DesktopBrowserInfo;
 
 public class TestResultContainer {
 

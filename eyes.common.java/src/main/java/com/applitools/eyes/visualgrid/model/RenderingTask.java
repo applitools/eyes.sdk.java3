@@ -5,7 +5,6 @@ import com.applitools.ICheckSettingsInternal;
 import com.applitools.eyes.Logger;
 import com.applitools.eyes.TaskListener;
 import com.applitools.eyes.UserAgent;
-import com.applitools.eyes.visualgrid.model.deviceinfo.DesktopBrowserInfo;
 import com.applitools.eyes.visualgrid.services.IEyesConnector;
 import com.applitools.eyes.visualgrid.services.VisualGridRunner;
 import com.applitools.eyes.visualgrid.services.VisualGridTask;

@@ -5,7 +5,7 @@ import com.applitools.eyes.TestResultsSummary;
 import com.applitools.eyes.selenium.fluent.Target;
 import com.applitools.eyes.utils.SeleniumUtils;
 import com.applitools.eyes.utils.TestUtils;
-import com.applitools.eyes.visualgrid.model.deviceinfo.DesktopBrowserInfo;
+import com.applitools.eyes.visualgrid.model.DesktopBrowserInfo;
 import com.applitools.eyes.visualgrid.services.VisualGridRunner;
 import org.openqa.selenium.WebDriver;
 import org.testng.Assert;

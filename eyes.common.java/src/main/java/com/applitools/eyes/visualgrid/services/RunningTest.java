@@ -6,7 +6,7 @@ import com.applitools.eyes.IBatchCloser;
 import com.applitools.eyes.Logger;
 import com.applitools.eyes.selenium.Configuration;
 import com.applitools.eyes.selenium.ISeleniumConfigurationProvider;
-import com.applitools.eyes.visualgrid.model.deviceinfo.DesktopBrowserInfo;
+import com.applitools.eyes.visualgrid.model.DesktopBrowserInfo;
 import com.applitools.eyes.visualgrid.model.RenderingTask;
 import com.applitools.eyes.TestResultContainer;
 import com.applitools.eyes.visualgrid.model.VisualGridSelector;

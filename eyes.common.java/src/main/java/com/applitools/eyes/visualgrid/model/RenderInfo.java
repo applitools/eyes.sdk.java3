@@ -1,9 +1,6 @@
 package com.applitools.eyes.visualgrid.model;
 
 import com.applitools.eyes.Region;
-import com.applitools.eyes.visualgrid.model.deviceinfo.ChromeEmulationInfo;
-import com.applitools.eyes.visualgrid.model.deviceinfo.EmulationBaseInfo;
-import com.applitools.eyes.visualgrid.model.deviceinfo.IosDeviceInfo;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 

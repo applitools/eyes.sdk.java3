@@ -4,7 +4,7 @@ import com.applitools.eyes.Logger;
 import com.applitools.eyes.selenium.Configuration;
 import com.applitools.eyes.selenium.rendering.VisualGridEyes;
 import com.applitools.eyes.utils.TestUtils;
-import com.applitools.eyes.visualgrid.model.deviceinfo.DesktopBrowserInfo;
+import com.applitools.eyes.visualgrid.model.DesktopBrowserInfo;
 import com.applitools.eyes.visualgrid.services.RunningTest;
 import com.applitools.eyes.visualgrid.services.VisualGridTask;
 import org.testng.Assert;

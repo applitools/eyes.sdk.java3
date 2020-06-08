@@ -2,7 +2,7 @@ package com.applitools.eyes.selenium;
 
 import com.applitools.eyes.ImageMatchSettings;
 import com.applitools.eyes.RectangleSize;
-import com.applitools.eyes.visualgrid.model.deviceinfo.*;
+import com.applitools.eyes.visualgrid.model.*;
 
 import java.util.ArrayList;
 import java.util.Collections;

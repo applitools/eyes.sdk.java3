@@ -105,16 +105,8 @@ public class RenderRequest {
         this.renderInfo = renderInfo;
     }
 
-    public String getPlatform() {
-        return platform;
-    }
-
     public void setPlatform(String platform) {
         this.platform = platform;
-    }
-
-    public BrowserType getBrowserName() {
-        return browserName;
     }
 
     public void setBrowserName(BrowserType browserName) {
@@ -147,7 +139,7 @@ public class RenderRequest {
 
     @JsonProperty("browser")
     @JsonInclude(JsonInclude.Include.NON_NULL)
-    public Map<String, Object> Browser() {
+    public Map<String, Object> getBrowser() {
         Map<String, Object> map = new HashMap<>();
         map.put("name", this.browserName);
         return map;
@@ -155,7 +147,7 @@ public class RenderRequest {
 
     @JsonProperty("platform")
     @JsonInclude(JsonInclude.Include.NON_NULL)
-    public Map<String, Object> Platform() {
+    public Map<String, Object> getPlatform() {
         Map<String, Object> map = new HashMap<>();
         map.put("name", this.platform);
         return map;

@@ -1,7 +1,7 @@
 package com.applitools.eyes.selenium;
 
 import com.applitools.eyes.config.Configuration;
-import com.applitools.eyes.visualgrid.model.deviceinfo.DesktopBrowserInfo;
+import com.applitools.eyes.visualgrid.model.DesktopBrowserInfo;
 
 import java.util.List;
 

@@ -1,4 +1,4 @@
-package com.applitools.eyes.visualgrid.model.deviceinfo;
+package com.applitools.eyes.visualgrid.model;
 
 import com.fasterxml.jackson.annotation.JsonValue;
 

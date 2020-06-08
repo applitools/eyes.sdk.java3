@@ -1,6 +1,6 @@
 package com.applitools.eyes.selenium;
 
-import com.applitools.eyes.visualgrid.model.deviceinfo.*;
+import com.applitools.eyes.visualgrid.model.*;
 
 import java.util.List;
 
