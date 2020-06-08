@@ -70,8 +70,8 @@ public class Eyes implements ISeleniumConfigurationProvider, IEyesBase {
         }
     }
 
-    public void initLocatorProvider(RemoteWebDriver webDriver) {
-        EyesWebDriver driver = new EyesWebDriver(getLogger(), null, webDriver);
+    private void initLocatorProvider(WebDriver webDriver) {
+        EyesWebDriver driver = new EyesWebDriver(getLogger(), null, (RemoteWebDriver) webDriver);
         visualLocatorProvider = new SeleniumVisualLocatorProvider(
                 seleniumEyes,
                 driver,
@@ -89,6 +89,8 @@ public class Eyes implements ISeleniumConfigurationProvider, IEyesBase {
             configuration.setIsVisualGrid(true);
             seleniumEyes.open(webDriver);
         }
+
+        initLocatorProvider(webDriver);
         return activeEyes.open(webDriver);
     }
 
@@ -104,6 +106,8 @@ public class Eyes implements ISeleniumConfigurationProvider, IEyesBase {
             configuration.setIsVisualGrid(true);
             seleniumEyes.open(driver);
         }
+
+        initLocatorProvider(driver);
         return activeEyes.open(driver, appName, testName, null);
     }
 
@@ -121,6 +125,8 @@ public class Eyes implements ISeleniumConfigurationProvider, IEyesBase {
             configuration.setIsVisualGrid(true);
             seleniumEyes.open(driver);
         }
+
+        initLocatorProvider(driver);
         return activeEyes.open(driver, appName, testName, viewportSize);
     }
 

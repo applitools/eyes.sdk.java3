@@ -16,6 +16,7 @@ import com.applitools.eyes.visualgrid.model.RenderingInfo;
 import com.applitools.utils.ArgumentGuard;
 import com.applitools.utils.GeneralUtils;
 import com.applitools.utils.ImageUtils;
+import com.sun.org.apache.xerces.internal.impl.dtd.DTDGrammar;
 
 import java.awt.image.BufferedImage;
 import java.io.IOException;
@@ -41,7 +42,12 @@ public class SeleniumVisualLocatorProvider implements VisualLocatorProvider {
     }
 
     private BufferedImage getViewPortScreenshot() {
-        UserAgent userAgent = UserAgent.parseUserAgentString(driver.getUserAgent());
+        String uaString = driver.getUserAgent();
+        UserAgent userAgent = null;
+        if (uaString != null) {
+            userAgent = UserAgent.parseUserAgentString(uaString, true);
+        }
+        UserAgent.parseUserAgentString(uaString, true);
         ImageProvider provider = ImageProviderFactory.getImageProvider(userAgent, eyes, logger, driver);
         BufferedImage image = provider.getImage();
         return ImageUtils.scaleImage(image, 1 / eyes.getDevicePixelRatio());

@@ -36,7 +36,6 @@ public class TestVisualLocators extends ReportingTestSuite {
         RemoteWebDriver driver = SeleniumUtils.createChromeDriver();
         driver.get("https://applitools.github.io/demo/TestPages/FramesTestPage/");
         try {
-            eyes.initLocatorProvider(driver);
             eyes.open(driver, "Applitools Eyes SDK", "testVisualLocators" + suffix);
             Map<String, List<Region>> result = eyes.locate(VisualLocator.name("applitools_title"));
             eyes.closeAsync();
