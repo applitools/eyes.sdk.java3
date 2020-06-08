@@ -183,7 +183,7 @@ public class TestRenderings {
         Eyes eyes = new Eyes(runner);
         Configuration conf = eyes.getConfiguration();
         conf.addBrowser(new IosDeviceInfo(IosDeviceName.iPhone_XR, IosScreenOrientation.LANDSCAPE_LEFT));
-        conf.setSaveFailedTests(false);
+        conf.setSaveDiffs(false);
         eyes.setConfiguration(conf);
         eyes.setLogHandler(new StdoutLogHandler());
         ChromeDriver driver = SeleniumUtils.createChromeDriver();
