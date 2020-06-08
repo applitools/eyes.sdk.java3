@@ -302,4 +302,16 @@
             </class>
         </classes>
     </test>
+    <test name="TestRenderings" parallel="methods">
+        <classes>
+            <class name="com.applitools.eyes.renderingGrid.TestRenderings">
+                <methods>
+                    <include name="TestMobileOnly"/>
+                    <include name="testRenderingIosSimulator"/>
+                    <include name="testRenderingMultipleBrowsers"/>
+                    <include name="TestSpecialRendering"/>
+                </methods>
+            </class>
+        </classes>
+    </test>
 </suite>
