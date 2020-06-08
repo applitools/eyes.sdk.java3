@@ -426,6 +426,9 @@ public class VisualGridEyes implements ISeleniumEyes, IRenderingEyes {
                 logger.verbose("is current running test closed: " + runningTest.isTestClose());
                 logger.verbose("closing current running test");
                 FutureTask<TestResultContainer> closeFuture = runningTest.close();
+                if (closeFuture == null) {
+                    continue;
+                }
                 futureList.addAll(Collections.singleton(closeFuture));
                 logger.verbose("adding closeFuture to futureList");
             }

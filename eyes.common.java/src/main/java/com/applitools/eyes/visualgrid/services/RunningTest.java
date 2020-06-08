@@ -253,6 +253,8 @@ public class RunningTest {
                 logger.verbose("returning future of close task");
                 return taskToFutureMapping.get(closeTask);
             }
+
+            return null;
         }
 
         logger.verbose("adding close visualGridTask...");
