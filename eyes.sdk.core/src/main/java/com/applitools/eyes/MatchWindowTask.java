@@ -4,6 +4,7 @@
 package com.applitools.eyes;
 
 import com.applitools.connectivity.ServerConnector;
+import com.applitools.connectivity.api.Response;
 import com.applitools.eyes.capture.AppOutputProvider;
 import com.applitools.eyes.capture.AppOutputWithScreenshot;
 import com.applitools.eyes.config.IConfigurationGetter;
@@ -194,7 +195,9 @@ public class MatchWindowTask {
                 int wait = 500;
                 while (retriesLeft-- > 0) {
                     try {
-                        int statusCode = serverConnector.uploadData(bytes, renderingInfo, targetUrl, contentType, mediaType);
+                        Response response = serverConnector.uploadData(bytes, renderingInfo, targetUrl, contentType, mediaType);
+                        int statusCode = response.getStatusCode();
+                        response.close();
                         if (statusCode == 200 || statusCode == 201) {
                             logger.verbose("upload " + mediaType + " guid " + uuid + "complete.");
                             return targetUrl;

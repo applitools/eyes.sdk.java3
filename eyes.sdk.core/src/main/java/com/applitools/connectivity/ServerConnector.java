@@ -276,7 +276,7 @@ public class ServerConnector extends RestClient implements IServerConnector {
         }
     }
 
-    public int uploadData(byte[] bytes, RenderingInfo renderingInfo, final String targetUrl, String contentType, final String mediaType) {
+    public Response uploadData(byte[] bytes, RenderingInfo renderingInfo, final String targetUrl, String contentType, final String mediaType) {
         Request request = makeEyesRequest(new HttpRequestBuilder() {
             @Override
             public Request build() {
@@ -285,11 +285,7 @@ public class ServerConnector extends RestClient implements IServerConnector {
         });
         request = request.header("X-Auth-Token", renderingInfo.getAccessToken())
                 .header("x-ms-blob-type", "BlockBlob");
-        Response response = request.method(HttpMethod.PUT, bytes, contentType);
-        int statusCode = response.getStatusCode();
-        response.close();
-        logger.verbose("Upload Status Code: " + statusCode);
-        return statusCode;
+        return request.method(HttpMethod.PUT, bytes, contentType);
     }
 
     public void downloadString(final URL uri, final TaskListener<String> listener) {
@@ -613,6 +609,41 @@ public class ServerConnector extends RestClient implements IServerConnector {
             }
         } catch (Exception e) {
             GeneralUtils.logExceptionStackTrace(logger, e);
+        }
+        return null;
+    }
+
+    public String postViewportImage(byte[] bytes) {
+        String targetUrl;
+        RenderingInfo renderingInfo = getRenderInfo();
+        if (renderingInfo != null && (targetUrl = renderingInfo.getResultsUrl()) != null) {
+            try {
+                UUID uuid = UUID.randomUUID();
+                targetUrl = targetUrl.replace("__random__", uuid.toString());
+                logger.verbose("uploading viewport image to " + targetUrl);
+
+                for (int i = 0; i < ServerConnector.MAX_CONNECTION_RETRIES; i++) {
+                    Response response = uploadData(bytes, renderingInfo, targetUrl, "image/png", "image/png");
+                    int statusCode = response.getStatusCode();
+                    if (statusCode == HttpStatus.SC_OK || statusCode == HttpStatus.SC_CREATED) {
+                        return targetUrl;
+                    }
+
+                    String body = response.readEntity(String.class);
+                    String errorMessage = String.format("Status: %d %s. Response Body: %s",
+                            statusCode, response.getStatusPhrase(), body);
+
+                    if (statusCode < 500) {
+                        throw new IOException(String.format("Failed uploading image. %s", errorMessage));
+                    }
+
+                    logger.log(String.format("Failed uploading image, retrying. %s", errorMessage));
+                    Thread.sleep(200);
+                }
+            } catch (Exception e) {
+                logger.log("Error uploading viewport image");
+                GeneralUtils.logExceptionStackTrace(logger, e);
+            }
         }
         return null;
     }

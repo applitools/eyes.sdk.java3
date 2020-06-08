@@ -6,13 +6,13 @@ import com.applitools.eyes.*;
 import com.applitools.eyes.debug.DebugScreenshotsProvider;
 import com.applitools.eyes.events.ISessionEventHandler;
 import com.applitools.eyes.exceptions.TestFailedException;
-import com.applitools.eyes.locators.VisualLocatorProvider;
+import com.applitools.eyes.locators.VisualLocatorsProvider;
 import com.applitools.eyes.locators.VisualLocatorSettings;
 import com.applitools.eyes.positioning.PositionProvider;
 import com.applitools.eyes.selenium.fluent.SeleniumCheckSettings;
 import com.applitools.eyes.selenium.fluent.Target;
 import com.applitools.eyes.selenium.frames.FrameChain;
-import com.applitools.eyes.selenium.locators.SeleniumVisualLocatorProvider;
+import com.applitools.eyes.selenium.locators.SeleniumVisualLocatorsProvider;
 import com.applitools.eyes.selenium.positioning.ImageRotation;
 import com.applitools.eyes.selenium.rendering.VisualGridEyes;
 import com.applitools.eyes.selenium.wrappers.EyesWebDriver;
@@ -43,7 +43,7 @@ public class Eyes implements ISeleniumConfigurationProvider, IEyesBase {
     private EyesRunner runner = null;
     private Configuration configuration = new Configuration();
     private ImageRotation rotation;
-    VisualLocatorProvider visualLocatorProvider;
+    VisualLocatorsProvider visualLocatorsProvider;
 
     /**
      * Instantiates a new Eyes.
@@ -72,7 +72,7 @@ public class Eyes implements ISeleniumConfigurationProvider, IEyesBase {
 
     private void initLocatorProvider(WebDriver webDriver) {
         EyesWebDriver driver = new EyesWebDriver(getLogger(), null, (RemoteWebDriver) webDriver);
-        visualLocatorProvider = new SeleniumVisualLocatorProvider(
+        visualLocatorsProvider = new SeleniumVisualLocatorsProvider(
                 seleniumEyes,
                 driver,
                 getLogger(),
@@ -1859,6 +1859,6 @@ public class Eyes implements ISeleniumConfigurationProvider, IEyesBase {
 
     public Map<String, List<Region>> locate(VisualLocatorSettings visualLocatorSettings) {
         ArgumentGuard.notNull(visualLocatorSettings, "visualLocatorSettings");
-        return visualLocatorProvider.getLocators(visualLocatorSettings);
+        return visualLocatorsProvider.getLocators(visualLocatorSettings);
     }
 }

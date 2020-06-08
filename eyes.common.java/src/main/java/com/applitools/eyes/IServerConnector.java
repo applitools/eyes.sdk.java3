@@ -1,5 +1,6 @@
 package com.applitools.eyes;
 
+import com.applitools.connectivity.api.Response;
 import com.applitools.eyes.visualgrid.model.*;
 
 import java.net.URI;
@@ -172,5 +173,5 @@ public interface IServerConnector {
 
     boolean getDontCloseBatches();
 
-    int uploadData(byte[] bytes, RenderingInfo renderingInfo, String targetUrl, String contentType, String mediaType);
+    Response uploadData(byte[] bytes, RenderingInfo renderingInfo, String targetUrl, String contentType, String mediaType);
 }

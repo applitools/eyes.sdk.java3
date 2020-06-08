@@ -5,6 +5,6 @@ import com.applitools.eyes.Region;
 import java.util.List;
 import java.util.Map;
 
-public interface VisualLocatorProvider {
+public interface VisualLocatorsProvider {
     Map<String, List<Region>> getLocators(VisualLocatorSettings visualLocatorSettings);
 }

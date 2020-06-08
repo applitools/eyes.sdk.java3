@@ -6,26 +6,21 @@ import com.applitools.eyes.Region;
 import com.applitools.eyes.UserAgent;
 import com.applitools.eyes.capture.ImageProvider;
 import com.applitools.eyes.debug.DebugScreenshotsProvider;
-import com.applitools.eyes.locators.VisualLocatorProvider;
 import com.applitools.eyes.locators.VisualLocatorSettings;
 import com.applitools.eyes.locators.VisualLocatorsData;
+import com.applitools.eyes.locators.VisualLocatorsProvider;
 import com.applitools.eyes.selenium.SeleniumEyes;
 import com.applitools.eyes.selenium.capture.ImageProviderFactory;
 import com.applitools.eyes.selenium.wrappers.EyesWebDriver;
-import com.applitools.eyes.visualgrid.model.RenderingInfo;
 import com.applitools.utils.ArgumentGuard;
-import com.applitools.utils.GeneralUtils;
 import com.applitools.utils.ImageUtils;
-import com.sun.org.apache.xerces.internal.impl.dtd.DTDGrammar;
 
 import java.awt.image.BufferedImage;
-import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
-import java.util.UUID;
 
-public class SeleniumVisualLocatorProvider implements VisualLocatorProvider {
+public class SeleniumVisualLocatorsProvider implements VisualLocatorsProvider {
 
     protected Logger logger;
     private final ServerConnector serverConnector;
@@ -33,7 +28,7 @@ public class SeleniumVisualLocatorProvider implements VisualLocatorProvider {
     private final  EyesWebDriver driver;
     private final DebugScreenshotsProvider debugScreenshotsProvider;
 
-    public SeleniumVisualLocatorProvider(SeleniumEyes eyes, EyesWebDriver driver, Logger logger, DebugScreenshotsProvider debugScreenshotsProvider) {
+    public SeleniumVisualLocatorsProvider(SeleniumEyes eyes, EyesWebDriver driver, Logger logger, DebugScreenshotsProvider debugScreenshotsProvider) {
         this.driver = driver;
         this.eyes = eyes;
         this.serverConnector = eyes.getServerConnector();
@@ -67,7 +62,7 @@ public class SeleniumVisualLocatorProvider implements VisualLocatorProvider {
         byte[] image = ImageUtils.encodeAsPng(viewPortScreenshot);
 
         logger.verbose("Post visual locators screenshot...");
-        String viewportScreenshotUrl = postViewportImage(image);
+        String viewportScreenshotUrl = serverConnector.postViewportImage(image);
 
         logger.verbose("Screenshot URL: " + viewportScreenshotUrl);
 
@@ -75,32 +70,5 @@ public class SeleniumVisualLocatorProvider implements VisualLocatorProvider {
 
         logger.verbose("Post visual locators: " + data.toString());
         return serverConnector.postLocators(data);
-    }
-
-    private String postViewportImage(byte[] bytes) {
-        String targetUrl;
-        RenderingInfo renderingInfo = serverConnector.getRenderInfo();
-        if (renderingInfo != null && (targetUrl = renderingInfo.getResultsUrl()) != null) {
-            try {
-                UUID uuid = UUID.randomUUID();
-                targetUrl = targetUrl.replace("__random__", uuid.toString());
-                logger.verbose("uploading viewport image to " + targetUrl);
-
-                for (int i = 0; i < ServerConnector.MAX_CONNECTION_RETRIES; i++) {
-                    int statusCode = serverConnector.uploadData(bytes, renderingInfo, targetUrl, "image/png", "image/png");
-                    if (statusCode == 200 || statusCode == 201) {
-                        return targetUrl;
-                    }
-                    if (statusCode < 500) {
-                        throw new IOException(String.format("Failed uploading image. Status code %d", statusCode));
-                    }
-                    Thread.sleep(1000);
-                }
-            } catch (Exception e) {
-                logger.log("Error uploading viewport image");
-                GeneralUtils.logExceptionStackTrace(logger, e);
-            }
-        }
-        return null;
     }
 }
