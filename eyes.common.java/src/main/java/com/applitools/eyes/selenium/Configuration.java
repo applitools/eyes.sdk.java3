@@ -134,21 +134,21 @@ public class Configuration extends com.applitools.eyes.config.Configuration impl
     }
 
     @Override
-    public IConfigurationSetter addBrowser(DesktopBrowserInfo browserInfo) {
-        this.browsersInfo.add(browserInfo);
-        return this;
-    }
-
-    @Override
-    public IConfigurationSetter addBrowser(ChromeEmulationInfo browserInfo) {
-        DesktopBrowserInfo desktopBrowserInfo = new DesktopBrowserInfo(browserInfo);
+    public IConfigurationSetter addBrowser(DesktopBrowserInfo desktopBrowserInfo) {
         this.browsersInfo.add(desktopBrowserInfo);
         return this;
     }
 
     @Override
-    public IConfigurationSetter addBrowser(IosDeviceInfo browserInfo) {
-        DesktopBrowserInfo desktopBrowserInfo = new DesktopBrowserInfo(browserInfo);
+    public IConfigurationSetter addBrowser(ChromeEmulationInfo chromeEmulationInfo) {
+        DesktopBrowserInfo desktopBrowserInfo = new DesktopBrowserInfo(chromeEmulationInfo);
+        this.browsersInfo.add(desktopBrowserInfo);
+        return this;
+    }
+
+    @Override
+    public IConfigurationSetter addBrowser(IosDeviceInfo iosDeviceInfo) {
+        DesktopBrowserInfo desktopBrowserInfo = new DesktopBrowserInfo(iosDeviceInfo);
 
         this.browsersInfo.add(desktopBrowserInfo);
         return this;

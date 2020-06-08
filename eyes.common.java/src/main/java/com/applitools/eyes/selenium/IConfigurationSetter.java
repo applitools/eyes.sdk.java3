@@ -15,11 +15,11 @@ public interface IConfigurationSetter extends com.applitools.eyes.config.IConfig
 
     IConfigurationSetter addBrowsers(IRenderingBrowserInfo... browserInfos);
 
-    IConfigurationSetter addBrowser(DesktopBrowserInfo browserInfo);
+    IConfigurationSetter addBrowser(DesktopBrowserInfo desktopBrowserInfo);
 
-    IConfigurationSetter addBrowser(ChromeEmulationInfo browserInfo);
+    IConfigurationSetter addBrowser(ChromeEmulationInfo chromeEmulationInfo);
 
-    IConfigurationSetter addBrowser(IosDeviceInfo browserInfo);
+    IConfigurationSetter addBrowser(IosDeviceInfo iosDeviceInfo);
 
     IConfigurationSetter addBrowser(int width, int height, BrowserType browserType, String baselineEnvName);
 
