@@ -629,7 +629,7 @@ public class ServerConnector extends RestClient implements IServerConnector {
                         return targetUrl;
                     }
 
-                    String body = response.readEntity(String.class);
+                    String body = response.getBodyString();
                     String errorMessage = String.format("Status: %d %s. Response Body: %s",
                             statusCode, response.getStatusPhrase(), body);
 
