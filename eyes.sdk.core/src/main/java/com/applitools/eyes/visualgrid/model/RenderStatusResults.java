@@ -1,8 +1,6 @@
 package com.applitools.eyes.visualgrid.model;
 
-import com.applitools.eyes.IRegion;
 import com.applitools.eyes.RectangleSize;
-import com.applitools.eyes.Region;
 
 import java.util.List;
 

@@ -26,7 +26,7 @@ import java.net.URL;
 import java.util.*;
 import java.util.concurrent.Future;
 
-public class ServerConnector extends RestClient implements IServerConnector {
+public class ServerConnector extends RestClient {
 
     public static final int DEFAULT_CLIENT_TIMEOUT = 1000 * 60 * 5; // 5 minutes
     public static final int MAX_CONNECTION_RETRIES = 3;

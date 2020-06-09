@@ -1,7 +1,6 @@
 package com.applitools.eyes;
 
 import com.applitools.eyes.exceptions.NotSupportedException;
-import com.applitools.utils.ArgumentGuard;
 
 import java.util.*;
 import java.util.regex.Matcher;

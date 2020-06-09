@@ -1,6 +1,5 @@
 package com.applitools.eyes.visualgrid.model;
 
-import java.net.URL;
 import java.util.List;
 
 public class FrameData
