@@ -204,6 +204,7 @@ public class TestRenderings {
         Eyes eyes = new Eyes(runner);
         Configuration conf = eyes.getConfiguration();
         conf.addBrowser(new IosDeviceInfo(IosDeviceName.iPhone_7));
+        conf.addBrowser(new ChromeEmulationInfo(DeviceName.iPhone_4, ScreenOrientation.LANDSCAPE));
         conf.addBrowser(new DesktopBrowserInfo(new RectangleSize(800, 800), BrowserType.SAFARI));
         eyes.setConfiguration(conf);
         eyes.setLogHandler(new StdoutLogHandler());
