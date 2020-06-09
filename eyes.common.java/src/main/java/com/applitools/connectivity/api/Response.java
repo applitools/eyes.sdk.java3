@@ -38,7 +38,7 @@ public abstract class Response {
 
     public void logIfError() {
         try {
-            if (getStatusCode() > 400 && getStatusCode() < 500) {
+            if (getStatusCode() >= 400) {
                 logger.log(String.format("Got invalid response from the server. Status code: %s. Status Phrase: %s. Response body: %s",
                         getStatusCode(), getStatusPhrase(), getBodyString()));
             }
