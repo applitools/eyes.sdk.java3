@@ -18,8 +18,8 @@ public class IosDeviceInfo implements IRenderingBrowserInfo {
         this.screenOrientation = screenOrientation;
     }
 
-    public IosDeviceName getDeviceName() {
-        return deviceName;
+    public String getDeviceName() {
+        return deviceName.getName();
     }
 
     public IosScreenOrientation getScreenOrientation() {

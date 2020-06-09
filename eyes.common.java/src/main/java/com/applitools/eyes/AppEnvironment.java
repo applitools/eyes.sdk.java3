@@ -156,7 +156,7 @@ public class AppEnvironment {
      * @param deviceInfo the device info
      */
     public void setDeviceInfo(String deviceInfo) {
-        this.deviceInfo =  deviceInfo != null  ? deviceInfo + " (Chrome emulation)" : "Desktop";
+        this.deviceInfo =  deviceInfo != null  ? deviceInfo : "Desktop";
     }
 
     /**
