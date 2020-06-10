@@ -3,8 +3,6 @@ package com.applitools.eyes;
 import com.applitools.eyes.utils.ReportingTestSuite;
 import org.testng.Assert;
 import org.testng.ITestContext;
-import org.testng.annotations.BeforeMethod;
-import org.testng.annotations.BeforeTest;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 

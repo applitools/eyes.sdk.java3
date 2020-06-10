@@ -24,7 +24,7 @@
     <dependencies>
         <dependency>
             <groupId>com.applitools</groupId>
-            <artifactId>eyes-common-java3</artifactId>
+            <artifactId>eyes-sdk-core-java3</artifactId>
             <version>3.165.0</version>
             <type>test-jar</type>
             <scope>test</scope>

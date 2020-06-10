@@ -1,4 +1,5 @@
-import com.applitools.eyes.BrowserNames;
+package com.applitools.eyes;
+
 import com.applitools.eyes.selenium.BrowserType;
 import com.applitools.eyes.utils.ReportingTestSuite;
 import org.testng.Assert;

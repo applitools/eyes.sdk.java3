@@ -26,13 +26,6 @@
             <version>3.165.0</version>
         </dependency>
         <dependency>
-            <groupId>com.applitools</groupId>
-            <artifactId>eyes-common-java3</artifactId>
-            <version>3.165.0</version>
-            <type>test-jar</type>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
             <groupId>com.sun.jersey</groupId>
             <artifactId>jersey-client</artifactId>
             <version>1.19</version>
