@@ -3,13 +3,11 @@ package com.applitools.eyes.demo;
 import com.applitools.eyes.*;
 import com.applitools.eyes.selenium.ClassicRunner;
 import com.applitools.eyes.selenium.Eyes;
-import com.applitools.eyes.selenium.StitchMode;
-import com.applitools.eyes.selenium.fluent.Target;
 import com.applitools.eyes.utils.ReportingTestSuite;
 import com.applitools.eyes.utils.SeleniumUtils;
 import com.applitools.eyes.utils.TestUtils;
 import com.applitools.eyes.visualgrid.services.VisualGridRunner;
-import org.openqa.selenium.JavascriptExecutor;
+import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.BeforeMethod;
@@ -51,24 +49,25 @@ public class BasicDemo extends ReportingTestSuite {
         Eyes eyes = new Eyes(runner);
         eyes.setLogHandler(logger);
         eyes.setBatch(batch);
-        eyes.setProxy(new ProxySettings("http://localhost:8888"));
-        try
-        {
-            eyes.setStitchMode(StitchMode.CSS);
-            eyes.open(driver, "Netcentric 33594 app", "Netcentric 33594 Test" + suffix, new RectangleSize(1000, 900));
-            driver.get("https://www.queenslandminingexpo.com.au/en-gb.html");
-            JavascriptExecutor js = (JavascriptExecutor)driver;
-            js.executeScript("window.scrollTo(0,document.body.scrollHeight)");
-            Thread.sleep(5000);
-            eyes.check(Target.window().fully());
+        //eyes.setProxy(new ProxySettings("http://localhost:8888"));
+        try {
+            eyes.open(driver, "Demo App", "BasicDemo" + suffix, new RectangleSize(800, 800));
+
+            // Navigate the browser to the "ACME" demo app.
+            driver.get("https://demo.applitools.com");
+
+            // To see visual bugs after the first run, use the commented line below instead.
+            //driver.get("https://demo.applitools.com/index_v2.html");
+
+            eyes.checkWindow("Login Window");
+            driver.findElement(By.id("log-in")).click();
+            eyes.checkWindow("App Window");
             eyes.closeAsync();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        } finally
-        {
-            driver.quit();
+        } finally {
             eyes.abortAsync();
-            runner.getAllTestResults();
+            driver.quit();
+            TestResultsSummary allTestResults = runner.getAllTestResults();
+            System.out.println(allTestResults);
         }
     }
 }

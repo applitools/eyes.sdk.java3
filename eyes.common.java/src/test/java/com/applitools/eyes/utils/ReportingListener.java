@@ -7,22 +7,22 @@ import org.testng.ITestResult;
 public class ReportingListener implements ITestListener {
     @Override
     public void onTestStart(ITestResult result) {
-        System.out.println("Starting Test: " + result.getTestName());
+        System.out.println(String.format("Starting Test: %s of %s", result.getMethod().getMethodName(), result.getTestClass().getName()));
     }
 
     @Override
     public void onTestSuccess(ITestResult result) {
-        System.out.println("Test Succeeded: " + result.getTestName());
+        System.out.println(String.format("Test Succeeded: %s of %s", result.getMethod().getMethodName(), result.getTestClass().getName()));
     }
 
     @Override
     public void onTestFailure(ITestResult result) {
-        System.out.println("Test Failed: " + result.getTestName());
+        System.out.println(String.format("Test Failed: %s of %s", result.getMethod().getMethodName(), result.getTestClass().getName()));
     }
 
     @Override
     public void onTestSkipped(ITestResult result) {
-        System.out.println("Test Skipped: " + result.getTestName());
+        System.out.println(String.format("Test Skipped: %s of %s", result.getMethod().getMethodName(), result.getTestClass().getName()));
     }
 
     @Override
