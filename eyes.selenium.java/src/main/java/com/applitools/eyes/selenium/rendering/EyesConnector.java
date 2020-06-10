@@ -19,7 +19,7 @@ import java.util.concurrent.Future;
 class EyesConnector extends EyesBase implements IEyesConnector, IBatchCloser {
 
 
-    private final DesktopBrowserInfo browserInfo;
+    private final RenderBrowserInfo browserInfo;
     private String userAgent;
     private String device;
     private RectangleSize deviceSize;
@@ -28,7 +28,7 @@ class EyesConnector extends EyesBase implements IEyesConnector, IBatchCloser {
     private String testName;
 
 
-    public EyesConnector(ISeleniumConfigurationProvider configProvider, List<PropertyData> properties, DesktopBrowserInfo browserInfo) {
+    public EyesConnector(ISeleniumConfigurationProvider configProvider, List<PropertyData> properties, RenderBrowserInfo browserInfo) {
         configurationGetter = configProvider.get();
         this.browserInfo = browserInfo;
         if (properties != null) {

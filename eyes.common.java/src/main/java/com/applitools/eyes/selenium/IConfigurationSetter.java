@@ -15,6 +15,8 @@ public interface IConfigurationSetter extends com.applitools.eyes.config.IConfig
 
     IConfigurationSetter addBrowsers(IRenderingBrowserInfo... browserInfos);
 
+    IConfigurationSetter addBrowser(RenderBrowserInfo desktopBrowserInfo);
+
     IConfigurationSetter addBrowser(DesktopBrowserInfo desktopBrowserInfo);
 
     IConfigurationSetter addBrowser(ChromeEmulationInfo chromeEmulationInfo);
@@ -37,7 +39,7 @@ public interface IConfigurationSetter extends com.applitools.eyes.config.IConfig
 //
 //    IConfigurationSetter addDeviceEmulation(int width, int height, double scaleFactor);
 
-    IConfigurationSetter setBrowsersInfo(List<DesktopBrowserInfo> browsersInfo);
+    IConfigurationSetter setBrowsersInfo(List<RenderBrowserInfo> browsersInfo);
 
     IConfigurationSetter setTestName(String testName);
 

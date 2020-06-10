@@ -8,7 +8,7 @@ import com.applitools.eyes.selenium.BrowserType;
 import com.applitools.eyes.selenium.Configuration;
 import com.applitools.eyes.selenium.Eyes;
 import com.applitools.eyes.utils.TestUtils;
-import com.applitools.eyes.visualgrid.model.DesktopBrowserInfo;
+import com.applitools.eyes.visualgrid.model.RenderBrowserInfo;
 import com.applitools.eyes.visualgrid.services.VisualGridRunner;
 import com.applitools.utils.GeneralUtils;
 import org.openqa.selenium.WebDriver;
@@ -81,7 +81,7 @@ public class TestIEyesVG extends TestIEyesBase {
         browserTypes.put(BrowserType.IE_11, "IE 11.0");
 
 
-        List<DesktopBrowserInfo> browsers = renderingConfiguration.getBrowsersInfo();
+        List<RenderBrowserInfo> browsers = renderingConfiguration.getBrowsersInfo();
         TestResultsSummary resultsSummary = runner.getAllTestResults(false);
 
         logger.log(resultsSummary.toString());
@@ -110,10 +110,10 @@ public class TestIEyesVG extends TestIEyesBase {
             Assert.assertTrue(image2.getHasDom());
 
             AppEnvironment env = sessionResults.getEnv();
-            Iterator<DesktopBrowserInfo> iterator = browsers.iterator();
-            DesktopBrowserInfo browser = null;
+            Iterator<RenderBrowserInfo> iterator = browsers.iterator();
+            RenderBrowserInfo browser = null;
             while (iterator.hasNext()) {
-                DesktopBrowserInfo item = iterator.next();
+                RenderBrowserInfo item = iterator.next();
                 String hostingAppInfo = env.getHostingAppInfo();
                 if (hostingAppInfo == null || !hostingAppInfo.startsWith(browserTypes.get(item.getBrowserType())) &&
                         (env.getDisplaySize().getWidth() == item.getWidth()) && (env.getDisplaySize().getHeight() == item.getHeight())) {

@@ -21,7 +21,7 @@ public class Configuration extends com.applitools.eyes.config.Configuration impl
     //Rendering Configuration
     private Boolean isRenderingConfig = false;
 
-    private List<DesktopBrowserInfo> browsersInfo = new ArrayList<>();
+    private List<RenderBrowserInfo> browsersInfo = new ArrayList<>();
 
     @SuppressWarnings("IncompleteCopyConstructor")
     public Configuration(IConfigurationGetter other) {
@@ -41,8 +41,8 @@ public class Configuration extends com.applitools.eyes.config.Configuration impl
 
     public Configuration(RectangleSize viewportSize) {
         super();
-        ArrayList<DesktopBrowserInfo> browsersInfo = new ArrayList<>();
-        browsersInfo.add(new DesktopBrowserInfo(viewportSize.getWidth(), viewportSize.getHeight(), BrowserType.CHROME, null));
+        ArrayList<RenderBrowserInfo> browsersInfo = new ArrayList<>();
+        browsersInfo.add(new RenderBrowserInfo(viewportSize.getWidth(), viewportSize.getHeight(), BrowserType.CHROME, null));
         this.browsersInfo = browsersInfo;
     }
 
@@ -53,9 +53,9 @@ public class Configuration extends com.applitools.eyes.config.Configuration impl
     public Configuration(String appName, String testName,
                          RectangleSize viewportSize) {
         super();
-        ArrayList<DesktopBrowserInfo> browsersInfo = new ArrayList<>();
+        ArrayList<RenderBrowserInfo> browsersInfo = new ArrayList<>();
         if (viewportSize != null) {
-            browsersInfo.add(new DesktopBrowserInfo(viewportSize.getWidth(), viewportSize.getHeight(), BrowserType.CHROME, null));
+            browsersInfo.add(new RenderBrowserInfo(viewportSize.getWidth(), viewportSize.getHeight(), BrowserType.CHROME, null));
         }
         this.browsersInfo = browsersInfo;
         this.testName = testName;
@@ -135,29 +135,34 @@ public class Configuration extends com.applitools.eyes.config.Configuration impl
     }
 
     @Override
+    public IConfigurationSetter addBrowser(RenderBrowserInfo renderBrowserInfo) {
+        this.browsersInfo.add(renderBrowserInfo);
+        return this;
+    }
+
+    @Override
     public IConfigurationSetter addBrowser(DesktopBrowserInfo desktopBrowserInfo) {
-        this.browsersInfo.add(desktopBrowserInfo);
+        this.browsersInfo.add(desktopBrowserInfo.getRenderBrowserInfo());
         return this;
     }
 
     @Override
     public IConfigurationSetter addBrowser(ChromeEmulationInfo chromeEmulationInfo) {
-        DesktopBrowserInfo desktopBrowserInfo = new DesktopBrowserInfo(chromeEmulationInfo);
-        this.browsersInfo.add(desktopBrowserInfo);
+        RenderBrowserInfo renderBrowserInfo = new RenderBrowserInfo(chromeEmulationInfo);
+        this.browsersInfo.add(renderBrowserInfo);
         return this;
     }
 
     @Override
     public IConfigurationSetter addBrowser(IosDeviceInfo iosDeviceInfo) {
-        DesktopBrowserInfo desktopBrowserInfo = new DesktopBrowserInfo(iosDeviceInfo);
-
-        this.browsersInfo.add(desktopBrowserInfo);
+        RenderBrowserInfo renderBrowserInfo = new RenderBrowserInfo(iosDeviceInfo);
+        this.browsersInfo.add(renderBrowserInfo);
         return this;
     }
 
     @Override
     public IConfigurationSetter addBrowser(int width, int height, BrowserType browserType, String baselineEnvName) {
-        DesktopBrowserInfo browserInfo = new DesktopBrowserInfo(width, height, browserType, baselineEnvName);
+        RenderBrowserInfo browserInfo = new RenderBrowserInfo(width, height, browserType, baselineEnvName);
         addBrowser(browserInfo);
         return this;
     }
@@ -170,7 +175,7 @@ public class Configuration extends com.applitools.eyes.config.Configuration impl
     @Override
     public IConfigurationSetter addDeviceEmulation(DeviceName deviceName, ScreenOrientation orientation) {
         EmulationBaseInfo emulationInfo = new ChromeEmulationInfo(deviceName, orientation);
-        DesktopBrowserInfo browserInfo = new DesktopBrowserInfo(emulationInfo, baselineEnvName);
+        RenderBrowserInfo browserInfo = new RenderBrowserInfo(emulationInfo, baselineEnvName);
         this.browsersInfo.add(browserInfo);
         return this;
     }
@@ -178,7 +183,7 @@ public class Configuration extends com.applitools.eyes.config.Configuration impl
     @Override
     public IConfigurationSetter addDeviceEmulation(DeviceName deviceName) {
         EmulationBaseInfo emulationInfo = new ChromeEmulationInfo(deviceName, ScreenOrientation.PORTRAIT);
-        DesktopBrowserInfo browserInfo = new DesktopBrowserInfo(emulationInfo, baselineEnvName);
+        RenderBrowserInfo browserInfo = new RenderBrowserInfo(emulationInfo, baselineEnvName);
         this.browsersInfo.add(browserInfo);
         return this;
     }
@@ -186,7 +191,7 @@ public class Configuration extends com.applitools.eyes.config.Configuration impl
     @Override
     public IConfigurationSetter addDeviceEmulation(DeviceName deviceName, String baselineEnvName) {
         EmulationBaseInfo emulationInfo = new ChromeEmulationInfo(deviceName, ScreenOrientation.PORTRAIT);
-        DesktopBrowserInfo browserInfo = new DesktopBrowserInfo(emulationInfo, baselineEnvName);
+        RenderBrowserInfo browserInfo = new RenderBrowserInfo(emulationInfo, baselineEnvName);
         this.browsersInfo.add(browserInfo);
         return this;
     }
@@ -194,26 +199,26 @@ public class Configuration extends com.applitools.eyes.config.Configuration impl
     @Override
     public IConfigurationSetter addDeviceEmulation(DeviceName deviceName, ScreenOrientation orientation, String baselineEnvName) {
         EmulationBaseInfo emulationInfo = new ChromeEmulationInfo(deviceName, orientation);
-        DesktopBrowserInfo browserInfo = new DesktopBrowserInfo(emulationInfo, baselineEnvName);
+        RenderBrowserInfo browserInfo = new RenderBrowserInfo(emulationInfo, baselineEnvName);
         this.browsersInfo.add(browserInfo);
         return this;
     }
 
     @Override
-    public List<DesktopBrowserInfo> getBrowsersInfo() {
+    public List<RenderBrowserInfo> getBrowsersInfo() {
         if (browsersInfo != null && !browsersInfo.isEmpty()) {
             return browsersInfo;
         }
 
         if (this.viewportSize != null) {
-            DesktopBrowserInfo desktopBrowserInfo = new DesktopBrowserInfo(this.viewportSize.getWidth(), this.viewportSize.getHeight(), BrowserType.CHROME, baselineEnvName);
-            return Collections.singletonList(desktopBrowserInfo);
+            RenderBrowserInfo renderBrowserInfo = new RenderBrowserInfo(this.viewportSize.getWidth(), this.viewportSize.getHeight(), BrowserType.CHROME, baselineEnvName);
+            return Collections.singletonList(renderBrowserInfo);
         }
         return browsersInfo;
     }
 
     @Override
-    public IConfigurationSetter setBrowsersInfo(List<DesktopBrowserInfo> browsersInfo) {
+    public IConfigurationSetter setBrowsersInfo(List<RenderBrowserInfo> browsersInfo) {
         this.browsersInfo = browsersInfo;
         return this;
     }
@@ -237,8 +242,8 @@ public class Configuration extends com.applitools.eyes.config.Configuration impl
     @Override
     public RectangleSize getViewportSize() {
         if (isRenderingConfig) {
-            DesktopBrowserInfo desktopBrowserInfo = this.browsersInfo.get(0);
-            return new RectangleSize(desktopBrowserInfo.getWidth(), desktopBrowserInfo.getHeight());
+            RenderBrowserInfo renderBrowserInfo = this.browsersInfo.get(0);
+            return new RectangleSize(renderBrowserInfo.getWidth(), renderBrowserInfo.getHeight());
         }
         return super.viewportSize;
     }

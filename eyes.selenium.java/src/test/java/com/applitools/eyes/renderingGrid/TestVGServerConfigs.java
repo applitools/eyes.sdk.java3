@@ -9,7 +9,7 @@ import com.applitools.eyes.selenium.Eyes;
 import com.applitools.eyes.selenium.TestDataProvider;
 import com.applitools.eyes.utils.SeleniumUtils;
 import com.applitools.eyes.utils.TestUtils;
-import com.applitools.eyes.visualgrid.model.DesktopBrowserInfo;
+import com.applitools.eyes.visualgrid.model.RenderBrowserInfo;
 import com.applitools.eyes.visualgrid.services.VisualGridRunner;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
@@ -48,7 +48,7 @@ public class TestVGServerConfigs {
             Eyes eyes = new Eyes(runner);
             eyes.setLogHandler(new FileLogger("fabric.log", true, true));
             Configuration conf = new Configuration();
-            conf.addBrowser(new DesktopBrowserInfo(800, 600, BrowserType.CHROME));
+            conf.addBrowser(new RenderBrowserInfo(800, 600, BrowserType.CHROME));
             conf.setServerUrl("https://eyesfabric4eyes.applitools.com");
             conf.setApiKey("CAE7aS103TDz7XyegELya3tHpEIXTFi0gBBwvgq104PSHIU110");
             conf.setAppName("app").setTestName("test");

@@ -5,7 +5,7 @@ import com.applitools.eyes.TestResultsSummary;
 import com.applitools.eyes.selenium.fluent.Target;
 import com.applitools.eyes.utils.SeleniumUtils;
 import com.applitools.eyes.utils.TestUtils;
-import com.applitools.eyes.visualgrid.model.DesktopBrowserInfo;
+import com.applitools.eyes.visualgrid.model.RenderBrowserInfo;
 import com.applitools.eyes.visualgrid.services.VisualGridRunner;
 import org.openqa.selenium.WebDriver;
 import org.testng.Assert;
@@ -45,8 +45,8 @@ public final class TestCounts {
         try {
             Configuration conf = new Configuration();
             conf.setBatch(TestDataProvider.batchInfo);
-            conf.addBrowser(new DesktopBrowserInfo(900, 600));
-            conf.addBrowser(new DesktopBrowserInfo(1024, 768));
+            conf.addBrowser(new RenderBrowserInfo(900, 600));
+            conf.addBrowser(new RenderBrowserInfo(1024, 768));
             testObjects.eyes.setConfiguration(conf);
             testObjects.eyes.open(testObjects.webDriver, "Test Count", "Test_VGTestsCount_2");
             testObjects.eyes.check("Test", Target.window());
@@ -65,8 +65,8 @@ public final class TestCounts {
         try {
             Configuration conf = new Configuration();
             conf.setBatch(TestDataProvider.batchInfo);
-            conf.addBrowser(new DesktopBrowserInfo(900, 600));
-            conf.addBrowser(new DesktopBrowserInfo(1024, 768));
+            conf.addBrowser(new RenderBrowserInfo(900, 600));
+            conf.addBrowser(new RenderBrowserInfo(1024, 768));
             conf.setAppName("Test Count").setTestName("Test_VGTestsCount_3");
             testObjects.eyes.setConfiguration(conf);
             testObjects.eyes.open(testObjects.webDriver);
@@ -86,7 +86,7 @@ public final class TestCounts {
         try {
             Configuration conf = new Configuration();
             conf.setBatch(TestDataProvider.batchInfo);
-            conf.addBrowser(new DesktopBrowserInfo(800, 600));
+            conf.addBrowser(new RenderBrowserInfo(800, 600));
             conf.setAppName("Test Count").setTestName("Test_VGTestsCount_4");
             testObjects.eyes.setConfiguration(conf);
             testObjects.eyes.open(testObjects.webDriver);
@@ -106,8 +106,8 @@ public final class TestCounts {
         try {
             Configuration conf = new Configuration();
             conf.setBatch(TestDataProvider.batchInfo);
-            conf.addBrowser(new DesktopBrowserInfo(900, 600));
-            conf.addBrowser(new DesktopBrowserInfo(1024, 768));
+            conf.addBrowser(new RenderBrowserInfo(900, 600));
+            conf.addBrowser(new RenderBrowserInfo(1024, 768));
             testObjects.eyes.setConfiguration(conf);
             testObjects.eyes.open(testObjects.webDriver, "Test Count", "Test_VGTestsCount_5", new RectangleSize(640, 480));
             testObjects.eyes.check("Test", Target.window());

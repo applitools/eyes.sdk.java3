@@ -6,7 +6,7 @@ import com.applitools.eyes.IBatchCloser;
 import com.applitools.eyes.Logger;
 import com.applitools.eyes.selenium.Configuration;
 import com.applitools.eyes.selenium.ISeleniumConfigurationProvider;
-import com.applitools.eyes.visualgrid.model.DesktopBrowserInfo;
+import com.applitools.eyes.visualgrid.model.RenderBrowserInfo;
 import com.applitools.eyes.visualgrid.model.RenderingTask;
 import com.applitools.eyes.TestResultContainer;
 import com.applitools.eyes.visualgrid.model.VisualGridSelector;
@@ -19,7 +19,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 public class RunningTest {
     private final List<VisualGridTask> visualGridTaskList = Collections.synchronizedList(new ArrayList<VisualGridTask>());
     private IEyesConnector eyes;
-    private DesktopBrowserInfo browserInfo;
+    private RenderBrowserInfo browserInfo;
     private AtomicBoolean isTestOpen = new AtomicBoolean(false);
     private AtomicBoolean isTestClose = new AtomicBoolean(false);
     private AtomicBoolean isTestInExceptionMode = new AtomicBoolean(false);
@@ -47,13 +47,13 @@ public class RunningTest {
         this.openTask = task;
     }
 
-    public RunningTest(DesktopBrowserInfo browserInfo, Logger logger)
+    public RunningTest(RenderBrowserInfo browserInfo, Logger logger)
     {
         this.browserInfo = browserInfo;
         this.logger = logger;
     }
 
-    public RunningTest(DesktopBrowserInfo browserInfo, Logger logger, ISeleniumConfigurationProvider configuration) {
+    public RunningTest(RenderBrowserInfo browserInfo, Logger logger, ISeleniumConfigurationProvider configuration) {
         this.browserInfo = browserInfo;
         this.configurationProvider = configuration;
         this.logger = logger;
@@ -61,7 +61,7 @@ public class RunningTest {
 
     /******** END - PUBLIC FOR TESTING PURPOSES ONLY ********/
 
-    public RunningTest(IEyesConnector eyes, ISeleniumConfigurationProvider configuration, DesktopBrowserInfo browserInfo, Logger logger, RunningTestListener listener) {
+    public RunningTest(IEyesConnector eyes, ISeleniumConfigurationProvider configuration, RenderBrowserInfo browserInfo, Logger logger, RunningTestListener listener) {
         this.eyes = eyes;
         this.browserInfo = browserInfo;
         this.configurationProvider = configuration;
@@ -216,7 +216,7 @@ public class RunningTest {
         return null;
     }
 
-    public DesktopBrowserInfo getBrowserInfo() {
+    public RenderBrowserInfo getBrowserInfo() {
         return browserInfo;
     }
 

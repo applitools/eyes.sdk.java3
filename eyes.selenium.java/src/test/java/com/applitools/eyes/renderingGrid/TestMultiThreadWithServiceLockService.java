@@ -11,7 +11,7 @@ import com.applitools.eyes.selenium.fluent.Target;
 import com.applitools.eyes.utils.SeleniumUtils;
 import com.applitools.eyes.utils.TestUtils;
 import com.applitools.eyes.visualgrid.model.CompletableTask;
-import com.applitools.eyes.visualgrid.model.DesktopBrowserInfo;
+import com.applitools.eyes.visualgrid.model.RenderBrowserInfo;
 import com.applitools.eyes.visualgrid.services.VisualGridRunner;
 import com.applitools.eyes.visualgrid.services.VisualGridTask;
 import org.openqa.selenium.WebDriver;
@@ -57,9 +57,9 @@ public final class TestMultiThreadWithServiceLockService {
             public void run() {
                 String baselineEnvName = "";
                 TestThreadMethod("VG-MultiThreadBatchC11", threadALock,
-                        new DesktopBrowserInfo(800, 600, BrowserType.CHROME, baselineEnvName),
-                        new DesktopBrowserInfo(700, 500, BrowserType.CHROME, baselineEnvName),
-                        new DesktopBrowserInfo(400, 300, BrowserType.CHROME, baselineEnvName));
+                        new RenderBrowserInfo(800, 600, BrowserType.CHROME, baselineEnvName),
+                        new RenderBrowserInfo(700, 500, BrowserType.CHROME, baselineEnvName),
+                        new RenderBrowserInfo(400, 300, BrowserType.CHROME, baselineEnvName));
             }
         }, "ThreadA");
 
@@ -68,8 +68,8 @@ public final class TestMultiThreadWithServiceLockService {
             public void run() {
                 String baselineEnvName = "";
                 TestThreadMethod("VG-MultiThreadBatchC22", threadBLock,
-                        new DesktopBrowserInfo(840, 680, BrowserType.CHROME, baselineEnvName),
-                        new DesktopBrowserInfo(750, 530, BrowserType.CHROME, baselineEnvName));
+                        new RenderBrowserInfo(840, 680, BrowserType.CHROME, baselineEnvName),
+                        new RenderBrowserInfo(750, 530, BrowserType.CHROME, baselineEnvName));
             }
         }, "ThreadB");
 
@@ -176,7 +176,7 @@ public final class TestMultiThreadWithServiceLockService {
         }
     }
 
-    private void TestThreadMethod(String batchName, Object lock, DesktopBrowserInfo... browsersInfo) {
+    private void TestThreadMethod(String batchName, Object lock, RenderBrowserInfo... browsersInfo) {
         Eyes eyes = new Eyes(renderingManager);
         eyes.setBatch(new BatchInfo(batchName));
         Configuration configuration = new Configuration();

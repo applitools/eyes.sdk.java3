@@ -604,7 +604,7 @@ public class RenderingTask implements Callable<RenderStatusResults>, Completable
 
         for (VisualGridTask visualGridTask : this.visualGridTaskList) {
 
-            DesktopBrowserInfo browserInfo = visualGridTask.getBrowserInfo();
+            RenderBrowserInfo browserInfo = visualGridTask.getBrowserInfo();
 
             String sizeMode = checkSettingsInternal.getSizeMode();
 

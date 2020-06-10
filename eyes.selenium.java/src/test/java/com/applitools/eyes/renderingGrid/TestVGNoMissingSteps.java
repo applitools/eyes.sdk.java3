@@ -4,7 +4,7 @@ import com.applitools.eyes.Logger;
 import com.applitools.eyes.selenium.Configuration;
 import com.applitools.eyes.selenium.rendering.VisualGridEyes;
 import com.applitools.eyes.utils.TestUtils;
-import com.applitools.eyes.visualgrid.model.DesktopBrowserInfo;
+import com.applitools.eyes.visualgrid.model.RenderBrowserInfo;
 import com.applitools.eyes.visualgrid.services.RunningTest;
 import com.applitools.eyes.visualgrid.services.VisualGridTask;
 import org.testng.Assert;
@@ -17,7 +17,7 @@ import static com.applitools.eyes.visualgrid.services.VisualGridTask.TaskType.*;
 
 public class TestVGNoMissingSteps {
     private static Logger logger = new Logger();
-    private static DesktopBrowserInfo browserInfo = new DesktopBrowserInfo(10, 10);
+    private static RenderBrowserInfo browserInfo = new RenderBrowserInfo(10, 10);
 
     @Test
     public void TestNoMissingSteps_UT() {

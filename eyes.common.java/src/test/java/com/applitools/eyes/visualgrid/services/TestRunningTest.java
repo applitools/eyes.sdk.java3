@@ -4,7 +4,7 @@ import com.applitools.eyes.Logger;
 import com.applitools.eyes.selenium.Configuration;
 import com.applitools.eyes.selenium.ISeleniumConfigurationProvider;
 import com.applitools.eyes.utils.ReportingTestSuite;
-import com.applitools.eyes.visualgrid.model.DesktopBrowserInfo;
+import com.applitools.eyes.visualgrid.model.RenderBrowserInfo;
 import org.testng.Assert;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
@@ -16,7 +16,7 @@ import static org.mockito.Mockito.*;
 
 public class TestRunningTest extends ReportingTestSuite {
 
-    DesktopBrowserInfo browserInfo = mock(DesktopBrowserInfo.class);
+    RenderBrowserInfo browserInfo = mock(RenderBrowserInfo.class);
     Logger logger = mock(Logger.class);
     ISeleniumConfigurationProvider configurationProvider = mock(ISeleniumConfigurationProvider.class);
 
