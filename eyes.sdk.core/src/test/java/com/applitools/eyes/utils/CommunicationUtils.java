@@ -1,76 +1,58 @@
 package com.applitools.eyes.utils;
 
+import com.applitools.connectivity.ServerConnector;
+import com.applitools.connectivity.api.HttpClient;
+import com.applitools.connectivity.api.HttpClientImpl;
+import com.applitools.connectivity.api.Request;
+import com.applitools.connectivity.api.Response;
 import com.applitools.eyes.BatchInfo;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.apache.commons.io.IOUtils;
-import org.apache.http.HttpEntity;
-import org.apache.http.HttpResponse;
-import org.apache.http.client.methods.*;
-import org.apache.http.entity.ContentType;
-import org.apache.http.entity.StringEntity;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClients;
+import org.apache.http.HttpStatus;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.net.URI;
-import java.nio.charset.StandardCharsets;
+import javax.ws.rs.HttpMethod;
+import javax.ws.rs.core.MediaType;
 
 public class CommunicationUtils {
 
-    public static String getString(String url) {
-        return getString(url, null);
-    }
-
-    public static String getString(String url, HttpAuth creds) {
-        try (CloseableHttpClient httpClient = HttpClients.custom().build()) {
-            HttpGet request = new HttpGet(url);
-            setCredentials(creds, request);
-            HttpResponse httpResponse = httpClient.execute(request);
-            HttpEntity entity = httpResponse.getEntity();
-
-            BufferedReader br = new BufferedReader(new InputStreamReader(entity.getContent()));
-            // Read in all of the post results into a String.
-            StringBuilder output = new StringBuilder();
-            String currentLine;
-            while ((currentLine = br.readLine()) != null) {
-                output.append(currentLine);
-            }
-
-            return  output.toString();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return null;
+    private static HttpClient createClient() {
+        return new HttpClientImpl(ServerConnector.DEFAULT_CLIENT_TIMEOUT, null);
     }
 
     public static <Tin> void putJson(String url, Tin data, HttpAuth creds) {
-        jsonRequest(url, data, creds, new HttpPut());
+        jsonRequest(url, data, creds, HttpMethod.PUT);
     }
 
     public static <Tin> void postJson(String url, Tin data, HttpAuth creds) {
-        jsonRequest(url, data, creds, new HttpPost());
+        jsonRequest(url, data, creds, HttpMethod.POST);
     }
 
-    public static <Tin> void jsonRequest(String url, Tin data, HttpAuth creds, HttpEntityEnclosingRequestBase request) {
-        try (CloseableHttpClient httpClient = HttpClients.custom().build()) {
-            request.setURI(new URI(url));
+    public static <Tin> void jsonRequest(String url, Tin data, HttpAuth creds, String httpMethod) {
+        HttpClient httpClient = createClient();
+        Response response = null;
+        try {
+            Request request = httpClient.target(url).request();
             setCredentials(creds, request);
             String json = createJsonString(data);
-            request.setEntity(new StringEntity(json, ContentType.APPLICATION_JSON));
-
-            httpClient.execute(request);
+            response = request.method(httpMethod, json, MediaType.APPLICATION_JSON);
+            if (response.getStatusCode() != HttpStatus.SC_OK) {
+                System.out.println(String.format("Test report failed. Status: %d %s. Body: %s",
+                        response.getStatusCode(), response.getStatusPhrase(), response.readEntity(String.class)));
+            }
         } catch (Exception e) {
             e.printStackTrace();
+        } finally {
+            httpClient.close();
+            if (response != null) {
+                response.close();
+            }
         }
     }
 
-    private static void setCredentials(HttpAuth creds, HttpRequestBase request) {
+    private static void setCredentials(HttpAuth creds, Request request) {
         if (creds != null) {
-            request.addHeader(creds.getHeader());
+            request.header(creds.getHeader().getName(), creds.getHeader().getValue());
         }
     }
 
@@ -88,26 +70,23 @@ public class CommunicationUtils {
 
     public static BatchInfo getBatch(String batchId, String serverUrl, String apikey) {
         BatchInfo batchInfo = null;
-        try (CloseableHttpClient httpClient = HttpClients.custom().build()) {
+        HttpClient httpClient = createClient();
+        try {
             String url = String.format("%s/api/sessions/batches/%s/bypointerid?apikey=%s", serverUrl, batchId, apikey);
-            HttpGet request = new HttpGet(url);
-
-            HttpResponse response = httpClient.execute(request);
+            Request request = httpClient.target(url).request();
+            Response response = request.method(HttpMethod.GET, null, null);
+            String data = response.readEntity(String.class);
+            response.close();
             batchInfo = null;
-            if (response.getStatusLine().getStatusCode() == 200) {
+            if (response.getStatusCode() == 200) {
                 ObjectMapper objectMapper = new ObjectMapper();
                 objectMapper = objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-                byte[] bytes = new byte[0];
-                try {
-                    bytes = IOUtils.toByteArray(response.getEntity().getContent());
-                    String s = new String(bytes, StandardCharsets.UTF_8);
-                    System.out.println(s);
-                } catch (IOException ignored) {
-                }
-                batchInfo = objectMapper.readValue(bytes, BatchInfo.class);
+                batchInfo = objectMapper.readValue(data, BatchInfo.class);
             }
         } catch (Exception e) {
             e.printStackTrace();
+        } finally {
+            httpClient.close();
         }
         return batchInfo;
     }
