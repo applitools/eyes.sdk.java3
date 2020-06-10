@@ -43,10 +43,10 @@ public class CommunicationUtils {
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
-            httpClient.close();
             if (response != null) {
                 response.close();
             }
+            httpClient.close();
         }
     }
 
