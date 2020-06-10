@@ -4,6 +4,7 @@
 
     <listeners>
         <listener class-name="com.applitools.eyes.selenium.ExcludeFailingTestsListener"/>
+        <listener class-name="com.applitools.eyes.utils.ReportingListener"/>
         <!--<listener class-name="com.applitools.eyes.utils.RetryListener" />-->
         <!--<listener class-name="com.applitools.eyes.utils.PostTestResultsListener" />-->
     </listeners>

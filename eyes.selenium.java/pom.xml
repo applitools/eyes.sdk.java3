@@ -74,6 +74,10 @@
                             <name>suitethreadpoolsize</name>
                             <value>2</value>
                         </property>
+                        <property>
+                            <name>listener</name>
+                            <value></value>
+                        </property>
                     </properties>
                     <suiteXmlFiles>
                         <suiteXmlFile>regressionTestsSuite.xml</suiteXmlFile>
