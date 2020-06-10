@@ -428,7 +428,7 @@ public class ServerConnector extends RestClient implements IServerConnector {
             objectMapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
             objectMapper.configure(MapperFeature.SORT_PROPERTIES_ALPHABETICALLY, true);
             String json = objectMapper.writeValueAsString(renderRequests);
-            response = request.method(HttpMethod.POST, json.getBytes(), MediaType.APPLICATION_JSON);
+            response = request.method(HttpMethod.POST, json, MediaType.APPLICATION_JSON);
             if (validStatusCodes.contains(response.getStatusCode())) {
                 RunningRender[] runningRenders = parseResponseWithJsonData(response, validStatusCodes, new TypeReference<RunningRender[]>() {});
                 return Arrays.asList(runningRenders);
@@ -588,7 +588,7 @@ public class ServerConnector extends RestClient implements IServerConnector {
             Response response = null;
             try {
                 String json = objectMapper.writeValueAsString(renderIds);
-                response = request.method(HttpMethod.POST, json.getBytes(), MediaType.APPLICATION_JSON);
+                response = request.method(HttpMethod.POST, json, MediaType.APPLICATION_JSON);
                 if (validStatusCodes.contains(response.getStatusCode())) {
                     this.logger.verbose("request succeeded");
                     RenderStatusResults[] renderStatusResults = parseResponseWithJsonData(response, validStatusCodes, new TypeReference<RenderStatusResults[]>(){});
@@ -629,9 +629,8 @@ public class ServerConnector extends RestClient implements IServerConnector {
                         return targetUrl;
                     }
 
-                    String body = response.getBodyString();
-                    String errorMessage = String.format("Status: %d %s. Response Body: %s",
-                            statusCode, response.getStatusPhrase(), body);
+                    String errorMessage = String.format("Status: %d %s.",
+                            statusCode, response.getStatusPhrase());
 
                     if (statusCode < 500) {
                         throw new IOException(String.format("Failed uploading image. %s", errorMessage));

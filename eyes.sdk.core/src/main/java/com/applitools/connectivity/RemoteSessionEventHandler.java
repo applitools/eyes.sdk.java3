@@ -85,7 +85,7 @@ public class RemoteSessionEventHandler extends RestClient {
         sendMessage(new HttpMethodCall() {
             public Response call() {
                 Request request = defaultEndPoint.path(autSessionId).request(MediaType.APPLICATION_JSON);
-                return request.method(HttpMethod.PUT, "{\"action\": \"initStart\"}".getBytes(), MediaType.APPLICATION_JSON);
+                return request.method(HttpMethod.PUT, "{\"action\": \"initStart\"}", MediaType.APPLICATION_JSON);
             }
         });
     }
@@ -94,7 +94,7 @@ public class RemoteSessionEventHandler extends RestClient {
         sendMessage(new HttpMethodCall() {
             public Response call() {
                 Request request = defaultEndPoint.path(autSessionId).request(MediaType.APPLICATION_JSON);
-                return request.method(HttpMethod.PUT, "{\"action\": \"initEnd\"}".getBytes(), MediaType.APPLICATION_JSON);
+                return request.method(HttpMethod.PUT, "{\"action\": \"initEnd\"}", MediaType.APPLICATION_JSON);
             }
         });
     }
@@ -105,7 +105,7 @@ public class RemoteSessionEventHandler extends RestClient {
             public Response call() {
                 String data = "{\"action\": \"setSizeStart\", \"size\":{\"width\": " + size.getWidth() + ", \"height\": " + size.getHeight() + "}}";
                 Request request = defaultEndPoint.path(autSessionId).request(MediaType.APPLICATION_JSON);
-                return request.method(HttpMethod.PUT, data.getBytes(), MediaType.APPLICATION_JSON);
+                return request.method(HttpMethod.PUT, data, MediaType.APPLICATION_JSON);
             }
         });
     }
@@ -114,7 +114,7 @@ public class RemoteSessionEventHandler extends RestClient {
         sendMessage(new HttpMethodCall() {
             public Response call() {
                 Request request = defaultEndPoint.path(autSessionId).request(MediaType.APPLICATION_JSON);
-                return request.method(HttpMethod.PUT, "{\"action\": \"setSizeEnd\"}".getBytes(), MediaType.APPLICATION_JSON);
+                return request.method(HttpMethod.PUT, "{\"action\": \"setSizeEnd\"}", MediaType.APPLICATION_JSON);
             }
         });
     }
@@ -125,7 +125,7 @@ public class RemoteSessionEventHandler extends RestClient {
             public Response call() {
                 Request request = defaultEndPoint.request(MediaType.APPLICATION_JSON);
                 String data = "{\"autSessionId\": \"" + autSessionIdFinal + "\"}";
-                return request.method(HttpMethod.POST, data.getBytes(), MediaType.APPLICATION_JSON);
+                return request.method(HttpMethod.POST, data, MediaType.APPLICATION_JSON);
             }
         });
         this.autSessionId = autSessionId;
@@ -147,7 +147,7 @@ public class RemoteSessionEventHandler extends RestClient {
                 }
 
                 String data = "{\"action\": \"testEnd\", \"testResults\":" + testResultJson + "}";
-                return invocationBuilder.method(HttpMethod.PUT, data.getBytes(), MediaType.APPLICATION_JSON);
+                return invocationBuilder.method(HttpMethod.PUT, data, MediaType.APPLICATION_JSON);
             }
         });
     }
@@ -159,7 +159,7 @@ public class RemoteSessionEventHandler extends RestClient {
                 Request request = defaultEndPoint.path(autSessionIdFinal).path("validations")
                         .request(MediaType.APPLICATION_JSON);
 
-                return request.method(HttpMethod.POST, validationInfo.toJsonString().getBytes(), MediaType.APPLICATION_JSON);
+                return request.method(HttpMethod.POST, validationInfo.toJsonString(), MediaType.APPLICATION_JSON);
             }
         });
     }
@@ -173,7 +173,7 @@ public class RemoteSessionEventHandler extends RestClient {
                         .request(MediaType.APPLICATION_JSON);
 
                 String data = "{\"action\":\"validationEnd\", \"asExpected\":" + validationResult.isAsExpected() + "}";
-                return request.method(HttpMethod.PUT, data.getBytes(), MediaType.APPLICATION_JSON);
+                return request.method(HttpMethod.PUT, data, MediaType.APPLICATION_JSON);
             }
         });
     }

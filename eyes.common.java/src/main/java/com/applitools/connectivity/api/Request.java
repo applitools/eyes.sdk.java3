@@ -27,5 +27,5 @@ public abstract class Request {
      * @param contentType The data content type.  If null, no data will be sent.
      * @return Response from the server
      */
-    public abstract Response method(String method, byte[] data, String contentType);
+    public abstract Response method(String method, Object data, String contentType);
 }

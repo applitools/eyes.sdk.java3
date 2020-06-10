@@ -23,7 +23,7 @@ public class RequestImpl extends Request {
     }
 
     @Override
-    public Response method(String method, byte[] data, String contentType) {
+    public Response method(String method, Object data, String contentType) {
         ArgumentGuard.notNullOrEmpty(method, "method");
         if (data != null) {
             if (contentType == null) {

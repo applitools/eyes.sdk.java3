@@ -126,7 +126,7 @@ public class TestServerConnector extends ReportingTestSuite {
         // Handle the first request in the long request
         when(endPoint.request((String) any())).thenReturn(firstRequest);
         when(firstRequest.header(anyString(), anyString())).thenReturn(firstRequest);
-        when(firstRequest.method(eq(httpMethod), (byte[]) any(), anyString())).thenReturn(firstResponse);
+        when(firstRequest.method(eq(httpMethod), any(), anyString())).thenReturn(firstResponse);
         when(firstResponse.getHeader(HttpHeaders.LOCATION, false)).thenReturn(getRequestUri);
         when(firstResponse.getStatusCode()).thenReturn(HttpStatus.SC_ACCEPTED);
 
