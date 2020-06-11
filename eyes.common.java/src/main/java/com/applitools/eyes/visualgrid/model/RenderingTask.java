@@ -301,12 +301,6 @@ public class RenderingTask implements Callable<RenderStatusResults>, Completable
         }
     }
 
-    private void notifyFailedAllListeners(Exception e) {
-        for (RenderTaskListener listener : listeners) {
-            listener.onRenderFailed(e);
-        }
-    }
-
     private Map<RunningRender, RenderRequest> mapRequestToRunningRender(List<RunningRender> runningRenders, RenderRequest[] requests) {
         Map<RunningRender, RenderRequest> mapping = new HashMap<>();
         for (int i = 0; i < requests.length; i++) {
