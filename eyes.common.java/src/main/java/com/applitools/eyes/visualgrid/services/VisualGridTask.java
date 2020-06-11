@@ -246,6 +246,8 @@ public class VisualGridTask implements Callable<TestResultContainer>, Completabl
             listener.onTaskFailed(exception, this);
         }
         logger.verbose("exit - renderId: " + renderId);
+        renderResult = new RenderStatusResults();
+        renderResult.setDeviceSize(configurationGetter.getViewportSize());
     }
 
     public Throwable getException() {

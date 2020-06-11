@@ -2,6 +2,7 @@ package com.applitools.eyes.visualgrid.model;
 
 import com.applitools.ICheckSettings;
 import com.applitools.ICheckSettingsInternal;
+import com.applitools.eyes.EyesException;
 import com.applitools.eyes.Logger;
 import com.applitools.eyes.TaskListener;
 import com.applitools.eyes.UserAgent;
@@ -172,8 +173,15 @@ public class RenderingTask implements Callable<RenderStatusResults>, Completable
                 }
                 logger.verbose("step 3.1");
                 if (runningRenders == null || runningRenders.size() == 0) {
-                    logger.verbose("ERROR - runningRenders is null or empty.");
-                    break;
+                    for (RenderRequest renderRequest : requests) {
+                        for (VisualGridTask openTask : openVisualGridTaskList) {
+                            if (openTask.getRunningTest() == renderRequest.getVisualGridTask().getRunningTest()) {
+                                openTask.setRenderError(null, "Invalid response for render request");
+                            }
+                        }
+                        renderRequest.getVisualGridTask().setRenderError(null, "Invalid response for render request");
+                    }
+                    throw new EyesException("Invalid response for render request");
                 }
 
                 for (int i = 0; i < requests.length; i++) {
@@ -290,6 +298,12 @@ public class RenderingTask implements Callable<RenderStatusResults>, Completable
     private void notifySuccessAllListeners() {
         for (RenderTaskListener listener : listeners) {
             listener.onRenderSuccess();
+        }
+    }
+
+    private void notifyFailedAllListeners(Exception e) {
+        for (RenderTaskListener listener : listeners) {
+            listener.onRenderFailed(e);
         }
     }
 
