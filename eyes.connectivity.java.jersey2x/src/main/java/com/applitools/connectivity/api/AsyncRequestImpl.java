@@ -35,7 +35,7 @@ public class AsyncRequestImpl extends AsyncRequest {
             @Override
             public void completed(Response response) {
                 try {
-                    callback.onComplete(new ResponseImpl(response, logIfError ? logger : null));
+                    callback.onComplete(new ResponseImpl(response, logIfError ? logger : new Logger()));
                 } catch (Exception e) {
                     callback.onFail(e);
                 }

@@ -14,9 +14,7 @@ public class ResponseImpl extends Response {
         super(logger);
         this.response = response;
         readEntity();
-        if (logger != null) {
-            logIfError();
-        }
+        logIfError();
     }
 
     @Override
