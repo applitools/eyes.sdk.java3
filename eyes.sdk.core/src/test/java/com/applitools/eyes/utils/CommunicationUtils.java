@@ -6,6 +6,7 @@ import com.applitools.connectivity.api.HttpClientImpl;
 import com.applitools.connectivity.api.Request;
 import com.applitools.connectivity.api.Response;
 import com.applitools.eyes.BatchInfo;
+import com.applitools.eyes.Logger;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -17,7 +18,7 @@ import javax.ws.rs.core.MediaType;
 public class CommunicationUtils {
 
     private static HttpClient createClient() {
-        return new HttpClientImpl(ServerConnector.DEFAULT_CLIENT_TIMEOUT, null);
+        return new HttpClientImpl(new Logger(), ServerConnector.DEFAULT_CLIENT_TIMEOUT, null);
     }
 
     public static <Tin> void postJson(String url, Tin data, HttpAuth creds) {
@@ -34,7 +35,7 @@ public class CommunicationUtils {
             response = request.method(httpMethod, json, MediaType.APPLICATION_JSON);
             if (response.getStatusCode() != HttpStatus.SC_OK) {
                 System.out.println(String.format("Test report failed. Status: %d %s. Body: %s",
-                        response.getStatusCode(), response.getStatusPhrase(), response.readEntity(String.class)));
+                        response.getStatusCode(), response.getStatusPhrase(), response.getBodyString()));
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -71,7 +72,7 @@ public class CommunicationUtils {
             String url = String.format("%s/api/sessions/batches/%s/bypointerid?apikey=%s", serverUrl, batchId, apikey);
             Request request = httpClient.target(url).request();
             Response response = request.method(HttpMethod.GET, null, null);
-            String data = response.readEntity(String.class);
+            String data = response.getBodyString();
             response.close();
             batchInfo = null;
             if (response.getStatusCode() == 200) {
