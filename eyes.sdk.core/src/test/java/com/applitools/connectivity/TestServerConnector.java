@@ -81,7 +81,7 @@ public class TestServerConnector extends ReportingTestSuite {
         }
 
         @Override
-        public Future<?> method(String method, AsyncRequestCallback callback, Object data, String contentType) {
+        public Future<?> method(String method, AsyncRequestCallback callback, Object data, String contentType, boolean logIfError) {
             return null;
         }
     }
