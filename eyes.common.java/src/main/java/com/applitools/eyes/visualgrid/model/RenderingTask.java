@@ -173,14 +173,7 @@ public class RenderingTask implements Callable<RenderStatusResults>, Completable
                 }
                 logger.verbose("step 3.1");
                 if (runningRenders == null || runningRenders.size() == 0) {
-                    for (RenderRequest renderRequest : requests) {
-                        for (VisualGridTask openTask : openVisualGridTaskList) {
-                            if (openTask.getRunningTest() == renderRequest.getVisualGridTask().getRunningTest()) {
-                                openTask.setRenderError(null, "Invalid response for render request");
-                            }
-                        }
-                        renderRequest.getVisualGridTask().setRenderError(null, "Invalid response for render request");
-                    }
+                    setRenderErrorToTasks(requests);
                     throw new EyesException("Invalid response for render request");
                 }
 
@@ -292,6 +285,17 @@ public class RenderingTask implements Callable<RenderStatusResults>, Completable
             } catch (Exception e) {
                 GeneralUtils.logExceptionStackTrace(logger, e);
             }
+        }
+    }
+
+    private void setRenderErrorToTasks(RenderRequest[] requests) {
+        for (RenderRequest renderRequest : requests) {
+            for (VisualGridTask openTask : openVisualGridTaskList) {
+                if (openTask.getRunningTest() == renderRequest.getVisualGridTask().getRunningTest()) {
+                    openTask.setRenderError(null, "Invalid response for render request");
+                }
+            }
+            renderRequest.getVisualGridTask().setRenderError(null, "Invalid response for render request");
         }
     }
 
