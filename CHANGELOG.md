@@ -1,6 +1,7 @@
 ## [vNext]
 ### Fixed
-- Test now won't run forever after a failed rendering in the VG server. [Trello 1907](https://trello.com/c/n80nncwf)
+- Tests now report their status properly. [Trello 1902](https://trello.com/c/Y8SZwm6m)
+- Tests now won't run forever after a failed rendering in the VG server. [Trello 1907](https://trello.com/c/n80nncwf)
 ### Updated
 - Updated browser info api as required. [Trello 1872](https://trello.com/c/bykk2rzB)
 
