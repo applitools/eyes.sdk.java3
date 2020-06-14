@@ -59,7 +59,7 @@ public abstract class ReportingTestSuite {
 
     @AfterClass
     public void oneTimeTearDown(ITestContext testContext) {
-        System.out.println("Unified report: sending JSON to report " + reportSummary.toString());
+        System.out.println(String.format("Reporting test %s: %s", this.getClass().getName(), reportSummary));
         try {
             CommunicationUtils.postJson("http://sdk-test-results.herokuapp.com/result", reportSummary, null);
         } catch (Throwable t) {

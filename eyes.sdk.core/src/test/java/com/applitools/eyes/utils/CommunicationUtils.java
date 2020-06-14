@@ -20,10 +20,6 @@ public class CommunicationUtils {
         return new HttpClientImpl(ServerConnector.DEFAULT_CLIENT_TIMEOUT, null);
     }
 
-    public static <Tin> void putJson(String url, Tin data, HttpAuth creds) {
-        jsonRequest(url, data, creds, HttpMethod.PUT);
-    }
-
     public static <Tin> void postJson(String url, Tin data, HttpAuth creds) {
         jsonRequest(url, data, creds, HttpMethod.POST);
     }
