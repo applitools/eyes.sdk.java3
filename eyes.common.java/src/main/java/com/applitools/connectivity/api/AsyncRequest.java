@@ -28,7 +28,12 @@ public abstract class AsyncRequest {
      * @param callback To be called when the response is received
      * @param data The data to send with the request. If null, no data will be sent.
      * @param contentType The data content type.  If null, no data will be sent.
+     * @param logIfError If true, a detailed log will be written in case of an error.
      * @return Response from the server
      */
-    public abstract Future<?> method(String method, AsyncRequestCallback callback, Object data, String contentType);
+    public abstract Future<?> method(String method, AsyncRequestCallback callback, Object data, String contentType, boolean logIfError);
+
+    public Future<?> method(String method, AsyncRequestCallback callback, Object data, String contentType) {
+        return method(method, callback, data, contentType, true);
+    }
 }

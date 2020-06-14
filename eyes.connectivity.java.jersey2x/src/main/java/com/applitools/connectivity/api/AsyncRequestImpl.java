@@ -28,13 +28,17 @@ public class AsyncRequestImpl extends AsyncRequest {
     }
 
     @Override
-    public Future<?> method(String method, final AsyncRequestCallback callback, Object data, String contentType) {
+    public Future<?> method(String method, final AsyncRequestCallback callback, Object data, String contentType, final boolean logIfError) {
         ArgumentGuard.notNullOrEmpty(method, "method");
 
         InvocationCallback<Response> invocationCallback = new InvocationCallback<Response>() {
             @Override
             public void completed(Response response) {
-                callback.onComplete(new ResponseImpl(response, logger));
+                try {
+                    callback.onComplete(new ResponseImpl(response, logIfError ? logger : null));
+                } catch (Exception e) {
+                    callback.onFail(e);
+                }
             }
 
             @Override

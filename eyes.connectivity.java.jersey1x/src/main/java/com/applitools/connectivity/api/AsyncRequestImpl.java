@@ -6,7 +6,6 @@ import com.sun.jersey.api.client.AsyncWebResource;
 import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.client.async.TypeListener;
 
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
 public class AsyncRequestImpl extends AsyncRequest {
@@ -27,7 +26,7 @@ public class AsyncRequestImpl extends AsyncRequest {
     }
 
     @Override
-    public Future<?> method(String method, final AsyncRequestCallback callback, Object data, String contentType) {
+    public Future<?> method(String method, final AsyncRequestCallback callback, Object data, String contentType, final boolean logIfError) {
         ArgumentGuard.notNullOrEmpty(method, "method");
         if (data != null) {
             if (contentType == null) {
@@ -39,10 +38,10 @@ public class AsyncRequestImpl extends AsyncRequest {
 
         return request.method(method, new TypeListener<ClientResponse>(ClientResponse.class) {
             @Override
-            public void onComplete(Future<ClientResponse> f) throws InterruptedException {
+            public void onComplete(Future<ClientResponse> f) {
                 try {
-                    callback.onComplete(new ResponseImpl(f.get(), logger));
-                } catch (ExecutionException e) {
+                    callback.onComplete(new ResponseImpl(f.get(), logIfError ? logger : null));
+                } catch (Exception e) {
                     callback.onFail(e);
                 }
             }

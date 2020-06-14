@@ -324,7 +324,7 @@ public class ServerConnector extends RestClient implements IServerConnector {
                     listener.onFail();
                 }
             }
-        }, null, null);
+        }, null, null, false);
     }
 
     public Future<?> downloadResource(final URI url, final String userAgent, final String refererUrl,
@@ -384,7 +384,7 @@ public class ServerConnector extends RestClient implements IServerConnector {
                     listener.onFail();
                 }
             }
-        }, null, null);
+        }, null, null, false);
     }
 
     public RenderingInfo getRenderInfo() {
