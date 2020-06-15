@@ -12,7 +12,7 @@ import java.util.List;
 
 public class TestAPI extends ReportingTestSuite {
     public TestAPI(){
-        super.setGroupName("Core");
+        super.setGroupName("core");
     }
     @Test
     public void TestBrowserNames() {

@@ -12,6 +12,7 @@ import com.applitools.utils.GeneralUtils;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.testng.Assert;
 import org.testng.annotations.DataProvider;
+import org.testng.annotations.Listeners;
 import org.testng.annotations.Test;
 
 import java.io.IOException;
@@ -20,6 +21,7 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+@Listeners(TestListener.class)
 public class TestRenderings {
 
     @Test

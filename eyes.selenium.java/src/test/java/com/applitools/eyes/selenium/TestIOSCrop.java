@@ -3,6 +3,7 @@ package com.applitools.eyes.selenium;
 import com.applitools.eyes.Logger;
 import com.applitools.eyes.RectangleSize;
 import com.applitools.eyes.selenium.capture.SafariScreenshotImageProvider;
+import com.applitools.eyes.utils.ReportingTestSuite;
 import com.applitools.eyes.utils.TestUtils;
 import com.applitools.utils.ImageUtils;
 import org.openqa.selenium.ScreenOrientation;
@@ -17,7 +18,11 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-public class TestIOSCrop {
+public class TestIOSCrop extends ReportingTestSuite {
+
+    public TestIOSCrop() {
+        super.setGroupName("selenium");
+    }
 
     @DataProvider(name = "IOSDevices", parallel = true)
     public static Object[][] IOSDevices() {

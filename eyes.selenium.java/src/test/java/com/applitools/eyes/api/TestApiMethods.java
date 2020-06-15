@@ -6,6 +6,7 @@ import com.applitools.eyes.selenium.ClassicRunner;
 import com.applitools.eyes.selenium.Eyes;
 import com.applitools.eyes.selenium.TestDataProvider;
 import com.applitools.eyes.selenium.fluent.Target;
+import com.applitools.eyes.utils.ReportingTestSuite;
 import com.applitools.eyes.utils.SeleniumUtils;
 import com.applitools.eyes.utils.TestUtils;
 import com.applitools.eyes.visualgrid.services.VisualGridRunner;
@@ -13,7 +14,11 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.testng.annotations.Test;
 
-public class TestApiMethods {
+public class TestApiMethods extends ReportingTestSuite {
+
+    public TestApiMethods() {
+        super.setGroupName("selenium");
+    }
 
     @Test(dataProvider = "booleanDP", dataProviderClass = TestDataProvider.class)
     public void TestCloseAsync(boolean useVisualGrid) {

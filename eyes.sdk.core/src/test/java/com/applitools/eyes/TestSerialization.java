@@ -4,6 +4,7 @@ import com.applitools.ICheckSettings;
 import com.applitools.eyes.config.Configuration;
 import com.applitools.eyes.fluent.ICheckSettingsInternal;
 import com.applitools.eyes.fluent.Target;
+import com.applitools.eyes.utils.ReportingTestSuite;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.testng.Assert;
@@ -16,7 +17,11 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.TimeZone;
 
-public class TestSerialization {
+public class TestSerialization extends ReportingTestSuite {
+
+    public TestSerialization() {
+        super.setGroupName("core");
+    }
 
     /**
      * Used for serialization testing

@@ -1,6 +1,7 @@
 package com.applitools.eyes.selenium;
 
 import com.applitools.eyes.selenium.fluent.Target;
+import com.applitools.eyes.utils.ReportingTestSuite;
 import com.applitools.eyes.utils.TestUtils;
 import io.appium.java_client.MobileBy;
 import io.appium.java_client.MobileElement;
@@ -15,7 +16,11 @@ import java.net.URL;
 
 import static com.applitools.eyes.selenium.TestDataProvider.*;
 
-public class MobileNativeTests {
+public class MobileNativeTests extends ReportingTestSuite {
+
+    public MobileNativeTests() {
+        super.setGroupName("selenium");
+    }
 
     private void setCapabilities(Eyes eyes, DesiredCapabilities capabilities, String methodName) {
         capabilities.setCapability("username", SAUCE_USERNAME);

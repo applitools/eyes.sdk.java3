@@ -1,22 +1,21 @@
 package com.applitools.eyes.renderingGrid;
 
 import com.applitools.eyes.EyesRunner;
-import com.applitools.eyes.selenium.BrowserType;
-import com.applitools.eyes.selenium.Configuration;
-import com.applitools.eyes.selenium.Eyes;
-import com.applitools.eyes.selenium.TestDataProvider;
+import com.applitools.eyes.selenium.*;
 import com.applitools.eyes.selenium.rendering.VisualGridEyes;
 import com.applitools.eyes.utils.SeleniumUtils;
 import com.applitools.eyes.utils.TestUtils;
 import com.applitools.eyes.visualgrid.services.VisualGridRunner;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
+import org.testng.annotations.Listeners;
 import org.testng.annotations.Test;
 
+@Listeners(TestListener.class)
 public class TestVGCloseAsync {
 
     @Test
-    public void TestCloseAsync() {
+    public void TestVGCloseAsync() {
         EyesRunner runner = new VisualGridRunner(10);
         Eyes eyes = new Eyes(runner);
         TestUtils.setupLogging(eyes);

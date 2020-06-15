@@ -2,12 +2,14 @@ package com.applitools.eyes.renderingGrid;
 
 import com.applitools.eyes.Logger;
 import com.applitools.eyes.selenium.Configuration;
+import com.applitools.eyes.selenium.TestListener;
 import com.applitools.eyes.selenium.rendering.VisualGridEyes;
 import com.applitools.eyes.utils.TestUtils;
 import com.applitools.eyes.visualgrid.model.RenderBrowserInfo;
 import com.applitools.eyes.visualgrid.services.RunningTest;
 import com.applitools.eyes.visualgrid.services.VisualGridTask;
 import org.testng.Assert;
+import org.testng.annotations.Listeners;
 import org.testng.annotations.Test;
 
 import java.util.ArrayList;
@@ -15,6 +17,7 @@ import java.util.List;
 
 import static com.applitools.eyes.visualgrid.services.VisualGridTask.TaskType.*;
 
+@Listeners(TestListener.class)
 public class TestVGNoMissingSteps {
     private static Logger logger = new Logger();
     private static RenderBrowserInfo browserInfo = new RenderBrowserInfo(10, 10);

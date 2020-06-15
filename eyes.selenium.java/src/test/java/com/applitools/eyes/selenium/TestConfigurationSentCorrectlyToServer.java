@@ -9,11 +9,13 @@ import com.applitools.eyes.visualgrid.services.VisualGridRunner;
 import org.openqa.selenium.WebDriver;
 import org.testng.Assert;
 import org.testng.annotations.DataProvider;
+import org.testng.annotations.Listeners;
 import org.testng.annotations.Test;
 
 import java.io.IOException;
 import java.util.Calendar;
 
+@Listeners(TestListener.class)
 public class TestConfigurationSentCorrectlyToServer extends EnvironmentModifier {
 
     @DataProvider(name = "dp")

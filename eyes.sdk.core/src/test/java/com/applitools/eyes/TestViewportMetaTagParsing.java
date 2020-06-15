@@ -1,10 +1,15 @@
 package com.applitools.eyes;
 
+import com.applitools.eyes.utils.ReportingTestSuite;
 import org.testng.Assert;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
-public class TestViewportMetaTagParsing {
+public class TestViewportMetaTagParsing extends ReportingTestSuite {
+
+    public TestViewportMetaTagParsing() {
+        super.setGroupName("core");
+    }
 
     @DataProvider(name = "dp")
     public static Object[][] dp() {

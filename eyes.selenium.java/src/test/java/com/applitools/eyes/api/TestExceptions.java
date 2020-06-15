@@ -7,13 +7,18 @@ import com.applitools.eyes.selenium.ClassicRunner;
 import com.applitools.eyes.selenium.Configuration;
 import com.applitools.eyes.selenium.Eyes;
 import com.applitools.eyes.selenium.TestDataProvider;
+import com.applitools.eyes.utils.ReportingTestSuite;
 import com.applitools.eyes.utils.SeleniumUtils;
 import com.applitools.eyes.visualgrid.services.VisualGridRunner;
 import org.openqa.selenium.WebDriver;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
-public class TestExceptions {
+public class TestExceptions extends ReportingTestSuite {
+
+    public TestExceptions() {
+        super.setGroupName("selenium");
+    }
 
     @Test(dataProvider = "booleanDP", dataProviderClass = TestDataProvider.class)
     public void TestEyesExceptions(boolean useVisualGrid) {

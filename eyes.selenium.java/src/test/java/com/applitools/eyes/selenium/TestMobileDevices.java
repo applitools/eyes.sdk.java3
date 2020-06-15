@@ -2,13 +2,15 @@ package com.applitools.eyes.selenium;
 
 import com.applitools.eyes.TestResults;
 import com.applitools.eyes.selenium.fluent.Target;
-import com.applitools.eyes.utils.*;
+import com.applitools.eyes.utils.ChromeMobileEmulationDeviceSettings;
+import com.applitools.eyes.utils.ReportingTestSuite;
+import com.applitools.eyes.utils.SeleniumUtils;
+import com.applitools.eyes.utils.TestUtils;
 import org.openqa.selenium.ScreenOrientation;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.remote.RemoteWebDriver;
-import org.openqa.selenium.remote.SessionId;
 import org.testng.ITest;
 import org.testng.annotations.DataProvider;
 
@@ -20,7 +22,8 @@ import java.util.concurrent.TimeUnit;
 import static com.applitools.eyes.selenium.TestDataProvider.*;
 
 
-public class TestMobileDevices implements ITest {
+public class TestMobileDevices extends ReportingTestSuite implements ITest {
+
     public final String deviceName;
     public final String platformVersion;
     public final ScreenOrientation deviceOrientation;
@@ -28,6 +31,7 @@ public class TestMobileDevices implements ITest {
     private final String testName;
 
     public TestMobileDevices(String deviceName, String platformVersion, ScreenOrientation deviceOrientation, String page) {
+        super.setGroupName("selenium");
         this.deviceName = deviceName;
         this.platformVersion = platformVersion;
         this.deviceOrientation = deviceOrientation;

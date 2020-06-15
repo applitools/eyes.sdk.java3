@@ -4,6 +4,7 @@ import com.applitools.eyes.EyesRunner;
 import com.applitools.eyes.RectangleSize;
 import com.applitools.eyes.selenium.*;
 import com.applitools.eyes.selenium.fluent.Target;
+import com.applitools.eyes.utils.ReportingTestSuite;
 import com.applitools.eyes.utils.SeleniumUtils;
 import com.applitools.eyes.visualgrid.services.VisualGridRunner;
 import org.openqa.selenium.WebDriver;
@@ -12,7 +13,8 @@ import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Factory;
 import org.testng.annotations.Test;
 
-public class TestAbort {
+public class TestAbort extends ReportingTestSuite {
+
     private WebDriver driver;
     private Eyes eyes;
     private EyesRunner runner;
@@ -20,6 +22,7 @@ public class TestAbort {
 
     @Factory(dataProvider = "booleanDP", dataProviderClass = TestDataProvider.class)
     public TestAbort(boolean useVisualGrid) {
+        super.setGroupName("selenium");
         this.useVisualGrid = useVisualGrid;
     }
 
