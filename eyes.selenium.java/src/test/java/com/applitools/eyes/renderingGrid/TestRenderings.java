@@ -4,6 +4,7 @@ import com.applitools.eyes.*;
 import com.applitools.eyes.metadata.SessionResults;
 import com.applitools.eyes.selenium.*;
 import com.applitools.eyes.selenium.fluent.Target;
+import com.applitools.eyes.utils.ReportingTestSuite;
 import com.applitools.eyes.utils.SeleniumUtils;
 import com.applitools.eyes.utils.TestUtils;
 import com.applitools.eyes.visualgrid.model.*;
@@ -21,8 +22,11 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-@Listeners(TestListener.class)
-public class TestRenderings {
+public class TestRenderings extends ReportingTestSuite {
+
+    public TestRenderings() {
+        super.setGroupName("selenium");
+    }
 
     @Test
     public void TestMobileOnly() {

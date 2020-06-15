@@ -4,19 +4,22 @@ import com.applitools.ICheckSettings;
 import com.applitools.eyes.*;
 import com.applitools.eyes.fluent.ICheckSettingsInternal;
 import com.applitools.eyes.selenium.fluent.Target;
+import com.applitools.eyes.utils.ReportingTestSuite;
 import com.applitools.utils.GeneralUtils;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import org.testng.Assert;
 import org.testng.annotations.DataProvider;
-import org.testng.annotations.Listeners;
 import org.testng.annotations.Test;
 
 import java.io.IOException;
 import java.util.Calendar;
 
-@Listeners(TestListener.class)
-public class TestSessionStartInfo {
+public class TestSessionStartInfo extends ReportingTestSuite {
+
+    public TestSessionStartInfo() {
+        super.setGroupName("selenium");
+    }
 
     @Test()
     public void TestSessionInfo() {

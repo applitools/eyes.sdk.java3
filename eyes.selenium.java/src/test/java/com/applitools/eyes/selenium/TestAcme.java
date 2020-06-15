@@ -11,7 +11,6 @@ import org.testng.annotations.Listeners;
 import org.testng.annotations.Test;
 
 @Listeners(TestListener.class)
-@SuppressWarnings("SpellCheckingInspection")
 public class TestAcme extends TestSetup {
 
     @Factory(dataProvider = "dp", dataProviderClass = TestDataProvider.class)
@@ -19,18 +18,6 @@ public class TestAcme extends TestSetup {
         super("Eyes Selenium SDK - ACME", caps, mode);
         testedPageSize = new RectangleSize(1024, 768);
     }
-
-//    @Test
-//    public void Test(){
-//        getDriver().get("file:///C:/temp/fluentexample/Account%20-%20ACME.html");
-//        getEyes().check("main window with table",
-//                Target.window()
-//                        .fully()
-//                        .ignore(By.className("toolbar"))
-//                        .layout(By.id("orders-list-desktop"), By.className("snapshot-topic"), By.id("results-count"))
-//                        .strict()
-//        );
-//    }
 
     @Test
     public void TestAcmeLogin() {

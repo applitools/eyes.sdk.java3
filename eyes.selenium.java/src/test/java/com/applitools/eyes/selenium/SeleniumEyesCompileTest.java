@@ -4,17 +4,16 @@ import com.applitools.eyes.*;
 import com.applitools.eyes.selenium.fluent.SeleniumCheckSettings;
 import com.applitools.eyes.selenium.positioning.ImageRotation;
 import com.applitools.eyes.triggers.MouseAction;
+import com.applitools.eyes.utils.ReportingTestSuite;
 import com.applitools.eyes.utils.SeleniumUtils;
 import com.applitools.eyes.utils.TestUtils;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.testng.annotations.BeforeClass;
-import org.testng.annotations.Listeners;
 import org.testng.annotations.Test;
 
-@Listeners(TestListener.class)
-public class SeleniumEyesCompileTest {
+public class SeleniumEyesCompileTest extends ReportingTestSuite {
     private Eyes eyes;
     private Region region = new Region(10, 10, 10, 10);
     private WebElement webElement = null;
@@ -28,8 +27,7 @@ public class SeleniumEyesCompileTest {
 
 
     public SeleniumEyesCompileTest() {
-
-
+        super.setGroupName("selenium");
     }
 
     @BeforeClass()

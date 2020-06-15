@@ -8,7 +8,7 @@ import com.applitools.eyes.metadata.ActualAppOutput;
 import com.applitools.eyes.metadata.SessionResults;
 import com.applitools.eyes.selenium.fluent.Target;
 import com.applitools.eyes.selenium.wrappers.EyesWebDriver;
-import com.applitools.eyes.utils.CommunicationUtils;
+import com.applitools.eyes.utils.ReportingTestSuite;
 import com.applitools.eyes.utils.SeleniumUtils;
 import com.applitools.eyes.utils.TestUtils;
 import com.applitools.utils.GeneralUtils;
@@ -18,14 +18,16 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.testng.Assert;
 import org.testng.annotations.BeforeClass;
-import org.testng.annotations.Listeners;
 import org.testng.annotations.Test;
 
 import java.io.IOException;
 import java.util.Comparator;
 
-@Listeners(TestListener.class)
-public final class TestSendDom {
+public final class TestSendDom extends ReportingTestSuite {
+
+    public TestSendDom() {
+        super.setGroupName("selenium");
+    }
 
     @BeforeClass(alwaysRun = true)
     public void OneTimeSetUp() {

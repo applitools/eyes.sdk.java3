@@ -6,18 +6,20 @@ import com.applitools.eyes.TestResultsSummary;
 import com.applitools.eyes.selenium.ClassicRunner;
 import com.applitools.eyes.selenium.Eyes;
 import com.applitools.eyes.selenium.TestDataProvider;
-import com.applitools.eyes.selenium.TestListener;
 import com.applitools.eyes.selenium.fluent.Target;
+import com.applitools.eyes.utils.ReportingTestSuite;
 import com.applitools.eyes.utils.SeleniumUtils;
 import com.applitools.eyes.visualgrid.services.VisualGridRunner;
 import org.openqa.selenium.WebDriver;
 import org.testng.Assert;
 import org.testng.annotations.DataProvider;
-import org.testng.annotations.Listeners;
 import org.testng.annotations.Test;
 
-@Listeners(TestListener.class)
-public class TestDoubleOpenClose {
+public class TestDoubleOpenClose extends ReportingTestSuite {
+
+    public TestDoubleOpenClose() {
+        super.setGroupName("selenium");
+    }
 
     @DataProvider(name = "booleanDP")
     public Object[] dp() {

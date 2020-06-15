@@ -5,14 +5,18 @@ import com.applitools.eyes.EyesRunner;
 import com.applitools.eyes.FileLogger;
 import com.applitools.eyes.RectangleSize;
 import com.applitools.eyes.utils.CommunicationUtils;
+import com.applitools.eyes.utils.ReportingTestSuite;
 import com.applitools.eyes.utils.SeleniumUtils;
 import org.openqa.selenium.WebDriver;
 import org.testng.Assert;
-import org.testng.annotations.Listeners;
 import org.testng.annotations.Test;
 
-@Listeners(TestListener.class)
-public final class TestBatchAPI {
+public final class TestBatchAPI extends ReportingTestSuite {
+
+    public TestBatchAPI() {
+        super.setGroupName("selenium");
+    }
+
     @Test
     public void testCloseBatch() {
         ClassicRunner classicRunner = new ClassicRunner();

@@ -3,6 +3,7 @@ package com.applitools.eyes.renderingGrid;
 import com.applitools.eyes.EyesRunner;
 import com.applitools.eyes.selenium.*;
 import com.applitools.eyes.selenium.rendering.VisualGridEyes;
+import com.applitools.eyes.utils.ReportingTestSuite;
 import com.applitools.eyes.utils.SeleniumUtils;
 import com.applitools.eyes.utils.TestUtils;
 import com.applitools.eyes.visualgrid.services.VisualGridRunner;
@@ -11,8 +12,11 @@ import org.openqa.selenium.WebDriver;
 import org.testng.annotations.Listeners;
 import org.testng.annotations.Test;
 
-@Listeners(TestListener.class)
-public class TestVGCloseAsync {
+public class TestVGCloseAsync extends ReportingTestSuite {
+
+    public TestVGCloseAsync() {
+        super.setGroupName("selenium");
+    }
 
     @Test
     public void TestVGCloseAsync() {

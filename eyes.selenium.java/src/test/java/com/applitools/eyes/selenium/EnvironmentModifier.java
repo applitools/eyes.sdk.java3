@@ -1,13 +1,16 @@
 package com.applitools.eyes.selenium;
 
+import com.applitools.eyes.utils.ReportingTestSuite;
+
 import java.lang.reflect.Field;
 import java.util.Map;
 
-class EnvironmentModifier {
+class EnvironmentModifier extends ReportingTestSuite {
 
     private Map<String, String> unmodifiedEnvMap = null;
 
     public EnvironmentModifier() {
+        super.setGroupName("selenium");
         try {
             Class<?> processEnvironment = Class.forName("java.lang.ProcessEnvironment");
 

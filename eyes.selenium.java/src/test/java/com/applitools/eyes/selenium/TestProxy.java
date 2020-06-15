@@ -2,16 +2,19 @@ package com.applitools.eyes.selenium;
 
 import com.applitools.eyes.EyesException;
 import com.applitools.eyes.ProxySettings;
+import com.applitools.eyes.utils.ReportingTestSuite;
 import com.applitools.eyes.utils.SeleniumUtils;
 import org.openqa.selenium.WebDriver;
 import org.testng.Assert;
-import org.testng.annotations.Listeners;
 import org.testng.annotations.Test;
 
 import java.io.IOException;
 
-@Listeners(TestListener.class)
-public class TestProxy {
+public class TestProxy extends ReportingTestSuite {
+
+    public TestProxy() {
+        super.setGroupName("selenium");
+    }
 
     @Test
     public void testNetworkThroughProxy() throws IOException, InterruptedException {
