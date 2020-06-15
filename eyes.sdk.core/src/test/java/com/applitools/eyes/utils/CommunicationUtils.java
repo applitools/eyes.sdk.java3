@@ -21,10 +21,6 @@ public class CommunicationUtils {
         return new HttpClientImpl(new Logger(), ServerConnector.DEFAULT_CLIENT_TIMEOUT, null);
     }
 
-    public static <Tin> void postJson(String url, Tin data, HttpAuth creds) {
-        jsonRequest(url, data, creds, HttpMethod.POST);
-    }
-
     public static <Tin> void jsonRequest(String url, Tin data, HttpAuth creds, String httpMethod) {
         HttpClient httpClient = createClient();
         Response response = null;
@@ -34,11 +30,9 @@ public class CommunicationUtils {
             String json = createJsonString(data);
             response = request.method(httpMethod, json, MediaType.APPLICATION_JSON);
             if (response.getStatusCode() != HttpStatus.SC_OK) {
-                System.out.println(String.format("Test report failed. Status: %d %s. Body: %s",
+                throw new IllegalStateException(String.format("Test report failed. Status: %d %s. Body: %s",
                         response.getStatusCode(), response.getStatusPhrase(), response.getBodyString()));
             }
-        } catch (Exception e) {
-            e.printStackTrace();
         } finally {
             if (response != null) {
                 response.close();
