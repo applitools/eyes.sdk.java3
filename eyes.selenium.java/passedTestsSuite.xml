@@ -47,7 +47,7 @@
         <classes>
             <class name="com.applitools.eyes.selenium.TestScrollRootElementOnSimplePage">
                 <methods>
-                    <include name="TestCheckWindowSimpleHtml" />
+                    <include name="TestCheckWindow_Simple_Html" />
                 </methods>
             </class>
         </classes>
