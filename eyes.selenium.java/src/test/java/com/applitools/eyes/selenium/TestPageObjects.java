@@ -3,7 +3,6 @@ package com.applitools.eyes.selenium;
 import com.applitools.eyes.*;
 import com.applitools.eyes.utils.SeleniumUtils;
 import com.applitools.eyes.visualgrid.services.VisualGridRunner;
-import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
@@ -17,19 +16,13 @@ public class TestPageObjects {
     private WebDriver driver;
     private final LogHandler logger = new StdoutLogHandler(false);
 
-    public static class GoogleSearchPage {
+    public static class DemoPage {
         // The element is now looked up using the name attribute
-        @FindBy(name = "q")
-        private WebElement searchBox;
+        @FindBy(id = "centered")
+        private WebElement greenRectangleElement;
 
-        public void searchFor(String text) {
-            // We continue using the element just as before
-            searchBox.sendKeys(text);
-            searchBox.submit();
-        }
-
-        public WebElement getElement() {
-            return searchBox;
+        public WebElement getGreenRectangleElement() {
+            return greenRectangleElement;
         }
     }
 
@@ -51,10 +44,10 @@ public class TestPageObjects {
         eyes.setLogHandler(logger);
         try {
             eyes.open(driver, "Java Eyes SDK", "testPageObject" + suffix, new RectangleSize(800, 800));
-            driver.get("http://www.google.com/");
-            GoogleSearchPage page = PageFactory.initElements(driver, GoogleSearchPage.class);
+            driver.get("https://applitools.github.io/demo/TestPages/FramesTestPage/");
+            DemoPage page = PageFactory.initElements(driver, DemoPage.class);
             //page.searchFor("Cheese");
-            eyes.checkRegion(page.getElement());
+            eyes.checkRegion(page.getGreenRectangleElement());
             eyes.closeAsync();
         } finally {
             eyes.abortAsync();
