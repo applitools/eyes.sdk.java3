@@ -4,17 +4,20 @@ import com.applitools.ICheckSettings;
 import com.applitools.ICheckSettingsInternal;
 import com.applitools.connectivity.ServerConnector;
 import com.applitools.eyes.*;
+import com.applitools.eyes.config.Configuration;
 import com.applitools.eyes.fluent.CheckSettings;
 import com.applitools.eyes.fluent.GetFloatingRegion;
 import com.applitools.eyes.fluent.GetRegion;
-import com.applitools.eyes.selenium.*;
+import com.applitools.eyes.selenium.BrowserType;
+import com.applitools.eyes.selenium.EyesSeleniumUtils;
+import com.applitools.eyes.selenium.ISeleniumEyes;
+import com.applitools.eyes.config.ConfigurationProvider;
 import com.applitools.eyes.selenium.fluent.*;
 import com.applitools.eyes.selenium.frames.Frame;
 import com.applitools.eyes.selenium.frames.FrameChain;
 import com.applitools.eyes.selenium.wrappers.EyesTargetLocator;
 import com.applitools.eyes.selenium.wrappers.EyesWebDriver;
 import com.applitools.eyes.visualgrid.model.*;
-import com.applitools.eyes.visualgrid.model.RenderBrowserInfo;
 import com.applitools.eyes.visualgrid.services.*;
 import com.applitools.utils.ArgumentGuard;
 import com.applitools.utils.ClassVersionGetter;
@@ -56,7 +59,7 @@ public class VisualGridEyes implements ISeleniumEyes, IRenderingEyes {
     private Set<Future<TestResultContainer>> closeFuturesSet = new HashSet<>();
     private Boolean isDisabled = Boolean.FALSE;
     private ServerConnector serverConnector = null;
-    private final SeleniumConfigurationProvider configurationProvider;
+    private final ConfigurationProvider configurationProvider;
     private UserAgent userAgent = null;
     private RectangleSize viewportSize;
     private AtomicBoolean isCheckTimerTimedOut = new AtomicBoolean(false);
@@ -91,7 +94,7 @@ public class VisualGridEyes implements ISeleniumEyes, IRenderingEyes {
         }
     }
 
-    public VisualGridEyes(VisualGridRunner renderingGridManager, SeleniumConfigurationProvider configurationProvider) {
+    public VisualGridEyes(VisualGridRunner renderingGridManager, ConfigurationProvider configurationProvider) {
         this.configurationProvider = configurationProvider;
         ArgumentGuard.notNull(renderingGridManager, "renderingGridRunner");
         this.renderingGridRunner = renderingGridManager;

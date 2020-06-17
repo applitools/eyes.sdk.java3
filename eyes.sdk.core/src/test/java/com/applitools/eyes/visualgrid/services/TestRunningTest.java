@@ -1,8 +1,8 @@
 package com.applitools.eyes.visualgrid.services;
 
 import com.applitools.eyes.Logger;
-import com.applitools.eyes.selenium.Configuration;
-import com.applitools.eyes.selenium.SeleniumConfigurationProvider;
+import com.applitools.eyes.config.Configuration;
+import com.applitools.eyes.config.ConfigurationProvider;
 import com.applitools.eyes.utils.ReportingTestSuite;
 import com.applitools.eyes.visualgrid.model.RenderBrowserInfo;
 import org.testng.Assert;
@@ -18,7 +18,7 @@ public class TestRunningTest extends ReportingTestSuite {
 
     RenderBrowserInfo browserInfo = mock(RenderBrowserInfo.class);
     Logger logger = mock(Logger.class);
-    SeleniumConfigurationProvider configurationProvider = mock(SeleniumConfigurationProvider.class);
+    ConfigurationProvider configurationProvider = mock(ConfigurationProvider.class);
 
     RunningTest runningTest;
     VisualGridTask openTask;

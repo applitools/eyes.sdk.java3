@@ -4,7 +4,7 @@ import com.applitools.ICheckSettings;
 import com.applitools.ICheckSettingsInternal;
 import com.applitools.eyes.*;
 import com.applitools.eyes.exceptions.DiffsFoundException;
-import com.applitools.eyes.selenium.Configuration;
+import com.applitools.eyes.config.Configuration;
 import com.applitools.eyes.visualgrid.model.*;
 import com.applitools.eyes.visualgrid.model.RenderBrowserInfo;
 import com.applitools.utils.ArgumentGuard;

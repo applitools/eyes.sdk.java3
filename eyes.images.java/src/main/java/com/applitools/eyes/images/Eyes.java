@@ -6,6 +6,7 @@ package com.applitools.eyes.images;
 import com.applitools.ICheckSettings;
 import com.applitools.eyes.*;
 import com.applitools.eyes.config.Configuration;
+import com.applitools.eyes.config.IConfiguration;
 import com.applitools.eyes.events.ValidationInfo;
 import com.applitools.eyes.events.ValidationResult;
 import com.applitools.eyes.exceptions.TestFailedException;
@@ -20,7 +21,7 @@ import com.applitools.utils.ImageUtils;
 import java.awt.image.BufferedImage;
 
 @SuppressWarnings({"WeakerAccess", "UnusedReturnValue"})
-public class Eyes extends EyesBase {
+public class Eyes extends EyesBase implements IConfiguration {
 
     private String title;
     private EyesImagesScreenshot screenshot;

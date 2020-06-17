@@ -225,7 +225,7 @@ public abstract class EyesBase implements IEyesBase{
         if (serverConnector == null) {
             throw new EyesException("server connector not set.");
         }
-        getConfiguration().setProxy(abstractProxySettings);
+
         serverConnector.setProxy(abstractProxySettings);
         return getConfiguration();
     }

@@ -5,9 +5,9 @@ import com.applitools.ICheckSettings;
 import com.applitools.eyes.IBatchCloser;
 import com.applitools.eyes.Logger;
 import com.applitools.eyes.TestResultContainer;
-import com.applitools.eyes.selenium.Configuration;
+import com.applitools.eyes.config.Configuration;
 import com.applitools.eyes.visualgrid.model.RenderBrowserInfo;
-import com.applitools.eyes.selenium.SeleniumConfigurationProvider;
+import com.applitools.eyes.config.ConfigurationProvider;
 import com.applitools.eyes.visualgrid.model.RenderingTask;
 import com.applitools.eyes.visualgrid.model.VisualGridSelector;
 
@@ -24,7 +24,7 @@ public class RunningTest {
     private AtomicBoolean isTestClose = new AtomicBoolean(false);
     private AtomicBoolean isTestInExceptionMode = new AtomicBoolean(false);
     private RunningTestListener listener;
-    private SeleniumConfigurationProvider configurationProvider;
+    private ConfigurationProvider configurationProvider;
     private HashMap<VisualGridTask, FutureTask<TestResultContainer>> taskToFutureMapping = new HashMap<>();
     private Logger logger;
     private AtomicBoolean isCloseTaskIssued = new AtomicBoolean(false);
@@ -53,7 +53,7 @@ public class RunningTest {
         this.logger = logger;
     }
 
-    public RunningTest(RenderBrowserInfo browserInfo, Logger logger, SeleniumConfigurationProvider configurationProvider) {
+    public RunningTest(RenderBrowserInfo browserInfo, Logger logger, ConfigurationProvider configurationProvider) {
         this.browserInfo = browserInfo;
         this.configurationProvider = configurationProvider;
         this.logger = logger;
@@ -61,7 +61,7 @@ public class RunningTest {
 
     /******** END - PUBLIC FOR TESTING PURPOSES ONLY ********/
 
-    public RunningTest(IEyesConnector eyes, SeleniumConfigurationProvider configurationProvider, RenderBrowserInfo browserInfo, Logger logger, RunningTestListener listener) {
+    public RunningTest(IEyesConnector eyes, ConfigurationProvider configurationProvider, RenderBrowserInfo browserInfo, Logger logger, RunningTestListener listener) {
         this.eyes = eyes;
         this.browserInfo = browserInfo;
         this.configurationProvider = configurationProvider;

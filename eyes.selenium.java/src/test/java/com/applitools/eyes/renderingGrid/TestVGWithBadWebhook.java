@@ -2,7 +2,7 @@ package com.applitools.eyes.renderingGrid;
 
 import com.applitools.eyes.BatchInfo;
 import com.applitools.eyes.RectangleSize;
-import com.applitools.eyes.selenium.Configuration;
+import com.applitools.eyes.config.Configuration;
 import com.applitools.eyes.selenium.Eyes;
 import com.applitools.eyes.selenium.fluent.Target;
 import com.applitools.eyes.utils.SeleniumUtils;

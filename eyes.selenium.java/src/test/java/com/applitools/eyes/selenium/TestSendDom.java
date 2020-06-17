@@ -4,6 +4,8 @@ import com.applitools.eyes.IEyesBase;
 import com.applitools.eyes.Logger;
 import com.applitools.eyes.RectangleSize;
 import com.applitools.eyes.TestResults;
+import com.applitools.eyes.config.Configuration;
+import com.applitools.eyes.config.ConfigurationProvider;
 import com.applitools.eyes.metadata.ActualAppOutput;
 import com.applitools.eyes.metadata.SessionResults;
 import com.applitools.eyes.selenium.fluent.Target;
@@ -79,7 +81,7 @@ public final class TestSendDom extends ReportingTestSuite {
         private String domJson;
 
         public DomInterceptingEyes() {
-            super(new SeleniumConfigurationProvider() {
+            super(new ConfigurationProvider() {
                 final Configuration configuration = new Configuration();
 
                 @Override

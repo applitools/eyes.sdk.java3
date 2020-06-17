@@ -5,7 +5,7 @@ import com.applitools.eyes.FileLogger;
 import com.applitools.eyes.Logger;
 import com.applitools.eyes.TestResultsSummary;
 import com.applitools.eyes.selenium.BrowserType;
-import com.applitools.eyes.selenium.Configuration;
+import com.applitools.eyes.config.Configuration;
 import com.applitools.eyes.selenium.Eyes;
 import com.applitools.eyes.selenium.fluent.Target;
 import com.applitools.eyes.utils.SeleniumUtils;

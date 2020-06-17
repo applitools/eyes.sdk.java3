@@ -5,7 +5,7 @@ import com.applitools.eyes.metadata.ActualAppOutput;
 import com.applitools.eyes.metadata.Image;
 import com.applitools.eyes.metadata.SessionResults;
 import com.applitools.eyes.selenium.BrowserType;
-import com.applitools.eyes.selenium.Configuration;
+import com.applitools.eyes.config.Configuration;
 import com.applitools.eyes.selenium.Eyes;
 import com.applitools.eyes.utils.TestUtils;
 import com.applitools.eyes.visualgrid.model.RenderBrowserInfo;

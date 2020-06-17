@@ -1,5 +1,6 @@
 package com.applitools.eyes.selenium;
 
+import com.applitools.eyes.config.Configuration;
 import com.applitools.eyes.selenium.fluent.Target;
 import com.applitools.eyes.utils.ChromeMobileEmulationDeviceSettings;
 import com.applitools.eyes.utils.ReportingTestSuite;
@@ -7,7 +8,6 @@ import com.applitools.eyes.utils.SeleniumUtils;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
-import org.testng.annotations.Listeners;
 import org.testng.annotations.Test;
 
 public class TestMobileEmulation extends ReportingTestSuite {

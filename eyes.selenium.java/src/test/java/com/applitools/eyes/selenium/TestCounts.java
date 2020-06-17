@@ -2,6 +2,7 @@ package com.applitools.eyes.selenium;
 
 import com.applitools.eyes.RectangleSize;
 import com.applitools.eyes.TestResultsSummary;
+import com.applitools.eyes.config.Configuration;
 import com.applitools.eyes.selenium.fluent.Target;
 import com.applitools.eyes.utils.ReportingTestSuite;
 import com.applitools.eyes.utils.SeleniumUtils;

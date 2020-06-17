@@ -2,8 +2,8 @@ package com.applitools.eyes.renderingGrid;
 
 import com.applitools.eyes.EyesRunner;
 import com.applitools.eyes.RectangleSize;
+import com.applitools.eyes.config.Configuration;
 import com.applitools.eyes.selenium.BrowserType;
-import com.applitools.eyes.selenium.Configuration;
 import com.applitools.eyes.selenium.Eyes;
 import com.applitools.eyes.selenium.TestDataProvider;
 import com.applitools.eyes.selenium.fluent.Target;

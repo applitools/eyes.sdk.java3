@@ -4,6 +4,7 @@ import com.applitools.eyes.EyesBase;
 import com.applitools.eyes.EyesScreenshot;
 import com.applitools.eyes.ImageMatchSettings;
 import com.applitools.eyes.RectangleSize;
+import com.applitools.eyes.config.Configuration;
 import com.applitools.eyes.fluent.ICheckSettingsInternal;
 
 public class TestEyes extends EyesBase {

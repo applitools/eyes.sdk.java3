@@ -2,6 +2,7 @@ package com.applitools.eyes.selenium;
 
 import com.applitools.ICheckSettings;
 import com.applitools.eyes.*;
+import com.applitools.eyes.config.Configuration;
 import com.applitools.eyes.fluent.ICheckSettingsInternal;
 import com.applitools.eyes.selenium.fluent.Target;
 import com.applitools.eyes.utils.ReportingTestSuite;

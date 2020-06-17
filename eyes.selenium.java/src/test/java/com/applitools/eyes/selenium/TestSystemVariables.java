@@ -3,6 +3,7 @@ package com.applitools.eyes.selenium;
 import com.applitools.connectivity.ServerConnector;
 import com.applitools.eyes.BatchInfo;
 import com.applitools.eyes.Logger;
+import com.applitools.eyes.config.Configuration;
 import org.testng.Assert;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
