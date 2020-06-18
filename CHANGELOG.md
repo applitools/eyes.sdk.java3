@@ -3,6 +3,7 @@
 - Tests now report their status properly. [Trello 1902](https://trello.com/c/Y8SZwm6m)
 - Tests now won't run forever after a failed rendering in the VG server. [Trello 1907](https://trello.com/c/n80nncwf)
 ### Updated
+- DOM Capture and Snapshot scripts [Trello 1865](https://trello.com/c/haTeCXzq)
 - Updated browser info api as required. [Trello 1872](https://trello.com/c/bykk2rzB)
 ### Added
 - Supporting tests page factory object. [Trello 1503](https://trello.com/c/pjmn2N7H)
