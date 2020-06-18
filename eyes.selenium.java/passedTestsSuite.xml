@@ -314,4 +314,13 @@
             </class>
         </classes>
     </test>
+    <test name="TestPageFactory" parallel="methods">
+        <classes>
+            <class name="com.applitools.eyes.selenium.TestPageFactory">
+                <methods>
+                    <include name="testPageFactory"/>
+                </methods>
+            </class>
+        </classes>
+    </test>
 </suite>
