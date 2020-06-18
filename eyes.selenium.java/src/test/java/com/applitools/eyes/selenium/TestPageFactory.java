@@ -35,7 +35,7 @@ public class TestPageFactory {
 
     @DataProvider(name = "booleanDP")
     public Object[] dp() {
-        return new Object[]{Boolean.FALSE};
+        return new Object[]{Boolean.TRUE, Boolean.FALSE};
     }
 
     @BeforeMethod
@@ -54,7 +54,6 @@ public class TestPageFactory {
             eyes.open(driver, "Java Eyes SDK", "testPageFactory" + suffix, new RectangleSize(800, 800));
             driver.get("https://applitools.github.io/demo/TestPages/FramesTestPage/");
             DemoPage page = PageFactory.initElements(driver, DemoPage.class);
-            //page.searchFor("Cheese");
             eyes.checkRegion(page.getGreenRectangleElement());
             eyes.checkRegion(page.getIframeElement());
             eyes.closeAsync();
