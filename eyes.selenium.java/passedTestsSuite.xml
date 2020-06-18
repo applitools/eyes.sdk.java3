@@ -316,7 +316,7 @@
     </test>
     <test name="TestPageFactory" parallel="methods">
         <classes>
-            <class name="com.applitools.eyes.selenium.TestPageFactory">
+            <class name="com.applitools.eyes.selenium.wrappers.TestPageFactory">
                 <methods>
                     <include name="testPageFactory"/>
                 </methods>
