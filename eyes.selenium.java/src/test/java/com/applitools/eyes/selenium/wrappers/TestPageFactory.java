@@ -1,5 +1,6 @@
 package com.applitools.eyes.selenium.wrappers;
 
+import com.applitools.eyes.utils.ReportingTestSuite;
 import com.applitools.eyes.utils.SeleniumUtils;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
@@ -11,7 +12,11 @@ import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
-public class TestPageFactory {
+public class TestPageFactory extends ReportingTestSuite {
+
+    public TestPageFactory() {
+        super.setGroupName("selenium");
+    }
 
     private WebDriver driver;
 
