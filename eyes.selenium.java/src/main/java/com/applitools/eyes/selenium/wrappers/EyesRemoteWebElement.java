@@ -136,7 +136,7 @@ public class EyesRemoteWebElement extends RemoteWebElement {
 
     /**
      * If the web element was created by {@link org.openqa.selenium.support.FindBy}, then it's a {@link Proxy} object.
-     * This method gets the real web element in this case.
+     * This method gets the real web element from the proxy object.
      */
     private WebElement getWrappedWebElement(WebElement webElement) {
         if (!(webElement instanceof Proxy)) {
