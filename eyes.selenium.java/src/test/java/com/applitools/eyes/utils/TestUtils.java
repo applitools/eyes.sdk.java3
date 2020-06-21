@@ -187,7 +187,7 @@ public class TestUtils {
                 .queryParam("apiKey", eyes.getApiKey())
                 .build();
 
-        RestClient client = new RestClient(new Logger(), apiSessionUri, ServerConnector.DEFAULT_CLIENT_TIMEOUT);
+        RestClient client = new RestClient(new Logger(new StdoutLogHandler()), apiSessionUri, ServerConnector.DEFAULT_CLIENT_TIMEOUT);
         return client.sendHttpWebRequest(apiSessionUri.toString(), HttpMethod.GET, MediaType.APPLICATION_JSON).getBodyString();
     }
 }

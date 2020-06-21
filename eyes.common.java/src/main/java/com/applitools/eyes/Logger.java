@@ -13,6 +13,11 @@ public class Logger {
         sessionId = "";
     }
 
+    public Logger(LogHandler handler) {
+        this();
+        logHandler = handler;
+    }
+
     public void setSessionId(String sessionId) {
         this.sessionId = sessionId;
     }
