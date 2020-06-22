@@ -216,6 +216,7 @@
             <class name="com.applitools.eyes.renderingGrid.TestVGServerConfigs">
                 <methods>
                     <include name="TestVGDoubleCloseNoCheck" />
+                    <include name="TestVGChangeConfigAfterOpen"/>
                 </methods>
             </class>
         </classes>

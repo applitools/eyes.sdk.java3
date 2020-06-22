@@ -1,6 +1,7 @@
 package com.applitools.eyes.renderingGrid;
 
 import com.applitools.eyes.*;
+import com.applitools.eyes.metadata.ActualAppOutput;
 import com.applitools.eyes.metadata.ImageMatchSettings;
 import com.applitools.eyes.metadata.SessionResults;
 import com.applitools.eyes.selenium.BrowserType;
@@ -46,66 +47,47 @@ public class TestVGServerConfigs extends ReportingTestSuite {
     }
 
     @Test
-    public void TestVGChangeConfigAfterOpen() {
+    public void TestVGChangeConfigAfterOpen() throws IOException {
         WebDriver driver = new ChromeDriver();
-        driver.get("https://applitools.com/helloworld");
-        VisualGridRunner runner = new VisualGridRunner(10,"TestVGChangeConfigAfterOpen");
+        VisualGridRunner runner = new VisualGridRunner(10);
+        Eyes eyes = new Eyes(runner);
         try {
-            Eyes eyes = new Eyes(runner);
-            eyes.setLogHandler(new FileLogger("fabric.log", true, true));
-            Configuration conf = new Configuration();
+            eyes.setLogHandler(new StdoutLogHandler());
+            Configuration conf = eyes.getConfiguration();
             conf.addBrowser(new RenderBrowserInfo(800, 600, BrowserType.CHROME));
-            conf.setServerUrl("https://eyesfabric4eyes.applitools.com");
-            conf.setApiKey("CAE7aS103TDz7XyegELya3tHpEIXTFi0gBBwvgq104PSHIU110");
-            conf.setAppName("app").setTestName("test");
             conf.setBatch(TestDataProvider.batchInfo);
             conf.setAccessibilityValidation(null).setIgnoreDisplacements(false);
-//            conf.setProxy(new ProxySettings("http://127.0.0.1", 8888, null, null));
+            eyes.setConfiguration(conf);
+            eyes.setBranchName("master");
+
+            driver.get("https://applitools.com/helloworld");
+            eyes.open(driver, "Java Eyes SDK", "Test VG Change Config After Open");
+            conf.setIgnoreDisplacements(true);
             eyes.setConfiguration(conf);
 
-            eyes.open(driver);
-
-            AccessibilitySettings accessibilitySettings = new AccessibilitySettings(AccessibilityLevel.AAA, AccessibilityGuidelinesVersion.WCAG_2_0);
-            conf.setAccessibilityValidation(accessibilitySettings).setIgnoreDisplacements(true);
+            eyes.checkWindow();
+            conf.setMatchLevel(MatchLevel.LAYOUT).setIgnoreDisplacements(false);
             eyes.setConfiguration(conf);
 
             eyes.checkWindow();
 
-            accessibilitySettings = new AccessibilitySettings(AccessibilityLevel.AA, AccessibilityGuidelinesVersion.WCAG_2_1);
-            conf.setAccessibilityValidation(accessibilitySettings).setMatchLevel(MatchLevel.LAYOUT);
-            eyes.setConfiguration(conf);
-
-            eyes.checkWindow();
-
-            TestResults results = eyes.close(false);
-
-            SessionResults sessionResults = null;
-            try {
-                sessionResults = TestUtils.getSessionResults("CAE7aS103TDz7XyegELya3tHpEIXTFi0gBBwvgq104PSHIU110", results);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-
-            Assert.assertNull(sessionResults.getStartInfo().getDefaultMatchSettings().getAccessibilitySettings());
-            final ImageMatchSettings defaultMatchSettings = sessionResults.getStartInfo().getDefaultMatchSettings();
-            Assert.assertFalse(defaultMatchSettings.getIgnoreDisplacements());
-            Assert.assertEquals(MatchLevel.STRICT, sessionResults.getStartInfo().getDefaultMatchSettings().getMatchLevel());
-
-            Assert.assertEquals(2, sessionResults.getActualAppOutput().length);
-
-            accessibilitySettings = sessionResults.getActualAppOutput()[0].getImageMatchSettings().getAccessibilitySettings();
-            Assert.assertEquals(AccessibilityLevel.AAA, accessibilitySettings.getLevel());
-            Assert.assertEquals(AccessibilityGuidelinesVersion.WCAG_2_0, accessibilitySettings.getGuidelinesVersion());
-            Assert.assertTrue(sessionResults.getActualAppOutput()[0].getImageMatchSettings().getIgnoreDisplacements());
-            Assert.assertEquals(MatchLevel.STRICT, sessionResults.getActualAppOutput()[0].getImageMatchSettings().getMatchLevel());
-
-            accessibilitySettings =sessionResults.getActualAppOutput()[1].getImageMatchSettings().getAccessibilitySettings();
-            Assert.assertEquals(AccessibilityGuidelinesVersion.WCAG_2_1, accessibilitySettings.getGuidelinesVersion());
-            Assert.assertTrue(sessionResults.getActualAppOutput()[1].getImageMatchSettings().getIgnoreDisplacements());
-            Assert.assertEquals(MatchLevel.LAYOUT2, sessionResults.getActualAppOutput()[1].getImageMatchSettings().getMatchLevel());
+            eyes.closeAsync();
         } finally {
             driver.quit();
-            runner.getAllTestResults();
+            eyes.abortAsync();
+            TestResultsSummary resultsSummary = runner.getAllTestResults();
+            TestResultContainer[] results = resultsSummary.getAllResults();
+            SessionResults sessionResults = TestUtils.getSessionResults(eyes.getApiKey(), results[0].getTestResults());
+            Assert.assertNotNull(sessionResults);
+            Assert.assertEquals(2, sessionResults.getActualAppOutput().length);
+
+            ActualAppOutput output = sessionResults.getActualAppOutput()[0];
+            Assert.assertTrue(output.getImageMatchSettings().getIgnoreDisplacements());
+            Assert.assertEquals(output.getImageMatchSettings().getMatchLevel(), MatchLevel.STRICT);
+
+            output = sessionResults.getActualAppOutput()[1];
+            Assert.assertFalse(output.getImageMatchSettings().getIgnoreDisplacements());
+            Assert.assertEquals(output.getImageMatchSettings().getMatchLevel(), MatchLevel.LAYOUT2);
         }
     }
 }
