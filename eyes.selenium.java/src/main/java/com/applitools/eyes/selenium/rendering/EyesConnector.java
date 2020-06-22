@@ -148,11 +148,11 @@ class EyesConnector extends EyesBase implements IEyesConnector, IBatchCloser {
         return null;
     }
 
-    public com.applitools.eyes.config.Configuration setApiKey(String apiKey) {
+    public Configuration setApiKey(String apiKey) {
         return super.setApiKey(apiKey);
     }
 
-    public com.applitools.eyes.config.Configuration setServerUrl(URI serverUrl) {
+    public Configuration setServerUrl(URI serverUrl) {
         return super.setServerUrl(serverUrl);
     }
 

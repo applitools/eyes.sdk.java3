@@ -13,11 +13,11 @@ import java.util.concurrent.Future;
 public interface IEyesConnector {
     void log(String massage);
 
-    com.applitools.eyes.config.Configuration setProxy(AbstractProxySettings proxy);
+    Configuration setProxy(AbstractProxySettings proxy);
 
     void setLogHandler(LogHandler logHandler);
 
-    com.applitools.eyes.config.Configuration setServerUrl(String serverUrl) throws URISyntaxException;
+    Configuration setServerUrl(String serverUrl) throws URISyntaxException;
 
     URI getServerUrl();
 
@@ -43,13 +43,13 @@ public interface IEyesConnector {
 
     void setRenderInfo(RenderingInfo renderingInfo);
 
-    com.applitools.eyes.config.Configuration setBatch(BatchInfo batchInfo);
+    Configuration setBatch(BatchInfo batchInfo);
 
     void setUserAgent(String userAgent);
 
     String getApiKey();
 
-    com.applitools.eyes.config.Configuration setApiKey(String apiKey);
+    Configuration setApiKey(String apiKey);
 
     void setBranchName(String branchName);
 
