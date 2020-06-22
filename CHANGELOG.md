@@ -1,3 +1,10 @@
+## [vNext]
+### Fixed
+- Users can now use fluent API to update configuration in any order. [Trello 1689](https://trello.com/c/UDYmDZnw)
+- `eyes.setApiKey` now Updates configuration properly. [Trello 1918](https://trello.com/c/J3FVMkCK)
+### Updated
+- Configuration structure is refactored to be less complicated for developers. [Trello 1888](https://trello.com/c/cSqePDVh)
+
 ## [3.166.0] - 2020-06-22
 ### Fixed
 - Tests now report their status properly. [Trello 1902](https://trello.com/c/Y8SZwm6m)
