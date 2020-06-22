@@ -58,7 +58,6 @@ public class TestVGServerConfigs extends ReportingTestSuite {
             conf.setBatch(TestDataProvider.batchInfo);
             conf.setAccessibilityValidation(null).setIgnoreDisplacements(false);
             eyes.setConfiguration(conf);
-            eyes.setBranchName("master");
 
             driver.get("https://applitools.com/helloworld");
             eyes.open(driver, "Java Eyes SDK", "Test VG Change Config After Open");
