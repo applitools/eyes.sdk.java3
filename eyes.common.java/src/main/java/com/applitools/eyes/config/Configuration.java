@@ -348,8 +348,7 @@ public class Configuration implements IConfiguration {
     }
 
     /**
-     * @param failureReports The failure reports setting.
-     * @see FailureReports
+     * @deprecated
      */
     @Override
     public Configuration setFailureReports(FailureReports failureReports) {
@@ -358,7 +357,7 @@ public class Configuration implements IConfiguration {
     }
 
     /**
-     * @return the failure reports setting.
+     * @deprecated
      */
     @Override
     public FailureReports getFailureReports() {

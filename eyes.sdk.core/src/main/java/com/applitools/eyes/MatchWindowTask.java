@@ -503,16 +503,16 @@ public class MatchWindowTask {
         ImageMatchSettings imageMatchSettings = null;
         if (checkSettingsInternal != null) {
 
-            Configuration configGetter = eyes.getConfiguration();
-            ImageMatchSettings defaultMatchSettings = configGetter.getDefaultMatchSettings();
+            Configuration config = eyes.getConfiguration();
+            ImageMatchSettings defaultMatchSettings = config.getDefaultMatchSettings();
 
             imageMatchSettings = new ImageMatchSettings(defaultMatchSettings); // clone default match settings
             imageMatchSettings.setMatchLevel(checkSettingsInternal.getMatchLevel() != null ? checkSettingsInternal.getMatchLevel() : defaultMatchSettings.getMatchLevel());
-            imageMatchSettings.setIgnoreCaret(checkSettingsInternal.getIgnoreCaret() != null ? checkSettingsInternal.getIgnoreCaret() : configGetter.getIgnoreCaret());
-            imageMatchSettings.setUseDom(checkSettingsInternal.isUseDom() != null ? checkSettingsInternal.isUseDom() : configGetter.getUseDom());
-            imageMatchSettings.setEnablePatterns(checkSettingsInternal.isEnablePatterns() != null ? checkSettingsInternal.isEnablePatterns() : configGetter.getEnablePatterns());
-            imageMatchSettings.setIgnoreDisplacements(checkSettingsInternal.isIgnoreDisplacements() != null ? checkSettingsInternal.isIgnoreDisplacements() : configGetter.getIgnoreDisplacements());
-            imageMatchSettings.setAccessibilitySettings(configGetter.getAccessibilityValidation());
+            imageMatchSettings.setIgnoreCaret(checkSettingsInternal.getIgnoreCaret() != null ? checkSettingsInternal.getIgnoreCaret() : config.getIgnoreCaret());
+            imageMatchSettings.setUseDom(checkSettingsInternal.isUseDom() != null ? checkSettingsInternal.isUseDom() : config.getUseDom());
+            imageMatchSettings.setEnablePatterns(checkSettingsInternal.isEnablePatterns() != null ? checkSettingsInternal.isEnablePatterns() : config.getEnablePatterns());
+            imageMatchSettings.setIgnoreDisplacements(checkSettingsInternal.isIgnoreDisplacements() != null ? checkSettingsInternal.isIgnoreDisplacements() : config.getIgnoreDisplacements());
+            imageMatchSettings.setAccessibilitySettings(config.getAccessibilityValidation());
         }
         return imageMatchSettings;
     }

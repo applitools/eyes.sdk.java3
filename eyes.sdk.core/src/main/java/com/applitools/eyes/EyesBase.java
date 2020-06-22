@@ -161,6 +161,7 @@ public abstract class EyesBase implements IEyesBase{
      */
     public Configuration setApiKey(String apiKey) {
         ArgumentGuard.notNull(apiKey, "apiKey");
+        getConfiguration().setApiKey(apiKey);
         if (serverConnector == null) {
             throw new EyesException("server connector not set.");
         }

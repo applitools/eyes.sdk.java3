@@ -81,8 +81,10 @@ public interface IConfiguration {
 
     Configuration setSessionType(SessionType sessionType);
 
+    @Deprecated
     FailureReports getFailureReports();
 
+    @Deprecated
     Configuration setFailureReports(FailureReports failureReports);
 
     Boolean isSendDom();
