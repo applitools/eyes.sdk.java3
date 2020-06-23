@@ -4,6 +4,7 @@
 - `eyes.setApiKey` now Updates configuration properly. [Trello 1918](https://trello.com/c/J3FVMkCK)
 ### Updated
 - Configuration structure is refactored to be less complicated for developers. [Trello 1888](https://trello.com/c/cSqePDVh)
+- Moved the content of eyes.common.java to eyes.sdk.core. [Trello 1889](https://trello.com/c/2j9Owbw3)
 
 ## [3.166.0] - 2020-06-22
 ### Fixed
