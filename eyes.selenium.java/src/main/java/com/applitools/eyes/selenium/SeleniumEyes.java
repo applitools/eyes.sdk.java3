@@ -1957,19 +1957,18 @@ public class SeleniumEyes extends EyesBase implements ISeleniumEyes, IDriverProv
 
     private EyesWebDriverScreenshot getScaledAndCroppedScreenshot(ScaleProviderFactory scaleProviderFactory) {
         BufferedImage screenshotImage = this.imageProvider.getImage();
+        debugScreenshotsProvider.save(screenshotImage, "original");
 
         ScaleProvider scaleProvider = scaleProviderFactory.getScaleProvider(screenshotImage.getWidth());
         CutProvider cutProvider = cutProviderHandler.get();
         if (scaleProvider.getScaleRatio() != 1.0) {
-            BufferedImage scaledImage = ImageUtils.scaleImage(screenshotImage, scaleProvider);
-            screenshotImage = scaledImage;
+            screenshotImage = ImageUtils.scaleImage(screenshotImage, scaleProvider);
             debugScreenshotsProvider.save(screenshotImage, "scaled");
             cutProvider.scale(scaleProvider.getScaleRatio());
         }
 
         if (!(cutProvider instanceof NullCutProvider)) {
-            BufferedImage croppedImage = cutProvider.cut(screenshotImage);
-            screenshotImage = croppedImage;
+            screenshotImage = cutProvider.cut(screenshotImage);
             debugScreenshotsProvider.save(screenshotImage, "cut");
         }
 

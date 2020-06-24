@@ -1,6 +1,7 @@
 ## [vNext]
 ### Fixed
 - Calling `eyes.check` with `fully(false)` now doesn't take full page screenshot even if `forceFullPageScreenshot` is set to true in the configuration. [Trello 1926](https://trello.com/c/4vcerUTm)
+- `saveDebugScreenshot` now works when there is no full page screenshot. [Trello 1138](https://trello.com/c/DUjJxuMH)
 
 ## [3.167.0] - 2020-06-23
 ### Fixed
