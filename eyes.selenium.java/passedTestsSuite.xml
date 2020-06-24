@@ -329,6 +329,7 @@
             <class name="com.applitools.eyes.selenium.TestSeleniumEyes">
                 <methods>
                     <include name="testShouldTakeFullPageScreenshot"/>
+                    <include name="testDebugScreenshot"/>
                 </methods>
             </class>
         </classes>

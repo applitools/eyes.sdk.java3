@@ -10,6 +10,7 @@ import com.applitools.eyes.capture.EyesScreenshotFactory;
 import com.applitools.eyes.capture.ImageProvider;
 import com.applitools.eyes.config.Configuration;
 import com.applitools.eyes.config.ConfigurationProvider;
+import com.applitools.eyes.debug.DebugScreenshotsProvider;
 import com.applitools.eyes.exceptions.TestFailedException;
 import com.applitools.eyes.fluent.GetRegion;
 import com.applitools.eyes.fluent.ICheckSettingsInternal;
@@ -2267,5 +2268,12 @@ public class SeleniumEyes extends EyesBase implements ISeleniumEyes, IDriverProv
     @Override
     public Configuration getConfiguration() {
         return configurationProvider.get();
+    }
+
+    /**
+     * For test purposes only.
+     */
+    void setDebugScreenshotProvider(DebugScreenshotsProvider debugScreenshotProvider) {
+        this.debugScreenshotsProvider = debugScreenshotProvider;
     }
 }
