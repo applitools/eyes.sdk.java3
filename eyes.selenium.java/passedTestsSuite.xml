@@ -324,4 +324,13 @@
             </class>
         </classes>
     </test>
+    <test name="TestSeleniumEyes" parallel="methods">
+        <classes>
+            <class name="com.applitools.eyes.selenium.TestSeleniumEyes">
+                <methods>
+                    <include name="testShouldTakeFullPageScreenshot"/>
+                </methods>
+            </class>
+        </classes>
+    </test>
 </suite>
