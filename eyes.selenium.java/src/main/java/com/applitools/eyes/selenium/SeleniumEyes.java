@@ -1723,7 +1723,7 @@ public class SeleniumEyes extends EyesBase implements ISeleniumEyes, IDriverProv
             } catch (EyesException e1) {
                 // Just in case the user catches this error
                 ((EyesTargetLocator) driver.switchTo()).frames(originalFrame);
-
+                GeneralUtils.logExceptionStackTrace(logger, e1);
                 throw new TestFailedException("Failed to set the viewport size", e1);
             }
             ((EyesTargetLocator) driver.switchTo()).frames(originalFrame);
