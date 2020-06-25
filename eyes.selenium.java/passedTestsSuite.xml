@@ -334,4 +334,13 @@
             </class>
         </classes>
     </test>
+    <test name="TestConfiguration" parallel="methods">
+        <classes>
+            <class name="com.applitools.eyes.selenium.TestConfiguration">
+                <methods>
+                    <include name="testConfigurationConstructors"/>
+                </methods>
+            </class>
+        </classes>
+    </test>
 </suite>
