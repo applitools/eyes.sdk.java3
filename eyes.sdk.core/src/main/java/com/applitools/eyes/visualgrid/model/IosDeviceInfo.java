@@ -6,14 +6,14 @@ public class IosDeviceInfo implements IRenderingBrowserInfo {
 
     @JsonProperty("name")
     private final IosDeviceName deviceName;
-    private final IosScreenOrientation screenOrientation;
+    private final ScreenOrientation screenOrientation;
 
     public IosDeviceInfo(IosDeviceName deviceName) {
         this.deviceName = deviceName;
-        this.screenOrientation = IosScreenOrientation.PORTRAIT;
+        this.screenOrientation = ScreenOrientation.PORTRAIT;
     }
 
-    public IosDeviceInfo(IosDeviceName deviceName, IosScreenOrientation screenOrientation) {
+    public IosDeviceInfo(IosDeviceName deviceName, ScreenOrientation screenOrientation) {
         this.deviceName = deviceName;
         this.screenOrientation = screenOrientation;
     }
@@ -22,7 +22,7 @@ public class IosDeviceInfo implements IRenderingBrowserInfo {
         return deviceName.getName();
     }
 
-    public IosScreenOrientation getScreenOrientation() {
+    public ScreenOrientation getScreenOrientation() {
         return screenOrientation;
     }
 

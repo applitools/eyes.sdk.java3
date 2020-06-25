@@ -3,6 +3,8 @@
 - Calling `eyes.check` with `fully(false)` now doesn't take full page screenshot even if `forceFullPageScreenshot` is set to true in the configuration. [Trello 1926](https://trello.com/c/4vcerUTm)
 - `saveDebugScreenshot` now works when there is no full page screenshot. [Trello 1138](https://trello.com/c/DUjJxuMH)
 - Removed unused `Target` class in the java.sdk.core. [Trello 1098](https://trello.com/c/Oi36yIro)
+### Updated
+- Updated the API of the IOS Simulation. [Trello 1944](https://trello.com/c/EzyG7525)
 
 ## [3.167.0] - 2020-06-23
 ### Fixed
