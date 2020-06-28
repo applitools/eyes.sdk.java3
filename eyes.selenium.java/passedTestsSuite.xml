@@ -311,6 +311,7 @@
                     <include name="testRenderingIosSimulator"/>
                     <include name="testRenderingMultipleBrowsers"/>
                     <include name="TestSpecialRendering"/>
+                    <include name="testRenderFail"/>
                 </methods>
             </class>
         </classes>
