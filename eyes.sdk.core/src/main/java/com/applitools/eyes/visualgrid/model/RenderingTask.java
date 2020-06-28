@@ -160,11 +160,6 @@ public class RenderingTask implements Callable<RenderStatusResults>, Completable
             do {
                 try {
                     runningRenders = this.eyesConnector.render(requests);
-                    logger.verbose("step 3.1");
-                    if (runningRenders == null || runningRenders.size() == 0) {
-                        setRenderErrorToTasks(requests);
-                        throw new EyesException("Invalid response for render request");
-                    }
                 } catch (Exception e) {
                     GeneralUtils.logExceptionStackTrace(logger, e);
                     logger.verbose("/render throws exception... sleeping for 1.5s");
@@ -176,6 +171,12 @@ public class RenderingTask implements Callable<RenderStatusResults>, Completable
                         setRenderErrorToTasks(requests);
                         throw new EyesException("Invalid response for render request", e1);
                     }
+                }
+
+                logger.verbose("step 3.1");
+                if (runningRenders == null || runningRenders.size() == 0) {
+                    setRenderErrorToTasks(requests);
+                    throw new EyesException("Invalid response for render request");
                 }
 
                 for (int i = 0; i < requests.length; i++) {
