@@ -242,7 +242,7 @@ public class VisualGridTask implements Callable<TestResultContainer>, Completabl
     public void setRenderError(String renderId, String error) {
         logger.verbose("enter - renderId: " + renderId);
         for (TaskListener listener : listeners) {
-            exception = new Error("Render Failed for " + this.getBrowserInfo() + " (renderId: " + renderId + ") with reason: " + error);
+            exception = new InstantiationError("Render Failed for " + this.getBrowserInfo() + " (renderId: " + renderId + ") with reason: " + error);
             listener.onTaskFailed(exception, this);
         }
         logger.verbose("exit - renderId: " + renderId);

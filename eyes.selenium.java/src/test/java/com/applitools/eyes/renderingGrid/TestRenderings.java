@@ -1,5 +1,6 @@
 package com.applitools.eyes.renderingGrid;
 
+import com.applitools.connectivity.ServerConnector;
 import com.applitools.eyes.*;
 import com.applitools.eyes.config.Configuration;
 import com.applitools.eyes.metadata.SessionResults;
@@ -24,6 +25,9 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+
+import static org.mockito.Matchers.any;
+import static org.mockito.Mockito.*;
 
 public class TestRenderings extends ReportingTestSuite {
 
@@ -227,6 +231,38 @@ public class TestRenderings extends ReportingTestSuite {
             driver.quit();
             eyes.abortAsync();
             runner.getAllTestResults();
+        }
+    }
+
+    @SuppressWarnings("ThrowFromFinallyBlock")
+    @Test
+    public void testRenderFail() {
+        ServerConnector serverConnector = spy(ServerConnector.class);
+        doThrow(new IllegalStateException()).when(serverConnector).render((RenderRequest) any());
+
+        EyesRunner runner = new VisualGridRunner(10);
+        Eyes eyes = new Eyes(runner);
+        eyes.setLogHandler(new StdoutLogHandler());
+        eyes.setServerConnector(serverConnector);
+        ChromeDriver driver = SeleniumUtils.createChromeDriver();
+        driver.get("http://applitools.github.io/demo");
+        try {
+            eyes.open(driver, "Applitools Eyes Sdk", "Test Render Fail", new RectangleSize(800, 800));
+            eyes.checkWindow();
+            eyes.closeAsync();
+        } finally {
+            driver.quit();
+            eyes.abortAsync();
+            try {
+                runner.getAllTestResults();
+                Assert.fail("Expected an exception to be thrown");
+            } catch (Throwable t) {
+                if (t instanceof AssertionError) {
+                    throw  t;
+                }
+                Assert.assertTrue(t.getCause() instanceof InstantiationError);
+            }
+
         }
     }
 }

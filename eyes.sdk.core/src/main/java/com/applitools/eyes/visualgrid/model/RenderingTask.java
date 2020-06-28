@@ -156,25 +156,26 @@ public class RenderingTask implements Callable<RenderStatusResults>, Completable
             boolean stillRunning;
             long elapsedTimeStart = System.currentTimeMillis();
             boolean isForcePutAlreadyDone = false;
-            List<RunningRender> runningRenders = null;
+            List<RunningRender> runningRenders;
             do {
                 try {
                     runningRenders = this.eyesConnector.render(requests);
-                } catch (Exception e) {
-                    Thread.sleep(1500);
-                    logger.verbose("/render throws exception... sleeping for 1.5s");
-                    if (isSecondRequestAlreadyHappened) {
-                        logger.verbose("Second request already happened");
-                        throw e;
+                    logger.verbose("step 3.1");
+                    if (runningRenders == null || runningRenders.size() == 0) {
+                        setRenderErrorToTasks(requests);
+                        throw new EyesException("Invalid response for render request");
                     }
-                    isSecondRequestAlreadyHappened = true;;
+                } catch (Exception e) {
                     GeneralUtils.logExceptionStackTrace(logger, e);
+                    logger.verbose("/render throws exception... sleeping for 1.5s");
                     logger.verbose("ERROR " + e.getMessage());
-                }
-                logger.verbose("step 3.1");
-                if (runningRenders == null || runningRenders.size() == 0) {
-                    setRenderErrorToTasks(requests);
-                    throw new EyesException("Invalid response for render request");
+                    Thread.sleep(1500);
+                    try {
+                        runningRenders = this.eyesConnector.render(requests);
+                    } catch (Exception e1) {
+                        setRenderErrorToTasks(requests);
+                        throw new EyesException("Invalid response for render request", e1);
+                    }
                 }
 
                 for (int i = 0; i < requests.length; i++) {
