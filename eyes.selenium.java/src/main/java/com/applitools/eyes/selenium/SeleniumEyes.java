@@ -2276,4 +2276,8 @@ public class SeleniumEyes extends EyesBase implements ISeleniumEyes, IDriverProv
     void setDebugScreenshotProvider(DebugScreenshotsProvider debugScreenshotProvider) {
         this.debugScreenshotsProvider = debugScreenshotProvider;
     }
+
+    public UserAgent getUserAgent() {
+        return userAgent;
+    }
 }

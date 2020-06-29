@@ -32,12 +32,16 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 public class DomCapture {
     private static String CAPTURE_FRAME_SCRIPT;
+    private static String CAPTURE_FRAME_SCRIPT_FOR_IE;
 
     private final Phaser cssPhaser = new Phaser(); // Phaser for syncing all callbacks on a single Frame
 
     static {
         try {
             CAPTURE_FRAME_SCRIPT = GeneralUtils.readToEnd(DomCapture.class.getResourceAsStream("/captureDomAndPoll.js"));
+            CAPTURE_FRAME_SCRIPT += "return __captureDomAndPoll();";
+            CAPTURE_FRAME_SCRIPT_FOR_IE = GeneralUtils.readToEnd(DomCapture.class.getResourceAsStream("/captureDomAndPollForIE.js"));
+            CAPTURE_FRAME_SCRIPT_FOR_IE += "return __captureDomAndPollForIE();";
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -54,11 +58,13 @@ public class DomCapture {
     private boolean shouldWaitForPhaser = false;
     private AtomicBoolean isCheckTimerTimedOut = new AtomicBoolean(false);
     private Timer timer;
+    private final UserAgent userAgent;
 
     public DomCapture(SeleniumEyes eyes) {
         mServerConnector = eyes.getServerConnector();
         logger = eyes.getLogger();
         driver = (EyesWebDriver) eyes.getDriver();
+        userAgent = eyes.getUserAgent();
     }
 
 
@@ -110,7 +116,12 @@ public class DomCapture {
             ScriptResponse.Status status = null;
             ScriptResponse scriptResponse = null;
             do {
-                resultAsString = (String) this.driver.executeScript(CAPTURE_FRAME_SCRIPT + "return __captureDomAndPoll();");
+                if (userAgent.isInternetExplorer()) {
+                    resultAsString = (String) this.driver.executeScript(CAPTURE_FRAME_SCRIPT_FOR_IE);
+                } else {
+                    resultAsString = (String) this.driver.executeScript(CAPTURE_FRAME_SCRIPT);
+                }
+
                 try {
                     scriptResponse = GeneralUtils.parseJsonToObject(resultAsString, ScriptResponse.class);
                     status = scriptResponse.getStatus();

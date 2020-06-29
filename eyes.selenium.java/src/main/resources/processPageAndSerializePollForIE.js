@@ -1,4 +1,4 @@
-/* @applitools/dom-snapshot@3.5.4 */
+/* @applitools/dom-snapshot@3.6.0 */
 
 function __processPageAndSerializePollForIE() {
     var processPageAndSerializePollForIE = (function () {
@@ -22924,6 +22924,11 @@ function __processPageAndSerializePollForIE() {
                         cache[url] = Promise.resolve({
                             resourceUrls: resourceUrls
                         });
+                    } else if (/https:\/\/fonts.googleapis.com/.test(url)) {
+                        log('not processing google font:', url);
+                        cache[url] = Promise.resolve({
+                            resourceUrls: [url]
+                        });
                     } else {
                         var now = Date.now();
                         cache[url] = doProcessResource(url).then(function (result) {
@@ -23495,7 +23500,7 @@ function __processPageAndSerializePollForIE() {
             });
             return doProcessPage(doc).then(function (result) {
                 log('processPage end');
-                result.scriptVersion = '3.5.4';
+                result.scriptVersion = '3.6.0';
                 return result;
             });
 

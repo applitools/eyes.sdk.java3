@@ -21,6 +21,7 @@ public class UserAgent {
             Pattern.compile(String.format(PRODUCT, "Safari")),
             Pattern.compile(String.format(PRODUCT, "Firefox")),
             Pattern.compile(String.format(PRODUCT, "Edge")),
+            Pattern.compile(String.format(PRODUCT, "Edg")),
             Pattern.compile("(?:MS(?<product>IE) " + MAJOR_MINOR + ")")
     };
 
@@ -43,7 +44,7 @@ public class UserAgent {
     private static final Pattern HIDDEN_IE_REGEX = Pattern.compile(
             "(?:(?:rv:" + MAJOR_MINOR + "\\) like Gecko))");
 
-    private static final Pattern EDGE_REGEX = Pattern.compile(String.format(PRODUCT, "Edge"));
+    private static final Pattern EDGE_REGEX = Pattern.compile(String.format(PRODUCT, "Edge?"));
 
     private String originalUserAgentString;
     private String os;
@@ -230,6 +231,10 @@ public class UserAgent {
 
     public String getBrowserMinorVersion() {
         return browserMinorVersion;
+    }
+
+    public boolean isInternetExplorer() {
+        return browser.equals(BrowserNames.IE) || (browser.equals(BrowserNames.EDGE) && Integer.parseInt(browserMajorVersion) <= 18);
     }
 
     @Override

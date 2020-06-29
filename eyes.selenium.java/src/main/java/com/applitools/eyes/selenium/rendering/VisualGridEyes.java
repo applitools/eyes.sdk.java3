@@ -50,7 +50,8 @@ public class VisualGridEyes implements ISeleniumEyes, IRenderingEyes {
     private IRenderingEyes.EyesListener listener;
     List<TestResultContainer> allTestResults = new ArrayList<>();
 
-    private String PROCESS_RESOURCES;
+    private String PROCESS_PAGE;
+    private String PROCESS_PAGE_FOR_IE;
     private EyesWebDriver webDriver;
     private RenderingInfo renderingInfo;
     private IEyesConnector VGEyesConnector;
@@ -88,7 +89,10 @@ public class VisualGridEyes implements ISeleniumEyes, IRenderingEyes {
 
     {
         try {
-            PROCESS_RESOURCES = GeneralUtils.readToEnd(VisualGridEyes.class.getResourceAsStream("/processPageAndSerializePoll.js"));
+            PROCESS_PAGE = GeneralUtils.readToEnd(VisualGridEyes.class.getResourceAsStream("/processPageAndSerializePoll.js"));
+            PROCESS_PAGE +=  "return __processPageAndSerializePoll();";
+            PROCESS_PAGE_FOR_IE = GeneralUtils.readToEnd(VisualGridEyes.class.getResourceAsStream("/processPageAndSerializePollForIE.js"));
+            PROCESS_PAGE_FOR_IE += "return __processPageAndSerializePollForIE();";
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -657,7 +661,12 @@ public class VisualGridEyes implements ISeleniumEyes, IRenderingEyes {
         ScriptResponse.Status status = null;
         ScriptResponse scriptResponse = null;
         do {
-            resultAsString = (String) this.webDriver.executeScript(PROCESS_RESOURCES + "return __processPageAndSerializePoll();");
+            if (userAgent.isInternetExplorer()) {
+                resultAsString = (String) this.webDriver.executeScript(PROCESS_PAGE_FOR_IE);
+            } else {
+                resultAsString = (String) this.webDriver.executeScript(PROCESS_PAGE);
+            }
+
             try {
                 scriptResponse = GeneralUtils.parseJsonToObject(resultAsString, ScriptResponse.class);
                 logger.verbose("Dom extraction polling...");
