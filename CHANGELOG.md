@@ -1,6 +1,8 @@
 ## [3.168.1]  - 2020-06-28
 ### Fixed
 - `eyes.getConfiguration` now returns `com.applitools.eyes.selenium.Configuration`. [Trello 1950](https://trello.com/c/7vPwXLqG)
+### Updated
+- Updated DOM Snapshot to 3.5.4. [Trello 1961](https://trello.com/c/iDf2x25p)
 
 ## [3.168.0] - 2020-06-25
 ### Fixed

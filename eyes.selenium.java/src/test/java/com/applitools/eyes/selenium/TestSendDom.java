@@ -136,6 +136,7 @@ public final class TestSendDom extends ReportingTestSuite {
         webDriver.get("https://applitools.github.io/demo/TestPages/FramesTestPage/");
         DomInterceptingEyes eyes = new DomInterceptingEyes();
         eyes.setBatch(TestDataProvider.batchInfo);
+        eyes.setApiKey("TKYcQIFGLNd0KxaoV72Ruw5CDPRUGEWmy1qqF9mTtqw110");
         eyes.getConfiguration().setAppName("Test Send DOM").setTestName("Full Window").setViewportSize(new RectangleSize(1024, 768));
         EyesWebDriver eyesWebDriver = (EyesWebDriver) eyes.open(webDriver);
         try {

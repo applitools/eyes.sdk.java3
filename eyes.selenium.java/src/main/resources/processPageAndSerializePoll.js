@@ -1,4 +1,4 @@
-/* @applitools/dom-snapshot@3.5.3 */
+/* @applitools/dom-snapshot@3.5.4 */
 
 function __processPageAndSerializePoll() {
   var processPageAndSerializePoll = (function () {
@@ -13441,15 +13441,26 @@ function __processPageAndSerializePoll() {
               .catch(e => {
                 if (probablyCORS(e)) {
                   return {probablyCORS: true, url};
+                } else if (e.isTimeout) {
+                  return {isTimeout: true, url};
                 } else {
                   throw e;
                 }
               })
-              .then(({url, type, value, probablyCORS}) => {
+              .then(({url, type, value, probablyCORS, isTimeout}) => {
                 if (probablyCORS) {
                   log('not fetched due to CORS', `[${Date.now() - now}ms]`, url);
                   sessionCache && sessionCache.setItem(url, []);
                   return {resourceUrls: [url]};
+                }
+
+                if (isTimeout) {
+                  // TODO return errorStatusCode once VG supports it (https://trello.com/c/J5lBWutP/92-when-capturing-dom-add-non-200-urls-to-resource-map)
+                  log('not fetched due to timeout, returning empty resource');
+                  sessionCache && sessionCache.setItem(url, []);
+                  return {
+                    blobsObj: {[url]: {type: 'application/x-applitools-empty', value: new ArrayBuffer()}},
+                  };
                 }
 
                 log(`fetched [${Date.now() - now}ms] ${url} bytes: ${value.byteLength}`);
@@ -13599,27 +13610,49 @@ function __processPageAndSerializePoll() {
 
     var makeExtractResourcesFromSvg_1 = makeExtractResourcesFromSvg;
 
-    function fetchUrl(url, fetch = window.fetch) {
-      // Why return a `new Promise` like this? Because people like Atlassian do horrible things.
-      // They monkey patched window.fetch, and made it so it throws a synchronous exception if the route is not well known.
-      // Returning a new Promise guarantees that `fetchUrl` is the async function that it declares to be.
-      return new Promise((resolve, reject) => {
-        return fetch(url, {cache: 'force-cache', credentials: 'same-origin'})
-            .then(resp =>
-                resp.status === 200
-                    ? resp.arrayBuffer().then(buff => ({
-                      url,
-                      type: resp.headers.get('Content-Type'),
-                      value: buff,
-                    }))
-                    : Promise.reject(new Error(`bad status code ${resp.status}`)),
-            )
-            .then(resolve)
-            .catch(err => reject(err));
-      });
+    function makeFetchUrl({
+                            fetch = window.fetch,
+                            AbortController = window.AbortController,
+                            timeout = 10000,
+                          }) {
+      return function fetchUrl(url) {
+        // Why return a `new Promise` like this? Because people like Atlassian do horrible things.
+        // They monkey patched window.fetch, and made it so it throws a synchronous exception if the route is not well known.
+        // Returning a new Promise guarantees that `fetchUrl` is the async function that it declares to be.
+        return new Promise((resolve, reject) => {
+          const controller = new AbortController();
+
+          const timeoutId = setTimeout(() => {
+            const err = new Error('fetchUrl timeout reached');
+            err.isTimeout = true;
+            reject(err);
+            controller.abort();
+          }, timeout);
+
+          return fetch(url, {
+            cache: 'force-cache',
+            credentials: 'same-origin',
+            signal: controller.signal,
+          })
+              .then(resp => {
+                clearTimeout(timeoutId);
+                if (resp.status === 200) {
+                  return resp.arrayBuffer().then(buff => ({
+                    url,
+                    type: resp.headers.get('Content-Type'),
+                    value: buff,
+                  }));
+                } else {
+                  return Promise.reject(new Error(`bad status code ${resp.status}`));
+                }
+              })
+              .then(resolve)
+              .catch(err => reject(err));
+        });
+      };
     }
 
-    var fetchUrl_1 = fetchUrl;
+    var fetchUrl = makeFetchUrl;
 
     function sanitizeAuthUrl(urlStr) {
       const url = new URL(urlStr);
@@ -13666,8 +13699,8 @@ function __processPageAndSerializePoll() {
                 [CSSRule.IMPORT_RULE]: () => {
                   if (rule.styleSheet) {
                     styleSheetCache[rule.styleSheet.href] = rule.styleSheet;
-                    return rule.href;
                   }
+                  return rule.href;
                 },
                 [CSSRule.FONT_FACE_RULE]: () => getUrlFromCssText_1(rule.cssText),
                 [CSSRule.SUPPORTS_RULE]: () => extractResourcesFromStyleSheet(rule),
@@ -13889,7 +13922,10 @@ function __processPageAndSerializePoll() {
 
     var sessionCache = makeSessionCache;
 
-    function processPage(doc = document, {showLogs, useSessionCache, dontFetchResources} = {}) {
+    function processPage(
+        doc = document,
+        {showLogs, useSessionCache, dontFetchResources, fetchTimeout} = {},
+    ) {
       /* MARKER FOR TEST - DO NOT DELETE */
       const log$$1 = showLogs ? log(Date.now()) : noop$4;
       log$$1('processPage start');
@@ -13902,8 +13938,9 @@ function __processPageAndSerializePoll() {
       );
 
       const extractResourcesFromSvg = makeExtractResourcesFromSvg_1({extractResourceUrlsFromStyleTags: extractResourceUrlsFromStyleTags$$1});
+      const fetchUrl$$1 = fetchUrl({timeout: fetchTimeout});
       const processResource$$1 = processResource({
-        fetchUrl: fetchUrl_1,
+        fetchUrl: fetchUrl$$1,
         findStyleSheetByUrl: findStyleSheetByUrl$$1,
         getCorsFreeStyleSheet: getCorsFreeStyleSheet_1,
         extractResourcesFromStyleSheet: extractResourcesFromStyleSheet$$1,
@@ -13920,7 +13957,7 @@ function __processPageAndSerializePoll() {
 
       return doProcessPage(doc).then(result => {
         log$$1('processPage end');
-        result.scriptVersion = '3.5.3';
+        result.scriptVersion = '3.5.4';
         return result;
       });
 
