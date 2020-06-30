@@ -35,6 +35,7 @@ public final class TestBatchAPI extends ReportingTestSuite {
             eyes.closeAsync();
         } finally {
             driver.quit();
+            eyes.abortAsync();
             runner.getAllTestResults(false);
         }
         BatchInfo batch = CommunicationUtils.getBatch(batchInfo.getId(), eyes.getServerUrl().toString(), eyes.getApiKey());
