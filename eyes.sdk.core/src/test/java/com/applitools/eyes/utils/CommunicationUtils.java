@@ -7,6 +7,7 @@ import com.applitools.connectivity.api.Request;
 import com.applitools.connectivity.api.Response;
 import com.applitools.eyes.BatchInfo;
 import com.applitools.eyes.Logger;
+import com.applitools.eyes.StdoutLogHandler;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -14,11 +15,12 @@ import org.apache.http.HttpStatus;
 
 import javax.ws.rs.HttpMethod;
 import javax.ws.rs.core.MediaType;
+import java.io.IOException;
 
 public class CommunicationUtils {
 
     private static HttpClient createClient() {
-        return new HttpClientImpl(new Logger(), ServerConnector.DEFAULT_CLIENT_TIMEOUT, null);
+        return new HttpClientImpl(new Logger(new StdoutLogHandler()), ServerConnector.DEFAULT_CLIENT_TIMEOUT, null);
     }
 
     public static <Tin> void jsonRequest(String url, Tin data, HttpAuth creds, String httpMethod) {
@@ -59,7 +61,7 @@ public class CommunicationUtils {
         return json;
     }
 
-    public static BatchInfo getBatch(String batchId, String serverUrl, String apikey) {
+    public static BatchInfo getBatch(String batchId, String serverUrl, String apikey) throws Exception {
         BatchInfo batchInfo = null;
         HttpClient httpClient = createClient();
         try {
@@ -68,14 +70,13 @@ public class CommunicationUtils {
             Response response = request.method(HttpMethod.GET, null, null);
             String data = response.getBodyString();
             response.close();
-            batchInfo = null;
-            if (response.getStatusCode() == 200) {
-                ObjectMapper objectMapper = new ObjectMapper();
-                objectMapper = objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-                batchInfo = objectMapper.readValue(data, BatchInfo.class);
+            if (response.getStatusCode() != HttpStatus.SC_OK) {
+                throw new IOException("Failed getting batch info from the server");
             }
-        } catch (Exception e) {
-            e.printStackTrace();
+
+            ObjectMapper objectMapper = new ObjectMapper();
+            objectMapper = objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+            batchInfo = objectMapper.readValue(data, BatchInfo.class);
         } finally {
             httpClient.close();
         }

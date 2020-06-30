@@ -1,24 +1,10 @@
 <!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd" >
 
 <suite name="failed tests" verbose="1" parallel="tests">
-
-    <test name="Test_WEB" parallel="instances">
-        <classes>
-            <class name="com.applitools.eyes.selenium.TestBatchAPI"/>
-        </classes>
-    </test>
     <test name="Test_VG" parallel="instances">
         <classes>
             <class name="com.applitools.eyes.renderingGrid.TestVGWithJunit"/>
             <class name="com.applitools.eyes.renderingGrid.TestVGExceptionInRegion"/>
         </classes>
     </test>
-
-    <test name="TestBatchAPI">
-        <classes>
-            <class name="com.applitools.eyes.selenium.TestBatchAPI">
-            </class>
-        </classes>
-    </test>
-
 </suite>
