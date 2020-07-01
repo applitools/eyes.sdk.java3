@@ -18,11 +18,9 @@ public class AsyncRequestImpl extends AsyncRequest {
         this.request = request;
     }
 
-
     @Override
     public AsyncRequest header(String name, String value) {
         ArgumentGuard.notNullOrEmpty(name, "header name");
-        ArgumentGuard.notNullOrEmpty(value, String.format("value of %s", name));
         request = request.header(name, value);
         return this;
     }

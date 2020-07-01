@@ -31,6 +31,8 @@ public class ServerConnector extends RestClient {
     public static final int DEFAULT_CLIENT_TIMEOUT = 1000 * 60 * 5; // 5 minutes
     public static final int MAX_CONNECTION_RETRIES = 3;
 
+    private static final List<String> DOMAINS_FILTERED = Collections.singletonList("https://fonts.googleapis.com");
+
     String API_SESSIONS = "api/sessions";
     String CLOSE_BATCH = "api/sessions/batches/%s/close/bypointerid";
 
@@ -335,8 +337,10 @@ public class ServerConnector extends RestClient {
     public Future<?> downloadResource(final URI url, final String userAgent, final String refererUrl,
                                       final TaskListener<RGridResource> listener, final int attemptNumber) {
         AsyncRequest asyncRequest = restClient.target(url.toString()).asyncRequest(MediaType.WILDCARD);
-        asyncRequest.header("User-Agent", userAgent);
         asyncRequest.header("Referer", refererUrl);
+        if (!DOMAINS_FILTERED.contains(url.toString())) {
+            asyncRequest.header("User-Agent", userAgent);
+        }
 
         return asyncRequest.method(HttpMethod.GET, new AsyncRequestCallback() {
             @Override

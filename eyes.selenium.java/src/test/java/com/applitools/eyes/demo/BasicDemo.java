@@ -25,7 +25,7 @@ public class BasicDemo extends ReportingTestSuite {
 
     @DataProvider(name = "booleanDP")
     public Object[] dp() {
-        return new Object[]{Boolean.TRUE, Boolean.FALSE};
+        return new Object[]{Boolean.TRUE};
     }
 
     @BeforeClass
@@ -49,7 +49,7 @@ public class BasicDemo extends ReportingTestSuite {
         Eyes eyes = new Eyes(runner);
         eyes.setLogHandler(logger);
         eyes.setBatch(batch);
-        //eyes.setProxy(new ProxySettings("http://localhost:8888"));
+        eyes.setProxy(new ProxySettings("http://localhost:8888"));
         try {
             eyes.open(driver, "Demo App", "BasicDemo" + suffix, new RectangleSize(800, 800));
 
