@@ -25,7 +25,7 @@ public class BasicDemo extends ReportingTestSuite {
 
     @DataProvider(name = "booleanDP")
     public Object[] dp() {
-        return new Object[]{Boolean.TRUE};
+        return new Object[]{Boolean.TRUE, Boolean.FALSE};
     }
 
     @BeforeClass
