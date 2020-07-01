@@ -5,6 +5,8 @@ package com.applitools.eyes.selenium;
 
 import com.applitools.eyes.*;
 import com.applitools.eyes.selenium.exceptions.EyesDriverOperationException;
+import com.applitools.eyes.selenium.fluent.IScrollRootElementContainer;
+import com.applitools.eyes.selenium.wrappers.EyesRemoteWebElement;
 import com.applitools.eyes.selenium.wrappers.EyesWebDriver;
 import com.applitools.utils.ArgumentGuard;
 import com.applitools.utils.GeneralUtils;
@@ -710,6 +712,39 @@ public class EyesSeleniumUtils {
         }
 
         return region.getSize();
+    }
+
+    public static WebElement getDocumentElement(EyesWebDriver driver, Logger logger) {
+        WebElement html = driver.findElement(By.tagName("html"));
+        WebElement body = driver.findElement(By.tagName("body"));
+        EyesRemoteWebElement htmlElement = new EyesRemoteWebElement(logger, driver, html);
+        EyesRemoteWebElement bodyElement = new EyesRemoteWebElement(logger, driver, body);
+        if (htmlElement.getBoundingClientRect().height < bodyElement.getBoundingClientRect().height) {
+            return bodyElement;
+        } else {
+            return htmlElement;
+        }
+    }
+
+    public static WebElement getScrollRootElement(EyesWebDriver driver, Logger logger, IScrollRootElementContainer scrollRootElementContainer) {
+        if (EyesSeleniumUtils.isMobileDevice(driver)) {
+            return null;
+        }
+
+        if (scrollRootElementContainer == null) {
+            return EyesSeleniumUtils.getDocumentElement(driver, logger);
+        }
+
+        WebElement scrollRootElement = scrollRootElementContainer.getScrollRootElement();
+        if (scrollRootElement != null) {
+            return scrollRootElement;
+        }
+
+        By scrollRootSelector = scrollRootElementContainer.getScrollRootSelector();
+        if (scrollRootSelector != null) {
+            return driver.findElement(scrollRootSelector);
+        }
+        return EyesSeleniumUtils.getDocumentElement(driver, logger);
     }
 }
 

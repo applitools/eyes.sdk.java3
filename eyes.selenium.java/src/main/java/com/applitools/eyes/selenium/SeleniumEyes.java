@@ -332,7 +332,7 @@ public class SeleniumEyes extends EyesBase implements ISeleniumEyes, IDriverProv
      */
     public WebElement getScrollRootElement() {
         if (this.scrollRootElement == null) {
-            this.scrollRootElement = driver.findElement(By.tagName("html"));
+            this.scrollRootElement = EyesSeleniumUtils.getDocumentElement(driver, logger);
         }
         return this.scrollRootElement;
     }
@@ -435,8 +435,7 @@ public class SeleniumEyes extends EyesBase implements ISeleniumEyes, IDriverProv
             //check(settings);
         }
 
-        this.scrollRootElement = getScrollRootElement((IScrollRootElementContainer) checkSettings[0], driver);
-        //this.scrollRootElement = driver.findElement(By.tagName("html"));
+        this.scrollRootElement = EyesSeleniumUtils.getScrollRootElement(driver, logger, (IScrollRootElementContainer) checkSettings[0]);
         this.currentFramePositionProvider = null;
         setPositionProvider(createPositionProvider());
 
@@ -473,7 +472,7 @@ public class SeleniumEyes extends EyesBase implements ISeleniumEyes, IDriverProv
         if (hasFrames) {
             region = new Region(bBox.getLocation(), ((EyesRemoteWebElement) scrollRootElement).getClientSize());
         } else {
-            WebElement documentElement = driver.findElement(By.tagName("html"));
+            WebElement documentElement = EyesSeleniumUtils.getDocumentElement(driver, logger);
             if (!scrollRootElement.equals(documentElement)) {
                 EyesRemoteWebElement eyesScrollRootElement;
                 if (scrollRootElement instanceof EyesRemoteWebElement) {
@@ -658,7 +657,7 @@ public class SeleniumEyes extends EyesBase implements ISeleniumEyes, IDriverProv
                 scrollRootElement = frame.getScrollRootElement();
             }
             if (scrollRootElement == null) {
-                scrollRootElement = driver.findElement(By.tagName("html"));
+                scrollRootElement = EyesSeleniumUtils.getDocumentElement(driver, logger);
             }
             PositionProvider positionProvider = ScrollPositionProviderFactory.getScrollPositionProvider(userAgent, logger, jsExecutor, scrollRootElement);
 
@@ -710,10 +709,10 @@ public class SeleniumEyes extends EyesBase implements ISeleniumEyes, IDriverProv
             final Region targetRegion = checkSettingsInternal.getTargetRegion();
 
             logger.verbose("setting scrollRootElement...");
-            this.scrollRootElement = getScrollRootElement(seleniumCheckTarget, driver);
+            this.scrollRootElement = EyesSeleniumUtils.getScrollRootElement(driver, logger, seleniumCheckTarget);
             WebElement documentElement = null;
             if (!isMobileDevice) {
-                documentElement = driver.findElement(By.tagName("html"));
+                documentElement = EyesSeleniumUtils.getDocumentElement(driver, logger);
             }
             logger.verbose("scrollRootElement_ set to " + scrollRootElement);
 
@@ -891,7 +890,7 @@ public class SeleniumEyes extends EyesBase implements ISeleniumEyes, IDriverProv
     }
 
     private void updateFrameScrollRoot(IScrollRootElementContainer frameTarget) {
-        WebElement rootElement = getScrollRootElement(frameTarget, driver);
+        WebElement rootElement = EyesSeleniumUtils.getScrollRootElement(driver, logger, frameTarget);
         Frame frame = driver.getFrameChain().peek();
         frame.setScrollRootElement(rootElement);
     }
@@ -915,7 +914,7 @@ public class SeleniumEyes extends EyesBase implements ISeleniumEyes, IDriverProv
                 scrollRootElement = this.scrollRootElement;
             } else {
                 if (parentFrame == null) {
-                    scrollRootElement = driver.findElement(By.tagName("html"));
+                    scrollRootElement = EyesSeleniumUtils.getDocumentElement(driver, logger);
                 } else {
                     scrollRootElement = parentFrame.getScrollRootElement();
                 }
@@ -1116,7 +1115,7 @@ public class SeleniumEyes extends EyesBase implements ISeleniumEyes, IDriverProv
     }
 
     private ScaleProviderFactory getScaleProviderFactory() {
-        WebElement element = driver.findElement(By.tagName("html"));
+        WebElement element = EyesSeleniumUtils.getDocumentElement(driver, logger);
         RectangleSize entireSize = EyesSeleniumUtils.getEntireElementSize(logger, jsExecutor, element);
         return new ContextBasedScaleProviderFactory(logger, entireSize,
                 viewportSize, devicePixelRatio, false,
@@ -1138,7 +1137,7 @@ public class SeleniumEyes extends EyesBase implements ISeleniumEyes, IDriverProv
         }
 
         if (scrollRootElement == null) {
-            scrollRootElement = driver.findElement(By.tagName("html"));
+            scrollRootElement = EyesSeleniumUtils.getDocumentElement(driver, logger);
         }
         return scrollRootElement;
     }
@@ -2084,23 +2083,6 @@ public class SeleniumEyes extends EyesBase implements ISeleniumEyes, IDriverProv
     @Override
     public void setIsDisabled(Boolean disabled) {
         super.setIsDisabled(disabled);
-    }
-
-    private static WebElement getScrollRootElement(IScrollRootElementContainer scrollRootElementContainer, WebDriver driver) {
-        WebElement scrollRootElement = null;
-        if (!EyesSeleniumUtils.isMobileDevice(driver)) {
-            if (scrollRootElementContainer == null) {
-                scrollRootElement = driver.findElement(By.tagName("html"));
-            } else {
-                scrollRootElement = scrollRootElementContainer.getScrollRootElement();
-                if (scrollRootElement == null) {
-                    By scrollRootSelector = scrollRootElementContainer.getScrollRootSelector();
-                    scrollRootElement = driver.findElement(scrollRootSelector != null ? scrollRootSelector : By.tagName("html"));
-                }
-            }
-        }
-
-        return scrollRootElement;
     }
 
     private PositionProvider getElementPositionProvider(WebElement scrollRootElement) {

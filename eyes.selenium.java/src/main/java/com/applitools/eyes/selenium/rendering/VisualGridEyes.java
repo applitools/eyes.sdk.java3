@@ -801,26 +801,9 @@ public class VisualGridEyes implements ISeleniumEyes, IRenderingEyes {
     }
 
     private void updateFrameScrollRoot(IScrollRootElementContainer frameTarget) {
-        WebElement rootElement = getScrollRootElement(frameTarget);
+        WebElement rootElement = EyesSeleniumUtils.getScrollRootElement(webDriver, logger, frameTarget);
         Frame frame = webDriver.getFrameChain().peek();
         frame.setScrollRootElement(rootElement);
-    }
-
-    private WebElement getScrollRootElement(IScrollRootElementContainer scrollRootElementContainer) {
-        WebElement scrollRootElement = null;
-        if (!EyesSeleniumUtils.isMobileDevice(webDriver)) {
-            if (scrollRootElementContainer == null) {
-                scrollRootElement = webDriver.findElement(By.tagName("html"));
-            } else {
-                scrollRootElement = scrollRootElementContainer.getScrollRootElement();
-                if (scrollRootElement == null) {
-                    By scrollRootSelector = scrollRootElementContainer.getScrollRootSelector();
-                    scrollRootElement = webDriver.findElement(scrollRootSelector != null ? scrollRootSelector : By.tagName("html"));
-                }
-            }
-        }
-
-        return scrollRootElement;
     }
 
     private synchronized List<VisualGridTask> addOpenTaskToAllRunningTest() {

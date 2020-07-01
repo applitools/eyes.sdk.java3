@@ -3,13 +3,13 @@ package com.applitools.eyes.selenium.capture;
 import com.applitools.eyes.*;
 import com.applitools.eyes.capture.ImageProvider;
 import com.applitools.eyes.positioning.PositionProvider;
+import com.applitools.eyes.selenium.EyesSeleniumUtils;
 import com.applitools.eyes.selenium.SeleniumEyes;
 import com.applitools.eyes.selenium.SeleniumJavaScriptExecutor;
 import com.applitools.eyes.selenium.frames.FrameChain;
 import com.applitools.eyes.selenium.positioning.ScrollPositionProviderFactory;
 import com.applitools.eyes.selenium.wrappers.EyesWebDriver;
 import com.applitools.utils.ImageUtils;
-import org.openqa.selenium.By;
 import org.openqa.selenium.OutputType;
 import org.openqa.selenium.TakesScreenshot;
 
@@ -39,7 +39,7 @@ public class InternetExplorerScreenshotImageProvider implements ImageProvider {
         FrameChain currentFrameChain = ((EyesWebDriver) eyes.getDriver()).getFrameChain();
         PositionProvider positionProvider = null;
         if (currentFrameChain.size() == 0) {
-            positionProvider = ScrollPositionProviderFactory.getScrollPositionProvider(userAgent, logger, jsExecutor, eyes.getDriver().findElement(By.tagName("html")));
+            positionProvider = ScrollPositionProviderFactory.getScrollPositionProvider(userAgent, logger, jsExecutor, EyesSeleniumUtils.getDocumentElement((EyesWebDriver) eyes.getDriver(), logger));
             loc = positionProvider.getCurrentPosition();
         } else {
             loc = currentFrameChain.getDefaultContentScrollPosition();

@@ -17,7 +17,6 @@ import com.applitools.eyes.selenium.wrappers.EyesTargetLocator;
 import com.applitools.eyes.selenium.wrappers.EyesWebDriver;
 import com.applitools.utils.ArgumentGuard;
 import com.applitools.utils.ImageUtils;
-import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 
 import java.awt.image.BufferedImage;
@@ -108,7 +107,7 @@ public class EyesWebDriverScreenshot extends EyesScreenshot {
     }
 
     private RectangleSize getFrameContentSize() {
-        EyesRemoteWebElement frameDocumentElement = (EyesRemoteWebElement) driver.findElement(By.tagName("html"));
+        EyesRemoteWebElement frameDocumentElement = (EyesRemoteWebElement) EyesSeleniumUtils.getDocumentElement(driver, logger);
         return frameDocumentElement.getClientSize();
     }
 

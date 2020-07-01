@@ -7,6 +7,7 @@ import com.applitools.eyes.*;
 import com.applitools.eyes.positioning.PositionMemento;
 import com.applitools.eyes.positioning.PositionProvider;
 import com.applitools.eyes.selenium.Borders;
+import com.applitools.eyes.selenium.EyesSeleniumUtils;
 import com.applitools.eyes.selenium.positioning.ScrollPositionMemento;
 import com.applitools.eyes.selenium.positioning.ScrollPositionProviderFactory;
 import com.applitools.eyes.selenium.wrappers.EyesWebDriver;
@@ -123,7 +124,7 @@ public final class Frame {
         WebElement scrollRootElement = getScrollRootElement();
         if (scrollRootElement == null) {
             logger.verbose("no scroll root element. selecting default.");
-            scrollRootElement = driver.findElement(By.tagName("html"));
+            scrollRootElement = EyesSeleniumUtils.getDocumentElement((EyesWebDriver) driver, logger);
         }
 
         return scrollRootElement;
