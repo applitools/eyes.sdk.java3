@@ -179,25 +179,38 @@ public class TestServerConnector extends ReportingTestSuite {
     public void testDownloadResourceRequestHeaders() throws Exception {
         String userAgent = "userAgent";
         String referer = "referer";
-        URI url = new URI("http://downloadResource.com");
-        ConnectivityTarget target = mock(ConnectivityTarget.class);
-        MockedAsyncRequest mockedAsyncRequest = new MockedAsyncRequest(new Logger());
-
-        when(restClient.target(url.toString())).thenReturn(target);
-        when(target.asyncRequest(anyString())).thenReturn(mockedAsyncRequest);
-
-        ServerConnector connector = new ServerConnector();
-        connector.updateClient(restClient);
-        connector.downloadResource(url, userAgent, referer, new TaskListener<RGridResource>() {
+        TaskListener<RGridResource> emptyListener = new TaskListener<RGridResource>() {
             @Override
             public void onComplete(RGridResource taskResponse) {}
 
             @Override
             public void onFail() {}
-        });
+        };
+        ServerConnector connector = new ServerConnector();
+        connector.updateClient(restClient);
 
+        // Regular Domain
+        URI url = new URI("http://downloadResource.com");
+        ConnectivityTarget target = mock(ConnectivityTarget.class);
+        MockedAsyncRequest mockedAsyncRequest = new MockedAsyncRequest(new Logger());
+        when(restClient.target(url.toString())).thenReturn(target);
+        when(target.asyncRequest(anyString())).thenReturn(mockedAsyncRequest);
+
+        connector.downloadResource(url, userAgent, referer, emptyListener);
         Map<String, String> expectedHeaders = new HashMap<>();
         expectedHeaders.put("User-Agent", userAgent);
+        expectedHeaders.put("Referer", referer);
+        Assert.assertEquals(mockedAsyncRequest.headers, expectedHeaders);
+
+        // Filtered Domain
+        URI filteredUrl = new URI("https://fonts.googleapis.com");
+        target = mock(ConnectivityTarget.class);
+        mockedAsyncRequest = new MockedAsyncRequest(new Logger());
+        when(restClient.target(filteredUrl.toString())).thenReturn(target);
+        when(target.asyncRequest(anyString())).thenReturn(mockedAsyncRequest);
+
+        connector.downloadResource(filteredUrl, userAgent, referer, emptyListener);
+        expectedHeaders = new HashMap<>();
         expectedHeaders.put("Referer", referer);
         Assert.assertEquals(mockedAsyncRequest.headers, expectedHeaders);
     }
