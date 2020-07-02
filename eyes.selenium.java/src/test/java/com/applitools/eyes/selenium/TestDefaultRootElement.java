@@ -17,14 +17,14 @@ public class TestDefaultRootElement extends ReportingTestSuite {
     }
 
     @Test
-    public void testCheckDefaultElementBiggerBody() {
+    public void testBodyGreaterThanHtml() {
         EyesRunner runner =  new ClassicRunner();
         Eyes eyes = new Eyes(runner);
         eyes.setLogHandler(new StdoutLogHandler());
         ChromeDriver driver = SeleniumUtils.createChromeDriver();
         try {
-            eyes.open(driver, "Applitools Eyes SDK", "Check Element Bigger Body");
-            driver.get("https://applitools.github.io/demo/TestPages/TestBigBody/");
+            eyes.open(driver, "Applitools Eyes SDK", "Test Body Greater Than Html");
+            driver.get("https://applitools.github.io/demo/TestPages/TestBodyGreaterThanHtml/");
             driver.executeScript("window.scrollTo(0, document.body.scrollHeight)");
             WebElement select = driver.findElement(By.cssSelector("html > body > div > select"));
             eyes.check(Target.region(select).fully());

@@ -357,7 +357,7 @@
         <classes>
             <class name="com.applitools.eyes.selenium.TestDefaultRootElement">
                 <methods>
-                    <include name="testCheckDefaultElementBiggerBody"/>
+                    <include name="testBodyGreaterThanHtml"/>
                 </methods>
             </class>
         </classes>
