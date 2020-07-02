@@ -353,4 +353,13 @@
             </class>
         </classes>
     </test>
+    <test name="TestDefaultRootElement" parallel="methods">
+        <classes>
+            <class name="com.applitools.eyes.selenium.TestDefaultRootElement">
+                <methods>
+                    <include name="testCheckDefaultElementBiggerBody"/>
+                </methods>
+            </class>
+        </classes>
+    </test>
 </suite>
