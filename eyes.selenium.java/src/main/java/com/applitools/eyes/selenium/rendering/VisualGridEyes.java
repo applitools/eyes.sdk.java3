@@ -801,7 +801,7 @@ public class VisualGridEyes implements ISeleniumEyes, IRenderingEyes {
     }
 
     private void updateFrameScrollRoot(IScrollRootElementContainer frameTarget) {
-        WebElement rootElement = EyesSeleniumUtils.getScrollRootElement(webDriver, logger, frameTarget);
+        WebElement rootElement = EyesSeleniumUtils.getScrollRootElement(logger, webDriver, frameTarget);
         Frame frame = webDriver.getFrameChain().peek();
         frame.setScrollRootElement(rootElement);
     }

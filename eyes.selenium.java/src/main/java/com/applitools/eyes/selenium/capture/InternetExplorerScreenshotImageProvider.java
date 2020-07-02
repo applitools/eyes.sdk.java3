@@ -39,7 +39,7 @@ public class InternetExplorerScreenshotImageProvider implements ImageProvider {
         FrameChain currentFrameChain = ((EyesWebDriver) eyes.getDriver()).getFrameChain();
         PositionProvider positionProvider = null;
         if (currentFrameChain.size() == 0) {
-            positionProvider = ScrollPositionProviderFactory.getScrollPositionProvider(userAgent, logger, jsExecutor, EyesSeleniumUtils.getDocumentElement((EyesWebDriver) eyes.getDriver(), logger));
+            positionProvider = ScrollPositionProviderFactory.getScrollPositionProvider(userAgent, logger, jsExecutor, EyesSeleniumUtils.getDefaultRootElement(logger, (EyesWebDriver) eyes.getDriver()));
             loc = positionProvider.getCurrentPosition();
         } else {
             loc = currentFrameChain.getDefaultContentScrollPosition();

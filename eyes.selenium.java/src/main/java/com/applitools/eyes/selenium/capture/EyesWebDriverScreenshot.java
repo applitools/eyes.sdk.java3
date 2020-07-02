@@ -107,7 +107,7 @@ public class EyesWebDriverScreenshot extends EyesScreenshot {
     }
 
     private RectangleSize getFrameContentSize() {
-        EyesRemoteWebElement frameDocumentElement = (EyesRemoteWebElement) EyesSeleniumUtils.getDocumentElement(driver, logger);
+        EyesRemoteWebElement frameDocumentElement = (EyesRemoteWebElement) EyesSeleniumUtils.getDefaultRootElement(logger, driver);
         return frameDocumentElement.getClientSize();
     }
 

@@ -714,7 +714,11 @@ public class EyesSeleniumUtils {
         return region.getSize();
     }
 
-    public static WebElement getDocumentElement(EyesWebDriver driver, Logger logger) {
+    /**
+     * #internal
+     * This method gets the default root element of the page. It will be "html" unless "body" element is higher.
+     */
+    public static WebElement getDefaultRootElement(Logger logger, EyesWebDriver driver) {
         WebElement html = driver.findElement(By.tagName("html"));
         WebElement body = driver.findElement(By.tagName("body"));
         EyesRemoteWebElement htmlElement = new EyesRemoteWebElement(logger, driver, html);
@@ -726,13 +730,16 @@ public class EyesSeleniumUtils {
         }
     }
 
-    public static WebElement getScrollRootElement(EyesWebDriver driver, Logger logger, IScrollRootElementContainer scrollRootElementContainer) {
+    /**
+     * #internal
+     */
+    public static WebElement getScrollRootElement(Logger logger, EyesWebDriver driver, IScrollRootElementContainer scrollRootElementContainer) {
         if (EyesSeleniumUtils.isMobileDevice(driver)) {
             return null;
         }
 
         if (scrollRootElementContainer == null) {
-            return EyesSeleniumUtils.getDocumentElement(driver, logger);
+            return EyesSeleniumUtils.getDefaultRootElement(logger, driver);
         }
 
         WebElement scrollRootElement = scrollRootElementContainer.getScrollRootElement();
@@ -744,7 +751,8 @@ public class EyesSeleniumUtils {
         if (scrollRootSelector != null) {
             return driver.findElement(scrollRootSelector);
         }
-        return EyesSeleniumUtils.getDocumentElement(driver, logger);
+
+        logger.log("Warning: Got an empty scroll root element container");
+        return EyesSeleniumUtils.getDefaultRootElement(logger, driver);
     }
 }
-
