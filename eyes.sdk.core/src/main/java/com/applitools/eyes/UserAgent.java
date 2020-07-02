@@ -234,6 +234,7 @@ public class UserAgent {
     }
 
     public boolean isInternetExplorer() {
+        // Version 18 of Edge is currently the last version of the legacy Edge browser (44)
         return browser.equals(BrowserNames.IE) || (browser.equals(BrowserNames.EDGE) && Integer.parseInt(browserMajorVersion) <= 18);
     }
 
