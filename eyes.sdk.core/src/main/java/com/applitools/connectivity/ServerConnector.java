@@ -671,8 +671,12 @@ public class ServerConnector extends RestClient {
     }
 
     public void closeBatch(String batchId) {
+        closeBatch(batchId, false);
+    }
+
+    public void closeBatch(String batchId, boolean forceClose) {
         boolean dontCloseBatchesStr = GeneralUtils.getDontCloseBatches();
-        if (dontCloseBatchesStr) {
+        if (dontCloseBatchesStr && !forceClose) {
             logger.log("APPLITOOLS_DONT_CLOSE_BATCHES environment variable set to true. Skipping batch close.");
             return;
         }
