@@ -1,4 +1,6 @@
 ## [vNext]
+### Fixed
+- Calculating element scroll size **after** hiding scrollbars. [Trello 1881](https://trello.com/c/9pVjoVwC) 
 ### Updated
 - Updated DOM Snapshot to 3.6.0 and supported scripts for internet explorer. [Trello 1962](https://trello.com/c/MlHqSdXv)
 - The default scroll root element is now the bigger one between "body" and "html" instead of only "html". [Trello 1972](https://trello.com/c/YfJRReVo)

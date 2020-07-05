@@ -1325,10 +1325,7 @@ public class SeleniumEyes extends EyesBase implements ISeleniumEyes, IDriverProv
         }
 
         String displayStyle = eyesElement.getComputedStyle("display");
-        RectangleSize scrollSize = eyesElement.getScrollSize();
         RectangleSize clientSize = eyesElement.getClientSize();
-        logger.verbose(String.format("displayStyle: %s ; scrollSize: %s ; clientSize %s ; effectiveViewport size: %s",
-                displayStyle, scrollSize, clientSize, effectiveViewport.getSize()));
 
         String originalOverflow = null;
         if (this.stitchContent && !displayStyle.equalsIgnoreCase("inline") &&
@@ -1341,6 +1338,10 @@ public class SeleniumEyes extends EyesBase implements ISeleniumEyes, IDriverProv
             this.elementPositionProvider = null;
         }
 
+        RectangleSize scrollSize = eyesElement.getScrollSize();
+        logger.verbose(String.format("displayStyle: %s ; scrollSize: %s ; clientSize %s ; effectiveViewport size: %s",
+                displayStyle, scrollSize, clientSize, effectiveViewport.getSize()));
+        
         EyesTargetLocator switchTo = (EyesTargetLocator) this.driver.switchTo();
         FrameChain fc = this.driver.getFrameChain().clone();
 
