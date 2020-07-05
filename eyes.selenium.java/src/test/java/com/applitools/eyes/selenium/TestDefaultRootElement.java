@@ -1,6 +1,7 @@
 package com.applitools.eyes.selenium;
 
 import com.applitools.eyes.EyesRunner;
+import com.applitools.eyes.RectangleSize;
 import com.applitools.eyes.StdoutLogHandler;
 import com.applitools.eyes.selenium.fluent.Target;
 import com.applitools.eyes.utils.ReportingTestSuite;
@@ -23,11 +24,11 @@ public class TestDefaultRootElement extends ReportingTestSuite {
         eyes.setLogHandler(new StdoutLogHandler());
         ChromeDriver driver = SeleniumUtils.createChromeDriver();
         try {
-            eyes.open(driver, "Applitools Eyes SDK", "Test Body Greater Than Html");
+            eyes.open(driver, "Applitools Eyes SDK", "Test Body Greater Than Html", new RectangleSize(1220, 800));
             driver.get("https://applitools.github.io/demo/TestPages/TestBodyGreaterThanHtml/");
             driver.executeScript("window.scrollTo(0, document.body.scrollHeight)");
-            WebElement select = driver.findElement(By.cssSelector("html > body > div > select"));
-            eyes.check(Target.region(select).fully());
+            WebElement element = driver.findElement(By.cssSelector("html > body > div"));
+            eyes.check(Target.region(element).fully());
             eyes.closeAsync();
         } finally {
             driver.quit();
