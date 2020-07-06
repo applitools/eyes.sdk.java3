@@ -250,9 +250,9 @@ public class MatchWindowTask {
             Collections.addAll(mutableRegions, currentRegions);
         }
 
-        for (GetSimpleRegion getSimpleRegions : simpleRegions) {
-            if (getSimpleRegions instanceof SimpleRegionByRectangle) {
-                mutableRegions.addAll(getSimpleRegions.getRegions(null));
+        for (GetSimpleRegion simpleRegion : simpleRegions) {
+            if (simpleRegion instanceof SimpleRegionByRectangle) {
+                mutableRegions.addAll(simpleRegion.getRegions(null));
             }
         }
 

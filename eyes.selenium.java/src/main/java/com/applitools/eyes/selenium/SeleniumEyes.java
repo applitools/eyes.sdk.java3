@@ -504,9 +504,9 @@ public class SeleniumEyes extends EyesBase implements ISeleniumEyes, IBatchClose
 
         for (int i = 0; i < checkSettings.length; ++i) {
             if (((Hashtable<Integer, GetSimpleRegion>) getRegions).containsKey(i)) {
-                GetSimpleRegion getSimpleRegion = getRegions.get(i);
+                GetSimpleRegion simpleRegion = getRegions.get(i);
                 ICheckSettingsInternal checkSettingsInternal = checkSettingsInternalDictionary.get(i);
-                List<EyesScreenshot> subScreenshots = getSubScreenshots(hasFrames ? Region.EMPTY : bBox, screenshot, getSimpleRegion);
+                List<EyesScreenshot> subScreenshots = getSubScreenshots(hasFrames ? Region.EMPTY : bBox, screenshot, simpleRegion);
                 matchRegion(checkSettingsInternal, mwt, subScreenshots);
             }
         }
@@ -566,9 +566,9 @@ public class SeleniumEyes extends EyesBase implements ISeleniumEyes, IBatchClose
     private Region findBoundingBox(Dictionary<Integer, GetSimpleRegion> getRegions, ICheckSettings[] checkSettings, EyesScreenshot screenshot) {
         Region bBox = null;
         for (int i = 0; i < checkSettings.length; ++i) {
-            GetSimpleRegion getSimpleRegion = getRegions.get(i);
-            if (getSimpleRegion != null) {
-                List<Region> regions = getSimpleRegion.getRegions(screenshot);
+            GetSimpleRegion simpleRegion = getRegions.get(i);
+            if (simpleRegion != null) {
+                List<Region> regions = simpleRegion.getRegions(screenshot);
                 for (Region region : regions) {
                     if (bBox == null) {
                         bBox = new Region(region);
