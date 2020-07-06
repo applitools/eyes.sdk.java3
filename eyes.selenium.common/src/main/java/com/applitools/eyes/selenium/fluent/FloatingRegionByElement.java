@@ -5,7 +5,6 @@ import com.applitools.eyes.EyesScreenshot;
 import com.applitools.eyes.FloatingMatchSettings;
 import com.applitools.eyes.Location;
 import com.applitools.eyes.fluent.GetFloatingRegion;
-import com.applitools.eyes.selenium.rendering.IGetSeleniumRegion;
 import com.applitools.eyes.visualgrid.model.IGetFloatingRegionOffsets;
 import org.openqa.selenium.Dimension;
 import org.openqa.selenium.Point;

@@ -1,4 +1,4 @@
-package com.applitools.eyes.selenium.rendering;
+package com.applitools.eyes.selenium.fluent;
 
 import org.openqa.selenium.WebElement;
 

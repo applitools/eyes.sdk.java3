@@ -9,11 +9,12 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>eyes-appium-java</artifactId>
+    <artifactId>eyes-selenium-common</artifactId>
+
     <dependencies>
         <dependency>
             <groupId>com.applitools</groupId>
-            <artifactId>eyes-selenium-common</artifactId>
+            <artifactId>eyes-sdk-core-java3</artifactId>
             <version>3.171.0</version>
         </dependency>
         <dependency>
@@ -24,9 +25,9 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>io.appium</groupId>
-            <artifactId>java-client</artifactId>
-            <version>6.1.0</version>
+            <groupId>org.seleniumhq.selenium</groupId>
+            <artifactId>selenium-java</artifactId>
+            <version>3.141.59</version>
         </dependency>
     </dependencies>
 
