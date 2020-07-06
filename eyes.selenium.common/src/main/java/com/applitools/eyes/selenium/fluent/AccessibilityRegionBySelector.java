@@ -2,7 +2,6 @@ package com.applitools.eyes.selenium.fluent;
 
 import com.applitools.eyes.*;
 import com.applitools.eyes.fluent.IGetAccessibilityRegionType;
-import com.applitools.eyes.selenium.rendering.IGetSeleniumRegion;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Point;
 import org.openqa.selenium.WebDriver;

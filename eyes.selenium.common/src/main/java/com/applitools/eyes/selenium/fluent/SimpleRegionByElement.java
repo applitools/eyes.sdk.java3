@@ -2,22 +2,16 @@ package com.applitools.eyes.selenium.fluent;
 
 import com.applitools.eyes.*;
 import com.applitools.eyes.fluent.GetSimpleRegion;
-import com.applitools.eyes.selenium.rendering.IGetSeleniumRegion;
-import com.applitools.eyes.selenium.wrappers.EyesRemoteWebElement;
-import com.applitools.eyes.selenium.wrappers.EyesWebDriver;
 import org.openqa.selenium.Dimension;
 import org.openqa.selenium.Point;
-import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-public class SimpleRegionByElement implements GetSimpleRegion, IGetSeleniumRegion, ImplicitInitiation {
+public class SimpleRegionByElement implements GetSimpleRegion, IGetSeleniumRegion {
 
-    private Logger logger;
-    private WebDriver driver;
     private WebElement element;
 
     public SimpleRegionByElement(WebElement element) {
@@ -25,17 +19,7 @@ public class SimpleRegionByElement implements GetSimpleRegion, IGetSeleniumRegio
     }
 
     @Override
-    public void init(Logger logger, WebDriver driver) {
-        this.logger = logger;
-        this.driver = driver;
-    }
-
-    @Override
     public List<Region> getRegions(EyesScreenshot screenshot) {
-        if (!(element instanceof EyesRemoteWebElement)) {
-            element = new EyesRemoteWebElement(logger, (EyesWebDriver) driver, element);
-        }
-
         Point locationAsPoint = element.getLocation();
         Dimension size = element.getSize();
 
