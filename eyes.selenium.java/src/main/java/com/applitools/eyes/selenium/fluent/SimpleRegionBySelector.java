@@ -1,24 +1,32 @@
 package com.applitools.eyes.selenium.fluent;
 
 import com.applitools.eyes.*;
-import com.applitools.eyes.fluent.GetRegion;
-import com.applitools.eyes.selenium.SeleniumEyes;
+import com.applitools.eyes.fluent.GetSimpleRegion;
 import com.applitools.eyes.selenium.rendering.IGetSeleniumRegion;
 import org.openqa.selenium.*;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class SimpleRegionBySelector implements GetRegion , IGetSeleniumRegion {
-    private By selector;
+public class SimpleRegionBySelector implements GetSimpleRegion, IGetSeleniumRegion, ImplicitInitiation {
+
+    private Logger logger;
+    private WebDriver driver;
+    private final By selector;
 
     public SimpleRegionBySelector(By selector) {
         this.selector = selector;
     }
 
     @Override
-    public List<Region> getRegions(EyesBase eyesBase, EyesScreenshot screenshot) {
-        List<WebElement> elements = ((SeleniumEyes) eyesBase).getDriver().findElements(this.selector);
+    public void init(Logger logger, WebDriver driver) {
+        this.logger = logger;
+        this.driver = driver;
+    }
+
+    @Override
+    public List<Region> getRegions( EyesScreenshot screenshot) {
+        List<WebElement> elements = driver.findElements(this.selector);
         List<Region> values = new ArrayList<>(elements.size());
         for (WebElement element : elements) {
 
@@ -38,7 +46,7 @@ public class SimpleRegionBySelector implements GetRegion , IGetSeleniumRegion {
     }
 
     @Override
-    public List<WebElement> getElements(WebDriver webDriver) {
-        return webDriver.findElements(selector);
+    public List<WebElement> getElements() {
+        return driver.findElements(selector);
     }
 }

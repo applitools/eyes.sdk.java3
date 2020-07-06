@@ -12,7 +12,7 @@ import com.applitools.eyes.config.Configuration;
 import com.applitools.eyes.config.ConfigurationProvider;
 import com.applitools.eyes.debug.DebugScreenshotsProvider;
 import com.applitools.eyes.exceptions.TestFailedException;
-import com.applitools.eyes.fluent.GetRegion;
+import com.applitools.eyes.fluent.GetSimpleRegion;
 import com.applitools.eyes.fluent.ICheckSettingsInternal;
 import com.applitools.eyes.fluent.SimpleRegionByRectangle;
 import com.applitools.eyes.positioning.PositionMemento;
@@ -48,7 +48,7 @@ import java.util.List;
  * The main API gateway for the SDK.
  */
 @SuppressWarnings("WeakerAccess")
-public class SeleniumEyes extends EyesBase implements ISeleniumEyes, IDriverProvider, IBatchCloser {
+public class SeleniumEyes extends EyesBase implements ISeleniumEyes, IBatchCloser {
 
     private FrameChain originalFC;
     private WebElement scrollRootElement;
@@ -404,7 +404,7 @@ public class SeleniumEyes extends EyesBase implements ISeleniumEyes, IDriverProv
 
         logger.verbose(getConfiguration().toString());
 
-        Dictionary<Integer, GetRegion> getRegions = new Hashtable<>();
+        Dictionary<Integer, GetSimpleRegion> getRegions = new Hashtable<>();
         Dictionary<Integer, ICheckSettingsInternal> checkSettingsInternalDictionary = new Hashtable<>();
 
         for (int i = 0; i < checkSettings.length; ++i) {
@@ -422,6 +422,7 @@ public class SeleniumEyes extends EyesBase implements ISeleniumEyes, IDriverProv
                         (settings instanceof ISeleniumCheckTarget) ? (ISeleniumCheckTarget) settings : null;
 
                 if (seleniumCheckTarget != null) {
+                    seleniumCheckTarget.init(logger, driver);
                     WebElement targetElement = getTargetElement(seleniumCheckTarget);
                     if (targetElement == null && seleniumCheckTarget.getFrameChain().size() == 1) {
                         targetElement = getFrameElement(seleniumCheckTarget.getFrameChain().get(0));
@@ -443,7 +444,7 @@ public class SeleniumEyes extends EyesBase implements ISeleniumEyes, IDriverProv
         getConfiguration().setForceFullPageScreenshot(originalForceFPS);
     }
 
-    private void matchRegions(Dictionary<Integer, GetRegion> getRegions,
+    private void matchRegions(Dictionary<Integer, GetSimpleRegion> getRegions,
                               Dictionary<Integer, ICheckSettingsInternal> checkSettingsInternalDictionary,
                               ICheckSettings[] checkSettings) {
 
@@ -502,10 +503,10 @@ public class SeleniumEyes extends EyesBase implements ISeleniumEyes, IDriverProv
         EyesWebDriverScreenshot screenshot = new EyesWebDriverScreenshot(logger, driver, screenshotImage, EyesWebDriverScreenshot.ScreenshotType.VIEWPORT, Location.ZERO);
 
         for (int i = 0; i < checkSettings.length; ++i) {
-            if (((Hashtable<Integer, GetRegion>) getRegions).containsKey(i)) {
-                GetRegion getRegion = getRegions.get(i);
+            if (((Hashtable<Integer, GetSimpleRegion>) getRegions).containsKey(i)) {
+                GetSimpleRegion getSimpleRegion = getRegions.get(i);
                 ICheckSettingsInternal checkSettingsInternal = checkSettingsInternalDictionary.get(i);
-                List<EyesScreenshot> subScreenshots = getSubScreenshots(hasFrames ? Region.EMPTY : bBox, screenshot, getRegion);
+                List<EyesScreenshot> subScreenshots = getSubScreenshots(hasFrames ? Region.EMPTY : bBox, screenshot, getSimpleRegion);
                 matchRegion(checkSettingsInternal, mwt, subScreenshots);
             }
         }
@@ -521,9 +522,9 @@ public class SeleniumEyes extends EyesBase implements ISeleniumEyes, IDriverProv
         ((EyesTargetLocator) driver.switchTo()).frames(this.originalFC);
     }
 
-    private List<EyesScreenshot> getSubScreenshots(Region bBox, EyesWebDriverScreenshot screenshot, GetRegion getRegion) {
+    private List<EyesScreenshot> getSubScreenshots(Region bBox, EyesWebDriverScreenshot screenshot, GetSimpleRegion getSimpleRegion) {
         List<EyesScreenshot> subScreenshots = new ArrayList<>();
-        for (Region r : getRegion.getRegions(this, screenshot)) {
+        for (Region r : getSimpleRegion.getRegions(screenshot)) {
             logger.verbose("original sub-region: " + r);
             r = r.offset(-bBox.getLeft(), -bBox.getTop());
             //r = regionPositionCompensation.compensateRegionPosition(r, devicePixelRatio);
@@ -553,7 +554,7 @@ public class SeleniumEyes extends EyesBase implements ISeleniumEyes, IDriverProv
         }
     }
 
-    private Region findBoundingBox(Dictionary<Integer, GetRegion> getRegions, ICheckSettings[] checkSettings) {
+    private Region findBoundingBox(Dictionary<Integer, GetSimpleRegion> getRegions, ICheckSettings[] checkSettings) {
         RectangleSize rectSize = getViewportSize();
         logger.verbose("rectSize: " + rectSize);
         EyesScreenshot screenshot = new EyesWebDriverScreenshot(logger, driver,
@@ -562,12 +563,12 @@ public class SeleniumEyes extends EyesBase implements ISeleniumEyes, IDriverProv
         return findBoundingBox(getRegions, checkSettings, screenshot);
     }
 
-    private Region findBoundingBox(Dictionary<Integer, GetRegion> getRegions, ICheckSettings[] checkSettings, EyesScreenshot screenshot) {
+    private Region findBoundingBox(Dictionary<Integer, GetSimpleRegion> getRegions, ICheckSettings[] checkSettings, EyesScreenshot screenshot) {
         Region bBox = null;
         for (int i = 0; i < checkSettings.length; ++i) {
-            GetRegion getRegion = getRegions.get(i);
-            if (getRegion != null) {
-                List<Region> regions = getRegion.getRegions(this, screenshot);
+            GetSimpleRegion getSimpleRegion = getRegions.get(i);
+            if (getSimpleRegion != null) {
+                List<Region> regions = getSimpleRegion.getRegions(screenshot);
                 for (Region region : regions) {
                     if (bBox == null) {
                         bBox = new Region(region);
@@ -701,6 +702,9 @@ public class SeleniumEyes extends EyesBase implements ISeleniumEyes, IDriverProv
 
             ICheckSettingsInternal checkSettingsInternal = (ICheckSettingsInternal) checkSettings;
             ISeleniumCheckTarget seleniumCheckTarget = (checkSettings instanceof ISeleniumCheckTarget) ? (ISeleniumCheckTarget) checkSettings : null;
+            if (seleniumCheckTarget != null) {
+                seleniumCheckTarget.init(logger, driver);
+            }
             String name = checkSettingsInternal.getName();
 
             logger.verbose(String.format("check(\"%s\", checkSettings) - begin", name));

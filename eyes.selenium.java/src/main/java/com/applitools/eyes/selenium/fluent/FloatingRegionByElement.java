@@ -1,12 +1,14 @@
 package com.applitools.eyes.selenium.fluent;
 
-import com.applitools.eyes.*;
+import com.applitools.eyes.CoordinatesType;
+import com.applitools.eyes.EyesScreenshot;
+import com.applitools.eyes.FloatingMatchSettings;
+import com.applitools.eyes.Location;
 import com.applitools.eyes.fluent.GetFloatingRegion;
 import com.applitools.eyes.selenium.rendering.IGetSeleniumRegion;
 import com.applitools.eyes.visualgrid.model.IGetFloatingRegionOffsets;
 import org.openqa.selenium.Dimension;
 import org.openqa.selenium.Point;
-import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
 import java.util.ArrayList;
@@ -15,11 +17,11 @@ import java.util.List;
 
 public class FloatingRegionByElement implements GetFloatingRegion, IGetSeleniumRegion, IGetFloatingRegionOffsets {
 
-    private WebElement element;
-    private int maxUpOffset;
-    private int maxDownOffset;
-    private int maxLeftOffset;
-    private int maxRightOffset;
+    private final WebElement element;
+    private final int maxUpOffset;
+    private final int maxDownOffset;
+    private final int maxLeftOffset;
+    private final int maxRightOffset;
 
     public FloatingRegionByElement(WebElement element, int maxUpOffset, int maxDownOffset, int maxLeftOffset, int maxRightOffset) {
 
@@ -31,7 +33,7 @@ public class FloatingRegionByElement implements GetFloatingRegion, IGetSeleniumR
     }
 
     @Override
-    public List<FloatingMatchSettings> getRegions(EyesBase eyesBase, EyesScreenshot screenshot) {
+    public List<FloatingMatchSettings> getRegions(EyesScreenshot screenshot) {
         Point locationAsPoint = element.getLocation();
         Dimension size = element.getSize();
 
@@ -53,7 +55,7 @@ public class FloatingRegionByElement implements GetFloatingRegion, IGetSeleniumR
     }
 
     @Override
-    public List<WebElement> getElements(WebDriver webDriver) {
+    public List<WebElement> getElements() {
         return Collections.singletonList(element);
     }
 

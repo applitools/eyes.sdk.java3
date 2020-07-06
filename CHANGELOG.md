@@ -1,3 +1,7 @@
+## [vNext]
+### Updated
+- Update all `GetRegion` classes, so they don't depend on `Eyes` or `EyesBase` objects. [Trello 1980](https://trello.com/c/RYAOPRpc)
+
 ## [3.169.0] - 2020-05-07
 ### Fixed
 - Correct size calculation for elements that change when hiding scrollbars. [Trello 1881](https://trello.com/c/9pVjoVwC) 

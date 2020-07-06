@@ -2,7 +2,6 @@ package com.applitools.eyes.selenium.fluent;
 
 import com.applitools.eyes.*;
 import com.applitools.eyes.fluent.GetFloatingRegion;
-import com.applitools.eyes.selenium.SeleniumEyes;
 import com.applitools.eyes.selenium.EyesSeleniumUtils;
 import com.applitools.eyes.selenium.rendering.IGetSeleniumRegion;
 import com.applitools.eyes.visualgrid.model.IGetFloatingRegionOffsets;
@@ -14,16 +13,17 @@ import org.openqa.selenium.WebElement;
 import java.util.ArrayList;
 import java.util.List;
 
-public class FloatingRegionBySelector implements GetFloatingRegion , IGetSeleniumRegion, IGetFloatingRegionOffsets {
+public class FloatingRegionBySelector implements GetFloatingRegion , IGetSeleniumRegion, IGetFloatingRegionOffsets, ImplicitInitiation {
 
-    private By selector;
-    private int maxUpOffset;
-    private int maxDownOffset;
-    private int maxLeftOffset;
-    private int maxRightOffset;
+    private Logger logger;
+    private WebDriver driver;
+    private final By selector;
+    private final int maxUpOffset;
+    private final int maxDownOffset;
+    private final int maxLeftOffset;
+    private final int maxRightOffset;
 
     public FloatingRegionBySelector(By regionSelector, int maxUpOffset, int maxDownOffset, int maxLeftOffset, int maxRightOffset) {
-
         this.selector = regionSelector;
         this.maxUpOffset = maxUpOffset;
         this.maxDownOffset = maxDownOffset;
@@ -32,10 +32,15 @@ public class FloatingRegionBySelector implements GetFloatingRegion , IGetSeleniu
     }
 
     @Override
-    public List<FloatingMatchSettings> getRegions(EyesBase eyesBase, EyesScreenshot screenshot) {
-        List<WebElement> elements = ((SeleniumEyes) eyesBase).getDriver().findElements(this.selector);
+    public void init(Logger logger, WebDriver driver) {
+        this.logger = logger;
+        this.driver = driver;
+    }
+
+    @Override
+    public List<FloatingMatchSettings> getRegions(EyesScreenshot screenshot) {
+        List<WebElement> elements = driver.findElements(this.selector);
         List<FloatingMatchSettings> values = new ArrayList<>();
-        Logger logger = eyesBase.getLogger();
 
         for (WebElement element : elements) {
             Point locationAsPoint = element.getLocation();
@@ -58,8 +63,8 @@ public class FloatingRegionBySelector implements GetFloatingRegion , IGetSeleniu
     }
 
     @Override
-    public List<WebElement> getElements(WebDriver webDriver) {
-        return webDriver.findElements(this.selector);
+    public List<WebElement> getElements() {
+        return driver.findElements(this.selector);
     }
 
     @Override

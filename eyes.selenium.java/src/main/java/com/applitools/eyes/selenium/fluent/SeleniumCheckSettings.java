@@ -1,13 +1,11 @@
 package com.applitools.eyes.selenium.fluent;
 
-import com.applitools.eyes.AccessibilityRegionType;
-import com.applitools.eyes.MatchLevel;
-import com.applitools.eyes.Region;
-import com.applitools.eyes.fluent.CheckSettings;
-import com.applitools.eyes.fluent.ICheckSettingsInternal;
+import com.applitools.eyes.*;
+import com.applitools.eyes.fluent.*;
 import com.applitools.eyes.visualgrid.model.VisualGridSelector;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import org.openqa.selenium.By;
+import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
 import java.util.ArrayList;
@@ -45,6 +43,24 @@ public class SeleniumCheckSettings extends CheckSettings implements ISeleniumChe
 
     public SeleniumCheckSettings(String tag) {
         this.name = tag;
+    }
+
+    @Override
+    public void init(Logger logger, WebDriver driver) {
+        initGetRegions(logger, driver, ignoreRegions);
+        initGetRegions(logger, driver, layoutRegions);
+        initGetRegions(logger, driver, strictRegions);
+        initGetRegions(logger, driver, contentRegions);
+        initGetRegions(logger, driver, floatingRegions);
+        initGetRegions(logger, driver, accessibilityRegions);
+    }
+
+    private void initGetRegions(Logger logger, WebDriver driver, List<? extends GetRegion> getRegions) {
+        for (GetRegion getRegion : getRegions) {
+            if (getRegion instanceof ImplicitInitiation) {
+                ((ImplicitInitiation) getRegion).init(logger, driver);
+            }
+        }
     }
 
     @Override
@@ -504,6 +520,5 @@ public class SeleniumCheckSettings extends CheckSettings implements ISeleniumChe
         }
         return clone;
     }
-
-
 }
+

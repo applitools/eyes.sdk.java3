@@ -20,11 +20,12 @@ public class CheckSettings implements ICheckSettings, ICheckSettingsInternal {
     private MatchLevel matchLevel = null;
     private Boolean ignoreCaret = null;
     private Boolean stitchContent = null;
-    private List<GetRegion> ignoreRegions = new ArrayList<>();
-    private List<GetRegion> layoutRegions = new ArrayList<>();
-    private List<GetRegion> strictRegions = new ArrayList<>();
-    private List<GetRegion> contentRegions = new ArrayList<>();
-    private List<GetFloatingRegion> floatingRegions = new ArrayList<>();
+    protected final List<GetSimpleRegion> ignoreRegions = new ArrayList<>();
+    protected final List<GetSimpleRegion> layoutRegions = new ArrayList<>();
+    protected final List<GetSimpleRegion> strictRegions = new ArrayList<>();
+    protected final List<GetSimpleRegion> contentRegions = new ArrayList<>();
+    protected final List<GetFloatingRegion> floatingRegions = new ArrayList<>();
+    protected List<GetAccessibilityRegion> accessibilityRegions = new ArrayList<>();
     private int timeout = -1;
     protected String name;
     protected Boolean enablePatterns;
@@ -32,7 +33,6 @@ public class CheckSettings implements ICheckSettings, ICheckSettingsInternal {
     protected Boolean useDom;
     protected Map<String, String> scriptHooks = new HashMap<>();
     protected Boolean ignoreDisplacements;
-    protected List<IGetAccessibilityRegion> accessibilityRegions = new ArrayList<>();
 
     protected CheckSettings() { }
 
@@ -52,7 +52,7 @@ public class CheckSettings implements ICheckSettings, ICheckSettingsInternal {
         this.ignore_(new SimpleRegionByRectangle(region));
     }
 
-    protected void ignore_(GetRegion regionProvider) {
+    protected void ignore_(GetSimpleRegion regionProvider) {
         ignoreRegions.add(regionProvider);
     }
 
@@ -60,7 +60,7 @@ public class CheckSettings implements ICheckSettings, ICheckSettingsInternal {
         this.layout_(new SimpleRegionByRectangle(region));
     }
 
-    protected void layout_(GetRegion regionProvider) {
+    protected void layout_(GetSimpleRegion regionProvider) {
         layoutRegions.add(regionProvider);
     }
 
@@ -68,7 +68,7 @@ public class CheckSettings implements ICheckSettings, ICheckSettingsInternal {
         this.content_(new SimpleRegionByRectangle(region));
     }
 
-    protected void content_(GetRegion regionProvider) {
+    protected void content_(GetSimpleRegion regionProvider) {
         contentRegions.add(regionProvider);
     }
 
@@ -76,7 +76,7 @@ public class CheckSettings implements ICheckSettings, ICheckSettingsInternal {
         this.strict_(new SimpleRegionByRectangle(region));
     }
 
-    protected void strict_(GetRegion regionProvider) {
+    protected void strict_(GetSimpleRegion regionProvider) {
         strictRegions.add(regionProvider);
     }
 
@@ -389,25 +389,25 @@ public class CheckSettings implements ICheckSettings, ICheckSettingsInternal {
     }
 
     @Override
-    public GetRegion[] getIgnoreRegions() {
-        return this.ignoreRegions.toArray(new GetRegion[0]);
+    public GetSimpleRegion[] getIgnoreRegions() {
+        return this.ignoreRegions.toArray(new GetSimpleRegion[0]);
     }
 
     @Override
-    public GetRegion[] getStrictRegions() {
-        return this.strictRegions.toArray(new GetRegion[0]);
-    }
-
-
-    @Override
-    public GetRegion[] getLayoutRegions() {
-        return this.layoutRegions.toArray(new GetRegion[0]);
+    public GetSimpleRegion[] getStrictRegions() {
+        return this.strictRegions.toArray(new GetSimpleRegion[0]);
     }
 
 
     @Override
-    public GetRegion[] getContentRegions() {
-        return this.contentRegions.toArray(new GetRegion[0]);
+    public GetSimpleRegion[] getLayoutRegions() {
+        return this.layoutRegions.toArray(new GetSimpleRegion[0]);
+    }
+
+
+    @Override
+    public GetSimpleRegion[] getContentRegions() {
+        return this.contentRegions.toArray(new GetSimpleRegion[0]);
     }
 
 
@@ -496,15 +496,15 @@ public class CheckSettings implements ICheckSettings, ICheckSettingsInternal {
 
     @Override
     public ICheckSettings beforeRenderScreenshotHook(String hook) {
-        ICheckSettings clone = this.clone();
-        ((CheckSettings) clone).scriptHooks.put(BEFORE_CAPTURE_SCREENSHOT, hook);
+        CheckSettings clone = this.clone();
+        clone.scriptHooks.put(BEFORE_CAPTURE_SCREENSHOT, hook);
         return clone;
     }
 
     @Override
     public ICheckSettings ignoreDisplacements(boolean ignoreDisplacements) {
-        ICheckSettings clone = this.clone();
-        ((CheckSettings) clone).ignoreDisplacements = ignoreDisplacements;
+        CheckSettings clone = this.clone();
+        clone.ignoreDisplacements = ignoreDisplacements;
         return clone;
     }
 
@@ -513,7 +513,7 @@ public class CheckSettings implements ICheckSettings, ICheckSettingsInternal {
         return this.ignoreDisplacements(true);
     }
 
-    protected void accessibility_(IGetAccessibilityRegion accessibilityRegionProvider)
+    protected void accessibility_(GetAccessibilityRegion accessibilityRegionProvider)
     {
         this.accessibilityRegions.add(accessibilityRegionProvider);
     }
@@ -531,13 +531,12 @@ public class CheckSettings implements ICheckSettings, ICheckSettingsInternal {
         return clone;
     }
 
-    protected void accessibility(IGetAccessibilityRegion accessibilityRegionProvider)
-    {
+    protected void accessibility(GetAccessibilityRegion accessibilityRegionProvider) {
         accessibilityRegions.add(accessibilityRegionProvider);
     }
 
     @Override
-    public IGetAccessibilityRegion[] getAccessibilityRegions() {
-        return this.accessibilityRegions.toArray(new IGetAccessibilityRegion[0]);
+    public GetAccessibilityRegion[] getAccessibilityRegions() {
+        return this.accessibilityRegions.toArray(new GetAccessibilityRegion[0]);
     }
 }

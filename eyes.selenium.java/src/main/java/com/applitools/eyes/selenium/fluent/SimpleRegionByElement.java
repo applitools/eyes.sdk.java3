@@ -1,8 +1,7 @@
 package com.applitools.eyes.selenium.fluent;
 
 import com.applitools.eyes.*;
-import com.applitools.eyes.fluent.GetRegion;
-import com.applitools.eyes.selenium.SeleniumEyes;
+import com.applitools.eyes.fluent.GetSimpleRegion;
 import com.applitools.eyes.selenium.rendering.IGetSeleniumRegion;
 import com.applitools.eyes.selenium.wrappers.EyesRemoteWebElement;
 import com.applitools.eyes.selenium.wrappers.EyesWebDriver;
@@ -12,10 +11,13 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
-public class SimpleRegionByElement implements GetRegion, IGetSeleniumRegion {
+public class SimpleRegionByElement implements GetSimpleRegion, IGetSeleniumRegion, ImplicitInitiation {
+
+    private Logger logger;
+    private WebDriver driver;
     private WebElement element;
 
     public SimpleRegionByElement(WebElement element) {
@@ -23,10 +25,15 @@ public class SimpleRegionByElement implements GetRegion, IGetSeleniumRegion {
     }
 
     @Override
-    public List<Region> getRegions(EyesBase eyesBase, EyesScreenshot screenshot) {
-        if (!(element instanceof EyesRemoteWebElement) && (eyesBase instanceof SeleniumEyes)) {
-            SeleniumEyes seleniumEyes = (SeleniumEyes) eyesBase;
-            element = new EyesRemoteWebElement(eyesBase.getLogger(), (EyesWebDriver) seleniumEyes.getDriver(), element);
+    public void init(Logger logger, WebDriver driver) {
+        this.logger = logger;
+        this.driver = driver;
+    }
+
+    @Override
+    public List<Region> getRegions(EyesScreenshot screenshot) {
+        if (!(element instanceof EyesRemoteWebElement)) {
+            element = new EyesRemoteWebElement(logger, (EyesWebDriver) driver, element);
         }
 
         Point locationAsPoint = element.getLocation();
@@ -47,7 +54,7 @@ public class SimpleRegionByElement implements GetRegion, IGetSeleniumRegion {
     }
 
     @Override
-    public List<WebElement> getElements(WebDriver webDriver) {
-        return Arrays.asList(element);
+    public List<WebElement> getElements() {
+        return Collections.singletonList(element);
     }
 }

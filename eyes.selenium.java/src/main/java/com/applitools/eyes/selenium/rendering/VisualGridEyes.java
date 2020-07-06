@@ -7,7 +7,7 @@ import com.applitools.eyes.*;
 import com.applitools.eyes.config.Configuration;
 import com.applitools.eyes.fluent.CheckSettings;
 import com.applitools.eyes.fluent.GetFloatingRegion;
-import com.applitools.eyes.fluent.GetRegion;
+import com.applitools.eyes.fluent.GetSimpleRegion;
 import com.applitools.eyes.selenium.BrowserType;
 import com.applitools.eyes.selenium.EyesSeleniumUtils;
 import com.applitools.eyes.selenium.ISeleniumEyes;
@@ -537,9 +537,14 @@ public class VisualGridEyes implements ISeleniumEyes, IRenderingEyes {
     public void check(ICheckSettings checkSettings) {
         logger.verbose("enter");
 
-        if (!validateEyes()) return;
+        if (!validateEyes()) {
+            return;
+        }
 
         ArgumentGuard.notOfType(checkSettings, ICheckSettings.class, "checkSettings");
+        if (checkSettings instanceof ISeleniumCheckTarget) {
+            ((ISeleniumCheckTarget) checkSettings).init(logger, webDriver);
+        }
 
         waitBeforeDomSnapshot();
 
@@ -899,12 +904,12 @@ public class VisualGridEyes implements ISeleniumEyes, IRenderingEyes {
 
     private List<WebElementRegion>[] collectSeleniumRegions(ICheckSettingsInternal csInternal) {
         CheckSettings settings = (CheckSettings) csInternal;
-        GetRegion[] ignoreRegions = settings.getIgnoreRegions();
-        GetRegion[] layoutRegions = settings.getLayoutRegions();
-        GetRegion[] strictRegions = settings.getStrictRegions();
-        GetRegion[] contentRegions = settings.getContentRegions();
+        GetSimpleRegion[] ignoreRegions = settings.getIgnoreRegions();
+        GetSimpleRegion[] layoutRegions = settings.getLayoutRegions();
+        GetSimpleRegion[] strictRegions = settings.getStrictRegions();
+        GetSimpleRegion[] contentRegions = settings.getContentRegions();
         GetFloatingRegion[] floatingRegions = settings.getFloatingRegions();
-        IGetAccessibilityRegion[] accessibilityRegions = settings.getAccessibilityRegions();
+        GetAccessibilityRegion[] accessibilityRegions = settings.getAccessibilityRegions();
 
         List<WebElementRegion> ignoreElements = getElementsFromRegions(Arrays.asList(ignoreRegions));
         List<WebElementRegion> layoutElements = getElementsFromRegions(Arrays.asList(layoutRegions));
@@ -938,7 +943,7 @@ public class VisualGridEyes implements ISeleniumEyes, IRenderingEyes {
         for (Object getRegion : regionsProvider) {
             if (getRegion instanceof IGetSeleniumRegion) {
                 IGetSeleniumRegion getSeleniumRegion = (IGetSeleniumRegion) getRegion;
-                List<WebElement> webElements = getSeleniumRegion.getElements(webDriver);
+                List<WebElement> webElements = getSeleniumRegion.getElements();
                 for (WebElement webElement : webElements) {
                     elements.add(new WebElementRegion(webElement, getRegion));
                 }

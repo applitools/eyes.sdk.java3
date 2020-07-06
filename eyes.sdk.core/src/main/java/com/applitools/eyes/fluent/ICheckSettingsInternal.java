@@ -1,20 +1,20 @@
 package com.applitools.eyes.fluent;
 
 import com.applitools.ICheckSettings;
-import com.applitools.eyes.IGetAccessibilityRegion;
+import com.applitools.eyes.GetAccessibilityRegion;
 import com.applitools.eyes.visualgrid.model.VisualGridSelector;
 
 public interface ICheckSettingsInternal extends com.applitools.ICheckSettingsInternal {
 
     Boolean getStitchContent();
 
-    GetRegion[] getIgnoreRegions();
+    GetSimpleRegion[] getIgnoreRegions();
 
-    GetRegion[] getStrictRegions();
+    GetSimpleRegion[] getStrictRegions();
 
-    GetRegion[] getLayoutRegions();
+    GetSimpleRegion[] getLayoutRegions();
 
-    GetRegion[] getContentRegions();
+    GetSimpleRegion[] getContentRegions();
 
     GetFloatingRegion[] getFloatingRegions();
 
@@ -35,5 +35,5 @@ public interface ICheckSettingsInternal extends com.applitools.ICheckSettingsInt
 
     Boolean isIgnoreDisplacements();
 
-    IGetAccessibilityRegion[] getAccessibilityRegions();
+    GetAccessibilityRegion[] getAccessibilityRegions();
 }

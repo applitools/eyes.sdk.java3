@@ -3,10 +3,10 @@ package com.applitools.eyes;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
-public class AccessibilityRegionByRectangle implements IGetAccessibilityRegion{
+public class AccessibilityRegionByRectangle implements GetAccessibilityRegion {
     @JsonInclude
     private int left;
     @JsonInclude
@@ -71,8 +71,8 @@ public class AccessibilityRegionByRectangle implements IGetAccessibilityRegion{
     }
 
     @Override
-    public List<AccessibilityRegionByRectangle> getRegions(IDriverProvider eyesBase, EyesScreenshot screenshot) {
-        return Arrays.asList(this);
+    public List<AccessibilityRegionByRectangle> getRegions(EyesScreenshot screenshot) {
+        return Collections.singletonList(this);
     }
 
     @Override
@@ -101,12 +101,10 @@ public class AccessibilityRegionByRectangle implements IGetAccessibilityRegion{
         }
         AccessibilityRegionByRectangle otherRegion = (AccessibilityRegionByRectangle) other;
 
-        boolean result =
-                otherRegion.width == width &&
-                        otherRegion.height == height &&
-                        otherRegion.left == left &&
-                        otherRegion.top == top &&
-                        otherRegion.type == type;
-        return result;
+        return otherRegion.width == width &&
+                otherRegion.height == height &&
+                otherRegion.left == left &&
+                otherRegion.top == top &&
+                otherRegion.type == type;
     }
 }

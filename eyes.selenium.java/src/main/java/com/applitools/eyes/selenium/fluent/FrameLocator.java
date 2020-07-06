@@ -3,7 +3,7 @@ package com.applitools.eyes.selenium.fluent;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 
-public class FrameLocator implements ISeleniumFrameCheckTarget{
+public class FrameLocator implements ISeleniumFrameCheckTarget {
     private By frameSelector;
     private String frameNameOrId;
     private Integer frameIndex;

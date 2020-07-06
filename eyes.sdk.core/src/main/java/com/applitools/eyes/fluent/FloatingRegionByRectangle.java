@@ -6,11 +6,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class FloatingRegionByRectangle implements GetFloatingRegion {
-    private Region rect;
-    private int maxUpOffset;
-    private int maxDownOffset;
-    private int maxLeftOffset;
-    private int maxRightOffset;
+    private final Region rect;
+    private final int maxUpOffset;
+    private final int maxDownOffset;
+    private final int maxLeftOffset;
+    private final int maxRightOffset;
 
     public FloatingRegionByRectangle(Region rect, int maxUpOffset, int maxDownOffset, int maxLeftOffset, int maxRightOffset) {
         this.rect = rect;
@@ -21,7 +21,7 @@ public class FloatingRegionByRectangle implements GetFloatingRegion {
     }
 
     @Override
-    public List<FloatingMatchSettings> getRegions(EyesBase eyesBase, EyesScreenshot screenshot) {
+    public List<FloatingMatchSettings> getRegions(EyesScreenshot screenshot) {
         List<FloatingMatchSettings> value = new ArrayList<>();
         value.add(new FloatingMatchSettings(
                 rect.getLeft(), rect.getTop(), rect.getWidth(), rect.getHeight(),

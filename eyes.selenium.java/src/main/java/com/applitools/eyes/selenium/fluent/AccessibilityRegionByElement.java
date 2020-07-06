@@ -4,16 +4,15 @@ import com.applitools.eyes.*;
 import com.applitools.eyes.fluent.IGetAccessibilityRegionType;
 import com.applitools.eyes.selenium.rendering.IGetSeleniumRegion;
 import org.openqa.selenium.Point;
-import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
-public class AccessibilityRegionByElement implements IGetAccessibilityRegion, IGetSeleniumRegion, IGetAccessibilityRegionType {
+public class AccessibilityRegionByElement implements GetAccessibilityRegion, IGetSeleniumRegion, IGetAccessibilityRegionType {
 
-    private AccessibilityRegionType regionType;
-    private WebElement element;
+    private final AccessibilityRegionType regionType;
+    private final WebElement element;
 
     public AccessibilityRegionByElement(WebElement element, AccessibilityRegionType regionType) {
         this.element = element;
@@ -21,11 +20,10 @@ public class AccessibilityRegionByElement implements IGetAccessibilityRegion, IG
     }
 
     @Override
-    public List<AccessibilityRegionByRectangle> getRegions(IDriverProvider eyesBase, EyesScreenshot screenshot) {
+    public List<AccessibilityRegionByRectangle> getRegions(EyesScreenshot screenshot) {
         Point p = element.getLocation();
         Location pTag = screenshot.convertLocation(new Location(p.x, p.y), CoordinatesType.CONTEXT_RELATIVE, CoordinatesType.SCREENSHOT_AS_IS);
-
-        return Arrays.asList(new AccessibilityRegionByRectangle(new Region(pTag, new RectangleSize(element.getSize().width, element.getSize().height)), regionType));
+        return Collections.singletonList(new AccessibilityRegionByRectangle(new Region(pTag, new RectangleSize(element.getSize().width, element.getSize().height)), regionType));
     }
 
 
@@ -35,8 +33,8 @@ public class AccessibilityRegionByElement implements IGetAccessibilityRegion, IG
     }
 
     @Override
-    public List<WebElement> getElements(WebDriver driver) {
-        return Arrays.asList(element);
+    public List<WebElement> getElements() {
+        return Collections.singletonList(element);
     }
 
 }
