@@ -26,3 +26,4 @@ eyes.selenium.java/src/main/resources/processResource.js
 */.settings
 .project
 .classpath
+venv
