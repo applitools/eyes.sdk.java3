@@ -12,7 +12,6 @@ import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.remote.RemoteWebDriver;
 import org.testng.ITest;
-import org.testng.annotations.DataProvider;
 
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -37,16 +36,6 @@ public class TestMobileDevices extends ReportingTestSuite implements ITest {
         this.deviceOrientation = deviceOrientation;
         this.page = page;
         this.testName = initTestName(deviceName, platformVersion, deviceOrientation, this.page);
-    }
-
-    @DataProvider(name = "androidDevices", parallel = true)
-    public static Object[][] androidDevices() {
-        List<Object[]> devices = Arrays.asList(new Object[][]{
-                {"Android Emulator", "8.0", ScreenOrientation.PORTRAIT, false},
-                {"Android Emulator", "8.0", ScreenOrientation.LANDSCAPE, true}
-        });
-        devices = addPageType(devices);
-        return devices.toArray(new Object[0][]);
     }
 
     protected static void initEyes(String deviceName, String platformVersion, ScreenOrientation deviceOrientation, String platformName, String browserName, String page) {
@@ -117,6 +106,10 @@ public class TestMobileDevices extends ReportingTestSuite implements ITest {
         chromeSimulationData.put("Android Emulator;8.0;PORTRAIT", new ChromeMobileEmulationDeviceSettings(
                 "Mozilla/5.0 (Linux; Android 8.0.0; Android SDK built for x86_64 Build/OSR1.180418.004) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/69.0.3497.100 Mobile Safari/537.36",
                 384, 512, 2));
+
+        chromeSimulationData.put("Android Emulator;8.0;LANDSCAPE", new ChromeMobileEmulationDeviceSettings(
+                "Mozilla/5.0 (Linux; Android 8.0.0; Android SDK built for x86_64 Build/OSR1.180418.004) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/69.0.3497.100 Mobile Safari/537.36",
+                512, 384, 2));
 
         // iPads, Landscape
 
@@ -307,7 +300,7 @@ public class TestMobileDevices extends ReportingTestSuite implements ITest {
     private static TestResults runTest(boolean fully, Eyes eyes, String testName, WebDriver driver, String page) {
         try {
             driver.get("https://applitools.github.io/demo/TestPages/DynamicResolution/" + page + ".html");
-            eyes.open(driver, "Eyes Selenium SDK - iOS Safari Cropping", testName);
+            eyes.open(driver, "Eyes Selenium SDK - Mobile Devices", testName);
             //eyes.Check("Initial view", Target.Region(By.CssSelector("div.page")).Fully(fully).SendDom(false));
             eyes.check(Target.window().fully(fully));
             TestResults result = eyes.close();

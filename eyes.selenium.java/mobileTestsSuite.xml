@@ -24,4 +24,9 @@
             <class name="com.applitools.eyes.selenium.MobileNativeTests"/>
         </classes>
     </test>
+    <test name="TestMobileDevicesAndroid">
+        <classes>
+            <class name="com.applitools.eyes.selenium.TestMobileDevicesAndroid"/>
+        </classes>
+    </test>
 </suite>

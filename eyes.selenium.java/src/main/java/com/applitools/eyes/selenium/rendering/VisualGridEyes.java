@@ -173,8 +173,8 @@ public class VisualGridEyes implements ISeleniumEyes, IRenderingEyes {
         if (!validateEyes()) return webDriver;
 
         ArgumentGuard.notNull(webDriver, "webDriver");
-        ArgumentGuard.notNull(getConfiguration().getTestName(), "testName");
-        ArgumentGuard.notNull(getConfiguration().getAppName(), "appName");
+        ArgumentGuard.notNullOrEmpty(getConfiguration().getAppName(), "appIdOrName");
+        ArgumentGuard.notNullOrEmpty(getConfiguration().getTestName(), "scenarioIdOrName");
 
         initDriver(webDriver);
 

@@ -382,8 +382,8 @@ public abstract class EyesBase implements IEyesBase{
         properties.add(pd);
     }
 
-    protected void addProperty(PropertyData propery) {
-        properties.add(propery);
+    protected void addProperty(PropertyData property) {
+        properties.add(property);
     }
 
     /**
@@ -1027,7 +1027,10 @@ public abstract class EyesBase implements IEyesBase{
                 } catch (Exception e) {
                     GeneralUtils.logExceptionStackTrace(logger, e);
                     retry++;
-                    continue;
+                    if (MAX_ITERATION > retry) {
+                        continue;
+                    }
+                    throw e;
                 }
 
                 this.validationId = -1;
@@ -1042,9 +1045,7 @@ public abstract class EyesBase implements IEyesBase{
             }
 
 
-        } while (MAX_ITERATION > retry);
-
-        throw new EyesException("eyes.openBase() failed");
+        } while (true);
     }
 
     protected RectangleSize getViewportSizeForOpen() {

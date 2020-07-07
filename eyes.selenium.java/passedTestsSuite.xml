@@ -362,4 +362,40 @@
             </class>
         </classes>
     </test>
+    <test name="TestSessionStartInfo" parallel="methods">
+        <classes>
+            <class name="com.applitools.eyes.selenium.TestSessionStartInfo">
+                <methods>
+                    <include name="TestSessionInfo"/>
+                </methods>
+            </class>
+        </classes>
+    </test>
+    <test name="BasicDemoJunit" parallel="methods">
+        <classes>
+            <class name="com.applitools.eyes.demo.BasicDemoJunit">
+                <methods>
+                    <include name="basicDemo"/>
+                </methods>
+            </class>
+        </classes>
+    </test>
+    <test name="TestExceptions" parallel="methods">
+        <classes>
+            <class name="com.applitools.eyes.api.TestExceptions">
+                <methods>
+                    <include name="TestEyesExceptions"/>
+                </methods>
+            </class>
+        </classes>
+    </test>
+    <test name="TestBadSelectors" parallel="methods">
+        <classes>
+            <class name="com.applitools.eyes.renderingGrid.TestBadSelectors">
+                <methods>
+                    <include name="TestCheckRegionWithBadSelector"/>
+                </methods>
+            </class>
+        </classes>
+    </test>
 </suite>

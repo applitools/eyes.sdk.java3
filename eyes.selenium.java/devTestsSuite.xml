@@ -3,6 +3,5 @@
 <suite name="dev suite">
     <suite-files>
         <suite-file path="passedTestsSuite.xml" />
-        <suite-file path="failedTestsSuite.xml" />
     </suite-files>
 </suite>

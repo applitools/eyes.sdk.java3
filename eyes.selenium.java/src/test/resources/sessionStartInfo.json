@@ -46,8 +46,8 @@
       "type" : "GraphicalObject"
     } ],
     "accessibilitySettings" : {
-      "level": "AA",
-      "version": "WCAG_2_0"
+      "level" : "AA",
+      "version" : "WCAG_2_0"
     },
     "Ignore" : null,
     "Layout" : null,

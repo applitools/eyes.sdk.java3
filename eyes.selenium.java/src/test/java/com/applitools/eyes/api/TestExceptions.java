@@ -1,8 +1,6 @@
 package com.applitools.eyes.api;
 
-import com.applitools.eyes.EyesException;
 import com.applitools.eyes.EyesRunner;
-import com.applitools.eyes.TestResults;
 import com.applitools.eyes.config.Configuration;
 import com.applitools.eyes.selenium.ClassicRunner;
 import com.applitools.eyes.selenium.Eyes;
@@ -26,87 +24,53 @@ public class TestExceptions extends ReportingTestSuite {
         final EyesRunner runner = useVisualGrid ? new VisualGridRunner(10) : new ClassicRunner();
         final Eyes eyes = new Eyes(runner);
         try {
-            eyes.setApiKey("");
-            EyesException ex1 = Assert.expectThrows(EyesException.class, new Assert.ThrowingRunnable() {
+            IllegalArgumentException ex1 = Assert.expectThrows(IllegalArgumentException.class, new Assert.ThrowingRunnable() {
                 @Override
-                public void run() throws Throwable {
+                public void run() {
                     eyes.open(driver);
                 }
             });
-
-            Assert.assertEquals(ex1.getMessage(), "API key not set! Log in to https://applitools.com to obtain your API key and use the 'Eyes.ApiKey' property to set it.");
-
-            eyes.setApiKey("someAPIkey");
-            IllegalArgumentException ex2 = Assert.expectThrows(IllegalArgumentException.class, new Assert.ThrowingRunnable() {
-                @Override
-                public void run() throws Throwable {
-                    eyes.open(driver);
-                }
-            });
-
-            Assert.assertEquals(ex2.getMessage(), (useVisualGrid ? "appName" : "appIdOrName") + " is null");
+            Assert.assertEquals(ex1.getMessage(), "appIdOrName is null");
 
             Configuration conf = new Configuration();
             conf.setAppName("");
             eyes.setConfiguration(conf);
-            IllegalArgumentException ex3 = Assert.expectThrows(IllegalArgumentException.class, new Assert.ThrowingRunnable() {
+            IllegalArgumentException ex2 = Assert.expectThrows(IllegalArgumentException.class, new Assert.ThrowingRunnable() {
                 @Override
-                public void run() throws Throwable {
+                public void run() {
                     eyes.open(driver);
                 }
             });
-            Assert.assertEquals(ex3.getMessage(), (useVisualGrid ? "appName" : "appIdOrName") + " is null");
+            Assert.assertEquals(ex2.getMessage(), "appIdOrName is empty");
 
             conf.setAppName("app");
             eyes.setConfiguration(conf);
-
-            IllegalArgumentException ex4 = Assert.expectThrows(IllegalArgumentException.class, new Assert.ThrowingRunnable() {
+            IllegalArgumentException ex3 = Assert.expectThrows(IllegalArgumentException.class, new Assert.ThrowingRunnable() {
                 @Override
-                public void run() throws Throwable {
+                public void run() {
                     eyes.open(driver);
                 }
             });
-            Assert.assertEquals(ex4.getMessage(), (useVisualGrid ? "testName" : "scenarioIdOrName") + " is null");
+            Assert.assertEquals(ex3.getMessage(), "scenarioIdOrName is null");
 
             conf.setTestName("");
             eyes.setConfiguration(conf);
-
-
-            IllegalArgumentException ex5 = Assert.expectThrows(IllegalArgumentException.class, new Assert.ThrowingRunnable() {
+            IllegalArgumentException ex4 = Assert.expectThrows(IllegalArgumentException.class, new Assert.ThrowingRunnable() {
                 @Override
-                public void run() throws Throwable {
+                public void run() {
                     eyes.open(driver);
                 }
             });
-            Assert.assertEquals(ex5.getMessage(), (useVisualGrid ? "testName" : "scenarioIdOrName") + " is null");
+            Assert.assertEquals(ex4.getMessage(), "scenarioIdOrName is empty");
 
             conf.setTestName("test");
             eyes.setConfiguration(conf);
             eyes.open(driver);
-            if (useVisualGrid) {
-
-                IllegalStateException ex6 = Assert.expectThrows(IllegalStateException.class, new Assert.ThrowingRunnable() {
-                    @Override
-                    public void run() throws Throwable {
-                        TestResults results = eyes.close();
-                        if (results != null) {
-                            results.delete();
-                        }
-                        runner.getAllTestResults();
-                    }
-                });
-                Assert.assertEquals(ex6.getMessage(), "Eyes not open");
-
-            } else {
-                TestResults results = eyes.close();
-                if (results != null) {
-                    results.delete();
-                }
-                runner.getAllTestResults();
-            }
+            eyes.closeAsync();
         } finally {
-            eyes.abort();
             driver.quit();
+            eyes.abortAsync();
+            runner.getAllTestResults();
         }
     }
 }
