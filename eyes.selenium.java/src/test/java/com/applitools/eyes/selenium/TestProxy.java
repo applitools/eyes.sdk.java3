@@ -30,7 +30,7 @@ public class TestProxy extends ReportingTestSuite {
             Eyes eyes = new Eyes();
             eyes.setProxy(new ProxySettings("http://127.0.0.1", 8080));
             eyes.open(driver2, "ProxyTest", "proxy test");
-        } catch (EyesException e){
+        } catch (Exception e){
             isOpenFailed = true;
         } finally {
             driver2.quit();
