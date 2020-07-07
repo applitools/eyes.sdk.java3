@@ -15,6 +15,7 @@ import org.testng.annotations.Test;
 
 import java.io.IOException;
 import java.util.Calendar;
+import java.util.TimeZone;
 
 public class TestSessionStartInfo extends ReportingTestSuite {
 
@@ -26,6 +27,7 @@ public class TestSessionStartInfo extends ReportingTestSuite {
     public void TestSessionInfo() {
         Calendar instance = Calendar.getInstance();
         instance.set(2017, Calendar.JULY, 29, 11, 1, 0);
+        instance.setTimeZone(TimeZone.getTimeZone("GMT"));
         BatchInfo batchInfo = new BatchInfo("some batch", instance);
         batchInfo.setId("someBatchId");
         ImageMatchSettings ims = new ImageMatchSettings();

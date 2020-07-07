@@ -8,7 +8,7 @@
     "id" : "someBatchId",
     "batchSequenceName" : null,
     "name" : "some batch",
-    "startedAt" : "2017-07-29T08:01:00Z",
+    "startedAt" : "2017-07-29T11:01:00Z",
     "notifyOnCompletion" : false,
     "isCompleted" : false
   },
