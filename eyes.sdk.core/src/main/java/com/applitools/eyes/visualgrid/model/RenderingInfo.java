@@ -7,7 +7,7 @@ public class RenderingInfo {
     private String resultsUrl = null;
     private String stitchingServiceUrl = null;
 
-    public RenderingInfo(String serviceUrl, String accessToken, String resultsUrl,String stitchingServiceUrl) {
+    public RenderingInfo(String serviceUrl, String accessToken, String resultsUrl, String stitchingServiceUrl) {
         this.serviceUrl = serviceUrl;
         this.accessToken = accessToken;
         this.resultsUrl = resultsUrl;

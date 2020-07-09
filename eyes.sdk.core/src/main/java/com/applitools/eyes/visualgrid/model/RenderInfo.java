@@ -16,7 +16,7 @@ public class RenderInfo {
     private int height;
 
     @JsonInclude(JsonInclude.Include.NON_NULL)
-    private String sizeMode;
+    private String target;
 
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private Region region;
@@ -31,10 +31,10 @@ public class RenderInfo {
     private VisualGridSelector selector;
 
 
-    public RenderInfo(int width, int height, String sizeMode, Region region, VisualGridSelector selector, EmulationBaseInfo emulationInfo, IosDeviceInfo iosDeviceInfo) {
+    public RenderInfo(int width, int height, String target, Region region, VisualGridSelector selector, EmulationBaseInfo emulationInfo, IosDeviceInfo iosDeviceInfo) {
         this.width = width;
         this.height = height;
-        this.sizeMode = sizeMode;
+        this.target = target;
         this.region = region;
         this.emulationInfo = emulationInfo;
         this.iosDeviceInfo = iosDeviceInfo;
@@ -57,12 +57,12 @@ public class RenderInfo {
         this.height = height;
     }
 
-    public String getSizeMode() {
-        return sizeMode;
+    public String getTarget() {
+        return target;
     }
 
-    public void setSizeMode(String sizeMode) {
-        this.sizeMode = sizeMode;
+    public void setTarget(String target) {
+        this.target = target;
     }
 
     @JsonProperty("region")
