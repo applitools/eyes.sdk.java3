@@ -1,13 +1,20 @@
 package com.applitools.eyes.selenium;
 
+import com.applitools.connectivity.ServerConnector;
+import com.applitools.eyes.EyesRunner;
 import com.applitools.eyes.RectangleSize;
+import com.applitools.eyes.TestResults;
+import com.applitools.eyes.TestResultsSummary;
 import com.applitools.eyes.config.Configuration;
 import com.applitools.eyes.config.ConfigurationProvider;
 import com.applitools.eyes.debug.DebugScreenshotsProvider;
 import com.applitools.eyes.selenium.fluent.Target;
 import com.applitools.eyes.utils.ReportingTestSuite;
 import com.applitools.eyes.utils.SeleniumUtils;
+import com.applitools.eyes.visualgrid.model.RenderingInfo;
+import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
 import org.testng.Assert;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
@@ -84,6 +91,49 @@ public class TestSeleniumEyes extends ReportingTestSuite {
         } finally {
             driver.quit();
             eyes.abortIfNotClosed();
+        }
+    }
+
+    @Test
+    public void testScreenshotTooBig() {
+        ClassicRunner runner = new ClassicRunner();
+        SeleniumEyes eyes = new SeleniumEyes(configurationProvider, runner);
+
+        final BufferedImage[] screenshots = new BufferedImage[1];
+        screenshots[0] = null;
+        eyes.setSaveDebugScreenshots(true);
+        eyes.setDebugScreenshotProvider(new DebugScreenshotsProvider() {
+            @Override
+            public void save(BufferedImage image, String suffix) {
+                screenshots[0] = image;
+            }
+        });
+
+        RenderingInfo renderingInfo = eyes.getRenderingInfo();
+        WebDriver driver = SeleniumUtils.createChromeDriver();
+        try {
+            driver = eyes.open(driver, "Applitools Eyes SDK", "Test Screenshot Too Big", new RectangleSize(800, 800));
+            driver.get(TESTED_PAGE_URL);
+            driver.findElement(By.id("stretched")).click();
+            WebElement frame = driver.findElement(By.cssSelector("#modal2 iframe"));
+            driver = driver.switchTo().frame(frame);
+            WebElement element = driver.findElement(By.tagName("html"));
+            eyes.check(Target.region(element).fully());
+            eyes.close(false);
+        } finally {
+            driver.quit();
+            eyes.abortIfNotClosed();
+        }
+
+        Assert.assertEquals(screenshots[0].getHeight(), renderingInfo.getMaxImageHeight());
+        TestResultsSummary summary = runner.getAllTestResults(false);
+        TestResults results = summary.getAllResults()[0].getTestResults();
+        ServerConnector connector = new ServerConnector();
+        try {
+            results.setServerConnector(connector);
+            results.delete();
+        } finally {
+            connector.closeConnector();
         }
     }
 }

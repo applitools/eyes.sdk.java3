@@ -33,6 +33,7 @@ import com.applitools.eyes.selenium.wrappers.EyesRemoteWebElement;
 import com.applitools.eyes.selenium.wrappers.EyesTargetLocator;
 import com.applitools.eyes.selenium.wrappers.EyesWebDriver;
 import com.applitools.eyes.triggers.MouseAction;
+import com.applitools.eyes.visualgrid.model.RenderingInfo;
 import com.applitools.utils.*;
 import org.openqa.selenium.*;
 import org.openqa.selenium.remote.RemoteWebDriver;
@@ -2001,14 +2002,11 @@ public class SeleniumEyes extends EyesBase implements ISeleniumEyes, IBatchClose
         WebElement scrollRootElement = getCurrentFrameScrollRootElement();
         PositionProvider originProvider = ScrollPositionProviderFactory.getScrollPositionProvider(userAgent, logger, jsExecutor, scrollRootElement);
         ISizeAdjuster sizeAdjuster = ImageProviderFactory.getImageSizeAdjuster(userAgent, jsExecutor);
-
+        RenderingInfo renderingInfo = getRenderingInfo();
         return new FullPageCaptureAlgorithm(logger, regionPositionCompensation,
                 getConfiguration().getWaitBeforeScreenshots(), debugScreenshotsProvider, screenshotFactory,
-                originProvider,
-                scaleProviderFactory,
-                cutProviderHandler.get(),
-                getConfiguration().getStitchOverlap(),
-                imageProvider, sizeAdjuster);
+                originProvider, scaleProviderFactory, cutProviderHandler.get(), getConfiguration().getStitchOverlap(),
+                imageProvider, sizeAdjuster, renderingInfo.getMaxImageHeight(), renderingInfo.getMaxImageArea());
     }
 
     @Override

@@ -2,6 +2,7 @@
 ### Updated
 - Update all `GetRegion` classes, so they don't depend on `Eyes` or `EyesBase` objects. [Trello 1980](https://trello.com/c/RYAOPRpc)
 - Updated the render request to match the protocol. `sizeMode` was change to `target` and `stitchingServiceUrl` was changed to `stitchingService`. [Trello 1988](https://trello.com/c/Yr6EsUlL)
+- Limited screenshot size. [Trello 1991](https://trello.com/c/2iCNfoI7)
 
 ## [3.169.0] - 2020-05-07
 ### Fixed

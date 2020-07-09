@@ -331,6 +331,7 @@
                 <methods>
                     <include name="testShouldTakeFullPageScreenshot"/>
                     <include name="testDebugScreenshot"/>
+                    <include name="testScreenshotTooBig"/>
                 </methods>
             </class>
         </classes>
@@ -394,6 +395,15 @@
             <class name="com.applitools.eyes.renderingGrid.TestBadSelectors">
                 <methods>
                     <include name="TestCheckRegionWithBadSelector"/>
+                </methods>
+            </class>
+        </classes>
+    </test>
+    <test name="TestRenderRequestSerialization" parallel="methods">
+        <classes>
+            <class name="com.applitools.eyes.renderingGrid.TestRenderRequestSerialization">
+                <methods>
+                    <include name="testSerialization"/>
                 </methods>
             </class>
         </classes>

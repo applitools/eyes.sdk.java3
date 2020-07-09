@@ -405,7 +405,7 @@ public class TestResults {
         this.status = status;
     }
 
-    void setServerConnector(ServerConnector serverConnector)
+    public void setServerConnector(ServerConnector serverConnector)
     {
         this.serverConnector = serverConnector;
     }
