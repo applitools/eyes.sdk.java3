@@ -1,6 +1,5 @@
 {
   "renderId": null,
-  "agentId": "eyes.selenium.visualgrid.java/${parent.version}",
   "stitchingService": "https://some.stitchingserviceuri.com",
   "webhook": "https://some.uri.com",
   "url": "https://another.url.co.il",
