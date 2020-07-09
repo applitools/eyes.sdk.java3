@@ -1,7 +1,6 @@
 package com.applitools.eyes.selenium;
 
 import com.applitools.connectivity.ServerConnector;
-import com.applitools.eyes.EyesRunner;
 import com.applitools.eyes.RectangleSize;
 import com.applitools.eyes.TestResults;
 import com.applitools.eyes.TestResultsSummary;
