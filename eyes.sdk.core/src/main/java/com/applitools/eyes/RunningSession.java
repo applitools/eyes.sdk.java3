@@ -18,7 +18,6 @@ public class RunningSession {
     private String sessionId;
 
     public RunningSession() {
-        isNew = false;
     }
 
     public Boolean getIsNew() {

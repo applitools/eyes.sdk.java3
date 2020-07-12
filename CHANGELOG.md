@@ -1,4 +1,6 @@
 ## [vNext]
+### Fixed
+- Fixed a bug when new tests weren't defined as new in old versions of the server. [Trello 1993](https://trello.com/c/JSnJauTu)
 ### Updated
 - Update all `GetRegion` classes, so they don't depend on `Eyes` or `EyesBase` objects. [Trello 1980](https://trello.com/c/RYAOPRpc)
 - Updated the render request to match the protocol. `sizeMode` was change to `target` and `stitchingServiceUrl` was changed to `stitchingService`. [Trello 1988](https://trello.com/c/Yr6EsUlL)

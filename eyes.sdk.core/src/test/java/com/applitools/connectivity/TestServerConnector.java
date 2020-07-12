@@ -42,7 +42,7 @@ public class TestServerConnector extends ReportingTestSuite {
 
     ObjectMapper jsonMapper = new ObjectMapper();
 
-    RunningSession runningSession = new RunningSession();
+    RunningSession runningSession;
 
     // Below are the mocks for the long request
     String getRequestUri = "getUri";
@@ -94,6 +94,7 @@ public class TestServerConnector extends ReportingTestSuite {
         when(endPoint.queryParam(anyString(), anyString())).thenReturn(endPoint);
 
         jsonMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+        runningSession = new RunningSession();
         runningSession.setUrl("");
         runningSession.setBaselineId("");
         runningSession.setBatchId("");
@@ -145,6 +146,7 @@ public class TestServerConnector extends ReportingTestSuite {
 
     @Test
     public void testStartSessionGotIsNew() throws JsonProcessingException {
+        Assert.assertNull(runningSession.getIsNew());
         Response response = mockLongRequest(HttpMethod.POST);
         when(response.getStatusPhrase()).thenReturn("");
 
