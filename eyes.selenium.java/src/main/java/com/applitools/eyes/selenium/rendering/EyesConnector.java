@@ -77,9 +77,9 @@ class EyesConnector extends EyesBase implements IEyesConnector, IBatchCloser {
         String tag = checkSettingsInternal.getName();
 
         AppOutput appOutput = new AppOutput(tag, null, domLocation, resultImageURL);
-        AppOutputWithScreenshot appOutputWithScreenshot = new AppOutputWithScreenshot(appOutput, null, location);
+        AppOutputWithScreenshot appOutputWithScreenshot = new AppOutputWithScreenshot(appOutput, null);
 
-        return matchWindowTask.performMatch(appOutputWithScreenshot, tag, false, checkSettingsInternal, imageMatchSettings, regions, regionSelectors, this, renderId, source);
+        return matchWindowTask.performMatch(appOutputWithScreenshot, tag, checkSettingsInternal, imageMatchSettings, regions, regionSelectors, this, renderId, source);
     }
 
     /**

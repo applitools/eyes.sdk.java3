@@ -16,6 +16,7 @@ public class MatchWindowData {
     public static class Options {
         private final Trigger[] userInputs;
         private final String name;
+        private final boolean replaceLast;
         private final boolean ignoreMismatch;
         private final boolean ignoreMatch;
         private final boolean forceMismatch;
@@ -45,7 +46,7 @@ public class MatchWindowData {
          * @param imageMatchSettings Settings specifying how the server should compare the image.
          * @param renderId
          */
-        public Options(String name, Trigger[] userInputs,
+        public Options(String name, Trigger[] userInputs, boolean replaceLast,
                        boolean ignoreMismatch, boolean ignoreMatch,
                        boolean forceMismatch, boolean forceMatch,
                        ImageMatchSettings imageMatchSettings,
@@ -54,6 +55,7 @@ public class MatchWindowData {
 
             this.name = name;
             this.userInputs = userInputs;
+            this.replaceLast = replaceLast;
             this.ignoreMismatch = ignoreMismatch;
             this.ignoreMatch = ignoreMatch;
             this.forceMismatch = forceMismatch;
@@ -69,6 +71,10 @@ public class MatchWindowData {
 
         public Trigger[] getUserInputs() {
             return userInputs;
+        }
+
+        public boolean getReplaceLast() {
+            return replaceLast;
         }
 
         public boolean getIgnoreMismatch() {

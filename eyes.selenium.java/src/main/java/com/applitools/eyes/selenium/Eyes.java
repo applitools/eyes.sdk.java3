@@ -1499,6 +1499,7 @@ public class Eyes implements IEyesBase {
      * @param serverConnector The server connector object to use.
      */
     public void setServerConnector(ServerConnector serverConnector) {
+        this.seleniumEyes.setServerConnector(serverConnector);
         if (this.isVisualGridEyes) {
             this.visualGridEyes.setServerConnector(serverConnector);
         }
