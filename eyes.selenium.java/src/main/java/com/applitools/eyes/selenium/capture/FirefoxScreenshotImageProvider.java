@@ -5,7 +5,7 @@ import com.applitools.eyes.capture.ImageProvider;
 import com.applitools.eyes.selenium.SeleniumEyes;
 import com.applitools.eyes.selenium.frames.FrameChain;
 import com.applitools.eyes.selenium.wrappers.EyesTargetLocator;
-import com.applitools.eyes.selenium.wrappers.EyesWebDriver;
+import com.applitools.eyes.selenium.wrappers.EyesSeleniumDriver;
 import com.applitools.utils.ImageUtils;
 import org.openqa.selenium.OutputType;
 import org.openqa.selenium.TakesScreenshot;
@@ -32,11 +32,11 @@ public class FirefoxScreenshotImageProvider implements ImageProvider {
 
     @Override
     public BufferedImage getImage() {
-        EyesWebDriver eyesWebDriver = (EyesWebDriver) eyes.getDriver();
-        FrameChain frameChain = eyesWebDriver.getFrameChain().clone();
+        EyesSeleniumDriver eyesSeleniumDriver = (EyesSeleniumDriver) eyes.getDriver();
+        FrameChain frameChain = eyesSeleniumDriver.getFrameChain().clone();
         logger.verbose("frameChain size: " + frameChain.size());
         logger.verbose("Switching temporarily to default content.");
-        eyesWebDriver.switchTo().defaultContent();
+        eyesSeleniumDriver.switchTo().defaultContent();
 
         logger.verbose("Getting screenshot as base64.");
         String screenshot64 = tsInstance.getScreenshotAs(OutputType.BASE64);
@@ -46,7 +46,7 @@ public class FirefoxScreenshotImageProvider implements ImageProvider {
         eyes.getDebugScreenshotsProvider().save(image, "FIREFOX");
 
         logger.verbose("Done. Switching back to original frame.");
-        ((EyesTargetLocator)eyesWebDriver.switchTo()).frames(frameChain);
+        ((EyesTargetLocator) eyesSeleniumDriver.switchTo()).frames(frameChain);
 
         return image;
     }

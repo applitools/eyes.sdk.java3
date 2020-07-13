@@ -4,10 +4,10 @@ import com.applitools.eyes.IEyesJsExecutor;
 import com.applitools.eyes.Logger;
 import com.applitools.eyes.RectangleSize;
 import com.applitools.eyes.UserAgent;
-import com.applitools.eyes.selenium.EyesSeleniumUtils;
+import com.applitools.eyes.selenium.EyesDriverUtils;
 import com.applitools.eyes.selenium.SeleniumEyes;
 import com.applitools.eyes.selenium.SeleniumJavaScriptExecutor;
-import com.applitools.eyes.selenium.wrappers.EyesWebDriver;
+import com.applitools.eyes.selenium.wrappers.EyesSeleniumDriver;
 import org.openqa.selenium.TakesScreenshot;
 
 public class MobileScreenshotImageProvider extends TakesScreenshotImageProvider {
@@ -21,15 +21,15 @@ public class MobileScreenshotImageProvider extends TakesScreenshotImageProvider 
     public MobileScreenshotImageProvider(SeleniumEyes eyes, Logger logger, TakesScreenshot tsInstance, UserAgent userAgent) {
         super(logger, tsInstance);
         this.eyes = eyes;
-        this.jsExecutor = new SeleniumJavaScriptExecutor((EyesWebDriver)eyes.getDriver());
+        this.jsExecutor = new SeleniumJavaScriptExecutor((EyesSeleniumDriver)eyes.getDriver());
         this.userAgent = userAgent;
     }
 
     protected RectangleSize getViewportSize() {
-        EyesWebDriver driver = (EyesWebDriver)eyes.getDriver();
+        EyesSeleniumDriver driver = (EyesSeleniumDriver)eyes.getDriver();
         if (cachedViewportSize == null || !driver.getCurrentUrl().equals(cachedUrl)) {
             cachedUrl = driver.getCurrentUrl();
-            cachedViewportSize = EyesSeleniumUtils.getViewportSize(driver, logger);
+            cachedViewportSize = EyesDriverUtils.getViewportSize(driver, logger);
         }
         return cachedViewportSize;
     }

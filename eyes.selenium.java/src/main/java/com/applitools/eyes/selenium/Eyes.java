@@ -17,7 +17,7 @@ import com.applitools.eyes.selenium.frames.FrameChain;
 import com.applitools.eyes.selenium.locators.SeleniumVisualLocatorsProvider;
 import com.applitools.eyes.selenium.positioning.ImageRotation;
 import com.applitools.eyes.selenium.rendering.VisualGridEyes;
-import com.applitools.eyes.selenium.wrappers.EyesWebDriver;
+import com.applitools.eyes.selenium.wrappers.EyesSeleniumDriver;
 import com.applitools.eyes.triggers.MouseAction;
 import com.applitools.eyes.visualgrid.model.RenderingInfo;
 import com.applitools.eyes.visualgrid.services.VisualGridRunner;
@@ -79,7 +79,7 @@ public class Eyes implements IEyesBase {
     }
 
     private void initLocatorProvider(WebDriver webDriver) {
-        EyesWebDriver driver = new EyesWebDriver(getLogger(), null, (RemoteWebDriver) webDriver);
+        EyesSeleniumDriver driver = new EyesSeleniumDriver(getLogger(), null, (RemoteWebDriver) webDriver);
         visualLocatorsProvider = new SeleniumVisualLocatorsProvider(
                 seleniumEyes,
                 driver,
@@ -1168,7 +1168,7 @@ public class Eyes implements IEyesBase {
      */
     public static void setViewportSize(WebDriver driver, RectangleSize size) {
         ArgumentGuard.notNull(driver, "driver");
-        EyesSeleniumUtils.setViewportSize(new Logger(), driver, size);
+        EyesDriverUtils.setViewportSize(new Logger(), driver, size);
     }
 
     /**
@@ -1294,7 +1294,7 @@ public class Eyes implements IEyesBase {
         this.rotation = rotation;
         WebDriver driver = getDriver();
         if (driver != null) {
-            ((EyesWebDriver) driver).setRotation(rotation);
+            ((EyesSeleniumDriver) driver).setRotation(rotation);
         }
     }
 

@@ -2,7 +2,7 @@ package com.applitools.eyes.selenium.wrappers;
 
 import com.applitools.eyes.*;
 import com.applitools.eyes.positioning.PositionProvider;
-import com.applitools.eyes.selenium.EyesSeleniumUtils;
+import com.applitools.eyes.selenium.EyesDriverUtils;
 import com.applitools.eyes.selenium.SeleniumEyes;
 import com.applitools.eyes.selenium.SizeAndBorders;
 import com.applitools.eyes.triggers.MouseAction;
@@ -23,7 +23,7 @@ import java.util.Map;
 @SuppressWarnings("FieldCanBeLocal")
 public class EyesRemoteWebElement extends RemoteWebElement {
     private final Logger logger;
-    private final EyesWebDriver eyesDriver;
+    private final EyesSeleniumDriver eyesDriver;
     private final RemoteWebElement webElement;
     private Method executeMethod;
 
@@ -101,7 +101,7 @@ public class EyesRemoteWebElement extends RemoteWebElement {
 
     private PositionProvider positionProvider;
 
-    public EyesRemoteWebElement(Logger logger, EyesWebDriver eyesDriver, WebElement webElement) {
+    public EyesRemoteWebElement(Logger logger, EyesSeleniumDriver eyesDriver, WebElement webElement) {
         super();
 
         ArgumentGuard.notNull(logger, "logger");
@@ -316,7 +316,7 @@ public class EyesRemoteWebElement extends RemoteWebElement {
      * @param overflow The overflow to set.
      */
     public String setOverflow(String overflow) {
-        return EyesSeleniumUtils.setOverflow(eyesDriver, overflow, this);
+        return EyesDriverUtils.setOverflow(eyesDriver, overflow, this);
     }
 
     @Override

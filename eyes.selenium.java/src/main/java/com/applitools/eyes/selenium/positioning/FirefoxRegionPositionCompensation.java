@@ -6,7 +6,7 @@ import com.applitools.eyes.Region;
 import com.applitools.eyes.UserAgent;
 import com.applitools.eyes.selenium.SeleniumEyes;
 import com.applitools.eyes.selenium.frames.FrameChain;
-import com.applitools.eyes.selenium.wrappers.EyesWebDriver;
+import com.applitools.eyes.selenium.wrappers.EyesSeleniumDriver;
 
 public class FirefoxRegionPositionCompensation implements RegionPositionCompensation {
 
@@ -35,8 +35,8 @@ public class FirefoxRegionPositionCompensation implements RegionPositionCompensa
             return region;
         }
 
-        EyesWebDriver eyesWebDriver = (EyesWebDriver) eyes.getDriver();
-        FrameChain frameChain = eyesWebDriver.getFrameChain();
+        EyesSeleniumDriver eyesSeleniumDriver = (EyesSeleniumDriver) eyes.getDriver();
+        FrameChain frameChain = eyesSeleniumDriver.getFrameChain();
         logger.verbose("frameChain.size(): " + frameChain.size());
         if (frameChain.size() > 0) {
             return region;

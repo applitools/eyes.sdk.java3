@@ -2,8 +2,8 @@ package com.applitools.eyes.selenium.triggers;
 
 import com.applitools.eyes.Location;
 import com.applitools.eyes.Logger;
-import com.applitools.eyes.selenium.EyesSeleniumUtils;
-import com.applitools.eyes.selenium.wrappers.EyesWebDriver;
+import com.applitools.eyes.selenium.EyesDriverUtils;
+import com.applitools.eyes.selenium.wrappers.EyesSeleniumDriver;
 import com.applitools.eyes.triggers.MouseAction;
 import com.applitools.eyes.Region;
 import com.applitools.utils.ArgumentGuard;
@@ -17,11 +17,11 @@ import org.openqa.selenium.interactions.Coordinates;
 public class EyesMouse implements Mouse {
 
     private final Logger logger;
-    private final EyesWebDriver eyesDriver;
+    private final EyesSeleniumDriver eyesDriver;
     private final Mouse mouse;
     private Location mouseLocation;
 
-    public EyesMouse(Logger logger, EyesWebDriver eyesDriver, Mouse mouse) {
+    public EyesMouse(Logger logger, EyesSeleniumDriver eyesDriver, Mouse mouse) {
         ArgumentGuard.notNull(logger, "logger");
         ArgumentGuard.notNull(eyesDriver, "eyesDriver");
         ArgumentGuard.notNull(mouse, "mouse");
@@ -45,7 +45,7 @@ public class EyesMouse implements Mouse {
     }
 
     public void click(Coordinates where) {
-        Location location = EyesSeleniumUtils.getPageLocation(where);
+        Location location = EyesDriverUtils.getPageLocation(where);
         logger.verbose("click(" + location + ")");
 
         moveIfNeeded(where);
@@ -56,7 +56,7 @@ public class EyesMouse implements Mouse {
     }
 
     public void doubleClick(Coordinates where) {
-        Location location = EyesSeleniumUtils.getPageLocation(where);
+        Location location = EyesDriverUtils.getPageLocation(where);
         logger.verbose("doubleClick(" + location + ")");
 
         moveIfNeeded(where);
@@ -67,7 +67,7 @@ public class EyesMouse implements Mouse {
     }
 
     public void mouseDown(Coordinates where) {
-        Location location = EyesSeleniumUtils.getPageLocation(where);
+        Location location = EyesDriverUtils.getPageLocation(where);
         logger.verbose("mouseDown(" + location + ")");
 
         moveIfNeeded(where);
@@ -78,7 +78,7 @@ public class EyesMouse implements Mouse {
     }
 
     public void mouseUp(Coordinates where) {
-        Location location = EyesSeleniumUtils.getPageLocation(where);
+        Location location = EyesDriverUtils.getPageLocation(where);
         logger.verbose("mouseUp(" + location + ")");
 
         moveIfNeeded(where);
@@ -89,7 +89,7 @@ public class EyesMouse implements Mouse {
     }
 
     public void mouseMove(Coordinates where) {
-        Location location = EyesSeleniumUtils.getPageLocation(where);
+        Location location = EyesDriverUtils.getPageLocation(where);
         logger.verbose("mouseMove(" + location + ")");
 
         if (location != null) {
@@ -104,7 +104,7 @@ public class EyesMouse implements Mouse {
     }
 
     public void mouseMove(Coordinates where, long xOffset, long yOffset) {
-        Location location = EyesSeleniumUtils.getPageLocation(where);
+        Location location = EyesDriverUtils.getPageLocation(where);
         logger.verbose("mouseMove(" + location + ", " + xOffset + ", "
                 + yOffset + ")");
 
@@ -133,7 +133,7 @@ public class EyesMouse implements Mouse {
     }
 
     public void contextClick(Coordinates where) {
-        Location location = EyesSeleniumUtils.getPageLocation(where);
+        Location location = EyesDriverUtils.getPageLocation(where);
         logger.verbose("contextClick(" + location + ")");
 
         moveIfNeeded(where);

@@ -1,10 +1,7 @@
 package com.applitools.eyes.selenium.wrappers;
 
 import com.applitools.eyes.*;
-import com.applitools.eyes.selenium.AppiumJsCommandExtractor;
-import com.applitools.eyes.selenium.Eyes;
-import com.applitools.eyes.selenium.EyesSeleniumUtils;
-import com.applitools.eyes.selenium.SeleniumEyes;
+import com.applitools.eyes.selenium.*;
 import com.applitools.eyes.selenium.frames.FrameChain;
 import com.applitools.eyes.selenium.positioning.ImageRotation;
 import com.applitools.eyes.selenium.triggers.EyesKeyboard;
@@ -26,10 +23,10 @@ import java.util.*;
  * Used so we'll be able to return the users an object with the same
  * functionality as {@link org.openqa.selenium.remote.RemoteWebDriver}.
  */
-public class EyesWebDriver implements HasCapabilities, HasInputDevices,
+public class EyesSeleniumDriver implements HasCapabilities, HasInputDevices,
         FindsByClassName, FindsByCssSelector, FindsById, FindsByLinkText,
         FindsByName, FindsByTagName, FindsByXPath, JavascriptExecutor,
-        SearchContext, TakesScreenshot, WebDriver, HasTouchScreen, IEyesJsExecutor {
+        SearchContext, TakesScreenshot, EyesWebDriver, WebDriver, HasTouchScreen, IEyesJsExecutor {
 
     private final Logger logger;
     private final SeleniumEyes eyes;
@@ -69,13 +66,13 @@ public class EyesWebDriver implements HasCapabilities, HasInputDevices,
         } else { // Do automatic rotation if necessary
             try {
                 logger.verbose("Trying to automatically normalize rotation...");
-                if (EyesSeleniumUtils.isMobileDevice(driver) &&
-                        EyesSeleniumUtils.isLandscapeOrientation(logger, driver)
+                if (EyesDriverUtils.isMobileDevice(driver) &&
+                        EyesDriverUtils.isLandscapeOrientation(logger, driver)
                         && image.getHeight() > image.getWidth()) {
                     // For Android, we need to rotate images to the right, and
                     // for iOS to the left.
                     int degrees =
-                            EyesSeleniumUtils.isAndroid(driver) ? 90 : -90;
+                            EyesDriverUtils.isAndroid(driver) ? 90 : -90;
                     normalizedImage = ImageUtils.rotateImage(image, degrees);
                 }
             } catch (Exception e) {
@@ -87,7 +84,7 @@ public class EyesWebDriver implements HasCapabilities, HasInputDevices,
         return normalizedImage;
     }
 
-    public EyesWebDriver(Logger logger, SeleniumEyes eyes, RemoteWebDriver driver)
+    public EyesSeleniumDriver(Logger logger, SeleniumEyes eyes, RemoteWebDriver driver)
             throws EyesException {
         ArgumentGuard.notNull(logger, "logger");
         ArgumentGuard.notNull(driver, "driver");
@@ -121,6 +118,7 @@ public class EyesWebDriver implements HasCapabilities, HasInputDevices,
         return eyes;
     }
 
+    @Override
     public RemoteWebDriver getRemoteWebDriver() {
         return driver;
     }
@@ -374,7 +372,7 @@ public class EyesWebDriver implements HasCapabilities, HasInputDevices,
 
         EyesTargetLocator switchTo = null;
         //In Appium driver there's no switchTo()
-        if (!EyesSeleniumUtils.isMobileDevice(this.driver)) {
+        if (!EyesDriverUtils.isMobileDevice(this.driver)) {
             switchTo = (EyesTargetLocator)switchTo();
         }
 
@@ -386,7 +384,7 @@ public class EyesWebDriver implements HasCapabilities, HasInputDevices,
         }
 
         logger.verbose("Extracting viewport size...");
-        defaultContentViewportSize = EyesSeleniumUtils.getViewportSizeOrDisplaySize(logger, this);
+        defaultContentViewportSize = EyesDriverUtils.getViewportSizeOrDisplaySize(logger, this);
         logger.verbose("Done! Viewport size: " + defaultContentViewportSize);
 
         if (currentFrames.size() > 0) {
@@ -426,7 +424,7 @@ public class EyesWebDriver implements HasCapabilities, HasInputDevices,
     public String getUserAgent() {
         String userAgent = null;
         try {
-            if (!EyesSeleniumUtils.isMobileDevice(driver)) {
+            if (!EyesDriverUtils.isMobileDevice(driver)) {
                 userAgent = (String) this.driver.executeScript("return navigator.userAgent");
                 logger.verbose("user agent: " + userAgent);
             } else {

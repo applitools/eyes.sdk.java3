@@ -7,7 +7,7 @@ import com.applitools.eyes.positioning.PositionProvider;
 import com.applitools.eyes.selenium.SeleniumEyes;
 import com.applitools.eyes.selenium.frames.FrameChain;
 import com.applitools.eyes.selenium.wrappers.EyesTargetLocator;
-import com.applitools.eyes.selenium.wrappers.EyesWebDriver;
+import com.applitools.eyes.selenium.wrappers.EyesSeleniumDriver;
 import com.applitools.utils.EfficientStringReplace;
 import com.applitools.utils.GeneralUtils;
 import com.helger.commons.collection.impl.ICommonsList;
@@ -50,7 +50,7 @@ public class DomCapture {
     private static long DOM_EXTRACTION_TIMEOUT = 5 * 60 * 1000;
 
     private static ServerConnector mServerConnector = null;
-    private EyesWebDriver driver;
+    private EyesSeleniumDriver driver;
     private final Logger logger;
     private String cssStartToken;
     private String cssEndToken;
@@ -63,7 +63,7 @@ public class DomCapture {
     public DomCapture(SeleniumEyes eyes) {
         mServerConnector = eyes.getServerConnector();
         logger = eyes.getLogger();
-        driver = (EyesWebDriver) eyes.getDriver();
+        driver = (EyesSeleniumDriver) eyes.getDriver();
         userAgent = eyes.getUserAgent();
     }
 

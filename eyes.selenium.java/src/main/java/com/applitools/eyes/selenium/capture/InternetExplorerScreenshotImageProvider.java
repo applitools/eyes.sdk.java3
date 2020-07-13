@@ -8,7 +8,7 @@ import com.applitools.eyes.selenium.SeleniumEyes;
 import com.applitools.eyes.selenium.SeleniumJavaScriptExecutor;
 import com.applitools.eyes.selenium.frames.FrameChain;
 import com.applitools.eyes.selenium.positioning.ScrollPositionProviderFactory;
-import com.applitools.eyes.selenium.wrappers.EyesWebDriver;
+import com.applitools.eyes.selenium.wrappers.EyesSeleniumDriver;
 import com.applitools.utils.ImageUtils;
 import org.openqa.selenium.OutputType;
 import org.openqa.selenium.TakesScreenshot;
@@ -27,7 +27,7 @@ public class InternetExplorerScreenshotImageProvider implements ImageProvider {
         this.eyes = eyes;
         this.logger = logger;
         this.tsInstance = tsInstance;
-        this.jsExecutor = new SeleniumJavaScriptExecutor((EyesWebDriver) eyes.getDriver());
+        this.jsExecutor = new SeleniumJavaScriptExecutor((EyesSeleniumDriver) eyes.getDriver());
         this.userAgent = userAgent;
     }
 
@@ -36,10 +36,10 @@ public class InternetExplorerScreenshotImageProvider implements ImageProvider {
         Location loc;
         double scaleRatio = eyes.getDevicePixelRatio();
 
-        FrameChain currentFrameChain = ((EyesWebDriver) eyes.getDriver()).getFrameChain();
+        FrameChain currentFrameChain = ((EyesSeleniumDriver) eyes.getDriver()).getFrameChain();
         PositionProvider positionProvider = null;
         if (currentFrameChain.size() == 0) {
-            positionProvider = ScrollPositionProviderFactory.getScrollPositionProvider(userAgent, logger, jsExecutor, EyesSeleniumUtils.getDefaultRootElement(logger, (EyesWebDriver) eyes.getDriver()));
+            positionProvider = ScrollPositionProviderFactory.getScrollPositionProvider(userAgent, logger, jsExecutor, EyesSeleniumUtils.getDefaultRootElement(logger, (EyesSeleniumDriver) eyes.getDriver()));
             loc = positionProvider.getCurrentPosition();
         } else {
             loc = currentFrameChain.getDefaultContentScrollPosition();

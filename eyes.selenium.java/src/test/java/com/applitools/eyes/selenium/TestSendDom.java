@@ -9,7 +9,7 @@ import com.applitools.eyes.config.ConfigurationProvider;
 import com.applitools.eyes.metadata.ActualAppOutput;
 import com.applitools.eyes.metadata.SessionResults;
 import com.applitools.eyes.selenium.fluent.Target;
-import com.applitools.eyes.selenium.wrappers.EyesWebDriver;
+import com.applitools.eyes.selenium.wrappers.EyesSeleniumDriver;
 import com.applitools.eyes.utils.ReportingTestSuite;
 import com.applitools.eyes.utils.SeleniumUtils;
 import com.applitools.eyes.utils.TestUtils;
@@ -58,7 +58,7 @@ public final class TestSendDom extends ReportingTestSuite {
         Eyes eyes = new Eyes();
         try {
             eyes.setBatch(TestDataProvider.batchInfo);
-            EyesWebDriver eyesWebDriver = (EyesWebDriver) eyes.open(webDriver, "Test Send DOM", testName);
+            EyesSeleniumDriver eyesSeleniumDriver = (EyesSeleniumDriver) eyes.open(webDriver, "Test Send DOM", testName);
             //DomCapture domCapture = new DomCapture(logger, eyesWebDriver);
             eyes.checkWindow();
             TestResults results = eyes.close(false);
@@ -137,7 +137,7 @@ public final class TestSendDom extends ReportingTestSuite {
         DomInterceptingEyes eyes = new DomInterceptingEyes();
         eyes.setBatch(TestDataProvider.batchInfo);
         eyes.getConfiguration().setAppName("Test Send DOM").setTestName("Full Window").setViewportSize(new RectangleSize(1024, 768));
-        EyesWebDriver eyesWebDriver = (EyesWebDriver) eyes.open(webDriver);
+        EyesSeleniumDriver eyesSeleniumDriver = (EyesSeleniumDriver) eyes.open(webDriver);
         try {
             eyes.check("Window", Target.window().fully());
             String actualDomJsonString = eyes.getDomJson();

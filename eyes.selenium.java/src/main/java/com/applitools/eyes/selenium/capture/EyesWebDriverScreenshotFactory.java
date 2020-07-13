@@ -4,7 +4,7 @@ import com.applitools.eyes.EyesScreenshot;
 import com.applitools.eyes.Location;
 import com.applitools.eyes.capture.EyesScreenshotFactory;
 import com.applitools.eyes.Logger;
-import com.applitools.eyes.selenium.wrappers.EyesWebDriver;
+import com.applitools.eyes.selenium.wrappers.EyesSeleniumDriver;
 
 import java.awt.image.BufferedImage;
 
@@ -13,9 +13,9 @@ import java.awt.image.BufferedImage;
  */
 public class EyesWebDriverScreenshotFactory implements EyesScreenshotFactory {
     private final Logger logger;
-    private final EyesWebDriver driver;
+    private final EyesSeleniumDriver driver;
 
-    public EyesWebDriverScreenshotFactory(Logger logger, EyesWebDriver driver) {
+    public EyesWebDriverScreenshotFactory(Logger logger, EyesSeleniumDriver driver) {
         this.logger = logger;
         this.driver = driver;
     }

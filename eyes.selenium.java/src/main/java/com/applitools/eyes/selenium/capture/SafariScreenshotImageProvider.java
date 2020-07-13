@@ -5,7 +5,7 @@ import com.applitools.eyes.positioning.PositionProvider;
 import com.applitools.eyes.selenium.SeleniumEyes;
 import com.applitools.eyes.selenium.frames.FrameChain;
 import com.applitools.eyes.selenium.positioning.ScrollPositionProviderFactory;
-import com.applitools.eyes.selenium.wrappers.EyesWebDriver;
+import com.applitools.eyes.selenium.wrappers.EyesSeleniumDriver;
 import com.applitools.utils.ImageUtils;
 import org.openqa.selenium.*;
 
@@ -48,7 +48,7 @@ public class SafariScreenshotImageProvider extends MobileScreenshotImageProvider
             if (forceFullPageScreenshot != null && !forceFullPageScreenshot) {
 
                 Location loc;
-                FrameChain currentFrameChain = ((EyesWebDriver) eyes.getDriver()).getFrameChain();
+                FrameChain currentFrameChain = ((EyesSeleniumDriver) eyes.getDriver()).getFrameChain();
 
                 if (currentFrameChain.size() == 0) {
                     WebElement scrollRootElement = eyes.getCurrentFrameScrollRootElement();

@@ -9,6 +9,7 @@ import com.applitools.eyes.fluent.CheckSettings;
 import com.applitools.eyes.fluent.GetFloatingRegion;
 import com.applitools.eyes.fluent.GetSimpleRegion;
 import com.applitools.eyes.selenium.BrowserType;
+import com.applitools.eyes.selenium.EyesDriverUtils;
 import com.applitools.eyes.selenium.EyesSeleniumUtils;
 import com.applitools.eyes.selenium.ISeleniumEyes;
 import com.applitools.eyes.config.ConfigurationProvider;
@@ -16,7 +17,7 @@ import com.applitools.eyes.selenium.fluent.*;
 import com.applitools.eyes.selenium.frames.Frame;
 import com.applitools.eyes.selenium.frames.FrameChain;
 import com.applitools.eyes.selenium.wrappers.EyesTargetLocator;
-import com.applitools.eyes.selenium.wrappers.EyesWebDriver;
+import com.applitools.eyes.selenium.wrappers.EyesSeleniumDriver;
 import com.applitools.eyes.visualgrid.model.*;
 import com.applitools.eyes.visualgrid.services.*;
 import com.applitools.utils.ArgumentGuard;
@@ -52,7 +53,7 @@ public class VisualGridEyes implements ISeleniumEyes, IRenderingEyes {
 
     private String PROCESS_PAGE;
     private String PROCESS_PAGE_FOR_IE;
-    private EyesWebDriver webDriver;
+    private EyesSeleniumDriver webDriver;
     private RenderingInfo renderingInfo;
     private IEyesConnector VGEyesConnector;
     private IDebugResourceWriter debugResourceWriter;
@@ -217,7 +218,7 @@ public class VisualGridEyes implements ISeleniumEyes, IRenderingEyes {
         }
     }
 
-    private void setViewportSize(EyesWebDriver webDriver) {
+    private void setViewportSize(EyesSeleniumDriver webDriver) {
         viewportSize = getConfiguration().getViewportSize();
 
         if (viewportSize == null) {
@@ -233,13 +234,13 @@ public class VisualGridEyes implements ISeleniumEyes, IRenderingEyes {
         }
 
         if (viewportSize == null) {
-            viewportSize = EyesSeleniumUtils.getViewportSize(webDriver);
+            viewportSize = EyesDriverUtils.getViewportSize(webDriver);
 
         }
 
         try {
 
-            EyesSeleniumUtils.setViewportSize(logger, webDriver, viewportSize);
+            EyesDriverUtils.setViewportSize(logger, webDriver, viewportSize);
 
         } catch (Exception e) {
             GeneralUtils.logExceptionStackTrace(logger, e);
@@ -285,7 +286,7 @@ public class VisualGridEyes implements ISeleniumEyes, IRenderingEyes {
 
     private void initDriver(WebDriver webDriver) {
         if (webDriver instanceof RemoteWebDriver) {
-            this.webDriver = new EyesWebDriver(logger, null, (RemoteWebDriver) webDriver);
+            this.webDriver = new EyesSeleniumDriver(logger, null, (RemoteWebDriver) webDriver);
         }
         @SuppressWarnings("UnnecessaryLocalVariable") String currentUrl = webDriver.getCurrentUrl();
         this.url = currentUrl;
@@ -994,7 +995,7 @@ public class VisualGridEyes implements ISeleniumEyes, IRenderingEyes {
         return allTestResults;
     }
 
-    public EyesWebDriver getDriver() {
+    public EyesSeleniumDriver getDriver() {
         return webDriver;
     }
 

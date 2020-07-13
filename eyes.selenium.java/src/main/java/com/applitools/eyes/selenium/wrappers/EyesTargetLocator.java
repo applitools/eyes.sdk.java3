@@ -26,7 +26,7 @@ import java.util.List;
 public class EyesTargetLocator implements WebDriver.TargetLocator {
 
     private final Logger logger;
-    private final EyesWebDriver driver;
+    private final EyesSeleniumDriver driver;
     private ScrollPositionProvider scrollPosition;
     private final WebDriver.TargetLocator targetLocator;
     private final SeleniumJavaScriptExecutor jsExecutor;
@@ -38,7 +38,7 @@ public class EyesTargetLocator implements WebDriver.TargetLocator {
      * @param driver        The WebDriver from which the targetLocator was received.
      * @param targetLocator The actual TargetLocator object.
      */
-    public EyesTargetLocator(EyesWebDriver driver, Logger logger,
+    public EyesTargetLocator(EyesSeleniumDriver driver, Logger logger,
                              WebDriver.TargetLocator targetLocator) {
         ArgumentGuard.notNull(driver, "driver");
         ArgumentGuard.notNull(targetLocator, "targetLocator");

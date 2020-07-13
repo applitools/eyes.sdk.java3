@@ -4,7 +4,7 @@ import com.applitools.eyes.*;
 import com.applitools.eyes.positioning.PositionMemento;
 import com.applitools.eyes.positioning.PositionProvider;
 import com.applitools.eyes.selenium.wrappers.EyesRemoteWebElement;
-import com.applitools.eyes.selenium.wrappers.EyesWebDriver;
+import com.applitools.eyes.selenium.wrappers.EyesSeleniumDriver;
 import com.applitools.utils.ArgumentGuard;
 import org.openqa.selenium.*;
 
@@ -12,7 +12,7 @@ public class ElementPositionProvider implements PositionProvider ,ISeleniumPosit
     private final Logger logger;
     private final EyesRemoteWebElement element;
 
-    public ElementPositionProvider(Logger logger, EyesWebDriver driver, WebElement element) {
+    public ElementPositionProvider(Logger logger, EyesSeleniumDriver driver, WebElement element) {
         ArgumentGuard.notNull(logger, "logger");
         ArgumentGuard.notNull(driver, "driver");
         ArgumentGuard.notNull(element, "element");

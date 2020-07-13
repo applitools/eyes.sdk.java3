@@ -10,7 +10,7 @@ import com.applitools.eyes.selenium.Borders;
 import com.applitools.eyes.selenium.EyesSeleniumUtils;
 import com.applitools.eyes.selenium.positioning.ScrollPositionMemento;
 import com.applitools.eyes.selenium.positioning.ScrollPositionProviderFactory;
-import com.applitools.eyes.selenium.wrappers.EyesWebDriver;
+import com.applitools.eyes.selenium.wrappers.EyesSeleniumDriver;
 import com.applitools.utils.ArgumentGuard;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
@@ -113,7 +113,7 @@ public final class Frame {
         jsExecutor.executeScript("arguments[0].style.overflow='" + originalOverflow + "';", scrollRootElement);
     }
 
-    public void returnToOriginalPosition(EyesWebDriver driver) {
+    public void returnToOriginalPosition(EyesSeleniumDriver driver) {
         WebElement scrollRootElement = getScrollRootElement(driver);
         PositionProvider positionProvider = ScrollPositionProviderFactory.getScrollPositionProvider(driver.getUserAgent(), logger, jsExecutor, scrollRootElement);
         positionProvider.restoreState(positionMemento);
@@ -123,7 +123,7 @@ public final class Frame {
         WebElement scrollRootElement = getScrollRootElement();
         if (scrollRootElement == null) {
             logger.verbose("no scroll root element. selecting default.");
-            scrollRootElement = EyesSeleniumUtils.getDefaultRootElement(logger, (EyesWebDriver) driver);
+            scrollRootElement = EyesSeleniumUtils.getDefaultRootElement(logger, (EyesSeleniumDriver) driver);
         }
 
         return scrollRootElement;
