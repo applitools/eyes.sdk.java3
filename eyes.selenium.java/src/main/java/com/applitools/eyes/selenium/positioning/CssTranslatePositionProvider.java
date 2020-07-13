@@ -3,7 +3,7 @@ package com.applitools.eyes.selenium.positioning;
 import com.applitools.eyes.*;
 import com.applitools.eyes.positioning.PositionMemento;
 import com.applitools.eyes.positioning.PositionProvider;
-import com.applitools.eyes.selenium.EyesSeleniumUtils;
+import com.applitools.eyes.selenium.EyesDriverUtils;
 import com.applitools.utils.ArgumentGuard;
 import org.openqa.selenium.WebElement;
 
@@ -62,7 +62,7 @@ public class CssTranslatePositionProvider implements PositionProvider, ISelenium
 
     public RectangleSize getEntireSize() {
         RectangleSize entireSize =
-                EyesSeleniumUtils.getEntireElementSize(logger, executor, scrollRootElement);
+                EyesDriverUtils.getEntireElementSize(logger, executor, scrollRootElement);
         logger.verbose("CssTranslatePositionProvider - Entire size: " + entireSize);
         return entireSize;
     }

@@ -1,13 +1,13 @@
 package com.applitools.eyes.selenium;
 
 import com.applitools.eyes.IEyesJsExecutor;
-import com.applitools.eyes.selenium.wrappers.EyesWebDriver;
+import com.applitools.eyes.selenium.wrappers.EyesSeleniumDriver;
 
 public class SeleniumJavaScriptExecutor implements IEyesJsExecutor {
 
-    private final EyesWebDriver driver;
+    private final EyesSeleniumDriver driver;
 
-    public SeleniumJavaScriptExecutor(EyesWebDriver driver) {
+    public SeleniumJavaScriptExecutor(EyesSeleniumDriver driver) {
         this.driver = driver;
     }
 

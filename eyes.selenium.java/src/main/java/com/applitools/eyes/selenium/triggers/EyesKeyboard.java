@@ -6,7 +6,7 @@ package com.applitools.eyes.selenium.triggers;
 import com.applitools.eyes.Logger;
 import com.applitools.eyes.Region;
 import com.applitools.eyes.selenium.wrappers.EyesRemoteWebElement;
-import com.applitools.eyes.selenium.wrappers.EyesWebDriver;
+import com.applitools.eyes.selenium.wrappers.EyesSeleniumDriver;
 import com.applitools.utils.ArgumentGuard;
 import org.openqa.selenium.interactions.Keyboard;
 import org.openqa.selenium.WebElement;
@@ -19,10 +19,10 @@ import org.openqa.selenium.remote.RemoteWebElement;
 public class EyesKeyboard implements Keyboard {
 
     private final Logger logger;
-    private final EyesWebDriver eyesDriver;
+    private final EyesSeleniumDriver eyesDriver;
     private final Keyboard keyboard;
 
-    public EyesKeyboard(Logger logger, EyesWebDriver eyesDriver,
+    public EyesKeyboard(Logger logger, EyesSeleniumDriver eyesDriver,
                         Keyboard keyboard) {
         ArgumentGuard.notNull(logger, "logger");
         ArgumentGuard.notNull(eyesDriver, "eyesDriver");
