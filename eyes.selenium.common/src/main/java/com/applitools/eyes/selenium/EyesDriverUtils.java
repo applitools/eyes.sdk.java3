@@ -226,14 +226,18 @@ public class EyesDriverUtils {
     public static Location getCurrentScrollPosition(
             IEyesJsExecutor executor) {
         //noinspection unchecked
-        String positionAsString = (String) executor.executeScript(JS_GET_CURRENT_SCROLL_POSITION);
-        String[] xy = positionAsString.split(";");
-        if (xy.length != 2) {
+        return parseLocationString(executor.executeScript(JS_GET_CURRENT_SCROLL_POSITION));
+    }
+
+    public static Location parseLocationString(Object position) {
+        String[] xy = position.toString().split(";");
+        if (xy.length != 2)
+        {
             throw new EyesException("Could not get scroll position!");
         }
         float x = Float.parseFloat(xy[0]);
         float y = Float.parseFloat(xy[1]);
-        return new Location((int) Math.ceil(x), (int) Math.ceil(y));
+        return new Location((int)Math.ceil(x), (int)Math.ceil(y));
     }
 
     /**

@@ -2,24 +2,18 @@ package com.applitools.eyes.selenium.positioning;
 
 import com.applitools.eyes.*;
 import com.applitools.eyes.positioning.PositionMemento;
-import com.applitools.eyes.positioning.PositionProvider;
 import com.applitools.eyes.selenium.EyesDriverUtils;
 import com.applitools.utils.ArgumentGuard;
+import org.openqa.selenium.Point;
 import org.openqa.selenium.WebElement;
 
-public class ScrollPositionProvider implements PositionProvider, ISeleniumPositionProvider {
-
+public class SeleniumScrollPositionProvider implements ScrollPositionProvider, ISeleniumPositionProvider {
 
     protected final Logger logger;
     protected final IEyesJsExecutor executor;
     protected final WebElement scrollRootElement;
 
-    private final String JS_GET_ENTIRE_PAGE_SIZE =
-            "var width = Math.max(arguments[0].clientWidth, arguments[0].scrollWidth);" +
-                    "var height = Math.max(arguments[0].clientHeight, arguments[0].scrollHeight);" +
-                    "return (width + ',' + height);";
-
-    public ScrollPositionProvider(Logger logger, IEyesJsExecutor executor, WebElement scrollRootElement) {
+    public SeleniumScrollPositionProvider(Logger logger, IEyesJsExecutor executor, WebElement scrollRootElement) {
         ArgumentGuard.notNull(logger, "logger");
         ArgumentGuard.notNull(executor, "executor");
 //        ArgumentGuard.notNull(scrollRootElement, "scrollRootElement");
@@ -33,7 +27,7 @@ public class ScrollPositionProvider implements PositionProvider, ISeleniumPositi
 
     public static Location getCurrentPosition(IEyesJsExecutor executor, WebElement scrollRootElement) {
         Object position = executor.executeScript("return arguments[0].scrollLeft+';'+arguments[0].scrollTop;", scrollRootElement);
-        return parseLocationString(position);
+        return EyesDriverUtils.parseLocationString(position);
     }
 
     /**
@@ -47,23 +41,19 @@ public class ScrollPositionProvider implements PositionProvider, ISeleniumPositi
      * Go to the specified location.
      * @param location The position to scroll to.
      */
+    @Override
     public Location setPosition(Location location) {
         logger.verbose(String.format("setting position of %s to %s", scrollRootElement, location));
         Object position = executor.executeScript(String.format("arguments[0].scrollLeft=%d; arguments[0].scrollTop=%d; return (arguments[0].scrollLeft+';'+arguments[0].scrollTop);",
                 location.getX(), location.getY()),
                 scrollRootElement);
-        return parseLocationString(position);
+        return EyesDriverUtils.parseLocationString(position);
     }
 
-    public static Location parseLocationString(Object position) {
-        String[] xy = position.toString().split(";");
-        if (xy.length != 2)
-        {
-            throw new EyesException("Could not get scroll position!");
-        }
-        float x = Float.parseFloat(xy[0]);
-        float y = Float.parseFloat(xy[1]);
-        return new Location((int)Math.ceil(x), (int)Math.ceil(y));
+    @Override
+    public void setPosition(WebElement element) {
+        Point loc = element.getLocation();
+        setPosition(new Location(loc.x, loc.y));
     }
 
     /**
@@ -93,14 +83,14 @@ public class ScrollPositionProvider implements PositionProvider, ISeleniumPositi
     }
 
 
-    public boolean equals(ScrollPositionProvider other){
+    public boolean equals(SeleniumScrollPositionProvider other){
         return this.scrollRootElement.equals(other.scrollRootElement);
     }
 
     @Override
     public boolean equals(Object other){
-        if (other instanceof  ScrollPositionProvider) {
-            return equals((ScrollPositionProvider)other);
+        if (other instanceof SeleniumScrollPositionProvider) {
+            return equals((SeleniumScrollPositionProvider)other);
         }
         return false;
     }

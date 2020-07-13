@@ -11,7 +11,7 @@ import com.applitools.eyes.selenium.SeleniumJavaScriptExecutor;
 import com.applitools.eyes.selenium.SizeAndBorders;
 import com.applitools.eyes.selenium.frames.Frame;
 import com.applitools.eyes.selenium.frames.FrameChain;
-import com.applitools.eyes.selenium.positioning.ScrollPositionProvider;
+import com.applitools.eyes.selenium.positioning.SeleniumScrollPositionProvider;
 import com.applitools.eyes.selenium.positioning.ScrollPositionProviderFactory;
 import com.applitools.utils.ArgumentGuard;
 import org.openqa.selenium.*;
@@ -27,7 +27,7 @@ public class EyesTargetLocator implements WebDriver.TargetLocator {
 
     private final Logger logger;
     private final EyesSeleniumDriver driver;
-    private ScrollPositionProvider scrollPosition;
+    private SeleniumScrollPositionProvider scrollPosition;
     private final WebDriver.TargetLocator targetLocator;
     private final SeleniumJavaScriptExecutor jsExecutor;
 

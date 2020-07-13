@@ -228,7 +228,7 @@ public class EyesRemoteWebElement extends RemoteWebElement {
 
     public Location getScrollLocation() {
         Object position = eyesDriver.executeScript(JS_GET_SCROLL_POSITION, this);
-        return parseLocationString(position);
+        return EyesDriverUtils.parseLocationString(position);
     }
 
     /**
@@ -291,17 +291,7 @@ public class EyesRemoteWebElement extends RemoteWebElement {
     public Location scrollTo(Location location) {
         Object position = eyesDriver.executeScript(String.format(JS_SCROLL_TO_FORMATTED_STR,
                 location.getX(), location.getY()) + JS_GET_SCROLL_POSITION, this);
-        return parseLocationString(position);
-    }
-
-    private Location parseLocationString(Object position) {
-        String[] xy = position.toString().split(";");
-        if (xy.length != 2) {
-            throw new EyesException("Could not get scroll position!");
-        }
-        float x = Float.parseFloat(xy[0]);
-        float y = Float.parseFloat(xy[1]);
-        return new Location((int) Math.ceil(x), (int) Math.ceil(y));
+        return EyesDriverUtils.parseLocationString(position);
     }
 
     /**
