@@ -8,23 +8,23 @@ import org.openqa.selenium.WebElement;
 
 public class ScrollPositionProviderFactory {
 
-    public static ScrollPositionProvider getScrollPositionProvider(String uaString,
-                                                                   Logger logger,
-                                                                   IEyesJsExecutor executor,
-                                                                   WebElement scrollRootElement) {
+    public static SeleniumScrollPositionProvider getScrollPositionProvider(String uaString,
+                                                                           Logger logger,
+                                                                           IEyesJsExecutor executor,
+                                                                           WebElement scrollRootElement) {
         UserAgent userAgent = UserAgent.parseUserAgentString(uaString, true);
         return getScrollPositionProvider(userAgent, logger, executor, scrollRootElement);
     }
 
-    public static ScrollPositionProvider getScrollPositionProvider(UserAgent userAgent,
-                                                                   Logger logger,
-                                                                   IEyesJsExecutor executor,
-                                                                   WebElement scrollRootElement) {
+    public static SeleniumScrollPositionProvider getScrollPositionProvider(UserAgent userAgent,
+                                                                           Logger logger,
+                                                                           IEyesJsExecutor executor,
+                                                                           WebElement scrollRootElement) {
         if (userAgent != null) {
             if (userAgent.getBrowser().equals(BrowserNames.EDGE)) {
                 return new EdgeBrowserScrollPositionProvider(logger, executor, scrollRootElement);
             }
         }
-        return new ScrollPositionProvider(logger, executor, scrollRootElement);
+        return new SeleniumScrollPositionProvider(logger, executor, scrollRootElement);
     }
 }

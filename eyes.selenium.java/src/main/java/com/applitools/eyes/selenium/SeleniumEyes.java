@@ -779,7 +779,7 @@ public class SeleniumEyes extends EyesBase implements ISeleniumEyes, IBatchClose
                     currentFramePositionProvider = PositionProviderFactory.getPositionProvider(logger, getConfiguration().getStitchMode(), jsExecutor, scrollRootElement, userAgent);
                     if (!isMobileDevice && this.stitchContent) {
                         String curPosStr = (String) driver.executeScript("var e = document.documentElement; var curPos = e.scrollLeft+';'+e.scrollTop; if (e.scrollTo) {e.scrollTo(0,0);} else {e.scrollTop=0;e.scrollLeft=0;} return curPos;");
-                        curPos = ScrollPositionProvider.parseLocationString(curPosStr);
+                        curPos = EyesDriverUtils.parseLocationString(curPosStr);
                     }
                     checkWindowBase(RegionProvider.NULL_INSTANCE, name, false, checkSettings, source);
                     if (!isMobileDevice) {
@@ -1020,7 +1020,7 @@ public class SeleniumEyes extends EyesBase implements ISeleniumEyes, IBatchClose
         FrameChain originalFrameChain = driver.getFrameChain().clone();
         EyesTargetLocator switchTo = (EyesTargetLocator) driver.switchTo();
         switchTo.frames(this.originalFC);
-        ScrollPositionProvider spp = ScrollPositionProviderFactory.getScrollPositionProvider(userAgent, logger, jsExecutor, scrollRootElement);
+        SeleniumScrollPositionProvider spp = ScrollPositionProviderFactory.getScrollPositionProvider(userAgent, logger, jsExecutor, scrollRootElement);
         Location location;
         try {
             location = spp.getCurrentPosition();

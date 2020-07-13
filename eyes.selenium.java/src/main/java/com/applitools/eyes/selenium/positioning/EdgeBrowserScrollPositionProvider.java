@@ -5,7 +5,7 @@ import com.applitools.eyes.Location;
 import com.applitools.eyes.Logger;
 import org.openqa.selenium.WebElement;
 
-public class EdgeBrowserScrollPositionProvider extends ScrollPositionProvider {
+public class EdgeBrowserScrollPositionProvider extends SeleniumScrollPositionProvider {
 
     public EdgeBrowserScrollPositionProvider(Logger logger, IEyesJsExecutor executor, WebElement scrollRootElement) {
         super(logger, executor, scrollRootElement);

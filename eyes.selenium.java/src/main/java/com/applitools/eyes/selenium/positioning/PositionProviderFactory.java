@@ -26,7 +26,7 @@ public class PositionProviderFactory {
                 if (userAgent != null && userAgent.getBrowser().equalsIgnoreCase(BrowserNames.EDGE))
                     return new EdgeBrowserScrollPositionProvider(logger, executor, scrollRootElement);
                 //else
-                return new ScrollPositionProvider(logger, executor, scrollRootElement);
+                return new SeleniumScrollPositionProvider(logger, executor, scrollRootElement);
             default:
                 return null;
         }

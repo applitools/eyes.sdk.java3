@@ -113,6 +113,14 @@ public class EyesAppiumDriver implements EyesWebDriver {
     }
 
     /**
+     * See {@link #getDefaultContentViewportSize(boolean)}.
+     * {@code forceQuery} defaults to {@code false}.
+     */
+    public RectangleSize getDefaultContentViewportSize() {
+        return getDefaultContentViewportSize(true);
+    }
+
+    /**
      * Rotates the image as necessary. The rotation is either manually forced
      * by passing a non-null ImageRotation, or automatically inferred.
      * @param driver   The underlying driver which produced the screenshot.
