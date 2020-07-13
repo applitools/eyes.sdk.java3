@@ -757,7 +757,7 @@ public abstract class EyesBase implements IEyesBase{
 
         beforeMatchWindow();
 
-        result = matchWindow(regionProvider, tag, ignoreMismatch, checkSettings, source);
+        result = matchWindow(regionProvider, tag, checkSettings, source);
 
         afterMatchWindow();
 
@@ -803,7 +803,7 @@ public abstract class EyesBase implements IEyesBase{
         return validationInfo;
     }
 
-    private MatchResult matchWindow(RegionProvider regionProvider, String tag, boolean ignoreMismatch,
+    private MatchResult matchWindow(RegionProvider regionProvider, String tag,
                                     ICheckSettings checkSettings, String source) {
         MatchResult result;
         ICheckSettingsInternal checkSettingsInternal = (checkSettings instanceof ICheckSettingsInternal) ? (ICheckSettingsInternal) checkSettings : null;
@@ -831,7 +831,7 @@ public abstract class EyesBase implements IEyesBase{
         logger.verbose("params: ([" + region + "], " + tag + ", " + retryTimeout + ")");
 
         result = matchWindowTask.matchWindow(
-                getUserInputs(), region, tag, shouldMatchWindowRunOnceOnTimeout, ignoreMismatch,
+                getUserInputs(), region, tag, shouldMatchWindowRunOnceOnTimeout,
                 checkSettingsInternal, retryTimeout, source);
 
         return result;
@@ -1410,7 +1410,7 @@ public abstract class EyesBase implements IEyesBase{
         String title = getTitle();
         logger.verbose("Done!");
 
-        AppOutputWithScreenshot result = new AppOutputWithScreenshot(new AppOutput(title, screenshotBytes, screenshot.domUrl, null), screenshot, location);
+        AppOutputWithScreenshot result = new AppOutputWithScreenshot(new AppOutput(title, screenshotBytes, screenshot.domUrl, null), screenshot);
         logger.verbose("Done!");
         return result;
     }

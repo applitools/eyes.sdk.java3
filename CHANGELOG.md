@@ -5,6 +5,7 @@
 - Update all `GetRegion` classes, so they don't depend on `Eyes` or `EyesBase` objects. [Trello 1980](https://trello.com/c/RYAOPRpc)
 - Updated the render request to match the protocol (internal). [Trello 1988](https://trello.com/c/Yr6EsUlL)
 - Limited screenshot size. [Trello 1991](https://trello.com/c/2iCNfoI7)
+- Screenshot retry mechanism is now more efficient. [Trello 1866](https://trello.com/c/KyxkI6Bu)
 
 ## [3.169.0] - 2020-07-05
 ### Fixed

@@ -15,19 +15,17 @@ import com.applitools.eyes.fluent.ICheckSettingsInternal;
 public class AppOutputWithScreenshot {
     private final AppOutput appOutput;
     private final EyesScreenshot screenshot;
-    private Location location;
 
-    public AppOutputWithScreenshot(AppOutput appOutput, EyesScreenshot screenshot, Location location) {
+    public AppOutputWithScreenshot(AppOutput appOutput, EyesScreenshot screenshot) {
         this.appOutput = appOutput;
         this.screenshot = screenshot;
-        this.location = location;
     }
 
     public AppOutput getAppOutput() {
         return appOutput;
     }
 
-    public EyesScreenshot getScreenshot(ICheckSettingsInternal checkSettingsInternal) {
+    public EyesScreenshot getScreenshot() {
         return screenshot;
     }
 }

@@ -124,7 +124,7 @@ public class ResponseTimeAlgorithm {
                 timedAppOutput,
                 tag,
                 true,
-                new MatchWindowData.Options(tag, noUserInputs, false,
+                new MatchWindowData.Options(tag, noUserInputs, false, false,
                         false, false, false, null, null, null),
                 null,
                 null);
@@ -270,12 +270,12 @@ public class ResponseTimeAlgorithm {
                     timedAppOutput,
                     tag,
                     true,
-                    new MatchWindowData.Options(tag, noUserInputs, true,
+                    new MatchWindowData.Options(tag, noUserInputs, false, true,
                             true, false, false, null, null, null),
                     null, null);
             currentWindowDataWithScreenshot =
                     new MatchWindowDataWithScreenshot(currentWindowData,
-                            appOutputWithScreenshot.getScreenshot(null));
+                            appOutputWithScreenshot.getScreenshot());
 
             // Add the screenshot to the collection and pass it to the
             // matcher thread.
@@ -600,6 +600,7 @@ public class ResponseTimeAlgorithm {
                             currentOptions.getUserInputs(),
                             false,
                             false,
+                            false,
                             true,
                             false,
                             null,
@@ -625,6 +626,7 @@ public class ResponseTimeAlgorithm {
                 new MatchWindowData.Options(
                         currentOptions.getName(),
                         currentOptions.getUserInputs(),
+                        false,
                         false,
                         false,
                         !forceMatch,
