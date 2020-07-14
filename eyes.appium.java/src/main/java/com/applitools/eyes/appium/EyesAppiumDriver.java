@@ -12,10 +12,7 @@ import org.openqa.selenium.*;
 import org.openqa.selenium.remote.RemoteWebElement;
 
 import java.awt.image.BufferedImage;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class EyesAppiumDriver implements EyesWebDriver {
 
@@ -172,6 +169,61 @@ public class EyesAppiumDriver implements EyesWebDriver {
         } else {
             throw new EyesException("findElement: Element is not a RemoteWebElement: " + by);
         }
+    }
+
+    @Override
+    public String getPageSource() {
+        return driver.getPageSource();
+    }
+
+    @Override
+    public void close() {
+        driver.close();
+    }
+
+    @Override
+    public void quit() {
+        driver.quit();
+    }
+
+    @Override
+    public Set<String> getWindowHandles() {
+        return driver.getWindowHandles();
+    }
+
+    @Override
+    public String getWindowHandle() {
+        return driver.getWindowHandle();
+    }
+
+    @Override
+    public TargetLocator switchTo() {
+        return driver.switchTo();
+    }
+
+    @Override
+    public Navigation navigate() {
+        return driver.navigate();
+    }
+
+    @Override
+    public Options manage() {
+        return driver.manage();
+    }
+
+    @Override
+    public void get(String url) {
+        driver.get(url);
+    }
+
+    @Override
+    public String getCurrentUrl() {
+        return driver.getCurrentUrl();
+    }
+
+    @Override
+    public String getTitle() {
+        return driver.getTitle();
     }
 
     @Override

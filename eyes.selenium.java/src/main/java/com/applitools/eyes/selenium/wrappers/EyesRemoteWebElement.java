@@ -642,6 +642,7 @@ public class EyesRemoteWebElement extends RemoteWebElement {
     public Rectangle getBoundingClientRect() {
         String retVal = (String) eyesDriver.executeScript("var r = arguments[0].getBoundingClientRect();" +
                 "return r.left+';'+r.top+';'+r.width+';'+r.height;", this);
+        logger.log(String.format("Bounding client rect: %s", retVal));
         String[] parts = retVal.split(";");
         Rectangle rect = new Rectangle(
                 Math.round(Float.parseFloat(parts[0])),

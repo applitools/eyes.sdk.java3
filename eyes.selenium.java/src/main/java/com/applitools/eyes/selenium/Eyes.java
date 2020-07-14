@@ -1843,7 +1843,6 @@ public class Eyes implements IEyesBase {
             this.setProxy(proxy);
         }
         this.configuration = new Configuration(configuration);
-
     }
 
     public void closeAsync() {
