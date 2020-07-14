@@ -425,9 +425,7 @@ public class EyesWebDriverScreenshot extends EyesScreenshot {
     }
 
     @Override
-    public Region getIntersectedRegion(Region region,
-                                       CoordinatesType resultCoordinatesType) {
-
+    public Region getIntersectedRegion(Region region, CoordinatesType resultCoordinatesType) {
         if (region.isSizeEmpty()) {
             return new Region(region);
         }

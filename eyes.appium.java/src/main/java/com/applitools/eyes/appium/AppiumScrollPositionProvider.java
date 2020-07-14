@@ -11,7 +11,6 @@ import com.applitools.utils.ArgumentGuard;
 import io.appium.java_client.AppiumDriver;
 import org.openqa.selenium.*;
 
-import javax.annotation.Nullable;
 import java.io.IOException;
 
 public abstract class AppiumScrollPositionProvider implements ScrollPositionProvider {
@@ -60,19 +59,21 @@ public abstract class AppiumScrollPositionProvider implements ScrollPositionProv
         return firstVisibleChild;
     }
 
-    @Nullable
     protected ContentSize getCachedContentSize () {
-        if (contentSize == null) {
-            try {
-                WebElement activeScroll = EyesAppiumUtils.getFirstScrollableView(driver);
-                contentSize = EyesAppiumUtils.getContentSize(driver, activeScroll);
-                logger.verbose("Retrieved contentSize, it is: " + contentSize);
-            } catch (NoSuchElementException e) {
-                logger.log("WARNING: No active scroll element, so no content size to retrieve");
-            } catch (IOException e) {
-                logger.log("WARNING: could not retrieve content size from active scroll element");
-            }
+        if (contentSize != null) {
+            return contentSize;
         }
+
+        try {
+            WebElement activeScroll = EyesAppiumUtils.getFirstScrollableView(driver);
+            contentSize = EyesAppiumUtils.getContentSize(driver, activeScroll);
+            logger.verbose("Retrieved contentSize, it is: " + contentSize);
+        } catch (NoSuchElementException e) {
+            logger.log("WARNING: No active scroll element, so no content size to retrieve");
+        } catch (IOException e) {
+            logger.log("WARNING: could not retrieve content size from active scroll element");
+        }
+
         return contentSize;
     }
 
