@@ -2,6 +2,7 @@ package com.applitools.eyes.selenium.fluent;
 
 import com.applitools.eyes.*;
 import com.applitools.eyes.fluent.*;
+import com.applitools.eyes.selenium.EyesWebDriver;
 import com.applitools.eyes.visualgrid.model.VisualGridSelector;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import org.openqa.selenium.By;
@@ -46,7 +47,7 @@ public class SeleniumCheckSettings extends CheckSettings implements ISeleniumChe
     }
 
     @Override
-    public void init(Logger logger, WebDriver driver) {
+    public void init(Logger logger, EyesWebDriver driver) {
         initGetRegions(logger, driver, ignoreRegions);
         initGetRegions(logger, driver, layoutRegions);
         initGetRegions(logger, driver, strictRegions);
@@ -55,7 +56,7 @@ public class SeleniumCheckSettings extends CheckSettings implements ISeleniumChe
         initGetRegions(logger, driver, accessibilityRegions);
     }
 
-    private void initGetRegions(Logger logger, WebDriver driver, List<? extends GetRegion> getRegions) {
+    private void initGetRegions(Logger logger, EyesWebDriver driver, List<? extends GetRegion> getRegions) {
         for (GetRegion getRegion : getRegions) {
             if (getRegion instanceof ImplicitInitiation) {
                 ((ImplicitInitiation) getRegion).init(logger, driver);

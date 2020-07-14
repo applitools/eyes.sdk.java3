@@ -158,6 +158,7 @@ public class EyesAppiumDriver implements EyesWebDriver {
         return xOutputType.convertFromBase64Png(screenshot64);
     }
 
+    @Override
     public EyesAppiumElement findElement(By by) {
         WebElement webElement = driver.findElement(by);
         if (webElement instanceof RemoteWebElement) {
@@ -173,6 +174,7 @@ public class EyesAppiumDriver implements EyesWebDriver {
         }
     }
 
+    @Override
     public List<WebElement> findElements(By by) {
         List<WebElement> foundWebElementsList = driver.findElements(by);
 

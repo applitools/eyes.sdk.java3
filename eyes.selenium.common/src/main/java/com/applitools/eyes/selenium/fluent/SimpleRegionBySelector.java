@@ -2,6 +2,7 @@ package com.applitools.eyes.selenium.fluent;
 
 import com.applitools.eyes.*;
 import com.applitools.eyes.fluent.GetSimpleRegion;
+import com.applitools.eyes.selenium.EyesWebDriver;
 import org.openqa.selenium.*;
 
 import java.util.ArrayList;
@@ -10,7 +11,7 @@ import java.util.List;
 public class SimpleRegionBySelector implements GetSimpleRegion, IGetSeleniumRegion, ImplicitInitiation {
 
     private Logger logger;
-    private WebDriver driver;
+    private EyesWebDriver driver;
     private final By selector;
 
     public SimpleRegionBySelector(By selector) {
@@ -18,7 +19,7 @@ public class SimpleRegionBySelector implements GetSimpleRegion, IGetSeleniumRegi
     }
 
     @Override
-    public void init(Logger logger, WebDriver driver) {
+    public void init(Logger logger, EyesWebDriver driver) {
         this.logger = logger;
         this.driver = driver;
     }

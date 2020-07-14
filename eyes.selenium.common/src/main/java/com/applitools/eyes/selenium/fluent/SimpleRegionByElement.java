@@ -12,7 +12,7 @@ import java.util.List;
 
 public class SimpleRegionByElement implements GetSimpleRegion, IGetSeleniumRegion {
 
-    private final WebElement element;
+    protected final WebElement element;
 
     public SimpleRegionByElement(WebElement element) {
         this.element = element;

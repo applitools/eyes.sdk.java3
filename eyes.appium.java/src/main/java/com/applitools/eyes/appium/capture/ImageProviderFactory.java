@@ -1,7 +1,6 @@
 package com.applitools.eyes.appium.capture;
 
 import com.applitools.eyes.Logger;
-import com.applitools.eyes.appium.Eyes;
 import com.applitools.eyes.capture.ImageProvider;
 import com.applitools.eyes.selenium.capture.TakesScreenshotImageProvider;
 import org.openqa.selenium.JavascriptExecutor;

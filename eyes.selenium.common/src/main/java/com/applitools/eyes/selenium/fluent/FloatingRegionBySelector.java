@@ -2,6 +2,7 @@ package com.applitools.eyes.selenium.fluent;
 
 import com.applitools.eyes.*;
 import com.applitools.eyes.fluent.GetFloatingRegion;
+import com.applitools.eyes.selenium.EyesWebDriver;
 import com.applitools.eyes.visualgrid.model.IGetFloatingRegionOffsets;
 import com.applitools.utils.GeneralUtils;
 import org.openqa.selenium.*;
@@ -12,7 +13,7 @@ import java.util.List;
 public class FloatingRegionBySelector implements GetFloatingRegion , IGetSeleniumRegion, IGetFloatingRegionOffsets, ImplicitInitiation {
 
     private Logger logger;
-    private WebDriver driver;
+    private EyesWebDriver driver;
     private final By selector;
     private final int maxUpOffset;
     private final int maxDownOffset;
@@ -28,7 +29,7 @@ public class FloatingRegionBySelector implements GetFloatingRegion , IGetSeleniu
     }
 
     @Override
-    public void init(Logger logger, WebDriver driver) {
+    public void init(Logger logger, EyesWebDriver driver) {
         this.logger = logger;
         this.driver = driver;
     }
