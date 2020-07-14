@@ -2,6 +2,7 @@ package com.applitools.eyes.selenium.fluent;
 
 import com.applitools.eyes.*;
 import com.applitools.eyes.fluent.IGetAccessibilityRegionType;
+import com.applitools.eyes.selenium.EyesWebDriver;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Point;
 import org.openqa.selenium.WebDriver;
@@ -13,7 +14,7 @@ import java.util.List;
 public class AccessibilityRegionBySelector implements GetAccessibilityRegion, IGetSeleniumRegion, IGetAccessibilityRegionType, ImplicitInitiation {
 
     private Logger logger;
-    private WebDriver driver;
+    private EyesWebDriver driver;
     private final AccessibilityRegionType regionType;
     private final By selector;
 
@@ -23,7 +24,7 @@ public class AccessibilityRegionBySelector implements GetAccessibilityRegion, IG
     }
 
     @Override
-    public void init(Logger logger, WebDriver driver) {
+    public void init(Logger logger, EyesWebDriver driver) {
         this.logger = logger;
         this.driver = driver;
     }

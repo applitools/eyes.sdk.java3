@@ -1,28 +1,34 @@
 package com.applitools.eyes.appium.fluent;
 
 import com.applitools.eyes.*;
-import com.applitools.eyes.appium.Eyes;
+import com.applitools.eyes.appium.EyesAppiumDriver;
 import com.applitools.eyes.appium.EyesAppiumElement;
-import com.applitools.eyes.selenium.fluent.IGetSeleniumRegion;
+import com.applitools.eyes.selenium.EyesWebDriver;
+import com.applitools.eyes.selenium.fluent.ImplicitInitiation;
 import org.openqa.selenium.Dimension;
 import org.openqa.selenium.Point;
 import org.openqa.selenium.WebElement;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
-public class SimpleRegionByElement implements IGetSeleniumRegion {
+public class SimpleRegionByElement extends com.applitools.eyes.selenium.fluent.SimpleRegionByElement implements ImplicitInitiation {
 
-    private final WebElement element;
+    private EyesAppiumDriver driver;
 
     public SimpleRegionByElement(WebElement element) {
-        this.element = element;
+        super(element);
     }
 
-    public List<Region> getRegions(Eyes eyes) {
-        EyesAppiumElement eyesAppiumElement = new EyesAppiumElement((eyes.getEyesDriver(),
-                element, 1/eyes.getDevicePixelRatio());
+    @Override
+    public void init(Logger logger, EyesWebDriver driver) {
+        this.driver = (EyesAppiumDriver) driver;
+    }
+
+    @Override
+    public List<Region> getRegions(EyesScreenshot screenshot) {
+        EyesAppiumElement eyesAppiumElement = new EyesAppiumElement(driver,
+                element, 1 / driver.getDevicePixelRatio());
 
         Point locationAsPoint = eyesAppiumElement.getLocation();
         Dimension size = eyesAppiumElement.getSize();
@@ -32,10 +38,5 @@ public class SimpleRegionByElement implements IGetSeleniumRegion {
                 CoordinatesType.SCREENSHOT_AS_IS));
 
         return value;
-    }
-
-    @Override
-    public List<WebElement> getElements() {
-        return Collections.singletonList(element);
     }
 }
