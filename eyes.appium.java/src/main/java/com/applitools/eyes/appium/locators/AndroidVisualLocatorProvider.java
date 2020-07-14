@@ -13,7 +13,7 @@ import java.util.Map;
 
 public class AndroidVisualLocatorProvider extends MobileVisualLocatorProvider {
 
-    AndroidVisualLocatorProvider(Logger logger, EyesAppiumDriver driver, ServerConnector serverConnector,
+    public AndroidVisualLocatorProvider(Logger logger, EyesAppiumDriver driver, ServerConnector serverConnector,
                                  double devicePixelRatio, String appName, DebugScreenshotsProvider debugScreenshotsProvider) {
         super(logger, driver, serverConnector, devicePixelRatio, appName, debugScreenshotsProvider);
     }

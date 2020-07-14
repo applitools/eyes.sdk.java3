@@ -18,10 +18,11 @@ import java.util.List;
 
 public class AppiumCheckSettings extends CheckSettings implements ImplicitInitiation {
 
-    protected By targetSelector;
-    protected WebElement targetElement;
+    private By targetSelector;
+    private WebElement targetElement;
     private By cutElementSelector;
     private ElementType cutElementType;
+    private Boolean statusBarExists;
 
     protected AppiumCheckSettings() {
         super();
@@ -169,5 +170,29 @@ public class AppiumCheckSettings extends CheckSettings implements ImplicitInitia
 
     public By getCutElementSelector() {
         return cutElementSelector;
+    }
+
+    public AppiumCheckSettings statusBarExists() {
+        AppiumCheckSettings clone = this.clone();
+        clone.statusBarExists = true;
+        return clone;
+    }
+
+    public AppiumCheckSettings statusBarExists(boolean statusBarExists) {
+        AppiumCheckSettings clone = this.clone();
+        clone.statusBarExists = statusBarExists;
+        return clone;
+    }
+
+    public Boolean getStatusBarExists() {
+        return statusBarExists;
+    }
+
+    public By getTargetSelector() {
+        return this.targetSelector;
+    }
+
+    public WebElement getTargetElement() {
+        return this.targetElement;
     }
 }

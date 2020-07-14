@@ -304,7 +304,7 @@ public class SeleniumEyes extends EyesBase implements ISeleniumEyes, IBatchClose
         logger.verbose("Device pixel ratio: " + devicePixelRatio);
     }
 
-    private void ensureViewportSize() {
+    protected void ensureViewportSize() {
         if (this.getConfiguration().getViewportSize() == null) {
             this.getConfiguration().setViewportSize(driver.getDefaultContentViewportSize());
         }
