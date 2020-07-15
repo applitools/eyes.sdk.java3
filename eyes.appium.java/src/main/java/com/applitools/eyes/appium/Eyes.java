@@ -111,8 +111,6 @@ public class Eyes extends EyesBase {
 
         EyesScreenshotFactory screenshotFactory = new EyesAppiumScreenshotFactory(logger, this.driver);
 
-        ensureViewportSize();
-
         openBase();
 
         setUserAgent(UserAgent.parseUserAgentString(sessionStartInfo.getEnvironment().getInferred(), true));

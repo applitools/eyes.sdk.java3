@@ -1353,7 +1353,7 @@ public abstract class EyesBase implements IEyesBase{
         return null;
     }
 
-    protected void ensureViewportSize() {
+    private void ensureViewportSize() {
         if (!isViewportSizeSet) {
             if (viewportSize == null || viewportSize.isEmpty()) {
                 try {
