@@ -79,10 +79,9 @@ public class Eyes implements IEyesBase {
     }
 
     private void initLocatorProvider(WebDriver webDriver) {
-        EyesSeleniumDriver driver = new EyesSeleniumDriver(getLogger(), null, (RemoteWebDriver) webDriver);
         visualLocatorsProvider = new SeleniumVisualLocatorsProvider(
                 seleniumEyes,
-                driver,
+                (EyesSeleniumDriver) webDriver,
                 getLogger(),
                 getDebugScreenshotsProvider());
     }
@@ -98,8 +97,9 @@ public class Eyes implements IEyesBase {
             seleniumEyes.open(webDriver);
         }
 
+        webDriver = activeEyes.open(webDriver);
         initLocatorProvider(webDriver);
-        return activeEyes.open(webDriver);
+        return webDriver;
     }
 
     /**
@@ -115,8 +115,9 @@ public class Eyes implements IEyesBase {
             seleniumEyes.open(driver);
         }
 
+        driver = activeEyes.open(driver, appName, testName, null);
         initLocatorProvider(driver);
-        return activeEyes.open(driver, appName, testName, null);
+        return driver;
     }
 
     /**
@@ -134,8 +135,9 @@ public class Eyes implements IEyesBase {
             seleniumEyes.open(driver);
         }
 
+        driver = activeEyes.open(driver, appName, testName, viewportSize);
         initLocatorProvider(driver);
-        return activeEyes.open(driver, appName, testName, viewportSize);
+        return driver;
     }
 
     /**

@@ -725,6 +725,11 @@ public abstract class EyesBase implements IEyesBase{
     protected void afterMatchWindow() {
     }
 
+    protected MatchResult checkWindowBase(RegionProvider regionProvider, String tag,
+                                          boolean ignoreMismatch, ICheckSettings checkSettings) {
+        return checkWindowBase(regionProvider, tag, ignoreMismatch, checkSettings, getAppName());
+    }
+
     /**
      * Takes a snapshot of the application under test and matches it with the
      * expected output.
