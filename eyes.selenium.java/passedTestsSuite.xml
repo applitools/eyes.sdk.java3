@@ -331,6 +331,7 @@
                 <methods>
                     <include name="testShouldTakeFullPageScreenshot"/>
                     <include name="testDebugScreenshot"/>
+                    <include name="testChangeTabs"/>
                     <include name="testScreenshotTooBig"/>
                 </methods>
             </class>

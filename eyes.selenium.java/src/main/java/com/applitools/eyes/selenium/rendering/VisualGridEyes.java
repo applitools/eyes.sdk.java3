@@ -133,7 +133,6 @@ public class VisualGridEyes implements ISeleniumEyes, IRenderingEyes {
     public void setLogHandler(LogHandler logHandler) {
         if (getIsDisabled()) return;
         LogHandler currentLogHandler = logger.getLogHandler();
-        this.logger = new Logger();
         this.logger.setLogHandler(new MultiLogHandler(currentLogHandler, logHandler));
 
         if (currentLogHandler.isOpen() && !logHandler.isOpen()) {

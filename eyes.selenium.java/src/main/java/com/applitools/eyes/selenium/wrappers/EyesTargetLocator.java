@@ -46,9 +46,6 @@ public class EyesTargetLocator implements WebDriver.TargetLocator {
         this.logger = logger;
         this.targetLocator = targetLocator;
         this.jsExecutor = new SeleniumJavaScriptExecutor(driver);
-        if (this.driver.getEyes() != null) {
-            this.scrollPosition = ScrollPositionProviderFactory.getScrollPositionProvider(driver.getUserAgent(), logger, jsExecutor, driver.getEyes().getCurrentFrameScrollRootElement());
-        }
     }
 
     /**
@@ -271,6 +268,9 @@ public class EyesTargetLocator implements WebDriver.TargetLocator {
 
     public void resetScroll() {
         logger.verbose("enter");
+        if (this.driver.getEyes() != null) {
+            this.scrollPosition = ScrollPositionProviderFactory.getScrollPositionProvider(driver.getUserAgent(), logger, jsExecutor, driver.getEyes().getCurrentFrameScrollRootElement());
+        }
         if (defaultContentPositionMemento != null) {
             scrollPosition.restoreState(defaultContentPositionMemento);
         }

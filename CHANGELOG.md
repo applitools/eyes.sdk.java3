@@ -1,3 +1,7 @@
+## [vNext]
+### Fixed
+- Calling `switchTo` with `EyesWebDriver` now works properly. [Trello 1818](https://trello.com/c/488BZ24S)
+
 ## [3.170.0] - 2020-07-13
 ### Fixed
 - Fixed a bug when new tests weren't defined as new in old versions of the server. [Trello 1993](https://trello.com/c/JSnJauTu)

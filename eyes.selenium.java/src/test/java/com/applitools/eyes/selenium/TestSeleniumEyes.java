@@ -19,6 +19,8 @@ import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
 import java.awt.image.BufferedImage;
+import java.util.Arrays;
+import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 public class TestSeleniumEyes extends ReportingTestSuite {
@@ -86,6 +88,26 @@ public class TestSeleniumEyes extends ReportingTestSuite {
             wasSavedDebugScreenshot.set(false);
             eyes.check(Target.window().fully());
             Assert.assertTrue(wasSavedDebugScreenshot.get());
+            eyes.close(true);
+        } finally {
+            driver.quit();
+            eyes.abortIfNotClosed();
+        }
+    }
+
+    @Test
+    public void testChangeTabs() {
+        SeleniumEyes eyes = new SeleniumEyes(configurationProvider, new ClassicRunner());
+        WebDriver driver = SeleniumUtils.createChromeDriver();
+        try {
+            driver = eyes.open(driver, "Applitools Eyes SDK", "Test Change Tabs", new RectangleSize(800, 800));
+            driver.get("https://the-internet.herokuapp.com/windows");
+            driver.findElement(By.xpath("//a[contains(@href, 'new')]")).click();
+            List tabs = Arrays.asList(driver.getWindowHandles().toArray());
+            driver.switchTo().window((String) tabs.get(1));
+            driver.close();
+            driver.switchTo().window((String) tabs.get(0));
+            eyes.checkWindow();
             eyes.close(true);
         } finally {
             driver.quit();
