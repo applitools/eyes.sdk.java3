@@ -109,8 +109,6 @@ public class Eyes extends EyesBase {
 
         tryUpdateDevicePixelRatio();
 
-        EyesScreenshotFactory screenshotFactory = new EyesAppiumScreenshotFactory(logger, this.driver);
-
         openBase();
 
         setUserAgent(UserAgent.parseUserAgentString(sessionStartInfo.getEnvironment().getInferred(), true));
@@ -119,6 +117,8 @@ public class Eyes extends EyesBase {
         regionPositionCompensation = new NullRegionPositionCompensation();
 
         initDriverBasedPositionProviders();
+
+        initVisualLocatorProvider();
 
         this.driver.setRotation(getRotation());
         return this.driver;
@@ -356,7 +356,7 @@ public class Eyes extends EyesBase {
                 public Region getRegion() {
                     return new Region(targetRegion.getLocation(), targetRegion.getSize(), CoordinatesType.CONTEXT_RELATIVE);
                 }
-            }, name, false, checkSettings, "");
+            }, name, false, checkSettings);
         } else if (appiumCheckTarget != null) {
             WebElement targetElement = getTargetElement(appiumCheckTarget);
             if (targetElement != null) {
@@ -370,7 +370,7 @@ public class Eyes extends EyesBase {
                 this.targetElement = null;
             } else {
                 logger.verbose("default case");
-                result = this.checkWindowBase(RegionProvider.NULL_INSTANCE, name, false, checkSettings, "");
+                result = this.checkWindowBase(RegionProvider.NULL_INSTANCE, name, false, checkSettings);
             }
         }
 
@@ -458,7 +458,7 @@ public class Eyes extends EyesBase {
             public Region getRegion() {
                 return getElementRegion(element, checkSettings);
             }
-        }, name, false, checkSettings, "");
+        }, name, false, checkSettings);
     }
 
     private WebElement getTargetElement(AppiumCheckSettings seleniumCheckTarget) {
@@ -561,7 +561,7 @@ public class Eyes extends EyesBase {
                 Dimension d = targetElement.getSize();
                 return new Region(p.getX(), p.getY(), d.getWidth(), d.getHeight(), CoordinatesType.CONTEXT_RELATIVE);
             }
-        }, name, false, checkSettings, "");
+        }, name, false, checkSettings);
         logger.verbose("Done! trying to scroll back to original position.");
 
         return result;
