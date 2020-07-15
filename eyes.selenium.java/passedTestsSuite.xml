@@ -408,7 +408,7 @@
             </class>
         </classes>
     </test>
-    <test name="TestMatchWindow" parallel="methods">
+    <test name="TestMatchWindow">
         <classes>
             <class name="com.applitools.eyes.selenium.TestMatchWindow">
                 <methods>
