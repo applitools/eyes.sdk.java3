@@ -15,6 +15,7 @@ public class AppOutput {
     private final String domUrl;
     private String screenshotUrl;
     private final byte[] screenshotBytes;
+    private RectangleSize viewport;
 
     /**
      * @param title           The title of the window.
@@ -27,6 +28,11 @@ public class AppOutput {
         this.screenshotBytes = screenshotBytes;
         this.domUrl = domUrl;
         this.screenshotUrl = screenshotUrl;
+    }
+
+    public AppOutput(String title, byte[] screenshotBytes, String domUrl, String screenshotUrl, RectangleSize viewport) {
+        this(title, screenshotBytes, domUrl, screenshotUrl);
+        this.viewport = viewport;
     }
 
     public String getTitle() {
@@ -47,5 +53,9 @@ public class AppOutput {
 
     public void setScreenshotUrl(String screenshotUrl) {
         this.screenshotUrl = screenshotUrl;
+    }
+
+    public RectangleSize getViewport() {
+        return viewport;
     }
 }

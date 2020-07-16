@@ -24,6 +24,8 @@ public class RenderStatusResults {
 
     private RectangleSize deviceSize = null;
 
+    private RectangleSize visualViewport = null;
+
     public RenderStatus getStatus() {
         return status;
     }
@@ -88,6 +90,14 @@ public class RenderStatusResults {
         this.deviceSize = deviceSize;
     }
 
+    public RectangleSize getVisualViewport() {
+        return visualViewport;
+    }
+
+    public void setVisualViewport(RectangleSize visualViewport) {
+        this.visualViewport = visualViewport;
+    }
+
     public String getRenderId() {
         return renderId;
     }
@@ -107,6 +117,7 @@ public class RenderStatusResults {
                 ", error='" + error + '\'' +
                 ", selectorRegions=" + selectorRegions +
                 ", deviceSize=" + deviceSize +
+                ", visualViewport=" + visualViewport +
                 '}';
     }
 
