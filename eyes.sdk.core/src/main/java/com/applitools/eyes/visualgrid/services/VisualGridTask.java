@@ -105,16 +105,13 @@ public class VisualGridTask implements Callable<TestResultContainer>, Completabl
                     if (renderResult != null) {
                         String userAgent = renderResult.getUserAgent();
                         RectangleSize deviceSize = renderResult.getDeviceSize();
-                        RectangleSize visualViewport = renderResult.getVisualViewport();
                         eyesConnector.setUserAgent(userAgent);
                         eyesConnector.setDeviceSize(deviceSize);
-                        eyesConnector.setVisualViewport(visualViewport);
                     } else {
                         // We are in exception mode - trying to do eyes.open() without first render
                         RenderBrowserInfo browserInfo = runningTest.getBrowserInfo();
                         //eyesConnector.setUserAgent(craftUserAgent(browserInfo));
                         eyesConnector.setDeviceSize(browserInfo.getViewportSize());
-                        eyesConnector.setVisualViewport(browserInfo.getViewportSize());
                     }
                     eyesConnector.open(configuration, runningTest.getAppName(), runningTest.getTestName());
                     logger.verbose("Eyes Open Done.");
@@ -154,7 +151,8 @@ public class VisualGridTask implements Callable<TestResultContainer>, Completabl
                         }
                     }
 
-                    eyesConnector.matchWindow(imageLocation, domLocation, (ICheckSettings) checkSettings, regions, this.regionSelectors, location, renderResult.getRenderId(), source);
+                    eyesConnector.matchWindow(imageLocation, domLocation, (ICheckSettings) checkSettings, regions,
+                            this.regionSelectors, location, renderResult.getRenderId(), source, renderResult.getVisualViewport());
                     logger.verbose("match done");
                     break;
 
@@ -251,7 +249,6 @@ public class VisualGridTask implements Callable<TestResultContainer>, Completabl
         logger.verbose("exit - renderId: " + renderId);
         renderResult = new RenderStatusResults();
         renderResult.setDeviceSize(configuration.getViewportSize());
-        renderResult.setVisualViewport(configuration.getViewportSize());
     }
 
     public Throwable getException() {

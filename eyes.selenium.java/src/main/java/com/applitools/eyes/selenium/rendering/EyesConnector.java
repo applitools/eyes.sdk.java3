@@ -19,7 +19,6 @@ class EyesConnector extends EyesBase implements IEyesConnector, IBatchCloser {
     private String userAgent;
     private String device;
     private RectangleSize deviceSize;
-    private RectangleSize visualViewport;
     private Configuration configuration;
     private String appName;
     private String testName;
@@ -63,7 +62,7 @@ class EyesConnector extends EyesBase implements IEyesConnector, IBatchCloser {
 
     public MatchResult matchWindow(String resultImageURL, String domLocation, ICheckSettings checkSettings,
                                    List<? extends IRegion> regions, List<VisualGridSelector[]> regionSelectors, Location location,
-                                   String renderId, String source) {
+                                   String renderId, String source, RectangleSize virtualViewport) {
 
         ICheckSettingsInternal checkSettingsInternal = (ICheckSettingsInternal) checkSettings;
         if (checkSettingsInternal.getStitchContent() == null) {
@@ -76,7 +75,7 @@ class EyesConnector extends EyesBase implements IEyesConnector, IBatchCloser {
 
         String tag = checkSettingsInternal.getName();
 
-        AppOutput appOutput = new AppOutput(tag, null, domLocation, resultImageURL, visualViewport);
+        AppOutput appOutput = new AppOutput(tag, null, domLocation, resultImageURL, virtualViewport);
         AppOutputWithScreenshot appOutputWithScreenshot = new AppOutputWithScreenshot(appOutput, null);
 
         return matchWindowTask.performMatch(appOutputWithScreenshot, tag, checkSettingsInternal, imageMatchSettings, regions, regionSelectors, this, renderId, source);
@@ -192,11 +191,6 @@ class EyesConnector extends EyesBase implements IEyesConnector, IBatchCloser {
 
     public void setDeviceSize(RectangleSize deviceSize) {
         this.deviceSize = deviceSize;
-    }
-
-    @Override
-    public void setVisualViewport(RectangleSize visualViewport) {
-        this.visualViewport = visualViewport;
     }
 
     public RunningSession getSession() {
