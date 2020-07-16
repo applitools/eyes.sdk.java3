@@ -96,7 +96,7 @@ public abstract class TestSetup extends ReportingTestSuite implements ITest {
 
     protected String testSuitName;
 
-    protected String testedPageUrl = "https://applitools.github.io/demo/TestPages/FramesTestPage/";
+    public static String testedPageUrl = "https://applitools.github.io/demo/TestPages/FramesTestPage/";
     //protected RectangleSize testedPageSize = new RectangleSize(1200, 800);
     protected RectangleSize testedPageSize = new RectangleSize(700, 460);
 

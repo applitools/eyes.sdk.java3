@@ -400,11 +400,12 @@
             </class>
         </classes>
     </test>
-    <test name="TestRenderRequestSerialization" parallel="methods">
+    <test name="TestRenderSerialization" parallel="methods">
         <classes>
-            <class name="com.applitools.eyes.renderingGrid.TestRenderRequestSerialization">
+            <class name="com.applitools.eyes.renderingGrid.TestRenderSerialization">
                 <methods>
-                    <include name="testSerialization"/>
+                    <include name="testRenderRequestSerialization"/>
+                    <include name="testRenderResultSerialization"/>
                 </methods>
             </class>
         </classes>
