@@ -10,6 +10,7 @@ import com.applitools.eyes.capture.ImageProvider;
 import com.applitools.eyes.config.Configuration;
 import com.applitools.eyes.events.ValidationInfo;
 import com.applitools.eyes.events.ValidationResult;
+import com.applitools.eyes.exceptions.TestFailedException;
 import com.applitools.eyes.fluent.ICheckSettingsInternal;
 import com.applitools.eyes.locators.VisualLocatorSettings;
 import com.applitools.eyes.locators.VisualLocatorsProvider;
@@ -20,6 +21,9 @@ import com.applitools.eyes.selenium.EyesDriverUtils;
 import com.applitools.eyes.selenium.positioning.ImageRotation;
 import com.applitools.eyes.selenium.positioning.NullRegionPositionCompensation;
 import com.applitools.eyes.selenium.positioning.RegionPositionCompensation;
+import com.applitools.eyes.selenium.regionVisibility.MoveToRegionVisibilityStrategy;
+import com.applitools.eyes.selenium.regionVisibility.NopRegionVisibilityStrategy;
+import com.applitools.eyes.selenium.regionVisibility.RegionVisibilityStrategy;
 import com.applitools.utils.*;
 import io.appium.java_client.AppiumDriver;
 import org.openqa.selenium.*;
@@ -32,6 +36,7 @@ import java.util.List;
 import java.util.Map;
 
 public class Eyes extends EyesBase {
+    private static final int USE_DEFAULT_MATCH_TIMEOUT = -1;
 
     public static final double UNKNOWN_DEVICE_PIXEL_RATIO = 0;
     public static final double DEFAULT_DEVICE_PIXEL_RATIO = 1;
@@ -49,6 +54,13 @@ public class Eyes extends EyesBase {
     private ImageRotation rotation;
     private Region regionToCheck = null;
     protected WebElement targetElement = null;
+    private PropertyHandler<RegionVisibilityStrategy> regionVisibilityStrategyHandler;
+
+    public Eyes() {
+        super();
+        regionVisibilityStrategyHandler = new SimplePropertyHandler<>();
+        regionVisibilityStrategyHandler.set(new MoveToRegionVisibilityStrategy(logger));
+    }
 
     public WebDriver open(WebDriver driver, Configuration configuration) {
         this.configuration = configuration;
@@ -124,6 +136,23 @@ public class Eyes extends EyesBase {
         return this.driver;
     }
 
+    public void checkWindow() {
+        checkWindow(null);
+    }
+
+    public void checkWindow(String tag) {
+        check(tag, Target.window());
+    }
+
+    public void checkWindow(int matchTimeout, String tag) {
+        check(tag, Target.window().timeout(matchTimeout));
+    }
+
+    public void checkWindow(String tag, boolean fully) {
+        check(tag, Target.window().fully(fully));
+
+    }
+
     public void check(String name, ICheckSettings checkSettings) {
         if (getIsDisabled()) {
             logger.log(String.format("check('%s', %s): Ignored", name, checkSettings));
@@ -150,6 +179,35 @@ public class Eyes extends EyesBase {
         if (driver != null) {
             driver.setRotation(rotation);
         }
+    }
+
+    public void setForceFullPageScreenshot(boolean shouldForce) {
+        configuration.setForceFullPageScreenshot(shouldForce);
+    }
+
+    public boolean getForceFullPageScreenshot() {
+        Boolean forceFullPageScreenshot = configuration.getForceFullPageScreenshot();
+        if (forceFullPageScreenshot == null) {
+            return false;
+        }
+        return forceFullPageScreenshot;
+    }
+
+    public void setScrollToRegion(boolean shouldScroll) {
+        if (shouldScroll) {
+            regionVisibilityStrategyHandler = new ReadOnlyPropertyHandler<RegionVisibilityStrategy>(logger, new MoveToRegionVisibilityStrategy(logger));
+        } else {
+            regionVisibilityStrategyHandler = new ReadOnlyPropertyHandler<RegionVisibilityStrategy>(logger, new NopRegionVisibilityStrategy(logger));
+        }
+    }
+
+    /**
+     * Gets scroll to region.
+     * @return Whether to automatically scroll to a region being validated.
+     */
+    @SuppressWarnings("BooleanMethodIsAlwaysInverted")
+    public boolean getScrollToRegion() {
+        return !(regionVisibilityStrategyHandler.get() instanceof NopRegionVisibilityStrategy);
     }
 
     protected UserAgent getUserAgent() {
@@ -216,6 +274,7 @@ public class Eyes extends EyesBase {
         if (driver instanceof AppiumDriver) {
             logger.verbose("Found an instance of AppiumDriver, so using EyesAppiumDriver instead");
             this.driver = new EyesAppiumDriver(logger, (AppiumDriver) driver);
+            regionVisibilityStrategyHandler.set(new NopRegionVisibilityStrategy(logger));
         } else {
             logger.verbose("Did not find an instance of AppiumDriver, using regular logic");
         }
@@ -461,6 +520,30 @@ public class Eyes extends EyesBase {
         }, name, false, checkSettings);
     }
 
+    public void checkElement(WebElement element) {
+        checkElement(element, null);
+    }
+
+    public void checkElement(WebElement element, String tag) {
+        checkElement(element, USE_DEFAULT_MATCH_TIMEOUT, tag);
+    }
+
+    public void checkElement(WebElement element, int matchTimeout, String tag) {
+        check(tag, Target.region(element).timeout(matchTimeout).fully());
+    }
+
+    public void checkElement(By selector) {
+        checkElement(selector, USE_DEFAULT_MATCH_TIMEOUT, null);
+    }
+
+    public void checkElement(By selector, String tag) {
+        checkElement(selector, USE_DEFAULT_MATCH_TIMEOUT, tag);
+    }
+
+    public void checkElement(By selector, int matchTimeout, String tag) {
+        check(tag, Target.region(selector).timeout(matchTimeout).fully());
+    }
+
     private WebElement getTargetElement(AppiumCheckSettings seleniumCheckTarget) {
         assert seleniumCheckTarget != null;
         By targetSelector = seleniumCheckTarget.getTargetSelector();
@@ -565,6 +648,72 @@ public class Eyes extends EyesBase {
         logger.verbose("Done! trying to scroll back to original position.");
 
         return result;
+    }
+
+    public void checkRegion(Region region) {
+        checkRegion(region, USE_DEFAULT_MATCH_TIMEOUT, null);
+    }
+
+    public void checkRegion(final Region region, int matchTimeout, String tag) throws TestFailedException {
+        if (getIsDisabled()) {
+            getLogger().log(String.format("checkRegion([%s], %d, '%s'): Ignored", region, matchTimeout, tag));
+            return;
+        }
+
+        ArgumentGuard.notNull(region, "region");
+
+        getLogger().verbose(String.format("checkRegion([%s], %d, '%s')", region, matchTimeout, tag));
+
+        check(Target.region(region).timeout(matchTimeout).withName(tag));
+    }
+
+    public void checkRegion(WebElement element) {
+        checkRegion(element, USE_DEFAULT_MATCH_TIMEOUT, null, true);
+    }
+
+    public void checkRegion(WebElement element, String tag, boolean stitchContent) {
+        checkRegion(element, USE_DEFAULT_MATCH_TIMEOUT, tag, stitchContent);
+    }
+
+    public void checkRegion(final WebElement element, int matchTimeout, String tag) {
+        checkRegion(element, matchTimeout, tag, true);
+    }
+
+    public void checkRegion(WebElement element, int matchTimeout, String tag, boolean stitchContent) {
+        if (getIsDisabled()) {
+            getLogger().log(String.format("checkRegion([%s], %d, '%s'): Ignored", element, matchTimeout, tag));
+            return;
+        }
+
+        ArgumentGuard.notNull(element, "element");
+
+        getLogger().verbose(String.format("checkRegion([%s], %d, '%s')", element, matchTimeout, tag));
+
+        check(Target.region(element).timeout(matchTimeout).withName(tag).fully(stitchContent));
+    }
+
+    public void checkRegion(By selector) {
+        checkRegion(selector, USE_DEFAULT_MATCH_TIMEOUT, null, false);
+    }
+
+    public void checkRegion(By selector, boolean stitchContent) {
+        checkRegion(selector, USE_DEFAULT_MATCH_TIMEOUT, null, stitchContent);
+    }
+
+    public void checkRegion(By selector, String tag) {
+        checkRegion(selector, USE_DEFAULT_MATCH_TIMEOUT, tag, true);
+    }
+
+    public void checkRegion(By selector, String tag, boolean stitchContent) {
+        checkRegion(selector, USE_DEFAULT_MATCH_TIMEOUT, tag, stitchContent);
+    }
+
+    public void checkRegion(By selector, int matchTimeout, String tag) {
+        checkRegion(selector, matchTimeout, tag, true);
+    }
+
+    public void checkRegion(By selector, int matchTimeout, String tag, boolean stitchContent) {
+        check(tag, Target.region(selector).timeout(matchTimeout).fully(stitchContent));
     }
 
     @Override

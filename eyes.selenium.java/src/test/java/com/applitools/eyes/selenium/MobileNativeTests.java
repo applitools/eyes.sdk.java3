@@ -2,7 +2,7 @@ package com.applitools.eyes.selenium;
 
 import com.applitools.eyes.selenium.fluent.Target;
 import com.applitools.eyes.utils.ReportingTestSuite;
-import com.applitools.eyes.utils.TestUtils;
+import com.applitools.eyes.utils.SeleniumTestUtils;
 import io.appium.java_client.MobileBy;
 import io.appium.java_client.MobileElement;
 import io.appium.java_client.android.AndroidDriver;
@@ -31,7 +31,7 @@ public class MobileNativeTests extends ReportingTestSuite {
     private Eyes initEyes(DesiredCapabilities capabilities) {
         Eyes eyes = new Eyes();
         String testName = Thread.currentThread().getStackTrace()[2].getMethodName();
-        TestUtils.setupLogging(eyes, testName);
+        SeleniumTestUtils.setupLogging(eyes, testName);
         setCapabilities(eyes, capabilities, testName);
         eyes.setBatch(TestDataProvider.batchInfo);
         return eyes;
