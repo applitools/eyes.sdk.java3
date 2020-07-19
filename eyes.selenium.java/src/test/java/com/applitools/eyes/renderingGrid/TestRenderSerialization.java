@@ -5,7 +5,6 @@ import com.applitools.eyes.*;
 import com.applitools.eyes.selenium.BrowserType;
 import com.applitools.eyes.selenium.Eyes;
 import com.applitools.eyes.selenium.TestDomCapture;
-import com.applitools.eyes.selenium.TestSetup;
 import com.applitools.eyes.selenium.fluent.Target;
 import com.applitools.eyes.utils.SeleniumUtils;
 import com.applitools.eyes.visualgrid.model.*;
@@ -93,7 +92,7 @@ public class TestRenderSerialization {
         Eyes eyes = new Eyes(runner);
         eyes.setServerConnector(serverConnector);
         WebDriver driver = SeleniumUtils.createChromeDriver();
-        driver.get(TestSetup.testedPageUrl);
+        driver.get("https://applitools.github.io/demo/TestPages/FramesTestPage/");
         try {
             eyes.open(driver, "Applitools Eyes SDK", "testRenderResultSerialization", new RectangleSize(800, 800));
             eyes.checkWindow();
