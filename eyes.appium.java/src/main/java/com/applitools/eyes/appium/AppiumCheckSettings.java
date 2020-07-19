@@ -1,5 +1,6 @@
 package com.applitools.eyes.appium;
 
+import com.applitools.ICheckSettings;
 import com.applitools.eyes.AccessibilityRegionType;
 import com.applitools.eyes.Logger;
 import com.applitools.eyes.Region;
@@ -9,6 +10,7 @@ import com.applitools.eyes.appium.fluent.SimpleRegionByElement;
 import com.applitools.eyes.fluent.CheckSettings;
 import com.applitools.eyes.fluent.GetRegion;
 import com.applitools.eyes.selenium.EyesWebDriver;
+import com.applitools.eyes.selenium.fluent.AccessibilityRegionBySelector;
 import com.applitools.eyes.selenium.fluent.ImplicitInitiation;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
@@ -143,6 +145,12 @@ public class AppiumCheckSettings extends CheckSettings implements ImplicitInitia
         return clone;
     }
 
+    public AppiumCheckSettings accessibility(By regionSelector, AccessibilityRegionType regionType) {
+        AppiumCheckSettings clone = clone();
+        clone.accessibility_(new AccessibilityRegionBySelector(regionSelector, regionType));
+        return clone;
+    }
+
     public AppiumCheckSettings accessibility(WebElement element, AccessibilityRegionType regionType) {
         AppiumCheckSettings clone = clone();
         clone.accessibility(new AccessibilityRegionByElement(element, regionType));
@@ -194,5 +202,15 @@ public class AppiumCheckSettings extends CheckSettings implements ImplicitInitia
 
     public WebElement getTargetElement() {
         return this.targetElement;
+    }
+
+    @Override
+    public AppiumCheckSettings fully() {
+        return (AppiumCheckSettings) super.fully();
+    }
+
+    @Override
+    public AppiumCheckSettings fully(Boolean fully) {
+        return (AppiumCheckSettings) super.fully(fully);
     }
 }

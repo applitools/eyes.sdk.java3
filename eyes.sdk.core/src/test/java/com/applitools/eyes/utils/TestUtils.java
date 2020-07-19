@@ -5,7 +5,6 @@ import com.applitools.connectivity.ServerConnector;
 import com.applitools.eyes.*;
 import com.applitools.eyes.metadata.ActualAppOutput;
 import com.applitools.eyes.metadata.SessionResults;
-import com.applitools.eyes.selenium.Eyes;
 import com.applitools.utils.ArgumentGuard;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -59,24 +58,6 @@ public class TestUtils {
 
     public static LogHandler initLogger(String methodName) {
         return initLogger(methodName, null);
-    }
-
-    public static void setupLogging(Eyes eyes) {
-        setupLogging(eyes, Thread.currentThread().getStackTrace()[2].getMethodName());
-    }
-
-    public static void setupLogging(Eyes eyes, String methodName) {
-        LogHandler logHandler;
-        if (!TestUtils.runOnCI && logsPath != null) {
-            String path = initLogPath(methodName);
-            logHandler = new FileLogger(path + File.separator + methodName + ".log", false, true);
-            eyes.setDebugScreenshotsPath(path);
-            eyes.setDebugScreenshotsPrefix(methodName + "_");
-            eyes.setSaveDebugScreenshots(true);
-        } else {
-            logHandler = new StdoutLogHandler(verboseLogs);
-        }
-        eyes.setLogHandler(logHandler);
     }
 
     public static SessionResults getSessionResults(String apiKey, TestResults results) throws java.io.IOException {

@@ -5,6 +5,7 @@ import com.applitools.eyes.TestResultsSummary;
 import com.applitools.eyes.config.Configuration;
 import com.applitools.eyes.selenium.fluent.Target;
 import com.applitools.eyes.utils.ReportingTestSuite;
+import com.applitools.eyes.utils.SeleniumTestUtils;
 import com.applitools.eyes.utils.SeleniumUtils;
 import com.applitools.eyes.utils.TestUtils;
 import com.applitools.eyes.visualgrid.model.RenderBrowserInfo;
@@ -24,7 +25,7 @@ public final class TestCounts extends ReportingTestSuite {
         webDriver.get("https://applitools.com/helloworld");
         VisualGridRunner runner = new VisualGridRunner(10);
         Eyes eyes = new Eyes(runner);
-        TestUtils.setupLogging(eyes);
+        SeleniumTestUtils.setupLogging(eyes);
         eyes.setSendDom(false);
         return new TestObjects(webDriver, runner, eyes);
     }

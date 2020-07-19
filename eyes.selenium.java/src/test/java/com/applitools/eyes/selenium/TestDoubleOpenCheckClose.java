@@ -1,7 +1,7 @@
 package com.applitools.eyes.selenium;
 
 import com.applitools.eyes.selenium.fluent.Target;
-import com.applitools.eyes.utils.TestUtils;
+import com.applitools.eyes.utils.SeleniumTestUtils;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.remote.RemoteWebDriver;
@@ -16,7 +16,7 @@ public class TestDoubleOpenCheckClose {
     @Test
     public void TestDoubleOpenCheckCloseOnSauceLabs() throws MalformedURLException {
         Eyes eyes = new Eyes();
-        TestUtils.setupLogging(eyes);
+        SeleniumTestUtils.setupLogging(eyes);
         eyes.setSendDom(false);
         eyes.setBatch(TestDataProvider.batchInfo);
 

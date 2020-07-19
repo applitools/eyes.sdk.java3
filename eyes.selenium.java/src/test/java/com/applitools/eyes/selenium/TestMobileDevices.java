@@ -2,10 +2,7 @@ package com.applitools.eyes.selenium;
 
 import com.applitools.eyes.TestResults;
 import com.applitools.eyes.selenium.fluent.Target;
-import com.applitools.eyes.utils.ChromeMobileEmulationDeviceSettings;
-import com.applitools.eyes.utils.ReportingTestSuite;
-import com.applitools.eyes.utils.SeleniumUtils;
-import com.applitools.eyes.utils.TestUtils;
+import com.applitools.eyes.utils.*;
 import org.openqa.selenium.ScreenOrientation;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
@@ -50,7 +47,7 @@ public class TestMobileDevices extends ReportingTestSuite implements ITest {
 
         String testName = getTestName(deviceName, platformVersion, deviceOrientation, page);
 
-        TestUtils.setupLogging(eyes, testName);
+        SeleniumTestUtils.setupLogging(eyes, testName);
 
         eyes.getLogger().log(testName);
         WebDriver driver = initEyesSimulation(deviceName, platformVersion, deviceOrientation, testName + " " + eyes.getFullAgentId(), platformName, browserName);
