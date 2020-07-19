@@ -63,21 +63,16 @@ class EyesConnector extends EyesBase implements IEyesConnector, IBatchCloser {
     public MatchResult matchWindow(String resultImageURL, String domLocation, ICheckSettings checkSettings,
                                    List<? extends IRegion> regions, List<VisualGridSelector[]> regionSelectors, Location location,
                                    String renderId, String source, RectangleSize virtualViewport) {
-
         ICheckSettingsInternal checkSettingsInternal = (ICheckSettingsInternal) checkSettings;
         if (checkSettingsInternal.getStitchContent() == null) {
             checkSettings.fully();
         }
 
         MatchWindowTask matchWindowTask = new MatchWindowTask(this.logger, this.serverConnector, this.runningSession, getConfiguration().getMatchTimeout(), this);
-
         ImageMatchSettings imageMatchSettings = MatchWindowTask.createImageMatchSettings(checkSettingsInternal, this);
-
         String tag = checkSettingsInternal.getName();
-
         AppOutput appOutput = new AppOutput(tag, null, domLocation, resultImageURL, virtualViewport);
-        AppOutputWithScreenshot appOutputWithScreenshot = new AppOutputWithScreenshot(appOutput, null);
-
+        AppOutputWithScreenshot appOutputWithScreenshot = new AppOutputWithScreenshot(appOutput, null, location);
         return matchWindowTask.performMatch(appOutputWithScreenshot, tag, checkSettingsInternal, imageMatchSettings, regions, regionSelectors, this, renderId, source);
     }
 
