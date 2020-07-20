@@ -54,6 +54,10 @@ jobs:
           fi
         - chmod +x ./runTests.sh
         - ./runTests.sh
+    - stage: generic
+      script:
+        - cd generic.tests
+        - yarn java
     - stage: deploy
       if: tag =~ ^RELEASE_CANDIDATE AND fork == false
       script:

@@ -27,3 +27,13 @@ eyes.selenium.java/src/main/resources/processResource.js
 .project
 .classpath
 venv
+
+# sdk-coverage-tests
+**/test/java/coverage/generic/
+coverage-test-report.xml
+coverage-tests-metadata.json
+
+# yarn
+.yarn
+# Dependency directory
+node_modules
