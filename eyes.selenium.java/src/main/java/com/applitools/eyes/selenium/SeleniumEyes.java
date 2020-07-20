@@ -1938,20 +1938,22 @@ public class SeleniumEyes extends EyesBase implements ISeleniumEyes, IBatchClose
         return result;
     }
 
-    private BufferedImage cropIfNeeded(BufferedImage entireFrameOrElement) {
+    private BufferedImage cropIfNeeded(BufferedImage image) {
         int maxImageHeight = renderInfo.getMaxImageHeight();
         int maxImageArea = renderInfo.getMaxImageArea();
-        if (entireFrameOrElement.getHeight() <= maxImageHeight &&
-                entireFrameOrElement.getWidth() * entireFrameOrElement.getHeight() <= maxImageArea) {
-            return entireFrameOrElement;
+        if (image.getHeight() <= maxImageHeight &&
+                image.getWidth() * image.getHeight() <= maxImageArea) {
+            return image;
         }
 
-        int  trimmedHeight = Math.min(maxImageArea / entireFrameOrElement.getWidth(), maxImageHeight);
-        Region newRegion = new Region(0, 0, entireFrameOrElement.getWidth(), trimmedHeight);
+        int  trimmedHeight = Math.min(maxImageArea / image.getWidth(), maxImageHeight);
+        Region newRegion = new Region(0, 0, image.getWidth(), trimmedHeight);
         if (newRegion.isSizeEmpty()) {
-            return entireFrameOrElement;
+            return image;
         }
-        return ImageUtils.cropImage(logger, entireFrameOrElement, newRegion);
+        image = ImageUtils.cropImage(logger, image, newRegion);
+        debugScreenshotsProvider.save(image, "final");
+        return image;
     }
 
     private EyesWebDriverScreenshot getElementScreenshot(ScaleProviderFactory scaleProviderFactory, EyesTargetLocator switchTo) {

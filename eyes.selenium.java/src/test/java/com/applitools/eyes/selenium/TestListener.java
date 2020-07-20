@@ -53,7 +53,6 @@ public class TestListener implements ITestListener {
         if (instance instanceof TestSetup) {
             TestSetup testSetup = (TestSetup) instance;
             GeneralUtils.logExceptionStackTrace(testSetup.getEyes().getLogger(), result.getThrowable());
-            result.setStatus(ITestResult.FAILURE);
             afterMethodFailure(testSetup);
         }
     }
@@ -68,7 +67,6 @@ public class TestListener implements ITestListener {
         //System.out.println("onTestFailedButWithinSuccessPercentage");
         Object instance = result.getInstance();
         if (instance instanceof TestSetup) {
-            result.setStatus(ITestResult.FAILURE);
             afterMethodFailure((TestSetup) instance);
         }
     }
