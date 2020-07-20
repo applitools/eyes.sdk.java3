@@ -30,15 +30,12 @@ public class FullPageCaptureAlgorithm {
     private final int stitchingOverlap;
     private final ImageProvider imageProvider;
     private final ISizeAdjuster sizeAdjuster;
-    private final int maxScreenshotHeight;
-    private final int maxScreenshotArea;
 
     public FullPageCaptureAlgorithm(Logger logger, RegionPositionCompensation regionPositionCompensation,
                                     int waitBeforeScreenshots, DebugScreenshotsProvider debugScreenshotsProvider,
                                     EyesScreenshotFactory screenshotFactory, PositionProvider originProvider,
                                     ScaleProviderFactory scaleProviderFactory, CutProvider cutProvider,
-                                    int stitchingOverlap, ImageProvider imageProvider, ISizeAdjuster sizeAdjuster,
-                                    int maxScreenshotHeight, int maxScreenshotArea) {
+                                    int stitchingOverlap, ImageProvider imageProvider, ISizeAdjuster sizeAdjuster) {
 
         ArgumentGuard.notNull(logger, "logger");
 
@@ -52,8 +49,6 @@ public class FullPageCaptureAlgorithm {
         this.stitchingOverlap = stitchingOverlap;
         this.imageProvider = imageProvider;
         this.sizeAdjuster = sizeAdjuster != null ? sizeAdjuster : NullSizeAdjuster.getInstance();
-        this.maxScreenshotHeight = maxScreenshotHeight;
-        this.maxScreenshotArea = maxScreenshotArea;
 
         this.regionPositionCompensation =
                 regionPositionCompensation != null
@@ -207,13 +202,6 @@ public class FullPageCaptureAlgorithm {
 
         positionProvider.restoreState(originalStitchedState);
         originProvider.restoreState(originalPosition);
-
-        if (stitchedImage.getHeight() > maxScreenshotHeight || stitchedImage.getWidth() * stitchedImage.getHeight() > maxScreenshotArea)
-        {
-            int  trimmedHeight = Math.min(maxScreenshotArea / stitchedImage.getWidth(), maxScreenshotHeight);
-            Region newRegion = new Region(0, 0, stitchedImage.getWidth(), trimmedHeight);
-            stitchedImage = cropScreenshot(stitchedImage, newRegion);
-        }
 
         return stitchedImage;
     }
