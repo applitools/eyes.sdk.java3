@@ -91,6 +91,7 @@
         <module>eyes.sdk.core</module>
         <module>eyes.images.java</module>
         <module>eyes.selenium.java</module>
+        <module>generic.tests</module>
 <!--        <module>eyes.sdk.distribution</module>-->
 <!--        <module>eyes.sdk.distribution.images</module>-->
     </modules>
