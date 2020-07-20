@@ -79,6 +79,10 @@ public class Eyes implements IEyesBase {
     }
 
     private void initLocatorProvider(WebDriver webDriver) {
+        if (!(webDriver instanceof EyesSeleniumDriver)) {
+            webDriver = new EyesSeleniumDriver(getLogger(), seleniumEyes, (RemoteWebDriver) webDriver);
+        }
+
         visualLocatorsProvider = new SeleniumVisualLocatorsProvider(
                 seleniumEyes,
                 (EyesSeleniumDriver) webDriver,
