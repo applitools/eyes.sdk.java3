@@ -1,11 +1,13 @@
 package com.applitools.eyes.demo;
 
 import com.applitools.eyes.*;
+import com.applitools.eyes.exceptions.DiffsFoundException;
 import com.applitools.eyes.selenium.ClassicRunner;
 import com.applitools.eyes.selenium.Eyes;
 import com.applitools.eyes.utils.ReportingTestSuite;
 import com.applitools.eyes.utils.SeleniumUtils;
 import com.applitools.eyes.visualgrid.services.VisualGridRunner;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -62,6 +64,30 @@ public class BasicDemoJunit extends ReportingTestSuite {
             driver.quit();
             TestResultsSummary allTestResults = runner.getAllTestResults();
             System.out.println(allTestResults);
+        }
+    }
+
+    @Test
+    public void mismatchDemo() {
+        EyesRunner runner = useVisualGrid ? new VisualGridRunner(10) : new ClassicRunner();
+        String suffix = useVisualGrid ? "_VG" : "";
+        Eyes eyes = new Eyes(runner);
+        eyes.setLogHandler(logger);
+        try {
+            eyes.open(driver, "Demo App", "Mismatch Demo" + suffix, new RectangleSize(800, 800));
+
+            // Navigate the browser to the "ACME" demo app.
+            driver.get("https://applitools.github.io/demo/TestPages/SpecialCases/everchanging.html");
+            eyes.checkWindow();
+            eyes.closeAsync();
+            runner.getAllTestResults();
+            Assert.fail("Expected exception to be thrown");
+        } catch (DiffsFoundException ignored) {}
+        catch (Error e) {
+            Assert.assertTrue(e.getCause() instanceof DiffsFoundException);
+        }
+        finally {
+            driver.quit();
         }
     }
 }

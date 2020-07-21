@@ -333,6 +333,7 @@
                     <include name="testDebugScreenshot"/>
                     <include name="testChangeTabs"/>
                     <include name="testScreenshotTooBig"/>
+                    <include name="testConfiguration"/>
                 </methods>
             </class>
         </classes>
@@ -378,6 +379,7 @@
             <class name="com.applitools.eyes.demo.BasicDemoJunit">
                 <methods>
                     <include name="basicDemo"/>
+                    <include name="mismatchDemo"/>
                 </methods>
             </class>
         </classes>

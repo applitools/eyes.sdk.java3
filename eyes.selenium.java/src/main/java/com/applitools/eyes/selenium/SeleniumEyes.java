@@ -33,7 +33,6 @@ import com.applitools.eyes.selenium.wrappers.EyesRemoteWebElement;
 import com.applitools.eyes.selenium.wrappers.EyesTargetLocator;
 import com.applitools.eyes.selenium.wrappers.EyesWebDriver;
 import com.applitools.eyes.triggers.MouseAction;
-import com.applitools.eyes.visualgrid.model.RenderingInfo;
 import com.applitools.utils.*;
 import org.openqa.selenium.*;
 import org.openqa.selenium.remote.RemoteWebDriver;
@@ -1931,12 +1930,30 @@ public class SeleniumEyes extends EyesBase implements ISeleniumEyes, IBatchClose
                     ((ISeleniumPositionProvider) positionProvider).getScrolledElement());
         }
         entireFrameOrElement = algo.getStitchedRegion(regionToCheck, fullRegionToCheck, positionProvider);
-
+        entireFrameOrElement = cropIfNeeded(entireFrameOrElement);
         logger.verbose("Building screenshot object...");
         RectangleSize size = new RectangleSize(entireFrameOrElement.getWidth(), entireFrameOrElement.getHeight());
         Location frameLocationInScreenshot = new Location(-regionToCheck.getLeft(), -regionToCheck.getTop());
         result = new EyesWebDriverScreenshot(logger, driver, entireFrameOrElement, size, frameLocationInScreenshot);
         return result;
+    }
+
+    private BufferedImage cropIfNeeded(BufferedImage image) {
+        int maxImageHeight = renderInfo.getMaxImageHeight();
+        int maxImageArea = renderInfo.getMaxImageArea();
+        if (image.getHeight() <= maxImageHeight &&
+                image.getWidth() * image.getHeight() <= maxImageArea) {
+            return image;
+        }
+
+        int  trimmedHeight = Math.min(maxImageArea / image.getWidth(), maxImageHeight);
+        Region newRegion = new Region(0, 0, image.getWidth(), trimmedHeight);
+        if (newRegion.isSizeEmpty()) {
+            return image;
+        }
+        image = ImageUtils.cropImage(logger, image, newRegion);
+        debugScreenshotsProvider.save(image, "final");
+        return image;
     }
 
     private EyesWebDriverScreenshot getElementScreenshot(ScaleProviderFactory scaleProviderFactory, EyesTargetLocator switchTo) {
@@ -2002,11 +2019,11 @@ public class SeleniumEyes extends EyesBase implements ISeleniumEyes, IBatchClose
         WebElement scrollRootElement = getCurrentFrameScrollRootElement();
         PositionProvider originProvider = ScrollPositionProviderFactory.getScrollPositionProvider(userAgent, logger, jsExecutor, scrollRootElement);
         ISizeAdjuster sizeAdjuster = ImageProviderFactory.getImageSizeAdjuster(userAgent, jsExecutor);
-        RenderingInfo renderingInfo = getRenderingInfo();
+        getRenderingInfo();
         return new FullPageCaptureAlgorithm(logger, regionPositionCompensation,
                 getConfiguration().getWaitBeforeScreenshots(), debugScreenshotsProvider, screenshotFactory,
                 originProvider, scaleProviderFactory, cutProviderHandler.get(), getConfiguration().getStitchOverlap(),
-                imageProvider, sizeAdjuster, renderingInfo.getMaxImageHeight(), renderingInfo.getMaxImageArea());
+                imageProvider, sizeAdjuster);
     }
 
     @Override

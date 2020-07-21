@@ -84,7 +84,7 @@ public class TestListener implements ITestListener {
             if (testSetup.getDriver() != null) {
                 testSetup.getDriver().quit();
             }
-            testSetup.getRunner().getAllTestResults();
+            testSetup.getRunner().getAllTestResults(false);
         }
     }
 

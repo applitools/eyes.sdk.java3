@@ -70,7 +70,7 @@ public class RenderingTask implements Callable<RenderStatusResults>, Completable
     Phaser resourcesPhaser = new Phaser();
 
     // Listener for putResource tasks
-    private TaskListener<Boolean> putListener = new TaskListener<Boolean>() {
+    final TaskListener<Boolean> putListener = new TaskListener<Boolean>() {
         @Override
         public void onComplete(Boolean isSucceeded) {
             try {
@@ -363,7 +363,7 @@ public class RenderingTask implements Callable<RenderStatusResults>, Completable
         logger.verbose("exit");
     }
 
-    private void createPutFutures(RunningRender runningRender, Map<String, RGridResource> resources) {
+    void createPutFutures(RunningRender runningRender, Map<String, RGridResource> resources) {
         List<String> needMoreResources = runningRender.getNeedMoreResources();
         for (String url : needMoreResources) {
             if (putResourceCache.containsKey(url)) {

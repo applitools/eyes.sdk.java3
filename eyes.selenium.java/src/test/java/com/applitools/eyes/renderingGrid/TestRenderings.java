@@ -3,10 +3,8 @@ package com.applitools.eyes.renderingGrid;
 import com.applitools.connectivity.ServerConnector;
 import com.applitools.eyes.*;
 import com.applitools.eyes.config.Configuration;
-import com.applitools.eyes.metadata.SessionResults;
 import com.applitools.eyes.selenium.BrowserType;
 import com.applitools.eyes.selenium.Eyes;
-import com.applitools.eyes.selenium.StitchMode;
 import com.applitools.eyes.selenium.TestDataProvider;
 import com.applitools.eyes.selenium.fluent.Target;
 import com.applitools.eyes.utils.ReportingTestSuite;
@@ -20,14 +18,9 @@ import org.testng.Assert;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
-
-import static org.mockito.Matchers.any;
-import static org.mockito.Mockito.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.spy;
 
 public class TestRenderings extends ReportingTestSuite {
 
@@ -56,7 +49,7 @@ public class TestRenderings extends ReportingTestSuite {
         eyes.check("Test Mobile Only", Target.window().fully());
         driver.quit();
         eyes.close();
-        TestResultsSummary allResults = runner.getAllTestResults();
+        runner.getAllTestResults();
     }
 
     @DataProvider
@@ -86,13 +79,6 @@ public class TestRenderings extends ReportingTestSuite {
         sconf.addBrowser(1200, 800, BrowserType.CHROME);
         sconf.addBrowser(1200, 800, BrowserType.FIREFOX);
 
-        // Edge doesn't support Shadow-DOM - returns an empty image.
-        //sconf.AddBrowser(1200, 800, BrowserType.EDGE);
-
-        // Internet Explorer doesn't support Shadow-DOM - fails to render and throws an error.
-        //sconf.AddBrowser(1200, 800, BrowserType.IE_11);
-        //sconf.AddBrowser(1200, 800, BrowserType.IE_10);
-
         eyes.setConfiguration(sconf);
         ChromeDriver driver = SeleniumUtils.createChromeDriver();
         eyes.open(driver);
@@ -105,7 +91,7 @@ public class TestRenderings extends ReportingTestSuite {
         eyes.check(testName, Target.window().fully());
         driver.quit();
         eyes.close(false);
-        TestResultsSummary allResults = runner.getAllTestResults(false);
+        runner.getAllTestResults(false);
     }
 
     @Test
@@ -157,7 +143,7 @@ public class TestRenderings extends ReportingTestSuite {
     @Test
     public void testRenderFail() {
         ServerConnector serverConnector = spy(ServerConnector.class);
-        doThrow(new IllegalStateException()).when(serverConnector).render((RenderRequest) any());
+        doThrow(new IllegalStateException()).when(serverConnector).render(any(RenderRequest.class));
 
         EyesRunner runner = new VisualGridRunner(10);
         Eyes eyes = new Eyes(runner);
@@ -177,11 +163,10 @@ public class TestRenderings extends ReportingTestSuite {
                 Assert.fail("Expected an exception to be thrown");
             } catch (Throwable t) {
                 if (t instanceof AssertionError) {
-                    throw  t;
+                    throw t;
                 }
                 Assert.assertTrue(t.getCause() instanceof InstantiationError);
             }
-
         }
     }
 }

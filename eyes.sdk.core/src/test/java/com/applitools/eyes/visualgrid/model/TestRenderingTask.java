@@ -1,5 +1,9 @@
 package com.applitools.eyes.visualgrid.model;
 
+import com.applitools.connectivity.ServerConnector;
+import com.applitools.connectivity.TestServerConnector;
+import com.applitools.connectivity.api.*;
+import com.applitools.eyes.Logger;
 import com.applitools.eyes.TaskListener;
 import com.applitools.eyes.UserAgent;
 import com.applitools.eyes.utils.ReportingTestSuite;
@@ -7,6 +11,7 @@ import com.applitools.eyes.visualgrid.services.IEyesConnector;
 import com.applitools.eyes.visualgrid.services.VisualGridTask;
 import com.applitools.utils.GeneralUtils;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.apache.http.HttpStatus;
 import org.mockito.ArgumentMatchers;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
@@ -65,9 +70,9 @@ public class TestRenderingTask extends ReportingTestSuite {
 
         // When RenderingTask tries to get a new resource, this task will be submitted to the ExecutorService
         when(eyesConnector.getResource(ArgumentMatchers.<URI>any(), anyString(), anyString(), ArgumentMatchers.<TaskListener<RGridResource>>any()))
-                .thenAnswer(new Answer<Object>() {
+                .thenAnswer(new Answer<Future<?>>() {
             @Override
-            public Object answer(final InvocationOnMock invocationOnMock) throws Throwable {
+            public Future<?> answer(final InvocationOnMock invocationOnMock) throws Throwable {
                 try {
                     service.submit(new Runnable() {
                         @Override
@@ -104,6 +109,87 @@ public class TestRenderingTask extends ReportingTestSuite {
         renderingTask.fetchAllResources(allBlobs, resourceUrls, frameData);
         renderingTask.resourcesPhaser.awaitAdvanceInterruptibly(0, 30, TimeUnit.SECONDS);
         Assert.assertEquals(counter.get(), 8);
+    }
+
+    @Test
+    public void testPutResources() throws Exception {
+        final ServerConnector serverConnector = TestServerConnector.getOfflineServerConnector(null,
+                new AsyncRequest(new Logger()) {
+                    @Override
+                    public AsyncRequest header(String name, String value) {
+                        return this;
+                    }
+
+                    @Override
+                    public Future<?> method(String method, AsyncRequestCallback callback, Object data, String contentType, boolean logIfError) {
+                        callback.onComplete(new Response(new Logger()) {
+                            @Override
+                            public int getStatusCode() {
+                                return HttpStatus.SC_OK;
+                            }
+
+                            @Override
+                            public String getStatusPhrase() {
+                                return "";
+                            }
+
+                            @Override
+                            public String getHeader(String name, boolean ignoreCase) {
+                                return "";
+                            }
+
+                            @Override
+                            public String getBodyString() {
+                                return "content";
+                            }
+
+                            @Override
+                            protected void readEntity() {}
+
+
+                            @Override
+                            public void close() {}
+                        });
+                        return null;
+                    }
+                });
+        RenderingInfo renderingInfo = new RenderingInfo("", "", "", "", 0, 0);
+        serverConnector.setRenderingInfo(renderingInfo);
+
+        final Future<?> future = mock(Future.class);
+        when(future.get()).thenThrow(new IllegalStateException());
+        when(future.get(anyLong(), (TimeUnit) any())).thenThrow(new IllegalStateException());
+        VisualGridTask visualGridTask = mock(VisualGridTask.class);
+        IEyesConnector eyesConnector = mock(IEyesConnector.class);
+        when(visualGridTask.getEyesConnector()).thenReturn(eyesConnector);
+        UserAgent userAgent = mock(UserAgent.class);
+        when(userAgent.getOriginalUserAgentString()).thenReturn("");
+        final RenderingTask renderingTask = new RenderingTask(eyesConnector, Collections.singletonList(visualGridTask), userAgent);
+
+        when(eyesConnector.renderPutResource(any(RunningRender.class), any(RGridResource.class), anyString(), ArgumentMatchers.<TaskListener<Boolean>>any()))
+                .thenAnswer(new Answer<Future<?>>() {
+                    @Override
+                    public Future<?> answer(InvocationOnMock invocation) throws Throwable {
+                        serverConnector.renderPutResource(
+                                (RunningRender) invocation.getArgument(0),
+                                (RGridResource) invocation.getArgument(1),
+                                (String) invocation.getArgument(2),
+                                (TaskListener<Boolean>) invocation.getArgument(3));
+                        return future;
+                    }
+                });
+
+
+        RunningRender runningRender = new RunningRender();
+        runningRender.setRenderId("");
+        runningRender.setNeedMoreResources(Arrays.asList("1", "2", "3"));
+        Map<String, RGridResource> resourceMap = new HashMap<>();
+        resourceMap.put("1", new RGridResource("1", "", "1".getBytes()));
+        resourceMap.put("2", new RGridResource("2", "", "2".getBytes()));
+        resourceMap.put("3", new RGridResource("3", "", "3".getBytes()));
+        resourceMap.put("4", new RGridResource("4", "", "4".getBytes()));
+        renderingTask.createPutFutures(runningRender, resourceMap);
+        renderingTask.resourcesPhaser.awaitAdvanceInterruptibly(0, 30, TimeUnit.SECONDS);
     }
 
     /**
