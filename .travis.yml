@@ -55,8 +55,8 @@ jobs:
         - if [[ $TRAVIS_TAG =~ ^FULL_COVERAGE_TESTS ]]; then
           sed -i 's/regressionTestsSuite.xml/devTestsSuite.xml/g' $TRAVIS_BUILD_DIR/eyes.selenium.java/pom.xml;
           fi
-#        - chmod +x ./runTests.sh
-#        - ./runTests.sh
+        - chmod +x ./runTests.sh
+        - ./runTests.sh
     - stage: generic
       script:
         - cd eyes.selenium.java;
