@@ -182,7 +182,6 @@ module.exports = [
   {
     name: 'TestCheckRegionInAVeryBigFrame',
     executionMode: {isScrollStitching: true},
-    disabled: true,
   },
   {
     name: 'TestCheckRegionInAVeryBigFrameAfterManualSwitchToFrame',
