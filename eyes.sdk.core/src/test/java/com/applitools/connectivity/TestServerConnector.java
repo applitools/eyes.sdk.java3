@@ -67,7 +67,7 @@ public class TestServerConnector extends ReportingTestSuite {
     @Mock
     Response deleteResponse;
 
-    static class MockedAsyncRequest extends AsyncRequest {
+    public static class MockedAsyncRequest extends AsyncRequest {
         final Map<String,String> headers = new HashMap<>();
 
         public MockedAsyncRequest(Logger logger) {
@@ -100,6 +100,19 @@ public class TestServerConnector extends ReportingTestSuite {
         runningSession.setBatchId("");
         runningSession.setId("");
         runningSession.setSessionId("");
+    }
+
+    public static ServerConnector getOfflineServerConnector(Request mockedRequest, AsyncRequest mockedAsyncRequest) {
+        HttpClient client = mock(HttpClient.class);
+        ConnectivityTarget target = mock(ConnectivityTarget.class);
+        when(client.target(anyString())).thenReturn(target);
+        when(target.path(anyString())).thenReturn(target);
+        when(target.queryParam(anyString(), anyString())).thenReturn(target);
+        when(target.request(anyString())).thenReturn(mockedRequest);
+        when(target.asyncRequest(anyString())).thenReturn(mockedAsyncRequest);
+        ServerConnector serverConnector = new ServerConnector();
+        serverConnector.updateClient(client);
+        return serverConnector;
     }
 
     /**

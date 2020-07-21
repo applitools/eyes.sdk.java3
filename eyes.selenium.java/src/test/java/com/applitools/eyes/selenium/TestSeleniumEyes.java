@@ -1,6 +1,7 @@
 package com.applitools.eyes.selenium;
 
 import com.applitools.connectivity.ServerConnector;
+import com.applitools.eyes.ProxySettings;
 import com.applitools.eyes.RectangleSize;
 import com.applitools.eyes.TestResults;
 import com.applitools.eyes.TestResultsSummary;
@@ -156,5 +157,28 @@ public class TestSeleniumEyes extends ReportingTestSuite {
         } finally {
             connector.closeConnector();
         }
+    }
+
+    @Test
+    public void testConfiguration() {
+        Eyes eyes = new Eyes();
+        eyes.setApiKey("apikey");
+        Assert.assertEquals(eyes.getConfiguration().getApiKey(), "apikey");
+
+        ProxySettings proxySettings = new ProxySettings("http://localhost:8888");
+        eyes.setProxy(proxySettings);
+        Assert.assertEquals(eyes.getConfiguration().getProxy(), proxySettings);
+
+        eyes.setBranchName("master");
+        Assert.assertEquals(eyes.getConfiguration().getBranchName(), "master");
+        eyes.setParentBranchName("develop");
+        Assert.assertEquals(eyes.getConfiguration().getParentBranchName(), "develop");
+
+        String url = "http://localhost";
+        eyes.setServerUrl(url);
+        Assert.assertEquals(eyes.getConfiguration().getServerUrl().toString(), url);
+
+        eyes.setAppName("app");
+        Assert.assertEquals(eyes.getConfiguration().getAppName(), "app");
     }
 }
