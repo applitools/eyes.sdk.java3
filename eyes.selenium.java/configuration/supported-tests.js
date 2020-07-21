@@ -70,6 +70,7 @@ module.exports = [
   {
     name: 'TestCheckFrameInFrame_Fully_Fluent2',
     executionMode: {isScrollStitching: true},
+    disabled: true,
   },
   {
     name: 'TestCheckFullWindowWithMultipleIgnoreRegionsBySelector_Fluent',
