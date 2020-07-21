@@ -576,6 +576,22 @@ public class Eyes extends EyesBase {
     }
 
     /**
+     * Set whether or not new tests are saved by default.
+     * @param saveNewTests True if new tests should be saved by default. False otherwise.
+     */
+    public void setSaveNewTests(boolean saveNewTests) {
+        this.configuration.setSaveNewTests(saveNewTests);
+    }
+
+    /**
+     * Gets save new tests.
+     * @return True if new tests are saved by default.
+     */
+    public boolean getSaveNewTests() {
+        return this.configuration.getSaveNewTests();
+    }
+
+    /**
      * Gets stitch overlap.
      * @return Returns the stitching overlap in pixels.
      */
