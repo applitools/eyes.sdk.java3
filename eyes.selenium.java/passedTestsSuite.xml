@@ -312,6 +312,7 @@
                     <include name="testRenderingMultipleBrowsers"/>
                     <include name="TestSpecialRendering"/>
                     <include name="testRenderFail"/>
+                    <include name="testRenderResourceNotFound"/>
                 </methods>
             </class>
         </classes>

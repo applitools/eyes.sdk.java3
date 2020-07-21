@@ -5,6 +5,7 @@
 ### Updated
 - Screenshot retry mechanism is now more efficient. [Trello 1866](https://trello.com/c/KyxkI6Bu)
 - Supporting visual viewports in UFG. [Trello 1957](https://trello.com/c/jWvdBwex)
+- Failed downloading of resources won't fail the UFG tests anymore. [Trello 1989](https://trello.com/c/uyVUx6kL)
 
 ## [3.170.0] - 2020-07-13
 ### Fixed

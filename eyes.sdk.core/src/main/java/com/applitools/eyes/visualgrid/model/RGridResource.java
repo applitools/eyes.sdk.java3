@@ -32,6 +32,10 @@ public class RGridResource {
     @JsonIgnore
     private AtomicBoolean isResourceParsed = new AtomicBoolean(false);
 
+    public static RGridResource createEmpty(String url) {
+        return new RGridResource(url, "application/empty-response", new byte[]{});
+    }
+
     public String getUrl() {
         return url;
     }

@@ -357,7 +357,9 @@ public class ServerConnector extends RestClient {
 
                     int statusCode = response.getStatusCode();
                     if (statusCode != HttpStatus.SC_OK && statusCode != HttpStatus.SC_CREATED) {
-                        logger.verbose(String.format("Error: Status %d on url %s", statusCode, url));
+                        logger.log(String.format("Error: Status %d on url %s when trying to get resource", statusCode, url));
+                        rgResource = RGridResource.createEmpty(url.toString());
+                        return;
                     }
 
                     byte[] fileContent = downloadFile(response);

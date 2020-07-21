@@ -1,5 +1,6 @@
 package com.applitools.eyes.renderingGrid;
 
+import com.applitools.ICheckSettings;
 import com.applitools.connectivity.ServerConnector;
 import com.applitools.eyes.*;
 import com.applitools.eyes.config.Configuration;
@@ -11,8 +12,15 @@ import com.applitools.eyes.utils.ReportingTestSuite;
 import com.applitools.eyes.utils.SeleniumUtils;
 import com.applitools.eyes.utils.TestUtils;
 import com.applitools.eyes.visualgrid.model.*;
+import com.applitools.eyes.visualgrid.services.IEyesConnector;
 import com.applitools.eyes.visualgrid.services.VisualGridRunner;
+import com.applitools.eyes.visualgrid.services.VisualGridTask;
 import com.applitools.utils.GeneralUtils;
+import org.mockito.ArgumentMatcher;
+import org.mockito.ArgumentMatchers;
+import org.mockito.invocation.InvocationOnMock;
+import org.mockito.stubbing.Answer;
+import org.openqa.selenium.By;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.testng.Assert;
 import org.testng.annotations.DataProvider;
@@ -21,6 +29,11 @@ import org.testng.annotations.Test;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.spy;
+import java.util.*;
+import java.util.concurrent.Future;
+import java.util.concurrent.atomic.AtomicBoolean;
+
+import static org.mockito.Mockito.*;
 
 public class TestRenderings extends ReportingTestSuite {
 
@@ -168,5 +181,77 @@ public class TestRenderings extends ReportingTestSuite {
                 Assert.assertTrue(t.getCause() instanceof InstantiationError);
             }
         }
+    }
+
+    @Test
+    public void testRenderResourceNotFound() {
+        final AtomicBoolean alreadyRendered = new AtomicBoolean(false);
+        final List<RGridResource> missingResources = new ArrayList<>();
+        final String missingUrl = "https://notfound.coma";
+
+        ServerConnector serverConnector = spy(new ServerConnector());
+        doAnswer(new Answer<List<RunningRender>>() {
+            @Override
+            public List<RunningRender> answer(InvocationOnMock invocation) throws Throwable {
+                List<RunningRender> runningRenders = (List<RunningRender>) invocation.callRealMethod();
+                if (alreadyRendered.get()) {
+                    return runningRenders;
+                }
+
+                alreadyRendered.set(true);
+                runningRenders.get(0).setNeedMoreResources(Collections.singletonList(missingUrl));
+                runningRenders.get(0).setRenderStatus(RenderStatus.NEED_MORE_RESOURCE);
+                return runningRenders;
+            }
+        }).when(serverConnector).render(any(RenderRequest.class));
+        doAnswer(new Answer<Future<?>>() {
+            @Override
+            public Future<?> answer(InvocationOnMock invocation) throws Throwable {
+                missingResources.add((RGridResource) invocation.getArgument(1));
+                return (Future<?>) invocation.callRealMethod();
+            }
+        }).when(serverConnector).renderPutResource(any(RunningRender.class), any(RGridResource.class), anyString(), ArgumentMatchers.<TaskListener<Boolean>>any());
+
+        VisualGridRunner runner = spy(new VisualGridRunner(10));
+        doAnswer(new Answer() {
+            @Override
+            public Object answer(InvocationOnMock invocation) throws Throwable {
+                FrameData frameData = invocation.getArgument(2);
+                frameData.getResourceUrls().add("https://notfound.coma");
+                invocation.callRealMethod();
+                return null;
+            }
+        }).when(runner).check(any(ICheckSettings.class), nullable(IDebugResourceWriter.class), any(FrameData.class),
+                any(IEyesConnector.class), ArgumentMatchers.<List<VisualGridTask>>any(), ArgumentMatchers.<List<VisualGridTask>>any(),
+                any(VisualGridRunner.RenderListener.class), ArgumentMatchers.<List<VisualGridSelector[]>>any(), any(UserAgent.class));
+
+        Eyes eyes = new Eyes(runner);
+        eyes.setLogHandler(new StdoutLogHandler());
+        eyes.setServerConnector(serverConnector);
+        ChromeDriver driver = SeleniumUtils.createChromeDriver();
+        try {
+            eyes.open(driver, "Applitools Eyes Sdk", "Test Render Resource Not Found", new RectangleSize(800, 800));
+            driver.get("http://applitools.github.io/demo");
+            eyes.checkWindow();
+            eyes.closeAsync();
+        } finally {
+            driver.quit();
+            eyes.abortAsync();
+            TestResultsSummary summary = runner.getAllTestResults(false);
+            TestResults results = summary.getAllResults()[0].getTestResults();
+            ServerConnector connector = new ServerConnector();
+            try {
+                results.setServerConnector(connector);
+                results.delete();
+            } finally {
+                connector.closeConnector();
+            }
+        }
+
+        Assert.assertEquals(missingResources.size(), 1);
+        RGridResource missingResource = missingResources.get(0);
+        Assert.assertEquals(missingResource.getUrl(), missingUrl);
+        Assert.assertEquals(missingResource.getContent().length, 0);
+        Assert.assertEquals(missingResource.getContentType(), "application/empty-response");
     }
 }
