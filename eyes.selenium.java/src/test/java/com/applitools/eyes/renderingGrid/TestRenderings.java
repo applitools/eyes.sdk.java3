@@ -185,7 +185,7 @@ public class TestRenderings extends ReportingTestSuite {
     public void testRenderResourceNotFound() {
         final AtomicBoolean alreadyRendered = new AtomicBoolean(false);
         final List<RGridResource> missingResources = new ArrayList<>();
-        final String missingUrl = "https://notfound.coma";
+        final String missingUrl = "http://httpstat.us/503";
 
         ServerConnector serverConnector = spy(new ServerConnector());
         doAnswer(new Answer<List<RunningRender>>() {
@@ -215,7 +215,7 @@ public class TestRenderings extends ReportingTestSuite {
             @Override
             public Object answer(InvocationOnMock invocation) throws Throwable {
                 FrameData frameData = invocation.getArgument(2);
-                frameData.getResourceUrls().add("https://notfound.coma");
+                frameData.getResourceUrls().add(missingUrl);
                 invocation.callRealMethod();
                 return null;
             }
