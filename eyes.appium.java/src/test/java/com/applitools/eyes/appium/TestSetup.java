@@ -1,6 +1,7 @@
 package com.applitools.eyes.appium;
 
 import com.applitools.eyes.LogHandler;
+import com.applitools.eyes.ProxySettings;
 import com.applitools.eyes.utils.ReportingTestSuite;
 import com.applitools.eyes.StdoutLogHandler;
 import com.applitools.utils.GeneralUtils;
@@ -38,6 +39,10 @@ public abstract class TestSetup extends ReportingTestSuite implements ITest {
 
         LogHandler logHandler = new StdoutLogHandler(true);
         eyes.setLogHandler(logHandler);
+        eyes.setSaveNewTests(false);
+        if (System.getenv("APPLITOOLS_USE_PROXY") != null) {
+            eyes.setProxy(new ProxySettings("http://127.0.0.1", 8888));
+        }
 
         try {
             initDriver();
