@@ -62,9 +62,9 @@ jobs:
         - cd eyes.selenium.java;
         - sed -i 's/regressionTestsSuite.xml/genericTestsSuite.xml/g' ./pom.xml;
         - if [[ $TRAVIS_TAG =~ ^RELEASE_CANDIDATE ]]; then
-          yarn release
+          yarn release;
           else
-          yarn java
+          yarn java;
           fi
     - stage: deploy
       if: tag =~ ^RELEASE_CANDIDATE AND fork == false
