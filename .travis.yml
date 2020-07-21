@@ -59,8 +59,13 @@ jobs:
         - ./runTests.sh
     - stage: generic
       script:
-        - cd generic.tests
-        - yarn java
+        - cd eyes.selenium.java;
+        - sed -i 's/regressionTestsSuite.xml/genericTestsSuite.xml/g' ./pom.xml;
+        - if [[ $TRAVIS_TAG =~ ^RELEASE_CANDIDATE ]]; then
+          yarn release
+          else
+          yarn java
+          fi
     - stage: deploy
       if: tag =~ ^RELEASE_CANDIDATE AND fork == false
       script:
