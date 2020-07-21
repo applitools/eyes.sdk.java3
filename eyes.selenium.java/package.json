@@ -15,7 +15,7 @@
   },
   "scripts": {
     "java": "yarn && yarn docker:start && yarn test && yarn report",
-    "local": "yarn && yarn docker:start && yarn test && yarn report; yarn docker:stop",
+    "local": "yarn install --no-lockfile && yarn docker:start && yarn test && yarn report; yarn docker:stop",
     "release": "yarn && yarn docker:start && yarn test && yarn report:prod",
     "generate": "coverage-tests create-tests --path ./configuration",
     "test": "yarn generate && mvn test",
@@ -26,12 +26,6 @@
     "docker:stop": "docker stop selenium && docker rm selenium"
   },
   "dependencies": {
-    "@applitools/sdk-coverage-tests": "latest",
-    "junit-merge": "^2.0.0",
-    "@typescript-eslint/parser": "^2.14.0",
-    "typescript": "^3.7.4"
-  },
-  "devDependencies": {
-    "mocha": "^8.0.1"
+    "@applitools/sdk-coverage-tests": "latest"
   }
 }
