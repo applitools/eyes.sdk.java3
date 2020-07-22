@@ -5,15 +5,21 @@ import com.applitools.eyes.RectangleSize;
 import com.applitools.eyes.config.Configuration;
 import com.applitools.eyes.selenium.Eyes;
 import com.applitools.eyes.selenium.fluent.Target;
+import com.applitools.eyes.utils.ReportingTestSuite;
 import com.applitools.eyes.utils.SeleniumUtils;
 import com.applitools.eyes.visualgrid.services.VisualGridRunner;
 import org.openqa.selenium.WebDriver;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
-public class TestVGWithBadWebhook {
+public class TestVGWithBadWebhook extends ReportingTestSuite {
+
+    public TestVGWithBadWebhook() {
+        super.setGroupName("selenium");
+    }
+
     @Test
-    public void Test() {
+    public void testVGWithBadWebhook() {
         WebDriver driver = SeleniumUtils.createChromeDriver();
         driver.get("https://applitools.com/helloworld");
 

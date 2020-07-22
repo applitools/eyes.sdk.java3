@@ -422,4 +422,13 @@
             </class>
         </classes>
     </test>
+    <test name="TestVGWithBadWebhook">
+        <classes>
+            <class name="com.applitools.eyes.renderingGrid.TestVGWithBadWebhook">
+                <methods>
+                    <include name="testVGWithBadWebhook"/>
+                </methods>
+            </class>
+        </classes>
+    </test>
 </suite>
