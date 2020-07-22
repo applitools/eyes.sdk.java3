@@ -2,7 +2,7 @@
 
 <suite name="passed tests" verbose="1" parallel="tests" thread-count="10">
     <test name="TestClassicApi">
-        <parameter name="dont_run" value="TestCheckInnerFrame+SCROLL, TestCheckInnerFrame+VG,TestCheckFrame+VG, TestCheckWindowFully+VG, TestDoubleCheckWindow+VG, TestCheckWindow+VG, TestCheckRegionInFrame+VG, TestCheckRegionInFrame+SCROLL"/>
+        <parameter name="dont_run" value="TestCheckInnerFrame+VG,TestCheckFrame+VG, TestCheckWindowFully+VG, TestDoubleCheckWindow+VG, TestCheckWindow+VG, TestCheckRegionInFrame+VG"/>
         <classes>
             <class name="com.applitools.eyes.selenium.TestClassicApi">
                 <methods>

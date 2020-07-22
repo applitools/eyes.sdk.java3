@@ -1,3 +1,7 @@
+## [vNext]
+### Fixed
+- Check region inside a frame with scroll stitching is now working. [Trello 2033](https://trello.com/c/ndMDaRQB)
+
 ## [3.171.0] - 2020-07-22
 ### Fixed
 - Calling `switchTo` with `EyesWebDriver` now works properly. [Trello 1818](https://trello.com/c/488BZ24S)
