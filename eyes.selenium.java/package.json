@@ -18,7 +18,7 @@
     "local": "yarn install --no-lockfile && yarn docker:start && yarn test && yarn report; yarn docker:stop",
     "release": "yarn && yarn docker:start && yarn test && yarn report:prod",
     "generate": "coverage-tests create-tests --path ./configuration",
-    "test": "yarn generate && mvn test",
+    "test": "yarn generate && mvn test -DsuiteFile=genericTestsSuite.xml",
     "report": "yarn move:report && coverage-tests process-report --path ./configuration$( [ -z $APPLITOOLS_REPORT_ID ] || echo \" --reportId $APPLITOOLS_REPORT_ID\" )",
     "report:prod": "yarn move:report && coverage-tests process-report --path ./configuration --reportId $APPLITOOLS_REPORT_ID --send-report prod",
     "move:report": "mv ./target/surefire-reports/java_coverage_tests/coverage-test-report.xml ./coverage-test-report.xml",
