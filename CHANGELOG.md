@@ -1,3 +1,7 @@
+
+### Added
+- Additional logging in `getViewportRect`. [Trello 644](https://trello.com/c/FnOtYN6J)
+
 ## [3.171.0] - 2020-07-22
 ### Fixed
 - Calling `switchTo` with `EyesWebDriver` now works properly. [Trello 1818](https://trello.com/c/488BZ24S)

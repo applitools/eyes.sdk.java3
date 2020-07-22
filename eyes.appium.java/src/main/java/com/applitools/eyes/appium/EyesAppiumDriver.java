@@ -64,6 +64,10 @@ public class EyesAppiumDriver implements EyesWebDriver {
     }
 
     public HashMap<String, Integer> getViewportRect () {
+        Object viewportRectObject = getCachedSessionDetails().get("viewportRect");
+        logger.verbose("Viewport Rect Type: " + viewportRectObject.getClass());
+        logger.verbose("Viewport Rect Value: " + viewportRectObject.toString());
+
         Map<String, Long> rectMap = (Map<String, Long>) getCachedSessionDetails().get("viewportRect");
         HashMap<String, Integer> intRectMap = new HashMap<String, Integer>();
         intRectMap.put("width", rectMap.get("width").intValue());
