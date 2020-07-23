@@ -1394,6 +1394,8 @@ public class SeleniumEyes extends EyesBase implements ISeleniumEyes, IBatchClose
                 memento = positionProvider.getState();
                 Location location = new Location(elementBounds.getLeft(), elementBounds.getTop());
                 offset = positionProvider.setPosition(location);
+                elementBounds = elementBounds.offset(-offset.getX(), -offset.getY());
+                fullElementBounds = fullElementBounds.offset(-offset.getX(), -offset.getY());
 
                 logger.verbose("offset: " + offset);
                 if (currentFC != fc) {
