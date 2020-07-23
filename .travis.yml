@@ -43,6 +43,15 @@ jobs:
         - export APPLITOOLS_REPORT_ID=${TRAVIS_COMMIT:0:7}-$TRAVIS_BUILD_NUMBER
         - chmod +x ./runTests.sh
         - ./runTests.sh "eyes.images.java"
+    - stage: test-appium
+      script:
+        - export APPLITOOLS_REPORT_ID=${TRAVIS_COMMIT:0:7}-$TRAVIS_BUILD_NUMBER
+        - sh upload_app.sh "https://applitools.bintray.com/Examples/android/1.2/app_android.apk" "app_android"
+        - sh upload_app.sh "https://applitools.bintray.com/Examples/androidx/1.0.0/app_androidx.apk" "app_androidx"
+        - sh upload_app.sh "https://applitools.bintray.com/Examples/app-android.apk" "app_android_accessibility"
+        - sh upload_app.sh "https://applitools.bintray.com/Examples/ipa/IOSTestApp.ipa" "app_ios"
+        - chmod +x ./runTests.sh
+        - ./runTests.sh "eyes.appium.java"
     - stage: test-selenium
       script:
         - export APPLITOOLS_REPORT_ID=${TRAVIS_COMMIT:0:7}-$TRAVIS_BUILD_NUMBER
@@ -55,28 +64,10 @@ jobs:
         - /home/travis/build/chromedriver --version
         - env webdriver.chrome.driver=/home/travis/build/
         - if [[ $TRAVIS_TAG =~ ^FULL_COVERAGE_TESTS ]]; then
-          sed -i 's/regressionTestsSuite.xml/devTestsSuite.xml/g' $TRAVIS_BUILD_DIR/eyes.selenium.java/pom.xml;
-          fi
+        sed -i 's/regressionTestsSuite.xml/devTestsSuite.xml/g' $TRAVIS_BUILD_DIR/eyes.selenium.java/pom.xml;
+        fi
         - chmod +x ./runTests.sh
         - ./runTests.sh "eyes.selenium.java"
-    - stage: test-appium
-      script:
-        - export APPLITOOLS_REPORT_ID=${TRAVIS_COMMIT:0:7}-$TRAVIS_BUILD_NUMBER
-        - sh upload_app.sh "https://applitools.bintray.com/Examples/android/1.2/app_android.apk" "app_android"
-        - sh upload_app.sh "https://applitools.bintray.com/Examples/androidx/1.0.0/app_androidx.apk" "app_androidx"
-        - sh upload_app.sh "https://applitools.bintray.com/Examples/app-android.apk" "app_android_accessibility"
-        - sh upload_app.sh "https://applitools.bintray.com/Examples/ipa/IOSTestApp.ipa" "app_ios"
-        - chmod +x ./runTests.sh
-        - ./runTests.sh
-    - stage: test-selenium
-      script:
-        - ./runTests.sh "eyes.selenium.java"
-    - stage: test-images
-      script:
-        - ./runTests.sh "eyes.images.java"
-    - stage: test-appium
-      script:
-        - ./runTests.sh "eyes.appium.java"
     - stage: generic
       script:
         - cd eyes.selenium.java;
