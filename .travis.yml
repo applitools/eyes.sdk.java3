@@ -23,27 +23,10 @@ before_script:
   - nvm use 14.5.0
 jobs:
   include:
-    - stage: test
+    - stage: test-core
       script:
-        - google-chrome --version
-        - chromium-browser --version
-        - latestChromeDriverURL=$(wget http://chromedriver.storage.googleapis.com/LATEST_RELEASE -q -O -)
-        - wget "http://chromedriver.storage.googleapis.com/${latestChromeDriverURL}/chromedriver_linux64.zip"
-        - unzip chromedriver_linux64.zip -d /home/travis/build/
-        - chmod +x /home/travis/build/chromedriver
-        - /home/travis/build/chromedriver --version
-        - env webdriver.chrome.driver=/home/travis/build/
         - export APPLITOOLS_REPORT_ID=${TRAVIS_COMMIT:0:7}-$TRAVIS_BUILD_NUMBER
         - SDK_VERSION=$(echo $TRAVIS_TAG | sed 's/[^.0-9]*//g')
-        - chmod +x ./extractChangeLog.sh
-        - TMP_CHANGELOG=$(./extractChangeLog.sh "$SDK_VERSION" "CHANGELOG.md")
-        - echo "$TMP_CHANGELOG"
-        - CHANGELOG=$([ -z "$TMP_CHANGELOG" ] && echo "ERROR === There is no change log for version $SDK_VERSION" || echo "$TMP_CHANGELOG")
-        - echo $CHANGELOG
-        - if [[ (-z "$TMP_CHANGELOG") && ($TRAVIS_TAG =~ ^RELEASE_CANDIDATE) ]]; then
-          sleep 5;
-          exit 1;
-          fi
         - if [[ $TRAVIS_TAG =~ ^RELEASE_CANDIDATE ]]; then
           git remote set-url origin https://${GITHUB_TOKEN}@github.com/${TRAVIS_REPO_SLUG};
           mvn versions:set -DnewVersion=$SDK_VERSION;
@@ -52,9 +35,33 @@ jobs:
           git commit -m 'update pom version';
           git push origin HEAD:$RELEASE_BRANCH;
           fi
+        - export APPLITOOLS_REPORT_ID=${TRAVIS_COMMIT:0:7}-$TRAVIS_BUILD_NUMBER
+        - chmod +x ./runTests.sh
+        - ./runTests.sh "eyes.sdk.core"
+    - stage: test-images
+      script:
+        - export APPLITOOLS_REPORT_ID=${TRAVIS_COMMIT:0:7}-$TRAVIS_BUILD_NUMBER
+        - chmod +x ./runTests.sh
+        - ./runTests.sh "eyes.images.java"
+    - stage: test-selenium
+      script:
+        - export APPLITOOLS_REPORT_ID=${TRAVIS_COMMIT:0:7}-$TRAVIS_BUILD_NUMBER
+        - google-chrome --version
+        - chromium-browser --version
+        - latestChromeDriverURL=$(wget http://chromedriver.storage.googleapis.com/LATEST_RELEASE -q -O -)
+        - wget "http://chromedriver.storage.googleapis.com/${latestChromeDriverURL}/chromedriver_linux64.zip"
+        - unzip chromedriver_linux64.zip -d /home/travis/build/
+        - chmod +x /home/travis/build/chromedriver
+        - /home/travis/build/chromedriver --version
+        - env webdriver.chrome.driver=/home/travis/build/
         - if [[ $TRAVIS_TAG =~ ^FULL_COVERAGE_TESTS ]]; then
           sed -i 's/regressionTestsSuite.xml/devTestsSuite.xml/g' $TRAVIS_BUILD_DIR/eyes.selenium.java/pom.xml;
           fi
+        - chmod +x ./runTests.sh
+        - ./runTests.sh "eyes.selenium.java"
+    - stage: test-appium
+      script:
+        - export APPLITOOLS_REPORT_ID=${TRAVIS_COMMIT:0:7}-$TRAVIS_BUILD_NUMBER
         - sh upload_app.sh "https://applitools.bintray.com/Examples/android/1.2/app_android.apk" "app_android"
         - sh upload_app.sh "https://applitools.bintray.com/Examples/androidx/1.0.0/app_androidx.apk" "app_androidx"
         - sh upload_app.sh "https://applitools.bintray.com/Examples/app-android.apk" "app_android_accessibility"
