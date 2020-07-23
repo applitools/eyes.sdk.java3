@@ -64,8 +64,8 @@ jobs:
         - /home/travis/build/chromedriver --version
         - env webdriver.chrome.driver=/home/travis/build/
         - if [[ $TRAVIS_TAG =~ ^FULL_COVERAGE_TESTS ]]; then
-        sed -i 's/regressionTestsSuite.xml/devTestsSuite.xml/g' $TRAVIS_BUILD_DIR/eyes.selenium.java/pom.xml;
-        fi
+          sed -i 's/regressionTestsSuite.xml/devTestsSuite.xml/g' $TRAVIS_BUILD_DIR/eyes.selenium.java/pom.xml;
+          fi
         - chmod +x ./runTests.sh
         - ./runTests.sh "eyes.selenium.java"
     - stage: generic
