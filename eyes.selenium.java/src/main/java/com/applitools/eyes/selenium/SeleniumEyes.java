@@ -1390,7 +1390,7 @@ public class SeleniumEyes extends EyesBase implements ISeleniumEyes, IBatchClose
                 WebElement scrollRootElement = getCurrentFrameScrollRootElement();
 
                 FrameChain currentFC = driver.getFrameChain().clone();
-                positionProvider = ScrollPositionProviderFactory.getScrollPositionProvider(userAgent, logger, jsExecutor, scrollRootElement);
+                positionProvider = getElementPositionProvider(scrollRootElement);
                 memento = positionProvider.getState();
                 Location location = new Location(elementBounds.getLeft(), elementBounds.getTop());
                 offset = positionProvider.setPosition(location);

@@ -139,8 +139,6 @@ public class EyesTargetLocator implements WebDriver.TargetLocator {
         logger.verbose("enter");
         if (driver.getFrameChain().size() != 0) {
             logger.verbose("Making preparations...");
-            Frame frame = driver.getFrameChain().pop();
-            frame.returnToOriginalPosition(driver);
             logger.verbose("Done! Switching to parent frame...");
             parentFrame(logger, targetLocator, driver.getFrameChain());
         }
