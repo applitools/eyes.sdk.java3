@@ -400,7 +400,7 @@ public class Eyes extends EyesBase {
 
         ValidationInfo validationInfo = this.fireValidationWillStartEvent(name);
 
-        this.stitchContent = checkSettingsInternal.getStitchContent();
+        this.stitchContent = checkSettingsInternal.getStitchContent() == null ? false : checkSettingsInternal.getStitchContent();
 
         final Region targetRegion = checkSettingsInternal.getTargetRegion();
 
@@ -496,7 +496,7 @@ public class Eyes extends EyesBase {
 
         EyesScreenshot result;
 
-        if (configuration.getForceFullPageScreenshot() || stitchContent) {
+        if (getForceFullPageScreenshot() || stitchContent) {
             result = getFullPageScreenshot();
         } else {
             result = getSimpleScreenshot();
@@ -589,6 +589,14 @@ public class Eyes extends EyesBase {
      */
     public boolean getSaveNewTests() {
         return this.configuration.getSaveNewTests();
+    }
+
+    public void setSaveDiffs(Boolean saveDiffs) {
+        this.configuration.setSaveDiffs(saveDiffs);
+    }
+
+    public Boolean getSaveDiffs() {
+        return this.configuration.getSaveDiffs();
     }
 
     /**
