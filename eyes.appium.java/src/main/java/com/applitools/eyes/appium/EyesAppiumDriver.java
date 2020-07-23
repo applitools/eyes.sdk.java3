@@ -14,7 +14,7 @@ import org.openqa.selenium.remote.RemoteWebElement;
 import java.awt.image.BufferedImage;
 import java.util.*;
 
-public class EyesAppiumDriver implements EyesWebDriver {
+public class EyesAppiumDriver implements EyesWebDriver, JavascriptExecutor {
 
     private final Logger logger;
     private final AppiumDriver driver;
@@ -257,5 +257,15 @@ public class EyesAppiumDriver implements EyesWebDriver {
 
     public Map<String, WebElement> getElementIds() {
         return elementsIds;
+    }
+
+    @Override
+    public Object executeScript(String script, Object... args) {
+        return driver.executeScript(script, args);
+    }
+
+    @Override
+    public Object executeAsyncScript(String script, Object... args) {
+        return driver.executeAsyncScript(script, args);
     }
 }

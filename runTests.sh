@@ -28,10 +28,12 @@ PING_LOOP_PID=$!
 # My build is using maven, but you could build anything with this, E.g.
 # your_build_command_1 >> $BUILD_OUTPUT 2>&1
 # your_build_command_2 >> $BUILD_OUTPUT 2>&1
-mvn test -e -X
+mvn test -pl "$1" -e -X
 
 #Run tests with other connectivity packages
-./runConnectivityTests.sh
+if [ "$1" == "eyes.selenium.java" ]; then
+  ./runConnectivityTests.sh
+fi
 
 # The build finished without returning an error so dump a tail of the output
 dump_output

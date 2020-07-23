@@ -61,6 +61,15 @@ jobs:
         - sh upload_app.sh "https://applitools.bintray.com/Examples/ipa/IOSTestApp.ipa" "app_ios"
         - chmod +x ./runTests.sh
         - ./runTests.sh
+    - stage: test-selenium
+      script:
+        - ./runTests.sh "eyes.selenium.java"
+    - stage: test-images
+      script:
+        - ./runTests.sh "eyes.images.java"
+    - stage: test-appium
+      script:
+        - ./runTests.sh "eyes.appium.java"
     - stage: generic
       script:
         - cd eyes.selenium.java;
@@ -69,10 +78,11 @@ jobs:
           else
           yarn java;
           fi
+        - ./runTests.sh "eyes.sdk.core"
     - stage: deploy
       if: tag =~ ^RELEASE_CANDIDATE AND fork == false
       script:
-        #         save the email of the person who did this commit in COMMITTER_EMAIL
+          #         save the email of the person who did this commit in COMMITTER_EMAIL
         - COMMITTER_EMAIL="$(git log -1 $TRAVIS_COMMIT --pretty="%cE")"
         - SDK_VERSION=$(echo $TRAVIS_TAG | sed 's/[^.0-9]*//g')
         - if [[ $COMMITTER_EMAIL =~ $ALLOWED_RELEASE_COMMITERS ]]; then
