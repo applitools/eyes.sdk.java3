@@ -121,6 +121,7 @@ public class Eyes extends EyesBase {
 
         tryUpdateDevicePixelRatio();
 
+        ensureViewportSize();
         openBase();
 
         setUserAgent(UserAgent.parseUserAgentString(sessionStartInfo.getEnvironment().getInferred(), true));
@@ -162,6 +163,12 @@ public class Eyes extends EyesBase {
         ArgumentGuard.notNull(checkSettings, "checkSettings");
         checkSettings = checkSettings.withName(name);
         this.check(checkSettings);
+    }
+
+    private void ensureViewportSize() {
+        if (this.configuration.getViewportSize() == null) {
+            this.configuration.setViewportSize(driver.getDefaultContentViewportSize());
+        }
     }
 
     /**
