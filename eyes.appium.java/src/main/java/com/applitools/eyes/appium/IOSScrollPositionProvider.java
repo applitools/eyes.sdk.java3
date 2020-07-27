@@ -8,6 +8,7 @@ import com.applitools.utils.ImageUtils;
 import io.appium.java_client.MobileBy;
 import io.appium.java_client.TouchAction;
 import io.appium.java_client.remote.MobileCapabilityType;
+import io.appium.java_client.touch.WaitOptions;
 import io.appium.java_client.touch.offset.PointOption;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.OutputType;
@@ -17,6 +18,7 @@ import org.openqa.selenium.WebElement;
 import javax.annotation.Nullable;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
+import java.time.Duration;
 import java.util.HashMap;
 import java.util.List;
 
@@ -136,7 +138,7 @@ public class IOSScrollPositionProvider extends AppiumScrollPositionProvider {
         logger.verbose("Trying to scroll from startX: " + startX + " | startY: " + startY + " | endX: " + endX + " | endY: " + endY);
 
         TouchAction scrollAction = new TouchAction(driver);
-        scrollAction.press(new PointOption().withCoordinates(startX, startY));
+        scrollAction.press(new PointOption().withCoordinates(startX, startY)).waitAction(new WaitOptions().withDuration(Duration.ofMillis(3000)));;
         scrollAction.moveTo(new PointOption().withCoordinates(startX, endY));
         scrollAction.release();
 
