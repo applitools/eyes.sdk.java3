@@ -4,6 +4,7 @@ import com.applitools.eyes.LogHandler;
 import com.applitools.eyes.ProxySettings;
 import com.applitools.eyes.utils.ReportingTestSuite;
 import com.applitools.eyes.StdoutLogHandler;
+import com.applitools.eyes.utils.TestUtils;
 import com.applitools.utils.GeneralUtils;
 import io.appium.java_client.AppiumDriver;
 import io.appium.java_client.MobileElement;
@@ -37,7 +38,7 @@ public abstract class TestSetup extends ReportingTestSuite implements ITest {
         eyes = new Eyes();
         eyes.setApiKey(System.getenv("APPLITOOLS_API_KEY"));
 
-        LogHandler logHandler = new StdoutLogHandler(true);
+        LogHandler logHandler = new StdoutLogHandler(TestUtils.verboseLogs);
         eyes.setLogHandler(logHandler);
         eyes.setSaveNewTests(false);
         if (System.getenv("APPLITOOLS_USE_PROXY") != null) {
