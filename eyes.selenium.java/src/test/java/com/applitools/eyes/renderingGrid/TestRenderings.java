@@ -1,6 +1,7 @@
 package com.applitools.eyes.renderingGrid;
 
 import com.applitools.ICheckSettings;
+import com.applitools.connectivity.MockedResponse;
 import com.applitools.connectivity.ServerConnector;
 import com.applitools.connectivity.TestServerConnector;
 import com.applitools.connectivity.api.*;
@@ -202,32 +203,7 @@ public class TestRenderings extends ReportingTestSuite {
             @Override
             public Object answer(InvocationOnMock invocation) {
                 AsyncRequestCallback callback = invocation.getArgument(1);
-                callback.onComplete(new Response(new Logger()) {
-                    @Override
-                    public int getStatusCode() {
-                        return 400;
-                    }
-
-                    @Override
-                    public String getStatusPhrase() {
-                        return "";
-                    }
-
-                    @Override
-                    public String getHeader(String name, boolean ignoreCase) {
-                        return null;
-                    }
-
-                    @Override
-                    protected void readEntity() {
-                        body = new byte[]{};
-                    }
-
-                    @Override
-                    public void close() {
-
-                    }
-                });
+                callback.onComplete(new MockedResponse(new Logger(), 400, "", "".getBytes()));
                 return null;
             }
         }).when(request1).method(eq(HttpMethod.GET), any(AsyncRequestCallback.class), nullable(String.class), nullable(String.class), eq(false));

@@ -225,10 +225,7 @@ public class TestRenderingTask extends ReportingTestSuite {
         frameData.setSrcAttr("");
         RenderRequest[] renderRequests = renderingTask.prepareDataForRG(frameData);
         Map<String, RGridResource> resourceMap = renderRequests[0].getResources();
-        Assert.assertEquals(resourceMap.size(), 3);
-        for (String url : urls) {
-            Assert.assertTrue(resourceMap.containsKey(url));
-        }
+        Assert.assertEquals(resourceMap.keySet(), new HashSet<>(urls));
     }
 
     /**
