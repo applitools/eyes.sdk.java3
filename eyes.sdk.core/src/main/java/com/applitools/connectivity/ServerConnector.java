@@ -357,7 +357,7 @@ public class ServerConnector extends RestClient {
 
                     int statusCode = response.getStatusCode();
                     if (statusCode != HttpStatus.SC_OK && statusCode != HttpStatus.SC_CREATED) {
-                        logger.log(String.format("Error: Status %d on url %s when trying to get resource", statusCode, url));
+                        logger.log(String.format("Error: Status %d on url %s when trying to get resource. Sending empty resource", statusCode, url));
                         rgResource = RGridResource.createEmpty(url.toString());
                         return;
                     }
@@ -387,7 +387,8 @@ public class ServerConnector extends RestClient {
                     logger.verbose(String.format("Failed downloading resource %s - trying again", url));
                     downloadResource(url, userAgent, refererUrl, listener, attemptNumber + 1);
                 } else {
-                    listener.onFail();
+                    logger.log(String.format("Error: Failed getting resource with url %s. Sending empty resource", url));
+                    listener.onComplete(RGridResource.createEmpty(url.toString()));
                 }
             }
         }, null, null, false);

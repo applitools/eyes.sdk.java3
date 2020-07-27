@@ -24,9 +24,7 @@ import org.testng.Assert;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 import java.util.concurrent.Future;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -184,8 +182,9 @@ public class TestRenderings extends ReportingTestSuite {
     @Test
     public void testRenderResourceNotFound() {
         final AtomicBoolean alreadyRendered = new AtomicBoolean(false);
-        final List<RGridResource> missingResources = new ArrayList<>();
+        final Map<String,RGridResource> missingResources = new HashMap<>();
         final String missingUrl = "http://httpstat.us/503";
+        final String unknownHostUrl = "http://hostwhichdoesntexist/503";
 
         ServerConnector serverConnector = spy(new ServerConnector());
         doAnswer(new Answer<List<RunningRender>>() {
@@ -197,7 +196,7 @@ public class TestRenderings extends ReportingTestSuite {
                 }
 
                 alreadyRendered.set(true);
-                runningRenders.get(0).setNeedMoreResources(Collections.singletonList(missingUrl));
+                runningRenders.get(0).setNeedMoreResources(Arrays.asList(missingUrl, unknownHostUrl));
                 runningRenders.get(0).setRenderStatus(RenderStatus.NEED_MORE_RESOURCE);
                 return runningRenders;
             }
@@ -205,7 +204,8 @@ public class TestRenderings extends ReportingTestSuite {
         doAnswer(new Answer<Future<?>>() {
             @Override
             public Future<?> answer(InvocationOnMock invocation) throws Throwable {
-                missingResources.add((RGridResource) invocation.getArgument(1));
+                RGridResource rGridResource = invocation.getArgument(1);
+                missingResources.put(rGridResource.getUrl(), rGridResource);
                 return (Future<?>) invocation.callRealMethod();
             }
         }).when(serverConnector).renderPutResource(any(RunningRender.class), any(RGridResource.class), anyString(), ArgumentMatchers.<TaskListener<Boolean>>any());
@@ -216,6 +216,7 @@ public class TestRenderings extends ReportingTestSuite {
             public Object answer(InvocationOnMock invocation) throws Throwable {
                 FrameData frameData = invocation.getArgument(2);
                 frameData.getResourceUrls().add(missingUrl);
+                frameData.getResourceUrls().add(unknownHostUrl);
                 invocation.callRealMethod();
                 return null;
             }
@@ -246,10 +247,14 @@ public class TestRenderings extends ReportingTestSuite {
             }
         }
 
-        Assert.assertEquals(missingResources.size(), 1);
-        RGridResource missingResource = missingResources.get(0);
+        RGridResource missingResource = missingResources.get(missingUrl);
         Assert.assertEquals(missingResource.getUrl(), missingUrl);
         Assert.assertEquals(missingResource.getContent().length, 0);
         Assert.assertEquals(missingResource.getContentType(), "application/empty-response");
+
+        RGridResource unknownHostResource = missingResources.get(unknownHostUrl);
+        Assert.assertEquals(unknownHostResource.getUrl(), unknownHostUrl);
+        Assert.assertEquals(unknownHostResource.getContent().length, 0);
+        Assert.assertEquals(unknownHostResource.getContentType(), "application/empty-response");
     }
 }

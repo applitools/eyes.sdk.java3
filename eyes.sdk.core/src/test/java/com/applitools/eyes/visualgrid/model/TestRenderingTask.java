@@ -2,10 +2,15 @@ package com.applitools.eyes.visualgrid.model;
 
 import com.applitools.connectivity.ServerConnector;
 import com.applitools.connectivity.TestServerConnector;
-import com.applitools.connectivity.api.*;
+import com.applitools.connectivity.api.AsyncRequest;
+import com.applitools.connectivity.api.AsyncRequestCallback;
+import com.applitools.connectivity.api.Response;
 import com.applitools.eyes.Logger;
+import com.applitools.eyes.RectangleSize;
 import com.applitools.eyes.TaskListener;
 import com.applitools.eyes.UserAgent;
+import com.applitools.eyes.fluent.CheckSettings;
+import com.applitools.eyes.selenium.BrowserType;
 import com.applitools.eyes.utils.ReportingTestSuite;
 import com.applitools.eyes.visualgrid.services.IEyesConnector;
 import com.applitools.eyes.visualgrid.services.VisualGridTask;
@@ -190,6 +195,46 @@ public class TestRenderingTask extends ReportingTestSuite {
         resourceMap.put("4", new RGridResource("4", "", "4".getBytes()));
         renderingTask.createPutFutures(runningRender, resourceMap);
         renderingTask.resourcesPhaser.awaitAdvanceInterruptibly(0, 30, TimeUnit.SECONDS);
+    }
+
+    @Test
+    public void testResourcesCaching() {
+        VisualGridTask visualGridTask = mock(VisualGridTask.class);
+        IEyesConnector eyesConnector = mock(IEyesConnector.class);
+        when(visualGridTask.getEyesConnector()).thenReturn(eyesConnector);
+        RenderBrowserInfo browserInfo = new RenderBrowserInfo(new RectangleSize(800, 800), BrowserType.CHROME);
+        when(visualGridTask.getBrowserInfo()).thenReturn(browserInfo);
+        UserAgent userAgent = mock(UserAgent.class);
+        when(userAgent.getOriginalUserAgentString()).thenReturn("");
+        CheckSettings checkSettings = mock(CheckSettings.class);
+        when(checkSettings.getSizeMode()).thenReturn("viewport");
+        when(checkSettings.isStitchContent()).thenReturn(true);
+
+        final Map<String, RGridResource> resourceMap = new HashMap<>();
+        RenderingTask renderingTask = new RenderingTask(eyesConnector, Collections.singletonList(visualGridTask), userAgent,
+                new IDebugResourceWriter() {
+                    @Override
+                    public void write(RGridResource resource) {
+                        resourceMap.put(resource.getUrl(), resource);
+                    }
+                }, checkSettings);
+        List<String> urls = Arrays.asList("http://1.com", "http://2.com", "http://3.com");
+        for (String url : urls) {
+            renderingTask.fetchedCacheMap.put(url, RGridResource.createEmpty(url));
+        }
+
+        FrameData frameData = new FrameData();
+        frameData.setUrl("http://random.com");
+        frameData.setResourceUrls(urls);
+        frameData.setBlobs(new ArrayList<BlobData>());
+        frameData.setFrames(new ArrayList<FrameData>());
+        frameData.setCdt(new ArrayList<CdtData>());
+        frameData.setSrcAttr("");
+        renderingTask.prepareDataForRG(frameData);
+        Assert.assertEquals(resourceMap.size(), 4);
+        for (String url : urls) {
+            Assert.assertTrue(resourceMap.containsKey(url));
+        }
     }
 
     /**
