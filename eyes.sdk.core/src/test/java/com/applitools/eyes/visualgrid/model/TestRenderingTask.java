@@ -210,14 +210,7 @@ public class TestRenderingTask extends ReportingTestSuite {
         when(checkSettings.getSizeMode()).thenReturn("viewport");
         when(checkSettings.isStitchContent()).thenReturn(true);
 
-        final Map<String, RGridResource> resourceMap = new HashMap<>();
-        RenderingTask renderingTask = new RenderingTask(eyesConnector, Collections.singletonList(visualGridTask), userAgent,
-                new IDebugResourceWriter() {
-                    @Override
-                    public void write(RGridResource resource) {
-                        resourceMap.put(resource.getUrl(), resource);
-                    }
-                }, checkSettings);
+        RenderingTask renderingTask = new RenderingTask(eyesConnector, Collections.singletonList(visualGridTask), userAgent, checkSettings);
         List<String> urls = Arrays.asList("http://1.com", "http://2.com", "http://3.com");
         for (String url : urls) {
             renderingTask.fetchedCacheMap.put(url, RGridResource.createEmpty(url));
@@ -230,8 +223,9 @@ public class TestRenderingTask extends ReportingTestSuite {
         frameData.setFrames(new ArrayList<FrameData>());
         frameData.setCdt(new ArrayList<CdtData>());
         frameData.setSrcAttr("");
-        renderingTask.prepareDataForRG(frameData);
-        Assert.assertEquals(resourceMap.size(), 4);
+        RenderRequest[] renderRequests = renderingTask.prepareDataForRG(frameData);
+        Map<String, RGridResource> resourceMap = renderRequests[0].getResources();
+        Assert.assertEquals(resourceMap.size(), 3);
         for (String url : urls) {
             Assert.assertTrue(resourceMap.containsKey(url));
         }

@@ -104,12 +104,17 @@ public class RenderingTask implements Callable<RenderStatusResults>, Completable
         void onRenderFailed(Exception e);
     }
 
+    /**
+     * For tests only
+     */
     RenderingTask(IEyesConnector eyesConnector, List<VisualGridTask> visualGridTaskList, UserAgent userAgent) {
-        this(eyesConnector, visualGridTaskList, userAgent, new NullDebugResourceWriter(), null);
+        this(eyesConnector, visualGridTaskList, userAgent, null);
     }
 
-    RenderingTask(IEyesConnector eyesConnector, List<VisualGridTask> visualGridTaskList, UserAgent userAgent,
-                  IDebugResourceWriter resourceWriter, ICheckSettings checkSettings) {
+    /**
+     * For tests only
+     */
+    RenderingTask(IEyesConnector eyesConnector, List<VisualGridTask> visualGridTaskList, UserAgent userAgent, ICheckSettings checkSettings) {
         this.eyesConnector = eyesConnector;
         this.visualGridTaskList = visualGridTaskList;
         this.userAgent = userAgent;
@@ -117,7 +122,6 @@ public class RenderingTask implements Callable<RenderStatusResults>, Completable
         logger = new Logger();
         regionSelectors = new ArrayList<>();
         putResourceCache = new HashMap<>();
-        debugResourceWriter = resourceWriter;
         this.checkSettings = checkSettings;
         this.renderingInfo = new RenderingInfo();
     }

@@ -2,6 +2,8 @@ package com.applitools.eyes.renderingGrid;
 
 import com.applitools.ICheckSettings;
 import com.applitools.connectivity.ServerConnector;
+import com.applitools.connectivity.TestServerConnector;
+import com.applitools.connectivity.api.*;
 import com.applitools.eyes.*;
 import com.applitools.eyes.config.Configuration;
 import com.applitools.eyes.selenium.BrowserType;
@@ -16,6 +18,7 @@ import com.applitools.eyes.visualgrid.services.IEyesConnector;
 import com.applitools.eyes.visualgrid.services.VisualGridRunner;
 import com.applitools.eyes.visualgrid.services.VisualGridTask;
 import com.applitools.utils.GeneralUtils;
+import org.apache.http.conn.util.InetAddressUtils;
 import org.mockito.ArgumentMatchers;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
@@ -24,6 +27,8 @@ import org.testng.Assert;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
+import javax.ws.rs.HttpMethod;
+import java.net.UnknownHostException;
 import java.util.*;
 import java.util.concurrent.Future;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -186,7 +191,65 @@ public class TestRenderings extends ReportingTestSuite {
         final String missingUrl = "http://httpstat.us/503";
         final String unknownHostUrl = "http://hostwhichdoesntexist/503";
 
+        HttpClient client = spy(new HttpClientImpl(new Logger(), ServerConnector.DEFAULT_CLIENT_TIMEOUT, null));
+
+        // Mocking async request to get status code 503 when downloading resource
+        ConnectivityTarget target1 = mock(ConnectivityTarget.class);
+        when(client.target(missingUrl)).thenReturn(target1);
+        AsyncRequest request1 = spy(new TestServerConnector.MockedAsyncRequest(new Logger()));
+        when(target1.asyncRequest(anyString())).thenReturn(request1);
+        doAnswer(new Answer() {
+            @Override
+            public Object answer(InvocationOnMock invocation) {
+                AsyncRequestCallback callback = invocation.getArgument(1);
+                callback.onComplete(new Response(new Logger()) {
+                    @Override
+                    public int getStatusCode() {
+                        return 400;
+                    }
+
+                    @Override
+                    public String getStatusPhrase() {
+                        return "";
+                    }
+
+                    @Override
+                    public String getHeader(String name, boolean ignoreCase) {
+                        return null;
+                    }
+
+                    @Override
+                    protected void readEntity() {
+                        body = new byte[]{};
+                    }
+
+                    @Override
+                    public void close() {
+
+                    }
+                });
+                return null;
+            }
+        }).when(request1).method(eq(HttpMethod.GET), any(AsyncRequestCallback.class), nullable(String.class), nullable(String.class), eq(false));
+
+        // Mocking async request to get an exception when downloading resource
+        ConnectivityTarget target2 = mock(ConnectivityTarget.class);
+        when(client.target(unknownHostUrl)).thenReturn(target2);
+        AsyncRequest request2 = spy(new TestServerConnector.MockedAsyncRequest(new Logger()));
+        when(target2.asyncRequest(anyString())).thenReturn(request2);
+        doAnswer(new Answer() {
+            @Override
+            public Object answer(InvocationOnMock invocation) {
+                AsyncRequestCallback callback = invocation.getArgument(1);
+                callback.onFail(new UnknownHostException());
+                return null;
+            }
+        }).when(request2).method(eq(HttpMethod.GET), any(AsyncRequestCallback.class), nullable(String.class), nullable(String.class), eq(false));
+
+
+        // Mocking server connector to add fake missing resources to the render request
         ServerConnector serverConnector = spy(new ServerConnector());
+        serverConnector.updateClient(client);
         doAnswer(new Answer<List<RunningRender>>() {
             @Override
             public List<RunningRender> answer(InvocationOnMock invocation) throws Throwable {

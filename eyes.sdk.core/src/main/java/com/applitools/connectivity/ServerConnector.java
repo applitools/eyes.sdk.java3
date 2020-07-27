@@ -107,7 +107,7 @@ public class ServerConnector extends RestClient {
         return getServerUrlBase();
     }
 
-    void updateClient(HttpClient client) {
+    public void updateClient(HttpClient client) {
         restClient = client;
     }
 
