@@ -1,0 +1,16 @@
+<!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd" >
+
+<suite name="passed suite" verbose="1">
+    <test name="tests">
+        <groups>
+            <run>
+                <exclude name="failed"/>
+            </run>
+        </groups>
+
+        <packages>
+            <package name="com.applitools.eyes.appium.*"/>
+        </packages>
+    </test>
+
+</suite>

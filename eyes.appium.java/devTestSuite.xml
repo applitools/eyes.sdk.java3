@@ -1,0 +1,8 @@
+<!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd" >
+
+<suite name="dev suite">
+    <suite-files>
+        <suite-file path="passedTestSuite.xml" />
+        <suite-file path="failedTestSuite.xml" />
+    </suite-files>
+</suite>
