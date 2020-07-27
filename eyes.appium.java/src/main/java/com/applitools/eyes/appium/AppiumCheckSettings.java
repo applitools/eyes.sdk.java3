@@ -1,6 +1,5 @@
 package com.applitools.eyes.appium;
 
-import com.applitools.ICheckSettings;
 import com.applitools.eyes.AccessibilityRegionType;
 import com.applitools.eyes.Logger;
 import com.applitools.eyes.Region;

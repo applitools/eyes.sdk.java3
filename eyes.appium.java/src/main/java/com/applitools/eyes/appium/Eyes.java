@@ -37,6 +37,7 @@ import java.util.Map;
 
 public class Eyes extends EyesBase {
     private static final int USE_DEFAULT_MATCH_TIMEOUT = -1;
+    private static final int DEFAULT_STITCH_OVERLAP = 50;
 
     public static final double UNKNOWN_DEVICE_PIXEL_RATIO = 0;
     public static final double DEFAULT_DEVICE_PIXEL_RATIO = 1;
@@ -60,6 +61,7 @@ public class Eyes extends EyesBase {
         super();
         regionVisibilityStrategyHandler = new SimplePropertyHandler<>();
         regionVisibilityStrategyHandler.set(new MoveToRegionVisibilityStrategy(logger));
+        configuration.setStitchOverlap(DEFAULT_STITCH_OVERLAP);
     }
 
     public WebDriver open(WebDriver driver, Configuration configuration) {
@@ -376,7 +378,6 @@ public class Eyes extends EyesBase {
     }
 
     private void updateCutElement(AppiumCheckSettings checkSettings) {
-        ElementType cutElementType = checkSettings.getCutElementType();
         try {
             if (checkSettings.getCutElementSelector() == null) {
                 return;
@@ -401,6 +402,9 @@ public class Eyes extends EyesBase {
 
         ICheckSettingsInternal checkSettingsInternal = (ICheckSettingsInternal) checkSettings;
         AppiumCheckSettings appiumCheckTarget = (checkSettings instanceof AppiumCheckSettings) ? (AppiumCheckSettings) checkSettings : null;
+        if (appiumCheckTarget != null) {
+            appiumCheckTarget.init(logger, driver);
+        }
         String name = checkSettingsInternal.getName();
 
         logger.verbose(String.format("check(\"%s\", checkSettings) - begin", name));

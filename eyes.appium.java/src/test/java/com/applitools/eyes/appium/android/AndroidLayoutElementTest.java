@@ -14,7 +14,6 @@ public class AndroidLayoutElementTest extends AndroidTestSetup {
     public void testAndroidLayoutElement() {
         BatchInfo batch = new BatchInfo("Regions test");
         eyes.setBatch(batch);
-        eyes.setSaveDebugScreenshots(true);
 
         driver.manage().timeouts().implicitlyWait(5, TimeUnit.SECONDS);
 

@@ -112,6 +112,7 @@ public class EyesRemoteWebElement extends RemoteWebElement {
         this.eyesDriver = eyesDriver;
 
 
+        logger.verbose(String.format("Element type: %s", webElement.getClass().getName()));
         webElement = getWrappedWebElement(webElement);
         if (webElement instanceof RemoteWebElement) {
             this.webElement = (RemoteWebElement) webElement;

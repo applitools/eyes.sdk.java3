@@ -27,9 +27,7 @@ public class SimpleRegionByElement extends com.applitools.eyes.selenium.fluent.S
 
     @Override
     public List<Region> getRegions(EyesScreenshot screenshot) {
-        EyesAppiumElement eyesAppiumElement = new EyesAppiumElement(driver,
-                element, 1 / driver.getDevicePixelRatio());
-
+        EyesAppiumElement eyesAppiumElement = new EyesAppiumElement(driver, element, 1 / driver.getDevicePixelRatio());
         Point locationAsPoint = eyesAppiumElement.getLocation();
         Dimension size = eyesAppiumElement.getSize();
 

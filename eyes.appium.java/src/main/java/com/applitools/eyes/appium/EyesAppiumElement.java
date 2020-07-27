@@ -1,11 +1,16 @@
 package com.applitools.eyes.appium;
 
 import com.applitools.eyes.EyesException;
+import com.google.common.collect.ImmutableMap;
 import io.appium.java_client.ios.IOSDriver;
 import org.openqa.selenium.Dimension;
 import org.openqa.selenium.Point;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.remote.DriverCommand;
 import org.openqa.selenium.remote.RemoteWebElement;
+import org.openqa.selenium.remote.Response;
+
+import java.util.Map;
 
 public class EyesAppiumElement extends RemoteWebElement {
 
@@ -22,6 +27,8 @@ public class EyesAppiumElement extends RemoteWebElement {
         }
         this.pixelRatio = pixelRatio;
         this.driver = driver;
+        setParent(driver.getRemoteWebDriver());
+        setId(this.webElement.getId());
     }
 
     protected Dimension getCachedSize() {
@@ -63,7 +70,12 @@ public class EyesAppiumElement extends RemoteWebElement {
 
     @Override
     public Point getLocation() {
-        Point location = super.getLocation();
+        String elementId = getId();
+        Response response = execute(DriverCommand.GET_ELEMENT_LOCATION, ImmutableMap.of("id", elementId));
+        Map<String, Object> rawPoint = (Map<String, Object>) response.getValue();
+        int x = (int) Math.round(((Number) rawPoint.get("x")).doubleValue());
+        int y = (int) Math.round(((Number) rawPoint.get("y")).doubleValue());
+        Point location =  new Point(x, y);
         location = new Point(location.getX(), location.getY() - driver.getStatusBarHeight());
         if (pixelRatio == 1.0) {
             return location;
