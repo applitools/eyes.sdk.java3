@@ -14,7 +14,7 @@ import org.openqa.selenium.remote.RemoteWebElement;
 import java.awt.image.BufferedImage;
 import java.util.*;
 
-public class EyesAppiumDriver implements EyesWebDriver, JavascriptExecutor {
+public class EyesAppiumDriver implements EyesWebDriver, JavascriptExecutor, TakesScreenshot, SearchContext, HasCapabilities {
 
     private final Logger logger;
     private final AppiumDriver driver;
@@ -93,6 +93,109 @@ public class EyesAppiumDriver implements EyesWebDriver, JavascriptExecutor {
         }
     }
 
+    @Override
+    public List<WebElement> findElements(By by) {
+        List<WebElement> foundWebElementsList = driver.findElements(by);
+
+        // This list will contain the found elements wrapped with our class.
+        List<WebElement> resultElementsList = new ArrayList<>(foundWebElementsList.size());
+        for (WebElement currentElement : foundWebElementsList) {
+            if (!(currentElement instanceof RemoteWebElement)) {
+                throw new EyesException(String.format("findElements: element is not a RemoteWebElement: %s", by));
+            }
+            resultElementsList.add(new EyesAppiumElement(this, currentElement, 1/getDevicePixelRatio()));
+
+            // For Remote web elements, we can keep the IDs
+            elementsIds.put(((RemoteWebElement) currentElement).getId(), currentElement);
+        }
+
+        return resultElementsList;
+    }
+
+    @Override
+    public EyesAppiumElement findElement(By by) {
+        WebElement webElement = driver.findElement(by);
+        if (!(webElement instanceof RemoteWebElement)) {
+            throw new EyesException("findElement: Element is not a RemoteWebElement: " + by);
+        }
+
+        EyesAppiumElement appiumElement = new EyesAppiumElement(this, webElement, 1/getDevicePixelRatio());
+
+        // For Remote web elements, we can keep the IDs,
+        // for Id based lookup (mainly used for Javascript related
+        // activities).
+        elementsIds.put(((RemoteWebElement) webElement).getId(), webElement);
+        return appiumElement;
+    }
+
+    public WebElement findElementByClassName(String className) {
+        return findElement(By.className(className));
+    }
+
+    public List<WebElement> findElementsByClassName(String className) {
+        return findElements(By.className(className));
+    }
+
+    public WebElement findElementByCssSelector(String cssSelector) {
+        return findElement(By.cssSelector(cssSelector));
+    }
+
+    public List<WebElement> findElementsByCssSelector(String cssSelector) {
+        return findElements(By.cssSelector(cssSelector));
+    }
+
+    public WebElement findElementById(String id) {
+        return findElement(By.id(id));
+    }
+
+    public List<WebElement> findElementsById(String id) {
+        return findElements(By.id(id));
+    }
+
+    public WebElement findElementByLinkText(String linkText) {
+        return findElement(By.linkText(linkText));
+    }
+
+    public List<WebElement> findElementsByLinkText(String linkText) {
+        return findElements(By.linkText(linkText));
+    }
+
+    public WebElement findElementByPartialLinkText(String partialLinkText) {
+        return findElement(By.partialLinkText(partialLinkText));
+    }
+
+    public List<WebElement> findElementsByPartialLinkText(String partialLinkText) {
+        return findElements(By.partialLinkText(partialLinkText));
+    }
+
+    public WebElement findElementByName(String name) {
+        return findElement(By.name(name));
+    }
+
+    public List<WebElement> findElementsByName(String name) {
+        return findElements(By.name(name));
+    }
+
+    public WebElement findElementByTagName(String tagName) {
+        return findElement(By.tagName(tagName));
+    }
+
+    public List<WebElement> findElementsByTagName(String tagName) {
+        return findElements(By.tagName(tagName));
+    }
+
+    public WebElement findElementByXPath(String path) {
+        return findElement(By.xpath(path));
+    }
+
+    public List<WebElement> findElementsByXPath(String path) {
+        return findElements(By.xpath(path));
+    }
+
+    public Capabilities getCapabilities() {
+        return driver.getCapabilities();
+    }
+
     /**
      * @param forceQuery If true, we will perform the query even if we have a cached viewport size.
      * @return The viewport size of the default content (outer most frame).
@@ -160,22 +263,6 @@ public class EyesAppiumDriver implements EyesWebDriver, JavascriptExecutor {
     }
 
     @Override
-    public EyesAppiumElement findElement(By by) {
-        WebElement webElement = driver.findElement(by);
-        if (webElement instanceof RemoteWebElement) {
-            EyesAppiumElement appiumElement = new EyesAppiumElement(this, webElement, 1/getDevicePixelRatio());
-
-            // For Remote web elements, we can keep the IDs,
-            // for Id based lookup (mainly used for Javascript related
-            // activities).
-            elementsIds.put(((RemoteWebElement) webElement).getId(), webElement);
-            return appiumElement;
-        } else {
-            throw new EyesException("findElement: Element is not a RemoteWebElement: " + by);
-        }
-    }
-
-    @Override
     public String getPageSource() {
         return driver.getPageSource();
     }
@@ -228,31 +315,6 @@ public class EyesAppiumDriver implements EyesWebDriver, JavascriptExecutor {
     @Override
     public String getTitle() {
         return driver.getTitle();
-    }
-
-    @Override
-    public List<WebElement> findElements(By by) {
-        List<WebElement> foundWebElementsList = driver.findElements(by);
-
-        // This list will contain the found elements wrapped with our class.
-        List<WebElement> resultElementsList = new ArrayList<>(foundWebElementsList.size());
-
-        for (WebElement currentElement : foundWebElementsList) {
-            if (currentElement instanceof RemoteWebElement) {
-                resultElementsList.add(new EyesAppiumElement(this, currentElement, 1/getDevicePixelRatio()));
-
-                // For Remote web elements, we can keep the IDs
-                elementsIds.put(((RemoteWebElement) currentElement).getId(),
-                        currentElement);
-
-            } else {
-                throw new EyesException(String.format(
-                        "findElements: element is not a RemoteWebElement: %s",
-                        by));
-            }
-        }
-
-        return resultElementsList;
     }
 
     public Map<String, WebElement> getElementIds() {

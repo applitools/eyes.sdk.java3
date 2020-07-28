@@ -1816,29 +1816,6 @@ public class SeleniumEyes extends EyesBase implements ISeleniumEyes, IBatchClose
     }
 
     @Override
-    protected EyesScreenshot getSubScreenshot(EyesScreenshot screenshot, Region region, ICheckSettingsInternal
-            checkSettingsInternal) {
-        ISeleniumCheckTarget seleniumCheckTarget = (checkSettingsInternal instanceof ISeleniumCheckTarget) ? (ISeleniumCheckTarget) checkSettingsInternal : null;
-
-        logger.verbose("original region: " + region);
-        region = regionPositionCompensation.compensateRegionPosition(region, devicePixelRatio);
-        logger.verbose("compensated region: " + region);
-
-        if (seleniumCheckTarget == null) {
-            // we should't get here, but just in case
-            return screenshot.getSubScreenshot(region, false);
-        }
-
-        // For check frame continue as usual
-        if (seleniumCheckTarget.getFrameChain().size() > 0) {
-            return screenshot.getSubScreenshot(region, false);
-        }
-
-        // For check region, we want the screenshot window to know it's a region.
-        return ((EyesWebDriverScreenshot) screenshot).getSubScreenshotForRegion(region, false);
-    }
-
-    @Override
     protected EyesScreenshot getScreenshot(ICheckSettingsInternal checkSettingsInternal) {
 
         ScaleProviderFactory scaleProviderFactory = updateScalingParams();

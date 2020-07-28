@@ -3,13 +3,15 @@ package com.applitools.eyes.appium;
 import com.applitools.eyes.EyesException;
 import com.google.common.collect.ImmutableMap;
 import io.appium.java_client.ios.IOSDriver;
-import org.openqa.selenium.Dimension;
-import org.openqa.selenium.Point;
-import org.openqa.selenium.WebElement;
+import org.openqa.selenium.*;
+import org.openqa.selenium.interactions.Coordinates;
 import org.openqa.selenium.remote.DriverCommand;
+import org.openqa.selenium.remote.FileDetector;
 import org.openqa.selenium.remote.RemoteWebElement;
 import org.openqa.selenium.remote.Response;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 public class EyesAppiumElement extends RemoteWebElement {
@@ -40,7 +42,15 @@ public class EyesAppiumElement extends RemoteWebElement {
 
     @Override
     public Dimension getSize() {
-        Dimension size = super.getSize();
+        String elementId = getId();
+        Response response = execute(DriverCommand.GET_ELEMENT_SIZE,
+                ImmutableMap.of("id", elementId));
+        Map<String, Object> rawSize = (Map<String, Object>) response.getValue();
+        int width = (int) Math.ceil(
+                ((Number) rawSize.get("width")).doubleValue());
+        int height = (int) Math.ceil(
+                ((Number) rawSize.get("height")).doubleValue());
+        Dimension size = new Dimension(width, height);
         if (pixelRatio == 1.0) {
             return size;
         }
@@ -69,6 +79,183 @@ public class EyesAppiumElement extends RemoteWebElement {
     }
 
     @Override
+    public WebDriver getWrappedDriver() {
+        return driver;
+    }
+
+    /**
+     * For RemoteWebElement object, the function returns an
+     * EyesRemoteWebElement object. For all other types of WebElement,
+     * the function returns the original object.
+     */
+    private WebElement wrapElement(WebElement elementToWrap) {
+        WebElement resultElement = elementToWrap;
+        if (elementToWrap instanceof RemoteWebElement) {
+            resultElement = new EyesAppiumElement(driver, elementToWrap, pixelRatio);
+        }
+        return resultElement;
+    }
+
+    /**
+     * For RemoteWebElement object, the function returns an
+     * EyesRemoteWebElement object. For all other types of WebElement,
+     * the function returns the original object.
+     */
+    private List<WebElement> wrapElements(List<WebElement> elementsToWrap) {
+        // This list will contain the found elements wrapped with our class.
+        List<WebElement> wrappedElementsList = new ArrayList<>(elementsToWrap.size());
+        for (WebElement currentElement : elementsToWrap) {
+            if (currentElement instanceof RemoteWebElement) {
+                wrappedElementsList.add(new EyesAppiumElement(driver, currentElement, pixelRatio));
+            } else {
+                wrappedElementsList.add(currentElement);
+            }
+        }
+
+        return wrappedElementsList;
+    }
+
+    @Override
+    public List<WebElement> findElements(By by) {
+        return wrapElements(webElement.findElements(by));
+    }
+
+    @Override
+    public WebElement findElement(By by) {
+        return wrapElement(webElement.findElement(by));
+    }
+
+    @Override
+    public WebElement findElementById(String using) {
+        return wrapElement(webElement.findElementById(using));
+    }
+
+    @Override
+    public List<WebElement> findElementsById(String using) {
+        return wrapElements(webElement.findElementsById(using));
+    }
+
+    @Override
+    public WebElement findElementByLinkText(String using) {
+        return wrapElement(webElement.findElementByLinkText(using));
+    }
+
+    @Override
+    public List<WebElement> findElementsByLinkText(String using) {
+        return wrapElements(webElement.findElementsByLinkText(using));
+    }
+
+    @Override
+    public WebElement findElementByName(String using) {
+        return wrapElement(webElement.findElementByName(using));
+    }
+
+    @Override
+    public List<WebElement> findElementsByName(String using) {
+        return wrapElements(webElement.findElementsByName(using));
+    }
+
+    @Override
+    public WebElement findElementByClassName(String using) {
+        return wrapElement(webElement.findElementByClassName(using));
+    }
+
+    @Override
+    public List<WebElement> findElementsByClassName(String using) {
+        return wrapElements(webElement.findElementsByClassName(using));
+    }
+
+    @Override
+    public WebElement findElementByCssSelector(String using) {
+        return wrapElement(webElement.findElementByCssSelector(using));
+    }
+
+    @Override
+    public List<WebElement> findElementsByCssSelector(String using) {
+        return wrapElements(webElement.findElementsByCssSelector(using));
+    }
+
+    @Override
+    public WebElement findElementByXPath(String using) {
+        return wrapElement(webElement.findElementByXPath(using));
+    }
+
+    @Override
+    public List<WebElement> findElementsByXPath(String using) {
+        return wrapElements(webElement.findElementsByXPath(using));
+    }
+
+    @Override
+    public WebElement findElementByPartialLinkText(String using) {
+        return wrapElement(webElement.findElementByPartialLinkText(using));
+    }
+
+    @Override
+    public List<WebElement> findElementsByPartialLinkText(String using) {
+        return wrapElements(webElement.findElementsByPartialLinkText(using));
+    }
+
+    @Override
+    public WebElement findElementByTagName(String using) {
+        return wrapElement(webElement.findElementByTagName(using));
+    }
+
+    @Override
+    public List<WebElement> findElementsByTagName(String using) {
+        return wrapElements(webElement.findElementsByTagName(using));
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        return (obj instanceof RemoteWebElement) && webElement.equals(obj);
+    }
+
+    @Override
+    public int hashCode() {
+        return webElement.hashCode();
+    }
+
+    @Override
+    public void setFileDetector(FileDetector detector) {
+        webElement.setFileDetector(detector);
+    }
+
+    @Override
+    public void submit() {
+        webElement.submit();
+    }
+
+    @Override
+    public void clear() {
+        webElement.clear();
+    }
+
+    @Override
+    public String getTagName() {
+        return webElement.getTagName();
+    }
+
+    @Override
+    public String getAttribute(String name) {
+        return webElement.getAttribute(name);
+    }
+
+    @Override
+    public boolean isSelected() {
+        return webElement.isSelected();
+    }
+
+    @Override
+    public boolean isEnabled() {
+        return webElement.isEnabled();
+    }
+
+    @Override
+    public String getText() {
+        return webElement.getText();
+    }
+
+    @Override
     public Point getLocation() {
         String elementId = getId();
         Response response = execute(DriverCommand.GET_ELEMENT_LOCATION, ImmutableMap.of("id", elementId));
@@ -90,5 +277,15 @@ public class EyesAppiumElement extends RemoteWebElement {
             unscaledY = (int) Math.ceil(location.getY()*pixelRatio);
         }
         return new Point(unscaledX, unscaledY);
+    }
+
+    @Override
+    public Coordinates getCoordinates() {
+        return webElement.getCoordinates();
+    }
+
+    @Override
+    public String toString() {
+        return "EyesAppiumElement: " + webElement.getId();
     }
 }

@@ -1394,9 +1394,7 @@ public abstract class EyesBase implements IEyesBase{
      * @param region         The region of the screenshot which will be set in the application output.
      * @return The updated app output and screenshot.
      */
-    private AppOutputWithScreenshot getAppOutputWithScreenshot(
-            Region region, ICheckSettingsInternal checkSettingsInternal) {
-
+    private AppOutputWithScreenshot getAppOutputWithScreenshot(Region region, ICheckSettingsInternal checkSettingsInternal) {
         logger.verbose("getting screenshot...");
         // Getting the screenshot (abstract function implemented by each SDK).
         EyesScreenshot screenshot = getScreenshot(checkSettingsInternal);
@@ -1406,7 +1404,7 @@ public abstract class EyesBase implements IEyesBase{
         Location location = null;
         if (!region.isSizeEmpty()) {
             location = region.getLocation();
-            screenshot = screenshot.getSubScreenshot(region, false);
+            screenshot = getSubScreenshot(screenshot, region, checkSettingsInternal);
             debugScreenshotsProvider.save(screenshot.getImage(), "SUB_SCREENSHOT");
         }
 
