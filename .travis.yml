@@ -54,7 +54,7 @@ jobs:
       script:
         - export APPLITOOLS_REPORT_ID=${TRAVIS_COMMIT:0:7}-$TRAVIS_BUILD_NUMBER
         - sh upload_app.sh "https://applitools.bintray.com/Examples/ipa/IOSTestApp.ipa" "app_ios"
-        - sed -i 's/androidTestsSuite.xml/iosTestsSuite.xml/g' $TRAVIS_BUILD_DIR/eyes.appium.java/pom.xml;
+        - sed -i 's/androidTestSuite.xml/iosTestSuite.xml/g' $TRAVIS_BUILD_DIR/eyes.appium.java/pom.xml;
         - chmod +x ./runTests.sh
         - ./runTests.sh "eyes.appium.java"
     - stage: test-selenium
