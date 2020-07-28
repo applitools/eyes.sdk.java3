@@ -1,6 +1,9 @@
 <!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd" >
 
-<suite name="passed suite" verbose="1">
+<suite name="ios suite" verbose="1">
+    <listeners>
+        <listener class-name="com.applitools.eyes.utils.ReportingListener"/>
+    </listeners>
     <test name="tests">
         <groups>
             <run>
@@ -9,8 +12,7 @@
         </groups>
 
         <packages>
-            <package name="com.applitools.eyes.appium.*"/>
+            <package name="com.applitools.eyes.appium.ios.*"/>
         </packages>
     </test>
-
 </suite>

@@ -43,13 +43,18 @@ jobs:
         - export APPLITOOLS_REPORT_ID=${TRAVIS_COMMIT:0:7}-$TRAVIS_BUILD_NUMBER
         - chmod +x ./runTests.sh
         - ./runTests.sh "eyes.images.java"
-    - stage: test-appium
+    - stage: test-appium-android
       script:
         - export APPLITOOLS_REPORT_ID=${TRAVIS_COMMIT:0:7}-$TRAVIS_BUILD_NUMBER
         - sh upload_app.sh "https://applitools.bintray.com/Examples/android/1.2/app_android.apk" "app_android"
         - sh upload_app.sh "https://applitools.bintray.com/Examples/androidx/1.0.0/app_androidx.apk" "app_androidx"
-        - sh upload_app.sh "https://applitools.bintray.com/Examples/app-android.apk" "app_android_accessibility"
+        - chmod +x ./runTests.sh
+        - ./runTests.sh "eyes.appium.java"
+    - stage: test-appium-ios
+      script:
+        - export APPLITOOLS_REPORT_ID=${TRAVIS_COMMIT:0:7}-$TRAVIS_BUILD_NUMBER
         - sh upload_app.sh "https://applitools.bintray.com/Examples/ipa/IOSTestApp.ipa" "app_ios"
+        - sed -i 's/androidTestsSuite.xml/iosTestsSuite.xml/g' $TRAVIS_BUILD_DIR/eyes.appium.java/pom.xml;
         - chmod +x ./runTests.sh
         - ./runTests.sh "eyes.appium.java"
     - stage: test-selenium

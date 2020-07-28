@@ -2,7 +2,8 @@
 
 <suite name="dev suite">
     <suite-files>
-        <suite-file path="passedTestSuite.xml" />
+        <suite-file path="androidTestSuite.xml" />
+        <suite-file path="iosTestSuite.xml" />
         <suite-file path="failedTestSuite.xml" />
     </suite-files>
 </suite>

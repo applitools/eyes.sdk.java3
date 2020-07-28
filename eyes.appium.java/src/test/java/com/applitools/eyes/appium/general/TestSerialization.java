@@ -1,8 +1,9 @@
-package com.applitools.eyes.appium;
+package com.applitools.eyes.appium.general;
 
 import com.applitools.ICheckSettings;
 import com.applitools.eyes.ImageMatchSettings;
 import com.applitools.eyes.MatchWindowTask;
+import com.applitools.eyes.appium.Target;
 import com.applitools.eyes.fluent.ICheckSettingsInternal;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;

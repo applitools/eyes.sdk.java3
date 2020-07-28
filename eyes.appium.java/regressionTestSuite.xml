@@ -1,11 +1,8 @@
 <!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd" >
 
 <suite name="regression suite">
-    <listeners>
-        <listener class-name="com.applitools.eyes.utils.ReportingListener"/>
-    </listeners>
-
     <suite-files>
-        <suite-file path="passedTestSuite.xml"/>
+        <suite-file path="androidTestSuite.xml"/>
+        <suite-file path="iosTestSuite.xml"/>
     </suite-files>
 </suite>

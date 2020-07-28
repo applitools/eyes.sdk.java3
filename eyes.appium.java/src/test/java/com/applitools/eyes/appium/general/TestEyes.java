@@ -1,4 +1,4 @@
-package com.applitools.eyes.appium;
+package com.applitools.eyes.appium.general;
 
 import com.applitools.eyes.EyesBase;
 import com.applitools.eyes.EyesScreenshot;

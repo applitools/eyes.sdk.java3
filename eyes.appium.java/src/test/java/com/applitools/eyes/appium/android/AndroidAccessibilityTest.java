@@ -29,7 +29,8 @@ public class AndroidAccessibilityTest extends AndroidTestSetup {
         configuration.setAccessibilityValidation(new AccessibilitySettings(AccessibilityLevel.AA, AccessibilityGuidelinesVersion.WCAG_2_0));
 
         eyes.open(driver, configuration);
-        eyes.check("Launcher screen", Target.window().accessibility(By.xpath("//*[@text='ScrollView']"), AccessibilityRegionType.GraphicalObject));
+        driver.findElementById("btn_edit_text").click();
+        eyes.check("Launcher screen", Target.window().accessibility(By.xpath("//*[@text='First Edit Text']"), AccessibilityRegionType.GraphicalObject));
         TestResults results = eyes.close(false);
 
         SessionAccessibilityStatus accessibilityStatus = results.getAccessibilityStatus();
@@ -44,7 +45,7 @@ public class AndroidAccessibilityTest extends AndroidTestSetup {
         ImageMatchSettings matchSettings = sessionResults.getActualAppOutput()[0].getImageMatchSettings();
         List<AccessibilityRegionByRectangle> actual = Arrays.asList(matchSettings.getAccessibility());
         Assert.assertEquals(new HashSet<>(actual), new HashSet<>(Collections.singletonList(
-                new AccessibilityRegionByRectangle(15, 358, 382, 48, AccessibilityRegionType.GraphicalObject)
+                new AccessibilityRegionByRectangle(16, 72, 380, 45, AccessibilityRegionType.GraphicalObject)
         )));
 
         configuration.setAccessibilityValidation(null);
@@ -52,11 +53,5 @@ public class AndroidAccessibilityTest extends AndroidTestSetup {
         eyes.checkWindow("No accessibility");
         results = eyes.close(false);
         Assert.assertNull(results.getAccessibilityStatus());
-    }
-
-    @Override
-    protected void setAppCapability() {
-        // To run locally use https://applitools.bintray.com/Examples/android/1.2/app_android.apk
-        capabilities.setCapability("app", "app_android_accessibility");
     }
 }
