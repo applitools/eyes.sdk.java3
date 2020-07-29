@@ -23,7 +23,8 @@ before_script:
   - nvm use 14.5.0
 jobs:
   include:
-    - stage: test-core
+    - stage: Test
+    - name: core
       script:
         - export APPLITOOLS_REPORT_ID=${TRAVIS_COMMIT:0:7}-$TRAVIS_BUILD_NUMBER
         - SDK_VERSION=$(echo $TRAVIS_TAG | sed 's/[^.0-9]*//g')
@@ -38,26 +39,26 @@ jobs:
         - export APPLITOOLS_REPORT_ID=${TRAVIS_COMMIT:0:7}-$TRAVIS_BUILD_NUMBER
         - chmod +x ./runTests.sh
         - ./runTests.sh "eyes.sdk.core"
-    - stage: test-images
+    - name: images
       script:
         - export APPLITOOLS_REPORT_ID=${TRAVIS_COMMIT:0:7}-$TRAVIS_BUILD_NUMBER
         - chmod +x ./runTests.sh
         - ./runTests.sh "eyes.images.java"
-    - stage: test-appium-android
+    - name: appium-android
       script:
         - export APPLITOOLS_REPORT_ID=${TRAVIS_COMMIT:0:7}-$TRAVIS_BUILD_NUMBER
         - sh upload_app.sh "https://applitools.bintray.com/Examples/android/1.2/app_android.apk" "app_android"
         - sh upload_app.sh "https://applitools.bintray.com/Examples/androidx/1.0.0/app_androidx.apk" "app_androidx"
         - chmod +x ./runTests.sh
         - ./runTests.sh "eyes.appium.java"
-    - stage: test-appium-ios
+    - name: appium-ios
       script:
         - export APPLITOOLS_REPORT_ID=${TRAVIS_COMMIT:0:7}-$TRAVIS_BUILD_NUMBER
         - sh upload_app.sh "https://applitools.bintray.com/Examples/ipa/IOSTestApp.ipa" "app_ios"
         - sed -i 's/androidTestSuite.xml/iosTestSuite.xml/g' $TRAVIS_BUILD_DIR/eyes.appium.java/pom.xml;
         - chmod +x ./runTests.sh
         - ./runTests.sh "eyes.appium.java"
-    - stage: test-selenium
+    - name: selenium
       script:
         - export APPLITOOLS_REPORT_ID=${TRAVIS_COMMIT:0:7}-$TRAVIS_BUILD_NUMBER
         - google-chrome --version
@@ -73,7 +74,7 @@ jobs:
           fi
         - chmod +x ./runTests.sh
         - ./runTests.sh "eyes.selenium.java"
-    - stage: generic
+    - name: generic
       script:
         - cd eyes.selenium.java;
         - if [[ $TRAVIS_TAG =~ ^RELEASE_CANDIDATE ]]; then
@@ -82,7 +83,7 @@ jobs:
           yarn java;
           fi
         - ./runTests.sh "eyes.sdk.core"
-    - stage: deploy
+    - stage: Deploy
       if: tag =~ ^RELEASE_CANDIDATE AND fork == false
       script:
           #         save the email of the person who did this commit in COMMITTER_EMAIL
