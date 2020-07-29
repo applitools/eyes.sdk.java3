@@ -23,7 +23,8 @@ before_script:
   - nvm use 14.5.0
 jobs:
   include:
-    - name: core
+    - stage: Test
+      name: core
       script:
         - export APPLITOOLS_REPORT_ID=${TRAVIS_COMMIT:0:7}-$TRAVIS_BUILD_NUMBER
         - SDK_VERSION=$(echo $TRAVIS_TAG | sed 's/[^.0-9]*//g')
