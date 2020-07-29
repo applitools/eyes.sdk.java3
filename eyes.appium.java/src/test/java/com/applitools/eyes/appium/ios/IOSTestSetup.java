@@ -14,7 +14,7 @@ public abstract class IOSTestSetup extends TestSetup {
         super.setCapabilities();
         capabilities.setCapability("platformName", "iOS");
         capabilities.setCapability("deviceName", "iPhone 8");
-        capabilities.setCapability("os_version", "13.3");
+        capabilities.setCapability("os_version", "12");
         capabilities.setCapability("automationName", "XCUITest");
         capabilities.setCapability("newCommandTimeout", 300);
         capabilities.setCapability("fullReset", false);
@@ -23,8 +23,6 @@ public abstract class IOSTestSetup extends TestSetup {
     @Override
     protected void initDriver() throws MalformedURLException {
         driver = new IOSDriver<>(new URL(appiumServerUrl), capabilities);
-        driver.executeScript("mobile: siriCommand", ImmutableMap.of("text", "Siri, switch to light mode"));
-        driver.launchApp();
     }
 
     @Override
