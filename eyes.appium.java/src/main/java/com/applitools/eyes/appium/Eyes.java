@@ -824,6 +824,30 @@ public class Eyes extends EyesBase {
         return new com.applitools.eyes.selenium.Configuration(configuration);
     }
 
+    public void setBranchName(String branchName) {
+        configuration.setBranchName(branchName);
+    }
+
+    public String getBranchName() {
+        return configuration.getBranchName();
+    }
+
+    public void setParentBranchName(String branchName) {
+        configuration.setParentBranchName(branchName);
+    }
+
+    public String getParentBranchName() {
+        return configuration.getParentBranchName();
+    }
+
+    public void setBaselineBranchName(String branchName) {
+        this.configuration.setBaselineBranchName(branchName);
+    }
+
+    public String getBaselineBranchName() {
+        return configuration.getBaselineBranchName();
+    }
+
     public void setConfiguration(Configuration configuration) {
         ArgumentGuard.notNull(configuration, "configuration");
         String apiKey = configuration.getApiKey();
