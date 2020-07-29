@@ -23,9 +23,8 @@ public abstract class IOSTestSetup extends TestSetup {
     @Override
     protected void initDriver() throws MalformedURLException {
         driver = new IOSDriver<>(new URL(appiumServerUrl), capabilities);
-
         driver.executeScript("mobile: siriCommand", ImmutableMap.of("text", "Siri, switch to light mode"));
-        driver.executeScript("mobile: pressButton", ImmutableMap.of("name", "home"));
+        driver.launchApp();
     }
 
     @Override
