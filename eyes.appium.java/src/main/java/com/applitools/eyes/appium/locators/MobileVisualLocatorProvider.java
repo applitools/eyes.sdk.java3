@@ -33,7 +33,7 @@ public abstract class MobileVisualLocatorProvider extends BaseVisualLocatorsProv
         BufferedImage image = ImageUtils.imageFromBase64(base64Image);
 
         logger.verbose("Scale image with the scale ratio - " + 1 / devicePixelRatio);
-        return ImageUtils.scaleImage(image, 1 / devicePixelRatio);
+        return ImageUtils.scaleImage(image, 1 / devicePixelRatio, true);
     }
 
     @Override

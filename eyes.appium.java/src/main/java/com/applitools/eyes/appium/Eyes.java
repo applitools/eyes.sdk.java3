@@ -656,7 +656,7 @@ public class Eyes extends EyesBase {
         ScaleProvider scaleProvider = scaleProviderFactory.getScaleProvider(screenshotImage.getWidth());
         if (scaleProvider.getScaleRatio() != 1.0) {
             logger.verbose("scaling...");
-            screenshotImage = ImageUtils.scaleImage(screenshotImage, scaleProvider);
+            screenshotImage = ImageUtils.scaleImage(screenshotImage, scaleProvider.getScaleRatio(), true);
             debugScreenshotsProvider.save(screenshotImage, "scaled");
         }
 
@@ -760,10 +760,10 @@ public class Eyes extends EyesBase {
 
             BufferedImage image = screenshot.getImage();
             if (image.getWidth() < driver.getViewportRect().get("width")) {
-                image = ImageUtils.scaleImage(image, driver.getDevicePixelRatio());
+                image = ImageUtils.scaleImage(image, driver.getDevicePixelRatio(), true);
             }
             BufferedImage subScreenshotImage = ImageUtils.scaleImage(ImageUtils.getImagePart(image, region),
-                    1/driver.getDevicePixelRatio());
+                    1/driver.getDevicePixelRatio(), true);
 
             EyesAppiumScreenshot result = new EyesAppiumScreenshot(logger, driver, subScreenshotImage);
 

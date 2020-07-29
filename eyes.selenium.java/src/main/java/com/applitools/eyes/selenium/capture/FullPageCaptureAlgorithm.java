@@ -109,7 +109,7 @@ public class FullPageCaptureAlgorithm {
         BufferedImage croppedInitialScreenshot = cropScreenshot(initialScreenshot, regionInScreenshot);
         debugScreenshotsProvider.save(croppedInitialScreenshot, "cropped");
 
-        BufferedImage scaledInitialScreenshot = ImageUtils.scaleImage(croppedInitialScreenshot, scaleProvider);
+        BufferedImage scaledInitialScreenshot = ImageUtils.scaleImage(croppedInitialScreenshot, scaleProvider.getScaleRatio());
         if (scaledInitialScreenshot != croppedInitialScreenshot) {
             saveDebugScreenshotPart(scaledInitialScreenshot, regionInScreenshot, "scaled");
         }

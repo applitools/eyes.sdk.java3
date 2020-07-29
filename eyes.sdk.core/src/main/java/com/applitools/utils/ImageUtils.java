@@ -278,20 +278,8 @@ public class ImageUtils {
         return result;
     }
 
-    /**
-     * Scales an image by the given ratio
-     * @param image         The image to scale.
-     * @param scaleProvider The encapsulation of the required scaling.
-     * @return If the scale ratio != 1, returns a new scaled image,
-     * otherwise, returns the original image.
-     */
-    public static BufferedImage scaleImage(BufferedImage image,
-                                           ScaleProvider scaleProvider) {
-        ArgumentGuard.notNull(image, "image");
-        ArgumentGuard.notNull(scaleProvider, "scaleProvider");
-
-        double scaleRatio = scaleProvider.getScaleRatio();
-        return scaleImage(image, scaleRatio);
+    public static BufferedImage scaleImage(BufferedImage image, double scaleRatio) {
+        return scaleImage(image, scaleRatio, false);
     }
 
     /**
@@ -301,14 +289,23 @@ public class ImageUtils {
      * @return If the scale ratio != 1, returns a new scaled image,
      * otherwise, returns the original image.
      */
-    public static BufferedImage scaleImage(BufferedImage image, double scaleRatio) {
+    public static BufferedImage scaleImage(BufferedImage image, double scaleRatio, boolean isMobile) {
         ArgumentGuard.notNull(image, "image");
-        ArgumentGuard.notNull(scaleRatio, "scaleRatio");
 
         image = normalizeImageType(image);
 
-        int targetWidth = (int)Math.ceil(image.getWidth() * scaleRatio);
-        int targetHeight = (int)Math.ceil(image.getHeight() * scaleRatio);
+        if (scaleRatio == 1) {
+            return image;
+        }
+
+        int targetWidth = (int) Math.ceil(image.getWidth() * scaleRatio);
+        int targetHeight;
+        if (isMobile) {
+            double imageRatio = (double) image.getHeight() / (double) image.getWidth();
+            targetHeight = (int) Math.ceil(targetWidth * imageRatio);;
+        } else {
+            targetHeight = (int) Math.ceil(image.getHeight() * scaleRatio);
+        }
 
         BufferedImage scaledImage = resizeImage(image, targetWidth, targetHeight);
 

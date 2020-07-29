@@ -1159,7 +1159,7 @@ public class SeleniumEyes extends EyesBase implements ISeleniumEyes, IBatchClose
             // FIXME - Scaling should be handled in a single place instead
             ScaleProvider scaleProvider = updateScalingParams().getScaleProvider(screenshotImage.getWidth());
 
-            screenshotImage = ImageUtils.scaleImage(screenshotImage, scaleProvider);
+            screenshotImage = ImageUtils.scaleImage(screenshotImage, scaleProvider.getScaleRatio());
             logger.verbose("Done! Building required object...");
             final EyesWebDriverScreenshot screenshot = new EyesWebDriverScreenshot(logger, driver, screenshotImage);
             logger.verbose("Done!");
@@ -1954,7 +1954,7 @@ public class SeleniumEyes extends EyesBase implements ISeleniumEyes, IBatchClose
         ScaleProvider scaleProvider = scaleProviderFactory.getScaleProvider(screenshotImage.getWidth());
         CutProvider cutProvider = cutProviderHandler.get();
         if (scaleProvider.getScaleRatio() != 1.0) {
-            screenshotImage = ImageUtils.scaleImage(screenshotImage, scaleProvider);
+            screenshotImage = ImageUtils.scaleImage(screenshotImage, scaleProvider.getScaleRatio());
             debugScreenshotsProvider.save(screenshotImage, "scaled");
             cutProvider.scale(scaleProvider.getScaleRatio());
         }

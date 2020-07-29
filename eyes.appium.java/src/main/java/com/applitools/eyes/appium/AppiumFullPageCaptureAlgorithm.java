@@ -407,7 +407,7 @@ public class AppiumFullPageCaptureAlgorithm {
             logger.verbose("Image was already bigger than entire size, so returning straightaway");
             originProvider.restoreState(originalPosition);
 
-            return ImageUtils.scaleImage(image, scaleProvider);
+            return ImageUtils.scaleImage(image, scaleProvider.getScaleRatio(), true);
         }
 
         // Otherwise, make a big image to stitch smaller parts into
@@ -440,7 +440,7 @@ public class AppiumFullPageCaptureAlgorithm {
             logger.verbose("Pixel ratio was 1, no need to scale stitched image");
         } else {
             logger.verbose("Pixel ratio was " + pixelRatio + "; scaling stitched image");
-            stitchedImage = ImageUtils.scaleImage(stitchedImage, scaleProvider);
+            stitchedImage = ImageUtils.scaleImage(stitchedImage, scaleProvider.getScaleRatio(), true);
             debugScreenshotsProvider.save(stitchedImage, "scaled");
         }
 
