@@ -183,14 +183,16 @@ public class IOSScrollPositionProvider extends AppiumScrollPositionProvider {
                         List<WebElement> list = element.findElements(MobileBy.xpath("//XCUIElementTypeTable[1]/*"));
                         if (!list.isEmpty()) {
                             WebElement lastElement = list.get(list.size()-1);
-                            contentSize.scrollableOffset = lastElement.getLocation().getY() + lastElement.getSize().getHeight() - element.getRect().getY();
+                            contentSize.scrollableOffset = lastElement.getLocation().getY() + lastElement.getSize().getHeight()
+                                    - element.getRect().getY() + eyesDriver.getStatusBarHeight();
                         }
                         break;
                     case "XCUIElementTypeScrollView":
                         list = element.findElements(MobileBy.xpath("//XCUIElementTypeScrollView[1]/*"));
                         if (!list.isEmpty()) {
                             WebElement firstElement = list.get(0);
-                            contentSize.scrollableOffset = firstElement.getLocation().getY() + firstElement.getSize().getHeight() - element.getRect().getY();
+                            contentSize.scrollableOffset = firstElement.getLocation().getY() + firstElement.getSize().getHeight()
+                                    - element.getRect().getY() + eyesDriver.getStatusBarHeight();
                         }
                         break;
                 }
