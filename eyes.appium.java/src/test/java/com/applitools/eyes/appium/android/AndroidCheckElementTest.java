@@ -25,16 +25,4 @@ public class AndroidCheckElementTest extends AndroidTestSetup {
 
         eyes.close();
     }
-
-    @Test
-    public void testAndroidCheckElements() {
-        driver.manage().timeouts().implicitlyWait(10_000, TimeUnit.MILLISECONDS);
-        eyes.setMatchTimeout(1000);
-
-        eyes.open(driver, getApplicationName(), "Check elements test");
-        eyes.check(Target.region(MobileBy.id("btn_recycler_view")),
-                Target.region(MobileBy.id("btn_activity_as_dialog")));
-
-        eyes.close();
-    }
 }
