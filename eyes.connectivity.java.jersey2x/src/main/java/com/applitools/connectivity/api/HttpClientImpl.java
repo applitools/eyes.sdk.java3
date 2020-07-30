@@ -7,6 +7,7 @@ import org.glassfish.jersey.apache.connector.ApacheConnectorProvider;
 import org.glassfish.jersey.client.ClientConfig;
 import org.glassfish.jersey.client.ClientProperties;
 import org.glassfish.jersey.client.RequestEntityProcessing;
+import org.glassfish.jersey.logging.LoggingFeature;
 
 import javax.net.ssl.SSLContext;
 import javax.ws.rs.client.Client;
@@ -51,17 +52,18 @@ public class HttpClientImpl extends HttpClient {
             SSLContext sslContext = NetworkUtils.getDisabledSSLContext();
             builder.sslContext(sslContext);
         } catch (NoSuchAlgorithmException | KeyManagementException ignored) {}
-        client = builder.build();
+
+        client = builder.register(new LoggingFeature(communicationLogger)).build();
     }
 
     @Override
     public ConnectivityTarget target(URI baseUrl) {
-        return new ConnectivityTargetImpl(client.target(baseUrl), logger);
+        return new ConnectivityTargetImpl(client.target(baseUrl), eyesLogger);
     }
 
     @Override
     public ConnectivityTarget target(String path) {
-        return new ConnectivityTargetImpl(client.target(path), logger);
+        return new ConnectivityTargetImpl(client.target(path), eyesLogger);
     }
 
     @Override

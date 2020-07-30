@@ -1,10 +1,8 @@
 package com.applitools.eyes.selenium;
 
+import com.applitools.connectivity.EyesConnectivityUtils;
 import com.applitools.connectivity.ServerConnector;
-import com.applitools.eyes.ProxySettings;
-import com.applitools.eyes.RectangleSize;
-import com.applitools.eyes.TestResults;
-import com.applitools.eyes.TestResultsSummary;
+import com.applitools.eyes.*;
 import com.applitools.eyes.config.Configuration;
 import com.applitools.eyes.config.ConfigurationProvider;
 import com.applitools.eyes.debug.DebugScreenshotsProvider;
@@ -180,5 +178,15 @@ public class TestSeleniumEyes extends ReportingTestSuite {
 
         eyes.setAppName("app");
         Assert.assertEquals(eyes.getConfiguration().getAppName(), "app");
+    }
+
+    @Test
+    public void testSetLogger() {
+        Eyes eyes = new Eyes(new ClassicRunner());
+        LogHandler logHandler = new StdoutLogHandler(true);
+        eyes.setLogHandler(logHandler);
+        ServerConnector serverConnector = eyes.getServerConnector();
+        Assert.assertEquals(serverConnector.getLogger().getLogHandler(), logHandler);
+        Assert.assertEquals(EyesConnectivityUtils.getClient(serverConnector).getLogger().getLogHandler(), logHandler);
     }
 }

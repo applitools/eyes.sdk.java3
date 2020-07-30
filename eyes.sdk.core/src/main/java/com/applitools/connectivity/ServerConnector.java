@@ -110,7 +110,8 @@ public class ServerConnector extends RestClient {
     }
 
     public void updateClient(HttpClient client) {
-        restClient = client;
+        restClient.close();
+        restClient = new HttpClientImpl(logger, client.getTimeout(), client.getProxySettings());
     }
 
     @Override

@@ -63,6 +63,10 @@ public class RestClient {
     public void setLogger(Logger logger) {
         ArgumentGuard.notNull(logger, "logger");
         this.logger = logger;
+        AbstractProxySettings proxySettings = restClient.getProxySettings();
+        int timeout = restClient.getTimeout();
+        restClient.close();
+        restClient = new HttpClientImpl(logger, timeout, proxySettings);
     }
 
     public Logger getLogger() {

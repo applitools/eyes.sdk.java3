@@ -5,6 +5,7 @@ import com.applitools.eyes.Logger;
 import com.applitools.utils.NetworkUtils;
 import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.config.ClientConfig;
+import com.sun.jersey.api.client.filter.LoggingFilter;
 import com.sun.jersey.client.apache4.config.DefaultApacheHttpClient4Config;
 import com.sun.jersey.client.urlconnection.HTTPSProperties;
 import com.sun.jersey.client.urlconnection.HttpURLConnectionFactory;
@@ -37,6 +38,7 @@ public class HttpClientImpl extends HttpClient {
 
         if (abstractProxySettings == null) {
             client = Client.create(clientConfig);
+            client.addFilter(new LoggingFilter(communicationLogger));
             return;
         }
 
@@ -76,16 +78,17 @@ public class HttpClientImpl extends HttpClient {
 
         URLConnectionClientHandler clientHandler = new URLConnectionClientHandler(factory);
         client = new Client(clientHandler, clientConfig);
+        client.addFilter(new LoggingFilter(communicationLogger));
     }
 
     @Override
     public ConnectivityTarget target(URI baseUrl) {
-        return new ConnectivityTargetImpl(client.resource(baseUrl), client.asyncResource(baseUrl), logger);
+        return new ConnectivityTargetImpl(client.resource(baseUrl), client.asyncResource(baseUrl), eyesLogger);
     }
 
     @Override
     public ConnectivityTarget target(String path) {
-        return new ConnectivityTargetImpl(client.resource(path), client.asyncResource(path), logger);
+        return new ConnectivityTargetImpl(client.resource(path), client.asyncResource(path), eyesLogger);
     }
 
     @Override

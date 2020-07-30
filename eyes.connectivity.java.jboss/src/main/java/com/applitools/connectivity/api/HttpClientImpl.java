@@ -15,10 +15,43 @@ import org.jboss.resteasy.client.jaxrs.ResteasyClient;
 import org.jboss.resteasy.client.jaxrs.ResteasyClientBuilder;
 import org.jboss.resteasy.client.jaxrs.engines.ApacheHttpClient4Engine;
 
+import javax.ws.rs.client.ClientRequestContext;
+import javax.ws.rs.client.ClientRequestFilter;
+import javax.ws.rs.core.MultivaluedMap;
 import java.net.URI;
 import java.util.concurrent.TimeUnit;
+import java.util.logging.Level;
 
 public class HttpClientImpl extends HttpClient {
+
+    private static class LoggingFilter implements ClientRequestFilter {
+
+        private final java.util.logging.Logger logger;
+
+        public LoggingFilter(java.util.logging.Logger logger) {
+            this.logger = logger;
+        }
+
+        @Override
+        public void filter(ClientRequestContext requestContext) {
+            if (logger == null) {
+                return;
+            }
+
+            StringBuilder builder = new StringBuilder("\n");
+            MultivaluedMap<String, Object> headers = requestContext.getHeaders();
+            for (String header : headers.keySet()) {
+                builder.append(header).append(": ").append(headers.get(header)).append("\n");
+            }
+
+            Object body = requestContext.getEntity();
+            if (body != null) {
+                builder.append(body.toString()).append("\n");
+            }
+
+            logger.log(Level.INFO, builder.toString());
+        }
+    }
 
     private static final int DEFAULT_HTTP_PROXY_PORT = 80;
     private static final int DEFAULT_HTTPS_PROXY_PORT = 443;
@@ -35,6 +68,7 @@ public class HttpClientImpl extends HttpClient {
                 .disableTrustManager();
         if (abstractProxySettings == null) {
             client = builder.build();
+            client.register(new LoggingFilter(communicationLogger));
             return;
         }
 
@@ -78,16 +112,18 @@ public class HttpClientImpl extends HttpClient {
             AuthScope authScope = new AuthScope(hostName, port, null, null);
             credProvider.setCredentials(authScope, credentials);
         }
+
+        client.register(new LoggingFilter(communicationLogger));
     }
 
     @Override
     public ConnectivityTarget target(URI baseUrl) {
-        return new ConnectivityTargetImpl(client.target(baseUrl), logger);
+        return new ConnectivityTargetImpl(client.target(baseUrl), eyesLogger);
     }
 
     @Override
     public ConnectivityTarget target(String path) {
-        return new ConnectivityTargetImpl(client.target(path), logger);
+        return new ConnectivityTargetImpl(client.target(path), eyesLogger);
     }
 
     @Override
