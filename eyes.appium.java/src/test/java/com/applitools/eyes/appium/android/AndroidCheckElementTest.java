@@ -33,7 +33,7 @@ public class AndroidCheckElementTest extends AndroidTestSetup {
 
         eyes.open(driver, getApplicationName(), "Check elements test");
         eyes.check(Target.region(MobileBy.id("btn_recycler_view")),
-                Target.region(MobileBy.id("btn_scroll_view_footer_header")));
+                Target.region(MobileBy.id("btn_activity_as_dialog")));
 
         eyes.close();
     }
