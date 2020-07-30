@@ -165,7 +165,6 @@ public class TestServerConnector extends ReportingTestSuite {
 
         ServerConnector connector = new ServerConnector();
         connector.updateClient(restClient);
-        connector.setLogger(new Logger());
         connector.setAgentId("agent_id");
 
         when(response.getStatusCode()).thenReturn(HttpStatus.SC_OK);
