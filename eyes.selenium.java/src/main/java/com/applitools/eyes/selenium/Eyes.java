@@ -354,8 +354,7 @@ public class Eyes implements IEyesBase {
      * Updates the match settings to be used for the session.
      * @param defaultMatchSettings The match settings to be used for the session.
      */
-    public void setDefaultMatchSettings(ImageMatchSettings
-                                                defaultMatchSettings) {
+    public void setDefaultMatchSettings(ImageMatchSettings defaultMatchSettings) {
         configuration.setDefaultMatchSettings(defaultMatchSettings);
     }
 
@@ -365,7 +364,6 @@ public class Eyes implements IEyesBase {
      */
     public ImageMatchSettings getDefaultMatchSettings() {
         return this.configuration.getDefaultMatchSettings();
-
     }
 
     /**

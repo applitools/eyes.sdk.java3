@@ -1,10 +1,11 @@
 package com.applitools.eyes.appium.general;
 
-import com.applitools.eyes.EyesBase;
-import com.applitools.eyes.EyesScreenshot;
-import com.applitools.eyes.RectangleSize;
+import com.applitools.eyes.*;
+import com.applitools.eyes.appium.Eyes;
 import com.applitools.eyes.config.Configuration;
 import com.applitools.eyes.fluent.ICheckSettingsInternal;
+import cucumber.api.java.gl.E;
+import org.testng.annotations.Test;
 
 public class TestEyes extends EyesBase {
 
@@ -59,5 +60,48 @@ public class TestEyes extends EyesBase {
 
     protected Configuration getConfiguration() {
         return configuration;
+    }
+
+    @Test
+    public void testEyesApi() {
+        Eyes eyes = new Eyes();
+        eyes.getParentBranchName();
+        eyes.setParentBranchName("");
+        eyes.getBranchName();
+        eyes.setBranchName("");
+        eyes.getSaveNewTests();
+        eyes.setSaveNewTests(true);
+        eyes.getSaveDiffs();
+        eyes.setSaveDiffs(true);
+        eyes.getDefaultMatchSettings();
+        eyes.setDefaultMatchSettings(new ImageMatchSettings());
+        eyes.getMatchTimeout();
+        eyes.setMatchTimeout(0);
+        eyes.getBaselineBranchName();
+        eyes.setBaselineBranchName("");;
+        eyes.getBaselineEnvName();
+        eyes.setBaselineEnvName("");
+        eyes.getHostApp();
+        eyes.setHostApp("");
+        eyes.getHostOS();
+        eyes.setHostOS("");
+        eyes.getStitchOverlap();
+        eyes.setStitchOverlap(0);
+        eyes.getBatch();
+        eyes.setBatch(new BatchInfo());
+        eyes.getAgentId();
+        eyes.setAgentId("");
+        eyes.getEnvName();
+        eyes.setEnvName("");
+        eyes.getApiKey();
+        eyes.setApiKey("");
+        eyes.getIgnoreCaret();
+        eyes.setIgnoreCaret(true);
+        eyes.getServerUrl();
+        eyes.setServerUrl("");
+        eyes.getMatchLevel();
+        eyes.setMatchLevel(MatchLevel.CONTENT);
+        eyes.getConfiguration();
+        eyes.setConfiguration(new Configuration());
     }
 }

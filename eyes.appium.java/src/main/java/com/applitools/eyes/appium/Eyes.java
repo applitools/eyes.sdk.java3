@@ -5,19 +5,24 @@ import com.applitools.eyes.*;
 import com.applitools.eyes.appium.capture.ImageProviderFactory;
 import com.applitools.eyes.appium.locators.AndroidVisualLocatorProvider;
 import com.applitools.eyes.appium.locators.IOSVisualLocatorProvider;
+import com.applitools.eyes.capture.AppOutputWithScreenshot;
 import com.applitools.eyes.capture.EyesScreenshotFactory;
 import com.applitools.eyes.capture.ImageProvider;
 import com.applitools.eyes.config.Configuration;
 import com.applitools.eyes.events.ValidationInfo;
 import com.applitools.eyes.events.ValidationResult;
 import com.applitools.eyes.exceptions.TestFailedException;
+import com.applitools.eyes.fluent.GetRegion;
+import com.applitools.eyes.fluent.GetSimpleRegion;
 import com.applitools.eyes.fluent.ICheckSettingsInternal;
+import com.applitools.eyes.fluent.SimpleRegionByRectangle;
 import com.applitools.eyes.locators.VisualLocatorSettings;
 import com.applitools.eyes.locators.VisualLocatorsProvider;
 import com.applitools.eyes.positioning.RegionProvider;
 import com.applitools.eyes.scaling.FixedScaleProviderFactory;
 import com.applitools.eyes.scaling.NullScaleProvider;
 import com.applitools.eyes.selenium.EyesDriverUtils;
+import com.applitools.eyes.selenium.fluent.SimpleRegionByElement;
 import com.applitools.eyes.selenium.positioning.ImageRotation;
 import com.applitools.eyes.selenium.positioning.NullRegionPositionCompensation;
 import com.applitools.eyes.selenium.positioning.RegionPositionCompensation;
@@ -27,13 +32,13 @@ import com.applitools.eyes.selenium.regionVisibility.RegionVisibilityStrategy;
 import com.applitools.utils.*;
 import io.appium.java_client.AppiumDriver;
 import org.openqa.selenium.*;
+import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.remote.RemoteWebDriver;
 
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.net.URI;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class Eyes extends EyesBase {
     private static final int USE_DEFAULT_MATCH_TIMEOUT = -1;
@@ -388,6 +393,93 @@ public class Eyes extends EyesBase {
         }
     }
 
+    public void check(ICheckSettings... checkSettings) {
+        if (getIsDisabled()) {
+            logger.log(String.format("check(ICheckSettings[%d]): Ignored", checkSettings.length));
+            return;
+        }
+
+        boolean originalForceFPS = getConfiguration().getForceFullPageScreenshot() != null && getConfiguration().getForceFullPageScreenshot();
+
+        if (checkSettings.length > 1) {
+            getConfiguration().setForceFullPageScreenshot(true);
+        }
+
+        Dictionary<Integer, GetSimpleRegion> getRegions = new Hashtable<>();
+        Dictionary<Integer, ICheckSettingsInternal> checkSettingsInternalDictionary = new Hashtable<>();
+
+        for (int i = 0; i < checkSettings.length; ++i) {
+            ICheckSettings settings = checkSettings[i];
+            ICheckSettingsInternal checkSettingsInternal = (ICheckSettingsInternal) settings;
+
+            checkSettingsInternalDictionary.put(i, checkSettingsInternal);
+
+            Region targetRegion = checkSettingsInternal.getTargetRegion();
+
+            if (targetRegion != null) {
+                getRegions.put(i, new SimpleRegionByRectangle(targetRegion));
+            } else {
+                AppiumCheckSettings appiumCheckTarget = (settings instanceof AppiumCheckSettings) ? (AppiumCheckSettings) settings : null;
+                if (appiumCheckTarget != null) {
+                    WebElement targetElement = getTargetElement(appiumCheckTarget);
+                    if (targetElement != null) {
+                        getRegions.put(i, new SimpleRegionByElement(targetElement));
+                    }
+                }
+            }
+        }
+
+        matchRegions(getRegions, checkSettingsInternalDictionary, checkSettings);
+        getConfiguration().setForceFullPageScreenshot(originalForceFPS);
+    }
+
+    private void matchRegions(Dictionary<Integer, GetSimpleRegion> getRegions,
+                              Dictionary<Integer, ICheckSettingsInternal> checkSettingsInternalDictionary,
+                              ICheckSettings[] checkSettings) {
+
+        if (getRegions.size() == 0) {
+            return;
+        }
+
+        MatchWindowTask mwt = new MatchWindowTask(logger, serverConnector, runningSession, getMatchTimeout(), this);
+        EyesScreenshot screenshot = getFullPageScreenshot();
+        for (int i = 0; i < checkSettings.length; ++i) {
+            if (((Hashtable<Integer, GetSimpleRegion>) getRegions).containsKey(i)) {
+                GetSimpleRegion getRegion = getRegions.get(i);
+                ICheckSettingsInternal checkSettingsInternal = checkSettingsInternalDictionary.get(i);
+                List<EyesScreenshot> subScreenshots = getSubScreenshots(screenshot, getRegion);
+                matchRegion(checkSettingsInternal, mwt, subScreenshots);
+            }
+        }
+    }
+
+    private List<EyesScreenshot> getSubScreenshots(EyesScreenshot screenshot, GetSimpleRegion getRegion) {
+        List<EyesScreenshot> subScreenshots = new ArrayList<>();
+        for (Region r : getRegion.getRegions(screenshot)) {
+            logger.verbose("original sub-region: " + r);
+            r = regionPositionCompensation.compensateRegionPosition(r, getDevicePixelRatio());
+            logger.verbose("sub-region after compensation: " + r);
+            EyesScreenshot subScreenshot = screenshot.getSubScreenshot(r, false);
+            subScreenshots.add(subScreenshot);
+        }
+        return subScreenshots;
+    }
+
+    private void matchRegion(ICheckSettingsInternal checkSettingsInternal, MatchWindowTask mwt, List<EyesScreenshot> subScreenshots) {
+        String name = checkSettingsInternal.getName();
+        for (EyesScreenshot subScreenshot : subScreenshots) {
+            debugScreenshotsProvider.save(subScreenshot.getImage(), String.format("subscreenshot_%s", name));
+
+            ImageMatchSettings ims = MatchWindowTask.createImageMatchSettings(checkSettingsInternal, subScreenshot, this);
+            Location location = subScreenshot.getLocationInScreenshot(Location.ZERO, CoordinatesType.SCREENSHOT_AS_IS);
+            AppOutput appOutput = new AppOutput(name, ImageUtils.encodeAsPng(subScreenshot.getImage()), null, null);
+            AppOutputWithScreenshot appOutputWithScreenshot = new AppOutputWithScreenshot(appOutput, subScreenshot, location);
+            MatchResult matchResult = mwt.performMatch(new ArrayList<Trigger>(), appOutputWithScreenshot, name, false,
+                    checkSettingsInternal, ims, this, getAppName());
+            logger.verbose("matchResult.asExcepted: " + matchResult.getAsExpected());
+        }
+    }
+
     public void check(ICheckSettings checkSettings) {
         if (checkSettings instanceof AppiumCheckSettings) {
             updateCutElement((AppiumCheckSettings) checkSettings);
@@ -608,6 +700,14 @@ public class Eyes extends EyesBase {
 
     public Boolean getSaveDiffs() {
         return this.configuration.getSaveDiffs();
+    }
+
+    public void setDefaultMatchSettings(ImageMatchSettings defaultMatchSettings) {
+        configuration.setDefaultMatchSettings(defaultMatchSettings);
+    }
+
+    public ImageMatchSettings getDefaultMatchSettings() {
+        return this.configuration.getDefaultMatchSettings();
     }
 
     /**
@@ -838,6 +938,71 @@ public class Eyes extends EyesBase {
 
     public String getParentBranchName() {
         return configuration.getParentBranchName();
+    }
+
+    @Override
+    public Configuration setBatch(BatchInfo batch) {
+        return this.configuration.setBatch(batch);
+    }
+
+    public BatchInfo getBatch() {
+        return configuration.getBatch();
+    }
+
+    public void setAgentId(String agentId) {
+        this.configuration.setAgentId(agentId);
+    }
+
+    public String getAgentId() {
+        return this.configuration.getAgentId();
+    }
+
+    public void setHostOS(String hostOS) {
+        this.configuration.setHostOS(hostOS);
+    }
+
+    public String getHostOS() {
+        return this.configuration.getHostOS();
+    }
+
+    public void setHostApp(String hostApp) {
+        this.configuration.setHostApp(hostApp);
+    }
+
+    public String getHostApp() {
+        return this.configuration.getHostOS();
+    }
+
+    public boolean getIgnoreCaret() {
+        return this.configuration.getIgnoreCaret();
+    }
+
+    public void setIgnoreCaret(boolean value) {
+        this.configuration.setIgnoreCaret(value);
+    }
+
+    public void setMatchLevel(MatchLevel matchLevel) {
+        this.configuration.getDefaultMatchSettings().setMatchLevel(matchLevel);
+    }
+
+    public MatchLevel getMatchLevel() {
+        return this.configuration.getDefaultMatchSettings().getMatchLevel();
+    }
+
+    public void setEnvName(String envName) {
+        this.configuration.setEnvironmentName(envName);
+    }
+
+    public String getEnvName() {
+        return this.configuration.getEnvironmentName();
+    }
+
+    public void setBaselineEnvName(String baselineEnvName) {
+        this.configuration.setBaselineEnvName(baselineEnvName);
+    }
+
+    public String getBaselineEnvName() {
+        return configuration.getBaselineEnvName();
     }
 
     public void setBaselineBranchName(String branchName) {

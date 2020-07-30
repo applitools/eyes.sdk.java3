@@ -134,7 +134,7 @@ public class RestClient {
             return request;
         }
 
-        return request.header(AGENT_ID_CUSTOM_HEADER, agentId);
+        return request.header(AGENT_ID_CUSTOM_HEADER, null);
     }
 
     protected Response sendLongRequest(Request request, String method, String data, String mediaType) throws EyesException {
