@@ -13,6 +13,7 @@ import com.applitools.eyes.visualgrid.model.IGetFloatingRegionOffsets;
 import com.applitools.eyes.visualgrid.model.MutableRegion;
 import com.applitools.eyes.visualgrid.model.RenderingInfo;
 import com.applitools.eyes.visualgrid.model.VisualGridSelector;
+import com.applitools.eyes.visualgrid.model.DeviceSize;
 import com.applitools.utils.ArgumentGuard;
 import com.applitools.utils.GeneralUtils;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -156,6 +157,8 @@ public class MatchWindowTask {
         MatchWindowData data = new MatchWindowData(userInputs.toArray(new Trigger[0]), appOutput.getAppOutput(), tag,
                 false, options, agentSetupStr, renderId);
 
+
+        Map<String, DeviceSize> devicesSizes = serverConnector.getDevicesSizes();
 
         if (!tryUploadImage(data)) {
             throw new EyesException("matchWindow failed: could not upload image to storage service.");

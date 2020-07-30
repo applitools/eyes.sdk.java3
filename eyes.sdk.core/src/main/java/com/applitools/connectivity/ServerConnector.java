@@ -38,6 +38,7 @@ public class ServerConnector extends RestClient {
 
     //Rendering Grid
     String RENDER_INFO_PATH = API_SESSIONS + "/renderinfo";
+    String IOS_DEVICES_SIZES = "/ios-devices-sizes";
     String RESOURCES_SHA_256 = "/resources/sha256/";
     String RENDER_STATUS = "/render-status";
     String RENDER = "/render";
@@ -46,6 +47,7 @@ public class ServerConnector extends RestClient {
 
     private String apiKey = null;
     private RenderingInfo renderingInfo;
+    private Map<String, DeviceSize> devicesSizes;
 
     /***
      * @param logger    Logger instance.
@@ -420,6 +422,35 @@ public class ServerConnector extends RestClient {
         }
     }
 
+    public Map<String, DeviceSize> getDevicesSizes() {
+        if (devicesSizes != null) {
+            return devicesSizes;
+        }
+
+        Request request = makeEyesRequest(new HttpRequestBuilder() {
+            @Override
+            public Request build() {
+                return restClient.target(renderingInfo.getServiceUrl()).path(IOS_DEVICES_SIZES)
+                        .queryParam("apiKey", getApiKey()).request();
+            }
+        });
+        Response response = sendLongRequest(request, HttpMethod.GET, null, null);
+
+        // Ok, let's create the running session from the response
+        List<Integer> validStatusCodes = new ArrayList<>(1);
+        validStatusCodes.add(HttpStatus.SC_OK);
+
+        try {
+            devicesSizes = parseResponseWithJsonData(response, validStatusCodes, new TypeReference<HashMap<String, DeviceSize>>() {
+            });
+        } catch (Throwable e) {
+            devicesSizes = new HashMap<>();
+        } finally {
+            response.close();
+        }
+        return devicesSizes;
+    }
+
     public List<RunningRender> render(RenderRequest... renderRequests) {
         ArgumentGuard.notNull(renderRequests, "renderRequests");
         this.logger.verbose("called with " + Arrays.toString(renderRequests));
@@ -484,12 +515,12 @@ public class ServerConnector extends RestClient {
     }
 
     public Future<?> renderPutResource(final RunningRender runningRender, final RGridResource resource,
-                                        final String userAgent, final TaskListener<Boolean> listener) {
+                                       final String userAgent, final TaskListener<Boolean> listener) {
         return renderPutResource(runningRender, resource, userAgent, listener, 1);
     }
 
     public Future<?> renderPutResource(final RunningRender runningRender, final RGridResource resource,
-                                        final String userAgent, final TaskListener<Boolean> listener, final int attemptNumber) {
+                                       final String userAgent, final TaskListener<Boolean> listener, final int attemptNumber) {
         ArgumentGuard.notNull(runningRender, "runningRender");
         ArgumentGuard.notNull(resource, "resource");
         byte[] content = resource.getContent();
@@ -698,7 +729,7 @@ public class ServerConnector extends RestClient {
                             .request((String) null);
                 }
             });
-             response = request.method(HttpMethod.DELETE, null, null);
+            response = request.method(HttpMethod.DELETE, null, null);
         } finally {
             if (response != null) {
                 response.close();

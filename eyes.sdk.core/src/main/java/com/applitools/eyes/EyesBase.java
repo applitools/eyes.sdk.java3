@@ -25,16 +25,14 @@ import com.applitools.eyes.scaling.NullScaleProvider;
 import com.applitools.eyes.triggers.MouseAction;
 import com.applitools.eyes.triggers.MouseTrigger;
 import com.applitools.eyes.triggers.TextTrigger;
+import com.applitools.eyes.visualgrid.model.DeviceSize;
 import com.applitools.eyes.visualgrid.model.RenderingInfo;
 import com.applitools.utils.*;
 
 import java.awt.image.BufferedImage;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.ArrayDeque;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Queue;
+import java.util.*;
 
 /**
  * Applitools Eyes Base for Java API .
@@ -72,6 +70,7 @@ public abstract class EyesBase implements IEyesBase{
     private int validationId;
     private final SessionEventHandlers sessionEventHandlers = new SessionEventHandlers();
     protected DebugScreenshotsProvider debugScreenshotsProvider;
+    private Map<String, DeviceSize> devicesSizes;
 
     public EyesBase() {
 
@@ -1459,6 +1458,14 @@ public abstract class EyesBase implements IEyesBase{
         }
         this.renderInfo = getServerConnector().getRenderInfo();
         return this.renderInfo;
+    }
+
+    public Map<String, DeviceSize> getDevicesSizes() {
+        if (this.devicesSizes != null) {
+            return this.devicesSizes;
+        }
+        this.devicesSizes = getServerConnector().getDevicesSizes();
+        return this.devicesSizes;
     }
 
     /**
