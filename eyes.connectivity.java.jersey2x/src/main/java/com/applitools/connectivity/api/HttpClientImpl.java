@@ -53,7 +53,11 @@ public class HttpClientImpl extends HttpClient {
             builder.sslContext(sslContext);
         } catch (NoSuchAlgorithmException | KeyManagementException ignored) {}
 
-        client = builder.register(new LoggingFeature(communicationLogger)).build();
+        if (communicationLogger != null) {
+            builder.register(new LoggingFeature(communicationLogger));
+        }
+
+        client = builder.build();
     }
 
     @Override

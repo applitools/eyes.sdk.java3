@@ -112,6 +112,11 @@ public class FileLogger implements LogHandler {
         return fileWriter != null;
     }
 
+    @Override
+    public boolean shouldLogCommunication() {
+        return false;
+    }
+
     private String getFormattedTimeStamp() {
         return dateFormat.format(Calendar.getInstance().getTime());
     }

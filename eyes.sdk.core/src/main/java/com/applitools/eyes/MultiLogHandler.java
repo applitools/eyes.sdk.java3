@@ -38,6 +38,16 @@ public class MultiLogHandler implements LogHandler {
         return true;
     }
 
+    @Override
+    public boolean shouldLogCommunication() {
+        boolean shouldLogCommunication = false;
+        for (LogHandler logHandler : logHandlers) {
+            shouldLogCommunication |= logHandler.shouldLogCommunication();
+        }
+
+        return shouldLogCommunication;
+    }
+
     public void addLogHandler(LogHandler logHandler) {
         logHandlers.add(logHandler);
     }

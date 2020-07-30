@@ -38,7 +38,9 @@ public class HttpClientImpl extends HttpClient {
 
         if (abstractProxySettings == null) {
             client = Client.create(clientConfig);
-            client.addFilter(new LoggingFilter(communicationLogger));
+            if (communicationLogger != null) {
+                client.addFilter(new LoggingFilter(communicationLogger));
+            }
             return;
         }
 
@@ -79,6 +81,9 @@ public class HttpClientImpl extends HttpClient {
         URLConnectionClientHandler clientHandler = new URLConnectionClientHandler(factory);
         client = new Client(clientHandler, clientConfig);
         client.addFilter(new LoggingFilter(communicationLogger));
+        if (communicationLogger != null) {
+            client.addFilter(new LoggingFilter(communicationLogger));
+        }
     }
 
     @Override

@@ -25,7 +25,8 @@ public abstract class HttpClient {
     }
 
     private void initCommunicationLogger() {
-        if (true) {
+        if (!eyesLogger.getLogHandler().shouldLogCommunication()) {
+            communicationLogger = null;
             return;
         }
 
