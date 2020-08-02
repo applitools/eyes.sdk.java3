@@ -85,8 +85,8 @@ public class TestImagesApi extends ReportingTestSuite {
         config.setAppName("DefaultAppName");
         e3.setConfiguration(config);
 
-        Assert.assertEquals("app1", e1.getConfiguration().getAppName(), "e1 app name");
-        Assert.assertEquals("app2", e2.getConfiguration().getAppName(), "e2 app name");
-        Assert.assertEquals("DefaultAppName", e3.getConfiguration().getAppName(), "e3 app name");
+        Assert.assertEquals("app1", e1.getConfigurationInstance().getAppName(), "e1 app name");
+        Assert.assertEquals("app2", e2.getConfigurationInstance().getAppName(), "e2 app name");
+        Assert.assertEquals("DefaultAppName", e3.getConfigurationInstance().getAppName(), "e3 app name");
     }
 }

@@ -9,7 +9,6 @@ import com.applitools.eyes.config.ConfigurationProvider;
 import com.applitools.eyes.metadata.ActualAppOutput;
 import com.applitools.eyes.metadata.SessionResults;
 import com.applitools.eyes.selenium.fluent.Target;
-import com.applitools.eyes.selenium.wrappers.EyesSeleniumDriver;
 import com.applitools.eyes.utils.ReportingTestSuite;
 import com.applitools.eyes.utils.SeleniumUtils;
 import com.applitools.eyes.utils.TestUtils;
@@ -136,7 +135,7 @@ public final class TestSendDom extends ReportingTestSuite {
         webDriver.get("https://applitools.github.io/demo/TestPages/FramesTestPage/");
         DomInterceptingEyes eyes = new DomInterceptingEyes();
         eyes.setBatch(TestDataProvider.batchInfo);
-        eyes.getConfiguration().setAppName("Test Send DOM").setTestName("Full Window").setViewportSize(new RectangleSize(1024, 768));
+        eyes.getConfigurationInstance().setAppName("Test Send DOM").setTestName("Full Window").setViewportSize(new RectangleSize(1024, 768));
         EyesWebDriver eyesWebDriver = (EyesWebDriver) eyes.open(webDriver);
         try {
             eyes.check("Window", Target.window().fully());

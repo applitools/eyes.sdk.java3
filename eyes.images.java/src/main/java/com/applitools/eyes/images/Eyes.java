@@ -77,7 +77,7 @@ public class Eyes extends EyesBase implements IConfiguration {
 
         BufferedImage image = imagesCheckTarget.getImage();
 
-        if (viewportSize == null) {
+        if (config.getViewportSize() == null) {
             setViewportSize(new RectangleSize(image.getWidth(), image.getHeight()));
         }
         return checkImage_(RegionProvider.NULL_INSTANCE, image, name, false, checkSettings);
@@ -142,7 +142,7 @@ public class Eyes extends EyesBase implements IConfiguration {
 
         logger.verbose(String.format("CheckImage(Image, '%s', %b)", tag, ignoreMismatch));
 
-        if (viewportSize == null) {
+        if (config.getViewportSize() == null) {
             setViewportSize(new RectangleSize(image.getWidth(), image.getHeight()));
         }
 
@@ -234,7 +234,7 @@ public class Eyes extends EyesBase implements IConfiguration {
 
         logger.verbose(String.format("CheckRegion(Image, [%s], '%s', %b)", region, tag, ignoreMismatch));
 
-        if (viewportSize == null) {
+        if (config.getViewportSize() == null) {
             setViewportSize(new RectangleSize(image.getWidth(), image.getHeight()));
         }
 
@@ -291,7 +291,7 @@ public class Eyes extends EyesBase implements IConfiguration {
      * {@inheritDoc}
      */
     public RectangleSize getViewportSize() {
-        return viewportSize;
+        return config.getViewportSize();
     }
 
     public SessionType getSessionType() {
@@ -308,7 +308,7 @@ public class Eyes extends EyesBase implements IConfiguration {
      */
     public Configuration setViewportSize(RectangleSize size) {
         ArgumentGuard.notNull(size, "size");
-        viewportSize = new RectangleSize(size.getWidth(), size.getHeight());
+        config.setViewportSize(new RectangleSize(size.getWidth(), size.getHeight()));
         return config;
     }
 
@@ -438,7 +438,7 @@ public class Eyes extends EyesBase implements IConfiguration {
     }
 
     public String getTestName() {
-        return getConfiguration().getTestName();
+        return getConfigurationInstance().getTestName();
     }
 
     /**
@@ -859,7 +859,7 @@ public class Eyes extends EyesBase implements IConfiguration {
         return super.getApiKey();
     }
 
-    public Configuration getConfiguration() {
+    public Configuration getConfigurationInstance() {
         return new Configuration(config);
     }
 

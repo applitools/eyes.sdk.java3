@@ -265,7 +265,7 @@ public class TestSerialization extends ReportingTestSuite {
     public void test_ImageMatchSettings_Serialization_Global(boolean ignoreCaret, boolean useDom, boolean enablePatterns, boolean ignoreDisplacements) throws JsonProcessingException {
         ICheckSettings settings = new CheckSettings(0).fully().useDom(useDom).enablePatterns(enablePatterns).ignoreCaret(ignoreCaret);
         TestEyes eyes = new TestEyes();
-        Configuration configuration = eyes.getConfiguration();
+        Configuration configuration = eyes.getConfigurationInstance();
         configuration.setIgnoreDisplacements(ignoreDisplacements);
         eyes.setConfiguration(configuration);
         ImageMatchSettings imageMatchSettings = MatchWindowTask.createImageMatchSettings((ICheckSettingsInternal)settings, eyes);

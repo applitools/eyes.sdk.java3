@@ -14,7 +14,7 @@ import org.openqa.selenium.remote.RemoteWebElement;
 import java.awt.image.BufferedImage;
 import java.util.*;
 
-public class EyesAppiumDriver implements EyesWebDriver, JavascriptExecutor, TakesScreenshot, SearchContext, HasCapabilities {
+public class EyesAppiumDriver implements EyesWebDriver {
 
     private final Logger logger;
     private final AppiumDriver driver;
@@ -44,14 +44,6 @@ public class EyesAppiumDriver implements EyesWebDriver, JavascriptExecutor, Take
      */
     public void setRotation(ImageRotation rotation) {
         this.rotation = rotation;
-    }
-
-    public EyesAppiumElement getEyesElement(WebElement element) {
-        if (element instanceof EyesAppiumElement) {
-            return (EyesAppiumElement) element;
-        }
-
-        return new EyesAppiumElement(this, element, 1/getDevicePixelRatio());
     }
 
     private Map<String, Object> getCachedSessionDetails () {
@@ -224,38 +216,12 @@ public class EyesAppiumDriver implements EyesWebDriver, JavascriptExecutor, Take
         return getDefaultContentViewportSize(true);
     }
 
-    /**
-     * Rotates the image as necessary. The rotation is either manually forced
-     * by passing a non-null ImageRotation, or automatically inferred.
-     * @param driver   The underlying driver which produced the screenshot.
-     * @param image    The image to normalize.
-     * @param rotation The degrees by which to rotate the image:
-     *                 positive values = clockwise rotation,
-     *                 negative values = counter-clockwise,
-     *                 0 = force no rotation,
-     *                 null = rotate automatically as needed.
-     * @return A normalized image.
-     */
-    public static BufferedImage normalizeRotation(Logger logger, WebDriver driver,
-                                                  BufferedImage image, ImageRotation rotation) {
-        ArgumentGuard.notNull(driver, "driver");
-        ArgumentGuard.notNull(image, "image");
-        int degrees;
-        if (rotation != null) {
-            degrees = rotation.getRotation();
-        } else {
-            degrees = EyesAppiumUtils.tryAutomaticRotation(logger, driver, image);
-        }
-
-        return ImageUtils.rotateImage(image, degrees);
-    }
-
     public <X> X getScreenshotAs(OutputType<X> xOutputType)
             throws WebDriverException {
         // Get the image as base64.
         String screenshot64 = driver.getScreenshotAs(OutputType.BASE64);
         BufferedImage screenshot = ImageUtils.imageFromBase64(screenshot64);
-        screenshot = EyesAppiumDriver.normalizeRotation(logger, driver, screenshot, rotation);
+        screenshot = EyesAppiumUtils.normalizeRotation(logger, driver, screenshot, rotation);
 
         // Return the image in the requested format.
         screenshot64 = ImageUtils.base64FromImage(screenshot);

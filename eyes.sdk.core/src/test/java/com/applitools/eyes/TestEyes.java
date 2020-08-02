@@ -44,7 +44,7 @@ public class TestEyes extends EyesBase {
     }
 
     @Override
-    protected Configuration getConfiguration() {
+    protected Configuration getConfigurationInstance() {
         return configuration;
     }
 

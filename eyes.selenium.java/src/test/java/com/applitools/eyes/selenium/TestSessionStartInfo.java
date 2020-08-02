@@ -121,7 +121,7 @@ public class TestSessionStartInfo extends ReportingTestSuite {
     public void TestImageMatchSettingsSerialization_Global(boolean useDom, boolean enablePatterns, boolean ignoreDisplacements) {
         ICheckSettings settings = Target.window().fully().useDom(useDom).enablePatterns(enablePatterns);
         TestEyes eyes = new TestEyes();
-        Configuration configuration = eyes.getConfiguration();
+        Configuration configuration = eyes.getConfigurationInstance();
         ExactMatchSettings exactMatchSettings = new ExactMatchSettings();
         exactMatchSettings.setMatchThreshold(0.5f);
         configuration.setDefaultMatchSettings(new ImageMatchSettings(MatchLevel.EXACT, exactMatchSettings, useDom));
@@ -145,7 +145,7 @@ public class TestSessionStartInfo extends ReportingTestSuite {
     public void TestConfigurationSerialization(boolean useDom, boolean enablePatterns, boolean ignoreDisplacements) {
         ICheckSettings settings = Target.window().fully();
         TestEyes eyes = new TestEyes();
-        Configuration configuration = eyes.getConfiguration();
+        Configuration configuration = eyes.getConfigurationInstance();
         configuration.setUseDom(useDom);
         configuration.setEnablePatterns(enablePatterns);
         configuration.setIgnoreDisplacements(ignoreDisplacements);

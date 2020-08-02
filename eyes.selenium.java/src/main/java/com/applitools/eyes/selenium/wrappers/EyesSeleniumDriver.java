@@ -23,10 +23,9 @@ import java.util.*;
  * Used so we'll be able to return the users an object with the same
  * functionality as {@link org.openqa.selenium.remote.RemoteWebDriver}.
  */
-public class EyesSeleniumDriver implements HasCapabilities, HasInputDevices,
-        FindsByClassName, FindsByCssSelector, FindsById, FindsByLinkText,
-        FindsByName, FindsByTagName, FindsByXPath, JavascriptExecutor,
-        SearchContext, TakesScreenshot, EyesWebDriver, HasTouchScreen, IEyesJsExecutor {
+public class EyesSeleniumDriver implements HasInputDevices, FindsByClassName,
+        FindsByCssSelector, FindsById, FindsByLinkText, FindsByName, FindsByTagName,
+        FindsByXPath, EyesWebDriver, HasTouchScreen, IEyesJsExecutor {
 
     private final Logger logger;
     private final SeleniumEyes eyes;

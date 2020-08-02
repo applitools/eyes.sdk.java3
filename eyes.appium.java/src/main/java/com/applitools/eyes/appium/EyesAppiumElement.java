@@ -20,7 +20,6 @@ public class EyesAppiumElement extends RemoteWebElement {
 
     private final EyesAppiumDriver driver;
     private final RemoteWebElement webElement;
-    private Dimension size;
     private final double pixelRatio;
 
     public EyesAppiumElement(EyesAppiumDriver driver, WebElement webElement, double pixelRatio) {
@@ -39,49 +38,22 @@ public class EyesAppiumElement extends RemoteWebElement {
         setId(this.webElement.getId());
     }
 
-    protected Dimension getCachedSize() {
-        if (size == null) {
-            size = webElement.getSize();
-        }
-        return size;
-    }
-
     @Override
     public Dimension getSize() {
-        String elementId = getId();
-        Response response = execute(DriverCommand.GET_ELEMENT_SIZE,
-                ImmutableMap.of("id", elementId));
-        Map<String, Object> rawSize = (Map<String, Object>) response.getValue();
-        int width = (int) Math.ceil(
-                ((Number) rawSize.get("width")).doubleValue());
-        int height = (int) Math.ceil(
-                ((Number) rawSize.get("height")).doubleValue());
-        Dimension size = new Dimension(width, height);
+        Dimension size = webElement.getSize();
         if (pixelRatio == 1.0) {
             return size;
         }
         int unscaledWidth;
         int unscaledHeight;
         if (driver.getRemoteWebDriver() instanceof IOSDriver) {
-            unscaledWidth = webElement.getSize().getWidth();
-            unscaledHeight = webElement.getSize().getHeight();
+            unscaledWidth = size.getWidth();
+            unscaledHeight = size.getHeight();
         } else {
-            unscaledWidth = (int) Math.ceil(webElement.getSize().getWidth()*pixelRatio);
-            unscaledHeight = (int) Math.ceil(webElement.getSize().getHeight()*pixelRatio);
+            unscaledWidth = (int) Math.ceil(size.getWidth() * pixelRatio);
+            unscaledHeight = (int) Math.ceil(size.getHeight() * pixelRatio);
         }
         return new Dimension(unscaledWidth, unscaledHeight);
-    }
-
-    public int getClientWidth () {
-        return getCachedSize().width;
-    }
-
-    public int getClientHeight () {
-        return getCachedSize().height;
-    }
-
-    public int getComputedStyleInteger (String propStyle) {
-        return 0;
     }
 
     @Override

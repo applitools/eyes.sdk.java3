@@ -652,6 +652,44 @@ public class EyesDriverUtils {
     }
 
     /**
+     * Returns given element visible portion size.\
+     * @param element The element for which to return the size.
+     * @return The given element's visible portion size.
+     */
+    public static RectangleSize getElementVisibleSize(Logger logger, WebElement element) {
+        Point location = element.getLocation();
+        Dimension size = element.getSize();
+        Region region = new Region(location.getX(), location.getY(), size.getWidth(), size.getHeight());
+        WebElement parent;
+
+        try {
+            parent = element.findElement(By.xpath(".."));
+        } catch (Exception e) {
+            parent = null;
+        }
+
+        try {
+            while (parent != null && !region.isSizeEmpty()) {
+                Point parentLocation = parent.getLocation();
+                Dimension parentSize = parent.getSize();
+                Region parentRegion = new Region(parentLocation.getX(), parentLocation.getY(),
+                        parentSize.getWidth(), parentSize.getHeight());
+
+                region.intersect(parentRegion);
+                try {
+                    parent = parent.findElement(By.xpath(".."));
+                } catch (Exception e) {
+                    parent = null;
+                }
+            }
+        } catch (Exception ex) {
+            GeneralUtils.logExceptionStackTrace(logger, ex);
+        }
+
+        return region.getSize();
+    }
+
+    /**
      * Translates the current documentElement to the given position.
      * @param executor The executor to use.
      * @param position The position to translate to.

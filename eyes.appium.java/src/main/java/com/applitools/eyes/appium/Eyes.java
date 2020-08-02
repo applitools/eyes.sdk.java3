@@ -12,7 +12,6 @@ import com.applitools.eyes.config.Configuration;
 import com.applitools.eyes.events.ValidationInfo;
 import com.applitools.eyes.events.ValidationResult;
 import com.applitools.eyes.exceptions.TestFailedException;
-import com.applitools.eyes.fluent.GetRegion;
 import com.applitools.eyes.fluent.GetSimpleRegion;
 import com.applitools.eyes.fluent.ICheckSettingsInternal;
 import com.applitools.eyes.fluent.SimpleRegionByRectangle;
@@ -31,12 +30,11 @@ import com.applitools.eyes.selenium.regionVisibility.NopRegionVisibilityStrategy
 import com.applitools.eyes.selenium.regionVisibility.RegionVisibilityStrategy;
 import com.applitools.utils.*;
 import io.appium.java_client.AppiumDriver;
-import org.openqa.selenium.*;
 import org.openqa.selenium.NoSuchElementException;
+import org.openqa.selenium.*;
 import org.openqa.selenium.remote.RemoteWebDriver;
 
 import java.awt.image.BufferedImage;
-import java.io.IOException;
 import java.net.URI;
 import java.util.*;
 
@@ -56,9 +54,7 @@ public class Eyes extends EyesBase {
     private double devicePixelRatio = UNKNOWN_DEVICE_PIXEL_RATIO;
     private boolean stitchContent;
     private RegionPositionCompensation regionPositionCompensation;
-    private UserAgent userAgent;
     private ImageRotation rotation;
-    private Region regionToCheck = null;
     protected WebElement targetElement = null;
     private PropertyHandler<RegionVisibilityStrategy> regionVisibilityStrategyHandler;
 
@@ -70,7 +66,7 @@ public class Eyes extends EyesBase {
     }
 
     public WebDriver open(WebDriver driver, Configuration configuration) {
-        this.configuration = configuration;
+        this.configuration = new Configuration(configuration);
         return open(driver);
     }
 
@@ -131,8 +127,6 @@ public class Eyes extends EyesBase {
         ensureViewportSize();
         openBase();
 
-        setUserAgent(UserAgent.parseUserAgentString(sessionStartInfo.getEnvironment().getInferred(), true));
-
         initImageProvider();
         regionPositionCompensation = new NullRegionPositionCompensation();
 
@@ -173,9 +167,7 @@ public class Eyes extends EyesBase {
     }
 
     private void ensureViewportSize() {
-        if (this.configuration.getViewportSize() == null) {
-            this.configuration.setViewportSize(driver.getDefaultContentViewportSize());
-        }
+        this.configuration.setViewportSize(driver.getDefaultContentViewportSize());
     }
 
     /**
@@ -224,22 +216,6 @@ public class Eyes extends EyesBase {
         return !(regionVisibilityStrategyHandler.get() instanceof NopRegionVisibilityStrategy);
     }
 
-    protected UserAgent getUserAgent() {
-        return userAgent;
-    }
-
-    protected void setUserAgent(UserAgent userAgent) {
-        this.userAgent = userAgent;
-    }
-
-    public Region getRegionToCheck() {
-        return regionToCheck;
-    }
-
-    public void setRegionToCheck(Region regionToCheck) {
-        this.regionToCheck = regionToCheck;
-    }
-
     public boolean shouldStitchContent() {
         return stitchContent;
     }
@@ -257,22 +233,17 @@ public class Eyes extends EyesBase {
     @Override
     protected RectangleSize getViewportSize() {
         ArgumentGuard.notNull(driver, "driver");
-        return EyesDriverUtils.getViewportSizeOrDisplaySize(new Logger(), driver);
+        return driver.getDefaultContentViewportSize();
     }
 
     @Override
     protected Configuration setViewportSize(RectangleSize size) {
-        viewportSize = new RectangleSize(size.getWidth(), size.getHeight());
         return configuration;
     }
 
     @Override
     protected String getInferredEnvironment() {
-        if (userAgent != null) {
-            return "useragent:" + userAgent.toString();
-        }
-
-        return null;
+        return "";
     }
 
     private void initDriverBasedPositionProviders() {
@@ -298,22 +269,6 @@ public class Eyes extends EyesBase {
         return driver;
     }
 
-    protected ScaleProviderFactory getScaleProviderFactory() {
-        // in the context of appium, we know the pixel ratio by getting it directly from the appium
-        // server, so there's no need to figure anything out on the fly. just return a Fixed one
-        return new FixedScaleProviderFactory(logger, 1 / driver.getDevicePixelRatio(), scaleProviderHandler);
-    }
-
-    /**
-     * @param driver The driver for which to check if it represents a mobile
-     *               device.
-     * @return {@code true} if the platform running the test is a mobile
-     * platform. {@code false} otherwise.
-     */
-    protected boolean isMobileDevice(WebDriver driver) {
-        return EyesDriverUtils.isMobileDevice(driver);
-    }
-
     /**
      * {@inheritDoc}
      * <p>
@@ -321,47 +276,44 @@ public class Eyes extends EyesBase {
      */
     @Override
     protected AppEnvironment getAppEnvironment() {
-
         AppEnvironment appEnv = super.getAppEnvironment();
         RemoteWebDriver underlyingDriver = driver.getRemoteWebDriver();
         // If hostOs isn't set, we'll try and extract and OS ourselves.
-        if (appEnv.getOs() == null) {
-            logger.log("No OS set, checking for mobile OS...");
-            if (EyesDriverUtils.isMobileDevice(underlyingDriver)) {
-                String platformName = null;
-                logger.log("Mobile device detected! Checking device type..");
-                if (EyesDriverUtils.isAndroid(underlyingDriver)) {
-                    logger.log("Android detected.");
-                    platformName = "Android";
-                } else if (EyesDriverUtils.isIOS(underlyingDriver)) {
-                    logger.log("iOS detected.");
-                    platformName = "iOS";
-                } else {
-                    logger.log("Unknown device type.");
-                }
-                // We only set the OS if we identified the device type.
-                if (platformName != null) {
-                    String os = platformName;
-                    String platformVersion = EyesAppiumUtils.getPlatformVersion(underlyingDriver);
-                    if (platformVersion != null) {
-                        String majorVersion =
-                            platformVersion.split("\\.", 2)[0];
-
-                        if (!majorVersion.isEmpty()) {
-                            os += " " + majorVersion;
-                        }
-                    }
-
-                    logger.verbose("Setting OS: " + os);
-                    appEnv.setOs(os);
-                }
-                Object deviceNameCapability = underlyingDriver.getCapabilities().getCapability("deviceName");
-                String deviceName = deviceNameCapability != null ? deviceNameCapability.toString() : "Unknown";
-                appEnv.setDeviceInfo(deviceName);
-            } else {
-                logger.log("No mobile OS detected.");
-            }
+        if (appEnv.getOs() != null) {
+            return appEnv;
         }
+
+        logger.log("No OS set, checking for mobile OS...");
+        String platformName = null;
+        logger.log("Mobile device detected! Checking device type..");
+        if (EyesDriverUtils.isAndroid(underlyingDriver)) {
+            logger.log("Android detected.");
+            platformName = "Android";
+        } else if (EyesDriverUtils.isIOS(underlyingDriver)) {
+            logger.log("iOS detected.");
+            platformName = "iOS";
+        } else {
+            logger.log("Unknown device type.");
+        }
+        // We only set the OS if we identified the device type.
+        if (platformName != null) {
+            String os = platformName;
+            String platformVersion = EyesAppiumUtils.getPlatformVersion(underlyingDriver);
+            if (platformVersion != null) {
+                String majorVersion =
+                        platformVersion.split("\\.", 2)[0];
+
+                if (!majorVersion.isEmpty()) {
+                    os += " " + majorVersion;
+                }
+            }
+
+            logger.verbose("Setting OS: " + os);
+            appEnv.setOs(os);
+        }
+        Object deviceNameCapability = underlyingDriver.getCapabilities().getCapability("deviceName");
+        String deviceName = deviceNameCapability != null ? deviceNameCapability.toString() : "Unknown";
+        appEnv.setDeviceInfo(deviceName);
         logger.log("Done!");
         return appEnv;
     }
@@ -399,10 +351,10 @@ public class Eyes extends EyesBase {
             return;
         }
 
-        boolean originalForceFPS = getConfiguration().getForceFullPageScreenshot() != null && getConfiguration().getForceFullPageScreenshot();
+        boolean originalForceFPS = getConfigurationInstance().getForceFullPageScreenshot() != null && getConfigurationInstance().getForceFullPageScreenshot();
 
         if (checkSettings.length > 1) {
-            getConfiguration().setForceFullPageScreenshot(true);
+            getConfigurationInstance().setForceFullPageScreenshot(true);
         }
 
         Dictionary<Integer, GetSimpleRegion> getRegions = new Hashtable<>();
@@ -430,7 +382,7 @@ public class Eyes extends EyesBase {
         }
 
         matchRegions(getRegions, checkSettingsInternalDictionary, checkSettings);
-        getConfiguration().setForceFullPageScreenshot(originalForceFPS);
+        getConfigurationInstance().setForceFullPageScreenshot(originalForceFPS);
     }
 
     private void matchRegions(Dictionary<Integer, GetSimpleRegion> getRegions,
@@ -506,8 +458,6 @@ public class Eyes extends EyesBase {
         this.stitchContent = checkSettingsInternal.getStitchContent() == null ? false : checkSettingsInternal.getStitchContent();
 
         final Region targetRegion = checkSettingsInternal.getTargetRegion();
-
-        this.regionToCheck = null;
 
         MatchResult result = null;
 
@@ -664,16 +614,7 @@ public class Eyes extends EyesBase {
     private ScaleProviderFactory updateScalingParams() {
         // Update the scaling params only if we haven't done so yet, and the user hasn't set anything else manually.
         if (scaleProviderHandler.get() instanceof NullScaleProvider) {
-            ScaleProviderFactory factory;
-            logger.verbose("Setting scale provider...");
-            try {
-                factory = getScaleProviderFactory();
-            } catch (Exception e) {
-                // This can happen in Appium for example.
-                logger.verbose("Failed to set ContextBasedScaleProvider.");
-                logger.verbose("Using FixedScaleProvider instead...");
-                factory = new FixedScaleProviderFactory(logger, 1 / getDevicePixelRatio(), scaleProviderHandler);
-            }
+            ScaleProviderFactory factory = new FixedScaleProviderFactory(logger, 1 / getDevicePixelRatio(), scaleProviderHandler);
             logger.verbose("Done!");
             return factory;
         }
@@ -741,7 +682,7 @@ public class Eyes extends EyesBase {
 
         AppiumCaptureAlgorithmFactory algoFactory = new AppiumCaptureAlgorithmFactory(driver, logger,
                 scrollPositionProvider, imageProvider, debugScreenshotsProvider, scaleProviderFactory,
-                cutProviderHandler.get(), screenshotFactory, getConfiguration().getWaitBeforeScreenshots(), cutElement, getStitchOverlap());
+                cutProviderHandler.get(), screenshotFactory, getConfigurationInstance().getWaitBeforeScreenshots(), cutElement, getStitchOverlap());
 
         AppiumFullPageCaptureAlgorithm algo = algoFactory.getAlgorithm();
 
@@ -889,15 +830,6 @@ public class Eyes extends EyesBase {
         }
     }
 
-    public Location getElementOriginalLocation(WebElement element) {
-        try {
-            ContentSize contentSize = EyesAppiumUtils.getContentSize(driver.getRemoteWebDriver(), element);
-            return new Location(contentSize.left, contentSize.top);
-        } catch (IOException ignored) {
-            return new Location(element.getLocation().getX(), element.getLocation().getY());
-        }
-    }
-
     private void initVisualLocatorProvider() {
         if (EyesDriverUtils.isAndroid(driver)) {
             visualLocatorsProvider = new AndroidVisualLocatorProvider(logger, driver, serverConnector, getDevicePixelRatio(), configuration.getAppName(), debugScreenshotsProvider);
@@ -947,6 +879,11 @@ public class Eyes extends EyesBase {
     @Override
     public Configuration setBatch(BatchInfo batch) {
         return this.configuration.setBatch(batch);
+    }
+
+    @Override
+    protected Configuration getConfigurationInstance() {
+        return configuration;
     }
 
     public BatchInfo getBatch() {

@@ -4,7 +4,6 @@ import com.applitools.eyes.*;
 import com.applitools.eyes.appium.Eyes;
 import com.applitools.eyes.config.Configuration;
 import com.applitools.eyes.fluent.ICheckSettingsInternal;
-import cucumber.api.java.gl.E;
 import org.testng.annotations.Test;
 
 public class TestEyes extends EyesBase {
@@ -58,7 +57,7 @@ public class TestEyes extends EyesBase {
         this.configuration = configuration;
     }
 
-    protected Configuration getConfiguration() {
+    protected Configuration getConfigurationInstance() {
         return configuration;
     }
 

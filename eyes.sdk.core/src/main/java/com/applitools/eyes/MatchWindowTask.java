@@ -490,7 +490,7 @@ public class MatchWindowTask {
         ImageMatchSettings imageMatchSettings = null;
         if (checkSettingsInternal != null) {
 
-            Configuration config = eyes.getConfiguration();
+            Configuration config = eyes.getConfigurationInstance();
             ImageMatchSettings defaultMatchSettings = config.getDefaultMatchSettings();
 
             imageMatchSettings = new ImageMatchSettings(defaultMatchSettings); // clone default match settings

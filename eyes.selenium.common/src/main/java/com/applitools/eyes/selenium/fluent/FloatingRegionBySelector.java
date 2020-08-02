@@ -2,6 +2,7 @@ package com.applitools.eyes.selenium.fluent;
 
 import com.applitools.eyes.*;
 import com.applitools.eyes.fluent.GetFloatingRegion;
+import com.applitools.eyes.selenium.EyesDriverUtils;
 import com.applitools.eyes.selenium.EyesWebDriver;
 import com.applitools.eyes.visualgrid.model.IGetFloatingRegionOffsets;
 import com.applitools.utils.GeneralUtils;
@@ -41,7 +42,7 @@ public class FloatingRegionBySelector implements GetFloatingRegion , IGetSeleniu
 
         for (WebElement element : elements) {
             Point locationAsPoint = element.getLocation();
-            RectangleSize size = getElementVisibleSize(element);
+            RectangleSize size = EyesDriverUtils.getElementVisibleSize(logger, element);
 
             Location adjustedLocation;
             if (screenshot != null) {
@@ -82,43 +83,5 @@ public class FloatingRegionBySelector implements GetFloatingRegion , IGetSeleniu
     @Override
     public int getMaxDownOffset() {
         return maxDownOffset;
-    }
-
-    /**
-     * Returns given element visible portion size.\
-     * @param element The element for which to return the size.
-     * @return The given element's visible portion size.
-     */
-    private RectangleSize getElementVisibleSize(WebElement element) {
-        Point location = element.getLocation();
-        Dimension size = element.getSize();
-        Region region = new Region(location.getX(), location.getY(), size.getWidth(), size.getHeight());
-        WebElement parent;
-
-        try {
-            parent = element.findElement(By.xpath(".."));
-        } catch (Exception e) {
-            parent = null;
-        }
-
-        try {
-            while (parent != null && !region.isSizeEmpty()) {
-                Point parentLocation = parent.getLocation();
-                Dimension parentSize = parent.getSize();
-                Region parentRegion = new Region(parentLocation.getX(), parentLocation.getY(),
-                        parentSize.getWidth(), parentSize.getHeight());
-
-                region.intersect(parentRegion);
-                try {
-                    parent = parent.findElement(By.xpath(".."));
-                } catch (Exception e) {
-                    parent = null;
-                }
-            }
-        } catch (Exception ex) {
-            GeneralUtils.logExceptionStackTrace(logger, ex);
-        }
-
-        return region.getSize();
     }
 }

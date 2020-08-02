@@ -5,7 +5,9 @@ package com.applitools.eyes.appium;
 
 import com.applitools.eyes.Logger;
 import com.applitools.eyes.selenium.EyesDriverUtils;
+import com.applitools.eyes.selenium.positioning.ImageRotation;
 import com.applitools.utils.ArgumentGuard;
+import com.applitools.utils.ImageUtils;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.appium.java_client.AppiumDriver;
 import io.appium.java_client.android.AndroidDriver;
@@ -145,5 +147,31 @@ public class EyesAppiumUtils {
             logger.verbose("Skipped automatic rotation handling.");
         }
         return degrees;
+    }
+
+    /**
+     * Rotates the image as necessary. The rotation is either manually forced
+     * by passing a non-null ImageRotation, or automatically inferred.
+     * @param driver   The underlying driver which produced the screenshot.
+     * @param image    The image to normalize.
+     * @param rotation The degrees by which to rotate the image:
+     *                 positive values = clockwise rotation,
+     *                 negative values = counter-clockwise,
+     *                 0 = force no rotation,
+     *                 null = rotate automatically as needed.
+     * @return A normalized image.
+     */
+    public static BufferedImage normalizeRotation(Logger logger, WebDriver driver,
+                                                  BufferedImage image, ImageRotation rotation) {
+        ArgumentGuard.notNull(driver, "driver");
+        ArgumentGuard.notNull(image, "image");
+        int degrees;
+        if (rotation != null) {
+            degrees = rotation.getRotation();
+        } else {
+            degrees = EyesAppiumUtils.tryAutomaticRotation(logger, driver, image);
+        }
+
+        return ImageUtils.rotateImage(image, degrees);
     }
 }

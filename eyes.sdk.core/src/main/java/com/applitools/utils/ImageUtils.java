@@ -300,6 +300,9 @@ public class ImageUtils {
 
         int targetWidth = (int) Math.ceil(image.getWidth() * scaleRatio);
         int targetHeight;
+
+        // The difference in the scaling between mobile and web is because a legacy difference between
+        // the java appium sdk and the java selenium sdk. Changing it may fail a lot of clients' tests.
         if (isMobile) {
             double imageRatio = (double) image.getHeight() / (double) image.getWidth();
             targetHeight = (int) Math.ceil(targetWidth * imageRatio);;

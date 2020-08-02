@@ -17,6 +17,9 @@ public class RequestImpl extends Request {
     @Override
     public Request header(String name, String value) {
         ArgumentGuard.notNullOrEmpty(name, "name");
+        if (value == null) {
+            logger.verbose(String.format("Called header %s with null value", name));
+        }
         request = request.header(name, value);
         return this;
     }

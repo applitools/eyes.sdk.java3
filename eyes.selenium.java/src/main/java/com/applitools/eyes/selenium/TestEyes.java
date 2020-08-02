@@ -33,7 +33,7 @@ public class TestEyes extends EyesBase {
     }
 
     @Override
-    public Configuration getConfiguration() {
+    public Configuration getConfigurationInstance() {
         return configuration;
     }
 

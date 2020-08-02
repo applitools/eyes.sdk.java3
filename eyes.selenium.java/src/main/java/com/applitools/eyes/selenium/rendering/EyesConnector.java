@@ -68,7 +68,7 @@ class EyesConnector extends EyesBase implements IEyesConnector, IBatchCloser {
             checkSettings.fully();
         }
 
-        MatchWindowTask matchWindowTask = new MatchWindowTask(this.logger, this.serverConnector, this.runningSession, getConfiguration().getMatchTimeout(), this);
+        MatchWindowTask matchWindowTask = new MatchWindowTask(this.logger, this.serverConnector, this.runningSession, getConfigurationInstance().getMatchTimeout(), this);
         ImageMatchSettings imageMatchSettings = MatchWindowTask.createImageMatchSettings(checkSettingsInternal, this);
         String tag = checkSettingsInternal.getName();
         AppOutput appOutput = new AppOutput(tag, null, domLocation, resultImageURL, virtualViewport);
@@ -98,7 +98,7 @@ class EyesConnector extends EyesBase implements IEyesConnector, IBatchCloser {
 
     protected Configuration setViewportSize(RectangleSize size) {
         logger.log("WARNING setViewportSize() was called in Visual-Grid context");
-        return getConfiguration();
+        return getConfigurationInstance();
     }
 
     protected String getInferredEnvironment() {
@@ -117,7 +117,7 @@ class EyesConnector extends EyesBase implements IEyesConnector, IBatchCloser {
         return null;
     }
 
-    protected Configuration getConfiguration() {
+    protected Configuration getConfigurationInstance() {
         return configuration;
     }
 
@@ -151,11 +151,11 @@ class EyesConnector extends EyesBase implements IEyesConnector, IBatchCloser {
     }
 
     public void setBranchName(String branchName) {
-        getConfiguration().setBranchName(branchName);
+        getConfigurationInstance().setBranchName(branchName);
     }
 
     public void setParentBranchName(String parentBranchName) {
-        getConfiguration().setParentBranchName(parentBranchName);
+        getConfigurationInstance().setParentBranchName(parentBranchName);
     }
 
     public void setDevice(String device) {
@@ -212,7 +212,7 @@ class EyesConnector extends EyesBase implements IEyesConnector, IBatchCloser {
         if (baselineEnvName != null) {
             return baselineEnvName;
         }
-        return getConfiguration().getBaselineEnvName();
+        return getConfigurationInstance().getBaselineEnvName();
     }
 
     protected String getAppName() {
