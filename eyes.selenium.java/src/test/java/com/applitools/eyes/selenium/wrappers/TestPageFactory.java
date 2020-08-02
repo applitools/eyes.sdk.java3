@@ -1,5 +1,6 @@
 package com.applitools.eyes.selenium.wrappers;
 
+import com.applitools.eyes.selenium.EyesDriverUtils;
 import com.applitools.eyes.utils.ReportingTestSuite;
 import com.applitools.eyes.utils.SeleniumUtils;
 import org.openqa.selenium.WebDriver;
@@ -35,7 +36,7 @@ public class TestPageFactory extends ReportingTestSuite {
         driver.get("https://applitools.github.io/demo/TestPages/FramesTestPage/");
         DemoPage page = PageFactory.initElements(driver, DemoPage.class);
         Assert.assertFalse(page.greenRectangleElement instanceof RemoteWebElement);
-        WebElement wrappedWebElement = EyesRemoteWebElement.getWrappedWebElement(page.greenRectangleElement);
+        WebElement wrappedWebElement = EyesDriverUtils.getWrappedWebElement(page.greenRectangleElement);
         Assert.assertTrue(wrappedWebElement instanceof RemoteWebElement);
     }
 

@@ -654,6 +654,10 @@ public class Eyes extends EyesBase {
         if (targetElement == null && targetSelector != null) {
             targetElement = this.driver.findElement(targetSelector);
         }
+
+        if (targetElement != null && !(targetElement instanceof EyesAppiumElement)) {
+            targetElement = new EyesAppiumElement(driver, targetElement, 1 / devicePixelRatio);
+        }
         return targetElement;
     }
 

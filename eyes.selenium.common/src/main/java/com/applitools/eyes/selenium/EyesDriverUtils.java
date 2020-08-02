@@ -11,6 +11,9 @@ import io.appium.java_client.remote.MobileCapabilityType;
 import org.openqa.selenium.*;
 import org.openqa.selenium.interactions.Coordinates;
 
+import java.lang.reflect.Field;
+import java.lang.reflect.InvocationHandler;
+import java.lang.reflect.Proxy;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -657,5 +660,31 @@ public class EyesDriverUtils {
                                    Location position) {
         setTransform(executor, String.format("translate(-%spx, -%spx)",
                 position.getX(), position.getY()));
+    }
+
+    /**
+     * If the web element was created by {@link org.openqa.selenium.support.FindBy}, then it's a {@link java.lang.reflect.Proxy} object.
+     * This method gets the real web element from the proxy object.
+     */
+    public static WebElement getWrappedWebElement(WebElement webElement) {
+        if (!(webElement instanceof java.lang.reflect.Proxy)) {
+            return webElement;
+        }
+
+        java.lang.reflect.Proxy proxy = (java.lang.reflect.Proxy) webElement;
+        Field[] fields =  Proxy.class.getDeclaredFields();
+        for (Field field : fields) {
+            if(field.getType().equals(InvocationHandler.class)) {
+                field.setAccessible(true);
+                try {
+                    InvocationHandler handler = (InvocationHandler) field.get(proxy);
+                    return  (WebElement) handler.invoke(null, WrapsElement.class.getMethod("getWrappedElement"), null);
+                } catch (Throwable throwable) {
+                    throw new EyesException("Failed getting web element from page object", throwable);
+                }
+            }
+        }
+
+        throw new IllegalStateException("InvocationHandler field wasn't found in proxy class");
     }
 }

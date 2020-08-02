@@ -1,6 +1,8 @@
 package com.applitools.eyes.appium;
 
 import com.applitools.eyes.EyesException;
+import com.applitools.eyes.selenium.EyesDriverUtils;
+import com.applitools.utils.ArgumentGuard;
 import com.google.common.collect.ImmutableMap;
 import io.appium.java_client.ios.IOSDriver;
 import org.openqa.selenium.*;
@@ -22,6 +24,10 @@ public class EyesAppiumElement extends RemoteWebElement {
     private final double pixelRatio;
 
     public EyesAppiumElement(EyesAppiumDriver driver, WebElement webElement, double pixelRatio) {
+        ArgumentGuard.notNull(driver, "driver");
+        ArgumentGuard.notNull(webElement, "webElement");
+
+        webElement = EyesDriverUtils.getWrappedWebElement(webElement);
         if (webElement instanceof RemoteWebElement) {
             this.webElement = (RemoteWebElement) webElement;
         } else {

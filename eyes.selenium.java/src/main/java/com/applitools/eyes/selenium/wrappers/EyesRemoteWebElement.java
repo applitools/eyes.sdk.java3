@@ -113,7 +113,7 @@ public class EyesRemoteWebElement extends RemoteWebElement {
 
 
         logger.verbose(String.format("Element type: %s", webElement.getClass().getName()));
-        webElement = getWrappedWebElement(webElement);
+        webElement = EyesDriverUtils.getWrappedWebElement(webElement);
         if (webElement instanceof RemoteWebElement) {
             this.webElement = (RemoteWebElement) webElement;
         } else {
@@ -133,32 +133,6 @@ public class EyesRemoteWebElement extends RemoteWebElement {
         } catch (NoSuchMethodException e) {
             throw new EyesException("Failed to find 'execute' method!");
         }
-    }
-
-    /**
-     * If the web element was created by {@link org.openqa.selenium.support.FindBy}, then it's a {@link Proxy} object.
-     * This method gets the real web element from the proxy object.
-     */
-    static WebElement getWrappedWebElement(WebElement webElement) {
-        if (!(webElement instanceof Proxy)) {
-            return webElement;
-        }
-
-        Proxy proxy = (Proxy) webElement;
-        Field[] fields =  Proxy.class.getDeclaredFields();
-        for (Field field : fields) {
-            if(field.getType().equals(InvocationHandler.class)) {
-                field.setAccessible(true);
-                try {
-                    InvocationHandler handler = (InvocationHandler) field.get(proxy);
-                    return  (WebElement) handler.invoke(null, WrapsElement.class.getMethod("getWrappedElement"), null);
-                } catch (Throwable throwable) {
-                    throw new EyesException("Failed getting web element from page object", throwable);
-                }
-            }
-        }
-
-        throw new IllegalStateException("InvocationHandler field wasn't found in proxy class");
     }
 
     public Region getBounds() {
