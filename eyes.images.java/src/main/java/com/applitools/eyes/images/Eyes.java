@@ -860,7 +860,7 @@ public class Eyes extends EyesBase implements IConfiguration {
     }
 
     public Configuration getConfigurationInstance() {
-        return new Configuration(config);
+        return config;
     }
 
     public void setConfiguration(Configuration config) {
