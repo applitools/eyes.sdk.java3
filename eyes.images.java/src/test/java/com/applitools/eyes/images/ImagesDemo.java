@@ -1,6 +1,7 @@
 package com.applitools.eyes.images;
 
 import com.applitools.eyes.RectangleSize;
+import com.applitools.eyes.config.Configuration;
 import com.applitools.eyes.utils.ReportingTestSuite;
 import org.testng.annotations.Test;
 
@@ -18,10 +19,13 @@ public class ImagesDemo extends ReportingTestSuite {
     @Test
     public void testSanity() {
         Eyes eyes = new Eyes();
+        Configuration configuration = eyes.getConfiguration();
+        configuration.setViewportSize(new RectangleSize(785, 1087));
+        eyes.setConfiguration(configuration);
         BufferedImage img;
         try {
             // Start visual testing
-            eyes.open("Eyes Images SDK", "Sanity Test", new RectangleSize(785, 1087));
+            eyes.open("Eyes Images SDK", "Sanity Test");
 
             // Load page image and validate
             img = ImageIO.read(new URL("https://applitools.github.io/upload/appium.png"));

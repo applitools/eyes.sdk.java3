@@ -58,5 +58,3 @@ public class TestEyes extends EyesBase {
         return this.configuration;
     }
 }
-
-
