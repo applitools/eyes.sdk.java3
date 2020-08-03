@@ -8,6 +8,7 @@ import com.applitools.eyes.visualgrid.model.*;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.Future;
 
 public interface IEyesConnector {
@@ -66,4 +67,6 @@ public interface IEyesConnector {
     void addProperty(String name, String value);
 
     void clearProperties();
+
+    Map<String, DeviceSize> getDevicesSizes();
 }

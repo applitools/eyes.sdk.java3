@@ -307,10 +307,10 @@ public class RenderingTask implements Callable<RenderStatusResults>, Completable
         for (RenderRequest renderRequest : requests) {
             for (VisualGridTask openTask : openVisualGridTaskList) {
                 if (openTask.getRunningTest() == renderRequest.getVisualGridTask().getRunningTest()) {
-                    openTask.setRenderError(null, "Invalid response for render request");
+                    openTask.setRenderError(null, "Invalid response for render request", renderRequest);
                 }
             }
-            renderRequest.getVisualGridTask().setRenderError(null, "Invalid response for render request");
+            renderRequest.getVisualGridTask().setRenderError(null, "Invalid response for render request", renderRequest);
         }
     }
 
@@ -976,12 +976,14 @@ public class RenderingTask implements Callable<RenderStatusResults>, Completable
         }
 
         for (String id : ids) {
-            for (RunningRender renderedRender : runningRenders.keySet()) {
+            for (Map.Entry<RunningRender,RenderRequest> kvp : runningRenders.entrySet()) {
+                RunningRender renderedRender = kvp.getKey();
+                RenderRequest renderRequest = kvp.getValue();
                 String renderId = renderedRender.getRenderId();
                 if (renderId.equalsIgnoreCase(id)) {
                     logger.verbose("removing failed render id: " + id);
                     VisualGridTask visualGridTask = runningRenders.get(renderedRender).getVisualGridTask();
-                    visualGridTask.setRenderError(id, "too long rendering(rendering exceeded 150 sec)");
+                    visualGridTask.setRenderError(id, "too long rendering(rendering exceeded 150 sec)", renderRequest);
                     break;
                 }
             }
@@ -1011,7 +1013,9 @@ public class RenderingTask implements Callable<RenderStatusResults>, Completable
 
                 String removedId = ids.remove(j);
 
-                for (RunningRender renderedRender : runningRenders.keySet()) {
+                for (Map.Entry<RunningRender, RenderRequest> kvp: runningRenders.entrySet()) {
+                    RunningRender renderedRender = kvp.getKey();
+                    RenderRequest renderRequest = kvp.getValue();
                     String renderId = renderedRender.getRenderId();
                     if (renderId.equalsIgnoreCase(removedId)) {
                         VisualGridTask visualGridTask = runningRenders.get(renderedRender).getVisualGridTask();
@@ -1024,7 +1028,7 @@ public class RenderingTask implements Callable<RenderStatusResults>, Completable
                                     openVisualGridTask.setRenderResult(renderStatusResults);
                                 } else {
                                     logger.verbose("setting openVisualGridTask " + openVisualGridTask + " render error: " + removedId + " to url " + this.domData.getUrl());
-                                    openVisualGridTask.setRenderError(removedId, renderStatusResults.getError());
+                                    openVisualGridTask.setRenderError(removedId, renderStatusResults.getError(), renderRequest);
                                 }
                                 iterator.remove();
                             }
@@ -1033,7 +1037,7 @@ public class RenderingTask implements Callable<RenderStatusResults>, Completable
                         String error = renderStatusResults.getError();
                         if (error != null) {
                             GeneralUtils.logExceptionStackTrace(logger, new Exception(error));
-                            visualGridTask.setRenderError(renderId, error);
+                            visualGridTask.setRenderError(renderId, error, renderRequest);
                         }
                         visualGridTask.setRenderResult(renderStatusResults);
                         break;

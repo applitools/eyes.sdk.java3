@@ -240,7 +240,7 @@ public class VisualGridTask implements Callable<TestResultContainer>, Completabl
         this.listeners.add(listener);
     }
 
-    public void setRenderError(String renderId, String error) {
+    public void setRenderError(String renderId, String error, RenderRequest renderRequest) {
         logger.verbose("enter - renderId: " + renderId);
         for (TaskListener listener : listeners) {
             exception = new InstantiationError("Render Failed for " + this.getBrowserInfo() + " (renderId: " + renderId + ") with reason: " + error);
@@ -248,7 +248,22 @@ public class VisualGridTask implements Callable<TestResultContainer>, Completabl
         }
         logger.verbose("exit - renderId: " + renderId);
         renderResult = new RenderStatusResults();
-        renderResult.setDeviceSize(configuration.getViewportSize());
+        RectangleSize deviceSize = configuration.getViewportSize();
+        if (deviceSize.isEmpty()) {
+            IosDeviceInfo iosDeviceInfo = renderRequest.getRenderInfo().getIosDeviceInfo();
+            if (iosDeviceInfo != null) {
+                String deviceName = iosDeviceInfo.getDeviceName();
+                Map<String, DeviceSize> devicesSizes = eyesConnector.getDevicesSizes();
+                if (devicesSizes.containsKey(deviceName)) {
+                    if (iosDeviceInfo.getScreenOrientation().equals(ScreenOrientation.PORTRAIT)){
+                        deviceSize = devicesSizes.get(deviceName).getPortrait();
+                    } else {
+                        deviceSize = devicesSizes.get(deviceName).getLandscapeLeft();
+                    }
+                }
+            }
+        }
+        renderResult.setDeviceSize(deviceSize);
     }
 
     public Throwable getException() {
