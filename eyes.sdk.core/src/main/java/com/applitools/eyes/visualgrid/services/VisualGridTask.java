@@ -12,6 +12,7 @@ import com.applitools.utils.GeneralUtils;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.Callable;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -53,13 +54,13 @@ public class VisualGridTask implements Callable<TestResultContainer>, Completabl
     }
 
     /******** BEGIN - PUBLIC FOR TESTING PURPOSES ONLY ********/
-    public VisualGridTask(TaskType taskType, Logger logger, RunningTest runningTest)
-    {
+    public VisualGridTask(TaskType taskType, Logger logger, RunningTest runningTest) {
         this.logger = logger;
         this.type = taskType;
         this.runningTest = runningTest;
         this.regionSelectors = null;
     }
+
     /******** END - PUBLIC FOR TESTING PURPOSES ONLY ********/
 
     public VisualGridTask(Configuration configuration, TestResults testResults, IEyesConnector eyesConnector, TaskType type, TaskListener runningTestListener,
@@ -125,16 +126,11 @@ public class VisualGridTask implements Callable<TestResultContainer>, Completabl
 
                     List<VGRegion> vgRegions = renderResult.getSelectorRegions();
                     List<IRegion> regions = new ArrayList<>();
-                    if (vgRegions != null)
-                    {
-                        for(VGRegion reg : vgRegions)
-                        {
-                            if (reg.getError() != null)
-                            {
+                    if (vgRegions != null) {
+                        for (VGRegion reg : vgRegions) {
+                            if (reg.getError() != null) {
                                 logger.log(String.format("Warning: region error: %s", reg.getError()));
-                            }
-                            else
-                            {
+                            } else {
                                 regions.add(reg);
                             }
                         }
@@ -277,7 +273,7 @@ public class VisualGridTask implements Callable<TestResultContainer>, Completabl
     public void setExceptionAndAbort(Throwable exception) {
         logger.verbose("aborting task with exception");
         this.exception = exception;
-        if(type == TaskType.CLOSE){
+        if (type == TaskType.CLOSE) {
             type = TaskType.ABORT;
         }
         runningTest.abort(true, exception);
