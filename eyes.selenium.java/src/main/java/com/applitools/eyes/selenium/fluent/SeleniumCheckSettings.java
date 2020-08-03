@@ -2,7 +2,10 @@ package com.applitools.eyes.selenium.fluent;
 
 import com.applitools.eyes.*;
 import com.applitools.eyes.fluent.*;
-import com.applitools.eyes.selenium.wrappers.EyesWebDriver;
+import com.applitools.eyes.selenium.CheckState;
+import com.applitools.eyes.selenium.EyesSeleniumUtils;
+import com.applitools.eyes.selenium.EyesWebDriver;
+import com.applitools.eyes.selenium.wrappers.EyesSeleniumDriver;
 import com.applitools.eyes.visualgrid.model.VisualGridSelector;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import org.openqa.selenium.By;
@@ -23,8 +26,8 @@ public class SeleniumCheckSettings extends CheckSettings implements ISeleniumChe
     private List<FrameLocator> frameChain = new ArrayList<>();
     private WebElement scrollRootElement;
     private By scrollRootSelector;
-
     private VisualGridSelector selector;
+    private CheckState state;
 
     public SeleniumCheckSettings() {
     }
@@ -520,5 +523,22 @@ public class SeleniumCheckSettings extends CheckSettings implements ISeleniumChe
         }
         return clone;
     }
+
+    public void setState(CheckState state){
+        this.state = state;
+    }
+
+    public CheckState getState(){
+        return this.state;
+    }
+
+    public void sanitizeSettings(Logger logger, EyesSeleniumDriver driver, boolean isFully) {
+        if (frameChain.size() > 0 && targetElement == null && targetSelector == null && !isFully)
+        {
+            FrameLocator lastFrame = frameChain.get(frameChain.size() - 1);
+            frameChain.remove(frameChain.size() - 1);
+            targetElement = EyesSeleniumUtils.findFrameByFrameCheckTarget(lastFrame, driver);
+            logger.log("Using Target.Frame() for the purpose of Target.Region()");
+        }  }
 }
 

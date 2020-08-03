@@ -419,7 +419,7 @@ public class SeleniumEyes extends EyesBase implements ISeleniumEyes, IBatchClose
                     seleniumCheckTarget.init(logger, driver);
                     WebElement targetElement = getTargetElement(seleniumCheckTarget);
                     if (targetElement == null && seleniumCheckTarget.getFrameChain().size() == 1) {
-                        targetElement = getFrameElement(seleniumCheckTarget.getFrameChain().get(0));
+                        targetElement = EyesSeleniumUtils.findFrameByFrameCheckTarget(seleniumCheckTarget.getFrameChain().get(0), driver);
                     }
 
                     if (targetElement != null) {
@@ -576,36 +576,6 @@ public class SeleniumEyes extends EyesBase implements ISeleniumEyes, IBatchClose
         return bBox.offset(offset.getX(), offset.getY());
     }
 
-    private WebElement getFrameElement(FrameLocator frameLocator) {
-        WebElement frameReference = frameLocator.getFrameReference();
-
-        if (frameReference == null) {
-            By selector = frameLocator.getFrameSelector();
-            List<WebElement> possibleFrames = null;
-            if (selector != null) {
-                possibleFrames = driver.findElements(selector);
-            } else {
-                String nameOrId = frameLocator.getFrameNameOrId();
-                if (nameOrId != null) {
-                    possibleFrames = driver.findElementsById(nameOrId);
-                    if (possibleFrames.size() == 0) {
-                        possibleFrames = driver.findElementsByName(nameOrId);
-                        if (possibleFrames.size() == 0) {
-                            Integer frameIndex = frameLocator.getFrameIndex();
-                            if (frameIndex != null) {
-                                possibleFrames = driver.findElements(By.cssSelector(String.format("iframe:nth-of-type(%d)", frameIndex)));
-                            }
-                        }
-                    }
-                }
-            }
-            if (possibleFrames != null && possibleFrames.size() > 0) {
-                frameReference = possibleFrames.get(0);
-            }
-        }
-        return frameReference;
-    }
-
     private WebElement getTargetElement(ISeleniumCheckTarget seleniumCheckTarget) {
         assert seleniumCheckTarget != null;
         By targetSelector = seleniumCheckTarget.getTargetSelector();
@@ -689,14 +659,25 @@ public class SeleniumEyes extends EyesBase implements ISeleniumEyes, IBatchClose
                 logger.verbose("URL: " + driver.getCurrentUrl());
             }
 
+            ICheckSettingsInternal checkSettingsInternal = (ICheckSettingsInternal) checkSettings;
+            ISeleniumCheckTarget seleniumCheckTarget = (checkSettings instanceof ISeleniumCheckTarget) ? (ISeleniumCheckTarget) checkSettings : null;
+
+            CheckState state = new CheckState();
+            seleniumCheckTarget.setState(state);
+            Boolean forceFullPageScreenshot = getConfigurationInstance().getForceFullPageScreenshot();
+            Boolean fully = checkSettingsInternal.getStitchContent();
+            state.setStitchContent(fully || forceFullPageScreenshot);
+
+            // Ensure frame is not used as a region
+            ((SeleniumCheckSettings)checkSettings).sanitizeSettings(logger, driver, state.isStitchContent());
+
+
             regionToCheck = Region.EMPTY;
             fullRegionToCheck = Region.EMPTY;
 
             setEffectiveViewportSize(getConfigurationInstance().getViewportSize());
 
-            ICheckSettingsInternal checkSettingsInternal = (ICheckSettingsInternal) checkSettings;
-            ISeleniumCheckTarget seleniumCheckTarget = (checkSettings instanceof ISeleniumCheckTarget) ? (ISeleniumCheckTarget) checkSettings : null;
-            if (seleniumCheckTarget != null) {
+             if (seleniumCheckTarget != null) {
                 seleniumCheckTarget.init(logger, driver);
             }
             String name = checkSettingsInternal.getName();

@@ -4,10 +4,13 @@
 package com.applitools.eyes.selenium;
 
 import com.applitools.eyes.*;
+import com.applitools.eyes.selenium.fluent.FrameLocator;
 import com.applitools.eyes.selenium.fluent.IScrollRootElementContainer;
 import com.applitools.eyes.selenium.wrappers.EyesRemoteWebElement;
 import com.applitools.eyes.selenium.wrappers.EyesSeleniumDriver;
 import org.openqa.selenium.*;
+
+import java.util.List;
 
 /**
  * We named this class EyesSeleniumUtils because there's a SeleniumUtils
@@ -57,5 +60,32 @@ public class EyesSeleniumUtils {
 
         logger.log("Warning: Got an empty scroll root element container");
         return EyesSeleniumUtils.getDefaultRootElement(logger, driver);
+    }
+
+    public static WebElement findFrameByFrameCheckTarget(FrameLocator frameTarget, EyesSeleniumDriver driver) {
+        if (frameTarget.getFrameIndex() != null) {
+            return driver.findElement(By.xpath("IFRAME[" + frameTarget.getFrameIndex() + "]"));
+        }
+
+        String nameOrId = frameTarget.getFrameNameOrId();
+        if (nameOrId != null) {
+            List<WebElement> byId = driver.findElements(By.id(nameOrId));
+            if (byId.size() > 0) {
+                return byId.get(0);
+            }
+            return driver.findElement(By.name(nameOrId));
+        }
+
+        WebElement reference = frameTarget.getFrameReference();
+        if (reference != null) {
+            return reference;
+        }
+
+        By selector = frameTarget.getFrameSelector();
+        if (selector != null) {
+            return driver.findElement(selector);
+        }
+
+        return null;
     }
 }
