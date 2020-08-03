@@ -1478,7 +1478,18 @@ public abstract class EyesBase implements IEyesBase{
         return getConfigurationInstance();
     }
 
+    /**
+     * @return Edible instance of the configuration
+     */
     protected abstract Configuration getConfigurationInstance();
+
+    /**
+     *
+     * @return Cloned instance of the configuration
+     */
+    public Configuration getConfiguration() {
+        return new Configuration(getConfigurationInstance());
+    }
 
     public void abortAsync() {
         abort();

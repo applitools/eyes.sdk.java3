@@ -856,6 +856,7 @@ public class Eyes extends EyesBase {
         return region;
     }
 
+    @Override
     public com.applitools.eyes.selenium.Configuration getConfiguration() {
         return new com.applitools.eyes.selenium.Configuration(configuration);
     }

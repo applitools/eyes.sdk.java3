@@ -859,11 +859,8 @@ public class Eyes extends EyesBase implements IConfiguration {
         return super.getApiKey();
     }
 
-    public Configuration getConfiguration() {
-        return new Configuration(config);
-    }
-
-    public Configuration getConfigurationInstance() {
+    @Override
+    protected Configuration getConfigurationInstance() {
         return config;
     }
 

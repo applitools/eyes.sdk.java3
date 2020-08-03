@@ -2,7 +2,17 @@ package com.applitools.eyes;
 
 import java.awt.image.BufferedImage;
 
+import static java.awt.image.BufferedImage.TYPE_INT_RGB;
+
 public class TestEyesScreenshot extends EyesScreenshot {
+
+    private static final BufferedImage testBitmap = new BufferedImage(100, 100, TYPE_INT_RGB);
+    private static final Logger logger = new Logger();
+
+    public TestEyesScreenshot() {
+        super(logger, testBitmap);;
+    }
+
     public TestEyesScreenshot(Logger logger, BufferedImage image) {
         super(logger, image);
     }

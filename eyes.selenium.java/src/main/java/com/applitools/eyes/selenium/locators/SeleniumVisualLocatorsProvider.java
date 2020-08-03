@@ -18,7 +18,7 @@ public class SeleniumVisualLocatorsProvider extends BaseVisualLocatorsProvider {
     private final SeleniumEyes eyes;
 
     public SeleniumVisualLocatorsProvider(SeleniumEyes eyes, EyesSeleniumDriver driver, Logger logger, DebugScreenshotsProvider debugScreenshotsProvider) {
-        super(logger, eyes.getServerConnector(), eyes.getDevicePixelRatio(), eyes.getConfigurationInstance().getAppName(), debugScreenshotsProvider);
+        super(logger, eyes.getServerConnector(), eyes.getDevicePixelRatio(), eyes.getConfiguration().getAppName(), debugScreenshotsProvider);
         this.driver = driver;
         this.eyes = eyes;
     }

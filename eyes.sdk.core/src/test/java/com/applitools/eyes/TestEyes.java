@@ -49,6 +49,11 @@ public class TestEyes extends EyesBase {
     }
 
     @Override
+    public com.applitools.eyes.selenium.Configuration getConfiguration() {
+        return new com.applitools.eyes.selenium.Configuration(configuration);
+    }
+
+    @Override
     protected RectangleSize getViewportSize() {
         return new RectangleSize(100, 100);
     }
@@ -56,5 +61,9 @@ public class TestEyes extends EyesBase {
     @Override
     protected Configuration setViewportSize(RectangleSize size) {
         return this.configuration;
+    }
+
+    public void setDefaultMatchSettings(ImageMatchSettings defaultMatchSettings) {
+        configuration.setDefaultMatchSettings(defaultMatchSettings);
     }
 }

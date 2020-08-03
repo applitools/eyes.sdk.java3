@@ -2216,7 +2216,7 @@ public class SeleniumEyes extends EyesBase implements ISeleniumEyes, IBatchClose
     }
 
     @Override
-    public Configuration getConfigurationInstance() {
+    protected Configuration getConfigurationInstance() {
         return configurationProvider.get();
     }
 

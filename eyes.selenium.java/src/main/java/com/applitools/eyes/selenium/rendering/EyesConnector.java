@@ -117,6 +117,7 @@ class EyesConnector extends EyesBase implements IEyesConnector, IBatchCloser {
         return null;
     }
 
+    @Override
     protected Configuration getConfigurationInstance() {
         return configuration;
     }
