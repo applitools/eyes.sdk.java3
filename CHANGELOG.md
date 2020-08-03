@@ -1,3 +1,7 @@
+## [vNext]
+### Fixed
+- Try to send correct iOS device size when rendering fails. [Trello 2006](https://trello.com/c/a6l6gTf9)
+
 ## [3.172.1] - 2020-08-04
 ### Added
 - Appium module from java4 sdk. [Trello 1980](https://trello.com/c/RYAOPRpc)
