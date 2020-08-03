@@ -1,4 +1,4 @@
-/* @applitools/dom-snapshot@3.6.0 */
+/* @applitools/dom-snapshot@4.0.1 */
 
 function __processPageAndSerializePoll() {
   var processPageAndSerializePoll = (function () {
@@ -86,55 +86,6 @@ function __processPageAndSerializePoll() {
     }
 
     var arrayBufferToBase64_1 = arrayBufferToBase64;
-
-    function extractLinks(doc = document) {
-      const srcsetRegexp = /(\S+)(?:\s+[\d.]+[wx])?(?:,|$)/g;
-      const srcsetUrls = Array.from(doc.querySelectorAll('img[srcset],source[srcset]'), srcsetEl =>
-          execAll(srcsetRegexp, srcsetEl.getAttribute('srcset'), match => match[1]),
-      ).reduce((acc, urls) => acc.concat(urls), []);
-
-      const srcUrls = Array.from(
-          doc.querySelectorAll('img[src],source[src],input[type="image"][src],audio[src]'),
-      ).map(srcEl => srcEl.getAttribute('src'));
-
-      const imageUrls = Array.from(doc.querySelectorAll('image,use'))
-          .map(hrefEl => hrefEl.getAttribute('href') || hrefEl.getAttribute('xlink:href'))
-          .filter(u => u && u[0] !== '#');
-
-      const objectUrls = Array.from(doc.querySelectorAll('object'))
-          .map(el => el.getAttribute('data'))
-          .filter(Boolean);
-
-      const cssUrls = Array.from(
-          doc.querySelectorAll('link[rel~="stylesheet"], link[as="stylesheet"]'),
-      ).map(link => link.getAttribute('href'));
-
-      const videoPosterUrls = Array.from(doc.querySelectorAll('video[poster]')).map(videoEl =>
-          videoEl.getAttribute('poster'),
-      );
-
-      return Array.from(srcsetUrls)
-          .concat(Array.from(srcUrls))
-          .concat(Array.from(imageUrls))
-          .concat(Array.from(cssUrls))
-          .concat(Array.from(videoPosterUrls))
-          .concat(Array.from(objectUrls));
-
-      // can be replaced with matchAll once Safari supports it
-      function execAll(regexp, string, mapper) {
-        const matches = [];
-        const clonedRegexp = new RegExp(regexp.source, regexp.flags);
-        const isGlobal = clonedRegexp.global;
-        let match;
-        while ((match = clonedRegexp.exec(string))) {
-          matches.push(mapper(match));
-          if (!isGlobal) break;
-        }
-        return matches;
-      }
-    }
-
-    var extractLinks_1 = extractLinks;
 
     function uuid() {
       return window.crypto.getRandomValues(new Uint32Array(1))[0];
@@ -13135,6 +13086,89 @@ function __processPageAndSerializePoll() {
 
     var processInlineCss_1 = processInlineCss;
 
+    function getUrlFromCssText(cssText) {
+      const re = /url\((?!['"]?:)['"]?([^'")]*)['"]?\)/g;
+      const ret = [];
+      let result;
+      while ((result = re.exec(cssText)) !== null) {
+        ret.push(result[1]);
+      }
+      return ret;
+    }
+
+    var getUrlFromCssText_1 = getUrlFromCssText;
+
+    function extractResourceUrlsFromStyleAttrs(el) {
+      const style = el.getAttribute('style');
+      if (style) return getUrlFromCssText_1(style);
+    }
+
+    var extractResourceUrlsFromStyleAttrs_1 = extractResourceUrlsFromStyleAttrs;
+
+    const srcsetRegexp = /(\S+)(?:\s+[\d.]+[wx])?(?:,|$)/g;
+
+    function extractLinksFromElement(el) {
+      const matches = (el.matches || el.msMatchesSelector).bind(el);
+
+      let urls = [];
+
+      // srcset urls
+      if (matches('img[srcset],source[srcset]')) {
+        urls = urls.concat(execAll(srcsetRegexp, el.getAttribute('srcset'), match => match[1]));
+      }
+
+      // src urls
+      if (matches('img[src],source[src],input[type="image"][src],audio[src],video[src]')) {
+        urls.push(el.getAttribute('src'));
+      }
+
+      // image urls
+      if (matches('image,use')) {
+        const href = el.getAttribute('href') || el.getAttribute('xlink:href');
+        if (href && href[0] !== '#') {
+          urls.push(href);
+        }
+      }
+
+      // object urls
+      if (matches('object') && el.getAttribute('data')) {
+        urls.push(el.getAttribute('data'));
+      }
+
+      // css urls
+      if (matches('link[rel~="stylesheet"], link[as="stylesheet"]')) {
+        urls.push(el.getAttribute('href'));
+      }
+
+      // video poster urls
+      if (matches('video[poster]')) {
+        urls.push(el.getAttribute('poster'));
+      }
+
+      // style attribute urls
+      const styleAttrUrls = extractResourceUrlsFromStyleAttrs_1(el);
+      if (styleAttrUrls) {
+        urls = urls.concat(styleAttrUrls);
+      }
+
+      return urls;
+
+      // can be replaced with matchAll once Safari supports it
+      function execAll(regexp, string, mapper) {
+        const matches = [];
+        const clonedRegexp = new RegExp(regexp.source, regexp.flags);
+        const isGlobal = clonedRegexp.global;
+        let match;
+        while ((match = clonedRegexp.exec(string))) {
+          matches.push(mapper(match));
+          if (!isGlobal) break;
+        }
+        return matches;
+      }
+    }
+
+    var extractLinksFromElement_1 = extractLinksFromElement;
+
     const NEED_MAP_INPUT_TYPES = new Set([
       'date',
       'datetime-local',
@@ -13156,9 +13190,10 @@ function __processPageAndSerializePoll() {
       const docRoots = [docNode];
       const canvasElements = [];
       const inlineFrames = [];
+      let linkUrls = [];
 
       cdt[0].childNodeIndexes = childrenFactory(cdt, docNode.childNodes);
-      return {cdt, docRoots, canvasElements, inlineFrames};
+      return {cdt, docRoots, canvasElements, inlineFrames, linkUrls};
 
       function childrenFactory(cdt, elementNodes) {
         if (!elementNodes || elementNodes.length === 0) return null;
@@ -13199,8 +13234,18 @@ function __processPageAndSerializePoll() {
                 (elementNode.childNodes.length ? childrenFactory(cdt, elementNode.childNodes) : []);
 
             if (elementNode.shadowRoot) {
-              node.shadowRootIndex = elementNodeFactory(cdt, elementNode.shadowRoot);
-              docRoots.push(elementNode.shadowRoot);
+              if (
+                  typeof window === 'undefined' ||
+                  (typeof elementNode.attachShadow === 'function' &&
+                      /native code/.test(elementNode.attachShadow.toString()))
+              ) {
+                node.shadowRootIndex = elementNodeFactory(cdt, elementNode.shadowRoot);
+                docRoots.push(elementNode.shadowRoot);
+              } else {
+                node.childNodeIndexes = node.childNodeIndexes.concat(
+                    childrenFactory(cdt, elementNode.shadowRoot.childNodes),
+                );
+              }
             }
 
             if (elementNode.nodeName === 'CANVAS') {
@@ -13228,6 +13273,12 @@ function __processPageAndSerializePoll() {
         }
 
         if (node) {
+          if (nodeType === Node.ELEMENT_NODE) {
+            const linkUrlsFromElement = extractLinksFromElement_1(elementNode);
+            if (linkUrlsFromElement.length > 0) {
+              linkUrls = linkUrls.concat(linkUrlsFromElement);
+            }
+          }
           cdt.push(node);
           return cdt.length - 1;
         } else {
@@ -13264,6 +13315,15 @@ function __processPageAndSerializePoll() {
               value = value.replace(/^blob:/, '');
             } else if (ON_EVENT_REGEX.test(name)) {
               value = '';
+            } else if (
+                elementNode.nodeName === 'IFRAME' &&
+                isAccessibleFrame_1(elementNode) &&
+                name === 'src' &&
+                elementNode.contentDocument.location.href !== 'about:blank' &&
+                elementNode.contentDocument.location.href !==
+                absolutizeUrl_1(value, elementNode.ownerDocument.location.href)
+            ) {
+              value = elementNode.contentDocument.location.href;
             }
             return {
               name,
@@ -13290,7 +13350,11 @@ function __processPageAndSerializePoll() {
           addOrUpdateAttribute(node.attributes, 'value', elementNode.value);
         }
 
-        if (elementNode.tagName === 'OPTION' && elementNode.parentElement.value === elementNode.value) {
+        if (
+            elementNode.tagName === 'OPTION' &&
+            elementNode.parentElement.selectedOptions &&
+            Array.from(elementNode.parentElement.selectedOptions).indexOf(elementNode) > -1
+        ) {
           addOrUpdateAttribute(node.attributes, 'selected', '');
         }
 
@@ -13374,9 +13438,16 @@ function __processPageAndSerializePoll() {
     var aggregateResourceUrlsAndBlobs_1 = aggregateResourceUrlsAndBlobs;
 
     function makeGetResourceUrlsAndBlobs({processResource, aggregateResourceUrlsAndBlobs}) {
-      return function getResourceUrlsAndBlobs({documents, urls, forceCreateStyle = false}) {
+      return function getResourceUrlsAndBlobs({
+                                                documents,
+                                                urls,
+                                                forceCreateStyle = false,
+                                                skipResources,
+                                              }) {
         return Promise.all(
-            urls.map(url => processResource({url, documents, getResourceUrlsAndBlobs, forceCreateStyle})),
+            urls.map(url =>
+                processResource({url, documents, getResourceUrlsAndBlobs, forceCreateStyle, skipResources}),
+            ),
         ).then(resourceUrlsAndBlobsArr => aggregateResourceUrlsAndBlobs(resourceUrlsAndBlobsArr));
       };
     }
@@ -13392,7 +13463,7 @@ function __processPageAndSerializePoll() {
     function toUnAnchoredUri(url) {
       const m = url && url.match(/(^[^#]*)/);
       const res = (m && m[1]) || url;
-      return (res && res.replace(/\?\s*$/, '')) || url;
+      return (res && res.replace(/\?\s*$/, '?')) || url;
     }
 
     var toUnAnchoredUri_1 = toUnAnchoredUri;
@@ -13418,14 +13489,18 @@ function __processPageAndSerializePoll() {
                                         documents,
                                         getResourceUrlsAndBlobs,
                                         forceCreateStyle = false,
+                                        skipResources,
                                       }) {
         if (!cache[url]) {
           if (sessionCache && sessionCache.getItem(url)) {
             const resourceUrls = getDependencies(url);
             log('doProcessResource from sessionStorage', url, 'deps:', resourceUrls.slice(1));
             cache[url] = Promise.resolve({resourceUrls});
-          } else if (/https:\/\/fonts.googleapis.com/.test(url)) {
-            log('not processing google font:', url);
+          } else if (
+              (skipResources && skipResources.indexOf(url) > -1) ||
+              /https:\/\/fonts.googleapis.com/.test(url)
+          ) {
+            log('not processing resource from skip list (or google font):', url);
             cache[url] = Promise.resolve({resourceUrls: [url]});
           } else {
             const now = Date.now();
@@ -13450,19 +13525,24 @@ function __processPageAndSerializePoll() {
                   throw e;
                 }
               })
-              .then(({url, type, value, probablyCORS, isTimeout}) => {
+              .then(({url, type, value, probablyCORS, errorStatusCode, isTimeout}) => {
                 if (probablyCORS) {
                   log('not fetched due to CORS', `[${Date.now() - now}ms]`, url);
                   sessionCache && sessionCache.setItem(url, []);
                   return {resourceUrls: [url]};
                 }
 
+                if (errorStatusCode) {
+                  const blobsObj = {[url]: {errorStatusCode}};
+                  sessionCache && sessionCache.setItem(url, []);
+                  return {blobsObj};
+                }
+
                 if (isTimeout) {
-                  // TODO return errorStatusCode once VG supports it (https://trello.com/c/J5lBWutP/92-when-capturing-dom-add-non-200-urls-to-resource-map)
-                  log('not fetched due to timeout, returning empty resource');
+                  log('not fetched due to timeout, returning error status code 504 (Gateway timeout)');
                   sessionCache && sessionCache.setItem(url, []);
                   return {
-                    blobsObj: {[url]: {type: 'application/x-applitools-empty', value: new ArrayBuffer()}},
+                    blobsObj: {[url]: {errorStatusCode: 504}},
                   };
                 }
 
@@ -13501,6 +13581,7 @@ function __processPageAndSerializePoll() {
                     documents,
                     urls: absoluteDependentUrls,
                     forceCreateStyle,
+                    skipResources,
                   }).then(({resourceUrls, blobsObj}) => ({
                     resourceUrls,
                     blobsObj: Object.assign(blobsObj, thisBlob),
@@ -13550,18 +13631,6 @@ function __processPageAndSerializePoll() {
     }
 
     var processResource = makeProcessResource;
-
-    function getUrlFromCssText(cssText) {
-      const re = /url\((?!['"]?:)['"]?([^'")]*)['"]?\)/g;
-      const ret = [];
-      let result;
-      while ((result = re.exec(cssText)) !== null) {
-        ret.push(result[1]);
-      }
-      return ret;
-    }
-
-    var getUrlFromCssText_1 = getUrlFromCssText;
 
     function makeExtractResourcesFromSvg({parser, decoder, extractResourceUrlsFromStyleTags}) {
       return function(svgArrayBuffer) {
@@ -13646,7 +13715,7 @@ function __processPageAndSerializePoll() {
                     value: buff,
                   }));
                 } else {
-                  return Promise.reject(new Error(`bad status code ${resp.status}`));
+                  return {url, errorStatusCode: resp.status};
                 }
               })
               .then(resolve)
@@ -13711,7 +13780,12 @@ function __processPageAndSerializePoll() {
                 [CSSRule.STYLE_RULE]: () => {
                   let rv = [];
                   for (let i = 0, ii = rule.style.length; i < ii; i++) {
-                    const urls = getUrlFromCssText_1(rule.style.getPropertyValue(rule.style[i]));
+                    const property = rule.style[i];
+                    let propertyValue = rule.style.getPropertyValue(property);
+                    if (/^\s*var\s*\(/.test(propertyValue) || /^--/.test(property)) {
+                      propertyValue = unescapeCss(propertyValue);
+                    }
+                    const urls = getUrlFromCssText_1(propertyValue);
                     rv = rv.concat(urls);
                   }
                   return rv;
@@ -13726,21 +13800,16 @@ function __processPageAndSerializePoll() {
       };
     }
 
-    var extractResourcesFromStyleSheet = makeExtractResourcesFromStyleSheet;
-
-    function extractResourceUrlsFromStyleAttrs(cdt) {
-      return cdt.reduce((acc, node) => {
-        if (node.nodeType === 1) {
-          const styleAttr =
-              node.attributes && node.attributes.find(attr => attr.name.toUpperCase() === 'STYLE');
-
-          if (styleAttr) acc = acc.concat(getUrlFromCssText_1(styleAttr.value));
-        }
-        return acc;
-      }, []);
+    // copied from https://github.com/applitools/mono/commit/512ed8b805ab0ee6701ee04301e982afb382a7f0#diff-4d4bb24a63912943219ab77a43b29ee3R99
+    function unescapeCss(text) {
+      return text
+          .replace(/(\\[0-9a-fA-F]{1,6}\s?)/g, original =>
+              String.fromCodePoint(parseInt(original.substr(1).trim(), 16)),
+          )
+          .replace(/\\([^0-9a-fA-F])/g, '$1');
     }
 
-    var extractResourceUrlsFromStyleAttrs_1 = extractResourceUrlsFromStyleAttrs;
+    var extractResourcesFromStyleSheet = makeExtractResourcesFromStyleSheet;
 
     function makeExtractResourceUrlsFromStyleTags(extractResourcesFromStyleSheet) {
       return function extractResourceUrlsFromStyleTags(doc, onlyDocStylesheet = true) {
@@ -13927,11 +13996,12 @@ function __processPageAndSerializePoll() {
 
     function processPage(
         doc = document,
-        {showLogs, useSessionCache, dontFetchResources, fetchTimeout} = {},
+        {showLogs, useSessionCache, dontFetchResources, fetchTimeout, skipResources} = {},
     ) {
       /* MARKER FOR TEST - DO NOT DELETE */
       const log$$1 = showLogs ? log(Date.now()) : noop$4;
       log$$1('processPage start');
+      log$$1(`skipResources length: ${skipResources && skipResources.length}`);
       const sessionCache$$1 = useSessionCache && sessionCache({log: log$$1});
       const styleSheetCache = {};
       const extractResourcesFromStyleSheet$$1 = extractResourcesFromStyleSheet({styleSheetCache});
@@ -13960,22 +14030,21 @@ function __processPageAndSerializePoll() {
 
       return doProcessPage(doc).then(result => {
         log$$1('processPage end');
-        result.scriptVersion = '3.6.0';
+        result.scriptVersion = '4.0.1';
         return result;
       });
 
       function doProcessPage(doc, pageUrl = doc.location.href) {
         const baseUrl = getBaseUrl(doc) || pageUrl;
-        const {cdt, docRoots, canvasElements, inlineFrames} = domNodesToCdt_1(doc, baseUrl, log$$1);
+        const {cdt, docRoots, canvasElements, inlineFrames, linkUrls} = domNodesToCdt_1(
+            doc,
+            baseUrl,
+            log$$1,
+        );
 
-        const linkUrls = flat_1(docRoots.map(extractLinks_1));
-        const styleTagUrls = flat_1(docRoots.map(extractResourceUrlsFromStyleTags$$1));
+        const styleTagUrls = flat_1(docRoots.map(docRoot => extractResourceUrlsFromStyleTags$$1(docRoot)));
         const absolutizeThisUrl = getAbsolutizeByUrl(baseUrl);
-        const urls = uniq_1(
-            Array.from(linkUrls)
-                .concat(Array.from(styleTagUrls))
-                .concat(extractResourceUrlsFromStyleAttrs_1(cdt)),
-        )
+        const urls = uniq_1(Array.from(linkUrls).concat(Array.from(styleTagUrls)))
             .map(toUriEncoding_1)
             .map(absolutizeThisUrl)
             .map(toUnAnchoredUri_1)
@@ -13983,16 +14052,14 @@ function __processPageAndSerializePoll() {
 
         const resourceUrlsAndBlobsPromise = dontFetchResources
             ? Promise.resolve({resourceUrls: urls, blobsObj: {}})
-            : getResourceUrlsAndBlobs$$1({documents: docRoots, urls}).then(result => {
+            : getResourceUrlsAndBlobs$$1({documents: docRoots, urls, skipResources}).then(result => {
               sessionCache$$1 && sessionCache$$1.persist();
               return result;
             });
         const canvasBlobs = buildCanvasBlobs_1(canvasElements);
         const frameDocs = extractFrames_1(docRoots);
 
-        const processFramesPromise = frameDocs.map(f =>
-            doProcessPage(f, f.defaultView.frameElement.src),
-        );
+        const processFramesPromise = frameDocs.map(f => doProcessPage(f));
         const processInlineFramesPromise = inlineFrames.map(({element, url}) =>
             doProcessPage(element.contentDocument, url),
         );
@@ -14051,11 +14118,9 @@ function __processPageAndSerializePoll() {
     }
 
     function serializeFrame(frame) {
-      frame.blobs = frame.blobs.map(({url, type, value}) => ({
-        url,
-        type,
-        value: arrayBufferToBase64_1(value),
-      }));
+      frame.blobs = frame.blobs.map(blob =>
+          blob.value ? Object.assign(blob, {value: arrayBufferToBase64_1(blob.value)}) : blob,
+      );
       frame.frames.forEach(serializeFrame);
       return frame;
     }
