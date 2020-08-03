@@ -16,4 +16,14 @@
             <package name="com.applitools.eyes.appium.general.*"/>
         </packages>
     </test>
+    <test name="TestEyes">
+        <classes>
+            <class name="com.applitools.eyes.appium.TestEyes">
+                <methods>
+                    <include name="testEyesApi" />
+                    <include name="testConfigurationEdit" />
+                </methods>
+            </class>
+        </classes>
+    </test>
 </suite>

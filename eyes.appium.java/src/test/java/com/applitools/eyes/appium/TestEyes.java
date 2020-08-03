@@ -1,9 +1,9 @@
-package com.applitools.eyes.appium.general;
+package com.applitools.eyes.appium;
 
 import com.applitools.eyes.*;
-import com.applitools.eyes.appium.Eyes;
 import com.applitools.eyes.config.Configuration;
 import com.applitools.eyes.fluent.ICheckSettingsInternal;
+import org.testng.Assert;
 import org.testng.annotations.Test;
 
 public class TestEyes extends EyesBase {
@@ -102,5 +102,16 @@ public class TestEyes extends EyesBase {
         eyes.setMatchLevel(MatchLevel.CONTENT);
         eyes.getConfiguration();
         eyes.setConfiguration(new Configuration());
+    }
+
+    @Test
+    public void testConfigurationEdit() {
+        Eyes eyes = new Eyes();
+        int originalMatchTimeout = eyes.getConfiguration().getMatchTimeout();
+        int newMatchTimeout = originalMatchTimeout + 1000;
+        eyes.getConfiguration().setMatchTimeout(newMatchTimeout);
+        Assert.assertEquals(eyes.getConfiguration().getMatchTimeout(), originalMatchTimeout);
+        eyes.getConfigurationInstance().setMatchTimeout(newMatchTimeout);
+        Assert.assertEquals(eyes.getConfiguration().getMatchTimeout(), newMatchTimeout);
     }
 }

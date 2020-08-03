@@ -1479,7 +1479,7 @@ public abstract class EyesBase implements IEyesBase{
     }
 
     /**
-     * @return Edible instance of the configuration
+     * @return Underlying instance of the configuration for modification
      */
     protected abstract Configuration getConfigurationInstance();
 
