@@ -93,7 +93,7 @@ class EyesConnector extends EyesBase implements IEyesConnector, IBatchCloser {
     }
 
     protected RectangleSize getViewportSize() {
-        return null;
+        return RectangleSize.EMPTY;
     }
 
     protected Configuration setViewportSize(RectangleSize size) {

@@ -40,7 +40,7 @@ public class TestMobileDevices {
 
         Configuration config = eyes.getConfiguration();
         config.addBrowser(new IosDeviceInfo(IosDeviceName.iPhone_11_Pro));
-        config.addBrowser(new IosDeviceInfo(IosDeviceName.iPhone_XR));
+        //config.addBrowser(new IosDeviceInfo(IosDeviceName.iPhone_XR));
         config.setBatch(TestDataProvider.batchInfo);
         config.setAppName("Visual Grid Java Tests");
         config.setTestName("UFG Mobile Device No Result");
@@ -57,7 +57,7 @@ public class TestMobileDevices {
             driver.quit();
             eyes.abortAsync();
         }
-        TestResultsSummary allTestResults = runner.getAllTestResults();
+        TestResultsSummary allTestResults = runner.getAllTestResults(false);
         Assert.assertEquals(2, allTestResults.getAllResults().length);
         TestResults resultSanity = allTestResults.getAllResults()[0].getTestResults();
     }

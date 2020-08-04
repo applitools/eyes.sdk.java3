@@ -238,11 +238,7 @@ public class VisualGridTask implements Callable<TestResultContainer>, Completabl
 
     public void setRenderError(String renderId, String error, RenderRequest renderRequest) {
         logger.verbose("enter - renderId: " + renderId);
-        for (TaskListener listener : listeners) {
-            exception = new InstantiationError("Render Failed for " + this.getBrowserInfo() + " (renderId: " + renderId + ") with reason: " + error);
-            listener.onTaskFailed(exception, this);
-        }
-        logger.verbose("exit - renderId: " + renderId);
+
         renderResult = new RenderStatusResults();
         RectangleSize deviceSize = configuration.getViewportSize();
         if (deviceSize.isEmpty()) {
@@ -260,6 +256,14 @@ public class VisualGridTask implements Callable<TestResultContainer>, Completabl
             }
         }
         renderResult.setDeviceSize(deviceSize);
+
+        for (TaskListener listener : listeners) {
+            exception = new InstantiationError("Render Failed for " + this.getBrowserInfo() + " (renderId: " + renderId + ") with reason: " + error);
+            listener.onTaskFailed(exception, this);
+        }
+
+        logger.verbose("exit - renderId: " + renderId);
+
     }
 
     public Throwable getException() {
