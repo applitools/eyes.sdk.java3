@@ -54,11 +54,11 @@ public class TestMobileDevices {
             eyes.closeAsync();
         }
         finally {
-            eyes.abortIfNotClosed();
             driver.quit();
+            eyes.abortAsync();
         }
-        TestResultsSummary allTestResults = runner.getAllTestResults(false);
-        Assert.assertEquals(1, allTestResults.getAllResults().length);
+        TestResultsSummary allTestResults = runner.getAllTestResults();
+        Assert.assertEquals(2, allTestResults.getAllResults().length);
         TestResults resultSanity = allTestResults.getAllResults()[0].getTestResults();
     }
 }
