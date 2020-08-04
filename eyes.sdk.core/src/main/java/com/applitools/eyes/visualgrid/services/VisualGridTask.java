@@ -243,6 +243,8 @@ public class VisualGridTask implements Callable<TestResultContainer>, Completabl
         RenderStatusResults renderResult = new RenderStatusResults();
         renderResult.setDeviceSize(deviceSize);
 
+        logger.verbose("device size: " + deviceSize);
+
         for (TaskListener listener : listeners) {
             exception = new InstantiationError("Render Failed for " + this.getBrowserInfo() + " (renderId: " + renderId + ") with reason: " + error);
             listener.onTaskFailed(exception, this);
@@ -261,11 +263,14 @@ public class VisualGridTask implements Callable<TestResultContainer>, Completabl
                 String deviceName = iosDeviceInfo.getDeviceName();
                 Map<String, DeviceSize> devicesSizes = eyesConnector.getDevicesSizes();
                 if (devicesSizes.containsKey(deviceName)) {
+                    logger.verbose("found device in list.");
                     if (iosDeviceInfo.getScreenOrientation().equals(ScreenOrientation.PORTRAIT)){
                         deviceSize = devicesSizes.get(deviceName).getPortrait();
                     } else {
                         deviceSize = devicesSizes.get(deviceName).getLandscapeLeft();
                     }
+                } else {
+                    logger.verbose("could not find device in list.");
                 }
             }
         }
