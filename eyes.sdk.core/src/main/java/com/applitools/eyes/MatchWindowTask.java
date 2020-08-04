@@ -415,25 +415,24 @@ public class MatchWindowTask {
      * @param tag                    Optional tag to be associated with the match (can be {@code null}).
      * @param shouldRunOnceOnTimeout Force a single match attempt at the end of the match timeout.
      * @param checkSettingsInternal  The settings to use.
-     * @param retryTimeout           The amount of time to retry matching in milliseconds or a
-     *                               negative value to use the default retry timeout.
      * @return Returns the results of the match
      */
     public MatchResult matchWindow(Trigger[] userInputs,
                                    Region region, String tag,
                                    boolean shouldRunOnceOnTimeout,
                                    ICheckSettingsInternal checkSettingsInternal,
-                                   int retryTimeout,
                                    String source) {
 
+        ImageMatchSettings imageMatchSettings = createImageMatchSettings(checkSettingsInternal, this.eyes);
+        int retryTimeout = checkSettingsInternal.getTimeout();
         if (retryTimeout < 0) {
             retryTimeout = defaultRetryTimeout;
         }
 
         logger.verbose(String.format("retryTimeout = %d", retryTimeout));
 
-        EyesScreenshot screenshot = takeScreenshot(userInputs, region, tag,
-                shouldRunOnceOnTimeout, checkSettingsInternal, retryTimeout, source);
+        EyesScreenshot screenshot = takeScreenshot(userInputs, region, tag, shouldRunOnceOnTimeout,
+                checkSettingsInternal, imageMatchSettings, retryTimeout, source);
 
         updateLastScreenshot(screenshot);
         updateBounds(region);
@@ -508,6 +507,7 @@ public class MatchWindowTask {
     private EyesScreenshot takeScreenshot(Trigger[] userInputs, Region region, String tag,
                                           boolean shouldMatchWindowRunOnceOnTimeout,
                                           ICheckSettingsInternal checkSettingsInternal,
+                                          ImageMatchSettings imageMatchSettings,
                                           int retryTimeout, String source) {
         long elapsedTimeStart = System.currentTimeMillis();
         EyesScreenshot screenshot;
@@ -520,9 +520,9 @@ public class MatchWindowTask {
             if (shouldMatchWindowRunOnceOnTimeout) {
                 GeneralUtils.sleep(retryTimeout);
             }
-            screenshot = tryTakeScreenshot(userInputs, region, tag, checkSettingsInternal, source);
+            screenshot = tryTakeScreenshot(userInputs, region, tag, checkSettingsInternal, imageMatchSettings, source);
         } else {
-            screenshot = retryTakingScreenshot(userInputs, region, tag, checkSettingsInternal,
+            screenshot = retryTakingScreenshot(userInputs, region, tag, checkSettingsInternal, imageMatchSettings,
                     retryTimeout, source);
         }
 
@@ -533,8 +533,8 @@ public class MatchWindowTask {
     }
 
     private EyesScreenshot retryTakingScreenshot(Trigger[] userInputs, Region region, String tag,
-                                                 ICheckSettingsInternal checkSettingsInternal, int retryTimeout,
-                                                 String source) {
+                                                 ICheckSettingsInternal checkSettingsInternal,
+                                                 ImageMatchSettings imageMatchSettings, int retryTimeout, String source) {
         // Start the retry timer.
         long start = System.currentTimeMillis();
 
@@ -548,7 +548,7 @@ public class MatchWindowTask {
             // Wait before trying again.
             GeneralUtils.sleep(MATCH_INTERVAL);
 
-            screenshot = tryTakeScreenshot(userInputs, region, tag, checkSettingsInternal, source);
+            screenshot = tryTakeScreenshot(userInputs, region, tag, checkSettingsInternal, imageMatchSettings, source);
 
             if (matchResult.getAsExpected()) {
                 break;
@@ -559,15 +559,15 @@ public class MatchWindowTask {
 
         // if we're here because we haven't found a match yet, try once more
         if (!matchResult.getAsExpected()) {
-            screenshot = tryTakeScreenshot(userInputs, region, tag, checkSettingsInternal, source);
+            screenshot = tryTakeScreenshot(userInputs, region, tag, checkSettingsInternal, imageMatchSettings, source);
         }
         return screenshot;
     }
 
     private EyesScreenshot tryTakeScreenshot(Trigger[] userInputs, Region region, String tag,
                                              ICheckSettingsInternal checkSettingsInternal,
-                                             String source) {
-        AppOutputWithScreenshot appOutput = appOutputProvider.getAppOutput(region, checkSettingsInternal);
+                                             ImageMatchSettings imageMatchSettings, String source) {
+        AppOutputWithScreenshot appOutput = appOutputProvider.getAppOutput(region, checkSettingsInternal, imageMatchSettings);
         EyesScreenshot screenshot = appOutput.getScreenshot();
         AppOutput output = appOutput.getAppOutput();
         String currentScreenshotHash = GeneralUtils.getSha256hash(output.getScreenshotBytes());

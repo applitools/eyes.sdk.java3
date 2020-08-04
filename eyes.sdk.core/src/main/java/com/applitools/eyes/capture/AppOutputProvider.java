@@ -1,7 +1,6 @@
 package com.applitools.eyes.capture;
 
-import com.applitools.eyes.EyesScreenshot;
-import com.applitools.eyes.Location;
+import com.applitools.eyes.ImageMatchSettings;
 import com.applitools.eyes.Region;
 import com.applitools.eyes.fluent.ICheckSettingsInternal;
 
@@ -10,5 +9,5 @@ import com.applitools.eyes.fluent.ICheckSettingsInternal;
  */
 public interface AppOutputProvider {
     AppOutputWithScreenshot getAppOutput(Region region,
-                                         ICheckSettingsInternal checkSettingsInternal);
+                                         ICheckSettingsInternal checkSettingsInternal, ImageMatchSettings imageMatchSettings);
 }

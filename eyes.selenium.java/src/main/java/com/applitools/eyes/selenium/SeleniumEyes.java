@@ -354,7 +354,7 @@ public class SeleniumEyes extends EyesBase implements ISeleniumEyes, IBatchClose
      * Default match timeout is used.
      */
     public void checkWindow() {
-        checkWindow(null);
+        checkWindow((String)null);
     }
 
     /**
@@ -722,29 +722,29 @@ public class SeleniumEyes extends EyesBase implements ISeleniumEyes, IBatchClose
 
             if (targetElement != null) {
                 if (state.isStitchContent()) {
-                    checkFullElement_(checkSettingsInternal, targetElement, targetRegion, state);
+                    checkFullElement(checkSettingsInternal, targetElement, targetRegion, state);
                 } else {
                     // TODO Verify: if element is outside the viewport, we should still capture entire (outer) bounds
-                    checkElement_(checkSettingsInternal, targetElement, targetRegion, state);
+                    checkElement(checkSettingsInternal, targetElement, targetRegion, state);
                 }
             } else if (targetRegion != null) {
                 // Coordinates should always be treated as "Fully" in case they get out of the viewport.
                 boolean originalFully = state.isStitchContent();
                 state.setStitchContent(true);
-                checkFullRegion_(checkSettingsInternal, targetRegion, state);
+                checkFullRegion(checkSettingsInternal, targetRegion, state);
                 state.setStitchContent(originalFully);
             } else if (seleniumCheckTarget.getFrameChain().size() > 0) {
                 if (state.isStitchContent()) {
-                    checkFullFrame_(checkSettingsInternal, state);
+                    checkFullFrame(checkSettingsInternal, state);
                 } else {
                     logger.log("Target.Frame(frame).Fully(false)");
                     logger.log("WARNING: This shouldn't have been called, as it is covered by `CheckElement_(...)`");
                 }
             } else {
                 if (state.isStitchContent()) {
-                    checkFullWindow_(checkSettingsInternal, state, scrollRootElement);
+                    checkFullWindow(checkSettingsInternal, state, scrollRootElement);
                 } else {
-                    checkWindow_(checkSettingsInternal);
+                    checkWindow(checkSettingsInternal);
                 }
             }
 
@@ -752,9 +752,16 @@ public class SeleniumEyes extends EyesBase implements ISeleniumEyes, IBatchClose
 
             pageState.restorePageState();
         } catch (Exception ex) {
-            GeneralUtils.logExceptionStackTrace(logger, e);
-            throw ;
+            GeneralUtils.logExceptionStackTrace(logger, ex);
+            throw ex;
         }
+    }
+
+    private void checkWindow(ICheckSettingsInternal checkSettingsInternal)
+    {
+        logger.verbose("Target.Window()");
+
+        checkWindowBase(null, checkSettingsInternal, driver.getCurrentUrl());
     }
 
     public static WebElement tryGetUserDefinedSREFromSREContainer(IScrollRootElementContainer scrollRootElementContainer, EyesSeleniumDriver driver) {
@@ -851,60 +858,6 @@ public class SeleniumEyes extends EyesBase implements ISeleniumEyes, IBatchClose
 
         this.targetElement = null;
         return result;
-    }
-
-    private int switchToFrame(ISeleniumCheckTarget checkTarget) {
-        if (checkTarget == null) {
-            return 0;
-        }
-
-        List<FrameLocator> frameChain = checkTarget.getFrameChain();
-        int switchedToFrameCount = 0;
-        for (FrameLocator frameLocator : frameChain) {
-            if (switchToFrame(frameLocator)) {
-                switchedToFrameCount++;
-            }
-        }
-        return switchedToFrameCount;
-    }
-
-    private boolean switchToFrame(ISeleniumFrameCheckTarget frameTarget) {
-        WebDriver.TargetLocator switchTo = this.driver.switchTo();
-
-        if (frameTarget.getFrameIndex() != null) {
-            switchTo.frame(frameTarget.getFrameIndex());
-            updateFrameScrollRoot(frameTarget);
-            return true;
-        }
-
-        if (frameTarget.getFrameNameOrId() != null) {
-            switchTo.frame(frameTarget.getFrameNameOrId());
-            updateFrameScrollRoot(frameTarget);
-            return true;
-        }
-
-        if (frameTarget.getFrameReference() != null) {
-            switchTo.frame(frameTarget.getFrameReference());
-            updateFrameScrollRoot(frameTarget);
-            return true;
-        }
-
-        if (frameTarget.getFrameSelector() != null) {
-            WebElement frameElement = this.driver.findElement(frameTarget.getFrameSelector());
-            if (frameElement != null) {
-                switchTo.frame(frameElement);
-                updateFrameScrollRoot(frameTarget);
-                return true;
-            }
-        }
-
-        return false;
-    }
-
-    private void updateFrameScrollRoot(IScrollRootElementContainer frameTarget) {
-        WebElement rootElement = EyesSeleniumUtils.getScrollRootElement(logger, driver, frameTarget);
-        Frame frame = driver.getFrameChain().peek();
-        frame.setScrollRootElement(rootElement);
     }
 
     private FrameChain ensureFrameAndElementVisible(List<PositionProviderAndMemento> ppams, EyesRemoteWebElement element, Region elementBounds) {
@@ -1042,54 +995,54 @@ public class SeleniumEyes extends EyesBase implements ISeleniumEyes, IBatchClose
         return viewportBounds;
     }
 
-    private MatchResult checkRegion(String name, ICheckSettings checkSettings, String source) {
-//        // If needed, scroll to the top/left of the element (additional help
-//        // to make sure it's visible).
-//        Point locationAsPoint = targetElement.getLocation();
-//        RegionVisibilityStrategy regionVisibilityStrategy = regionVisibilityStrategyHandler.get();
+//    private MatchResult checkRegion(String name, ICheckSettings checkSettings, String source) {
+////        // If needed, scroll to the top/left of the element (additional help
+////        // to make sure it's visible).
+////        Point locationAsPoint = targetElement.getLocation();
+////        RegionVisibilityStrategy regionVisibilityStrategy = regionVisibilityStrategyHandler.get();
+////
+////        regionVisibilityStrategy.moveToRegion(positionProvider,
+////                new Location(locationAsPoint.getX(), locationAsPoint.getY()));
 //
-//        regionVisibilityStrategy.moveToRegion(positionProvider,
-//                new Location(locationAsPoint.getX(), locationAsPoint.getY()));
-
-        MatchResult result = checkWindowBase(new RegionProvider() {
-            @Override
-            public Region getRegion(ICheckSettingsInternal settings) {
-                EyesRemoteWebElement eyesTargetElement = ((EyesRemoteWebElement) targetElement);
-                Region rect = settings.getTargetRegion();
-                Region r;
-                if (rect == null) {
-                    Rectangle bounds;
-                    if (EyesDriverUtils.isMobileDevice(driver)) {
-                        bounds = eyesTargetElement.getRect();
-                    } else {
-                        bounds = eyesTargetElement.getBoundingClientRect();
-                    }
-                    r = new Region(bounds.getX(), bounds.getY(), bounds.getWidth(), bounds.getHeight(), CoordinatesType.CONTEXT_RELATIVE);
-                } else {
-                    SizeAndBorders sizeAndBorders = eyesTargetElement.getSizeAndBorders();
-                    RectangleSize s = sizeAndBorders.getSize();
-                    Borders b = sizeAndBorders.getBorders();
-                    Point p = targetElement.getLocation();
-                    p = p.moveBy(b.getLeft(), b.getTop());
-                    Region r2 = rect;
-
-                    //TODO - ITAI - try to use Region.Intersect
-                    int x = p.getX() + r2.getLeft();
-                    int y = p.getY() + r2.getTop();
-                    int w = Math.min(p.getX() + s.getWidth(), r2.getRight()) - x;
-                    int h = Math.min(p.getY() + s.getHeight(), r2.getBottom()) - y;
-
-                    r = new Region(x, y, w, h, CoordinatesType.CONTEXT_RELATIVE);
-                }
-
-                return r;
-            }
-        }, name, false, checkSettings, source);
-        logger.verbose("Done! trying to scroll back to original position.");
-
-        //regionVisibilityStrategy.returnToOriginalPosition(positionProvider);
-        return result;
-    }
+//        MatchResult result = checkWindowBase(new RegionProvider() {
+//            @Override
+//            public Region getRegion(ICheckSettingsInternal settings) {
+//                EyesRemoteWebElement eyesTargetElement = ((EyesRemoteWebElement) targetElement);
+//                Region rect = settings.getTargetRegion();
+//                Region r;
+//                if (rect == null) {
+//                    Rectangle bounds;
+//                    if (EyesDriverUtils.isMobileDevice(driver)) {
+//                        bounds = eyesTargetElement.getRect();
+//                    } else {
+//                        bounds = eyesTargetElement.getBoundingClientRect();
+//                    }
+//                    r = new Region(bounds.getX(), bounds.getY(), bounds.getWidth(), bounds.getHeight(), CoordinatesType.CONTEXT_RELATIVE);
+//                } else {
+//                    SizeAndBorders sizeAndBorders = eyesTargetElement.getSizeAndBorders();
+//                    RectangleSize s = sizeAndBorders.getSize();
+//                    Borders b = sizeAndBorders.getBorders();
+//                    Point p = targetElement.getLocation();
+//                    p = p.moveBy(b.getLeft(), b.getTop());
+//                    Region r2 = rect;
+//
+//                    //TODO - ITAI - try to use Region.Intersect
+//                    int x = p.getX() + r2.getLeft();
+//                    int y = p.getY() + r2.getTop();
+//                    int w = Math.min(p.getX() + s.getWidth(), r2.getRight()) - x;
+//                    int h = Math.min(p.getY() + s.getHeight(), r2.getBottom()) - y;
+//
+//                    r = new Region(x, y, w, h, CoordinatesType.CONTEXT_RELATIVE);
+//                }
+//
+//                return r;
+//            }
+//        }, name, false, checkSettings, source);
+//        logger.verbose("Done! trying to scroll back to original position.");
+//
+//        //regionVisibilityStrategy.returnToOriginalPosition(positionProvider);
+//        return result;
+//    }
 
     /**
      * Updates the state of scaling related parameters.
@@ -1168,7 +1121,7 @@ public class SeleniumEyes extends EyesBase implements ISeleniumEyes, IBatchClose
             logger.verbose("replacing regionToCheck");
             setRegionToCheck(screenshot.getFrameWindow());
 
-            super.checkWindowBase(RegionProvider.NULL_INSTANCE, tag, false, matchTimeout, source);
+            super.checkWindowBase(null, tag, matchTimeout, source);
         } finally {
             checkFrameOrElement = false;
             regionToCheck = null;
@@ -1311,209 +1264,6 @@ public class SeleniumEyes extends EyesBase implements ISeleniumEyes, IBatchClose
             settings = settings.frame(framePath[i]);
         }
         check(tag, settings.region(selector).timeout(matchTimeout).fully(stitchContent));
-    }
-
-    private MatchResult checkElement(WebElement element, String name, ICheckSettings checkSettings, String source) {
-
-        // Since the element might already have been found using EyesWebDriver.
-        final EyesRemoteWebElement eyesElement = (element instanceof EyesRemoteWebElement) ?
-                (EyesRemoteWebElement) element : new EyesRemoteWebElement(logger, driver, element);
-
-        if (EyesDriverUtils.isMobileDevice(driver)) {
-            return checkNativeElement(eyesElement, name, checkSettings, source);
-        }
-
-        String displayStyle = eyesElement.getComputedStyle("display");
-        RectangleSize clientSize = eyesElement.getClientSize();
-
-        String originalOverflow = null;
-        if (this.stitchContent && !displayStyle.equalsIgnoreCase("inline") &&
-                ((clientSize.getHeight() <= effectiveViewport.getHeight() && clientSize.getWidth() < effectiveViewport.getWidth()) ||
-                        (clientSize.getHeight() < effectiveViewport.getHeight() && clientSize.getWidth() <= effectiveViewport.getWidth()))) {
-            logger.verbose("setting this.elementPositionProvider.");
-            this.elementPositionProvider = new ElementPositionProvider(logger, this.driver, eyesElement);
-            originalOverflow = eyesElement.setOverflow("hidden");
-        } else {
-            this.elementPositionProvider = null;
-        }
-
-        RectangleSize scrollSize = eyesElement.getScrollSize();
-        logger.verbose(String.format("displayStyle: %s ; scrollSize: %s ; clientSize %s ; effectiveViewport size: %s",
-                displayStyle, scrollSize, clientSize, effectiveViewport.getSize()));
-
-        EyesTargetLocator switchTo = (EyesTargetLocator) this.driver.switchTo();
-        FrameChain fc = this.driver.getFrameChain().clone();
-
-        List<BoundsAndBorders> boundsList = new ArrayList<>();
-        List<PositionProviderAndMemento> ppams = new ArrayList<>();
-
-        Rectangle elementBoundsRect = eyesElement.getBoundingClientRect();
-        Region elementBounds = new Region(elementBoundsRect.x, elementBoundsRect.y, elementBoundsRect.width, elementBoundsRect.height);
-        SizeAndBorders sizeAndBorders = eyesElement.getSizeAndBorders();
-
-        if (this.stitchContent && this.elementPositionProvider != null) {
-            Borders borders = sizeAndBorders.getBorders();
-            elementBounds = elementBounds.offset(borders.getLeft(), borders.getTop());
-            elementBounds.setWidth(elementBounds.getWidth() - borders.getHorizontal());
-            elementBounds.setHeight(elementBounds.getHeight() - borders.getVertical());
-        }
-
-        Region originalElementBounds = new Region(elementBounds);
-        Region fullElementBounds = new Region(elementBounds);
-
-        if (this.stitchContent) {
-            fullElementBounds.setWidth(Math.max(fullElementBounds.getWidth(), scrollSize.getWidth()));
-            fullElementBounds.setHeight(Math.max(fullElementBounds.getHeight(), scrollSize.getHeight()));
-        }
-
-        logger.verbose("elementBounds: " + elementBounds);
-        logger.verbose("fullElementBounds: " + fullElementBounds);
-        PositionProvider positionProvider = null;
-        PositionMemento memento = null;
-        Location offset;
-
-        Region bounds;
-        Borders borders = new Borders();
-        for (int i = fc.size() - 1; i >= 0; --i) {
-            Frame frame = fc.getAt(i);
-            bounds = frame.getBounds();
-            borders = frame.getBorderWidths();
-
-            if (!bounds.contains(fullElementBounds)) {
-                logger.verbose("bounds outside effective viewport.");
-
-                WebElement scrollRootElement = getCurrentFrameScrollRootElement();
-
-                FrameChain currentFC = driver.getFrameChain().clone();
-                positionProvider = getElementPositionProvider(scrollRootElement);
-                memento = positionProvider.getState();
-                Location location = new Location(elementBounds.getLeft(), elementBounds.getTop());
-                offset = positionProvider.setPosition(location);
-                elementBounds = elementBounds.offset(-offset.getX(), -offset.getY());
-                fullElementBounds = fullElementBounds.offset(-offset.getX(), -offset.getY());
-
-                logger.verbose("offset: " + offset);
-                if (currentFC != fc) {
-                    PositionProviderAndMemento ppam = new PositionProviderAndMemento(positionProvider, memento, currentFC, offset);
-                    ppams.add(ppam);
-                }
-            }
-            logger.verbose("bounds: " + bounds);
-
-            logger.verbose("Element region (before intersection with effective viewport): " + this.regionToCheck);
-
-            elementBounds = elementBounds.offset(bounds.getLeft(), bounds.getTop());
-            elementBounds = elementBounds.offset(borders.getLeft(), borders.getTop());
-
-            fullElementBounds = fullElementBounds.offset(bounds.getLeft(), bounds.getTop());
-            fullElementBounds = fullElementBounds.offset(borders.getLeft(), borders.getTop());
-
-            boundsList.add(new BoundsAndBorders(bounds, borders));
-            switchTo.parentFrame();
-        }
-
-        if (!this.effectiveViewport.contains(elementBounds)) {
-            logger.verbose("bounds outside effective viewport.");
-            WebElement scrollRootElement = getCurrentFrameScrollRootElement();
-            if (scrollRootElement instanceof EyesRemoteWebElement) {
-                EyesRemoteWebElement eyesScrollRootElement = (EyesRemoteWebElement) scrollRootElement;
-                Rectangle sreBounds = eyesScrollRootElement.getBoundingClientRect();
-                Region sreBoundsRegion = new Region(sreBounds.x, sreBounds.y, sreBounds.width, sreBounds.height);
-                this.effectiveViewport.intersect(sreBoundsRegion);
-            }
-
-            //positionProvider = SeleniumScrollPositionProviderFactory.GetPositionProvider(Logger, StitchMode, jsExecutor_, userDefinedSRE, userAgent_);
-            positionProvider = getElementPositionProvider(scrollRootElement);
-            memento = positionProvider.getState();
-            elementBounds = elementBounds.offset(memento.getX(), memento.getY());
-            fullElementBounds = fullElementBounds.offset(memento.getX(), memento.getY());
-
-            Location elementLocation = elementBounds.getLocation();
-            elementLocation = elementLocation.offset(-effectiveViewport.getLeft(), -effectiveViewport.getTop());
-
-            offset = positionProvider.setPosition(elementLocation);
-            logger.verbose("offset: " + offset);
-
-            elementBounds = elementBounds.offset(-offset.getX(), -offset.getY());
-            fullElementBounds = fullElementBounds.offset(-offset.getX(), -offset.getY());
-
-            if (fc.size() > 0) {
-                //EyesRemoteWebElement eyesFrame = (EyesRemoteWebElement)fc[0].Reference;
-                //bounds = eyesFrame.GetClientBounds();
-                bounds = fc.getAt(0).getBounds();
-                boundsList.add(new BoundsAndBorders(bounds, new Borders()));
-            }
-        }
-
-        if (!this.stitchContent) {
-            elementBounds.intersect(effectiveViewport);
-            fullElementBounds.intersect(effectiveViewport);
-        }
-
-        Region viewport = new Region(elementBounds);
-        if (fc.size() > 0) {
-            Frame frame = fc.peek();
-            viewport.setSize(frame.getInnerSize());
-            switchTo.frames(fc);
-            viewport.intersect(elementBounds);
-        } else {
-            WebElement scrollRootElement = getCurrentFrameScrollRootElement();
-            if (scrollRootElement instanceof EyesRemoteWebElement) {
-                EyesRemoteWebElement eyesScrollRootElement = (EyesRemoteWebElement) scrollRootElement;
-                Rectangle sreBounds = eyesScrollRootElement.getBoundingClientRect();
-                Region sreBoundsRegion = new Region(sreBounds.x, sreBounds.y, sreBounds.width, sreBounds.height);
-                viewport.intersect(sreBoundsRegion);
-            }
-        }
-
-        this.regionToCheck = new Region(viewport);
-        this.fullRegionToCheck = new Region(fullElementBounds);
-        this.effectiveViewport = new Region(viewport);
-
-        MatchResult result = checkWindowBase(new RegionProvider() {
-            public Region getRegion(ICheckSettingsInternal settings) {
-                Region result = settings.getTargetRegion();
-                if (result == null) result = Region.EMPTY;
-                return result;
-            }
-        }, name, false, checkSettings, source);
-
-        if (positionProvider != null) {
-            switchTo.defaultContent();
-            positionProvider.restoreState(memento);
-        }
-
-        for (PositionProviderAndMemento ppam : ppams) {
-            try {
-                switchTo.frames(ppam.getFrames());
-                ppam.restoreState();
-            } catch (Exception e) {
-                GeneralUtils.logExceptionStackTrace(logger, e);
-            }
-        }
-
-        switchTo.frames(fc);
-
-        if (originalOverflow != null) {
-            eyesElement.setOverflow(originalOverflow);
-        }
-
-        return result;
-    }
-
-    private MatchResult checkNativeElement(EyesRemoteWebElement eyesElement, String name, ICheckSettings checkSettings, String source) {
-
-        final Rectangle rect = eyesElement.getRect();
-
-        MatchResult result = checkWindowBase(new RegionProvider() {
-            public Region getRegion(ICheckSettingsInternal settings) {
-                Region result = settings.getTargetRegion();
-                if (result == null) result = new Region(rect.x, rect.y, rect.width, rect.height);
-                return result;
-            }
-        }, name, false, checkSettings, source);
-
-        return result;
     }
 
     /**
