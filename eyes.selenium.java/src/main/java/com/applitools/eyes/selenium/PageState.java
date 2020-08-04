@@ -1,0 +1,127 @@
+package com.applitools.eyes.selenium;
+
+import com.applitools.eyes.Location;
+import com.applitools.eyes.Logger;
+import com.applitools.eyes.UserAgent;
+import com.applitools.eyes.positioning.PositionProvider;
+import com.applitools.eyes.selenium.fluent.FrameLocator;
+import com.applitools.eyes.selenium.fluent.ISeleniumCheckTarget;
+import com.applitools.eyes.selenium.fluent.ISeleniumFrameCheckTarget;
+import com.applitools.eyes.selenium.frames.Frame;
+import com.applitools.eyes.selenium.frames.FrameChain;
+import com.applitools.eyes.selenium.wrappers.EyesRemoteWebElement;
+import com.applitools.eyes.selenium.wrappers.EyesSeleniumDriver;
+import com.applitools.eyes.selenium.wrappers.EyesTargetLocator;
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
+
+import java.util.ArrayList;
+import java.util.List;
+
+public class PageState {
+    private EyesSeleniumDriver driver;
+    private Logger logger;
+    private List<FrameState> frameStates;
+    private FrameChain originalFrameChain;
+    private StitchMode stitchMode;
+    private UserAgent userAgent;
+
+    public PageState(Logger logger, EyesSeleniumDriver driver, StitchMode stitchMode, UserAgent userAgent) {
+        this.logger = logger;
+        this.driver = driver;
+        this.stitchMode = stitchMode;
+        this.userAgent = userAgent;
+    }
+
+    public void PreparePage(ISeleniumCheckTarget seleniumCheckTarget, Configuration config, WebElement userDefinedSRE) {
+        frameStates = new ArrayList<>();
+        originalFrameChain = driver.getFrameChain().clone();
+
+        if (seleniumCheckTarget.getTargetElement() != null ||
+                seleniumCheckTarget.getTargetSelector() != null ||
+                seleniumCheckTarget.getFrameChain().size() > 0) {
+            prepareParentFrames();
+        }
+
+        SaveCurrentFrameState_(frameStates, driver, userDefinedSRE);
+        TryHideScrollbarsInFrame(config, driver, userDefinedSRE);
+
+        int switchedToFrameCount = switchToTargetFrame(seleniumCheckTarget, config, frameStates, userDefinedSRE);
+        logger.verbose("switchedToFrameCount: " + switchedToFrameCount);
+    }
+
+    private void prepareParentFrames() {
+        if (originalFrameChain.size() == 0) return;
+
+        EyesTargetLocator switchTo = (EyesTargetLocator) driver.switchTo();
+        FrameChain fc = originalFrameChain.clone();
+        while (fc.size() > 0) {
+            switchTo.parentFrame();
+            Frame currentFrame = fc.pop();
+            WebElement rootElement = EyesSeleniumUtils.getCurrentFrameScrollRootElement(driver, null);
+            SaveCurrentFrameState_(frameStates, driver, rootElement);
+            MaximizeTargetFrameInCurrentFrame_(currentFrame.getReference(), rootElement);
+        }
+        frameStates.Reverse();
+        switchTo.frames(originalFrameChain);
+    }
+
+    public void restorePageState() {
+        frameStates.Reverse();
+        for(FrameState state : frameStates)
+        {
+            state.restore();
+        }
+        ((EyesTargetLocator) driver.switchTo()).frames(originalFrameChain);
+    }
+
+    public int switchToTargetFrame(ISeleniumCheckTarget checkTarget, Configuration config,
+                                   List<FrameState> frameStates, WebElement userDefinedSRE) {
+        List<FrameLocator> frameChain = checkTarget.getFrameChain();
+        for(FrameLocator frameLocator : frameChain)
+        {
+            WebElement frameElement = EyesSeleniumUtils.findFrameByFrameCheckTarget(frameLocator, driver);
+            MaximizeTargetFrameInCurrentFrame_(frameElement, userDefinedSRE);
+            SwitchToFrame_(frameElement, frameLocator, config, frameStates);
+        }
+        return frameChain.size();
+    }
+
+    private void MaximizeTargetFrameInCurrentFrame_(WebElement frameElement, WebElement userDefinedSRE) {
+        WebElement currentFrameSRE = EyesSeleniumUtils.getCurrentFrameScrollRootElement(driver, userDefinedSRE);
+
+        PositionProvider positionProvider = SeleniumEyes.getPositionProviderForScrollRootElement(logger, driver,
+                stitchMode, userAgent, currentFrameSRE);
+
+        Rectangle frameRect = EyesRemoteWebElement.getClientBoundsWithoutBorders(frameElement, driver, logger);
+        if (stitchMode == StitchMode.SCROLL) {
+            Location pageScrollPosition = positionProvider.getCurrentPosition();
+            frameRect.offset(pageScrollPosition);
+        }
+        positionProvider.setPosition(frameRect.getLocation());
+    }
+
+    private void SwitchToFrame_(WebElement frameElement,
+                                ISeleniumFrameCheckTarget frameTarget, Configuration config, List<FrameState> frameStates) {
+        WebDriver.TargetLocator switchTo = driver.switchTo();
+
+        switchTo.frame(frameElement);
+        WebElement rootElement = SeleniumEyes.getScrollRootElementFromSREContainer(frameTarget, driver);
+        Frame frame = driver.getFrameChain().peek();
+        frame.setScrollRootElement(rootElement);
+        SaveCurrentFrameState_(frameStates, driver, rootElement);
+        TryHideScrollbarsInFrame(config, driver, rootElement);
+        frame.setScrollRootElementInnerBounds(EyesRemoteWebElement.getClientBoundsWithoutBorders(rootElement, driver, logger));
+    }
+
+    private static void TryHideScrollbarsInFrame(Configuration config, EyesSeleniumDriver driver, WebElement rootElement) {
+        if (config.getHideScrollbars()) {
+            EyesDriverUtils.setOverflow(driver, "hidden", rootElement);
+        }
+    }
+
+    private static void SaveCurrentFrameState_(List<FrameState> frameStates, EyesSeleniumDriver driver, WebElement rootElement) {
+        FrameState frameState = FrameState.getCurrentFrameState(driver, rootElement);
+        frameStates.add(frameState);
+    }
+}
