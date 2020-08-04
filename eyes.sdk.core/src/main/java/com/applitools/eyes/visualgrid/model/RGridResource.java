@@ -15,19 +15,23 @@ public class RGridResource {
     private static final int MAX_RESOURCE_SIZE = 15 * 1024 * 1024;
 
     @JsonIgnore
-    private String url;
+    protected String url;
 
-    @JsonInclude
-    private final String contentType;
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    protected final String contentType;
 
     @JsonIgnore
-    private final byte[] content;
+    protected byte[] content = null;
 
     @JsonProperty("hash")
-    private final String sha256;
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    protected String sha256 = null;
+
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    private final Integer errorStatusCode;
 
     @JsonInclude
-    private final String hashFormat = "sha256";
+    protected final String hashFormat = "sha256";
 
     @JsonIgnore
     private AtomicBoolean isResourceParsed = new AtomicBoolean(false);
@@ -41,17 +45,22 @@ public class RGridResource {
     }
 
     public RGridResource(String url, String contentType, byte[] content) {
+        this(url, contentType, content, null);
+    }
 
+    public RGridResource(String url, String contentType, byte[] content, Integer errorStatusCode) {
         this.contentType = contentType;
-        this.content = content.length > MAX_RESOURCE_SIZE ? Arrays.copyOf(content, MAX_RESOURCE_SIZE) : content;
-        this.sha256 = GeneralUtils.getSha256hash(this.content);
         this.url = url;
+        this.errorStatusCode = errorStatusCode;
+        if (content != null) {
+            this.content = content.length > MAX_RESOURCE_SIZE ? Arrays.copyOf(content, MAX_RESOURCE_SIZE) : content;
+            this.sha256 = GeneralUtils.getSha256hash(this.content);
+        }
     }
 
     public String getContentType() {
         return contentType;
     }
-
 
     public byte[] getContent() {
         return content;
@@ -65,9 +74,8 @@ public class RGridResource {
         return sha256;
     }
 
-    @Override
-    public String toString() {
-        return "RGridResource{" + "url='" + url + '\'' + '}';
+    public Integer getErrorStatusCode() {
+        return errorStatusCode;
     }
 
     public void setIsResourceParsed(Boolean isResourceParsed) {
@@ -77,6 +85,11 @@ public class RGridResource {
     @JsonIgnore
     public boolean isResourceParsed() {
         return isResourceParsed.get();
+    }
+
+    @Override
+    public String toString() {
+        return "RGridResource{" + "url='" + url + '\'' + '}';
     }
 
     @Override

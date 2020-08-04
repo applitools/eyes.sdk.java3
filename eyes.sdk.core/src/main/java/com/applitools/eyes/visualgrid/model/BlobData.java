@@ -1,7 +1,6 @@
 package com.applitools.eyes.visualgrid.model;
 
 
-import java.net.URI;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 
@@ -13,6 +12,8 @@ public class BlobData {
     private String type;
 
     private String value;
+
+    private int errorStatusCode;
 
     public BlobData() {
     }
@@ -39,6 +40,14 @@ public class BlobData {
 
     public void setValue(String value) {
         this.value = value.getBytes(StandardCharsets.UTF_8).length > MAX_RESOURCE_SIZE ? new String(Arrays.copyOf(value.getBytes(StandardCharsets.UTF_8), MAX_RESOURCE_SIZE)) : value;
+    }
+
+    public int getErrorStatusCode() {
+        return errorStatusCode;
+    }
+
+    public void setErrorStatusCode(int errorStatusCode) {
+        this.errorStatusCode = errorStatusCode;
     }
 
     @Override
