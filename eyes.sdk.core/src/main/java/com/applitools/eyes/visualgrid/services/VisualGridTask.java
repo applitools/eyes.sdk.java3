@@ -239,7 +239,21 @@ public class VisualGridTask implements Callable<TestResultContainer>, Completabl
     public void setRenderError(String renderId, String error, RenderRequest renderRequest) {
         logger.verbose("enter - renderId: " + renderId);
 
-        renderResult = new RenderStatusResults();
+        RectangleSize deviceSize = getCorrectDeviceSize(renderRequest);
+        RenderStatusResults renderResult = new RenderStatusResults();
+        renderResult.setDeviceSize(deviceSize);
+
+        for (TaskListener listener : listeners) {
+            exception = new InstantiationError("Render Failed for " + this.getBrowserInfo() + " (renderId: " + renderId + ") with reason: " + error);
+            listener.onTaskFailed(exception, this);
+        }
+
+        this.renderResult = renderResult;
+        logger.verbose("exit - renderId: " + renderId);
+
+    }
+
+    private RectangleSize getCorrectDeviceSize(RenderRequest renderRequest) {
         RectangleSize deviceSize = configuration.getViewportSize();
         if (deviceSize.isEmpty()) {
             IosDeviceInfo iosDeviceInfo = renderRequest.getRenderInfo().getIosDeviceInfo();
@@ -255,15 +269,7 @@ public class VisualGridTask implements Callable<TestResultContainer>, Completabl
                 }
             }
         }
-        renderResult.setDeviceSize(deviceSize);
-
-        for (TaskListener listener : listeners) {
-            exception = new InstantiationError("Render Failed for " + this.getBrowserInfo() + " (renderId: " + renderId + ") with reason: " + error);
-            listener.onTaskFailed(exception, this);
-        }
-
-        logger.verbose("exit - renderId: " + renderId);
-
+        return deviceSize;
     }
 
     public Throwable getException() {
