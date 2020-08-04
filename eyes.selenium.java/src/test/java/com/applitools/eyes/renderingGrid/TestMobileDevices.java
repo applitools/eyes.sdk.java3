@@ -25,7 +25,7 @@ import static org.mockito.Mockito.spy;
 
 public class TestMobileDevices {
     @Test
-    public void TestIosDeviceReportedResolutionOnFailure() {
+    public void testIosDeviceReportedResolutionOnFailure() {
         ServerConnector serverConnector = spy(ServerConnector.class);
         doThrow(new IllegalStateException()).when(serverConnector).render(any(RenderRequest.class));
 
