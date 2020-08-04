@@ -9,19 +9,30 @@ import com.applitools.eyes.selenium.StitchMode;
 import com.applitools.utils.ArgumentGuard;
 import org.openqa.selenium.WebElement;
 
+import java.util.HashMap;
+import java.util.Map;
+
 public class PositionProviderFactory {
-    public static PositionProvider getPositionProvider(Logger logger, StitchMode stitchMode, IEyesJsExecutor executor, WebElement scrollRootElement){
-        return getPositionProvider(logger, stitchMode,executor, scrollRootElement, null);
+
+    private static Map<WebElement, PositionProvider> positionProviders = new HashMap<>();
+
+    public static PositionProvider getPositionProvider(Logger logger, StitchMode stitchMode, IEyesJsExecutor executor, WebElement scrollRootElement) {
+        PositionProvider positionProvider = positionProviders.get(scrollRootElement);
+        if (positionProvider != null) {
+            return positionProvider;
+        }
+        positionProvider = getPositionProvider(logger, stitchMode, executor, scrollRootElement, null);
+        positionProviders.put(scrollRootElement, positionProvider);
+        return positionProvider;
     }
 
-    public static PositionProvider getPositionProvider(Logger logger, StitchMode stitchMode, IEyesJsExecutor executor, WebElement scrollRootElement, UserAgent userAgent)
-    {
+    public static PositionProvider getPositionProvider(Logger logger, StitchMode stitchMode, IEyesJsExecutor executor, WebElement scrollRootElement, UserAgent userAgent) {
         ArgumentGuard.notNull(logger, "logger");
         ArgumentGuard.notNull(executor, "executor");
 
-        switch (stitchMode)
-        {
-            case CSS: return new CssTranslatePositionProvider(logger, executor, scrollRootElement);
+        switch (stitchMode) {
+            case CSS:
+                return new CssTranslatePositionProvider(logger, executor, scrollRootElement);
             case SCROLL:
                 if (userAgent != null && userAgent.getBrowser().equalsIgnoreCase(BrowserNames.EDGE))
                     return new EdgeBrowserScrollPositionProvider(logger, executor, scrollRootElement);
@@ -30,5 +41,9 @@ public class PositionProviderFactory {
             default:
                 return null;
         }
+    }
+
+    public static PositionProvider tryGetPositionProviderForElement(WebElement element) {
+        return positionProviders.get(element);
     }
 }

@@ -2,6 +2,7 @@ package com.applitools.eyes.selenium;
 
 import com.applitools.eyes.Location;
 import com.applitools.eyes.Logger;
+import com.applitools.eyes.Region;
 import com.applitools.eyes.UserAgent;
 import com.applitools.eyes.positioning.PositionProvider;
 import com.applitools.eyes.selenium.fluent.FrameLocator;
@@ -16,7 +17,10 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+
+import com.applitools.eyes.config.Configuration;
 
 public class PageState {
     private EyesSeleniumDriver driver;
@@ -33,7 +37,7 @@ public class PageState {
         this.userAgent = userAgent;
     }
 
-    public void PreparePage(ISeleniumCheckTarget seleniumCheckTarget, Configuration config, WebElement userDefinedSRE) {
+    public void preparePage(ISeleniumCheckTarget seleniumCheckTarget, Configuration config, WebElement userDefinedSRE) {
         frameStates = new ArrayList<>();
         originalFrameChain = driver.getFrameChain().clone();
 
@@ -58,16 +62,16 @@ public class PageState {
         while (fc.size() > 0) {
             switchTo.parentFrame();
             Frame currentFrame = fc.pop();
-            WebElement rootElement = EyesSeleniumUtils.getCurrentFrameScrollRootElement(driver, null);
+            WebElement rootElement = EyesSeleniumUtils.getCurrentFrameScrollRootElement(logger, driver, null);
             SaveCurrentFrameState_(frameStates, driver, rootElement);
             MaximizeTargetFrameInCurrentFrame_(currentFrame.getReference(), rootElement);
         }
-        frameStates.Reverse();
+        Collections.reverse(frameStates);
         switchTo.frames(originalFrameChain);
     }
 
     public void restorePageState() {
-        frameStates.Reverse();
+        Collections.reverse(frameStates);
         for(FrameState state : frameStates)
         {
             state.restore();
@@ -75,7 +79,7 @@ public class PageState {
         ((EyesTargetLocator) driver.switchTo()).frames(originalFrameChain);
     }
 
-    public int switchToTargetFrame(ISeleniumCheckTarget checkTarget, Configuration config,
+    private int switchToTargetFrame(ISeleniumCheckTarget checkTarget, Configuration config,
                                    List<FrameState> frameStates, WebElement userDefinedSRE) {
         List<FrameLocator> frameChain = checkTarget.getFrameChain();
         for(FrameLocator frameLocator : frameChain)
@@ -88,15 +92,15 @@ public class PageState {
     }
 
     private void MaximizeTargetFrameInCurrentFrame_(WebElement frameElement, WebElement userDefinedSRE) {
-        WebElement currentFrameSRE = EyesSeleniumUtils.getCurrentFrameScrollRootElement(driver, userDefinedSRE);
+        WebElement currentFrameSRE = EyesSeleniumUtils.getCurrentFrameScrollRootElement(logger, driver, userDefinedSRE);
 
         PositionProvider positionProvider = SeleniumEyes.getPositionProviderForScrollRootElement(logger, driver,
                 stitchMode, userAgent, currentFrameSRE);
 
-        Rectangle frameRect = EyesRemoteWebElement.getClientBoundsWithoutBorders(frameElement, driver, logger);
+        Region frameRect = EyesRemoteWebElement.getClientBoundsWithoutBorders(frameElement, driver, logger);
         if (stitchMode == StitchMode.SCROLL) {
             Location pageScrollPosition = positionProvider.getCurrentPosition();
-            frameRect.offset(pageScrollPosition);
+            frameRect.offset(pageScrollPosition.getX(), pageScrollPosition.getY());
         }
         positionProvider.setPosition(frameRect.getLocation());
     }
@@ -106,7 +110,7 @@ public class PageState {
         WebDriver.TargetLocator switchTo = driver.switchTo();
 
         switchTo.frame(frameElement);
-        WebElement rootElement = SeleniumEyes.getScrollRootElementFromSREContainer(frameTarget, driver);
+        WebElement rootElement = SeleniumEyes.getScrollRootElementFromSREContainer(logger, frameTarget, driver);
         Frame frame = driver.getFrameChain().peek();
         frame.setScrollRootElement(rootElement);
         SaveCurrentFrameState_(frameStates, driver, rootElement);

@@ -36,6 +36,7 @@ public final class Frame {
     private String originalOverflow;
     private Region bounds;
     private Borders borderWidths;
+    private Region scrollRootElementInnerBounds = Region.EMPTY;
 
     /**
      * @param logger           A Logger instance.
@@ -135,5 +136,13 @@ public final class Frame {
 
     public Borders getBorderWidths() {
         return this.borderWidths;
+    }
+
+    public Region getScrollRootElementInnerBounds() {
+        return scrollRootElementInnerBounds;
+    }
+
+    public void setScrollRootElementInnerBounds(Region sreInnerBounds) {
+        this.scrollRootElementInnerBounds = sreInnerBounds;
     }
 }

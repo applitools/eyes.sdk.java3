@@ -99,6 +99,11 @@ public class EyesRemoteWebElement extends RemoteWebElement {
                     JS_GET_BORDER_WIDTHS_ARR +
                     "return retVal;";
 
+    private static final String JS_GET_BOUNDING_CLIENT_RECT_WITHOUT_BORDERS =
+            "var el = arguments[0];" +
+            "var bcr = el.getBoundingClientRect();" +
+            "return (bcr.left + el.clientLeft) + ';' + (bcr.top + el.clientTop) + ';' + el.clientWidth + ';' + el.clientHeight;";
+
     private PositionProvider positionProvider;
 
     public EyesRemoteWebElement(Logger logger, EyesSeleniumDriver eyesDriver, WebElement webElement) {
@@ -133,6 +138,16 @@ public class EyesRemoteWebElement extends RemoteWebElement {
         } catch (NoSuchMethodException e) {
             throw new EyesException("Failed to find 'execute' method!");
         }
+    }
+
+    public static Region getClientBoundsWithoutBorders(WebElement element, EyesSeleniumDriver driver, Logger logger) {
+        String result = (String)driver.executeScript(JS_GET_BOUNDING_CLIENT_RECT_WITHOUT_BORDERS, element);
+        if (logger != null) logger.verbose(result);
+        String[] data = result.split(";");
+        Region rect = new Region(
+                Math.round(Float.valueOf(data[0])), Math.round(Float.valueOf(data[1])),
+                Math.round(Float.valueOf(data[2])), Math.round(Float.valueOf(data[3])));
+        return rect;
     }
 
     public Region getBounds() {

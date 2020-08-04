@@ -1,16 +1,16 @@
 package com.applitools.eyes.selenium;
 
 import com.applitools.eyes.RectangleSize;
+import com.applitools.eyes.Region;
 import com.applitools.eyes.positioning.PositionProvider;
-import org.openqa.selenium.Rectangle;
 import org.openqa.selenium.WebElement;
 
 public class CheckState {
     private WebElement targetElementInternal;
     private boolean stitchContent;
     private PositionProvider stitchPositionProvider;
-    private Rectangle effectiveViewport;
-    private Rectangle fullRegion;
+    private Region effectiveViewport;
+    private Region fullRegion;
     private PositionProvider originPositionProvider = new NullPositionProvider();
     private RectangleSize stitchOffset;
 
@@ -38,19 +38,19 @@ public class CheckState {
         this.stitchPositionProvider = stitchPositionProvider;
     }
 
-    public Rectangle getEffectiveViewport() {
+    public Region getEffectiveViewport() {
         return effectiveViewport;
     }
 
-    public void setEffectiveViewport(Rectangle effectiveViewport) {
+    public void setEffectiveViewport(Region effectiveViewport) {
         this.effectiveViewport = effectiveViewport;
     }
 
-    public Rectangle getFullRegion() {
+    public Region getFullRegion() {
         return fullRegion;
     }
 
-    public void setFullRegion(Rectangle fullRegion) {
+    public void setFullRegion(Region fullRegion) {
         this.fullRegion = fullRegion;
     }
 

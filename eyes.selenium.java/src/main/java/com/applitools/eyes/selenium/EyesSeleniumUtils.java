@@ -6,6 +6,8 @@ package com.applitools.eyes.selenium;
 import com.applitools.eyes.*;
 import com.applitools.eyes.selenium.fluent.FrameLocator;
 import com.applitools.eyes.selenium.fluent.IScrollRootElementContainer;
+import com.applitools.eyes.selenium.frames.Frame;
+import com.applitools.eyes.selenium.frames.FrameChain;
 import com.applitools.eyes.selenium.wrappers.EyesRemoteWebElement;
 import com.applitools.eyes.selenium.wrappers.EyesSeleniumDriver;
 import org.openqa.selenium.*;
@@ -87,5 +89,28 @@ public class EyesSeleniumUtils {
         }
 
         return null;
+    }
+
+    public static WebElement getCurrentFrameScrollRootElement(Logger logger, EyesSeleniumDriver driver, WebElement userDefinedSRE) {
+
+        WebElement scrollRootElement = tryGetCurrentFrameScrollRootElement(driver);
+        if (scrollRootElement == null)
+        {
+            scrollRootElement = userDefinedSRE != null ? userDefinedSRE : getDefaultRootElement(logger, driver);
+        }
+        return scrollRootElement;
+    }
+
+    public static WebElement tryGetCurrentFrameScrollRootElement(EyesSeleniumDriver driver)
+    {
+        FrameChain fc = driver.getFrameChain().clone();
+        Frame currentFrame = fc.peek();
+        WebElement scrollRootElement = null;
+        if (currentFrame != null)
+        {
+            scrollRootElement = currentFrame.getScrollRootElement();
+        }
+
+        return scrollRootElement;
     }
 }

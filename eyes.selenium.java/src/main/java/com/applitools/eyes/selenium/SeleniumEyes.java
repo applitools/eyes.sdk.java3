@@ -669,15 +669,14 @@ public class SeleniumEyes extends EyesBase implements ISeleniumEyes, IBatchClose
             state.setStitchContent(fully || forceFullPageScreenshot);
 
             // Ensure frame is not used as a region
-            ((SeleniumCheckSettings)checkSettings).sanitizeSettings(logger, driver, state.isStitchContent());
+            ((SeleniumCheckSettings) checkSettings).sanitizeSettings(logger, driver, state.isStitchContent());
 
             Region targetRegion = checkSettingsInternal.getTargetRegion();
 
             logger.verbose("setting userDefinedSRE ...");
             this.userDefinedSRE = tryGetUserDefinedSREFromSREContainer(seleniumCheckTarget, driver);
             WebElement scrollRootElement = this.userDefinedSRE;
-            if (scrollRootElement == null)
-            {
+            if (scrollRootElement == null) {
                 scrollRootElement = EyesSeleniumUtils.getDefaultRootElement(logger, driver);
             }
             logger.verbose("userDefinedSRE set to " + ((this.userDefinedSRE != null) ? userDefinedSRE.toString() : "null"));
@@ -721,46 +720,30 @@ public class SeleniumEyes extends EyesBase implements ISeleniumEyes, IBatchClose
             // 5. Go back to original frame
             // 6. Restore page state
 
-            if (targetElement != null)
-            {
-                if (state.isStitchContent())
-                {
+            if (targetElement != null) {
+                if (state.isStitchContent()) {
                     checkFullElement_(checkSettingsInternal, targetElement, targetRegion, state);
-                }
-                else
-                {
+                } else {
                     // TODO Verify: if element is outside the viewport, we should still capture entire (outer) bounds
                     checkElement_(checkSettingsInternal, targetElement, targetRegion, state);
                 }
-            }
-            else if (targetRegion != null)
-            {
+            } else if (targetRegion != null) {
                 // Coordinates should always be treated as "Fully" in case they get out of the viewport.
                 boolean originalFully = state.isStitchContent();
                 state.setStitchContent(true);
                 checkFullRegion_(checkSettingsInternal, targetRegion, state);
                 state.setStitchContent(originalFully);
-            }
-            else if (seleniumCheckTarget.getFrameChain().size() > 0)
-            {
-                if (state.isStitchContent())
-                {
+            } else if (seleniumCheckTarget.getFrameChain().size() > 0) {
+                if (state.isStitchContent()) {
                     checkFullFrame_(checkSettingsInternal, state);
-                }
-                else
-                {
+                } else {
                     logger.log("Target.Frame(frame).Fully(false)");
                     logger.log("WARNING: This shouldn't have been called, as it is covered by `CheckElement_(...)`");
                 }
-            }
-            else
-            {
-                if (state.isStitchContent())
-                {
+            } else {
+                if (state.isStitchContent()) {
                     checkFullWindow_(checkSettingsInternal, state, scrollRootElement);
-                }
-                else
-                {
+                } else {
                     checkWindow_(checkSettingsInternal);
                 }
             }
@@ -768,25 +751,80 @@ public class SeleniumEyes extends EyesBase implements ISeleniumEyes, IBatchClose
             caretVisibilityProvider.restoreCaret();
 
             pageState.restorePageState();
-        }
-        catch (Exception ex)
-        {
+        } catch (Exception ex) {
             GeneralUtils.logExceptionStackTrace(logger, e);
-            throw;
+            throw ;
         }
     }
 
-    private static WebElement tryGetUserDefinedSREFromSREContainer(ISeleniumCheckTarget scrollRootElementContainer, EyesSeleniumDriver driver) {
+    public static WebElement tryGetUserDefinedSREFromSREContainer(IScrollRootElementContainer scrollRootElementContainer, EyesSeleniumDriver driver) {
         WebElement scrollRootElement = scrollRootElementContainer.getScrollRootElement();
-        if (scrollRootElement == null)
-        {
+        if (scrollRootElement == null) {
             By scrollRootSelector = scrollRootElementContainer.getScrollRootSelector();
-            if (scrollRootSelector != null)
-            {
+            if (scrollRootSelector != null) {
                 scrollRootElement = driver.findElement(scrollRootSelector);
             }
         }
         return scrollRootElement;
+    }
+
+    public static WebElement getScrollRootElementFromSREContainer(Logger logger, IScrollRootElementContainer scrollRootElementContainer, EyesSeleniumDriver driver) {
+        WebElement scrollRootElement = tryGetUserDefinedSREFromSREContainer(scrollRootElementContainer, driver);
+        if (scrollRootElement == null) {
+            scrollRootElement = EyesSeleniumUtils.getDefaultRootElement(logger, driver);
+        }
+        return scrollRootElement;
+    }
+
+    public static PositionProvider getPositionProviderForScrollRootElement(Logger logger, EyesSeleniumDriver driver, StitchMode stitchMode, UserAgent ua, WebElement scrollRootElement) {
+        PositionProvider positionProvider = PositionProviderFactory.tryGetPositionProviderForElement(scrollRootElement);
+        if (positionProvider == null) {
+            logger.verbose("creating a new position provider.");
+            WebElement defaultSRE = EyesSeleniumUtils.getDefaultRootElement(logger, driver);
+            if (scrollRootElement.equals(defaultSRE)) {
+                positionProvider = PositionProviderFactory.getPositionProvider(logger, stitchMode, driver, scrollRootElement, ua);
+            } else {
+                positionProvider = new ElementPositionProvider(logger, driver, scrollRootElement);
+            }
+        }
+        logger.verbose("position provider: " + positionProvider);
+        return positionProvider;
+    }
+
+    private Region computeEffectiveViewport(FrameChain frameChain, RectangleSize initialSize) {
+        Region viewport = new Region(Location.ZERO, initialSize);
+        if (userDefinedSRE != null) {
+            Region sreInnerBounds = EyesRemoteWebElement.getClientBoundsWithoutBorders(userDefinedSRE, driver, logger);
+            viewport.intersect(sreInnerBounds);
+        }
+        Location offset = Location.ZERO;
+        for (Frame frame : frameChain) {
+            offset.offset(frame.getLocation());
+            Region frameViewport = new Region(offset, frame.getInnerSize());
+            viewport.intersect(frameViewport);
+            Region frameSreInnerBounds = frame.getScrollRootElementInnerBounds();
+            if (frameSreInnerBounds.isSizeEmpty()) {
+                continue;
+            }
+            frameSreInnerBounds.offset(offset.getX(), offset.getY());
+            viewport.intersect(frameSreInnerBounds);
+        }
+        return viewport;
+    }
+
+    private WebElement getTargetElementFromSettings(ISeleniumCheckTarget seleniumCheckTarget)
+    {
+        By targetSelector = seleniumCheckTarget.getTargetSelector();
+        WebElement targetElement = seleniumCheckTarget.getTargetElement();
+        if (targetElement == null && targetSelector != null)
+        {
+            targetElement = driver.findElement(targetSelector);
+        }
+        else if (targetElement != null && !(targetElement instanceof EyesRemoteWebElement))
+        {
+            targetElement = new EyesRemoteWebElement(logger, driver, targetElement);
+        }
+        return targetElement;
     }
 
     @Override
@@ -1100,19 +1138,7 @@ public class SeleniumEyes extends EyesBase implements ISeleniumEyes, IBatchClose
      * @return the current frame scroll root element
      */
     public WebElement getCurrentFrameScrollRootElement() {
-        FrameChain fc = driver.getFrameChain().clone();
-        Frame currentFrame = fc.peek();
-        WebElement scrollRootElement = null;
-        if (currentFrame != null) {
-            scrollRootElement = currentFrame.getScrollRootElement();
-        } else if (FrameChain.isSameFrameChain(fc, this.originalFC)) {
-            scrollRootElement = this.userDefinedSRE;
-        }
-
-        if (scrollRootElement == null) {
-            scrollRootElement = EyesSeleniumUtils.getDefaultRootElement(logger, driver);
-        }
-        return scrollRootElement;
+        return EyesSeleniumUtils.getCurrentFrameScrollRootElement(logger, driver, userDefinedSRE);
     }
 
     /**
@@ -1314,7 +1340,7 @@ public class SeleniumEyes extends EyesBase implements ISeleniumEyes, IBatchClose
         RectangleSize scrollSize = eyesElement.getScrollSize();
         logger.verbose(String.format("displayStyle: %s ; scrollSize: %s ; clientSize %s ; effectiveViewport size: %s",
                 displayStyle, scrollSize, clientSize, effectiveViewport.getSize()));
-        
+
         EyesTargetLocator switchTo = (EyesTargetLocator) this.driver.switchTo();
         FrameChain fc = this.driver.getFrameChain().clone();
 
@@ -1870,7 +1896,7 @@ public class SeleniumEyes extends EyesBase implements ISeleniumEyes, IBatchClose
             return image;
         }
 
-        int  trimmedHeight = Math.min(maxImageArea / image.getWidth(), maxImageHeight);
+        int trimmedHeight = Math.min(maxImageArea / image.getWidth(), maxImageHeight);
         Region newRegion = new Region(0, 0, image.getWidth(), trimmedHeight);
         if (newRegion.isSizeEmpty()) {
             return image;
