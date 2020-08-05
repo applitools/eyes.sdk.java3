@@ -13,7 +13,7 @@ public class BlobData {
 
     private String value;
 
-    private int errorStatusCode;
+    private Integer errorStatusCode;
 
     public BlobData() {
     }
@@ -42,11 +42,11 @@ public class BlobData {
         this.value = value.getBytes(StandardCharsets.UTF_8).length > MAX_RESOURCE_SIZE ? new String(Arrays.copyOf(value.getBytes(StandardCharsets.UTF_8), MAX_RESOURCE_SIZE)) : value;
     }
 
-    public int getErrorStatusCode() {
+    public Integer getErrorStatusCode() {
         return errorStatusCode;
     }
 
-    public void setErrorStatusCode(int errorStatusCode) {
+    public void setErrorStatusCode(Integer errorStatusCode) {
         this.errorStatusCode = errorStatusCode;
     }
 

@@ -18,7 +18,6 @@ import com.helger.css.ECSSVersion;
 import com.helger.css.decl.*;
 import com.helger.css.reader.CSSReader;
 import org.apache.commons.codec.binary.Base64;
-import org.apache.http.HttpStatus;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -646,7 +645,7 @@ public class RenderingTask implements Callable<RenderStatusResults>, Completable
         String contentAsString = blobAsMap.getValue();
         byte[] content = codec.decode(contentAsString);
         String urlAsString = blobAsMap.getUrl();
-        int errorStatusCode = blobAsMap.getErrorStatusCode();
+        Integer errorStatusCode = blobAsMap.getErrorStatusCode();
         try {
             URI url = baseUrl.resolve(urlAsString);
             urlAsString = url.toString();
@@ -655,10 +654,7 @@ public class RenderingTask implements Callable<RenderStatusResults>, Completable
             GeneralUtils.logExceptionStackTrace(logger, e);
         }
 
-        if (errorStatusCode >= HttpStatus.SC_MULTIPLE_CHOICES) {
-            return new RGridResource(urlAsString, blobAsMap.getType(), content, errorStatusCode);
-        }
-        return new RGridResource(urlAsString, blobAsMap.getType(), content);
+        return new RGridResource(urlAsString, blobAsMap.getType(), content, errorStatusCode);
     }
 
     private void parseAndCollectExternalResources(List<RGridResource> allBlobs, String baseUrl, Set<URI> resourceUrls) {

@@ -15,23 +15,23 @@ public class RGridResource {
     private static final int MAX_RESOURCE_SIZE = 15 * 1024 * 1024;
 
     @JsonIgnore
-    protected String url;
+    private String url;
 
     @JsonInclude(JsonInclude.Include.NON_NULL)
-    protected final String contentType;
+    private final String contentType;
 
     @JsonIgnore
-    protected byte[] content = null;
+    private byte[] content = null;
 
     @JsonProperty("hash")
     @JsonInclude(JsonInclude.Include.NON_NULL)
-    protected String sha256 = null;
+    private String sha256 = null;
 
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private final Integer errorStatusCode;
 
     @JsonInclude
-    protected final String hashFormat = "sha256";
+    private final String hashFormat = "sha256";
 
     @JsonIgnore
     private AtomicBoolean isResourceParsed = new AtomicBoolean(false);
