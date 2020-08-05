@@ -3,9 +3,8 @@ package com.applitools.eyes.selenium.fluent;
 import com.applitools.eyes.*;
 import com.applitools.eyes.fluent.GetFloatingRegion;
 import com.applitools.eyes.selenium.EyesDriverUtils;
-import com.applitools.eyes.selenium.EyesWebDriver;
+import com.applitools.eyes.selenium.wrappers.EyesWebDriver;
 import com.applitools.eyes.visualgrid.model.IGetFloatingRegionOffsets;
-import com.applitools.utils.GeneralUtils;
 import org.openqa.selenium.*;
 
 import java.util.ArrayList;

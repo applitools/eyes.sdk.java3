@@ -2,10 +2,9 @@ package com.applitools.eyes.selenium.fluent;
 
 import com.applitools.eyes.*;
 import com.applitools.eyes.fluent.IGetAccessibilityRegionType;
-import com.applitools.eyes.selenium.EyesWebDriver;
+import com.applitools.eyes.selenium.wrappers.EyesWebDriver;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Point;
-import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
 import java.util.ArrayList;

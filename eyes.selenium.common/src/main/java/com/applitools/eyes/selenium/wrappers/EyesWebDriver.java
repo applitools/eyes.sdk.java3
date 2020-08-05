@@ -1,4 +1,4 @@
-package com.applitools.eyes.selenium;
+package com.applitools.eyes.selenium.wrappers;
 
 import org.openqa.selenium.*;
 import org.openqa.selenium.remote.RemoteWebDriver;

@@ -3,7 +3,7 @@ package com.applitools.eyes.appium.fluent;
 import com.applitools.eyes.*;
 import com.applitools.eyes.appium.EyesAppiumDriver;
 import com.applitools.eyes.appium.EyesAppiumElement;
-import com.applitools.eyes.selenium.EyesWebDriver;
+import com.applitools.eyes.selenium.wrappers.EyesWebDriver;
 import com.applitools.eyes.selenium.fluent.ImplicitInitiation;
 import org.openqa.selenium.Dimension;
 import org.openqa.selenium.Point;

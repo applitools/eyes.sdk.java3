@@ -8,7 +8,7 @@ import com.applitools.eyes.appium.fluent.FloatingRegionByElement;
 import com.applitools.eyes.appium.fluent.SimpleRegionByElement;
 import com.applitools.eyes.fluent.CheckSettings;
 import com.applitools.eyes.fluent.GetRegion;
-import com.applitools.eyes.selenium.EyesWebDriver;
+import com.applitools.eyes.selenium.wrappers.EyesWebDriver;
 import com.applitools.eyes.selenium.fluent.AccessibilityRegionBySelector;
 import com.applitools.eyes.selenium.fluent.ImplicitInitiation;
 import org.openqa.selenium.By;
