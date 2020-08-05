@@ -573,7 +573,7 @@ public class SeleniumEyes extends EyesBase implements ISeleniumEyes, IBatchClose
             }
         }
         Location offset = screenshot.getLocationInScreenshot(Location.ZERO, CoordinatesType.CONTEXT_AS_IS);
-        return bBox.offset(offset.getX(), offset.getY());
+        return bBox.offset(offset);
     }
 
     private WebElement getTargetElement(ISeleniumCheckTarget seleniumCheckTarget) {
@@ -757,6 +757,49 @@ public class SeleniumEyes extends EyesBase implements ISeleniumEyes, IBatchClose
         }
     }
 
+    private void checkElement(ICheckSettingsInternal checkSettingsInternal, WebElement targetElement,
+                              Region targetRegion, CheckState state) {
+        List<FrameLocator> frameLocators = ((ISeleniumCheckTarget) checkSettingsInternal).getFrameChain();
+        if (frameLocators.size() > 0) {
+            logger.verbose("Target.Frame(frame).Region(element).Fully(false)");
+        } else {
+            logger.verbose("Target.Region(element).Fully(false)");
+        }
+        FrameChain currentFrameChain = driver.getFrameChain().clone();
+        Region bounds = EyesRemoteWebElement.getClientBounds(targetElement, driver, logger);
+
+        Location visualOffset = getFrameChainOffset(currentFrameChain);
+        bounds.offset(visualOffset);
+        WebElement currentFrameSRE = getCurrentFrameScrollRootElement();
+        PositionProvider currentFramePositionProvider = getPositionProviderForScrollRootElement(currentFrameSRE);
+        Location currentFramePosition = currentFramePositionProvider.getCurrentPosition();
+        bounds.offset(currentFramePosition);
+        Location actualFramePosition = currentFramePositionProvider.setPosition(bounds.getLocation());
+        bounds.offset(-actualFramePosition.getX(), -actualFramePosition.getY());
+
+        EyesTargetLocator switchTo = (EyesTargetLocator) driver.switchTo();
+        FrameChain fcClone = currentFrameChain.clone();
+
+        while (!state.getEffectiveViewport().isIntersected(bounds) && fcClone.size() > 0) {
+            fcClone.pop();
+            switchTo.parentFrame();
+            currentFrameSRE = getCurrentFrameScrollRootElement();
+            currentFramePositionProvider = getPositionProviderForScrollRootElement(currentFrameSRE);
+            currentFramePosition = currentFramePositionProvider.getCurrentPosition();
+            bounds.offset(currentFramePosition);
+            actualFramePosition = currentFramePositionProvider.setPosition(bounds.getLocation());
+            bounds.offset(-actualFramePosition.getX(), -actualFramePosition.getY());
+        }
+
+        switchTo.frames(currentFrameChain);
+
+        Region crop = computeCropRectangle(bounds, targetRegion);
+        if (crop == null) {
+            crop = bounds;
+        }
+        checkWindowBase(crop, checkSettingsInternal, driver.getCurrentUrl());
+    }
+
     private void checkWindow(ICheckSettingsInternal checkSettingsInternal) {
         logger.verbose("Target.Window()");
 
@@ -764,8 +807,7 @@ public class SeleniumEyes extends EyesBase implements ISeleniumEyes, IBatchClose
     }
 
     private void checkFullWindow(ICheckSettingsInternal checkSettingsInternal, CheckState state,
-                                  WebElement scrollRootElement)
-    {
+                                 WebElement scrollRootElement) {
         logger.verbose("Target.Window().Fully(true)");
 
         initPositionProvidersForCheckWindow(state, scrollRootElement);
@@ -773,20 +815,14 @@ public class SeleniumEyes extends EyesBase implements ISeleniumEyes, IBatchClose
         checkWindowBase(null, checkSettingsInternal, driver.getCurrentUrl());
     }
 
-    private void initPositionProvidersForCheckWindow(CheckState state, WebElement scrollRootElement)
-    {
-        if (getConfigurationInstance().getStitchMode() == StitchMode.SCROLL)
-        {
+    private void initPositionProvidersForCheckWindow(CheckState state, WebElement scrollRootElement) {
+        if (getConfigurationInstance().getStitchMode() == StitchMode.SCROLL) {
             state.setStitchPositionProvider(new SeleniumScrollPositionProvider(logger, driver, scrollRootElement));
-        }
-        else // Stitch mode == CSS
+        } else // Stitch mode == CSS
         {
-            if (userDefinedSRE != null)
-            {
+            if (userDefinedSRE != null) {
                 state.setStitchPositionProvider(new ElementPositionProvider(logger, driver, userDefinedSRE));
-            }
-            else
-            {
+            } else {
                 state.setStitchPositionProvider(new CssTranslatePositionProvider(logger, driver, scrollRootElement));
                 state.setOriginPositionProvider(new SeleniumScrollPositionProvider(logger, driver, scrollRootElement));
             }
@@ -825,7 +861,7 @@ public class SeleniumEyes extends EyesBase implements ISeleniumEyes, IBatchClose
         FrameChain currentFrameChain = driver.getFrameChain().clone();
         Location screenshotOffset = getFrameChainOffset(currentFrameChain);
         logger.verbose("screenshotOffset: " + screenshotOffset);
-        fullElementBounds.offset(screenshotOffset.getX(), screenshotOffset.getY());
+        fullElementBounds.offset(screenshotOffset);
 
         state.setFullRegion(fullElementBounds);
 
@@ -854,7 +890,7 @@ public class SeleniumEyes extends EyesBase implements ISeleniumEyes, IBatchClose
 
         // 2. Intersect the element and the effective viewport
         Region elementBoundsInScreenshotCoordinates = elementBounds;
-        elementBoundsInScreenshotCoordinates.offset(screenshotOffset.getX(), screenshotOffset.getY());
+        elementBoundsInScreenshotCoordinates.offset(screenshotOffset);
         state.setEffectiveViewport(state.getEffectiveViewport().getIntersected(elementBoundsInScreenshotCoordinates));
 
 
@@ -869,15 +905,14 @@ public class SeleniumEyes extends EyesBase implements ISeleniumEyes, IBatchClose
         Region crop = new Region(fullRect);
         Location cropLocation = crop.getLocation();
         Region cropRectClone = new Region(cropRect);
-        cropRectClone.offset(cropLocation.getX(), cropLocation.getY());
+        cropRectClone.offset(cropLocation);
         crop.intersect(cropRectClone);
         return crop;
     }
 
     private Location getFrameChainOffset(FrameChain frameChain) {
         Location offset = Location.ZERO;
-        for (Frame frame : frameChain)
-        {
+        for (Frame frame : frameChain) {
             offset.offset(frame.getLocation());
         }
         return offset;
@@ -894,24 +929,19 @@ public class SeleniumEyes extends EyesBase implements ISeleniumEyes, IBatchClose
 
     private void initPositionProvidersForCheckElement(boolean isScrollableElement, WebElement targetElement, CheckState state) {
         // User might still call "fully" on a non-scrollable element, adjust the position provider accordingly.
-        if (isScrollableElement)
-        {
+        if (isScrollableElement) {
             state.setStitchPositionProvider(new ElementPositionProvider(logger, driver, targetElement));
-        }
-        else // Not a scrollable element but an element enclosed within a scroll-root-element
+        } else // Not a scrollable element but an element enclosed within a scroll-root-element
         {
             WebElement scrollRootElement = getCurrentFrameScrollRootElement();
-            if (getConfigurationInstance().getStitchMode() == StitchMode.CSS)
-            {
+            if (getConfigurationInstance().getStitchMode() == StitchMode.CSS) {
                 state.setStitchPositionProvider(new CssTranslatePositionProvider(logger, driver, targetElement));
                 state.setOriginPositionProvider(new SeleniumScrollPositionProvider(logger, driver, scrollRootElement));
-            }
-            else
-            {
+            } else {
                 state.setStitchPositionProvider(new SeleniumScrollPositionProvider(logger, driver, scrollRootElement));
             }
         }
-        logger.verbose("isScrollableElement ?"+ isScrollableElement);
+        logger.verbose("isScrollableElement ?" + isScrollableElement);
     }
 
     public static WebElement tryGetUserDefinedSREFromSREContainer(IScrollRootElementContainer scrollRootElementContainer, EyesSeleniumDriver driver) {
@@ -931,6 +961,10 @@ public class SeleniumEyes extends EyesBase implements ISeleniumEyes, IBatchClose
             scrollRootElement = EyesSeleniumUtils.getDefaultRootElement(logger, driver);
         }
         return scrollRootElement;
+    }
+
+    private PositionProvider getPositionProviderForScrollRootElement(WebElement scrollRootElement) {
+        return getPositionProviderForScrollRootElement(logger, driver, getConfigurationInstance().getStitchMode(), userAgent, scrollRootElement);
     }
 
     public static PositionProvider getPositionProviderForScrollRootElement(Logger logger, EyesSeleniumDriver driver, StitchMode stitchMode, UserAgent ua, WebElement scrollRootElement) {
@@ -963,7 +997,7 @@ public class SeleniumEyes extends EyesBase implements ISeleniumEyes, IBatchClose
             if (frameSreInnerBounds.isSizeEmpty()) {
                 continue;
             }
-            frameSreInnerBounds.offset(offset.getX(), offset.getY());
+            frameSreInnerBounds.offset(offset);
             viewport.intersect(frameSreInnerBounds);
         }
         return viewport;
@@ -1053,7 +1087,7 @@ public class SeleniumEyes extends EyesBase implements ISeleniumEyes, IBatchClose
             ppams.add(ppam);
 
             Region reg = new Region(offsetPos, frame.getInnerSize());
-            reg = reg.offset(this.effectiveViewport.getLeft(), this.effectiveViewport.getTop());
+            reg = reg.offset(this.effectiveViewport.getLocation());
             effectiveViewport.intersect(reg);
             switchTo.frame(frame.getReference());
             parentFrame = frame;
@@ -1081,7 +1115,7 @@ public class SeleniumEyes extends EyesBase implements ISeleniumEyes, IBatchClose
         Region elementBounds = eyesRemoteWebElement.getBounds();
 
         Location currentFrameOffset = originalFC.getCurrentFrameOffset();
-        Region offsetElementBounds = elementBounds.offset(currentFrameOffset.getX(), currentFrameOffset.getY());
+        Region offsetElementBounds = elementBounds.offset(currentFrameOffset);
 
         Region viewportBounds = getViewportScrollBounds();
 

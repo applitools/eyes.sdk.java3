@@ -183,6 +183,15 @@ public class Region implements IRegion {
     }
 
     /**
+     * Get an offset region.
+     * @param location the amount by which to offset.
+     * @return A region with an offset location.
+     */
+    public Region offset(Location location) {
+        return new Region(getLocation().offset(location), getSize(), getCoordinatesType());
+    }
+
+    /**
      * Get a region which is a scaled version of the current region.
      * IMPORTANT: This also scales the LOCATION(!!) of the region (not just its size).
      * @param scaleRatio The ratio by which to scale the region.
