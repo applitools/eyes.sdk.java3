@@ -9,6 +9,7 @@ import com.applitools.eyes.selenium.Configuration;
 import com.applitools.eyes.selenium.Eyes;
 import com.applitools.eyes.selenium.TestDataProvider;
 import com.applitools.eyes.selenium.fluent.Target;
+import com.applitools.eyes.utils.ReportingTestSuite;
 import com.applitools.eyes.utils.SeleniumTestUtils;
 import com.applitools.eyes.utils.SeleniumUtils;
 import com.applitools.eyes.visualgrid.model.IosDeviceInfo;
@@ -23,7 +24,12 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.spy;
 
-public class TestMobileDevices {
+public class TestMobileDevices extends ReportingTestSuite {
+
+    public TestMobileDevices() {
+        super.setGroupName("selenium");
+    }
+
     @Test
     public void testIosDeviceReportedResolutionOnFailure() {
         ServerConnector serverConnector = spy(ServerConnector.class);
