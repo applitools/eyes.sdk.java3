@@ -763,6 +763,36 @@ public class SeleniumEyes extends EyesBase implements ISeleniumEyes, IBatchClose
         checkWindowBase(null, checkSettingsInternal, driver.getCurrentUrl());
     }
 
+    private void checkFullWindow(ICheckSettingsInternal checkSettingsInternal, CheckState state,
+                                  WebElement scrollRootElement)
+    {
+        logger.verbose("Target.Window().Fully(true)");
+
+        initPositionProvidersForCheckWindow(state, scrollRootElement);
+
+        checkWindowBase(null, checkSettingsInternal, driver.getCurrentUrl());
+    }
+
+    private void initPositionProvidersForCheckWindow(CheckState state, WebElement scrollRootElement)
+    {
+        if (getConfigurationInstance().getStitchMode() == StitchMode.SCROLL)
+        {
+            state.setStitchPositionProvider(new SeleniumScrollPositionProvider(logger, driver, scrollRootElement));
+        }
+        else // Stitch mode == CSS
+        {
+            if (userDefinedSRE != null)
+            {
+                state.setStitchPositionProvider(new ElementPositionProvider(logger, driver, userDefinedSRE));
+            }
+            else
+            {
+                state.setStitchPositionProvider(new CssTranslatePositionProvider(logger, driver, scrollRootElement));
+                state.setOriginPositionProvider(new SeleniumScrollPositionProvider(logger, driver, scrollRootElement));
+            }
+        }
+    }
+
     private void checkFullElement(ICheckSettingsInternal checkSettingsInternal, WebElement targetElement,
                                   Region targetRegion, CheckState state) {
         if (((ISeleniumCheckTarget) checkSettingsInternal).getFrameChain().size() > 0) {
