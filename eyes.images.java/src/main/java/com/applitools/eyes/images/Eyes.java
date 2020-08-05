@@ -80,7 +80,7 @@ public class Eyes extends EyesBase implements IConfiguration {
         if (config.getViewportSize() == null) {
             setViewportSize(new RectangleSize(image.getWidth(), image.getHeight()));
         }
-        return checkImage_(RegionProvider.NULL_INSTANCE, image, name, false, checkSettings);
+        return checkImage_(RegionProvider.NULL_INSTANCE, image, name, checkSettings);
     }
 
     /**
@@ -146,7 +146,7 @@ public class Eyes extends EyesBase implements IConfiguration {
             setViewportSize(new RectangleSize(image.getWidth(), image.getHeight()));
         }
 
-        return checkImage_(RegionProvider.NULL_INSTANCE, image, tag, ignoreMismatch, new CheckSettings(USE_DEFAULT_TIMEOUT));
+        return checkImage_(RegionProvider.NULL_INSTANCE, image, tag, new CheckSettings(USE_DEFAULT_TIMEOUT));
     }
 
     /**
@@ -242,7 +242,7 @@ public class Eyes extends EyesBase implements IConfiguration {
             public Region getRegion() {
                 return region;
             }
-        }, image, tag, ignoreMismatch, new CheckSettings(USE_DEFAULT_TIMEOUT));
+        }, image, tag, new CheckSettings(USE_DEFAULT_TIMEOUT));
     }
 
     /**
@@ -342,7 +342,7 @@ public class Eyes extends EyesBase implements IConfiguration {
      * Get the screenshot.
      * @return The screenshot.
      */
-    public EyesScreenshot getScreenshot(ICheckSettingsInternal checkSettingsInternal) {
+    public EyesScreenshot getScreenshot(Region targetRegion, ICheckSettingsInternal checkSettingsInternal) {
         return screenshot;
     }
 
@@ -359,19 +359,16 @@ public class Eyes extends EyesBase implements IConfiguration {
     }
 
     /**
-     * See {@link #checkImage_(RegionProvider, String, boolean, ICheckSettings)}.
-     * @param regionProvider The region for which verification will be
-     *                       performed. see {@link #checkWindowBase(RegionProvider, String, boolean, int, String)}.
+     * See {@link #checkImage_(RegionProvider, String, ICheckSettings)}.
+     * @param regionProvider The region for which verification will be performed.
      * @param image          The image to perform visual validation for.
      * @param tag            An optional tag to be associated with the validation checkpoint.
-     * @param ignoreMismatch True if the server should ignore a negative result for the visual validation.
      * @param checkSettings  The settings to use when checking the image.
      * @return True if the image matched the expected output, false otherwise.
      */
     private boolean checkImage_(RegionProvider regionProvider,
                                 BufferedImage image,
                                 String tag,
-                                boolean ignoreMismatch,
                                 ICheckSettings checkSettings) {
         // We verify that the image is indeed in the correct format.
         image = ImageUtils.normalizeImageType(image);
@@ -386,28 +383,26 @@ public class Eyes extends EyesBase implements IConfiguration {
         // Set the screenshot to be verified.
         screenshot = new EyesImagesScreenshot(logger, image);
 
-        return checkImage_(regionProvider, tag, ignoreMismatch, checkSettings);
+        return checkImage_(regionProvider, tag, checkSettings);
     }
 
 
     /**
      * Internal function for performing an image verification for a region of
      * a buffered image.
-     * @param regionProvider The region for which verification will be
-     *                       performed. see {@link #checkWindowBase(RegionProvider, String, boolean, int, String)}.
+     * @param regionProvider The region for which verification will be performed.
      * @param tag            An optional tag to be associated with the validation checkpoint.
-     * @param ignoreMismatch True if the server should ignore a negative result for the visual validation.
      * @param checkSettings  The settings to use when checking the image.
      * @return True if the image matched the expected output, false otherwise.
      */
-    private boolean checkImage_(RegionProvider regionProvider, String tag, boolean ignoreMismatch, ICheckSettings checkSettings) {
+    private boolean checkImage_(RegionProvider regionProvider, String tag, ICheckSettings checkSettings) {
 
         // Set the title to be linked to the screenshot.
         title = (tag != null) ? tag : "";
 
         ValidationInfo validationInfo = this.fireValidationWillStartEvent(tag);
 
-        MatchResult result = checkWindowBase(regionProvider, tag, ignoreMismatch, checkSettings, null);
+        MatchResult result = checkWindowBase(regionProvider.getRegion((ICheckSettingsInternal)checkSettings), checkSettings.withName(tag), null);
 
         ValidationResult validationResult = new ValidationResult();
         validationResult.setAsExpected(result.getAsExpected());

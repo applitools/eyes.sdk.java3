@@ -39,7 +39,7 @@ public class TestEyes extends EyesBase {
     }
 
     @Override
-    protected EyesScreenshot getScreenshot(ICheckSettingsInternal checkSettingsInternal) {
+    protected EyesScreenshot getScreenshot(Region targetRegion, ICheckSettingsInternal checkSettingsInternal) {
         return new TestEyesScreenshot(this.logger, null);
     }
 

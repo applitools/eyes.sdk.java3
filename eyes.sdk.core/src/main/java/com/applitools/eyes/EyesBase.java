@@ -1128,7 +1128,7 @@ public abstract class EyesBase implements IEyesBase {
     /**
      * @return An updated screenshot.
      */
-    protected abstract EyesScreenshot getScreenshot(ICheckSettingsInternal checkSettingsInternal);
+    protected abstract EyesScreenshot getScreenshot(Region targetRegion, ICheckSettingsInternal checkSettingsInternal);
 
     /**
      * @return The current title of of the AUT.
@@ -1368,7 +1368,7 @@ public abstract class EyesBase implements IEyesBase {
     private AppOutputWithScreenshot getAppOutputWithScreenshot(Region region, ICheckSettingsInternal checkSettingsInternal) {
         logger.verbose("getting screenshot...");
         // Getting the screenshot (abstract function implemented by each SDK).
-        EyesScreenshot screenshot = getScreenshot(checkSettingsInternal);
+        EyesScreenshot screenshot = getScreenshot(region, checkSettingsInternal);
         logger.verbose("Done getting screenshot!");
 
         // Cropping by region if necessary
