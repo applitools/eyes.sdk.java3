@@ -3,6 +3,8 @@
 - Try to send correct iOS device size when rendering fails. [Trello 2006](https://trello.com/c/a6l6gTf9)
 ### Updated
 - Updated DOM Snapshot script to 4.0.1. [Trello 2049](https://trello.com/c/8GP2pfLr)
+### Added
+- Added some missing logs for investigating clients' issues. [Trello 2000](https://trello.com/c/0EWqP5to)
 
 ## [3.172.1] - 2020-08-04
 ### Added

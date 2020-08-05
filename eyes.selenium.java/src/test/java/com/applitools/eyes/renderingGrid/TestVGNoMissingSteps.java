@@ -43,7 +43,7 @@ public class TestVGNoMissingSteps extends ReportingTestSuite {
         createTest("test8").addTo(tests);
         createTest("test9").setOpenTaskIssued().addTask(CHECK).addTo(tests);
 
-        List<RunningTest> filteredList = VisualGridEyes.collectTestsForCheck(logger, tests);
+        List<RunningTest> filteredList = VisualGridEyes.collectTestsForCheck(tests);
 
         Assert.assertEquals(filteredList.size(), 4);
         Assert.assertEquals(filteredList.get(0).getTestName(), "test1");

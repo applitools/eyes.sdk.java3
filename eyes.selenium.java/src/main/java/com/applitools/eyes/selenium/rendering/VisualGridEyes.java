@@ -106,22 +106,22 @@ public class VisualGridEyes implements ISeleniumEyes, IRenderingEyes {
         this.logger = renderingGridManager.getLogger();
     }
 
-    private RunningTest.RunningTestListener testListener = new RunningTest.RunningTestListener() {
+    private final RunningTest.RunningTestListener testListener = new RunningTest.RunningTestListener() {
         @Override
-        public void onTaskComplete(VisualGridTask task, RunningTest test) {
+        public void onTaskComplete(VisualGridTask task) {
             switch (task.getType()) {
                 case CLOSE:
                 case ABORT:
-                    VisualGridEyes.this.isVGEyesIssuedOpenTasks.set(false);
+                    isVGEyesIssuedOpenTasks.set(false);
             }
-            if (VisualGridEyes.this.listener != null) {
-                VisualGridEyes.this.listener.onTaskComplete(task, VisualGridEyes.this);
+            if (listener != null) {
+                listener.onTaskComplete(task, VisualGridEyes.this);
             }
         }
 
         @Override
         public void onRenderComplete() {
-            VisualGridEyes.this.listener.onRenderComplete();
+            listener.onRenderComplete();
         }
 
     };
@@ -429,6 +429,7 @@ public class VisualGridEyes implements ISeleniumEyes, IRenderingEyes {
             futureList = new ArrayList<>();
             for (RunningTest runningTest : testList) {
                 logger.verbose("running test name: " + getConfiguration().getTestName());
+                logger.verbose("running test device info: " + runningTest.getBrowserInfo());
                 logger.verbose("is current running test open: " + runningTest.isTestOpen());
                 logger.verbose("is current running test ready to close: " + runningTest.isTestReadyToClose());
                 logger.verbose("is current running test closed: " + runningTest.isTestClose());
@@ -568,7 +569,7 @@ public class VisualGridEyes implements ISeleniumEyes, IRenderingEyes {
 
             checkSettingsInternal = updateCheckSettings(checkSettings);
 
-            List<RunningTest> filteredTests = collectTestsForCheck(logger, testList);
+            List<RunningTest> filteredTests = collectTestsForCheck(testList);
 
             String source = webDriver.getCurrentUrl();
             for (RunningTest runningTest : filteredTests) {
@@ -608,7 +609,7 @@ public class VisualGridEyes implements ISeleniumEyes, IRenderingEyes {
     }
 
     /******** BEGIN - PUBLIC FOR TESTING PURPOSES ONLY ********/
-    public static List<RunningTest> collectTestsForCheck(Logger logger, List<RunningTest> tests) {
+    public static List<RunningTest> collectTestsForCheck(List<RunningTest> tests) {
         List<RunningTest> filteredTests = new ArrayList<>();
         for (final RunningTest test : tests) {
             List<VisualGridTask> taskList = test.getVisualGridTaskList();

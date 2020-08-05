@@ -1,11 +1,14 @@
 package com.applitools.eyes.demo;
 
 import com.applitools.eyes.*;
+import com.applitools.eyes.selenium.BrowserType;
 import com.applitools.eyes.selenium.ClassicRunner;
 import com.applitools.eyes.selenium.Eyes;
 import com.applitools.eyes.utils.ReportingTestSuite;
 import com.applitools.eyes.utils.SeleniumUtils;
 import com.applitools.eyes.utils.TestUtils;
+import com.applitools.eyes.visualgrid.model.DeviceName;
+import com.applitools.eyes.visualgrid.model.ScreenOrientation;
 import com.applitools.eyes.visualgrid.services.VisualGridRunner;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
@@ -17,7 +20,7 @@ import org.testng.annotations.Test;
 public class BasicDemo extends ReportingTestSuite {
     private static BatchInfo batch;
     private WebDriver driver;
-    private final LogHandler logger = new StdoutLogHandler(false);
+    private final LogHandler logger = new StdoutLogHandler(true);
 
     public BasicDemo(){
         super.setGroupName("selenium");
@@ -25,7 +28,7 @@ public class BasicDemo extends ReportingTestSuite {
 
     @DataProvider(name = "booleanDP")
     public Object[] dp() {
-        return new Object[]{Boolean.TRUE, Boolean.FALSE};
+        return new Object[]{Boolean.TRUE};
     }
 
     @BeforeClass
@@ -49,7 +52,14 @@ public class BasicDemo extends ReportingTestSuite {
         Eyes eyes = new Eyes(runner);
         eyes.setLogHandler(logger);
         eyes.setBatch(batch);
-        //eyes.setProxy(new ProxySettings("http://localhost:8888"));
+        eyes.setProxy(new ProxySettings("http://localhost:8888"));
+        eyes.setConfiguration(eyes.getConfiguration().addBrowser(900, 600, BrowserType.CHROME)
+                .addBrowser(900, 600, BrowserType.SAFARI)
+                .addBrowser(900, 600, BrowserType.FIREFOX)
+                .addBrowser(900, 786, BrowserType.IE_11)
+                .addDeviceEmulation(DeviceName.iPhone_4, ScreenOrientation.PORTRAIT)
+                .addDeviceEmulation(DeviceName.Galaxy_S5, ScreenOrientation.PORTRAIT)
+                .setMatchLevel(MatchLevel.LAYOUT));
         try {
             eyes.open(driver, "Demo App", "BasicDemo" + suffix, new RectangleSize(800, 800));
 
@@ -59,7 +69,7 @@ public class BasicDemo extends ReportingTestSuite {
             // To see visual bugs after the first run, use the commented line below instead.
             //driver.get("https://demo.applitools.com/index_v2.html");
 
-            eyes.checkWindow("Login Window");
+            //eyes.checkWindow("Login Window");
             driver.findElement(By.id("log-in")).click();
             eyes.checkWindow("App Window");
             eyes.closeAsync();

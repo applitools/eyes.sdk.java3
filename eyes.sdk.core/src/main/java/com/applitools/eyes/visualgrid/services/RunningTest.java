@@ -74,7 +74,9 @@ public class RunningTest {
     public Future<TestResultContainer> abort(boolean forceAbort, Throwable e) {
         logger.verbose("enter");
         if (closeTask != null) {
+            logger.verbose("close task already exists");
             if (forceAbort &&  closeTask.getType() == VisualGridTask.TaskType.CLOSE) {
+                logger.verbose("force abort");
                 removeAllCheckTasks();
                 closeTask.setExceptionAndAbort(e);
             }
@@ -85,6 +87,7 @@ public class RunningTest {
             openTask.setException(e);
         }
 
+        logger.verbose("close task doesn't exists, aborting the test");
         removeAllCheckTasks();
         VisualGridTask abortTask = new VisualGridTask(new Configuration(configurationProvider.get()), null,
                 eyes, VisualGridTask.TaskType.ABORT, taskListener, null, this, null, null);
@@ -101,6 +104,7 @@ public class RunningTest {
     }
 
     private void removeAllCheckTasks() {
+        logger.verbose("enter");
         Iterator<VisualGridTask> iterator = visualGridTaskList.iterator();
         int counter = 0;
         while (iterator.hasNext()) {
@@ -119,7 +123,7 @@ public class RunningTest {
 
     public interface RunningTestListener {
 
-        void onTaskComplete(VisualGridTask visualGridTask, RunningTest test);
+        void onTaskComplete(VisualGridTask visualGridTask);
 
         void onRenderComplete();
 
@@ -128,30 +132,29 @@ public class RunningTest {
     private final VisualGridTask.TaskListener taskListener = new VisualGridTask.TaskListener() {
         @Override
         public void onTaskComplete(VisualGridTask visualGridTask) {
-            RunningTest runningTest = RunningTest.this;
             logger.verbose("locking runningTest.visualGridTaskList");
-            synchronized (runningTest.visualGridTaskList) {
-                runningTest.visualGridTaskList.remove(visualGridTask);
+            synchronized (visualGridTaskList) {
+                visualGridTaskList.remove(visualGridTask);
             }
             logger.verbose("releasing runningTest.visualGridTaskList");
             switch (visualGridTask.getType()) {
                 case OPEN:
-                    runningTest.setTestOpen(true);
+                    isTestOpen.set(true);
                     break;
                 case CLOSE:
                 case ABORT:
-                    RunningTest.this.isTestClose.set(true);
+                    isTestClose.set(true);
                     break;
             }
-            if (runningTest.listener != null) {
-                RunningTest.this.listener.onTaskComplete(visualGridTask, RunningTest.this);
+            if (listener != null) {
+                listener.onTaskComplete(visualGridTask);
             }
         }
 
         @Override
         public void onTaskFailed(Throwable e, VisualGridTask visualGridTask) {
             setTestInExceptionMode(e);
-            listener.onTaskComplete(visualGridTask, RunningTest.this);
+            listener.onTaskComplete(visualGridTask);
         }
 
         @Override
@@ -166,10 +169,6 @@ public class RunningTest {
 
     public boolean isTestOpen() {
         return isTestOpen.get();
-    }
-
-    private void setTestOpen(boolean testOpen) {
-        isTestOpen.set(testOpen);
     }
 
     public List<VisualGridTask> getVisualGridTaskList() {
@@ -198,21 +197,23 @@ public class RunningTest {
     }
 
     public synchronized FutureTask<TestResultContainer> getNextCloseTask() {
-//        logger.verbose("enter");
+        logger.verbose("enter");
         if (!visualGridTaskList.isEmpty() && isCloseTaskIssued.get()) {
             VisualGridTask visualGridTask = visualGridTaskList.get(0);
             VisualGridTask.TaskType type = visualGridTask.getType();
-            if (type != VisualGridTask.TaskType.CLOSE && type != VisualGridTask.TaskType.ABORT) return null;
-//            logger.verbose("locking visualGridTaskList");
-            synchronized (visualGridTaskList) {
-//                logger.verbose("removing visualGridTask " + visualGridTask.toString() + " and exiting");
-                visualGridTaskList.remove(visualGridTask);
-//                logger.verbose("tasks in visualGridTaskList: " + visualGridTaskList.size());
+            if (type != VisualGridTask.TaskType.CLOSE && type != VisualGridTask.TaskType.ABORT) {
+                return null;
             }
-//            logger.verbose("releasing visualGridTaskList");
+            logger.verbose("locking visualGridTaskList");
+            synchronized (visualGridTaskList) {
+                logger.verbose("removing visualGridTask " + visualGridTask.toString() + " and exiting");
+                visualGridTaskList.remove(visualGridTask);
+                logger.verbose("tasks in visualGridTaskList: " + visualGridTaskList.size());
+            }
+            logger.verbose("releasing visualGridTaskList");
             return taskToFutureMapping.get(visualGridTask);
         }
-//        logger.verbose("exit with null");
+        logger.verbose("exit with null");
         return null;
     }
 
@@ -254,6 +255,7 @@ public class RunningTest {
                 return taskToFutureMapping.get(closeTask);
             }
 
+            logger.verbose("task list is empty and close task doesn't exist, not adding new close task");
             return null;
         }
 
