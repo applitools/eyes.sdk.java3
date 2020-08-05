@@ -354,7 +354,7 @@ public class SeleniumEyes extends EyesBase implements ISeleniumEyes, IBatchClose
      * Default match timeout is used.
      */
     public void checkWindow() {
-        checkWindow((String)null);
+        checkWindow((String) null);
     }
 
     /**
@@ -757,11 +757,79 @@ public class SeleniumEyes extends EyesBase implements ISeleniumEyes, IBatchClose
         }
     }
 
-    private void checkWindow(ICheckSettingsInternal checkSettingsInternal)
-    {
+    private void checkWindow(ICheckSettingsInternal checkSettingsInternal) {
         logger.verbose("Target.Window()");
 
         checkWindowBase(null, checkSettingsInternal, driver.getCurrentUrl());
+    }
+
+    private void checkFullElement(ICheckSettingsInternal checkSettingsInternal, WebElement targetElement,
+                                  Region targetRegion, CheckState state) {
+        if (((ISeleniumCheckTarget) checkSettingsInternal).getFrameChain().size() > 0) {
+            logger.verbose("Target.Frame(frame)...Region(element).Fully(true)");
+        } else {
+            logger.verbose("Target.Region(element).Fully(true)");
+        }
+
+        // Hide scrollbars
+        String originalOverflow = EyesDriverUtils.setOverflow(driver, "hidden", targetElement);
+
+        // Get element's scroll size and bounds
+        RectangleSize scrollSize = EyesRemoteWebElement.getScrollSize(targetElement, driver, logger);
+        Region elementBounds = EyesRemoteWebElement.getClientBounds(targetElement, driver, logger);
+        Region elementInnerBounds = EyesRemoteWebElement.getClientBoundsWithoutBorders(targetElement, driver, logger);
+
+        boolean isScrollableElement = scrollSize.getHeight() > elementInnerBounds.getHeight() || scrollSize.getWidth() > elementInnerBounds.getWidth();
+
+        if (isScrollableElement) {
+            elementBounds = elementInnerBounds;
+        }
+        initPositionProvidersForCheckElement(isScrollableElement, targetElement, state);
+
+        Location originalElementLocation = elementBounds.getLocation();
+        elementBounds = bringRegionToView(elementBounds, state.getEffectiveViewport().getLocation());
+
+        Region fullElementBounds = elementBounds;
+        fullElementBounds.setWidth(Math.max(fullElementBounds.getWidth(), scrollSize.getWidth()));
+        fullElementBounds.setHeight(Math.max(fullElementBounds.getHeight(), scrollSize.getHeight()));
+        FrameChain currentFrameChain = driver.getFrameChain().clone();
+        Location screenshotOffset = getFrameChainOffset(currentFrameChain);
+        logger.verbose("screenshotOffset: " + screenshotOffset);
+        fullElementBounds.offset(screenshotOffset.getX(), screenshotOffset.getY());
+
+        state.setFullRegion(fullElementBounds);
+
+        // Now we have a 2-step part:
+        // 1. Intersect the SRE and the effective viewport.
+        if (getConfigurationInstance().getStitchMode() == StitchMode.CSS && userDefinedSRE != null) {
+            Region viewportInScreenshot = state.getEffectiveViewport();
+            int elementTranslationWidth = originalElementLocation.getX() - elementBounds.getLeft();
+            int elementTranslationHeight = originalElementLocation.getY() - elementBounds.getTop();
+            state.setEffectiveViewport(new Region(
+                    viewportInScreenshot.getLeft(),
+                    viewportInScreenshot.getTop(),
+                    viewportInScreenshot.getWidth() - elementTranslationWidth,
+                    viewportInScreenshot.getHeight() - elementTranslationHeight));
+        }
+
+        // In CSS stitch mode, if the element is not scrollable but the SRE is (i.e., "Modal" case),
+        // we move the SRE to (0,0) but then we translate the element itself to get the full contents.
+        // However, in Scroll stitch mode, we scroll the SRE itself to the get full contents, and it
+        // already has an offset caused by "BringRegionToView", so we should consider this offset.
+        if (StitchMode == StitchModes.Scroll && !isScrollableElement) {
+            state.StitchOffset = (Size) originalElementLocation - (Size) elementBounds.Location;
+        }
+
+        // 2. Intersect the element and the effective viewport
+        Rectangle elementBoundsInScreenshotCoordinates = elementBounds;
+        elementBoundsInScreenshotCoordinates.Offset(screenshotOffset);
+        state.EffectiveViewport = Rectangle.Intersect(state.EffectiveViewport, elementBoundsInScreenshotCoordinates);
+
+
+        Rectangle ? crop = ComputeCropRectangle(fullElementBounds, targetRegion);
+        CheckWindowBase(crop, checkSettingsInternal, source:driver_.Url);
+
+        EyesSeleniumUtils.SetOverflow(originalOverflow, driver_, targetElement);
     }
 
     public static WebElement tryGetUserDefinedSREFromSREContainer(IScrollRootElementContainer scrollRootElementContainer, EyesSeleniumDriver driver) {
@@ -819,16 +887,12 @@ public class SeleniumEyes extends EyesBase implements ISeleniumEyes, IBatchClose
         return viewport;
     }
 
-    private WebElement getTargetElementFromSettings(ISeleniumCheckTarget seleniumCheckTarget)
-    {
+    private WebElement getTargetElementFromSettings(ISeleniumCheckTarget seleniumCheckTarget) {
         By targetSelector = seleniumCheckTarget.getTargetSelector();
         WebElement targetElement = seleniumCheckTarget.getTargetElement();
-        if (targetElement == null && targetSelector != null)
-        {
+        if (targetElement == null && targetSelector != null) {
             targetElement = driver.findElement(targetSelector);
-        }
-        else if (targetElement != null && !(targetElement instanceof EyesRemoteWebElement))
-        {
+        } else if (targetElement != null && !(targetElement instanceof EyesRemoteWebElement)) {
             targetElement = new EyesRemoteWebElement(logger, driver, targetElement);
         }
         return targetElement;

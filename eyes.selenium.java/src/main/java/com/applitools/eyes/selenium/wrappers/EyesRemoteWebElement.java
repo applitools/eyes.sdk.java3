@@ -51,7 +51,7 @@ public class EyesRemoteWebElement extends RemoteWebElement {
     private final String JS_GET_SCROLL_HEIGHT =
             "return arguments[0].scrollHeight;";
 
-    private final String JS_GET_SCROLL_SIZE =
+    private static final String JS_GET_SCROLL_SIZE =
             "return arguments[0].scrollWidth+ ';' + arguments[0].scrollHeight;";
 
     private final String JS_SCROLL_TO_FORMATTED_STR =
@@ -101,8 +101,8 @@ public class EyesRemoteWebElement extends RemoteWebElement {
 
     private static final String JS_GET_BOUNDING_CLIENT_RECT_WITHOUT_BORDERS =
             "var el = arguments[0];" +
-            "var bcr = el.getBoundingClientRect();" +
-            "return (bcr.left + el.clientLeft) + ';' + (bcr.top + el.clientTop) + ';' + el.clientWidth + ';' + el.clientHeight;";
+                    "var bcr = el.getBoundingClientRect();" +
+                    "return (bcr.left + el.clientLeft) + ';' + (bcr.top + el.clientTop) + ';' + el.clientWidth + ';' + el.clientHeight;";
 
     private PositionProvider positionProvider;
 
@@ -141,7 +141,7 @@ public class EyesRemoteWebElement extends RemoteWebElement {
     }
 
     public static Region getClientBoundsWithoutBorders(WebElement element, EyesSeleniumDriver driver, Logger logger) {
-        String result = (String)driver.executeScript(JS_GET_BOUNDING_CLIENT_RECT_WITHOUT_BORDERS, element);
+        String result = (String) driver.executeScript(JS_GET_BOUNDING_CLIENT_RECT_WITHOUT_BORDERS, element);
         if (logger != null) logger.verbose(result);
         String[] data = result.split(";");
         Region rect = new Region(
@@ -630,8 +630,17 @@ public class EyesRemoteWebElement extends RemoteWebElement {
     }
 
     public Rectangle getBoundingClientRect() {
-        String retVal = (String) eyesDriver.executeScript("var r = arguments[0].getBoundingClientRect();" +
-                "return r.left+';'+r.top+';'+r.width+';'+r.height;", this);
+        return getBoundingClientRect(this, this.eyesDriver, this.logger);
+    }
+
+    public static Region getClientBounds(WebElement element, JavascriptExecutor driver, Logger logger) {
+        Rectangle r = getBoundingClientRect(element, driver, logger);
+        return new Region(r.getX(), r.getY(), r.getWidth(), r.getHeight());
+    }
+
+    public static Rectangle getBoundingClientRect(WebElement element, JavascriptExecutor driver, Logger logger) {
+        String retVal = (String) driver.executeScript("var r = arguments[0].getBoundingClientRect();" +
+                "return r.left+';'+r.top+';'+r.width+';'+r.height;", element);
         logger.verbose(String.format("Bounding client rect: %s", retVal));
         String[] parts = retVal.split(";");
         return new Rectangle(
@@ -641,13 +650,14 @@ public class EyesRemoteWebElement extends RemoteWebElement {
                 Math.round(Float.parseFloat(parts[2])));
     }
 
-    /**
-     * @return The value of the scrollHeight property of the element.
-     */
     public RectangleSize getScrollSize() {
-        Object retVal = eyesDriver.executeScript(JS_GET_SCROLL_SIZE, this);
+        return getScrollSize(this, this.eyesDriver, this.logger);
+    }
+
+    public static RectangleSize getScrollSize(WebElement element, JavascriptExecutor driver, Logger logger) {
+        Object retVal = driver.executeScript(JS_GET_SCROLL_SIZE, element);
         if (retVal == null) {
-            return null;
+            return RectangleSize.EMPTY;
         }
         @SuppressWarnings("unchecked") String sizeStr = (String) retVal;
         sizeStr = sizeStr.replace("px", "");
