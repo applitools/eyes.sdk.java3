@@ -242,13 +242,13 @@ public class VisualGridTask implements Callable<TestResultContainer>, Completabl
         RectangleSize deviceSize = getCorrectDeviceSize(renderRequest);
         RenderStatusResults renderResult = new RenderStatusResults();
         renderResult.setDeviceSize(deviceSize);
-        this.renderResult = renderResult;
         logger.verbose("device size: " + deviceSize);
         for (TaskListener listener : listeners) {
             exception = new InstantiationError("Render Failed for " + this.getBrowserInfo() + " (renderId: " + renderId + ") with reason: " + error);
             listener.onTaskFailed(exception, this);
         }
 
+        this.renderResult = renderResult;
         logger.verbose("exit - renderId: " + renderId);
     }
 
