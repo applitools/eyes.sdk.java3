@@ -158,8 +158,6 @@ public class MatchWindowTask {
                 false, options, agentSetupStr, renderId);
 
 
-        Map<String, DeviceSize> devicesSizes = serverConnector.getDevicesSizes();
-
         if (!tryUploadImage(data)) {
             throw new EyesException("matchWindow failed: could not upload image to storage service.");
         }
