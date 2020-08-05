@@ -816,20 +816,72 @@ public class SeleniumEyes extends EyesBase implements ISeleniumEyes, IBatchClose
         // we move the SRE to (0,0) but then we translate the element itself to get the full contents.
         // However, in Scroll stitch mode, we scroll the SRE itself to the get full contents, and it
         // already has an offset caused by "BringRegionToView", so we should consider this offset.
-        if (StitchMode == StitchModes.Scroll && !isScrollableElement) {
-            state.StitchOffset = (Size) originalElementLocation - (Size) elementBounds.Location;
+        if (getConfigurationInstance().getStitchMode() == StitchMode.SCROLL && !isScrollableElement) {
+            state.setStitchOffset(new RectangleSize(
+                    originalElementLocation.getX() - elementBounds.getLeft(),
+                    originalElementLocation.getY() - elementBounds.getTop()));
         }
 
         // 2. Intersect the element and the effective viewport
-        Rectangle elementBoundsInScreenshotCoordinates = elementBounds;
-        elementBoundsInScreenshotCoordinates.Offset(screenshotOffset);
-        state.EffectiveViewport = Rectangle.Intersect(state.EffectiveViewport, elementBoundsInScreenshotCoordinates);
+        Region elementBoundsInScreenshotCoordinates = elementBounds;
+        elementBoundsInScreenshotCoordinates.offset(screenshotOffset.getX(), screenshotOffset.getY());
+        state.setEffectiveViewport(state.getEffectiveViewport().getIntersected(elementBoundsInScreenshotCoordinates));
 
 
-        Rectangle ? crop = ComputeCropRectangle(fullElementBounds, targetRegion);
-        CheckWindowBase(crop, checkSettingsInternal, source:driver_.Url);
+        Region crop = computeCropRectangle(fullElementBounds, targetRegion);
+        checkWindowBase(crop, checkSettingsInternal, driver.getCurrentUrl());
 
-        EyesSeleniumUtils.SetOverflow(originalOverflow, driver_, targetElement);
+        EyesDriverUtils.setOverflow(driver, originalOverflow, targetElement);
+    }
+
+    private static Region computeCropRectangle(Region fullRect, Region cropRect) {
+        if (cropRect == null) return null;
+        Region crop = new Region(fullRect);
+        Location cropLocation = crop.getLocation();
+        Region cropRectClone = new Region(cropRect);
+        cropRectClone.offset(cropLocation.getX(), cropLocation.getY());
+        crop.intersect(cropRectClone);
+        return crop;
+    }
+
+    private Location getFrameChainOffset(FrameChain frameChain) {
+        Location offset = Location.ZERO;
+        for (Frame frame : frameChain)
+        {
+            offset.offset(frame.getLocation());
+        }
+        return offset;
+    }
+
+    private Region bringRegionToView(Region bounds, Location viewportLocation) {
+        WebElement currentFrameSRE = getCurrentFrameScrollRootElement();
+        PositionProvider currentFramePositionProvider = PositionProviderFactory.getPositionProvider(
+                logger, getConfigurationInstance().getStitchMode(), jsExecutor, currentFrameSRE, userAgent);
+        Location actualFramePosition = currentFramePositionProvider.setPosition(bounds.getLocation().offset(-viewportLocation.getX(), -viewportLocation.getY()));
+        bounds.setLocation(bounds.getLocation().offset(-actualFramePosition.getX(), -actualFramePosition.getY()));
+        return bounds;
+    }
+
+    private void initPositionProvidersForCheckElement(boolean isScrollableElement, WebElement targetElement, CheckState state) {
+        // User might still call "fully" on a non-scrollable element, adjust the position provider accordingly.
+        if (isScrollableElement)
+        {
+            state.setStitchPositionProvider(new ElementPositionProvider(logger, driver, targetElement));
+        }
+        else // Not a scrollable element but an element enclosed within a scroll-root-element
+        {
+            WebElement scrollRootElement = getCurrentFrameScrollRootElement();
+            if (getConfigurationInstance().getStitchMode() == StitchMode.CSS)
+            {
+                state.setStitchPositionProvider(new CssTranslatePositionProvider(logger, driver, targetElement));
+                state.setOriginPositionProvider(new SeleniumScrollPositionProvider(logger, driver, scrollRootElement));
+            }
+            else
+            {
+                state.setStitchPositionProvider(new SeleniumScrollPositionProvider(logger, driver, scrollRootElement));
+            }
+        }
+        logger.verbose("isScrollableElement ?"+ isScrollableElement);
     }
 
     public static WebElement tryGetUserDefinedSREFromSREContainer(IScrollRootElementContainer scrollRootElementContainer, EyesSeleniumDriver driver) {

@@ -433,11 +433,16 @@ public class Region implements IRegion {
      * @param other The region with which to intersect.
      */
     public void intersect(Region other) {
+        Region intersected = getIntersected(other);
+        this.setLocation(intersected.getLocation());
+        this.setSize(intersected.getSize());
+    }
+
+    public Region getIntersected(Region other) {
 
         // If there's no intersection set this as the Empty region.
         if (!isIntersected(other)) {
-            makeEmpty();
-            return;
+            return Region.EMPTY;
         }
 
         // The regions intersect. So let's first find the left & top values
@@ -458,10 +463,7 @@ public class Region implements IRegion {
         int intersectionBottom = (bottom <= otherBottom) ? bottom : otherBottom;
         int intersectionHeight = intersectionBottom - intersectionTop;
 
-        left = intersectionLeft;
-        top = intersectionTop;
-        width = intersectionWidth;
-        height = intersectionHeight;
+        return new Region(intersectionLeft, intersectionTop, intersectionWidth, intersectionHeight, coordinatesType);
     }
 
     /**
