@@ -757,6 +757,36 @@ public class SeleniumEyes extends EyesBase implements ISeleniumEyes, IBatchClose
         }
     }
 
+    private void checkFullRegion(ICheckSettingsInternal checkSettingsInternal, Region targetRegion, CheckState state) {
+        if (((ISeleniumCheckTarget) checkSettingsInternal).getFrameChain().size() > 0) {
+            logger.verbose("Target.Frame(frame).Region(x,y,w,h).Fully(true)");
+        } else {
+            logger.verbose("Target.Region(x,y,w,h).Fully(true)");
+        }
+        FrameChain currentFrameChain = driver.getFrameChain().clone();
+        Frame currentFrame = currentFrameChain.peek();
+        if (currentFrame != null) {
+            Region currentFrameBoundsWithoutBorders = removeBorders(currentFrame.getBounds(), currentFrame.getBorderWidths());
+            state.setEffectiveViewport(state.getEffectiveViewport().getIntersected(currentFrameBoundsWithoutBorders));
+            WebElement currentFrameSRE = getCurrentFrameScrollRootElement();
+            RectangleSize currentSREScrollSize = EyesRemoteWebElement.getScrollSize(currentFrameSRE, driver, logger);
+            state.setFullRegion(new Region(state.getEffectiveViewport().getLocation(), currentSREScrollSize));
+        } else {
+            Location visualOffset = getFrameChainOffset(currentFrameChain);
+            targetRegion.offset(visualOffset);
+        }
+        checkWindowBase(targetRegion, checkSettingsInternal, driver.getCurrentUrl());
+    }
+
+    private static Region removeBorders(Region region, Borders borders) {
+        return new Region(
+                region.getLeft() + borders.getLeft(),
+                region.getTop() + borders.getTop(),
+                region.getWidth() - borders.getHorizontal(),
+                region.getHeight() - borders.getVertical(),
+                region.getCoordinatesType());
+    }
+
     private void checkElement(ICheckSettingsInternal checkSettingsInternal, WebElement targetElement,
                               Region targetRegion, CheckState state) {
         List<FrameLocator> frameLocators = ((ISeleniumCheckTarget) checkSettingsInternal).getFrameChain();
