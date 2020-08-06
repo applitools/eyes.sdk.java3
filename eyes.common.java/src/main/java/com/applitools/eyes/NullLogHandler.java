@@ -17,9 +17,4 @@ public class NullLogHandler implements LogHandler {
     public boolean isOpen() {
         return true;
     }
-
-    @Override
-    public boolean shouldLogCommunication() {
-        return false;
-    }
 }

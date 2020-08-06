@@ -11,21 +11,14 @@ import java.util.TimeZone;
 public class StdoutLogHandler implements LogHandler {
 
     private final boolean isVerbose;
-    private final boolean shouldLogCommunication;
 
     /**
      * Creates a new StdoutLogHandler instance.
      *
      * @param isVerbose Whether to handle or ignore verbose log messages.
-     * @param shouldLogCommunication Whether to log the communication with the server
      */
-    public StdoutLogHandler(boolean isVerbose, boolean shouldLogCommunication) {
-        this.isVerbose = isVerbose;
-        this.shouldLogCommunication = shouldLogCommunication;
-    }
-
     public StdoutLogHandler(boolean isVerbose) {
-        this(isVerbose, false);
+        this.isVerbose = isVerbose;
     }
 
     /**
@@ -57,10 +50,5 @@ public class StdoutLogHandler implements LogHandler {
     @Override
     public boolean isOpen() {
         return true;
-    }
-
-    @Override
-    public boolean shouldLogCommunication() {
-        return shouldLogCommunication;
     }
 }

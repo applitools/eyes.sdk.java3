@@ -4,38 +4,18 @@ import com.applitools.eyes.AbstractProxySettings;
 import com.applitools.eyes.Logger;
 
 import java.net.URI;
-import java.util.logging.ConsoleHandler;
-import java.util.logging.Level;
-import java.util.logging.SimpleFormatter;
 
 public abstract class HttpClient {
 
-    protected final Logger eyesLogger;
+    protected final Logger logger;
     protected final int timeout;
     protected final AbstractProxySettings abstractProxySettings;
     protected boolean isClosed = false;
 
-    protected java.util.logging.Logger communicationLogger = null;
-
-    public HttpClient(Logger eyesLogger, int timeout, AbstractProxySettings abstractProxySettings) {
-        this.eyesLogger = eyesLogger;
+    public HttpClient(Logger logger, int timeout, AbstractProxySettings abstractProxySettings) {
+        this.logger = logger;
         this.timeout = timeout;
         this.abstractProxySettings = abstractProxySettings;
-        initCommunicationLogger();
-    }
-
-    private void initCommunicationLogger() {
-        if (!eyesLogger.getLogHandler().shouldLogCommunication()) {
-            communicationLogger = null;
-            return;
-        }
-
-        communicationLogger = java.util.logging.Logger.getLogger("Communication Logger");
-        communicationLogger.setLevel(Level.FINE);
-        ConsoleHandler handler = new ConsoleHandler();
-        handler.setLevel(Level.FINE);
-        handler.setFormatter(new SimpleFormatter());
-        communicationLogger.addHandler(handler);
     }
 
     /**
@@ -61,7 +41,7 @@ public abstract class HttpClient {
     }
 
     public Logger getLogger() {
-        return eyesLogger;
+        return logger;
     }
 
     public abstract void close();

@@ -59,22 +59,4 @@ public class TestAPI extends ReportingTestSuite {
 
         Assert.assertEquals(0, browsers.size(), "Not all browser types names has been verified. Remaining browser types: " + StringUtils.join(browsers, ", "));
     }
-
-    @Test
-    public void testLogHandlers() {
-        LogHandler logHandler = new StdoutLogHandler(false);
-        Assert.assertFalse(logHandler.shouldLogCommunication());
-        logHandler = new StdoutLogHandler(false, true);
-        Assert.assertTrue(logHandler.shouldLogCommunication());
-
-        logHandler = new FileLogger(false);
-        Assert.assertFalse(logHandler.shouldLogCommunication());
-
-        logHandler = new NullLogHandler();
-        Assert.assertFalse(logHandler.shouldLogCommunication());
-
-        logHandler = new MultiLogHandler(new StdoutLogHandler(), new FileLogger(false),
-                new MultiLogHandler(new StdoutLogHandler(true, true), new NullLogHandler()));
-        Assert.assertTrue(logHandler.shouldLogCommunication());
-    }
 }

@@ -9,6 +9,4 @@ public interface LogHandler {
     void close();
 
     boolean isOpen();
-
-    boolean shouldLogCommunication();
 }

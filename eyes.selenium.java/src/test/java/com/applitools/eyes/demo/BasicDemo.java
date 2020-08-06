@@ -2,17 +2,24 @@ package com.applitools.eyes.demo;
 
 import com.applitools.eyes.*;
 import com.applitools.eyes.selenium.ClassicRunner;
+import com.applitools.eyes.selenium.Configuration;
 import com.applitools.eyes.selenium.Eyes;
 import com.applitools.eyes.utils.ReportingTestSuite;
 import com.applitools.eyes.utils.SeleniumUtils;
 import com.applitools.eyes.utils.TestUtils;
+import com.applitools.eyes.visualgrid.model.DeviceName;
+import com.applitools.eyes.visualgrid.model.ScreenOrientation;
 import com.applitools.eyes.visualgrid.services.VisualGridRunner;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.chrome.ChromeOptions;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
+
+import java.util.HashMap;
+import java.util.Map;
 
 public class BasicDemo extends ReportingTestSuite {
     private static BatchInfo batch;
@@ -25,7 +32,7 @@ public class BasicDemo extends ReportingTestSuite {
 
     @DataProvider(name = "booleanDP")
     public Object[] dp() {
-        return new Object[]{Boolean.TRUE, Boolean.FALSE};
+        return new Object[]{Boolean.TRUE};
     }
 
     @BeforeClass
@@ -39,7 +46,11 @@ public class BasicDemo extends ReportingTestSuite {
 
     @BeforeMethod
     public void beforeEach() {
-        driver = SeleniumUtils.createChromeDriver();
+        Map<String, String> mobileEmulation = new HashMap<>();
+        mobileEmulation.put("deviceName", "iPhone X");
+        ChromeOptions options = new ChromeOptions();
+        options.setExperimentalOption("mobileEmulation", mobileEmulation);
+        driver = SeleniumUtils.createChromeDriver(options);
     }
 
     @Test(dataProvider = "booleanDP")
@@ -49,19 +60,21 @@ public class BasicDemo extends ReportingTestSuite {
         Eyes eyes = new Eyes(runner);
         eyes.setLogHandler(logger);
         eyes.setBatch(batch);
+        Configuration conf = eyes.getConfiguration();
+        conf.addDeviceEmulation(DeviceName.iPhone_X,ScreenOrientation.PORTRAIT);
+        conf.addDeviceEmulation(DeviceName.Galaxy_S5, ScreenOrientation.LANDSCAPE);
+        eyes.setConfiguration(conf);
         //eyes.setProxy(new ProxySettings("http://localhost:8888"));
         try {
-            eyes.open(driver, "Demo App", "BasicDemo" + suffix, new RectangleSize(800, 800));
+            eyes.open(driver, "Demo App", "agilent" + suffix, new RectangleSize(800, 800));
 
             // Navigate the browser to the "ACME" demo app.
-            driver.get("https://demo.applitools.com");
+            driver.get("https://www.agilent.com/search/?Ntt=db-1");
 
             // To see visual bugs after the first run, use the commented line below instead.
             //driver.get("https://demo.applitools.com/index_v2.html");
 
-            eyes.checkWindow("Login Window");
-            driver.findElement(By.id("log-in")).click();
-            eyes.checkWindow("App Window");
+            eyes.checkWindow();
             eyes.closeAsync();
         } finally {
             eyes.abortAsync();

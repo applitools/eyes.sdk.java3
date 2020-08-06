@@ -33,11 +33,6 @@ public class TestImageUtils extends ReportingTestSuite {
             return true;
         }
 
-        @Override
-        public boolean shouldLogCommunication() {
-            return false;
-        }
-
         public boolean contains (String message) {
             return messages.contains(message);
         }
