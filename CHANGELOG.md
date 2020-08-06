@@ -1,6 +1,7 @@
 ## [vNext]
 ### Fixed
 - Agent ID was null in some cases. [Trello 2060](https://trello.com/c/zELwZYma)
+- Connectivity modules now get the correct log handler. [Trello 1803](https://trello.com/c/1lavL4Mg)
 
 ## [3.173.0] - 2020-08-05
 ### Fixed
