@@ -105,7 +105,7 @@ class EyesConnector extends EyesBase implements IEyesConnector, IBatchCloser {
         return "useragent:" + userAgent;
     }
 
-    protected EyesScreenshot getScreenshot(ICheckSettingsInternal checkSettingsInternal) {
+    protected EyesScreenshot getScreenshot(Region targetRegion, ICheckSettingsInternal checkSettingsInternal) {
         return null;
     }
 

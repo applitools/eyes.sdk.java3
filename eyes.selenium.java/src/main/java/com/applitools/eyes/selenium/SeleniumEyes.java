@@ -1676,24 +1676,7 @@ public class SeleniumEyes extends EyesBase implements ISeleniumEyes, IBatchClose
     }
 
     private EyesWebDriverScreenshot getElementScreenshot(ScaleProviderFactory scaleProviderFactory, EyesTargetLocator switchTo) {
-        EyesWebDriverScreenshot result;
-        List<PositionProviderAndMemento> ppams = null;
-        if (switchTo != null) {
-            ppams = ensureElementVisible(targetElement);
-        }
-        try {
-            Thread.sleep(getWaitBeforeScreenshots());
-        } catch (InterruptedException e) {
-            GeneralUtils.logExceptionStackTrace(logger, e);
-        }
-        result = getScaledAndCroppedScreenshot(scaleProviderFactory);
-        if (switchTo != null) {
-            for (int i = ppams.size() - 1; i >= 0; i--) {
-                PositionProviderAndMemento ppam = ppams.get(i);
-                switchTo.frames(ppam.getFrames());
-                ppam.restoreState();
-            }
-        }
+        EyesWebDriverScreenshot result = new EyesWebDriverScreenshot(logger, driver, null); // TODO - implement
         return result;
     }
 
