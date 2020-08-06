@@ -8,10 +8,7 @@ import com.applitools.eyes.config.Configuration;
 import com.applitools.eyes.fluent.CheckSettings;
 import com.applitools.eyes.fluent.GetFloatingRegion;
 import com.applitools.eyes.fluent.GetSimpleRegion;
-import com.applitools.eyes.selenium.BrowserType;
-import com.applitools.eyes.selenium.EyesDriverUtils;
-import com.applitools.eyes.selenium.EyesSeleniumUtils;
-import com.applitools.eyes.selenium.ISeleniumEyes;
+import com.applitools.eyes.selenium.*;
 import com.applitools.eyes.config.ConfigurationProvider;
 import com.applitools.eyes.selenium.fluent.*;
 import com.applitools.eyes.selenium.frames.Frame;
@@ -286,7 +283,8 @@ public class VisualGridEyes implements ISeleniumEyes, IRenderingEyes {
 
     private void initDriver(WebDriver webDriver) {
         if (webDriver instanceof RemoteWebDriver) {
-            this.webDriver = new EyesSeleniumDriver(logger, null, (RemoteWebDriver) webDriver);
+            SeleniumEyes seleniumEyes = new SeleniumEyes(configurationProvider, new ClassicRunner());
+            this.webDriver = new EyesSeleniumDriver(logger, seleniumEyes, (RemoteWebDriver) webDriver);
         }
         @SuppressWarnings("UnnecessaryLocalVariable") String currentUrl = webDriver.getCurrentUrl();
         this.url = currentUrl;

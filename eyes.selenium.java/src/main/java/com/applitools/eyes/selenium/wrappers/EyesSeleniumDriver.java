@@ -227,7 +227,7 @@ public class EyesSeleniumDriver implements HasInputDevices, FindsByClassName,
     }
 
     public TargetLocator switchTo() {
-        return new EyesTargetLocator(this, logger,driver.switchTo());
+        return new EyesTargetLocator(this, logger,driver.switchTo(), eyes.getConfiguration());
     }
 
     public Navigation navigate() {

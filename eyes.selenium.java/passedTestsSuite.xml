@@ -345,6 +345,7 @@
                 <methods>
                     <include name="testConfigurationConstructors"/>
                     <include name="testConfigurationEdit"/>
+                    <include name="testFeatures"/>
                 </methods>
             </class>
         </classes>

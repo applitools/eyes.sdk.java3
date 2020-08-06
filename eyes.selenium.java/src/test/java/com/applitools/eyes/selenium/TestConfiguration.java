@@ -2,6 +2,7 @@ package com.applitools.eyes.selenium;
 
 import com.applitools.eyes.RectangleSize;
 import com.applitools.eyes.config.ConfigurationProvider;
+import com.applitools.eyes.config.Feature;
 import com.applitools.eyes.utils.ReportingTestSuite;
 import org.testng.Assert;
 import org.testng.annotations.Test;
@@ -53,5 +54,13 @@ public class TestConfiguration extends ReportingTestSuite {
         Assert.assertEquals(seleniumEyes.getConfiguration().getMatchTimeout(), originalMatchTimeout);
         seleniumEyes.getConfigurationInstance().setMatchTimeout(newMatchTimeout);
         Assert.assertEquals(seleniumEyes.getConfiguration().getMatchTimeout(), newMatchTimeout);
+    }
+
+    @Test
+    public void testFeatures() {
+        com.applitools.eyes.config.Configuration configuration = new com.applitools.eyes.config.Configuration();
+        Assert.assertFalse(configuration.isFeatureActivated(Feature.OPTIMIZE_TEST));
+        configuration.activateFeatures(Feature.OPTIMIZE_TEST);
+        Assert.assertTrue(configuration.isFeatureActivated(Feature.OPTIMIZE_TEST));
     }
 }

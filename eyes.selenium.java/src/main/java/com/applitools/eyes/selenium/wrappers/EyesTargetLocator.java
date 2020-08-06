@@ -4,6 +4,8 @@
 package com.applitools.eyes.selenium.wrappers;
 
 import com.applitools.eyes.*;
+import com.applitools.eyes.config.Configuration;
+import com.applitools.eyes.config.Feature;
 import com.applitools.eyes.positioning.PositionMemento;
 import com.applitools.eyes.positioning.PositionProvider;
 import com.applitools.eyes.selenium.Borders;
@@ -30,6 +32,7 @@ public class EyesTargetLocator implements WebDriver.TargetLocator {
     private SeleniumScrollPositionProvider scrollPosition;
     private final WebDriver.TargetLocator targetLocator;
     private final SeleniumJavaScriptExecutor jsExecutor;
+    private final Configuration configuration;
 
     private PositionMemento defaultContentPositionMemento;
 
@@ -38,14 +41,14 @@ public class EyesTargetLocator implements WebDriver.TargetLocator {
      * @param driver        The WebDriver from which the targetLocator was received.
      * @param targetLocator The actual TargetLocator object.
      */
-    public EyesTargetLocator(EyesSeleniumDriver driver, Logger logger,
-                             WebDriver.TargetLocator targetLocator) {
+    public EyesTargetLocator(EyesSeleniumDriver driver, Logger logger, WebDriver.TargetLocator targetLocator, Configuration configuration) {
         ArgumentGuard.notNull(driver, "driver");
         ArgumentGuard.notNull(targetLocator, "targetLocator");
         this.driver = driver;
         this.logger = logger;
         this.targetLocator = targetLocator;
         this.jsExecutor = new SeleniumJavaScriptExecutor(driver);
+        this.configuration = configuration;
     }
 
     /**
@@ -241,8 +244,10 @@ public class EyesTargetLocator implements WebDriver.TargetLocator {
             logger.verbose("Making preparations...");
             driver.getFrameChain().clear();
             logger.verbose("Done! Switching to default content...");
+            targetLocator.defaultContent();
+        } else if (!configuration.isFeatureActivated(Feature.OPTIMIZE_TEST)) {
+            targetLocator.defaultContent();
         }
-        targetLocator.defaultContent();
         logger.verbose("Done!");
         return driver;
     }

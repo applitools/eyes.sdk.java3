@@ -4,12 +4,11 @@ import com.applitools.eyes.*;
 import com.applitools.eyes.selenium.BrowserType;
 import com.applitools.eyes.selenium.StitchMode;
 import com.applitools.eyes.visualgrid.model.*;
+import com.applitools.utils.ArgumentGuard;
 import com.applitools.utils.GeneralUtils;
 
 import java.net.URI;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
 public class Configuration implements IConfiguration {
     private static final int DEFAULT_MATCH_TIMEOUT = 2000; // Milliseconds;
@@ -57,6 +56,8 @@ public class Configuration implements IConfiguration {
 
     private List<RenderBrowserInfo> browsersInfo = new ArrayList<>();
 
+    private Set<Feature> features = new HashSet<>();
+
     public Configuration(Configuration other) {
         this.branchName = other.getBranchName();
         this.parentBranchName = other.getParentBranchName();
@@ -100,7 +101,8 @@ public class Configuration implements IConfiguration {
         this.isRenderingConfig = other.isRenderingConfig();
         this.browsersInfo.addAll(other.getBrowsersInfo());
         this.defaultMatchSettings = new ImageMatchSettings(other.getDefaultMatchSettings());
-        this.isVisualGrid = isVisualGrid();
+        this.isVisualGrid = other.isVisualGrid();
+        this.features = other.features;
     }
 
     public Configuration() {
@@ -682,5 +684,22 @@ public class Configuration implements IConfiguration {
 
     public boolean isVisualGrid() {
         return isVisualGrid;
+    }
+
+    /**
+     * Sets features to for the Eyes test.
+     * Overrides existing features.
+     */
+    public void activateFeatures(Feature feature, Feature... features) {
+        ArgumentGuard.notNull(feature, "feature");
+        ArgumentGuard.notNullElement(features, "features");
+        this.features.clear();
+        this.features.add(feature);
+        this.features.addAll(Arrays.asList(features));
+    }
+
+    public boolean isFeatureActivated(Feature feature) {
+        ArgumentGuard.notNull(feature, "feature");
+        return features.contains(feature);
     }
 }
