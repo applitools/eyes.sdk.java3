@@ -41,14 +41,14 @@ public class EyesTargetLocator implements WebDriver.TargetLocator {
      * @param driver        The WebDriver from which the targetLocator was received.
      * @param targetLocator The actual TargetLocator object.
      */
-    public EyesTargetLocator(EyesSeleniumDriver driver, Logger logger, WebDriver.TargetLocator targetLocator, Configuration configuration) {
+    public EyesTargetLocator(EyesSeleniumDriver driver, Logger logger, WebDriver.TargetLocator targetLocator) {
         ArgumentGuard.notNull(driver, "driver");
         ArgumentGuard.notNull(targetLocator, "targetLocator");
         this.driver = driver;
         this.logger = logger;
         this.targetLocator = targetLocator;
         this.jsExecutor = new SeleniumJavaScriptExecutor(driver);
-        this.configuration = configuration;
+        this.configuration = driver.getEyes().getConfiguration();
     }
 
     /**
