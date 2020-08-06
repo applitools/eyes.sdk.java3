@@ -45,19 +45,19 @@ class EyesConnector extends EyesBase implements IEyesConnector, IBatchCloser {
     }
 
     public Future<?> getResource(URI url, String userAgent, String refererUrl, TaskListener<RGridResource> listener) {
-        return this.serverConnector.downloadResource(url, userAgent, refererUrl, listener);
+        return getServerConnector().downloadResource(url, userAgent, refererUrl, listener);
     }
 
     public Future<?> renderPutResource(RunningRender runningRender, RGridResource resource, String userAgent, TaskListener<Boolean> listener) {
-        return this.serverConnector.renderPutResource(runningRender, resource, userAgent, listener);
+        return getServerConnector().renderPutResource(runningRender, resource, userAgent, listener);
     }
 
     public List<RunningRender> render(RenderRequest... renderRequests) {
-        return this.serverConnector.render(renderRequests);
+        return getServerConnector().render(renderRequests);
     }
 
     public List<RenderStatusResults> renderStatusById(String... renderIds) {
-        return this.serverConnector.renderStatusById(renderIds);
+        return getServerConnector().renderStatusById(renderIds);
     }
 
     public MatchResult matchWindow(String resultImageURL, String domLocation, ICheckSettings checkSettings,
@@ -68,7 +68,7 @@ class EyesConnector extends EyesBase implements IEyesConnector, IBatchCloser {
             checkSettings.fully();
         }
 
-        MatchWindowTask matchWindowTask = new MatchWindowTask(this.logger, this.serverConnector, this.runningSession, getConfigurationInstance().getMatchTimeout(), this);
+        MatchWindowTask matchWindowTask = new MatchWindowTask(this.logger, getServerConnector(), this.runningSession, getConfigurationInstance().getMatchTimeout(), this);
         ImageMatchSettings imageMatchSettings = MatchWindowTask.createImageMatchSettings(checkSettingsInternal, this);
         String tag = checkSettingsInternal.getName();
         AppOutput appOutput = new AppOutput(tag, null, domLocation, resultImageURL, virtualViewport);
@@ -124,7 +124,7 @@ class EyesConnector extends EyesBase implements IEyesConnector, IBatchCloser {
 
     public void setRenderInfo(RenderingInfo renderInfo) {
         this.renderInfo = renderInfo;
-        this.serverConnector.setRenderingInfo(renderInfo);
+        getServerConnector().setRenderingInfo(renderInfo);
     }
 
     public void setUserAgent(String userAgent) {
@@ -225,6 +225,6 @@ class EyesConnector extends EyesBase implements IEyesConnector, IBatchCloser {
     }
 
     public void closeBatch(String batchId) {
-        this.serverConnector.closeBatch(batchId);
+        getServerConnector().closeBatch(batchId);
     }
 }

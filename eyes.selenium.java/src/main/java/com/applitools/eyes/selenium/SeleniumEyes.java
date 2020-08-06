@@ -448,7 +448,7 @@ public class SeleniumEyes extends EyesBase implements ISeleniumEyes, IBatchClose
 
         Region bBox = findBoundingBox(getRegions, checkSettings);
 
-        MatchWindowTask mwt = new MatchWindowTask(logger, serverConnector, runningSession, getConfigurationInstance().getMatchTimeout(), this);
+        MatchWindowTask mwt = new MatchWindowTask(logger, getServerConnector(), runningSession, getConfigurationInstance().getMatchTimeout(), this);
 
         ScaleProviderFactory scaleProviderFactory = updateScalingParams();
         FullPageCaptureAlgorithm algo = createFullPageCaptureAlgorithm(scaleProviderFactory);
@@ -815,7 +815,7 @@ public class SeleniumEyes extends EyesBase implements ISeleniumEyes, IBatchClose
 
     @Override
     public void closeBatch(String batchId) {
-        this.serverConnector.closeBatch(batchId);
+        this.getServerConnector().closeBatch(batchId);
     }
 
     /**
@@ -2099,7 +2099,7 @@ public class SeleniumEyes extends EyesBase implements ISeleniumEyes, IBatchClose
             this.runner.aggregateResult(results);
         }
         this.cachedAUTSessionId = null;
-        this.serverConnector.closeConnector();
+        getServerConnector().closeConnector();
         return results;
     }
 

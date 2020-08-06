@@ -1,3 +1,7 @@
+## [vNext]
+### Fixed
+- Agent ID was null in some cases. [Trello 2060](https://trello.com/c/zELwZYma)
+
 ## [3.173.0] - 2020-08-05
 ### Fixed
 - Try to send correct iOS device size when rendering fails. [Trello 2006](https://trello.com/c/a6l6gTf9)

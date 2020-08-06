@@ -160,10 +160,10 @@ public abstract class EyesBase implements IEyesBase{
     public Configuration setApiKey(String apiKey) {
         ArgumentGuard.notNull(apiKey, "apiKey");
         getConfigurationInstance().setApiKey(apiKey);
-        if (serverConnector == null) {
+        if (getServerConnector() == null) {
             throw new EyesException("server connector not set.");
         }
-        serverConnector.setApiKey(apiKey);
+        getServerConnector().setApiKey(apiKey);
         return this.getConfigurationInstance();
     }
 
@@ -171,10 +171,10 @@ public abstract class EyesBase implements IEyesBase{
      * @return The currently set API key or {@code null} if no key is set.
      */
     public String getApiKey() {
-        if (serverConnector == null) {
+        if (getServerConnector() == null) {
             throw new EyesException("server connector not set.");
         }
-        return serverConnector.getApiKey();
+        return getServerConnector().getApiKey();
     }
 
 
@@ -194,13 +194,13 @@ public abstract class EyesBase implements IEyesBase{
      *                  the default server.
      */
     public Configuration setServerUrl(URI serverUrl) {
-        if (serverConnector == null) {
+        if (getServerConnector() == null) {
             throw new EyesException("server connector not set.");
         }
         if (serverUrl == null) {
-            serverConnector.setServerUrl(getDefaultServerUrl());
+            getServerConnector().setServerUrl(getDefaultServerUrl());
         } else {
-            serverConnector.setServerUrl(serverUrl);
+            getServerConnector().setServerUrl(serverUrl);
         }
         return this.getConfigurationInstance();
     }
@@ -209,10 +209,10 @@ public abstract class EyesBase implements IEyesBase{
      * @return The URI of the eyes server.
      */
     public URI getServerUrl() {
-        if (serverConnector == null) {
+        if (getServerConnector() == null) {
             throw new EyesException("server connector not set.");
         }
-        return serverConnector.getServerUrl();
+        return getServerConnector().getServerUrl();
     }
 
     /**
@@ -221,11 +221,11 @@ public abstract class EyesBase implements IEyesBase{
      *                              If {@code null} then no proxy is set.
      */
     public Configuration setProxy(AbstractProxySettings abstractProxySettings) {
-        if (serverConnector == null) {
+        if (getServerConnector() == null) {
             throw new EyesException("server connector not set.");
         }
 
-        serverConnector.setProxy(abstractProxySettings);
+        getServerConnector().setProxy(abstractProxySettings);
         return getConfigurationInstance();
     }
 
@@ -234,10 +234,10 @@ public abstract class EyesBase implements IEyesBase{
      * or {@code null} if no proxy is set.
      */
     public AbstractProxySettings getProxy() {
-        if (serverConnector == null) {
+        if (getServerConnector() == null) {
             throw new EyesException("server connector not set.");
         }
-        return serverConnector.getProxy();
+        return getServerConnector().getProxy();
     }
 
     /**
@@ -498,7 +498,7 @@ public abstract class EyesBase implements IEyesBase{
 
             logSessionResultsAndThrowException(logger, throwEx, results);
 
-            results.setServerConnector(this.serverConnector);
+            results.setServerConnector(getServerConnector());
 
             return results;
         } finally {
@@ -1072,7 +1072,7 @@ public abstract class EyesBase implements IEyesBase{
 
         matchWindowTask = new MatchWindowTask(
                 logger,
-                serverConnector,
+                getServerConnector(),
                 runningSession,
                 getConfigurationInstance().getMatchTimeout(),
                 this,
@@ -1097,8 +1097,8 @@ public abstract class EyesBase implements IEyesBase{
     }
 
     private void logOpenBase() {
-        logger.log(String.format("Eyes server URL is '%s'", serverConnector.getServerUrl()));
-        logger.verbose(String.format("Timeout = '%d'", serverConnector.getTimeout()));
+        logger.log(String.format("Eyes server URL is '%s'", getServerConnector().getServerUrl()));
+        logger.verbose(String.format("Timeout = '%d'", getServerConnector().getTimeout()));
         logger.log(String.format("matchTimeout = '%d' ", getConfigurationInstance().getMatchTimeout()));
         logger.log(String.format("Default match settings = '%s' ", getConfigurationInstance().getDefaultMatchSettings()));
         logger.log(String.format("FailureReports = '%s' ", getConfigurationInstance().getFailureReports()));

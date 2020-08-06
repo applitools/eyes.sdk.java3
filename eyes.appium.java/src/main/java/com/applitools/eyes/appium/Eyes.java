@@ -393,7 +393,7 @@ public class Eyes extends EyesBase {
             return;
         }
 
-        MatchWindowTask mwt = new MatchWindowTask(logger, serverConnector, runningSession, getMatchTimeout(), this);
+        MatchWindowTask mwt = new MatchWindowTask(logger, getServerConnector(), runningSession, getMatchTimeout(), this);
         EyesScreenshot screenshot = getFullPageScreenshot();
         for (int i = 0; i < checkSettings.length; ++i) {
             if (((Hashtable<Integer, GetSimpleRegion>) getRegions).containsKey(i)) {
@@ -510,7 +510,7 @@ public class Eyes extends EyesBase {
                 throw e;
             }
         }
-        this.serverConnector.closeConnector();
+        getServerConnector().closeConnector();
         return results;
     }
 
@@ -832,9 +832,9 @@ public class Eyes extends EyesBase {
 
     private void initVisualLocatorProvider() {
         if (EyesDriverUtils.isAndroid(driver)) {
-            visualLocatorsProvider = new AndroidVisualLocatorProvider(logger, driver, serverConnector, getDevicePixelRatio(), configuration.getAppName(), debugScreenshotsProvider);
+            visualLocatorsProvider = new AndroidVisualLocatorProvider(logger, driver, getServerConnector(), getDevicePixelRatio(), configuration.getAppName(), debugScreenshotsProvider);
         } else if (EyesDriverUtils.isIOS(driver)) {
-            visualLocatorsProvider = new IOSVisualLocatorProvider(logger, driver, serverConnector, getDevicePixelRatio(), configuration.getAppName(), debugScreenshotsProvider);
+            visualLocatorsProvider = new IOSVisualLocatorProvider(logger, driver, getServerConnector(), getDevicePixelRatio(), configuration.getAppName(), debugScreenshotsProvider);
         } else {
             throw new Error("Could not find driver type for getting visual locator provider");
         }
