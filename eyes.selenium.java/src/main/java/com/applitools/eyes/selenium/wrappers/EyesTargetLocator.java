@@ -5,7 +5,6 @@ package com.applitools.eyes.selenium.wrappers;
 
 import com.applitools.eyes.*;
 import com.applitools.eyes.config.Configuration;
-import com.applitools.eyes.config.Feature;
 import com.applitools.eyes.positioning.PositionMemento;
 import com.applitools.eyes.positioning.PositionProvider;
 import com.applitools.eyes.selenium.Borders;
@@ -13,8 +12,8 @@ import com.applitools.eyes.selenium.SeleniumJavaScriptExecutor;
 import com.applitools.eyes.selenium.SizeAndBorders;
 import com.applitools.eyes.selenium.frames.Frame;
 import com.applitools.eyes.selenium.frames.FrameChain;
-import com.applitools.eyes.selenium.positioning.SeleniumScrollPositionProvider;
 import com.applitools.eyes.selenium.positioning.ScrollPositionProviderFactory;
+import com.applitools.eyes.selenium.positioning.SeleniumScrollPositionProvider;
 import com.applitools.utils.ArgumentGuard;
 import org.openqa.selenium.*;
 import org.openqa.selenium.remote.RemoteWebElement;
@@ -244,10 +243,9 @@ public class EyesTargetLocator implements WebDriver.TargetLocator {
             logger.verbose("Making preparations...");
             driver.getFrameChain().clear();
             logger.verbose("Done! Switching to default content...");
-            targetLocator.defaultContent();
-        } else if (!configuration.isFeatureActivated(Feature.NO_SWITCH_WITHOUT_FRAME_CHAIN)) {
-            targetLocator.defaultContent();
         }
+
+        targetLocator.defaultContent();
         logger.verbose("Done!");
         return driver;
     }
