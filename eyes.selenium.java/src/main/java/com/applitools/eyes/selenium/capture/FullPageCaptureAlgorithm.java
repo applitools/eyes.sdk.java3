@@ -24,18 +24,20 @@ public class FullPageCaptureAlgorithm {
     private final int waitBeforeScreenshots;
     private final DebugScreenshotsProvider debugScreenshotsProvider;
     private final EyesScreenshotFactory screenshotFactory;
-    private final PositionProvider originProvider;
     private final ScaleProviderFactory scaleProviderFactory;
     private final CutProvider cutProvider;
     private final int stitchingOverlap;
     private final ImageProvider imageProvider;
     private final ISizeAdjuster sizeAdjuster;
+    private final int maxHeight;
+    private final int maxArea;
 
     public FullPageCaptureAlgorithm(Logger logger, RegionPositionCompensation regionPositionCompensation,
                                     int waitBeforeScreenshots, DebugScreenshotsProvider debugScreenshotsProvider,
-                                    EyesScreenshotFactory screenshotFactory, PositionProvider originProvider,
+                                    EyesScreenshotFactory screenshotFactory,
                                     ScaleProviderFactory scaleProviderFactory, CutProvider cutProvider,
-                                    int stitchingOverlap, ImageProvider imageProvider, ISizeAdjuster sizeAdjuster) {
+                                    int stitchingOverlap, ImageProvider imageProvider, int maxHeight, int maxArea,
+                                    ISizeAdjuster sizeAdjuster) {
 
         ArgumentGuard.notNull(logger, "logger");
 
@@ -43,12 +45,13 @@ public class FullPageCaptureAlgorithm {
         this.waitBeforeScreenshots = waitBeforeScreenshots;
         this.debugScreenshotsProvider = debugScreenshotsProvider;
         this.screenshotFactory = screenshotFactory;
-        this.originProvider = originProvider;
         this.scaleProviderFactory = scaleProviderFactory;
         this.cutProvider = cutProvider;
         this.stitchingOverlap = stitchingOverlap;
         this.imageProvider = imageProvider;
         this.sizeAdjuster = sizeAdjuster != null ? sizeAdjuster : NullSizeAdjuster.getInstance();
+        this.maxHeight = maxHeight;
+        this.maxArea = maxArea;
 
         this.regionPositionCompensation =
                 regionPositionCompensation != null
@@ -71,7 +74,8 @@ public class FullPageCaptureAlgorithm {
      * @param positionProvider A provider of the scrolling implementation.
      * @return An image which represents the stitched region.
      */
-    public BufferedImage getStitchedRegion(Region region, Region fullarea, PositionProvider positionProvider) {
+    public BufferedImage getStitchedRegion(Region region, Region fullarea, PositionProvider positionProvider,
+                                           PositionProvider originProvider, RectangleSize stitchOffset) {
         ArgumentGuard.notNull(region, "region");
         ArgumentGuard.notNull(positionProvider, "positionProvider");
 
