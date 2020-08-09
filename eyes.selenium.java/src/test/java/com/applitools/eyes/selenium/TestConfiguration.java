@@ -61,12 +61,12 @@ public class TestConfiguration extends ReportingTestSuite {
     @Test
     public void testFeatures() {
         com.applitools.eyes.config.Configuration configuration = new com.applitools.eyes.config.Configuration();
-        Assert.assertFalse(configuration.isFeatureActivated(Feature.NO_SWITCH_WITHOUT_FRAME_CHAIN));
-        configuration.setFeatures(Feature.NO_SWITCH_WITHOUT_FRAME_CHAIN);
-        Assert.assertTrue(configuration.isFeatureActivated(Feature.NO_SWITCH_WITHOUT_FRAME_CHAIN));
+        Assert.assertFalse(configuration.isFeatureActivated(Feature.UNUSED));
+        configuration.setFeatures(Feature.UNUSED);
+        Assert.assertTrue(configuration.isFeatureActivated(Feature.UNUSED));
 
-        configuration.setFeatures(null, Feature.NO_SWITCH_WITHOUT_FRAME_CHAIN);
-        Assert.assertEquals(configuration.getFeatures(), Collections.singletonList(Feature.NO_SWITCH_WITHOUT_FRAME_CHAIN));
+        configuration.setFeatures(null, Feature.UNUSED);
+        Assert.assertEquals(configuration.getFeatures(), Collections.singletonList(Feature.UNUSED));
         Assert.assertFalse(configuration.isFeatureActivated(null));
     }
 }
