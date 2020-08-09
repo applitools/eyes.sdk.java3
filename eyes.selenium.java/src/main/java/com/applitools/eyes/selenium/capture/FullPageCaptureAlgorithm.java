@@ -202,7 +202,7 @@ public class FullPageCaptureAlgorithm {
 
         BufferedImage stitchedImage = new BufferedImage(fullarea.getWidth(), fullarea.getHeight(), BufferedImage.TYPE_4BYTE_ABGR);
         // Take screenshot and stitch for each screenshot part.
-        stitchScreenshot(originalStitchedState, positionProvider, screenshotParts, stitchedImage, scaleProvider.getScaleRatio(), scaledCutProvider, sizeRatio);
+        stitchScreenshot(stitchOffset, positionProvider, screenshotParts, stitchedImage, scaleProvider.getScaleRatio(), scaledCutProvider, sizeRatio);
 
         positionProvider.restoreState(originalStitchedState);
         originProvider.restoreState(originalPosition);
@@ -219,27 +219,27 @@ public class FullPageCaptureAlgorithm {
         return initialScreenshot;
     }
 
-    private void stitchScreenshot(PositionMemento originalStitchedState, PositionProvider stitchProvider,
+    private void stitchScreenshot(RectangleSize stitchOffset, PositionProvider stitchProvider,
                                   SubregionForStitching[] screenshotParts, BufferedImage stitchedImage, double scaleRatio,
                                   CutProvider scaledCutProvider, float sizeRatio) {
         //noinspection unused
         int index = 0;
         logger.verbose(String.format("enter: originalStitchedState: %s ; scaleRatio: %s",
-                originalStitchedState, scaleRatio));
+                stitchOffset, scaleRatio));
 
         for (SubregionForStitching partRegion : screenshotParts) {
             logger.verbose("Part: " + partRegion);
             // Scroll to the part's top/left
-            Point partRegionLocation = partRegion.getScrollTo();
-            partRegionLocation.translate(originalStitchedState.getX(), originalStitchedState.getY());
-            Location scrollPosition = new Location(Math.round(partRegionLocation.x * sizeRatio), Math.round(partRegionLocation.y * sizeRatio));
+            Point partAbsoluteLocationInCurrentFrame = partRegion.getScrollTo();
+            partAbsoluteLocationInCurrentFrame.translate(stitchOffset.getWidth(), stitchOffset.getHeight());
+            Location scrollPosition = new Location(Math.round(partAbsoluteLocationInCurrentFrame.x * sizeRatio), Math.round(partAbsoluteLocationInCurrentFrame.y * sizeRatio));
             Location originPosition = stitchProvider.setPosition(scrollPosition);
 
             int dx = scrollPosition.getX() - originPosition.getX();
             int dy = scrollPosition.getY() - originPosition.getY();
 
-            Point targetPosition = partRegion.getPastePhysicalLocation();
-            targetPosition.translate(dx, dy);
+            Point partPastePosition = partRegion.getPastePhysicalLocation();
+            partPastePosition.translate(dx, dy);
 
             // Actually taking the screenshot.
             try {
@@ -267,10 +267,10 @@ public class FullPageCaptureAlgorithm {
             //debugScreenshotsProvider.save(cutPart, "cutPart-" + originPosition.getX() + "_" + originPosition.getY());
             //debugScreenshotsProvider.save(croppedPart, "croppedPart-" + originPosition.getX() + "_" + originPosition.getY());
             //debugScreenshotsProvider.save(scaledPartImage, "scaledPartImage-" + originPosition.getX() + "_" + originPosition.getY());
-            debugScreenshotsProvider.save(scaledCroppedPartImage, "scaledCroppedPartImage-" + targetPosition.getX() + "_" + targetPosition.getY());
-            logger.verbose("pasting part at " + targetPosition);
+            debugScreenshotsProvider.save(scaledCroppedPartImage, "scaledCroppedPartImage-" + partPastePosition.getX() + "_" + partPastePosition.getY());
+            logger.verbose("pasting part at " + partPastePosition);
 
-            stitchedImage.getRaster().setRect(targetPosition.x, targetPosition.y, scaledCroppedPartImage.getData());
+            stitchedImage.getRaster().setRect(partPastePosition.x, partPastePosition.y, scaledCroppedPartImage.getData());
 
             //debugScreenshotsProvider.save(stitchedImage, "stitched" + index + "(" + targetPosition.toStringForFilename() + ")");
             index++;

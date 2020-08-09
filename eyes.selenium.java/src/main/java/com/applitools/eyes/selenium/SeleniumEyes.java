@@ -932,7 +932,6 @@ public class SeleniumEyes extends EyesBase implements ISeleniumEyes, IBatchClose
         elementBoundsInScreenshotCoordinates.offset(screenshotOffset);
         state.setEffectiveViewport(state.getEffectiveViewport().getIntersected(elementBoundsInScreenshotCoordinates));
 
-
         Region crop = computeCropRectangle(fullElementBounds, targetRegion);
         checkWindowBase(crop, checkSettingsInternal, driver.getCurrentUrl());
 
