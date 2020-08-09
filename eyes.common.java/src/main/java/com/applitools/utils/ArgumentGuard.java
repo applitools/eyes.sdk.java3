@@ -23,11 +23,11 @@ public class ArgumentGuard {
     }
 
     /**
-     * Fails if the input iterable has null elements.
+     * Fails if the input iterable contains null elements.
      * @param param     The input parameter.
      * @param paramName The input parameter name.
      */
-    public static <T> void notNullElement(Iterable<T> param, String paramName) throws IllegalArgumentException {
+    public static <T> void notContainsNull(Iterable<T> param, String paramName) throws IllegalArgumentException {
         notNull(param, paramName);
         for (T element : param) {
             if (element == null) {
@@ -37,13 +37,13 @@ public class ArgumentGuard {
     }
 
     /**
-     * Fails if the input array has null elements.
+     * Fails if the input array has contains elements.
      * @param param     The input parameter.
      * @param paramName The input parameter name.
      */
-    public static <T> void notNullElement(T[] param, String paramName) throws IllegalArgumentException {
+    public static <T> void notContainsNull(T[] param, String paramName) throws IllegalArgumentException {
         notNull(param, paramName);
-        notNullElement(Arrays.asList(param), paramName);
+        notContainsNull(Arrays.asList(param), paramName);
     }
 
     /**

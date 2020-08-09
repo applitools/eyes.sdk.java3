@@ -7,6 +7,8 @@ import com.applitools.eyes.utils.ReportingTestSuite;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
+import java.util.Collections;
+
 public class TestConfiguration extends ReportingTestSuite {
 
     public TestConfiguration() {
@@ -62,5 +64,9 @@ public class TestConfiguration extends ReportingTestSuite {
         Assert.assertFalse(configuration.isFeatureActivated(Feature.NO_SWITCH_WITHOUT_FRAME_CHAIN));
         configuration.setFeatures(Feature.NO_SWITCH_WITHOUT_FRAME_CHAIN);
         Assert.assertTrue(configuration.isFeatureActivated(Feature.NO_SWITCH_WITHOUT_FRAME_CHAIN));
+
+        configuration.setFeatures(null, Feature.NO_SWITCH_WITHOUT_FRAME_CHAIN);
+        Assert.assertEquals(configuration.getFeatures(), Collections.singletonList(Feature.NO_SWITCH_WITHOUT_FRAME_CHAIN));
+        Assert.assertFalse(configuration.isFeatureActivated(null));
     }
 }

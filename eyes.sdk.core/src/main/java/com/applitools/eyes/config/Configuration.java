@@ -691,11 +691,10 @@ public class Configuration implements IConfiguration {
      * Overrides existing features.
      */
     public void setFeatures(Feature feature, Feature... features) {
-        ArgumentGuard.notNull(feature, "feature");
-        ArgumentGuard.notNullElement(features, "features");
         this.features.clear();
         this.features.add(feature);
         this.features.addAll(Arrays.asList(features));
+        this.features.remove(null);
     }
 
     public List<Feature> getFeatures() {
@@ -703,7 +702,6 @@ public class Configuration implements IConfiguration {
     }
 
     public boolean isFeatureActivated(Feature feature) {
-        ArgumentGuard.notNull(feature, "feature");
         return features.contains(feature);
     }
 }
