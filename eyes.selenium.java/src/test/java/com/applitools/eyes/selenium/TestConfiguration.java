@@ -59,8 +59,8 @@ public class TestConfiguration extends ReportingTestSuite {
     @Test
     public void testFeatures() {
         com.applitools.eyes.config.Configuration configuration = new com.applitools.eyes.config.Configuration();
-        Assert.assertFalse(configuration.isFeatureActivated(Feature.OPTIMIZE_TEST));
-        configuration.activateFeatures(Feature.OPTIMIZE_TEST);
-        Assert.assertTrue(configuration.isFeatureActivated(Feature.OPTIMIZE_TEST));
+        Assert.assertFalse(configuration.isFeatureActivated(Feature.NO_SWITCH_WITHOUT_FRAME_CHAIN));
+        configuration.setFeatures(Feature.NO_SWITCH_WITHOUT_FRAME_CHAIN);
+        Assert.assertTrue(configuration.isFeatureActivated(Feature.NO_SWITCH_WITHOUT_FRAME_CHAIN));
     }
 }

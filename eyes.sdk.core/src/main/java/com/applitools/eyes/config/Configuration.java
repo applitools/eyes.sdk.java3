@@ -690,12 +690,16 @@ public class Configuration implements IConfiguration {
      * Sets features to for the Eyes test.
      * Overrides existing features.
      */
-    public void activateFeatures(Feature feature, Feature... features) {
+    public void setFeatures(Feature feature, Feature... features) {
         ArgumentGuard.notNull(feature, "feature");
         ArgumentGuard.notNullElement(features, "features");
         this.features.clear();
         this.features.add(feature);
         this.features.addAll(Arrays.asList(features));
+    }
+
+    public List<Feature> getFeatures() {
+        return new ArrayList<>(features);
     }
 
     public boolean isFeatureActivated(Feature feature) {

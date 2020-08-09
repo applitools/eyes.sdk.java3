@@ -245,7 +245,7 @@ public class EyesTargetLocator implements WebDriver.TargetLocator {
             driver.getFrameChain().clear();
             logger.verbose("Done! Switching to default content...");
             targetLocator.defaultContent();
-        } else if (!configuration.isFeatureActivated(Feature.OPTIMIZE_TEST)) {
+        } else if (!configuration.isFeatureActivated(Feature.NO_SWITCH_WITHOUT_FRAME_CHAIN)) {
             targetLocator.defaultContent();
         }
         logger.verbose("Done!");

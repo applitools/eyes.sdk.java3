@@ -1,5 +1,5 @@
 package com.applitools.eyes.config;
 
 public enum Feature {
-    OPTIMIZE_TEST
+    NO_SWITCH_WITHOUT_FRAME_CHAIN
 }
