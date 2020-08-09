@@ -15,7 +15,6 @@ import com.applitools.eyes.exceptions.TestFailedException;
 import com.applitools.eyes.fluent.GetSimpleRegion;
 import com.applitools.eyes.fluent.ICheckSettingsInternal;
 import com.applitools.eyes.fluent.SimpleRegionByRectangle;
-import com.applitools.eyes.positioning.PositionMemento;
 import com.applitools.eyes.positioning.PositionProvider;
 import com.applitools.eyes.scaling.FixedScaleProviderFactory;
 import com.applitools.eyes.scaling.NullScaleProvider;
@@ -537,7 +536,7 @@ public class SeleniumEyes extends EyesBase implements ISeleniumEyes, IBatchClose
             AppOutput appOutput = new AppOutput(name, ImageUtils.encodeAsPng(subScreenshot.getImage()), null, null);
             AppOutputWithScreenshot appOutputWithScreenshot = new AppOutputWithScreenshot(appOutput, subScreenshot, location);
             MatchResult matchResult = mwt.performMatch(new ArrayList<Trigger>(), appOutputWithScreenshot, name, false,
-                    checkSettingsInternal, ims, this, source);
+                    ims, this, source);
 
             logger.verbose("matchResult.asExcepted: " + matchResult.getAsExpected());
         }
@@ -661,7 +660,7 @@ public class SeleniumEyes extends EyesBase implements ISeleniumEyes, IBatchClose
             seleniumCheckTarget.setState(state);
             Boolean forceFullPageScreenshot = getConfigurationInstance().getForceFullPageScreenshot();
             Boolean fully = checkSettingsInternal.getStitchContent();
-            state.setStitchContent(fully || forceFullPageScreenshot);
+            state.setStitchContent((fully == null ? false : fully) || (forceFullPageScreenshot == null ? false : forceFullPageScreenshot));
 
             // Ensure frame is not used as a region
             ((SeleniumCheckSettings) checkSettings).sanitizeSettings(logger, driver, state.isStitchContent());

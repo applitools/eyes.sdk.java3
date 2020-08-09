@@ -9,10 +9,10 @@ public class CheckState {
     private WebElement targetElementInternal;
     private boolean stitchContent;
     private PositionProvider stitchPositionProvider;
-    private Region effectiveViewport;
-    private Region fullRegion;
+    private Region effectiveViewport = Region.EMPTY;
+    private Region fullRegion = Region.EMPTY;
     private PositionProvider originPositionProvider = new NullPositionProvider();
-    private RectangleSize stitchOffset;
+    private RectangleSize stitchOffset = RectangleSize.EMPTY;
 
     public WebElement getTargetElementInternal() {
         return targetElementInternal;

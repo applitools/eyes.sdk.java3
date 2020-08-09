@@ -40,7 +40,7 @@ public class FrameState {
                 "var el=arguments[0]; return el.style.transform+'#'+el.scrollLeft+';'+el.scrollTop+'#'+el.style.overflow",
                 scrolledElement);
 
-        String[] datums = data.split("#");
+        String[] datums = data.split("#", -1);
         String cssTransform = datums[0];
         Location scrollPosition = EyesDriverUtils.parseLocationString(datums[1]);
         String overflow = datums[2];

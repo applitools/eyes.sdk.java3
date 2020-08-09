@@ -703,7 +703,7 @@ public abstract class EyesBase implements IEyesBase {
     /**
      * Takes a snapshot of the application under test and matches it with the
      * expected output.
-     * @param region The region to check or null for the entire window.
+     * @param region       The region to check or null for the entire window.
      * @param tag          An optional tag to be associated with the snapshot.
      * @param retryTimeout The amount of time to retry matching in milliseconds or a negative
      *                     value to use the default retry timeout.
@@ -728,9 +728,9 @@ public abstract class EyesBase implements IEyesBase {
     /**
      * Takes a snapshot of the application under test and matches it with the
      * expected output.
-     * @param region The region to check or null for the entire window.
-     * @param checkSettings  The settings to use.
-     * @param source       A string representing the source of the checkpoint.
+     * @param region        The region to check or null for the entire window.
+     * @param checkSettings The settings to use.
+     * @param source        A string representing the source of the checkpoint.
      * @return The result of matching the output with the expected output.
      * @throws TestFailedException Thrown if a mismatch is detected and immediate failure reports are enabled.
      */
@@ -756,7 +756,6 @@ public abstract class EyesBase implements IEyesBase {
         }
 
         ArgumentGuard.isValidState(getIsOpen(), "Eyes not open");
-        ArgumentGuard.notNull(region, "region");
 
         ensureRunningSession();
 
@@ -894,8 +893,7 @@ public abstract class EyesBase implements IEyesBase {
             public AppOutputWithScreenshot getAppOutput(
                     Region region,
                     ICheckSettingsInternal checkSettingsInternal, ImageMatchSettings imageMatchSettings) {
-                // FIXME - If we use compression here it hurts us later (because of another screenshot order).
-                return getAppOutputWithScreenshot(region, null);
+                return getAppOutputWithScreenshot(region, null, imageMatchSettings);
             }
         };
 
@@ -1055,7 +1053,7 @@ public abstract class EyesBase implements IEyesBase {
                     @Override
                     public AppOutputWithScreenshot getAppOutput(Region region,
                                                                 ICheckSettingsInternal checkSettingsInternal, ImageMatchSettings imageMatchSettings) {
-                        return getAppOutputWithScreenshot(region, checkSettingsInternal);
+                        return getAppOutputWithScreenshot(region, checkSettingsInternal, imageMatchSettings);
                     }
                 }
         );
@@ -1365,29 +1363,27 @@ public abstract class EyesBase implements IEyesBase {
      * @param region The region of the screenshot which will be set in the application output.
      * @return The updated app output and screenshot.
      */
-    private AppOutputWithScreenshot getAppOutputWithScreenshot(Region region, ICheckSettingsInternal checkSettingsInternal) {
+    private AppOutputWithScreenshot getAppOutputWithScreenshot(Region region, ICheckSettingsInternal checkSettingsInternal, ImageMatchSettings imageMatchSettings) {
         logger.verbose("getting screenshot...");
         // Getting the screenshot (abstract function implemented by each SDK).
         EyesScreenshot screenshot = getScreenshot(region, checkSettingsInternal);
+        byte[] screenshotBytes = null;
         logger.verbose("Done getting screenshot!");
-
-        // Cropping by region if necessary
-        Location location = null;
-        if (!region.isSizeEmpty()) {
-            location = region.getLocation();
-            screenshot = getSubScreenshot(screenshot, region, checkSettingsInternal);
-            debugScreenshotsProvider.save(screenshot.getImage(), "SUB_SCREENSHOT");
+        String domUrl = null;
+        if (screenshot != null) {
+            logger.verbose("Getting image bytes (encoded as PNG)...");
+            BufferedImage screenshotImage = screenshot.getImage();
+            screenshotBytes = ImageUtils.encodeAsPng(screenshotImage);
+            domUrl = screenshot.domUrl;
         }
 
-        logger.verbose("Getting image bytes (encoded as PNG)...");
-        BufferedImage screenshotImage = screenshot.getImage();
-        byte[] screenshotBytes = ImageUtils.encodeAsPng(screenshotImage);
+        MatchWindowTask.collectRegions(this, screenshot, checkSettingsInternal, imageMatchSettings);
 
         logger.verbose("Done! Getting title...");
         String title = getTitle();
         logger.verbose("Done!");
 
-        AppOutputWithScreenshot result = new AppOutputWithScreenshot(new AppOutput(title, screenshotBytes, screenshot.domUrl, null), screenshot, location);
+        AppOutputWithScreenshot result = new AppOutputWithScreenshot(new AppOutput(title, screenshotBytes, domUrl, null), screenshot, null);
         logger.verbose("Done!");
         return result;
     }
