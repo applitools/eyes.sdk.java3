@@ -442,4 +442,13 @@
             </class>
         </classes>
     </test>
+    <test name="TestEyesTargetLocator">
+        <classes>
+            <class name="com.applitools.eyes.selenium.wrappers.TestEyesTargetLocator">
+                <methods>
+                    <include name="testDefaultContentFeature"/>
+                </methods>
+            </class>
+        </classes>
+    </test>
 </suite>

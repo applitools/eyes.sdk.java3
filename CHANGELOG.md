@@ -4,6 +4,7 @@
 - Connectivity modules now get the correct log handler. [Trello 1803](https://trello.com/c/1lavL4Mg)
 ### Added
 - Supporting feature flags in the configuration. [Trello 2032](https://trello.com/c/tOKrAbIk)
+- New feature flag NO_SWITCH_WITHOUT_FRAME_CHAIN. [Trello 2032](https://trello.com/c/tOKrAbIk)
 
 ## [3.173.0] - 2020-08-05
 ### Fixed

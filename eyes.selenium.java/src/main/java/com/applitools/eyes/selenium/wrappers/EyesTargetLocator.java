@@ -1,9 +1,8 @@
-/*
- * Applitools SDK for Selenium integration.
- */
 package com.applitools.eyes.selenium.wrappers;
 
 import com.applitools.eyes.*;
+import com.applitools.eyes.config.Configuration;
+import com.applitools.eyes.config.Feature;
 import com.applitools.eyes.positioning.PositionMemento;
 import com.applitools.eyes.positioning.PositionProvider;
 import com.applitools.eyes.selenium.Borders;
@@ -30,6 +29,7 @@ public class EyesTargetLocator implements WebDriver.TargetLocator {
     private SeleniumScrollPositionProvider scrollPosition;
     private final WebDriver.TargetLocator targetLocator;
     private final SeleniumJavaScriptExecutor jsExecutor;
+    private final Configuration configuration;
 
     private PositionMemento defaultContentPositionMemento;
 
@@ -45,6 +45,7 @@ public class EyesTargetLocator implements WebDriver.TargetLocator {
         this.logger = logger;
         this.targetLocator = targetLocator;
         this.jsExecutor = new SeleniumJavaScriptExecutor(driver);
+        this.configuration = driver.getEyes().getConfiguration();
     }
 
     /**
@@ -240,8 +241,11 @@ public class EyesTargetLocator implements WebDriver.TargetLocator {
             logger.verbose("Making preparations...");
             driver.getFrameChain().clear();
             logger.verbose("Done! Switching to default content...");
+            targetLocator.defaultContent();
+        } else if (!configuration.isFeatureActivated(Feature.NO_SWITCH_WITHOUT_FRAME_CHAIN)) {
+            targetLocator.defaultContent();
         }
-        targetLocator.defaultContent();
+
         logger.verbose("Done!");
         return driver;
     }
