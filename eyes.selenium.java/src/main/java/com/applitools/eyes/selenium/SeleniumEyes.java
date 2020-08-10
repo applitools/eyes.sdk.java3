@@ -664,6 +664,7 @@ public class SeleniumEyes extends EyesBase implements ISeleniumEyes, IBatchClose
 
             // Ensure frame is not used as a region
             ((SeleniumCheckSettings) checkSettings).sanitizeSettings(logger, driver, state.isStitchContent());
+            seleniumCheckTarget.init(logger, driver);
 
             Region targetRegion = checkSettingsInternal.getTargetRegion();
 
@@ -685,7 +686,9 @@ public class SeleniumEyes extends EyesBase implements ISeleniumEyes, IBatchClose
 
             FrameChain frameChainAfterSwitchToTarget = driver.getFrameChain().clone();
 
-            state.setEffectiveViewport(computeEffectiveViewport(frameChainAfterSwitchToTarget, this.getViewportSize()));
+            RectangleSize viewportSize = this.effectiveViewport.getSize();
+            Region effectiveViewport = computeEffectiveViewport(frameChainAfterSwitchToTarget, viewportSize);
+            state.setEffectiveViewport(effectiveViewport);
             // new Rectangle(Point.Empty, viewportSize_);
             WebElement targetElement = getTargetElementFromSettings(seleniumCheckTarget);
 
@@ -893,13 +896,13 @@ public class SeleniumEyes extends EyesBase implements ISeleniumEyes, IBatchClose
         Location originalElementLocation = elementBounds.getLocation();
         elementBounds = bringRegionToView(elementBounds, state.getEffectiveViewport().getLocation());
 
-        Region fullElementBounds = elementBounds;
+        Region fullElementBounds = new Region(elementBounds);
         fullElementBounds.setWidth(Math.max(fullElementBounds.getWidth(), scrollSize.getWidth()));
         fullElementBounds.setHeight(Math.max(fullElementBounds.getHeight(), scrollSize.getHeight()));
         FrameChain currentFrameChain = driver.getFrameChain().clone();
         Location screenshotOffset = getFrameChainOffset(currentFrameChain);
         logger.verbose("screenshotOffset: " + screenshotOffset);
-        fullElementBounds.offset(screenshotOffset);
+        fullElementBounds = fullElementBounds.offset(screenshotOffset);
 
         state.setFullRegion(fullElementBounds);
 
@@ -927,9 +930,9 @@ public class SeleniumEyes extends EyesBase implements ISeleniumEyes, IBatchClose
         }
 
         // 2. Intersect the element and the effective viewport
-        Region elementBoundsInScreenshotCoordinates = elementBounds;
-        elementBoundsInScreenshotCoordinates.offset(screenshotOffset);
-        state.setEffectiveViewport(state.getEffectiveViewport().getIntersected(elementBoundsInScreenshotCoordinates));
+        Region elementBoundsInScreenshotCoordinates = elementBounds.offset(screenshotOffset);
+        Region intersectedViewport = state.getEffectiveViewport().getIntersected(elementBoundsInScreenshotCoordinates);
+        state.setEffectiveViewport(intersectedViewport);
 
         Region crop = computeCropRectangle(fullElementBounds, targetRegion);
         checkWindowBase(crop, checkSettingsInternal, driver.getCurrentUrl());
@@ -950,7 +953,7 @@ public class SeleniumEyes extends EyesBase implements ISeleniumEyes, IBatchClose
     private Location getFrameChainOffset(FrameChain frameChain) {
         Location offset = Location.ZERO;
         for (Frame frame : frameChain) {
-            offset.offset(frame.getLocation());
+            offset = offset.offset(frame.getLocation());
         }
         return offset;
     }
@@ -1027,14 +1030,14 @@ public class SeleniumEyes extends EyesBase implements ISeleniumEyes, IBatchClose
         }
         Location offset = Location.ZERO;
         for (Frame frame : frameChain) {
-            offset.offset(frame.getLocation());
+            offset = offset.offset(frame.getLocation());
             Region frameViewport = new Region(offset, frame.getInnerSize());
             viewport.intersect(frameViewport);
             Region frameSreInnerBounds = frame.getScrollRootElementInnerBounds();
             if (frameSreInnerBounds.isSizeEmpty()) {
                 continue;
             }
-            frameSreInnerBounds.offset(offset);
+            frameSreInnerBounds = frameSreInnerBounds.offset(offset);
             viewport.intersect(frameSreInnerBounds);
         }
         return viewport;
