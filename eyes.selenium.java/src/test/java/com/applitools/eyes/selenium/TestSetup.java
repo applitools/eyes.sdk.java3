@@ -106,7 +106,9 @@ public abstract class TestSetup extends ReportingTestSuite implements ITest {
     protected String platform;
     protected boolean forceFPS;
 
-    EyesRunner getRunner() { return this.runner; }
+    EyesRunner getRunner() {
+        return this.runner;
+    }
 
     @BeforeClass(alwaysRun = true)
     public void OneTimeSetUp() {
@@ -158,12 +160,11 @@ public abstract class TestSetup extends ReportingTestSuite implements ITest {
         getTestData().expectedFloatingRegions = new HashSet<>(Arrays.asList(expectedFloatingsRegions));
     }
 
-    public void addExpectedProperty(String propertyName, Object expectedValue)
-    {
+    public void addExpectedProperty(String propertyName, Object expectedValue) {
         Map<String, Object> expectedProps = getTestData().expectedProperties;
         expectedProps.put(propertyName, expectedValue);
     }
-    
+
     void beforeMethod(String testName) {
         // Initialize the eyes SDK and set your private API key.
         this.testName = testName + " " + options.getBrowserName() + " (" + this.mode + ")";
@@ -173,8 +174,7 @@ public abstract class TestSetup extends ReportingTestSuite implements ITest {
 
         if (this.runner instanceof VisualGridRunner) {
             testName += "_VG";
-        }
-        else if (this.stitchMode == StitchMode.SCROLL) {
+        } else if (this.stitchMode == StitchMode.SCROLL) {
             testName += "_Scroll";
         }
 
@@ -214,7 +214,13 @@ public abstract class TestSetup extends ReportingTestSuite implements ITest {
         //string userProfile = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
         driver.get(testedPageUrl);
         eyes.getLogger().log(testName + ": " + TestDataProvider.batchInfo.getName());
-
+        if (useVisualGrid) {
+            try {
+                Thread.sleep(2000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
         testData.setEyesDriver(driver);
         testData.setWebDriver(webDriver);
     }
@@ -237,15 +243,17 @@ public abstract class TestSetup extends ReportingTestSuite implements ITest {
         return eyes;
     }
 
-    protected void beforeOpen(Eyes eyes){};
+    protected void beforeOpen(Eyes eyes) {
+    }
+
+    ;
 
     @Override
     public String getTestName() {
         return testName;
     }
 
-    protected void setExpectedAccessibilityRegions(AccessibilityRegionByRectangle[] accessibilityRegions)
-    {
+    protected void setExpectedAccessibilityRegions(AccessibilityRegionByRectangle[] accessibilityRegions) {
         this.getTestData().expectedAccessibilityRegions = new HashSet<>(Arrays.asList(accessibilityRegions));
     }
 

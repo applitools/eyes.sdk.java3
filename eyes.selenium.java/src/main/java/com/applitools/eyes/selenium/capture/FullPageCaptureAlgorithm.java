@@ -87,6 +87,8 @@ public class FullPageCaptureAlgorithm {
         PositionMemento originalStitchedState = positionProvider.getState();
         logger.verbose("region size: " + region);
 
+        originProvider.setPosition(Location.ZERO);
+
         try {
             Thread.sleep(waitBeforeScreenshots);
         } catch (InterruptedException e) {
