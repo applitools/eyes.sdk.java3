@@ -2,6 +2,8 @@
 ### Fixed
 - Agent ID was null in some cases. [Trello 2060](https://trello.com/c/zELwZYma)
 - Connectivity modules now get the correct log handler. [Trello 1803](https://trello.com/c/1lavL4Mg)
+### Updated
+- Moved `AccessibilityStatus` enum to its own file. [Trello 2040](https://trello.com/c/ujY0T84R)
 ### Added
 - Supporting feature flags in the configuration. [Trello 2032](https://trello.com/c/tOKrAbIk)
 - New feature flag NO_SWITCH_WITHOUT_FRAME_CHAIN. [Trello 2032](https://trello.com/c/tOKrAbIk)

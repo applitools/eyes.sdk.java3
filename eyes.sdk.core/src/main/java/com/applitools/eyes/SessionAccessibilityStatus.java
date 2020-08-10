@@ -3,10 +3,6 @@ package com.applitools.eyes;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class SessionAccessibilityStatus {
-    public enum AccessibilityStatus {
-        Passed,
-        Failed
-    }
 
     @JsonProperty("status")
     private AccessibilityStatus status;
