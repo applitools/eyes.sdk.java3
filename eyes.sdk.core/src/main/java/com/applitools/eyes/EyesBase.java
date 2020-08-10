@@ -1214,7 +1214,7 @@ public abstract class EyesBase implements IEyesBase {
         Location cursorInScreenshot = new Location(cursor);
         // First we need to getting the cursor's coordinates relative to the
         // context (and not to the control).
-        cursorInScreenshot.offset(control.getLocation());
+        cursorInScreenshot = cursorInScreenshot.offset(control.getLocation());
         try {
             cursorInScreenshot = lastScreenshot.getLocationInScreenshot(
                     cursorInScreenshot, CoordinatesType.CONTEXT_RELATIVE);
@@ -1231,7 +1231,7 @@ public abstract class EyesBase implements IEyesBase {
         // the control.
         if (!controlScreenshotIntersect.isSizeEmpty()) {
             Location l = controlScreenshotIntersect.getLocation();
-            cursorInScreenshot.offset(-l.getX(), -l.getY());
+            cursorInScreenshot = cursorInScreenshot.offset(-l.getX(), -l.getY());
         }
 
         Trigger trigger = new MouseTrigger(action, controlScreenshotIntersect, cursorInScreenshot);

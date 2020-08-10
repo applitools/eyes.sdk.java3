@@ -55,8 +55,7 @@ public class VGRegion implements IRegion{
     @Override
     public Region offset(int dx, int dy) {
         Region r = getRegion();
-        r.offset(x, y);
-        return new Region(r);
+        return r.offset(x, y);
     }
 
     @Override

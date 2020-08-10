@@ -784,7 +784,7 @@ public class SeleniumEyes extends EyesBase implements ISeleniumEyes, IBatchClose
             state.setFullRegion(new Region(state.getEffectiveViewport().getLocation(), currentSREScrollSize));
         } else {
             Location visualOffset = getFrameChainOffset(currentFrameChain);
-            targetRegion.offset(visualOffset);
+            targetRegion = targetRegion.offset(visualOffset);
         }
         checkWindowBase(targetRegion, checkSettingsInternal, driver.getCurrentUrl());
     }
@@ -810,13 +810,13 @@ public class SeleniumEyes extends EyesBase implements ISeleniumEyes, IBatchClose
         Region bounds = EyesRemoteWebElement.getClientBounds(targetElement, driver, logger);
 
         Location visualOffset = getFrameChainOffset(currentFrameChain);
-        bounds.offset(visualOffset);
+        bounds = bounds.offset(visualOffset);
         WebElement currentFrameSRE = getCurrentFrameScrollRootElement();
         PositionProvider currentFramePositionProvider = getPositionProviderForScrollRootElement(currentFrameSRE);
         Location currentFramePosition = currentFramePositionProvider.getCurrentPosition();
-        bounds.offset(currentFramePosition);
+        bounds = bounds.offset(currentFramePosition);
         Location actualFramePosition = currentFramePositionProvider.setPosition(bounds.getLocation());
-        bounds.offset(-actualFramePosition.getX(), -actualFramePosition.getY());
+        bounds = bounds.offset(-actualFramePosition.getX(), -actualFramePosition.getY());
 
         EyesTargetLocator switchTo = (EyesTargetLocator) driver.switchTo();
         FrameChain fcClone = currentFrameChain.clone();
@@ -827,9 +827,9 @@ public class SeleniumEyes extends EyesBase implements ISeleniumEyes, IBatchClose
             currentFrameSRE = getCurrentFrameScrollRootElement();
             currentFramePositionProvider = getPositionProviderForScrollRootElement(currentFrameSRE);
             currentFramePosition = currentFramePositionProvider.getCurrentPosition();
-            bounds.offset(currentFramePosition);
+            bounds = bounds.offset(currentFramePosition);
             actualFramePosition = currentFramePositionProvider.setPosition(bounds.getLocation());
-            bounds.offset(-actualFramePosition.getX(), -actualFramePosition.getY());
+            bounds = bounds.offset(-actualFramePosition.getX(), -actualFramePosition.getY());
         }
 
         switchTo.frames(currentFrameChain);
@@ -944,8 +944,7 @@ public class SeleniumEyes extends EyesBase implements ISeleniumEyes, IBatchClose
         if (cropRect == null) return null;
         Region crop = new Region(fullRect);
         Location cropLocation = crop.getLocation();
-        Region cropRectClone = new Region(cropRect);
-        cropRectClone.offset(cropLocation);
+        Region cropRectClone = cropRect.offset(cropLocation);
         crop.intersect(cropRectClone);
         return crop;
     }

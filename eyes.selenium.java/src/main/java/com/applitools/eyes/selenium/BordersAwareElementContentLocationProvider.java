@@ -35,7 +35,7 @@ public class BordersAwareElementContentLocationProvider {
         int leftBorderWidth = getPropertyValue(logger, element, "border-left-width");
         int topBorderWidth = getPropertyValue(logger, element, "border-top-width");
 
-        Location contentLocation = new Location(location).offset(leftBorderWidth, topBorderWidth);
+        Location contentLocation = location.offset(leftBorderWidth, topBorderWidth);
         logger.verbose("Done!");
         return contentLocation;
     }

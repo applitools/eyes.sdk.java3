@@ -99,7 +99,7 @@ public class EyesImagesScreenshot extends EyesScreenshot {
         switch (from) {
             case SCREENSHOT_AS_IS:
                 if (to == CoordinatesType.CONTEXT_RELATIVE) {
-                    result.offset(bounds.getLeft(), bounds.getTop());
+                    result = result.offset(bounds.getLeft(), bounds.getTop());
                 } else {
                     throw new CoordinatesTypeConversionException(from, to);
                 }
@@ -107,7 +107,7 @@ public class EyesImagesScreenshot extends EyesScreenshot {
 
             case CONTEXT_RELATIVE:
                 if (to == CoordinatesType.SCREENSHOT_AS_IS) {
-                    result.offset(-bounds.getLeft(), -bounds.getTop());
+                    result = result.offset(-bounds.getLeft(), -bounds.getTop());
                 } else {
                     throw new CoordinatesTypeConversionException(from, to);
                 }

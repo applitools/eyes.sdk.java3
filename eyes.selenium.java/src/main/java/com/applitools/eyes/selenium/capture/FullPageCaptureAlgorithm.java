@@ -162,7 +162,7 @@ public class FullPageCaptureAlgorithm {
         }
 
         Region scaledCroppedSourceRect = cutProvider.toRegion(sourceRegion.getSize());
-        scaledCroppedSourceRect.offset(sourceRegion.getLeft(), sourceRegion.getTop());
+        scaledCroppedSourceRect = scaledCroppedSourceRect.offset(sourceRegion.getLeft(), sourceRegion.getTop());
         Rectangle scaledCroppedSourceRegion = new Rectangle(
                 (int) Math.ceil(scaledCroppedSourceRect.getLeft() / pixelRatio),
                 (int) Math.ceil(scaledCroppedSourceRect.getTop() / pixelRatio),
