@@ -962,7 +962,7 @@ public class SeleniumEyes extends EyesBase implements ISeleniumEyes, IBatchClose
         PositionProvider currentFramePositionProvider = PositionProviderFactory.getPositionProvider(
                 logger, getConfigurationInstance().getStitchMode(), jsExecutor, currentFrameSRE, userAgent);
         Location actualFramePosition = currentFramePositionProvider.setPosition(bounds.getLocation().offset(-viewportLocation.getX(), -viewportLocation.getY()));
-        bounds.setLocation(bounds.getLocation().offset(-actualFramePosition.getX(), -actualFramePosition.getY()));
+        bounds = bounds.offset(-actualFramePosition.getX(), -actualFramePosition.getY());
         return bounds;
     }
 

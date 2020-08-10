@@ -200,6 +200,8 @@ public class FullPageCaptureAlgorithm {
                     regionInScreenshot.getWidth(), regionInScreenshot.getHeight());
         }
 
+        fullarea = coerceImageSize(fullarea);
+
         SubregionForStitching[] screenshotParts = fullarea.getSubRegions(screenshotPartSize, stitchingOverlap, pixelRatio, rectInScreenshot, logger);
 
         BufferedImage stitchedImage = new BufferedImage(fullarea.getWidth(), fullarea.getHeight(), BufferedImage.TYPE_4BYTE_ABGR);
@@ -210,6 +212,31 @@ public class FullPageCaptureAlgorithm {
         originProvider.restoreState(originalPosition);
 
         return stitchedImage;
+    }
+
+    private Region coerceImageSize(Region fullarea) {
+        if (fullarea.getHeight() < maxHeight && fullarea.getArea() < maxArea)
+        {
+            logger.verbose("full area fits server limits.");
+            return fullarea;
+        }
+
+        if (maxArea == 0 || maxHeight == 0)
+        {
+            logger.verbose("server limits unspecified.");
+            return fullarea;
+        }
+
+        int trimmedHeight = Math.min(maxArea / fullarea.getWidth(), maxHeight);
+        Region newRegion = new Region(fullarea.getLeft(), fullarea.getTop(), fullarea.getWidth(), trimmedHeight, fullarea.getCoordinatesType());
+        if (newRegion.isSizeEmpty())
+        {
+            logger.verbose("empty region after coerce. returning original.");
+            return fullarea;
+        }
+        logger.verbose("coerced region: " + newRegion);
+        return newRegion;
+
     }
 
     private BufferedImage cropScreenshot(BufferedImage initialScreenshot, Region regionInScreenshot) {
