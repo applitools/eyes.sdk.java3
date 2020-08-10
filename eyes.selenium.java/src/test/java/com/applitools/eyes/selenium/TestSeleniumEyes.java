@@ -125,7 +125,9 @@ public class TestSeleniumEyes extends ReportingTestSuite {
         eyes.setDebugScreenshotProvider(new DebugScreenshotsProvider() {
             @Override
             public void save(BufferedImage image, String suffix) {
-                screenshots[0] = image;
+                if (suffix.equals("stitched")) {
+                    screenshots[0] = image;
+                }
             }
         });
 
