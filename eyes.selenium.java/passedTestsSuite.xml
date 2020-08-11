@@ -362,11 +362,11 @@
     </test>
     <test name="TestDefaultRootElement" parallel="methods">
         <parameter name="dont_run"
-                   value="testBodyGreaterThanHtml+VG"/>
+                   value="TestCheckElementFullyOnBottomAfterScroll+VG"/>
         <classes>
             <class name="com.applitools.eyes.selenium.TestDefaultRootElement">
                 <methods>
-                    <include name="testBodyGreaterThanHtml"/>
+                    <include name="TestCheckElementFullyOnBottomAfterScroll"/>
                 </methods>
             </class>
         </classes>

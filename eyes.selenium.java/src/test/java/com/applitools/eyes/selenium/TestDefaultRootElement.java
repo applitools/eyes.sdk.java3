@@ -19,7 +19,7 @@ public class TestDefaultRootElement extends TestSetup {
     }
 
     @Test
-    public void testBodyGreaterThanHtml() {
+    public void TestCheckElementFullyOnBottomAfterScroll() {
         ((JavascriptExecutor) getDriver()).executeScript("window.scrollTo(0, document.body.scrollHeight)");
         WebElement element = getDriver().findElement(By.cssSelector("html > body > div"));
         getEyes().check(Target.region(element).fully());
