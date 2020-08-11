@@ -155,6 +155,14 @@ public class TestFluentApi extends TestSetup {
     }
 
     @Test
+    public void TestCheckElementFullyAfterScroll()
+    {
+        ((JavascriptExecutor)getDriver()).executeScript("window.scrollTo(0, 500)");
+        WebElement element = getWebDriver().findElement(By.id("overflowing-div-image"));
+        getEyes().check("Fluent - Region by element - fully after scroll", Target.region(element).fully());
+    }
+
+    @Test
     public void TestCheckRegionBySelectorAfterManualScroll_Fluent() {
         ((JavascriptExecutor) getDriver()).executeScript("window.scrollBy(0,900)");
         getEyes().check("Fluent - Region by selector after manual scroll", Target.region(By.id("centered")));
