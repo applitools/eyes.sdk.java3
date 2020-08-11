@@ -924,26 +924,22 @@ public class SeleniumEyes extends EyesBase implements ISeleniumEyes, IBatchClose
     }
 
 
-        private void checkWindow(ICheckSettingsInternal checkSettingsInternal) {
+    private void checkWindow(ICheckSettingsInternal checkSettingsInternal) {
         logger.verbose("Target.Window()");
-
         checkWindowBase(null, checkSettingsInternal, driver.getCurrentUrl());
     }
 
-    private void checkFullWindow(ICheckSettingsInternal checkSettingsInternal, CheckState state,
-                                 WebElement scrollRootElement) {
+    private void checkFullWindow(ICheckSettingsInternal checkSettingsInternal, CheckState state, WebElement scrollRootElement) {
         logger.verbose("Target.Window().Fully(true)");
-
         initPositionProvidersForCheckWindow(state, scrollRootElement);
-
         checkWindowBase(null, checkSettingsInternal, driver.getCurrentUrl());
     }
 
     private void initPositionProvidersForCheckWindow(CheckState state, WebElement scrollRootElement) {
         if (getConfigurationInstance().getStitchMode() == StitchMode.SCROLL) {
             state.setStitchPositionProvider(new SeleniumScrollPositionProvider(logger, driver, scrollRootElement));
-        } else // Stitch mode == CSS
-        {
+        } else {
+            // Stitch mode == CSS
             if (userDefinedSRE != null) {
                 state.setStitchPositionProvider(new ElementPositionProvider(logger, driver, userDefinedSRE));
             } else {
@@ -954,7 +950,9 @@ public class SeleniumEyes extends EyesBase implements ISeleniumEyes, IBatchClose
     }
 
     private static Region computeCropRectangle(Region fullRect, Region cropRect) {
-        if (cropRect == null) return null;
+        if (cropRect == null) {
+            return null;
+        }
         Region crop = new Region(fullRect);
         Location cropLocation = crop.getLocation();
         Region cropRectClone = cropRect.offset(cropLocation);
