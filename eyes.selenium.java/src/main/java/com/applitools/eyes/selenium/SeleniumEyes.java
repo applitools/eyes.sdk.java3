@@ -526,7 +526,7 @@ public class SeleniumEyes extends EyesBase implements ISeleniumEyes, IBatchClose
     private void matchRegion(ICheckSettingsInternal checkSettingsInternal, MatchWindowTask mwt, List<EyesScreenshot> subScreenshots) {
 
         String name = checkSettingsInternal.getName();
-        String source = driver.getCurrentUrl();
+        String source = EyesDriverUtils.isMobileDevice(driver) ? null : driver.getCurrentUrl();
         for (EyesScreenshot subScreenshot : subScreenshots) {
 
             debugScreenshotsProvider.save(subScreenshot.getImage(), String.format("subscreenshot_%s", name));
@@ -649,8 +649,10 @@ public class SeleniumEyes extends EyesBase implements ISeleniumEyes, IBatchClose
 
             boolean isMobileDevice = EyesDriverUtils.isMobileDevice(driver);
 
+            String source = null;
             if (!isMobileDevice) {
-                logger.verbose("URL: " + driver.getCurrentUrl());
+                source = driver.getCurrentUrl();
+                logger.verbose("URL: " + source);
             }
 
             ICheckSettingsInternal checkSettingsInternal = (ICheckSettingsInternal) checkSettings;
@@ -721,29 +723,29 @@ public class SeleniumEyes extends EyesBase implements ISeleniumEyes, IBatchClose
                 if (isMobileDevice) {
                     checkNativeElement(checkSettingsInternal, targetElement);
                 } else if (state.isStitchContent()) {
-                    checkFullElement(checkSettingsInternal, targetElement, targetRegion, state);
+                    checkFullElement(checkSettingsInternal, targetElement, targetRegion, state, source);
                 } else {
                     // TODO Verify: if element is outside the viewport, we should still capture entire (outer) bounds
-                    checkElement(checkSettingsInternal, targetElement, targetRegion, state);
+                    checkElement(checkSettingsInternal, targetElement, targetRegion, state, source);
                 }
             } else if (targetRegion != null) {
                 // Coordinates should always be treated as "Fully" in case they get out of the viewport.
                 boolean originalFully = state.isStitchContent();
                 state.setStitchContent(true);
-                checkFullRegion(checkSettingsInternal, targetRegion, state);
+                checkFullRegion(checkSettingsInternal, targetRegion, state, source);
                 state.setStitchContent(originalFully);
             } else if (!isMobileDevice && seleniumCheckTarget.getFrameChain().size() > 0) {
                 if (state.isStitchContent()) {
-                    checkFullFrame(checkSettingsInternal, state);
+                    checkFullFrame(checkSettingsInternal, state, source);
                 } else {
                     logger.log("Target.Frame(frame).Fully(false)");
                     logger.log("WARNING: This shouldn't have been called, as it is covered by `CheckElement_(...)`");
                 }
             } else {
                 if (state.isStitchContent()) {
-                    checkFullWindow(checkSettingsInternal, state, scrollRootElement);
+                    checkFullWindow(checkSettingsInternal, state, scrollRootElement, source);
                 } else {
-                    checkWindow(checkSettingsInternal);
+                    checkWindow(checkSettingsInternal, source);
                 }
             }
 
@@ -756,7 +758,7 @@ public class SeleniumEyes extends EyesBase implements ISeleniumEyes, IBatchClose
         }
     }
 
-    private void checkFullFrame(ICheckSettingsInternal checkSettingsInternal, CheckState state) {
+    private void checkFullFrame(ICheckSettingsInternal checkSettingsInternal, CheckState state, String source) {
         logger.verbose("Target.Frame(frame).Fully(true)");
         FrameChain currentFrameChain = driver.getFrameChain().clone();
         Location visualOffset = getFrameChainOffset(currentFrameChain);
@@ -767,10 +769,10 @@ public class SeleniumEyes extends EyesBase implements ISeleniumEyes, IBatchClose
         RectangleSize currentSREScrollSize = EyesRemoteWebElement.getScrollSize(currentFrameSRE, driver, logger);
         state.setFullRegion(new Region(state.getEffectiveViewport().getLocation(), currentSREScrollSize));
 
-        checkWindowBase(null, checkSettingsInternal, driver.getCurrentUrl());
+        checkWindowBase(null, checkSettingsInternal, source);
     }
 
-    private void checkFullRegion(ICheckSettingsInternal checkSettingsInternal, Region targetRegion, CheckState state) {
+    private void checkFullRegion(ICheckSettingsInternal checkSettingsInternal, Region targetRegion, CheckState state, String source) {
         if (((ISeleniumCheckTarget) checkSettingsInternal).getFrameChain().size() > 0) {
             logger.verbose("Target.Frame(frame).Region(x,y,w,h).Fully(true)");
         } else {
@@ -788,7 +790,7 @@ public class SeleniumEyes extends EyesBase implements ISeleniumEyes, IBatchClose
             Location visualOffset = getFrameChainOffset(currentFrameChain);
             targetRegion = targetRegion.offset(visualOffset);
         }
-        checkWindowBase(targetRegion, checkSettingsInternal, driver.getCurrentUrl());
+        checkWindowBase(targetRegion, checkSettingsInternal, source);
     }
 
     private static Region removeBorders(Region region, Borders borders) {
@@ -801,7 +803,7 @@ public class SeleniumEyes extends EyesBase implements ISeleniumEyes, IBatchClose
     }
 
     private void checkElement(ICheckSettingsInternal checkSettingsInternal, WebElement targetElement,
-                              Region targetRegion, CheckState state) {
+                              Region targetRegion, CheckState state, String source) {
         List<FrameLocator> frameLocators = ((ISeleniumCheckTarget) checkSettingsInternal).getFrameChain();
         if (frameLocators.size() > 0) {
             logger.verbose("Target.Frame(frame).Region(element).Fully(false)");
@@ -840,11 +842,11 @@ public class SeleniumEyes extends EyesBase implements ISeleniumEyes, IBatchClose
         if (crop == null) {
             crop = bounds;
         }
-        checkWindowBase(crop, checkSettingsInternal, driver.getCurrentUrl());
+        checkWindowBase(crop, checkSettingsInternal, source);
     }
 
     private void checkFullElement(ICheckSettingsInternal checkSettingsInternal, WebElement targetElement,
-                                  Region targetRegion, CheckState state) {
+                                  Region targetRegion, CheckState state, String source) {
         if (((ISeleniumCheckTarget) checkSettingsInternal).getFrameChain().size() > 0) {
             logger.verbose("Target.Frame(frame)...Region(element).Fully(true)");
         } else {
@@ -908,7 +910,7 @@ public class SeleniumEyes extends EyesBase implements ISeleniumEyes, IBatchClose
         state.setEffectiveViewport(intersectedViewport);
 
         Region crop = computeCropRectangle(fullElementBounds, targetRegion);
-        checkWindowBase(crop, checkSettingsInternal, driver.getCurrentUrl());
+        checkWindowBase(crop, checkSettingsInternal, source);
 
         EyesDriverUtils.setOverflow(driver, originalOverflow, targetElement);
     }
@@ -924,15 +926,15 @@ public class SeleniumEyes extends EyesBase implements ISeleniumEyes, IBatchClose
     }
 
 
-    private void checkWindow(ICheckSettingsInternal checkSettingsInternal) {
+    private void checkWindow(ICheckSettingsInternal checkSettingsInternal, String source) {
         logger.verbose("Target.Window()");
-        checkWindowBase(null, checkSettingsInternal, driver.getCurrentUrl());
+        checkWindowBase(null, checkSettingsInternal, source);
     }
 
-    private void checkFullWindow(ICheckSettingsInternal checkSettingsInternal, CheckState state, WebElement scrollRootElement) {
+    private void checkFullWindow(ICheckSettingsInternal checkSettingsInternal, CheckState state, WebElement scrollRootElement, String source) {
         logger.verbose("Target.Window().Fully(true)");
         initPositionProvidersForCheckWindow(state, scrollRootElement);
-        checkWindowBase(null, checkSettingsInternal, driver.getCurrentUrl());
+        checkWindowBase(null, checkSettingsInternal, source);
     }
 
     private void initPositionProvidersForCheckWindow(CheckState state, WebElement scrollRootElement) {
