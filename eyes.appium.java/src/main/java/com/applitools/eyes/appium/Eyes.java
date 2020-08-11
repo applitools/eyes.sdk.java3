@@ -549,8 +549,10 @@ public class Eyes extends EyesBase {
             result = getSimpleScreenshot();
         }
 
-        result = getSubScreenshot(result, targetRegion, checkSettingsInternal);
-        debugScreenshotsProvider.save(result.getImage(), "SUB_SCREENSHOT");
+        if (targetRegion != null && !targetRegion.isEmpty()) {
+            result = getSubScreenshot(result, targetRegion, checkSettingsInternal);
+            debugScreenshotsProvider.save(result.getImage(), "SUB_SCREENSHOT");
+        }
 
         logger.verbose("Done!");
         return result;

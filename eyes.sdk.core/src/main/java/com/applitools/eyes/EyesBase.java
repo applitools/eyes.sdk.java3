@@ -1384,7 +1384,7 @@ public abstract class EyesBase implements IEyesBase {
         logger.verbose("Done!");
 
         AppOutputWithScreenshot result = new AppOutputWithScreenshot(new AppOutput(title, screenshotBytes, domUrl, null),
-                screenshot, region.isEmpty() ? null : region.getLocation());
+                screenshot, region == null || region.isEmpty() ? null : region.getLocation());
         logger.verbose("Done!");
         return result;
     }
