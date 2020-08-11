@@ -47,15 +47,18 @@ public class PageState {
             prepareParentFrames();
         }
 
-        saveCurrentFrameState(frameStates, driver, userDefinedSRE);
-        tryHideScrollbarsInFrame(config, driver, userDefinedSRE);
-
-        int switchedToFrameCount = switchToTargetFrame(seleniumCheckTarget, config, frameStates, userDefinedSRE);
-        logger.verbose("switchedToFrameCount: " + switchedToFrameCount);
+        if (!EyesDriverUtils.isMobileDevice(driver)) {
+            saveCurrentFrameState(frameStates, driver, userDefinedSRE);
+            tryHideScrollbarsInFrame(config, driver, userDefinedSRE);
+            int switchedToFrameCount = switchToTargetFrame(seleniumCheckTarget, config, frameStates, userDefinedSRE);
+            logger.verbose("switchedToFrameCount: " + switchedToFrameCount);
+        }
     }
 
     private void prepareParentFrames() {
-        if (originalFrameChain.size() == 0) return;
+        if (originalFrameChain.size() == 0) {
+            return;
+        }
 
         EyesTargetLocator switchTo = (EyesTargetLocator) driver.switchTo();
         FrameChain fc = originalFrameChain.clone();

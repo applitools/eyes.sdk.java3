@@ -730,7 +730,7 @@ public class SeleniumEyes extends EyesBase implements ISeleniumEyes, IBatchClose
                 state.setStitchContent(true);
                 checkFullRegion(checkSettingsInternal, targetRegion, state);
                 state.setStitchContent(originalFully);
-            } else if (seleniumCheckTarget.getFrameChain().size() > 0) {
+            } else if (!isMobileDevice && seleniumCheckTarget.getFrameChain().size() > 0) {
                 if (state.isStitchContent()) {
                     checkFullFrame(checkSettingsInternal, state);
                 } else {
