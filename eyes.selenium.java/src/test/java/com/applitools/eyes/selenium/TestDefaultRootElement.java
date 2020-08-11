@@ -5,6 +5,7 @@ import com.applitools.eyes.RectangleSize;
 import com.applitools.eyes.StdoutLogHandler;
 import com.applitools.eyes.selenium.fluent.Target;
 import com.applitools.eyes.utils.ReportingTestSuite;
+import com.applitools.eyes.utils.SeleniumTestUtils;
 import com.applitools.eyes.utils.SeleniumUtils;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
@@ -19,9 +20,9 @@ public class TestDefaultRootElement extends ReportingTestSuite {
 
     @Test
     public void testBodyGreaterThanHtml() {
-        EyesRunner runner =  new ClassicRunner();
+        EyesRunner runner = new ClassicRunner();
         Eyes eyes = new Eyes(runner);
-        eyes.setLogHandler(new StdoutLogHandler());
+        SeleniumTestUtils.setupLogging(eyes);
         ChromeDriver driver = SeleniumUtils.createChromeDriver();
         try {
             eyes.open(driver, "Applitools Eyes SDK", "Test Body Greater Than Html", new RectangleSize(1220, 800));
