@@ -673,9 +673,13 @@ public class SeleniumEyes extends EyesBase implements ISeleniumEyes, IBatchClose
             logger.verbose("setting userDefinedSRE ...");
             this.userDefinedSRE = tryGetUserDefinedSREFromSREContainer(seleniumCheckTarget, driver);
             WebElement scrollRootElement = this.userDefinedSRE;
+            if (scrollRootElement == null) {
+                scrollRootElement = getTargetElement(seleniumCheckTarget);
+            }
             if (scrollRootElement == null && !isMobileDevice) {
                 scrollRootElement = EyesSeleniumUtils.getDefaultRootElement(logger, driver);
             }
+
             logger.verbose("userDefinedSRE set to " + ((this.userDefinedSRE != null) ? userDefinedSRE.toString() : "null"));
             logger.verbose("scrollRootElement set to " + scrollRootElement);
 
