@@ -1528,6 +1528,7 @@ public class SeleniumEyes extends EyesBase implements ISeleniumEyes, IBatchClose
 
         if (targetRegion != null) {
             result = result.getSubScreenshot(targetRegion, false);
+            debugScreenshotsProvider.save(result.getImage(), "SUB_SCREENSHOT");
         }
 
         result.setDomUrl(tryCaptureAndPostDom(checkSettingsInternal));

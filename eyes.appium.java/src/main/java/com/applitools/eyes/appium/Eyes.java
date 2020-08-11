@@ -787,7 +787,6 @@ public class Eyes extends EyesBase {
         check(tag, Target.region(selector).timeout(matchTimeout).fully(stitchContent));
     }
 
-    @Override
     protected EyesScreenshot getSubScreenshot(EyesScreenshot screenshot, Region region, ICheckSettingsInternal checkSettingsInternal) {
         ArgumentGuard.notNull(region, "region");
         if ((EyesDriverUtils.isAndroid(driver) || EyesDriverUtils.isIOS(driver))

@@ -1355,10 +1355,6 @@ public abstract class EyesBase implements IEyesBase {
         }
     }
 
-    protected EyesScreenshot getSubScreenshot(EyesScreenshot screenshot, Region region, ICheckSettingsInternal checkSettingsInternal) {
-        return screenshot.getSubScreenshot(region, false);
-    }
-
     /**
      * @param region The region of the screenshot which will be set in the application output.
      * @return The updated app output and screenshot.
