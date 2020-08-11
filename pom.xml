@@ -84,10 +84,6 @@
     </build>
 
     <modules>
-        <module>eyes.common.java</module>
-        <module>eyes.connectivity.java.jersey1x</module>
-        <module>eyes.connectivity.java.jersey2x</module>
-        <module>eyes.connectivity.java.jboss</module>
         <module>eyes.sdk.core</module>
         <module>eyes.images.java</module>
         <module>eyes.selenium.java</module>

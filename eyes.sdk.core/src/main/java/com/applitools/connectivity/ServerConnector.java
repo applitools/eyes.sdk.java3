@@ -771,19 +771,4 @@ public class ServerConnector extends RestClient {
     public boolean getDontCloseBatches() {
         return "true".equalsIgnoreCase(GeneralUtils.getEnvString("APPLITOOLS_DONT_CLOSE_BATCHES"));
     }
-
-    private byte[] downloadFile(Response response) {
-        byte[] responseBody = response.getBody();
-        String contentEncoding = response.getHeader("Content-Encoding", false);
-        if (!"br".equalsIgnoreCase(contentEncoding)) {
-            return responseBody;
-        }
-
-        try {
-            return IOUtils.toByteArray(new BrotliInputStream(new ByteArrayInputStream(responseBody)));
-        } catch (IOException e) {
-            GeneralUtils.logExceptionStackTrace(logger, e);
-        }
-        return new byte[0];
-    }
 }

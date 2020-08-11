@@ -41,11 +41,6 @@ public class OverflowAwareCssTranslatePositionProvider extends CssTranslatePosit
     }
 
     @Override
-    /**
-     *
-     * @return The entire size of the container which the position is relative
-     * to.
-     */
     public RectangleSize getEntireSize() {
         RectangleSize result;
         try {

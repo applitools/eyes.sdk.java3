@@ -4,7 +4,6 @@ import com.applitools.eyes.*;
 import com.applitools.eyes.selenium.BrowserType;
 import com.applitools.eyes.selenium.StitchMode;
 import com.applitools.eyes.visualgrid.model.*;
-import com.applitools.utils.ArgumentGuard;
 import com.applitools.utils.GeneralUtils;
 
 import java.net.URI;

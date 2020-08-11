@@ -4,12 +4,10 @@
 package com.applitools.eyes;
 
 import com.applitools.utils.ArgumentGuard;
-import com.applitools.utils.GeneralUtils;
 
 import java.io.*;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
-import java.util.TimeZone;
 
 /**
  * Writes log messages to a file.

@@ -27,11 +27,6 @@
     <dependencies>
         <dependency>
             <groupId>com.applitools</groupId>
-            <artifactId>eyes-common-java3</artifactId>
-            <version>3.174.0</version>
-        </dependency>
-        <dependency>
-            <groupId>com.applitools</groupId>
             <artifactId>eyes-selenium-common-java3</artifactId>
             <version>3.174.0</version>
         </dependency>

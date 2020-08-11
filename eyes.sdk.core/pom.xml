@@ -23,8 +23,8 @@
     <dependencies>
         <dependency>
             <groupId>com.applitools</groupId>
-            <artifactId>eyes-connectivity-java3-jersey2x</artifactId>
-            <version>3.174.0</version>
+            <artifactId>eyes-connectivity-java3</artifactId>
+            <version>3.175.0</version>
         </dependency>
     </dependencies>
 

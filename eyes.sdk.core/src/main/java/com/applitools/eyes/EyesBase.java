@@ -776,7 +776,10 @@ public abstract class EyesBase implements IEyesBase {
 
     protected String tryCaptureAndPostDom(ICheckSettingsInternal checkSettingsInternal) {
         String domUrl = null;
-        if (GeneralUtils.configureSendDom(checkSettingsInternal, getConfigurationInstance())) {
+
+        Boolean sendDomFormCheckSettings = checkSettingsInternal.isSendDom();
+        boolean sendDomFromConfig = getConfigurationInstance().isSendDom() == null || getConfigurationInstance().isSendDom();
+        if ((sendDomFormCheckSettings != null && sendDomFormCheckSettings) || (sendDomFormCheckSettings == null && sendDomFromConfig)) {
             try {
                 String domJson = tryCaptureDom();
                 domUrl = tryPostDomCapture(domJson);

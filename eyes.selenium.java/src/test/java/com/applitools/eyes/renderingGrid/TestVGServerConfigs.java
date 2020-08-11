@@ -2,10 +2,9 @@ package com.applitools.eyes.renderingGrid;
 
 import com.applitools.eyes.*;
 import com.applitools.eyes.metadata.ActualAppOutput;
-import com.applitools.eyes.metadata.ImageMatchSettings;
 import com.applitools.eyes.metadata.SessionResults;
-import com.applitools.eyes.selenium.BrowserType;
 import com.applitools.eyes.config.Configuration;
+import com.applitools.eyes.selenium.BrowserType;
 import com.applitools.eyes.selenium.Eyes;
 import com.applitools.eyes.selenium.TestDataProvider;
 import com.applitools.eyes.utils.ReportingTestSuite;
@@ -14,7 +13,6 @@ import com.applitools.eyes.utils.TestUtils;
 import com.applitools.eyes.visualgrid.model.RenderBrowserInfo;
 import com.applitools.eyes.visualgrid.services.VisualGridRunner;
 import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.chrome.ChromeDriver;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
