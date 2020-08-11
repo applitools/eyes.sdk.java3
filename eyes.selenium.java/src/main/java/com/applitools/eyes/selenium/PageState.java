@@ -74,9 +74,12 @@ public class PageState {
     }
 
     public void restorePageState() {
+        if (EyesDriverUtils.isMobileDevice(driver)) {
+            return;
+        }
+
         Collections.reverse(frameStates);
-        for(FrameState state : frameStates)
-        {
+        for(FrameState state : frameStates) {
             state.restore();
         }
         ((EyesTargetLocator) driver.switchTo()).frames(originalFrameChain);

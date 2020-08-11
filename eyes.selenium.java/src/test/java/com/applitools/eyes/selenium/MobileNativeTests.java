@@ -34,6 +34,7 @@ public class MobileNativeTests extends ReportingTestSuite {
         SeleniumTestUtils.setupLogging(eyes, testName);
         setCapabilities(eyes, capabilities, testName);
         eyes.setBatch(TestDataProvider.batchInfo);
+        eyes.setSaveNewTests(false);
         return eyes;
     }
 

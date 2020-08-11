@@ -718,7 +718,9 @@ public class SeleniumEyes extends EyesBase implements ISeleniumEyes, IBatchClose
             // 6. Restore page state
 
             if (targetElement != null) {
-                if (state.isStitchContent()) {
+                if (isMobileDevice) {
+                    checkNativeElement(checkSettingsInternal, targetElement);
+                } else if (state.isStitchContent()) {
                     checkFullElement(checkSettingsInternal, targetElement, targetRegion, state);
                 } else {
                     // TODO Verify: if element is outside the viewport, we should still capture entire (outer) bounds
@@ -841,35 +843,6 @@ public class SeleniumEyes extends EyesBase implements ISeleniumEyes, IBatchClose
         checkWindowBase(crop, checkSettingsInternal, driver.getCurrentUrl());
     }
 
-    private void checkWindow(ICheckSettingsInternal checkSettingsInternal) {
-        logger.verbose("Target.Window()");
-
-        checkWindowBase(null, checkSettingsInternal, driver.getCurrentUrl());
-    }
-
-    private void checkFullWindow(ICheckSettingsInternal checkSettingsInternal, CheckState state,
-                                 WebElement scrollRootElement) {
-        logger.verbose("Target.Window().Fully(true)");
-
-        initPositionProvidersForCheckWindow(state, scrollRootElement);
-
-        checkWindowBase(null, checkSettingsInternal, driver.getCurrentUrl());
-    }
-
-    private void initPositionProvidersForCheckWindow(CheckState state, WebElement scrollRootElement) {
-        if (getConfigurationInstance().getStitchMode() == StitchMode.SCROLL) {
-            state.setStitchPositionProvider(new SeleniumScrollPositionProvider(logger, driver, scrollRootElement));
-        } else // Stitch mode == CSS
-        {
-            if (userDefinedSRE != null) {
-                state.setStitchPositionProvider(new ElementPositionProvider(logger, driver, userDefinedSRE));
-            } else {
-                state.setStitchPositionProvider(new CssTranslatePositionProvider(logger, driver, scrollRootElement));
-                state.setOriginPositionProvider(new SeleniumScrollPositionProvider(logger, driver, scrollRootElement));
-            }
-        }
-    }
-
     private void checkFullElement(ICheckSettingsInternal checkSettingsInternal, WebElement targetElement,
                                   Region targetRegion, CheckState state) {
         if (((ISeleniumCheckTarget) checkSettingsInternal).getFrameChain().size() > 0) {
@@ -938,6 +911,46 @@ public class SeleniumEyes extends EyesBase implements ISeleniumEyes, IBatchClose
         checkWindowBase(crop, checkSettingsInternal, driver.getCurrentUrl());
 
         EyesDriverUtils.setOverflow(driver, originalOverflow, targetElement);
+    }
+
+    private void checkNativeElement(ICheckSettingsInternal checkSettingsInternal, WebElement targetElement) {
+        final Rectangle rect = targetElement.getRect();
+        Region region = checkSettingsInternal.getTargetRegion();
+        if (region == null) {
+            region = new Region(rect.x, rect.y, rect.width, rect.height);
+        }
+
+        checkWindowBase(region, checkSettingsInternal, null);
+    }
+
+
+        private void checkWindow(ICheckSettingsInternal checkSettingsInternal) {
+        logger.verbose("Target.Window()");
+
+        checkWindowBase(null, checkSettingsInternal, driver.getCurrentUrl());
+    }
+
+    private void checkFullWindow(ICheckSettingsInternal checkSettingsInternal, CheckState state,
+                                 WebElement scrollRootElement) {
+        logger.verbose("Target.Window().Fully(true)");
+
+        initPositionProvidersForCheckWindow(state, scrollRootElement);
+
+        checkWindowBase(null, checkSettingsInternal, driver.getCurrentUrl());
+    }
+
+    private void initPositionProvidersForCheckWindow(CheckState state, WebElement scrollRootElement) {
+        if (getConfigurationInstance().getStitchMode() == StitchMode.SCROLL) {
+            state.setStitchPositionProvider(new SeleniumScrollPositionProvider(logger, driver, scrollRootElement));
+        } else // Stitch mode == CSS
+        {
+            if (userDefinedSRE != null) {
+                state.setStitchPositionProvider(new ElementPositionProvider(logger, driver, userDefinedSRE));
+            } else {
+                state.setStitchPositionProvider(new CssTranslatePositionProvider(logger, driver, scrollRootElement));
+                state.setOriginPositionProvider(new SeleniumScrollPositionProvider(logger, driver, scrollRootElement));
+            }
+        }
     }
 
     private static Region computeCropRectangle(Region fullRect, Region cropRect) {
@@ -1531,7 +1544,10 @@ public class SeleniumEyes extends EyesBase implements ISeleniumEyes, IBatchClose
             debugScreenshotsProvider.save(result.getImage(), "SUB_SCREENSHOT");
         }
 
-        result.setDomUrl(tryCaptureAndPostDom(checkSettingsInternal));
+        if (!EyesDriverUtils.isMobileDevice(driver)) {
+            result.setDomUrl(tryCaptureAndPostDom(checkSettingsInternal));
+        }
+
         return result;
     }
 
