@@ -463,7 +463,7 @@ public class Eyes extends EyesBase {
         if (targetRegion != null) {
             logger.verbose("have target region");
             Region region = new Region(targetRegion.getLocation(), targetRegion.getSize(), CoordinatesType.CONTEXT_RELATIVE);
-            result = this.checkWindowBase(region, checkSettings.withName(name), "app");
+            result = this.checkWindowBase(region, name, checkSettings);
         } else if (appiumCheckTarget != null) {
             WebElement targetElement = getTargetElement(appiumCheckTarget);
             if (targetElement != null) {
@@ -477,7 +477,7 @@ public class Eyes extends EyesBase {
                 this.targetElement = null;
             } else {
                 logger.verbose("default case");
-                result = this.checkWindowBase(null, checkSettings.withName(name), "app");
+                result = this.checkWindowBase(null, name, checkSettings);
             }
         }
 
@@ -539,7 +539,6 @@ public class Eyes extends EyesBase {
 
     @Override
     protected EyesScreenshot getScreenshot(Region targetRegion, ICheckSettingsInternal checkSettingsInternal) {
-
         logger.verbose("getScreenshot()");
 
         EyesScreenshot result;
@@ -549,6 +548,9 @@ public class Eyes extends EyesBase {
         } else {
             result = getSimpleScreenshot();
         }
+
+        result = getSubScreenshot(result, targetRegion, checkSettingsInternal);
+        debugScreenshotsProvider.save(result.getImage(), "SUB_SCREENSHOT");
 
         logger.verbose("Done!");
         return result;
@@ -561,7 +563,7 @@ public class Eyes extends EyesBase {
 
     protected MatchResult checkElement(final WebElement element, String name, final ICheckSettings checkSettings) {
         Region region = getElementRegion(element, checkSettings);
-        return checkWindowBase(region, checkSettings.withName(name), "app");
+        return checkWindowBase(region, name, checkSettings);
     }
 
     public void checkElement(WebElement element) {
@@ -711,7 +713,7 @@ public class Eyes extends EyesBase {
         Point p = targetElement.getLocation();
         Dimension d = targetElement.getSize();
         Region region = new Region(p.getX(), p.getY(), d.getWidth(), d.getHeight(), CoordinatesType.CONTEXT_RELATIVE);
-        MatchResult result = checkWindowBase(region, checkSettings.withName(name), "app");
+        MatchResult result = checkWindowBase(region, name, checkSettings);
         logger.verbose("Done! trying to scroll back to original position.");
 
         return result;
