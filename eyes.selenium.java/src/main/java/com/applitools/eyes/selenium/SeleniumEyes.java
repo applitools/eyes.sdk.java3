@@ -660,7 +660,7 @@ public class SeleniumEyes extends EyesBase implements ISeleniumEyes, IBatchClose
             seleniumCheckTarget.setState(state);
             Boolean forceFullPageScreenshot = getConfigurationInstance().getForceFullPageScreenshot();
             Boolean fully = checkSettingsInternal.getStitchContent();
-            state.setStitchContent((fully == null ? false : fully) || (forceFullPageScreenshot == null ? false : forceFullPageScreenshot));
+            state.setStitchContent((fully != null && fully) || (forceFullPageScreenshot != null && forceFullPageScreenshot));
 
             // Ensure frame is not used as a region
             ((SeleniumCheckSettings) checkSettings).sanitizeSettings(logger, driver, state.isStitchContent());
@@ -671,7 +671,7 @@ public class SeleniumEyes extends EyesBase implements ISeleniumEyes, IBatchClose
             logger.verbose("setting userDefinedSRE ...");
             this.userDefinedSRE = tryGetUserDefinedSREFromSREContainer(seleniumCheckTarget, driver);
             WebElement scrollRootElement = this.userDefinedSRE;
-            if (scrollRootElement == null) {
+            if (scrollRootElement == null && !isMobileDevice) {
                 scrollRootElement = EyesSeleniumUtils.getDefaultRootElement(logger, driver);
             }
             logger.verbose("userDefinedSRE set to " + ((this.userDefinedSRE != null) ? userDefinedSRE.toString() : "null"));
