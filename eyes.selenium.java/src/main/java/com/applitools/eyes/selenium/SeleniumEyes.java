@@ -820,7 +820,12 @@ public class SeleniumEyes extends EyesBase implements ISeleniumEyes, IBatchClose
         PositionProvider currentFramePositionProvider = getPositionProviderForScrollRootElement(currentFrameSRE);
         Location currentFramePosition = currentFramePositionProvider.getCurrentPosition();
         bounds = bounds.offset(currentFramePosition);
-        Location actualFramePosition = currentFramePositionProvider.setPosition(bounds.getLocation());
+        currentFramePositionProvider.setPosition(bounds.getLocation());
+        Region actualElementBounds = EyesRemoteWebElement.getClientBounds(targetElement, driver, logger);
+        actualElementBounds = actualElementBounds.offset(visualOffset);
+        actualElementBounds = actualElementBounds.offset(currentFramePosition);
+        Location actualFramePosition = new Location(bounds.getLeft() - actualElementBounds.getLeft(),
+                bounds.getTop() - actualElementBounds.getTop());
         bounds = bounds.offset(-actualFramePosition.getX(), -actualFramePosition.getY());
 
         EyesTargetLocator switchTo = (EyesTargetLocator) driver.switchTo();
