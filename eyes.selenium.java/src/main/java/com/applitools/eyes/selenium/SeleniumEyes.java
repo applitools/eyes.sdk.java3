@@ -976,11 +976,15 @@ public class SeleniumEyes extends EyesBase implements ISeleniumEyes, IBatchClose
 
     private Region bringRegionToView(Region bounds, Location viewportLocation) {
         WebElement currentFrameSRE = getCurrentFrameScrollRootElement();
+        StitchMode stitchMode = getConfigurationInstance().getStitchMode();
         PositionProvider currentFramePositionProvider = PositionProviderFactory.getPositionProvider(
-                logger, getConfigurationInstance().getStitchMode(), jsExecutor, currentFrameSRE, userAgent);
+                logger, stitchMode, jsExecutor, currentFrameSRE, userAgent);
         Location currentFramePosition = currentFramePositionProvider.getCurrentPosition();
         Location boundsPosition = bounds.getLocation();
         Location newFramePosition = boundsPosition.offset(-viewportLocation.getX(), -viewportLocation.getY());
+        if (stitchMode.equals(StitchMode.SCROLL)) {
+            newFramePosition = newFramePosition.offset(currentFramePosition);
+        }
         Location actualFramePosition = currentFramePositionProvider.setPosition(newFramePosition);
         bounds = bounds.offset(-actualFramePosition.getX(), -actualFramePosition.getY());
         bounds = bounds.offset(currentFramePosition);
