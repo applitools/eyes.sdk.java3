@@ -873,16 +873,20 @@ public class SeleniumEyes extends EyesBase implements ISeleniumEyes, IBatchClose
         initPositionProvidersForCheckElement(isScrollableElement, targetElement, state);
 
         Location originalElementLocation = elementBounds.getLocation();
-        elementBounds = bringRegionToView(elementBounds, state.getEffectiveViewport().getLocation());
-        Region currentElementRegion;
-        if (isScrollableElement) {
-            currentElementRegion = EyesRemoteWebElement.getClientBoundsWithoutBorders(targetElement, driver, logger);
-        } else {
-            currentElementRegion = EyesRemoteWebElement.getClientBounds(targetElement, driver, logger);
-        }
 
-        if (getConfigurationInstance().getStitchMode().equals(StitchMode.CSS)) {
-            elementBounds = elementBounds.offset(currentElementRegion.getLocation());
+        String positionStyle = ((EyesRemoteWebElement) targetElement).getComputedStyle("position");
+        if (!positionStyle.equalsIgnoreCase("fixed")) {
+            elementBounds = bringRegionToView(elementBounds, state.getEffectiveViewport().getLocation());
+            Region currentElementRegion;
+            if (isScrollableElement) {
+                currentElementRegion = EyesRemoteWebElement.getClientBoundsWithoutBorders(targetElement, driver, logger);
+            } else {
+                currentElementRegion = EyesRemoteWebElement.getClientBounds(targetElement, driver, logger);
+            }
+
+            if (getConfigurationInstance().getStitchMode().equals(StitchMode.CSS)) {
+                elementBounds = elementBounds.offset(currentElementRegion.getLocation());
+            }
         }
 
         Region fullElementBounds = new Region(elementBounds);
