@@ -819,11 +819,9 @@ public class SeleniumEyes extends EyesBase implements ISeleniumEyes, IBatchClose
         WebElement currentFrameSRE = getCurrentFrameScrollRootElement();
         PositionProvider currentFramePositionProvider = getPositionProviderForScrollRootElement(currentFrameSRE);
         Location currentFramePosition = currentFramePositionProvider.getCurrentPosition();
-        bounds = bounds.offset(currentFramePosition);
-        currentFramePositionProvider.setPosition(bounds.getLocation());
+        currentFramePositionProvider.setPosition(bounds.offset(currentFramePosition).getLocation());
         Region actualElementBounds = EyesRemoteWebElement.getClientBounds(targetElement, driver, logger);
         actualElementBounds = actualElementBounds.offset(visualOffset);
-        actualElementBounds = actualElementBounds.offset(currentFramePosition);
         Location actualFramePosition = new Location(bounds.getLeft() - actualElementBounds.getLeft(),
                 bounds.getTop() - actualElementBounds.getTop());
         bounds = bounds.offset(-actualFramePosition.getX(), -actualFramePosition.getY());
@@ -837,8 +835,11 @@ public class SeleniumEyes extends EyesBase implements ISeleniumEyes, IBatchClose
             currentFrameSRE = getCurrentFrameScrollRootElement();
             currentFramePositionProvider = getPositionProviderForScrollRootElement(currentFrameSRE);
             currentFramePosition = currentFramePositionProvider.getCurrentPosition();
-            bounds = bounds.offset(currentFramePosition);
-            actualFramePosition = currentFramePositionProvider.setPosition(bounds.getLocation());
+            currentFramePositionProvider.setPosition(bounds.offset(currentFramePosition).getLocation());
+            actualElementBounds = EyesRemoteWebElement.getClientBounds(targetElement, driver, logger);
+            actualElementBounds = actualElementBounds.offset(visualOffset);
+            actualFramePosition = new Location(bounds.getLeft() - actualElementBounds.getLeft(),
+                    bounds.getTop() - actualElementBounds.getTop());
             bounds = bounds.offset(-actualFramePosition.getX(), -actualFramePosition.getY());
         }
 
