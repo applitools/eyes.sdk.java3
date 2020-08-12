@@ -885,7 +885,7 @@ public class SeleniumEyes extends EyesBase implements ISeleniumEyes, IBatchClose
             }
 
             if (getConfigurationInstance().getStitchMode().equals(StitchMode.CSS)) {
-                elementBounds = elementBounds.offset(currentElementRegion.getLocation());
+                elementBounds = currentElementRegion;
             }
         }
 
