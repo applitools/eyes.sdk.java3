@@ -752,7 +752,7 @@ public class SeleniumEyes extends EyesBase implements ISeleniumEyes, IBatchClose
 
             caretVisibilityProvider.restoreCaret();
 
-            pageState.restorePageState();
+            pageState.restorePageState(getConfiguration(), scrollRootElement);
         } catch (Exception ex) {
             GeneralUtils.logExceptionStackTrace(logger, ex);
             throw ex;
