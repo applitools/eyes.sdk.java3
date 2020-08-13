@@ -61,9 +61,7 @@ public class FrameState {
             WebElement body = driver.findElement(By.tagName("body"));
             if (scrolledElement.equals(body)) {
                 WebElement html = driver.findElement(By.tagName("html"));
-                result = (String) driver.executeScript(script, html);
-                styleAttributes = result.split("#", -1);
-                htmlOverflow = styleAttributes[2];
+                htmlOverflow = (String) driver.executeScript("return arguments[0].style.overflow", html);
             }
         }
         return new FrameState(driver, scrolledElement, cssTransform, scrollPosition, frameChain, overflow, htmlOverflow);
