@@ -31,10 +31,6 @@ public class PageState {
     private final StitchMode stitchMode;
     private final UserAgent userAgent;
 
-    private String originalOverflow;
-    private String originalHtmlOverflow;
-    private String originalBodyOverflow;
-
     public PageState(Logger logger, EyesSeleniumDriver driver, StitchMode stitchMode, UserAgent userAgent) {
         this.logger = logger;
         this.driver = driver;
@@ -78,7 +74,7 @@ public class PageState {
         switchTo.frames(originalFrameChain);
     }
 
-    public void restorePageState(Configuration config, WebElement scrollRootElement) {
+    public void restorePageState() {
         if (EyesDriverUtils.isMobileDevice(driver)) {
             return;
         }
@@ -88,9 +84,6 @@ public class PageState {
             state.restore();
         }
         ((EyesTargetLocator) driver.switchTo()).frames(originalFrameChain);
-        if (!EyesDriverUtils.isMobileDevice(driver)) {
-            tryRevertScrollbarsInFrame(config, scrollRootElement);
-        }
     }
 
     private int switchToTargetFrame(ISeleniumCheckTarget checkTarget, Configuration config,
@@ -133,33 +126,26 @@ public class PageState {
     }
 
     private void tryHideScrollbarsInFrame(Configuration config, WebElement rootElement) {
-        updateScrollbars(config, rootElement, true);
-    }
-
-    private void tryRevertScrollbarsInFrame(Configuration config, WebElement rootElement) {
-        updateScrollbars(config, rootElement, false);
-    }
-
-    private void updateScrollbars(Configuration configuration, WebElement rootElement, boolean shouldHide) {
-        if (!configuration.getHideScrollbars()) {
+        if (!config.getHideScrollbars()) {
             return;
         }
 
         String hiddenValue = "hidden";
-
+        EyesDriverUtils.setOverflow(driver, hiddenValue, rootElement);
         if (!rootElement.equals(EyesSeleniumUtils.getDefaultRootElement(logger, driver))) {
-            originalOverflow = EyesDriverUtils.setOverflow(driver, shouldHide ? hiddenValue : originalOverflow, rootElement);
             return;
         }
 
-        WebElement html = driver.findElement(By.tagName("html"));
         WebElement body = driver.findElement(By.tagName("body"));
-        originalHtmlOverflow = EyesDriverUtils.setOverflow(driver, shouldHide ? hiddenValue : originalHtmlOverflow, html);
-        originalBodyOverflow = EyesDriverUtils.setOverflow(driver, shouldHide ? hiddenValue : originalBodyOverflow, body);
+        if (rootElement.equals(body)) {
+            WebElement html = driver.findElement(By.tagName("html"));
+            EyesDriverUtils.setOverflow(driver, hiddenValue, html);
+        }
     }
 
     private void saveCurrentFrameState(List<FrameState> frameStates, WebElement rootElement) {
-        FrameState frameState = FrameState.getCurrentFrameState(driver, rootElement);
+        boolean isDefaultSRE = rootElement.equals(EyesSeleniumUtils.getDefaultRootElement(logger, driver));
+        FrameState frameState = FrameState.getCurrentFrameState(driver, rootElement, isDefaultSRE);
         frameStates.add(frameState);
     }
 }

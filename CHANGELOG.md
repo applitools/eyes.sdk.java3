@@ -1,4 +1,6 @@
 ## [vNext]
+### Fixed
+- Scrollbars are hidden for both body and html if the SRE is body. [Trello 1900](https://trello.com/c/pOdhkDyy)
 ### Updated
 - DOM snapshot script to 4.0.5. [Trello 2006](https://trello.com/c/a6l6gTf9)
 
