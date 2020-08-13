@@ -1,3 +1,7 @@
+## [vNext]
+### Updated
+- DOM snapshot script to 4.0.5. [Trello 2006](https://trello.com/c/a6l6gTf9)
+
 ## [3.174.0] - 2020-08-12
 ### Fixed
 - Agent ID was null in some cases. [Trello 2060](https://trello.com/c/zELwZYma)
