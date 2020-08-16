@@ -18,6 +18,11 @@ addons:
 # $GITHUB_TOKEN
 # $ALLOWED_RELEASE_COMMITERS
 # $SDK
+before_install:
+  - git clone https://github.com/applitools/java3-connectivity.git
+  - cd java3-connectivity
+  - mvn install
+  - cd ..
 before_script:
   - nvm install 14.5.0
   - nvm use 14.5.0
@@ -26,7 +31,6 @@ jobs:
     - stage: Test
       name: Core
       script:
-        - export APPLITOOLS_REPORT_ID=${TRAVIS_COMMIT:0:7}-$TRAVIS_BUILD_NUMBER
         - export APPLITOOLS_REPORT_ID=${TRAVIS_COMMIT:0:7}-$TRAVIS_BUILD_NUMBER
         - chmod +x ./runTests.sh
         - ./runTests.sh "eyes.sdk.core"
