@@ -1,6 +1,8 @@
 ## [vNext]
 ### Updated
 - DOM snapshot script to 4.0.5. [Trello 2006](https://trello.com/c/a6l6gTf9)
+### Added
+- When render fails, the correct useragent will be sent in the test results. [Trello 2086](https://trello.com/c/RLOmjJLT)
 
 ## [3.174.0] - 2020-08-12
 ### Fixed

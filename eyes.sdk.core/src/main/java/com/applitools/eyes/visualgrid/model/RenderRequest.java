@@ -181,6 +181,10 @@ public class RenderRequest {
         this.stitchingService = stitchingService;
     }
 
+    public BrowserType getBrowserName() {
+        return browserName;
+    }
+
     @Override
     public String toString() {
         return "RenderRequest{" +

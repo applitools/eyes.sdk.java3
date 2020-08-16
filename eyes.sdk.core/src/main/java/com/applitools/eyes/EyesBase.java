@@ -70,7 +70,6 @@ public abstract class EyesBase implements IEyesBase {
     private int validationId;
     private final SessionEventHandlers sessionEventHandlers = new SessionEventHandlers();
     protected DebugScreenshotsProvider debugScreenshotsProvider;
-    private Map<String, DeviceSize> devicesSizes;
 
     public EyesBase() {
 
@@ -1425,11 +1424,11 @@ public abstract class EyesBase implements IEyesBase {
     }
 
     public Map<String, DeviceSize> getDevicesSizes() {
-        if (this.devicesSizes != null) {
-            return this.devicesSizes;
-        }
-        this.devicesSizes = getServerConnector().getDevicesSizes();
-        return this.devicesSizes;
+        return getServerConnector().getDevicesSizes();
+    }
+
+    public Map<String, String> getUserAgents() {
+        return getServerConnector().getUserAgents();
     }
 
     /**

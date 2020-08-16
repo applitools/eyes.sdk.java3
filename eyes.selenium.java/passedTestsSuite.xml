@@ -436,15 +436,6 @@
             </class>
         </classes>
     </test>
-    <test name="TestMobileDevicesOnVG">
-        <classes>
-            <class name="com.applitools.eyes.renderingGrid.TestMobileDevices">
-                <methods>
-                    <include name="testIosDeviceReportedResolutionOnFailure"/>
-                </methods>
-            </class>
-        </classes>
-    </test>
     <test name="TestEyesTargetLocator">
         <classes>
             <class name="com.applitools.eyes.selenium.wrappers.TestEyesTargetLocator">

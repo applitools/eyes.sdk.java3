@@ -69,4 +69,6 @@ public interface IEyesConnector {
     void clearProperties();
 
     Map<String, DeviceSize> getDevicesSizes();
+
+    Map<String, String> getUserAgents();
 }

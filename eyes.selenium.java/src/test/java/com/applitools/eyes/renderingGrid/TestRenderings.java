@@ -7,13 +7,12 @@ import com.applitools.connectivity.TestServerConnector;
 import com.applitools.connectivity.api.*;
 import com.applitools.eyes.*;
 import com.applitools.eyes.config.Configuration;
+import com.applitools.eyes.metadata.SessionResults;
 import com.applitools.eyes.selenium.BrowserType;
 import com.applitools.eyes.selenium.Eyes;
 import com.applitools.eyes.selenium.TestDataProvider;
 import com.applitools.eyes.selenium.fluent.Target;
-import com.applitools.eyes.utils.ReportingTestSuite;
-import com.applitools.eyes.utils.SeleniumUtils;
-import com.applitools.eyes.utils.TestUtils;
+import com.applitools.eyes.utils.*;
 import com.applitools.eyes.visualgrid.model.*;
 import com.applitools.eyes.visualgrid.services.IEyesConnector;
 import com.applitools.eyes.visualgrid.services.VisualGridRunner;
@@ -23,12 +22,14 @@ import org.apache.http.conn.util.InetAddressUtils;
 import org.mockito.ArgumentMatchers;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
+import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.testng.Assert;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
 import javax.ws.rs.HttpMethod;
+import java.io.IOException;
 import java.net.UnknownHostException;
 import java.util.*;
 import java.util.concurrent.Future;
@@ -156,35 +157,74 @@ public class TestRenderings extends ReportingTestSuite {
         }
     }
 
-    @SuppressWarnings("ThrowFromFinallyBlock")
     @Test
-    public void testRenderFail() {
+    public void testRenderFail() throws IOException {
         ServerConnector serverConnector = spy(ServerConnector.class);
         doThrow(new IllegalStateException()).when(serverConnector).render(any(RenderRequest.class));
 
         EyesRunner runner = new VisualGridRunner(10);
         Eyes eyes = new Eyes(runner);
-        eyes.setLogHandler(new StdoutLogHandler());
+        SeleniumTestUtils.setupLogging(eyes);
         eyes.setServerConnector(serverConnector);
-        ChromeDriver driver = SeleniumUtils.createChromeDriver();
-        driver.get("http://applitools.github.io/demo");
+
+        com.applitools.eyes.selenium.Configuration config = eyes.getConfiguration();
+        config.addBrowser(new DesktopBrowserInfo(new RectangleSize(700, 460), BrowserType.CHROME));
+        config.addDeviceEmulation(DeviceName.Galaxy_S3);
+        config.addBrowser(new IosDeviceInfo(IosDeviceName.iPhone_11_Pro));
+        config.addBrowser(new IosDeviceInfo(IosDeviceName.iPhone_XR));
+        config.setBatch(TestDataProvider.batchInfo);
+        config.setAppName("Applitools Eyes Sdk");
+        config.setTestName("Test Render Fail");
+        eyes.setConfiguration(config);
+
+        WebDriver driver = SeleniumUtils.createChromeDriver();
+        driver.get("https://demo.applitools.com");
         try {
-            eyes.open(driver, "Applitools Eyes Sdk", "Test Render Fail", new RectangleSize(800, 800));
-            eyes.checkWindow();
+            eyes.open(driver);
+            eyes.check(Target.window());
             eyes.closeAsync();
         } finally {
             driver.quit();
             eyes.abortAsync();
-            try {
-                runner.getAllTestResults();
-                Assert.fail("Expected an exception to be thrown");
-            } catch (Throwable t) {
-                if (t instanceof AssertionError) {
-                    throw t;
-                }
-                Assert.assertTrue(t.getCause() instanceof InstantiationError);
-            }
         }
+
+        TestResultsSummary allTestResults = runner.getAllTestResults(false);
+        Assert.assertEquals(4, allTestResults.getAllResults().length);
+
+        // Set results in array
+        TestResults[] testResults = new TestResults[4];
+        for (TestResultContainer results : allTestResults.getAllResults()) {
+            RenderBrowserInfo browserInfo = results.getBrowserInfo();
+            if (browserInfo.getIosDeviceInfo() == null && browserInfo.getEmulationInfo() == null) {
+                testResults[0] = results.getTestResults();
+                continue;
+            }
+
+            if (browserInfo.getEmulationInfo() != null) {
+                testResults[1] = results.getTestResults();
+                continue;
+            }
+
+            String deviceName = browserInfo.getIosDeviceInfo().getDeviceName();
+            if (deviceName.equals(IosDeviceName.iPhone_11_Pro.getName())) {
+                testResults[2] = results.getTestResults();
+                continue;
+            }
+            if (deviceName.equals(IosDeviceName.iPhone_XR.getName())) {
+                testResults[3] = results.getTestResults();
+                continue;
+            }
+
+            Assert.fail();
+        }
+
+        SessionResults chromeSessionResults = TestUtils.getSessionResults(eyes.getApiKey(), testResults[0]);
+        String actualUserAgent = chromeSessionResults.getStartInfo().getEnvironment().getInferred();
+        Map<String, String> userAgents = eyes.getServerConnector().getUserAgents();
+        Assert.assertEquals(actualUserAgent, "useragent:" + userAgents.get("chrome-0"));
+
+        Assert.assertEquals(testResults[2].getHostDisplaySize(), new RectangleSize(375, 812));
+        Assert.assertEquals(testResults[3].getHostDisplaySize(), new RectangleSize(414, 896));
     }
 
     @Test

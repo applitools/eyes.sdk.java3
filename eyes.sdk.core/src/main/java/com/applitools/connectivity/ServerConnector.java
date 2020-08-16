@@ -38,7 +38,8 @@ public class ServerConnector extends RestClient {
 
     //Rendering Grid
     String RENDER_INFO_PATH = API_SESSIONS + "/renderinfo";
-    String IOS_DEVICES_SIZES = "/ios-devices-sizes";
+    String IOS_DEVICES_PATH = "/ios-devices-sizes";
+    String USER_AGENT_PATH = "/user-agents";
     String RESOURCES_SHA_256 = "/resources/sha256/";
     String RENDER_STATUS = "/render-status";
     String RENDER = "/render";
@@ -48,6 +49,7 @@ public class ServerConnector extends RestClient {
     private String apiKey = null;
     private RenderingInfo renderingInfo;
     private Map<String, DeviceSize> devicesSizes;
+    private Map<String, String> userAgents;
 
     /***
      * @param logger    Logger instance.
@@ -422,15 +424,11 @@ public class ServerConnector extends RestClient {
         }
     }
 
-    public Map<String, DeviceSize> getDevicesSizes() {
-        if (devicesSizes != null) {
-            return devicesSizes;
-        }
-
+    public <T> T getFromServer(final String path, TypeReference<T> responseType) {
         Request request = makeEyesRequest(new HttpRequestBuilder() {
             @Override
             public Request build() {
-                return restClient.target(renderingInfo.getServiceUrl()).path(IOS_DEVICES_SIZES)
+                return restClient.target(renderingInfo.getServiceUrl()).path(path)
                         .queryParam("apiKey", getApiKey()).request();
             }
         });
@@ -441,14 +439,38 @@ public class ServerConnector extends RestClient {
         validStatusCodes.add(HttpStatus.SC_OK);
 
         try {
-            devicesSizes = parseResponseWithJsonData(response, validStatusCodes, new TypeReference<HashMap<String, DeviceSize>>() {
-            });
-        } catch (Throwable e) {
-            devicesSizes = new HashMap<>();
+            return parseResponseWithJsonData(response, validStatusCodes, responseType);
         } finally {
             response.close();
         }
+    }
+
+    public Map<String, DeviceSize> getDevicesSizes() {
+        if (devicesSizes != null) {
+            return devicesSizes;
+        }
+
+        try {
+            devicesSizes = getFromServer(IOS_DEVICES_PATH, new TypeReference<HashMap<String, DeviceSize>>() {});
+        } catch (Throwable e) {
+            devicesSizes = new HashMap<>();
+        }
+
         return devicesSizes;
+    }
+
+    public Map<String, String> getUserAgents() {
+        if (userAgents != null) {
+            return userAgents;
+        }
+
+        try {
+            userAgents = getFromServer(USER_AGENT_PATH, new TypeReference<HashMap<String, String>>() {});
+        } catch (Throwable e) {
+            userAgents = new HashMap<>();
+        }
+
+        return userAgents;
     }
 
     public List<RunningRender> render(RenderRequest... renderRequests) {
