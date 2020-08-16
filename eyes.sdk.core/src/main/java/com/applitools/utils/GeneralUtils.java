@@ -4,7 +4,6 @@ import com.applitools.ICheckSettingsInternal;
 import com.applitools.eyes.EyesException;
 import com.applitools.eyes.Logger;
 import com.applitools.eyes.config.Configuration;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -366,18 +365,5 @@ public class GeneralUtils {
 
     public static boolean getDontCloseBatches() {
         return "true".equalsIgnoreCase(GeneralUtils.getEnvString("APPLITOOLS_DONT_CLOSE_BATCHES"));
-    }
-
-    public static String getJsonPropertyFromField(Class<?> cls, String fieldName) {
-        try {
-            JsonProperty property = cls.getDeclaredField(fieldName).getAnnotation(JsonProperty.class);
-            if (property == null) {
-                return null;
-            }
-
-            return property.value();
-        } catch (NoSuchFieldException e) {
-            return null;
-        }
     }
 }
