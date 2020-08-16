@@ -223,6 +223,8 @@ public class TestRenderings extends ReportingTestSuite {
         Map<String, String> userAgents = eyes.getServerConnector().getUserAgents();
         Assert.assertEquals(actualUserAgent, "useragent:" + userAgents.get("chrome-0"));
 
+        Assert.assertEquals(testResults[0].getHostDisplaySize(), new RectangleSize(700, 460));
+        Assert.assertEquals(testResults[1].getHostDisplaySize(), new RectangleSize(360, 640));
         Assert.assertEquals(testResults[2].getHostDisplaySize(), new RectangleSize(375, 812));
         Assert.assertEquals(testResults[3].getHostDisplaySize(), new RectangleSize(414, 896));
     }

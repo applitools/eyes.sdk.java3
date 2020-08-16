@@ -1423,8 +1423,8 @@ public abstract class EyesBase implements IEyesBase {
         return this.renderInfo;
     }
 
-    public Map<String, DeviceSize> getDevicesSizes() {
-        return getServerConnector().getDevicesSizes();
+    public Map<String, DeviceSize> getDevicesSizes(String path) {
+        return getServerConnector().getDevicesSizes(path);
     }
 
     public Map<String, String> getUserAgents() {

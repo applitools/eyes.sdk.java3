@@ -33,22 +33,23 @@ public class ServerConnector extends RestClient {
 
     private static final List<String> DOMAINS_FILTERED = Collections.singletonList("https://fonts.googleapis.com");
 
-    String API_SESSIONS = "api/sessions";
-    String CLOSE_BATCH = "api/sessions/batches/%s/close/bypointerid";
+    static final String API_SESSIONS = "api/sessions";
+    static final String CLOSE_BATCH = "api/sessions/batches/%s/close/bypointerid";
 
     //Rendering Grid
-    String RENDER_INFO_PATH = API_SESSIONS + "/renderinfo";
-    String IOS_DEVICES_PATH = "/ios-devices-sizes";
-    String USER_AGENT_PATH = "/user-agents";
-    String RESOURCES_SHA_256 = "/resources/sha256/";
-    String RENDER_STATUS = "/render-status";
-    String RENDER = "/render";
+    static final String RENDER_INFO_PATH = API_SESSIONS + "/renderinfo";
+    public static final  String IOS_DEVICES_PATH = "/ios-devices-sizes";
+    public static final  String EMULATED_DEVICES_PATH = "/emulated-devices-sizes";
+    static final String USER_AGENT_PATH = "/user-agents";
+    static final String RESOURCES_SHA_256 = "/resources/sha256/";
+    static final String RENDER_STATUS = "/render-status";
+    static final String RENDER = "/render";
 
     public static final String API_PATH = "/api/sessions/running";
 
     private String apiKey = null;
     private RenderingInfo renderingInfo;
-    private Map<String, DeviceSize> devicesSizes;
+    private final Map<String, Map<String, DeviceSize>> devicesSizes = new HashMap<>();
     private Map<String, String> userAgents;
 
     /***
@@ -445,18 +446,18 @@ public class ServerConnector extends RestClient {
         }
     }
 
-    public Map<String, DeviceSize> getDevicesSizes() {
-        if (devicesSizes != null) {
-            return devicesSizes;
+    public Map<String, DeviceSize> getDevicesSizes(String path) {
+        if (devicesSizes.containsKey(path)) {
+            return devicesSizes.get(path);
         }
 
         try {
-            devicesSizes = getFromServer(IOS_DEVICES_PATH, new TypeReference<HashMap<String, DeviceSize>>() {});
+            devicesSizes.put(path, getFromServer(path, new TypeReference<HashMap<String, DeviceSize>>() {}));
         } catch (Throwable e) {
-            devicesSizes = new HashMap<>();
+            devicesSizes.put(path, new HashMap<String, DeviceSize>());
         }
 
-        return devicesSizes;
+        return devicesSizes.get(path);
     }
 
     public Map<String, String> getUserAgents() {

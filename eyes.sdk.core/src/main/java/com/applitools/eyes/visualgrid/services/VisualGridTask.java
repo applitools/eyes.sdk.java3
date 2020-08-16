@@ -2,6 +2,7 @@ package com.applitools.eyes.visualgrid.services;
 
 import com.applitools.ICheckSettings;
 import com.applitools.ICheckSettingsInternal;
+import com.applitools.connectivity.ServerConnector;
 import com.applitools.eyes.*;
 import com.applitools.eyes.config.Configuration;
 import com.applitools.eyes.exceptions.DiffsFoundException;
@@ -271,25 +272,32 @@ public class VisualGridTask implements Callable<TestResultContainer>, Completabl
     }
 
     private RectangleSize getCorrectDeviceSize(RenderRequest renderRequest) {
-        RectangleSize deviceSize = configuration.getViewportSize();
-        if (deviceSize.isEmpty()) {
-            IosDeviceInfo iosDeviceInfo = renderRequest.getRenderInfo().getIosDeviceInfo();
-            if (iosDeviceInfo != null) {
-                String deviceName = iosDeviceInfo.getDeviceName();
-                Map<String, DeviceSize> devicesSizes = eyesConnector.getDevicesSizes();
-                if (devicesSizes.containsKey(deviceName)) {
-                    logger.verbose("found device in list.");
-                    if (iosDeviceInfo.getScreenOrientation().equals(ScreenOrientation.PORTRAIT)){
-                        deviceSize = devicesSizes.get(deviceName).getPortrait();
-                    } else {
-                        deviceSize = devicesSizes.get(deviceName).getLandscapeLeft();
-                    }
-                } else {
-                    logger.verbose("could not find device in list.");
-                }
-            }
+        IosDeviceInfo iosDeviceInfo = renderRequest.getRenderInfo().getIosDeviceInfo();
+        EmulationBaseInfo emulationBaseInfo = renderRequest.getRenderInfo().getEmulationInfo();
+        if (iosDeviceInfo == null && emulationBaseInfo == null) {
+            return configuration.getViewportSize();
         }
-        return deviceSize;
+
+        if (emulationBaseInfo != null) {
+            return getDeviceSizeFromServer(emulationBaseInfo.getDeviceName(), emulationBaseInfo.getScreenOrientation(),
+                    ServerConnector.EMULATED_DEVICES_PATH);
+        }
+
+        return getDeviceSizeFromServer(iosDeviceInfo.getDeviceName(), iosDeviceInfo.getScreenOrientation(),
+                ServerConnector.IOS_DEVICES_PATH);
+    }
+
+    private RectangleSize getDeviceSizeFromServer(String deviceName, ScreenOrientation screenOrientation, String path) {
+        Map<String, DeviceSize> devicesSizes = eyesConnector.getDevicesSizes(path);
+        if (!devicesSizes.containsKey(deviceName)) {
+            logger.verbose(String.format("could not find device %s in list", deviceName));
+        }
+
+        if (screenOrientation.equals(ScreenOrientation.PORTRAIT)){
+            return devicesSizes.get(deviceName).getPortrait();
+        }
+
+        return devicesSizes.get(deviceName).getLandscapeLeft();
     }
 
     public Throwable getException() {
