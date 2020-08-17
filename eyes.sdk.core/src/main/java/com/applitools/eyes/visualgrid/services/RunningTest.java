@@ -258,6 +258,10 @@ public class RunningTest {
             }
 
             logger.verbose("task list is empty and close task doesn't exist");
+            if (!isTestOpen()) {
+                logger.verbose("test never opened, returning null");
+                return null;
+            }
         }
 
         logger.verbose("adding close visualGridTask...");
