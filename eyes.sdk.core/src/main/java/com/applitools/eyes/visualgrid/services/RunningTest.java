@@ -19,20 +19,19 @@ import java.util.concurrent.atomic.AtomicBoolean;
 public class RunningTest {
     private final List<VisualGridTask> visualGridTaskList = Collections.synchronizedList(new ArrayList<VisualGridTask>());
     private IEyesConnector eyes;
-    private RenderBrowserInfo browserInfo;
-    private AtomicBoolean isTestOpen = new AtomicBoolean(false);
-    private AtomicBoolean isTestClose = new AtomicBoolean(false);
-    private AtomicBoolean isTestInExceptionMode = new AtomicBoolean(false);
+    private final RenderBrowserInfo browserInfo;
+    private final AtomicBoolean isTestOpen = new AtomicBoolean(false);
+    private final AtomicBoolean isTestClose = new AtomicBoolean(false);
+    private final AtomicBoolean isTestInExceptionMode = new AtomicBoolean(false);
     private RunningTestListener listener;
     private ConfigurationProvider configurationProvider;
-    private HashMap<VisualGridTask, FutureTask<TestResultContainer>> taskToFutureMapping = new HashMap<>();
-    private Logger logger;
-    private AtomicBoolean isCloseTaskIssued = new AtomicBoolean(false);
+    private final HashMap<VisualGridTask, FutureTask<TestResultContainer>> taskToFutureMapping = new HashMap<>();
+    private final Logger logger;
+    private final AtomicBoolean isCloseTaskIssued = new AtomicBoolean(false);
     private VisualGridTask closeTask;
     private VisualGridTask openTask;
     private String appName;
     private String testName;
-    private Throwable error;
 
     /******** BEGIN - PUBLIC FOR TESTING PURPOSES ONLY ********/
     public void setCloseTask(VisualGridTask task) {
@@ -73,6 +72,7 @@ public class RunningTest {
 
     public Future<TestResultContainer> abort(boolean forceAbort, Throwable e) {
         logger.verbose("enter");
+        logger.verbose(String.format("test info: %s", browserInfo));
         if (closeTask != null) {
             logger.verbose("close task already exists");
             if (forceAbort &&  closeTask.getType() == VisualGridTask.TaskType.CLOSE) {
@@ -222,6 +222,7 @@ public class RunningTest {
     }
 
     public VisualGridTask open() {
+        logger.verbose(String.format("test info: %s", browserInfo));
         logger.verbose("adding Open visualGridTask...");
         VisualGridTask visualGridTask = new VisualGridTask(new Configuration(configurationProvider.get()), null,
                 eyes, VisualGridTask.TaskType.OPEN, taskListener, null, this, null, null);
@@ -239,6 +240,7 @@ public class RunningTest {
     }
 
     public FutureTask<TestResultContainer> close() {
+        logger.verbose(String.format("test info: %s", browserInfo));
         VisualGridTask lastVisualGridTask;
         if (!this.visualGridTaskList.isEmpty()) {
             logger.verbose("visual grid tasks list not empty");
@@ -255,8 +257,7 @@ public class RunningTest {
                 return taskToFutureMapping.get(closeTask);
             }
 
-            logger.verbose("task list is empty and close task doesn't exist, not adding new close task");
-            return null;
+            logger.verbose("task list is empty and close task doesn't exist");
         }
 
         logger.verbose("adding close visualGridTask...");
@@ -288,6 +289,7 @@ public class RunningTest {
     }
 
     public VisualGridTask check(ICheckSettings checkSettings, List<VisualGridSelector[]> regionSelectors, String source) {
+        logger.verbose(String.format("test info: %s", browserInfo));
         logger.verbose("adding check visualGridTask...");
         VisualGridTask visualGridTask = new VisualGridTask(new Configuration(configurationProvider.get()), null,
                 eyes, VisualGridTask.TaskType.CHECK, taskListener, checkSettings, this, regionSelectors, source);
@@ -327,7 +329,6 @@ public class RunningTest {
 
     public void setTestInExceptionMode(Throwable e) {
         this.isTestInExceptionMode.set(true);
-        this.error = e;
 
         if (closeTask != null) {
             logger.verbose("locking visualGridTaskList.");

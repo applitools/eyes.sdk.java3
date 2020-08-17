@@ -473,6 +473,7 @@ public class Eyes implements IEyesBase {
      * @return the test results
      */
     public TestResults close(boolean shouldThrowException) {
+        getLogger().verbose("enter");
         return activeEyes.close(shouldThrowException);
     }
 
@@ -1850,6 +1851,7 @@ public class Eyes implements IEyesBase {
     }
 
     public void closeAsync() {
+        getLogger().verbose("enter");
         if (isVisualGridEyes) {
             visualGridEyes.closeAsync();
         } else {

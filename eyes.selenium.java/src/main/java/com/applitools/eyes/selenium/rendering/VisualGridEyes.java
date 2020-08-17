@@ -305,7 +305,10 @@ public class VisualGridEyes implements ISeleniumEyes, IRenderingEyes {
     }
 
     public Collection<Future<TestResultContainer>> close() {
-        if (!validateEyes()) return new ArrayList<>();
+        logger.verbose("enter");
+        if (!validateEyes()) {
+            return new ArrayList<>();
+        }
         return closeAndReturnResults(false);
     }
 
@@ -386,13 +389,15 @@ public class VisualGridEyes implements ISeleniumEyes, IRenderingEyes {
     }
 
     private Collection<Future<TestResultContainer>> closeAndReturnResults(boolean throwException) {
-        if (!validateEyes()) return new ArrayList<>();
+        logger.verbose("enter " + getConfiguration().getBatch());
+        if (!validateEyes()) {
+            return new ArrayList<>();
+        }
 
         if (this.closeFuturesSet == null) {
             closeFuturesSet = new HashSet<>();
         }
         Throwable exception = null;
-        logger.verbose("enter " + getConfiguration().getBatch());
         try {
             Collection<Future<TestResultContainer>> futureList = closeAsync();
             this.renderingGridRunner.close(this);
@@ -421,10 +426,14 @@ public class VisualGridEyes implements ISeleniumEyes, IRenderingEyes {
     }
 
     public Collection<Future<TestResultContainer>> closeAsync() {
-        if (!validateEyes()) return new ArrayList<>();
+        logger.verbose("enter");
+        if (!validateEyes()) {
+            return new ArrayList<>();
+        }
         List<Future<TestResultContainer>> futureList = null;
         try {
             futureList = new ArrayList<>();
+            logger.verbose(String.format("closing %d running tests", testList.size()));
             for (RunningTest runningTest : testList) {
                 logger.verbose("running test name: " + getConfiguration().getTestName());
                 logger.verbose("running test device info: " + runningTest.getBrowserInfo());
@@ -443,6 +452,8 @@ public class VisualGridEyes implements ISeleniumEyes, IRenderingEyes {
         } catch (Throwable e) {
             GeneralUtils.logExceptionStackTrace(logger, e);
         }
+
+        logger.verbose("exit");
         return futureList;
     }
 

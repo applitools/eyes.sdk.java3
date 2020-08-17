@@ -6,6 +6,8 @@ import java.util.UUID;
 
 public abstract class EyesRunner {
 
+    private TestResultsSummary allTestResults = null;
+
     protected Logger logger = new IdPrintingLogger("n/a");
 
     private Map<String, IBatchCloser> batchesServerConnectorsMap = new HashMap<>();
@@ -19,7 +21,12 @@ public abstract class EyesRunner {
     }
 
     public TestResultsSummary getAllTestResults(boolean shouldThrowException) {
-        TestResultsSummary allTestResults;
+        logger.verbose("enter");
+        if (allTestResults != null) {
+            logger.log("WARNING: getAllTestResults called more than once");
+            return allTestResults;
+        }
+
         try {
             allTestResults = getAllTestResultsImpl(shouldThrowException);
         } finally {
@@ -29,6 +36,7 @@ public abstract class EyesRunner {
     }
 
     private void deleteAllBatches() {
+        logger.verbose(String.format("Deleting %d batches", batchesServerConnectorsMap.size()));
         for (String batch : batchesServerConnectorsMap.keySet()) {
             IBatchCloser connector = batchesServerConnectorsMap.get(batch);
             connector.closeBatch(batch);

@@ -237,6 +237,7 @@
             <class name="com.applitools.eyes.api.TestApiMethods">
                 <methods>
                     <include name="TestCloseAsync" />
+                    <include name="TestWaitBeforeClose"/>
                 </methods>
             </class>
         </classes>
