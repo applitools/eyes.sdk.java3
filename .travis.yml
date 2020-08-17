@@ -20,15 +20,18 @@ addons:
 # $SDK
 before_install:
   - git clone https://$GITHUB_TOKEN@github.com/applitools/java3-connectivity.git
-  - cd java3-connectivity
+  - pushd java3-connectivity
   - mvn install
-  - cd ..
+  - popd
   - git clone https://$GITHUB_TOKEN@github.com/applitools/java3-ufg.git
-  - cd java3-ufg
+  - pushd java3-ufg
   - mvn install
-  - cd ..
+  - popd
 before_script:
   - export APPLITOOLS_REPORT_ID=${TRAVIS_COMMIT:0:7}-$TRAVIS_BUILD_NUMBER
+  - pushd eyes.selenium.java/src/main/node_resources
+  - npm install
+  - popd
 jobs:
   include:
     - stage: Test
