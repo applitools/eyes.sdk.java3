@@ -64,6 +64,7 @@ jobs:
         - ./runTests.sh "eyes.selenium.java"
     - name: Generic
       script:
+        - export APPLITOOLS_REPORT_ID=${TRAVIS_COMMIT:0:7}-$TRAVIS_BUILD_NUMBER
         - cd eyes.selenium.java;
         - if [[ $TRAVIS_TAG =~ ^RELEASE_CANDIDATE ]]; then
           yarn release;
