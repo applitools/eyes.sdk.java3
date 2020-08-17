@@ -24,31 +24,30 @@ before_install:
   - mvn install
   - cd ..
 before_script:
-  - nvm install 14.5.0
-  - nvm use 14.5.0
+  - export APPLITOOLS_REPORT_ID=${TRAVIS_COMMIT:0:7}-$TRAVIS_BUILD_NUMBER
 jobs:
   include:
     - stage: Test
       name: Core
       script:
-        - export APPLITOOLS_REPORT_ID=${TRAVIS_COMMIT:0:7}-$TRAVIS_BUILD_NUMBER
+        - echo APPLITOOLS_REPORT_ID
         - chmod +x ./runTests.sh
         - ./runTests.sh "eyes.sdk.core"
     - name: Images
       script:
-        - export APPLITOOLS_REPORT_ID=${TRAVIS_COMMIT:0:7}-$TRAVIS_BUILD_NUMBER
+        - echo APPLITOOLS_REPORT_ID
         - chmod +x ./runTests.sh
         - ./runTests.sh "eyes.images.java"
     - name: Appium IOS
       script:
-        - export APPLITOOLS_REPORT_ID=${TRAVIS_COMMIT:0:7}-$TRAVIS_BUILD_NUMBER
+        - echo APPLITOOLS_REPORT_ID
         - sh upload_app.sh "https://applitools.bintray.com/Examples/ipa/IOSTestApp_1.ipa" "app_ios"
         - sed -i 's/androidTestSuite.xml/iosTestSuite.xml/g' $TRAVIS_BUILD_DIR/eyes.appium.java/pom.xml;
         - chmod +x ./runTests.sh
         - ./runTests.sh "eyes.appium.java"
     - name: Selenium
       script:
-        - export APPLITOOLS_REPORT_ID=${TRAVIS_COMMIT:0:7}-$TRAVIS_BUILD_NUMBER
+        - echo APPLITOOLS_REPORT_ID
         - google-chrome --version
         - chromium-browser --version
         - latestChromeDriverURL=$(wget http://chromedriver.storage.googleapis.com/LATEST_RELEASE -q -O -)
@@ -64,7 +63,9 @@ jobs:
         - ./runTests.sh "eyes.selenium.java"
     - name: Generic
       script:
-        - export APPLITOOLS_REPORT_ID=${TRAVIS_COMMIT:0:7}-$TRAVIS_BUILD_NUMBER
+        - echo APPLITOOLS_REPORT_ID
+        - nvm install 14.5.0
+        - nvm use 14.5.0
         - cd eyes.selenium.java;
         - if [[ $TRAVIS_TAG =~ ^RELEASE_CANDIDATE ]]; then
           yarn release;
@@ -73,7 +74,7 @@ jobs:
           fi
     - stage: Test Appium Android
       script:
-        - export APPLITOOLS_REPORT_ID=${TRAVIS_COMMIT:0:7}-$TRAVIS_BUILD_NUMBER
+        - echo APPLITOOLS_REPORT_ID
         - sh upload_app.sh "https://applitools.bintray.com/Examples/android/1.2/app_android.apk" "app_android"
         - sh upload_app.sh "https://applitools.bintray.com/Examples/androidx/1.0.0/app_androidx.apk" "app_androidx"
         - chmod +x ./runTests.sh
