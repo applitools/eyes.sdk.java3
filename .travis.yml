@@ -19,7 +19,7 @@ addons:
 # $ALLOWED_RELEASE_COMMITERS
 # $SDK
 before_install:
-  - git clone https://github.com/applitools/java3-connectivity.git
+  - git clone https://$GITHUB_TOKEN@github.com/applitools/java3-connectivity.git
   - cd java3-connectivity
   - mvn install
   - cd ..
