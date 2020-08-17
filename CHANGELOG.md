@@ -1,6 +1,7 @@
 ## [vNext]
 ### Updated
 - DOM snapshot script to 4.0.5. [Trello 2006](https://trello.com/c/a6l6gTf9)
+- Extracted connectivity and ufg dom analyzing to remote repositories. [Trello 2074](https://trello.com/c/pP9VbmKF)
 ### Added
 - When render fails, the correct useragent will be sent in the test results. [Trello 2086](https://trello.com/c/RLOmjJLT)
 - When render fails, the correct device size will be sent in the test results. [Trello 2087](https://trello.com/c/AQ0upINc)

@@ -64,17 +64,17 @@ public class TestRenderingTask extends ReportingTestSuite {
         final Future<?> future = mock(Future.class);
         when(future.get()).thenThrow(new IllegalStateException());
         when(future.get(anyLong(), (TimeUnit) any())).thenThrow(new IllegalStateException());
-        VisualGridTask visualGridTask = mock(VisualGridTask.class);
-        IEyesConnector eyesConnector = mock(IEyesConnector.class);
-        when(visualGridTask.getEyesConnector()).thenReturn(eyesConnector);
         UserAgent userAgent = mock(UserAgent.class);
         when(userAgent.getOriginalUserAgentString()).thenReturn("");
 
         final AtomicInteger counter = new AtomicInteger();
-        final RenderingTask renderingTask = new RenderingTask(eyesConnector, Collections.singletonList(visualGridTask), userAgent);
+        ServerConnector serverConnector = mock(ServerConnector.class);
+
+        final DomAnalyzer domAnalyzer = new DomAnalyzer(new Logger(), serverConnector, new NullDebugResourceWriter(),
+                frameData, new HashMap<String, RGridResource>(), userAgent);
 
         // When RenderingTask tries to get a new resource, this task will be submitted to the ExecutorService
-        when(eyesConnector.getResource(ArgumentMatchers.<URI>any(), anyString(), anyString(), ArgumentMatchers.<TaskListener<RGridResource>>any()))
+        when(serverConnector.downloadResource(ArgumentMatchers.<URI>any(), anyString(), anyString(), ArgumentMatchers.<TaskListener<RGridResource>>any()))
                 .thenAnswer(new Answer<Future<?>>() {
             @Override
             public Future<?> answer(final InvocationOnMock invocationOnMock) throws Throwable {
@@ -94,12 +94,12 @@ public class TestRenderingTask extends ReportingTestSuite {
                                 }
                                 if (!Objects.requireNonNull(innerUrls).isEmpty()) {
                                     try {
-                                        renderingTask.fetchAllResources(allBlobs, stringsToUris(innerUrls.keySet()), frameData);
+                                        domAnalyzer.fetchAllResources(allBlobs, stringsToUris(innerUrls.keySet()));
                                     } catch (URISyntaxException e) {
                                         throw new IllegalStateException(e);
                                     }
                                 }
-                                renderingTask.resourcesPhaser.arriveAndDeregister();
+                                domAnalyzer.resourcesPhaser.arriveAndDeregister();
                             }
                         }
                     });
@@ -111,8 +111,8 @@ public class TestRenderingTask extends ReportingTestSuite {
         });
 
         // We call the method which activates the process of collecting resources and wait to see if it ends properly.
-        renderingTask.fetchAllResources(allBlobs, resourceUrls, frameData);
-        renderingTask.resourcesPhaser.awaitAdvanceInterruptibly(0, 30, TimeUnit.SECONDS);
+        domAnalyzer.fetchAllResources(allBlobs, resourceUrls);
+        domAnalyzer.resourcesPhaser.awaitAdvanceInterruptibly(0, 30, TimeUnit.SECONDS);
         Assert.assertEquals(counter.get(), 8);
     }
 

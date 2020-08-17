@@ -13,25 +13,20 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.MapperFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
-import org.apache.commons.io.IOUtils;
 import org.apache.http.HttpStatus;
-import org.brotli.dec.BrotliInputStream;
 
 import javax.ws.rs.HttpMethod;
 import javax.ws.rs.core.MediaType;
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URL;
 import java.util.*;
 import java.util.concurrent.Future;
 
-public class ServerConnector extends RestClient {
+public class ServerConnector extends UfgConnector {
 
     public static final int DEFAULT_CLIENT_TIMEOUT = 1000 * 60 * 5; // 5 minutes
     public static final int MAX_CONNECTION_RETRIES = 3;
-
-    private static final List<String> DOMAINS_FILTERED = Collections.singletonList("https://fonts.googleapis.com");
 
     static final String API_SESSIONS = "api/sessions";
     static final String CLOSE_BATCH = "api/sessions/batches/%s/close/bypointerid";
@@ -329,71 +324,6 @@ public class ServerConnector extends RestClient {
                     downloadString(uri, listener, attemptNumber + 1);
                 } else {
                     listener.onFail();
-                }
-            }
-        }, null, null, false);
-    }
-
-    public Future<?> downloadResource(final URI url, final String userAgent, final String refererUrl,
-                                      final TaskListener<RGridResource> listener) {
-        return downloadResource(url, userAgent, refererUrl, listener, 1);
-    }
-
-    public Future<?> downloadResource(final URI url, final String userAgent, final String refererUrl,
-                                      final TaskListener<RGridResource> listener, final int attemptNumber) {
-        AsyncRequest asyncRequest = restClient.target(url.toString()).asyncRequest(MediaType.WILDCARD);
-        asyncRequest.header("Referer", refererUrl);
-        if (!DOMAINS_FILTERED.contains(url.toString())) {
-            asyncRequest.header("User-Agent", userAgent);
-        }
-
-        return asyncRequest.method(HttpMethod.GET, new AsyncRequestCallback() {
-            @Override
-            public void onComplete(Response response) {
-                RGridResource rgResource = null;
-                try {
-                    String contentLengthStr = response.getHeader(Request.CONTENT_LENGTH_HEADER, false);
-                    int contentLength = 0;
-                    if (contentLengthStr != null) {
-                        contentLength = Integer.parseInt(contentLengthStr);
-                    }
-                    logger.verbose("Content Length: " + contentLength);
-                    logger.verbose("downloading url - : " + url);
-
-                    int statusCode = response.getStatusCode();
-                    if (statusCode != HttpStatus.SC_OK && statusCode != HttpStatus.SC_CREATED) {
-                        logger.log(String.format("Error: Status %d on url %s when trying to get resource. Sending empty resource", statusCode, url));
-                        rgResource = RGridResource.createEmpty(url.toString());
-                        return;
-                    }
-
-                    byte[] fileContent = downloadFile(response);
-                    String contentType = response.getHeader(Request.CONTENT_TYPE_HEADER, true);
-                    String contentEncoding = response.getHeader("Content-Encoding", true);
-                    if (contentEncoding != null && contentEncoding.contains("gzip")) {
-                        try {
-                            fileContent = GeneralUtils.getUnGzipByteArrayOutputStream(fileContent);
-                        } catch (IOException e) {
-                            GeneralUtils.logExceptionStackTrace(logger, e);
-                        }
-                    }
-
-                    rgResource = new RGridResource(url.toString(), contentType, fileContent);
-                } finally {
-                    listener.onComplete(rgResource);
-                    response.close();
-                }
-            }
-
-            @Override
-            public void onFail(Throwable throwable) {
-                GeneralUtils.logExceptionStackTrace(logger, throwable);
-                if (attemptNumber < MAX_CONNECTION_RETRIES) {
-                    logger.verbose(String.format("Failed downloading resource %s - trying again", url));
-                    downloadResource(url, userAgent, refererUrl, listener, attemptNumber + 1);
-                } else {
-                    logger.log(String.format("Error: Failed getting resource with url %s. Sending empty resource", url));
-                    listener.onComplete(RGridResource.createEmpty(url.toString()));
                 }
             }
         }, null, null, false);

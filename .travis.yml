@@ -23,6 +23,10 @@ before_install:
   - cd java3-connectivity
   - mvn install
   - cd ..
+  - git clone https://github.com/applitools/java3-ufg.git
+  - cd java3-ufg
+  - mvn install
+  - cd ..
 before_script:
   - export APPLITOOLS_REPORT_ID=${TRAVIS_COMMIT:0:7}-$TRAVIS_BUILD_NUMBER
 jobs:

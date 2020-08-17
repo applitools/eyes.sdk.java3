@@ -23,7 +23,7 @@
     <dependencies>
         <dependency>
             <groupId>com.applitools</groupId>
-            <artifactId>eyes-connectivity-java3</artifactId>
+            <artifactId>eyes-ufg-java3</artifactId>
             <version>3.175.0</version>
             <exclusions>
                 <exclusion>
