@@ -23,7 +23,7 @@ before_install:
   - cd java3-connectivity
   - mvn install
   - cd ..
-  - git clone https://github.com/applitools/java3-ufg.git
+  - git clone https://$GITHUB_TOKEN@github.com/applitools/java3-ufg.git
   - cd java3-ufg
   - mvn install
   - cd ..
