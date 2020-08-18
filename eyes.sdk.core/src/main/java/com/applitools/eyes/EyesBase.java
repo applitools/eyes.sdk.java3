@@ -780,10 +780,7 @@ public abstract class EyesBase implements IEyesBase {
 
     protected String tryCaptureAndPostDom(ICheckSettingsInternal checkSettingsInternal) {
         String domUrl = null;
-
-        Boolean sendDomFormCheckSettings = checkSettingsInternal.isSendDom();
-        boolean sendDomFromConfig = getConfigurationInstance().isSendDom() == null || getConfigurationInstance().isSendDom();
-        if ((sendDomFormCheckSettings != null && sendDomFormCheckSettings) || (sendDomFormCheckSettings == null && sendDomFromConfig)) {
+        if (shouldCaptureDom(checkSettingsInternal.isSendDom())) {
             try {
                 String domJson = tryCaptureDom();
                 domUrl = tryPostDomCapture(domJson);
@@ -794,6 +791,11 @@ public abstract class EyesBase implements IEyesBase {
         }
 
         return domUrl;
+    }
+
+    private boolean shouldCaptureDom(Boolean sendDomFromCheckSettings) {
+        boolean sendDomFromConfig = getConfigurationInstance().isSendDom() == null || getConfigurationInstance().isSendDom();
+        return (sendDomFromCheckSettings != null && sendDomFromCheckSettings) || (sendDomFromCheckSettings == null && sendDomFromConfig);
     }
 
     protected ValidationInfo fireValidationWillStartEvent(String tag) {

@@ -25,6 +25,7 @@
             <groupId>com.applitools</groupId>
             <artifactId>eyes-ufg-java3</artifactId>
             <version>3.175.0</version>
+            <!--This exclusion does nothing. We need it for running tests for all 3 connectivity packages-->
             <exclusions>
                 <exclusion>
                     <groupId>com.applitools</groupId>
