@@ -1,8 +1,13 @@
 package com.applitools.eyes.images;
 
 import com.applitools.eyes.RectangleSize;
+import com.applitools.eyes.StdoutLogHandler;
+import com.applitools.eyes.TestResults;
 import com.applitools.eyes.config.Configuration;
+import com.applitools.eyes.metadata.StartInfo;
 import com.applitools.eyes.utils.ReportingTestSuite;
+import com.applitools.eyes.utils.TestUtils;
+import org.testng.Assert;
 import org.testng.annotations.Test;
 
 import javax.imageio.ImageIO;
@@ -19,9 +24,7 @@ public class ImagesDemo extends ReportingTestSuite {
     @Test
     public void testSanity() {
         Eyes eyes = new Eyes();
-        Configuration configuration = eyes.getConfiguration();
-        configuration.setViewportSize(new RectangleSize(785, 1087));
-        eyes.setConfiguration(configuration);
+        eyes.setLogHandler(new StdoutLogHandler());
         BufferedImage img;
         try {
             // Start visual testing
@@ -33,7 +36,9 @@ public class ImagesDemo extends ReportingTestSuite {
             eyes.check("Contact page", Target.image(img));
 
             // End visual testing. Validate visual correctness.
-            eyes.close();
+            TestResults results = eyes.close();
+            StartInfo startInfo = TestUtils.getSessionResults(eyes.getApiKey(), results).getStartInfo();
+            Assert.assertEquals(startInfo.getEnvironment().getDisplaySize(), new RectangleSize(img.getWidth(), img.getHeight()));
         } catch (IOException ex) {
             System.out.println(ex.toString());
         } finally {

@@ -2,6 +2,7 @@
 ### Fixed
 - UFG tests now finish properly even when being closed after `eyes.check` has finished. [Trello 2000](https://trello.com/c/0EWqP5to)
 - Now using cut provider and scale provider added by the user in the visual locators. [Trello 1955](https://trello.com/c/rhfcRXLV)
+- The viewport size in eyes-images is now the size of the checked image. [Trello 1783](https://trello.com/c/CHwLLCl1)
 ### Updated
 - DOM snapshot script to 4.0.5. [Trello 2006](https://trello.com/c/a6l6gTf9)
 - Extracted connectivity and ufg dom analyzing to remote repositories. [Trello 2074](https://trello.com/c/pP9VbmKF)

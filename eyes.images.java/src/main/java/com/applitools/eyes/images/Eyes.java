@@ -55,11 +55,10 @@ public class Eyes extends EyesBase implements IConfiguration {
         config.setAppName(appName);
         config.setTestName(testName);
         config.setViewportSize(dimensions);
-        openBase();
     }
 
     /**
-     * ﻿Starts a new test without setting the viewport size of the AUT.
+     * Starts a new test without setting the viewport size of the AUT.
      * @param appName  The name of the application under test.
      * @param testName The test name.
      * @see #open(String, String, RectangleSize)
@@ -67,19 +66,16 @@ public class Eyes extends EyesBase implements IConfiguration {
     public void open(String appName, String testName) {
         config.setAppName(appName);
         config.setTestName(testName);
-        openBase();
     }
 
     public boolean check(String name, ICheckSettings checkSettings) {
         IImagesCheckTarget imagesCheckTarget = (checkSettings instanceof IImagesCheckTarget) ? (IImagesCheckTarget) checkSettings : null;
 
-        if (imagesCheckTarget == null) return false;
+        if (imagesCheckTarget == null) {
+            return false;
+        }
 
         BufferedImage image = imagesCheckTarget.getImage();
-
-        if (config.getViewportSize() == null) {
-            setViewportSize(new RectangleSize(image.getWidth(), image.getHeight()));
-        }
         return checkImage_(RegionProvider.NULL_INSTANCE, image, name, checkSettings);
     }
 
@@ -141,10 +137,6 @@ public class Eyes extends EyesBase implements IConfiguration {
         ArgumentGuard.notNull(image, "image cannot be null!");
 
         logger.verbose(String.format("CheckImage(Image, '%s', %b)", tag, ignoreMismatch));
-
-        if (config.getViewportSize() == null) {
-            setViewportSize(new RectangleSize(image.getWidth(), image.getHeight()));
-        }
 
         return checkImage_(RegionProvider.NULL_INSTANCE, image, tag, new CheckSettings(USE_DEFAULT_TIMEOUT));
     }
@@ -233,11 +225,6 @@ public class Eyes extends EyesBase implements IConfiguration {
         ArgumentGuard.notNull(region, "region cannot be null!");
 
         logger.verbose(String.format("CheckRegion(Image, [%s], '%s', %b)", region, tag, ignoreMismatch));
-
-        if (config.getViewportSize() == null) {
-            setViewportSize(new RectangleSize(image.getWidth(), image.getHeight()));
-        }
-
         return checkImage_(new RegionProvider() {
             public Region getRegion() {
                 return region;
@@ -359,7 +346,6 @@ public class Eyes extends EyesBase implements IConfiguration {
     }
 
     /**
-     * See {@link #checkImage_(RegionProvider, String, ICheckSettings)}.
      * @param regionProvider The region for which verification will be performed.
      * @param image          The image to perform visual validation for.
      * @param tag            An optional tag to be associated with the validation checkpoint.
@@ -370,6 +356,13 @@ public class Eyes extends EyesBase implements IConfiguration {
                                 BufferedImage image,
                                 String tag,
                                 ICheckSettings checkSettings) {
+
+        if (config.getViewportSize() == null || config.getViewportSize().isEmpty()) {
+            setViewportSize(new RectangleSize(image.getWidth(), image.getHeight()));
+        }
+
+        openBase();
+
         // We verify that the image is indeed in the correct format.
         image = ImageUtils.normalizeImageType(image);
 
@@ -382,20 +375,6 @@ public class Eyes extends EyesBase implements IConfiguration {
 
         // Set the screenshot to be verified.
         screenshot = new EyesImagesScreenshot(logger, image);
-
-        return checkImage_(regionProvider, tag, checkSettings);
-    }
-
-
-    /**
-     * Internal function for performing an image verification for a region of
-     * a buffered image.
-     * @param regionProvider The region for which verification will be performed.
-     * @param tag            An optional tag to be associated with the validation checkpoint.
-     * @param checkSettings  The settings to use when checking the image.
-     * @return True if the image matched the expected output, false otherwise.
-     */
-    private boolean checkImage_(RegionProvider regionProvider, String tag, ICheckSettings checkSettings) {
 
         // Set the title to be linked to the screenshot.
         title = (tag != null) ? tag : "";
