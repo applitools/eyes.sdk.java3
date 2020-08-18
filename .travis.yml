@@ -19,12 +19,12 @@ addons:
 # $ALLOWED_RELEASE_COMMITERS
 # $SDK
 before_install:
-  - git clone https://$GITHUB_TOKEN@github.com/applitools/java3-connectivity.git
-  - pushd java3-connectivity
+  - git clone https://$GITHUB_TOKEN@github.com/applitools/eyes.common.java3.git
+  - pushd eyes.common.java3
   - mvn install
   - popd
-  - git clone https://$GITHUB_TOKEN@github.com/applitools/java3-ufg.git
-  - pushd java3-ufg
+  - git clone https://$GITHUB_TOKEN@github.com/applitools/eyes.ufg.java3.git
+  - pushd eyes.ufg.java3
   - mvn install
   - popd
 before_script:
