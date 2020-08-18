@@ -1845,22 +1845,6 @@ public class SeleniumEyes extends EyesBase implements ISeleniumEyes, IBatchClose
         }
 
         /**
-         * Gets cut provider.
-         * @return the cut provider
-         */
-        public String getCutProvider() {
-            return SeleniumEyes.this.cutProviderHandler.get().getClass().getName();
-        }
-
-        /**
-         * Gets scale provider.
-         * @return the scale provider
-         */
-        public String getScaleProvider() {
-            return SeleniumEyes.this.scaleProviderHandler.get().getClass().getName();
-        }
-
-        /**
          * Gets stitch mode.
          * @return the stitch mode
          */
@@ -1885,8 +1869,8 @@ public class SeleniumEyes extends EyesBase implements ISeleniumEyes, IBatchClose
             if (forceFullPageScreenshot == null) return false;
             return forceFullPageScreenshot;
         }
-    }
 
+    }
     @Override
     public Object getAgentSetup() {
         return new EyesSeleniumAgentSetup();
@@ -1911,5 +1895,17 @@ public class SeleniumEyes extends EyesBase implements ISeleniumEyes, IBatchClose
 
     public UserAgent getUserAgent() {
         return userAgent;
+    }
+
+    /**
+     * Gets scale provider.
+     * @return the scale provider
+     */
+    public ScaleProvider getScaleProvider() {
+        return scaleProviderHandler.get();
+    }
+
+    public CutProvider getCutProvider() {
+        return cutProviderHandler.get();
     }
 }

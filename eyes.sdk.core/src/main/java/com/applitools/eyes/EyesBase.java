@@ -346,6 +346,10 @@ public abstract class EyesBase implements IEyesBase {
         return cutProviderHandler != null && !(cutProviderHandler.get() instanceof NullCutProvider);
     }
 
+    public boolean getIsScaleProviderExplicitlySet() {
+        return scaleProviderHandler != null && !(scaleProviderHandler.get() instanceof NullScaleProvider);
+    }
+
     /**
      * Manually set the scale ratio for the images being validated.
      * @param scaleRatio The scale ratio to use, or {@code null} to reset

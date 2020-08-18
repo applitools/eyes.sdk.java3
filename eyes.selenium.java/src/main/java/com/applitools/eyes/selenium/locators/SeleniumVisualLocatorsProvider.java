@@ -33,6 +33,14 @@ public class SeleniumVisualLocatorsProvider extends BaseVisualLocatorsProvider {
         UserAgent.parseUserAgentString(uaString, true);
         ImageProvider provider = ImageProviderFactory.getImageProvider(userAgent, eyes, logger, driver);
         BufferedImage image = provider.getImage();
-        return ImageUtils.scaleImage(image, 1 / devicePixelRatio);
+        if (eyes.getIsCutProviderExplicitlySet()) {
+            image = eyes.getCutProvider().cut(image);
+        }
+
+        double scaleRatio = devicePixelRatio;
+        if (eyes.getIsScaleProviderExplicitlySet()) {
+            scaleRatio = eyes.getScaleProvider().getScaleRatio();
+        }
+        return ImageUtils.scaleImage(image, 1 / scaleRatio);
     }
 }
