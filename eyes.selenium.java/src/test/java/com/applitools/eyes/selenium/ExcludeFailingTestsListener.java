@@ -1,10 +1,9 @@
 package com.applitools.eyes.selenium;
 
 import org.testng.*;
-import java.util.*;
-import java.lang.reflect.Method;
-import com.applitools.eyes.api.TestApiMethods;
 
+import java.lang.reflect.Method;
+import java.util.Map;
 
 
 /**

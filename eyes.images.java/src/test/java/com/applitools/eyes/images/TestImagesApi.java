@@ -1,9 +1,7 @@
 package com.applitools.eyes.images;
 
 import com.applitools.eyes.*;
-import com.applitools.eyes.config.Configuration;
 import com.applitools.eyes.utils.ReportingTestSuite;
-import org.testng.Assert;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.BeforeMethod;
@@ -69,24 +67,5 @@ public class TestImagesApi extends ReportingTestSuite {
     public void TestCheckImage_Fluent_CutProvider() {
         eyes.setImageCut(new UnscaledFixedCutProvider(200, 100, 100, 50));
         eyes.check("TestCheckImage_Fluent", Target.image("resources/minions-800x500.jpg"));
-    }
-
-    @Test
-    public void TestConfiguration(){
-        Configuration config = new Configuration();
-
-        Eyes e1 = new Eyes();
-        e1.setConfiguration((Configuration)config.setAppName("app1"));
-
-        Eyes e2 = new Eyes();
-        e2.setConfiguration((Configuration)config.setAppName("app2"));
-
-        Eyes e3 = new Eyes();
-        config.setAppName("DefaultAppName");
-        e3.setConfiguration(config);
-
-        Assert.assertEquals("app1", e1.getConfiguration().getAppName(), "e1 app name");
-        Assert.assertEquals("app2", e2.getConfiguration().getAppName(), "e2 app name");
-        Assert.assertEquals("DefaultAppName", e3.getConfiguration().getAppName(), "e3 app name");
     }
 }
