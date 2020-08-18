@@ -20,13 +20,13 @@ public class FixedCutProvider implements CutProvider {
     /**
      *
      * @param header The header to cut in pixels.
-     * @param bottom The bottom to cut in pixels.
+     * @param footer The footer to cut in pixels.
      * @param left The left to cut in pixels.
      * @param right The right to cut in pixels.
      */
-    public FixedCutProvider(int header, int bottom, int left, int right) {
+    public FixedCutProvider(int header, int footer, int left, int right) {
         this.header = header;
-        this.footer = bottom;
+        this.footer = footer;
         this.left = left;
         this.right = right;
     }
