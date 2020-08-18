@@ -55,7 +55,6 @@ public class Eyes extends EyesBase implements IConfiguration {
         config.setAppName(appName);
         config.setTestName(testName);
         config.setViewportSize(dimensions);
-        isOpen = true;
     }
 
     /**
@@ -67,7 +66,6 @@ public class Eyes extends EyesBase implements IConfiguration {
     public void open(String appName, String testName) {
         config.setAppName(appName);
         config.setTestName(testName);
-        isOpen = true;
     }
 
     public boolean check(String name, ICheckSettings checkSettings) {
