@@ -10,7 +10,7 @@ import java.util.concurrent.*;
 
 public class VisualGridRunner extends EyesRunner {
 
-    private int concurrentOpenSessions;
+    private final int concurrentOpenSessions;
 
     //For Testing...
     private final Object openerServiceDebugLock;
@@ -22,11 +22,11 @@ public class VisualGridRunner extends EyesRunner {
     private EyesService eyesCloserService;
     private EyesService eyesCheckerService;
     private RenderingGridService renderingGridService;
-    private ThreadGroup servicesGroup = new ThreadGroup("Services Group");
+    private final ThreadGroup servicesGroup = new ThreadGroup("Services Group");
     private final List<IRenderingEyes> eyesToOpenList = Collections.synchronizedList(new ArrayList<IRenderingEyes>(200));
     private final Set<IRenderingEyes> allEyes = Collections.synchronizedSet(new HashSet<IRenderingEyes>());
-    private Map<String, RGridResource> cachedResources = Collections.synchronizedMap(new HashMap<String, RGridResource>());
-    private Map<String, RGridResource> putResourceCache = Collections.synchronizedMap(new HashMap<String, RGridResource>());
+    private final Map<String, RGridResource> cachedResources = Collections.synchronizedMap(new HashMap<String, RGridResource>());
+    private final Map<String, RGridResource> putResourceCache = Collections.synchronizedMap(new HashMap<String, RGridResource>());
 
     private final Object openerServiceConcurrencyLock = new Object();
     private final Object openerServiceLock = new Object();
@@ -95,18 +95,14 @@ public class VisualGridRunner extends EyesRunner {
     }
 
     @SuppressWarnings("SynchronizationOnLocalVariableOrMethodParameter")
-    private FutureTask<TestResultContainer> getOrWaitForTask(Object lock, @SuppressWarnings("SpellCheckingInspection") EyesService.Tasker tasker,
-                                                             String serviceName) {
+    private FutureTask<TestResultContainer> getOrWaitForTask(Object lock, EyesService.Tasker tasker) {
         FutureTask<TestResultContainer> nextTestToOpen = tasker.getNextTask();
         if (nextTestToOpen == null) {
             try {
-//                logger.verbose("locking " + serviceName);
                 synchronized (lock) {
                     lock.wait(500);
                 }
-//                logger.verbose("releasing " + serviceName);
                 nextTestToOpen = tasker.getNextTask();
-//                logger.verbose(serviceName + " tasker returned " + nextTestToOpen);
             } catch (Exception e) {
                 GeneralUtils.logExceptionStackTrace(logger, e);
             }
@@ -121,7 +117,7 @@ public class VisualGridRunner extends EyesRunner {
         renderingGridService.debugPauseService();
     }
 
-    private IRenderingEyes.EyesListener eyesListener = new IRenderingEyes.EyesListener() {
+    private final IRenderingEyes.EyesListener eyesListener = new IRenderingEyes.EyesListener() {
         @Override
         public void onTaskComplete(VisualGridTask visualGridTask, IRenderingEyes eyes) {
             logger.verbose("Enter with: " + visualGridTask.getType());
@@ -210,8 +206,8 @@ public class VisualGridRunner extends EyesRunner {
         this.eyesOpenerService = new OpenerService("eyesOpenerService", servicesGroup,
                 logger, this.concurrentOpenSessions, openerServiceConcurrencyLock, new EyesService.EyesServiceListener() {
             @Override
-            public FutureTask<TestResultContainer> getNextTask(@SuppressWarnings("SpellCheckingInspection") EyesService.Tasker tasker) {
-                return getOrWaitForTask(openerServiceLock, tasker, "eyesOpenerService");
+            public FutureTask<TestResultContainer> getNextTask(EyesService.Tasker tasker) {
+                return getOrWaitForTask(openerServiceLock, tasker);
             }
 
         }, openerServiceDebugLock, new EyesService.Tasker() {
@@ -223,9 +219,9 @@ public class VisualGridRunner extends EyesRunner {
 
         this.eyesCloserService = new EyesService("eyesCloserService", servicesGroup, logger, concurrentOpenSessions, closerServiceDebugLock, new EyesService.EyesServiceListener() {
             @Override
-            public FutureTask<TestResultContainer> getNextTask(@SuppressWarnings("SpellCheckingInspection") EyesService.Tasker tasker) {
+            public FutureTask<TestResultContainer> getNextTask(EyesService.Tasker tasker) {
 
-                return getOrWaitForTask(closerServiceLock, tasker, "eyesCloserService");
+                return getOrWaitForTask(closerServiceLock, tasker);
             }
 
         }, new EyesService.Tasker() {
@@ -260,9 +256,9 @@ public class VisualGridRunner extends EyesRunner {
 
         this.eyesCheckerService = new EyesService("eyesCheckerService", servicesGroup, logger, this.concurrentOpenSessions, checkerServiceDebugLock, new EyesService.EyesServiceListener() {
             @Override
-            public FutureTask<TestResultContainer> getNextTask(@SuppressWarnings("SpellCheckingInspection") EyesService.Tasker tasker) {
+            public FutureTask<TestResultContainer> getNextTask(EyesService.Tasker tasker) {
 
-                return getOrWaitForTask(checkerServiceLock, tasker, "eyesCheckerService");
+                return getOrWaitForTask(checkerServiceLock, tasker);
             }
 
         }, new EyesService.Tasker() {
@@ -275,7 +271,7 @@ public class VisualGridRunner extends EyesRunner {
     }
 
     private FutureTask<TestResultContainer> getNextCheckTask() {
-        VisualGridTask visualGridTask = null;
+        VisualGridTask visualGridTask;
         try {
             ScoreTask bestScoreTask = null;
             int bestScore = -1;
@@ -295,9 +291,11 @@ public class VisualGridRunner extends EyesRunner {
             if (bestScoreTask == null) {
                 return null;
             }
+
             visualGridTask = bestScoreTask.getVisualGridTask();
         } catch (Exception e) {
             GeneralUtils.logExceptionStackTrace(logger, e);
+            return null;
         }
         return new FutureTask<>(visualGridTask);
     }
@@ -333,7 +331,6 @@ public class VisualGridRunner extends EyesRunner {
     private synchronized FutureTask<TestResultContainer> getNextTestToOpen() {
         ScoreTask bestScoreTask = null;
         int bestMark = -1;
-//        logger.verbose("looking for best test in a list of " + allEyes.size());
         synchronized (allEyes) {
             for (IRenderingEyes eyes : allEyes) {
                 ScoreTask currentTestMark = null;
@@ -352,7 +349,6 @@ public class VisualGridRunner extends EyesRunner {
         }
 
         if (bestScoreTask == null) {
-//            logger.verbose("no test found.");
             return null;
         }
 
@@ -368,12 +364,10 @@ public class VisualGridRunner extends EyesRunner {
         if (this.renderingInfo == null) {
             this.renderingInfo = renderingInfo;
         }
-//        logger.verbose("locking eyesToOpenList");
+
         synchronized (eyesToOpenList) {
             eyesToOpenList.add(eyes);
         }
-//        logger.verbose("releasing eyesToOpenList");
-//        logger.verbose("locking allEyes");
 
         if (allEyes.isEmpty()) {
             this.setLogger(eyes.getLogger());

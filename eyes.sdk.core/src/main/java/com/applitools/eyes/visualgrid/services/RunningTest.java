@@ -18,12 +18,13 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 public class RunningTest {
     private final List<VisualGridTask> visualGridTaskList = Collections.synchronizedList(new ArrayList<VisualGridTask>());
-    private IEyesConnector eyes;
+    private IRenderingEyes eyes;
+    private IEyesConnector eyesConnector;
     private final RenderBrowserInfo browserInfo;
     private final AtomicBoolean isTestOpen = new AtomicBoolean(false);
     private final AtomicBoolean isTestClose = new AtomicBoolean(false);
     private final AtomicBoolean isTestInExceptionMode = new AtomicBoolean(false);
-    private RunningTestListener listener;
+    private IRenderingEyes.EyesListener listener;
     private ConfigurationProvider configurationProvider;
     private final HashMap<VisualGridTask, FutureTask<TestResultContainer>> taskToFutureMapping = new HashMap<>();
     private final Logger logger;
@@ -32,6 +33,43 @@ public class RunningTest {
     private VisualGridTask openTask;
     private String appName;
     private String testName;
+
+    private final VisualGridTask.TaskListener taskListener = new VisualGridTask.TaskListener() {
+        @Override
+        public void onTaskComplete(VisualGridTask visualGridTask) {
+            logger.verbose("locking runningTest.visualGridTaskList");
+            synchronized (visualGridTaskList) {
+                visualGridTaskList.remove(visualGridTask);
+            }
+            logger.verbose("releasing runningTest.visualGridTaskList");
+            switch (visualGridTask.getType()) {
+                case OPEN:
+                    isTestOpen.set(true);
+                    break;
+                case CLOSE:
+                case ABORT:
+                    isTestClose.set(true);
+                    break;
+            }
+            if (listener != null) {
+                listener.onTaskComplete(visualGridTask, eyes);
+            }
+        }
+
+        @Override
+        public void onTaskFailed(Throwable e, VisualGridTask visualGridTask) {
+            setTestInExceptionMode(e);
+            listener.onTaskComplete(visualGridTask, eyes);
+        }
+
+        @Override
+        public void onRenderComplete(RenderingTask renderingTask, Throwable error) {
+            logger.verbose("enter");
+            listener.onRenderComplete();
+            logger.verbose("exit");
+        }
+
+    };
 
     /******** BEGIN - PUBLIC FOR TESTING PURPOSES ONLY ********/
     public void setCloseTask(VisualGridTask task) {
@@ -60,11 +98,11 @@ public class RunningTest {
 
     /******** END - PUBLIC FOR TESTING PURPOSES ONLY ********/
 
-    public RunningTest(IEyesConnector eyes, ConfigurationProvider configurationProvider, RenderBrowserInfo browserInfo, Logger logger, RunningTestListener listener) {
+    public RunningTest(IRenderingEyes eyes, IEyesConnector eyesConnector, ConfigurationProvider configurationProvider, RenderBrowserInfo browserInfo, Logger logger) {
         this.eyes = eyes;
+        this.eyesConnector = eyesConnector;
         this.browserInfo = browserInfo;
         this.configurationProvider = configurationProvider;
-        this.listener = listener;
         this.logger = logger;
         this.appName = configurationProvider.get().getAppName();
         this.testName = configurationProvider.get().getTestName();
@@ -90,7 +128,7 @@ public class RunningTest {
         logger.verbose("close task doesn't exists, aborting the test");
         removeAllCheckTasks();
         VisualGridTask abortTask = new VisualGridTask(new Configuration(configurationProvider.get()), null,
-                eyes, VisualGridTask.TaskType.ABORT, taskListener, null, this, null, null);
+                eyesConnector, VisualGridTask.TaskType.ABORT, taskListener, null, this, null, null);
         visualGridTaskList.add(abortTask);
         this.closeTask = abortTask;
         FutureTask<TestResultContainer> futureTask = new FutureTask<>(abortTask);
@@ -100,7 +138,7 @@ public class RunningTest {
     }
 
     public IBatchCloser getBatchCloser() {
-        return (IBatchCloser) this.eyes;
+        return (IBatchCloser) this.eyesConnector;
     }
 
     private void removeAllCheckTasks() {
@@ -121,52 +159,6 @@ public class RunningTest {
         return closeTask != null;
     }
 
-    public interface RunningTestListener {
-
-        void onTaskComplete(VisualGridTask visualGridTask);
-
-        void onRenderComplete();
-
-    }
-
-    private final VisualGridTask.TaskListener taskListener = new VisualGridTask.TaskListener() {
-        @Override
-        public void onTaskComplete(VisualGridTask visualGridTask) {
-            logger.verbose("locking runningTest.visualGridTaskList");
-            synchronized (visualGridTaskList) {
-                visualGridTaskList.remove(visualGridTask);
-            }
-            logger.verbose("releasing runningTest.visualGridTaskList");
-            switch (visualGridTask.getType()) {
-                case OPEN:
-                    isTestOpen.set(true);
-                    break;
-                case CLOSE:
-                case ABORT:
-                    isTestClose.set(true);
-                    break;
-            }
-            if (listener != null) {
-                listener.onTaskComplete(visualGridTask);
-            }
-        }
-
-        @Override
-        public void onTaskFailed(Throwable e, VisualGridTask visualGridTask) {
-            setTestInExceptionMode(e);
-            listener.onTaskComplete(visualGridTask);
-        }
-
-        @Override
-        public void onRenderComplete(RenderingTask renderingTask, Throwable error) {
-            logger.verbose("enter");
-            listener.onRenderComplete();
-            logger.verbose("exit");
-        }
-
-    };
-
-
     public boolean isTestOpen() {
         return isTestOpen.get();
     }
@@ -176,7 +168,9 @@ public class RunningTest {
     }
 
     public ScoreTask getScoreTaskObjectByType(VisualGridTask.TaskType taskType) {
-        if (!this.isTestOpen.get() && taskType == VisualGridTask.TaskType.CHECK) return null;
+        if (!this.isTestOpen.get() && taskType == VisualGridTask.TaskType.CHECK) {
+            return null;
+        }
         int score = 0;
         VisualGridTask chosenVisualGridTask;
         synchronized (this.visualGridTaskList) {
@@ -186,12 +180,14 @@ public class RunningTest {
                 }
             }
 
-            if (this.visualGridTaskList.isEmpty())
+            if (this.visualGridTaskList.isEmpty()) {
                 return null;
+            }
 
             chosenVisualGridTask = this.visualGridTaskList.get(0);
-            if (chosenVisualGridTask.getType() != taskType || chosenVisualGridTask.isSent() || (taskType == VisualGridTask.TaskType.OPEN && !chosenVisualGridTask.isTaskReadyToCheck()))
+            if (chosenVisualGridTask.getType() != taskType || chosenVisualGridTask.isSent() || (taskType == VisualGridTask.TaskType.OPEN && !chosenVisualGridTask.isTaskReadyToCheck())) {
                 return null;
+            }
         }
         return new ScoreTask(chosenVisualGridTask, score);
     }
@@ -225,7 +221,7 @@ public class RunningTest {
         logger.verbose(String.format("test info: %s", browserInfo));
         logger.verbose("adding Open visualGridTask...");
         VisualGridTask visualGridTask = new VisualGridTask(new Configuration(configurationProvider.get()), null,
-                eyes, VisualGridTask.TaskType.OPEN, taskListener, null, this, null, null);
+                eyesConnector, VisualGridTask.TaskType.OPEN, taskListener, null, this, null, null);
         openTask = visualGridTask;
         FutureTask<TestResultContainer> futureTask = new FutureTask<>(visualGridTask);
         this.taskToFutureMapping.put(visualGridTask, futureTask);
@@ -266,7 +262,7 @@ public class RunningTest {
 
         logger.verbose("adding close visualGridTask...");
         VisualGridTask visualGridTask = new VisualGridTask(new Configuration(configurationProvider.get()), null,
-                eyes, VisualGridTask.TaskType.CLOSE, taskListener, null, this, null, null);
+                eyesConnector, VisualGridTask.TaskType.CLOSE, taskListener, null, this, null, null);
         FutureTask<TestResultContainer> futureTask = new FutureTask<>(visualGridTask);
         closeTask = visualGridTask;
         isCloseTaskIssued.set(true);
@@ -296,7 +292,7 @@ public class RunningTest {
         logger.verbose(String.format("test info: %s", browserInfo));
         logger.verbose("adding check visualGridTask...");
         VisualGridTask visualGridTask = new VisualGridTask(new Configuration(configurationProvider.get()), null,
-                eyes, VisualGridTask.TaskType.CHECK, taskListener, checkSettings, this, regionSelectors, source);
+                eyesConnector, VisualGridTask.TaskType.CHECK, taskListener, checkSettings, this, regionSelectors, source);
         logger.verbose("locking visualGridTaskList");
         synchronized (visualGridTaskList) {
             this.visualGridTaskList.add(visualGridTask);
@@ -325,10 +321,6 @@ public class RunningTest {
 
     public boolean isTestClose() {
         return isTestClose.get();
-    }
-
-    public IEyesConnector getEyes() {
-        return eyes;
     }
 
     public void setTestInExceptionMode(Throwable e) {
@@ -374,5 +366,9 @@ public class RunningTest {
 
     public void setTestName(String testName) {
         this.testName = testName;
+    }
+
+    public void setListener(IRenderingEyes.EyesListener eyesListener) {
+        this.listener = eyesListener;
     }
 }
