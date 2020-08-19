@@ -1,6 +1,9 @@
 package com.applitools.connectivity;
 
-import com.applitools.connectivity.api.*;
+import com.applitools.connectivity.api.ConnectivityTarget;
+import com.applitools.connectivity.api.HttpClient;
+import com.applitools.connectivity.api.Request;
+import com.applitools.connectivity.api.Response;
 import com.applitools.eyes.*;
 import com.applitools.eyes.locators.VisualLocatorsData;
 import com.applitools.eyes.visualgrid.model.*;
@@ -9,7 +12,6 @@ import com.applitools.utils.GeneralUtils;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.MapperFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
@@ -19,33 +21,14 @@ import javax.ws.rs.HttpMethod;
 import javax.ws.rs.core.MediaType;
 import java.io.IOException;
 import java.net.URI;
-import java.net.URL;
 import java.util.*;
-import java.util.concurrent.Future;
 
 public class ServerConnector extends UfgConnector {
 
-    public static final int DEFAULT_CLIENT_TIMEOUT = 1000 * 60 * 5; // 5 minutes
-    public static final int MAX_CONNECTION_RETRIES = 3;
-
-    static final String API_SESSIONS = "api/sessions";
     static final String CLOSE_BATCH = "api/sessions/batches/%s/close/bypointerid";
-
-    //Rendering Grid
-    static final String RENDER_INFO_PATH = API_SESSIONS + "/renderinfo";
-    public static final  String IOS_DEVICES_PATH = "/ios-devices-sizes";
-    public static final  String EMULATED_DEVICES_PATH = "/emulated-devices-sizes";
-    static final String USER_AGENT_PATH = "/user-agents";
-    static final String RESOURCES_SHA_256 = "/resources/sha256/";
     static final String RENDER_STATUS = "/render-status";
     static final String RENDER = "/render";
-
     public static final String API_PATH = "/api/sessions/running";
-
-    private String apiKey = null;
-    private RenderingInfo renderingInfo;
-    private final Map<String, Map<String, DeviceSize>> devicesSizes = new HashMap<>();
-    private Map<String, String> userAgents;
 
     /***
      * @param logger    Logger instance.
@@ -67,32 +50,12 @@ public class ServerConnector extends UfgConnector {
         this(new Logger());
     }
 
-    /**
-     * Sets the API key of your applitools Eyes account.
-     * @param apiKey The api key to set.
-     */
-    public void setApiKey(String apiKey) {
-        ArgumentGuard.notNull(apiKey, "apiKey");
-        this.apiKey = apiKey;
-    }
-
-    /**
-     * @return The currently set API key or {@code null} if no key is set.
-     */
-    public String getApiKey() {
-        return this.apiKey != null ? this.apiKey : GeneralUtils.getEnvString("APPLITOOLS_API_KEY");
-    }
-
     public void setAgentId(String agentId) {
         this.agentId = agentId;
     }
 
     public String getAgentId() {
         return this.agentId;
-    }
-
-    public void setRenderingInfo(RenderingInfo renderInfo) {
-        this.renderingInfo = renderInfo;
     }
 
     /**
@@ -278,132 +241,6 @@ public class ServerConnector extends UfgConnector {
         }
     }
 
-    public Response uploadData(byte[] bytes, RenderingInfo renderingInfo, final String targetUrl, String contentType, final String mediaType) {
-        Request request = makeEyesRequest(new HttpRequestBuilder() {
-            @Override
-            public Request build() {
-                return restClient.target(targetUrl).request(mediaType);
-            }
-        });
-        request = request.header("X-Auth-Token", renderingInfo.getAccessToken())
-                .header("x-ms-blob-type", "BlockBlob");
-        return request.method(HttpMethod.PUT, bytes, contentType);
-    }
-
-    public void downloadString(final URL uri, final TaskListener<String> listener) {
-        downloadString(uri, listener, 1);
-    }
-
-    public void downloadString(final URL uri, final TaskListener<String> listener, final int attemptNumber) {
-        AsyncRequest asyncRequest = restClient.target(uri.toString()).asyncRequest(MediaType.WILDCARD);
-        asyncRequest.method(HttpMethod.GET, new AsyncRequestCallback() {
-            @Override
-            public void onComplete(Response response) {
-                try {
-                    int statusCode = response.getStatusCode();
-                    if (statusCode >= 300) {
-                        logger.verbose("Got response status code - " + statusCode);
-                        listener.onFail();
-                        return;
-                    }
-
-                    byte[] fileContent = downloadFile(response);
-                    listener.onComplete(new String(fileContent));
-                } catch (Throwable t) {
-                    logger.verbose(t.getMessage());
-                } finally {
-                    response.close();
-                }
-            }
-
-            @Override
-            public void onFail(Throwable throwable) {
-                GeneralUtils.logExceptionStackTrace(logger, throwable);
-                if (attemptNumber < MAX_CONNECTION_RETRIES) {
-                    logger.verbose(String.format("Failed downloading resource %s - trying again", uri));
-                    downloadString(uri, listener, attemptNumber + 1);
-                } else {
-                    listener.onFail();
-                }
-            }
-        }, null, null, false);
-    }
-
-    public RenderingInfo getRenderInfo() {
-        if (renderingInfo != null) {
-            return renderingInfo;
-        }
-
-        Request request = makeEyesRequest(new HttpRequestBuilder() {
-            @Override
-            public Request build() {
-                return restClient.target(serverUrl).path(RENDER_INFO_PATH)
-                        .queryParam("apiKey", getApiKey()).request();
-            }
-        });
-        Response response = sendLongRequest(request, HttpMethod.GET, null, null);
-
-        // Ok, let's create the running session from the response
-        List<Integer> validStatusCodes = new ArrayList<>(1);
-        validStatusCodes.add(HttpStatus.SC_OK);
-
-        try {
-            renderingInfo = parseResponseWithJsonData(response, validStatusCodes, new TypeReference<RenderingInfo>() {});
-            return renderingInfo;
-        } finally {
-            response.close();
-        }
-    }
-
-    public <T> T getFromServer(final String path, TypeReference<T> responseType) {
-        Request request = makeEyesRequest(new HttpRequestBuilder() {
-            @Override
-            public Request build() {
-                return restClient.target(renderingInfo.getServiceUrl()).path(path)
-                        .queryParam("apiKey", getApiKey()).request();
-            }
-        });
-        Response response = sendLongRequest(request, HttpMethod.GET, null, null);
-
-        // Ok, let's create the running session from the response
-        List<Integer> validStatusCodes = new ArrayList<>(1);
-        validStatusCodes.add(HttpStatus.SC_OK);
-
-        try {
-            return parseResponseWithJsonData(response, validStatusCodes, responseType);
-        } finally {
-            response.close();
-        }
-    }
-
-    public Map<String, DeviceSize> getDevicesSizes(String path) {
-        if (devicesSizes.containsKey(path)) {
-            return devicesSizes.get(path);
-        }
-
-        try {
-            devicesSizes.put(path, getFromServer(path, new TypeReference<HashMap<String, DeviceSize>>() {}));
-        } catch (Throwable e) {
-            devicesSizes.put(path, new HashMap<String, DeviceSize>());
-        }
-
-        return devicesSizes.get(path);
-    }
-
-    public Map<String, String> getUserAgents() {
-        if (userAgents != null) {
-            return userAgents;
-        }
-
-        try {
-            userAgents = getFromServer(USER_AGENT_PATH, new TypeReference<HashMap<String, String>>() {});
-        } catch (Throwable e) {
-            userAgents = new HashMap<>();
-        }
-
-        return userAgents;
-    }
-
     public List<RunningRender> render(RenderRequest... renderRequests) {
         ArgumentGuard.notNull(renderRequests, "renderRequests");
         this.logger.verbose("called with " + Arrays.toString(renderRequests));
@@ -433,119 +270,6 @@ public class ServerConnector extends UfgConnector {
                 response.close();
             }
         }
-    }
-
-    public boolean renderCheckResource(final RunningRender runningRender, final RGridResource resource) {
-        ArgumentGuard.notNull(runningRender, "runningRender");
-        ArgumentGuard.notNull(resource, "resource");
-        this.logger.verbose("called with resource#" + resource.getSha256() + " for render: " + runningRender.getRenderId());
-
-        Request request = makeEyesRequest(new HttpRequestBuilder() {
-            @Override
-            public Request build() {
-                return restClient.target(renderingInfo.getServiceUrl()).path((RESOURCES_SHA_256) + resource.getSha256())
-                        .queryParam("render-id", runningRender.getRenderId()).request();
-            }
-        });
-        request.header("X-Auth-Token", renderingInfo.getAccessToken());
-
-        // Ok, let's create the running session from the response
-        List<Integer> validStatusCodes = new ArrayList<>();
-        validStatusCodes.add(HttpStatus.SC_OK);
-        validStatusCodes.add(HttpStatus.SC_NOT_FOUND);
-
-        Response response = request.method(HttpMethod.HEAD, null, null);
-        try {
-            int statusCode = response.getStatusCode();
-            if (validStatusCodes.contains(statusCode)) {
-                this.logger.verbose("request succeeded");
-                return statusCode == HttpStatus.SC_OK;
-            }
-            throw new EyesException("ServerConnector.renderCheckResource - unexpected status (" + statusCode + ")");
-        } finally {
-            response.close();
-        }
-    }
-
-    public Future<?> renderPutResource(final RunningRender runningRender, final RGridResource resource,
-                                       final String userAgent, final TaskListener<Boolean> listener) {
-        return renderPutResource(runningRender, resource, userAgent, listener, 1);
-    }
-
-    public Future<?> renderPutResource(final RunningRender runningRender, final RGridResource resource,
-                                       final String userAgent, final TaskListener<Boolean> listener, final int attemptNumber) {
-        ArgumentGuard.notNull(runningRender, "runningRender");
-        ArgumentGuard.notNull(resource, "resource");
-        byte[] content = resource.getContent();
-        ArgumentGuard.notNull(content, "resource.getContent()");
-
-        String hash = resource.getSha256();
-        String renderId = runningRender.getRenderId();
-        logger.verbose("resource hash:" + hash + " ; url: " + resource.getUrl() + " ; render id: " + renderId);
-
-        AsyncRequest asyncRequest = restClient
-                .target(renderingInfo.getServiceUrl())
-                .path(RESOURCES_SHA_256 + hash)
-                .queryParam("render-id", renderId)
-                .asyncRequest(resource.getContentType());
-
-        asyncRequest.header("X-Auth-Token", renderingInfo.getAccessToken());
-        asyncRequest.header("User-Agent", userAgent);
-
-        String contentType = resource.getContentType();
-        if (contentType == null || "None".equalsIgnoreCase(contentType)) {
-            contentType = MediaType.APPLICATION_OCTET_STREAM;
-        }
-
-        return asyncRequest.method(HttpMethod.PUT, new AsyncRequestCallback() {
-            @Override
-            public void onComplete(Response response) {
-                try {
-                    int statusCode = response.getStatusCode();
-                    if (statusCode != HttpStatus.SC_OK) {
-                        logger.verbose(String.format("Error: Status %d on url %s", statusCode, resource.getUrl()));
-                        if (statusCode >= 500 && attemptNumber < MAX_CONNECTION_RETRIES) {
-                            logger.verbose("Trying again");
-                            renderPutResource(runningRender, resource, userAgent, listener, attemptNumber + 1);
-                            return;
-                        }
-
-                        listener.onComplete(false);
-                        return;
-                    }
-
-                    String responseData = response.getBodyString();
-                    try {
-                        JsonNode jsonObject = jsonMapper.readTree(responseData);
-                        JsonNode value = jsonObject.get("hash");
-                        if (value == null) {
-                            listener.onComplete(false);
-                            return;
-                        }
-
-                        if (value.isValueNode() && value.asText().equals(resource.getSha256())) {
-                            listener.onComplete(true);
-                        }
-                    } catch (IOException e) {
-                        GeneralUtils.logExceptionStackTrace(logger, e);
-                        listener.onComplete(false);
-                    }
-                } finally {
-                    response.close();
-                }
-            }
-
-            @Override
-            public void onFail(Throwable throwable) {
-                GeneralUtils.logExceptionStackTrace(logger, throwable);
-                if (attemptNumber < MAX_CONNECTION_RETRIES) {
-                    logger.verbose(String.format("Failed putting resource %s - trying again", resource.getUrl()));
-                    renderPutResource(runningRender, resource, userAgent, listener, attemptNumber + 1);
-                } else {
-                    listener.onFail();
-                }
-            }
-        }, content, contentType);
     }
 
     public RenderStatusResults renderStatus(RunningRender runningRender) {
@@ -602,6 +326,18 @@ public class ServerConnector extends UfgConnector {
             GeneralUtils.logExceptionStackTrace(logger, e);
         }
         return null;
+    }
+
+    public Response uploadData(byte[] bytes, RenderingInfo renderingInfo, final String targetUrl, String contentType, final String mediaType) {
+        Request request = makeEyesRequest(new HttpRequestBuilder() {
+            @Override
+            public Request build() {
+                return restClient.target(targetUrl).request(mediaType);
+            }
+        });
+        request = request.header("X-Auth-Token", renderingInfo.getAccessToken())
+                .header("x-ms-blob-type", "BlockBlob");
+        return request.method(HttpMethod.PUT, bytes, contentType);
     }
 
     public String postViewportImage(byte[] bytes) {
