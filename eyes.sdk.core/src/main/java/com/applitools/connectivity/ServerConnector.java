@@ -6,10 +6,7 @@ import com.applitools.connectivity.api.HttpClient;
 import com.applitools.connectivity.api.Response;
 import com.applitools.eyes.*;
 import com.applitools.eyes.locators.VisualLocatorsData;
-import com.applitools.eyes.visualgrid.model.RenderRequest;
-import com.applitools.eyes.visualgrid.model.RenderStatusResults;
-import com.applitools.eyes.visualgrid.model.RenderingInfo;
-import com.applitools.eyes.visualgrid.model.RunningRender;
+import com.applitools.eyes.visualgrid.model.*;
 import com.applitools.utils.ArgumentGuard;
 import com.applitools.utils.GeneralUtils;
 import com.fasterxml.jackson.annotation.JsonInclude;
@@ -287,7 +284,18 @@ public class ServerConnector extends UfgConnector {
             ResponseParsingCallback<RenderStatusResults[]> callback = new ResponseParsingCallback<>(this, validStatusCodes, new TaskListener<RenderStatusResults[]>() {
                 @Override
                 public void onComplete(RenderStatusResults[] renderStatusResults) {
-                    listener.onComplete(renderStatusResults == null ? null : Arrays.asList(renderStatusResults));
+                    if (renderStatusResults == null) {
+                        listener.onComplete(null);
+                        return;
+                    }
+
+                    for (RenderStatusResults renderStatusResult : renderStatusResults) {
+                        if (renderStatusResult != null && renderStatusResult.getStatus() == RenderStatus.ERROR) {
+                            logger.verbose("error on render id - " + renderStatusResult);
+                        }
+                    }
+
+                    listener.onComplete(Arrays.asList(renderStatusResults));
                 }
 
                 @Override
