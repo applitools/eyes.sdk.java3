@@ -8,24 +8,24 @@ import com.applitools.eyes.TaskListener;
 import com.applitools.eyes.utils.ReportingTestSuite;
 import com.applitools.eyes.visualgrid.model.RGridResource;
 import com.applitools.utils.GeneralUtils;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.apache.http.HttpHeaders;
 import org.apache.http.HttpStatus;
+import org.mockito.ArgumentMatchers;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.mockito.invocation.InvocationOnMock;
+import org.mockito.stubbing.Answer;
 import org.testng.Assert;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
-import javax.ws.rs.HttpMethod;
 import java.net.URI;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.Future;
 
-import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
 
 public class TestServerConnector extends ReportingTestSuite {
@@ -43,29 +43,6 @@ public class TestServerConnector extends ReportingTestSuite {
     ObjectMapper jsonMapper = new ObjectMapper();
 
     RunningSession runningSession;
-
-    // Below are the mocks for the long request
-    String getRequestUri = "getUri";
-    String deleteRequestUri = "deleteUri";
-
-    @Mock
-    ConnectivityTarget getRequestTarget;
-    @Mock
-    ConnectivityTarget deleteRequestTarget;
-
-    @Mock
-    Request firstRequest;
-    @Mock
-    Request getRequest;
-    @Mock
-    Request deleteRequest;
-
-    @Mock
-    Response firstResponse;
-    @Mock
-    Response getResponse;
-    @Mock
-    Response deleteResponse;
 
     public static class MockedAsyncRequest extends AsyncRequest {
         final Map<String,String> headers = new HashMap<>();
@@ -115,78 +92,56 @@ public class TestServerConnector extends ReportingTestSuite {
         return serverConnector;
     }
 
-    /**
-     * Mocking the process of long request
-     * @param httpMethod The method of the first request
-     * @return The last response from the long request
-     */
-    public Response mockLongRequest(String httpMethod) {
-        // Handle the third request in the long request - DELETE request
-        when(restClient.target(deleteRequestUri)).thenReturn(deleteRequestTarget);
-        when(deleteRequestTarget.queryParam(anyString(), anyString())).thenReturn(deleteRequestTarget);
-        when(deleteRequestTarget.request((String) any())).thenReturn(deleteRequest);
-        when(deleteRequest.header(anyString(), anyString())).thenReturn(deleteRequest);
-        when(deleteRequest.method(HttpMethod.DELETE, null, null)).thenReturn(deleteResponse);
-
-        // Handle the second request in the long request - GET request
-        when(restClient.target(getRequestUri)).thenReturn(getRequestTarget);
-        when(getRequestTarget.queryParam(anyString(), anyString())).thenReturn(getRequestTarget);
-        when(getRequestTarget.request((String) any())).thenReturn(getRequest);
-        when(getRequest.header(anyString(), anyString())).thenReturn(getRequest);
-        when(getRequest.method(HttpMethod.GET, null, null)).thenReturn(getResponse);
-        when(getResponse.getHeader(HttpHeaders.LOCATION, false)).thenReturn(deleteRequestUri);
-        when(getResponse.getStatusCode()).thenReturn(HttpStatus.SC_CREATED);
-
-        // Handle the first request in the long request
-        when(endPoint.request((String) any())).thenReturn(firstRequest);
-        when(firstRequest.header(anyString(), anyString())).thenReturn(firstRequest);
-        when(firstRequest.method(eq(httpMethod), any(), anyString())).thenReturn(firstResponse);
-        when(firstResponse.getHeader(HttpHeaders.LOCATION, false)).thenReturn(getRequestUri);
-        when(firstResponse.getStatusCode()).thenReturn(HttpStatus.SC_ACCEPTED);
-
-        return deleteResponse;
-    }
-
-    public void verifyLongRequest() {
-        verify(restClient).target(getRequestUri);
-        verify(getRequestTarget).request((String) any());
-        verify(getRequest).method(HttpMethod.GET, null, null);
-
-        verify(restClient).target(deleteRequestUri);
-        verify(deleteRequestTarget).request((String) any());
-        verify(deleteRequest).method(HttpMethod.DELETE, null, null);
-    }
-
     @Test
-    public void testStartSessionGotIsNew() throws JsonProcessingException {
+    public void testStartSessionGotIsNew() throws Exception {
         Assert.assertNull(runningSession.getIsNew());
-        Response response = mockLongRequest(HttpMethod.POST);
+        final Response response = mock(Response.class);
         when(response.getStatusPhrase()).thenReturn("");
 
-        ServerConnector connector = new ServerConnector();
-        connector.updateClient(restClient);
+        TaskListener<RunningSession> listener = new TaskListener<RunningSession>() {
+            @Override
+            public void onComplete(RunningSession result) {
+                if (runningSession.getIsNew() != null) {
+                    Assert.assertEquals(result.getIsNew(), runningSession.getIsNew());
+                    return;
+                }
+
+                Assert.assertEquals(result.getIsNew().booleanValue(), response.getStatusCode() == HttpStatus.SC_CREATED);
+            }
+
+            @Override
+            public void onFail() {
+                Assert.fail();
+            }
+        };
+
+        ServerConnector connector = spy(new ServerConnector());
+        doAnswer(new Answer() {
+            @Override
+            public Object answer(InvocationOnMock invocation) {
+                AsyncRequestCallback callback = invocation.getArgument(2);
+                callback.onComplete(response);
+                return null;
+            }
+        }).when(connector).sendLongRequest(ArgumentMatchers.<AsyncRequest>any(), anyString(),
+                ArgumentMatchers.<AsyncRequestCallback>any(), anyString(), anyString());
         connector.setAgentId("agent_id");
 
         when(response.getStatusCode()).thenReturn(HttpStatus.SC_OK);
         runningSession.setIsNew(true);
         when(response.getBodyString()).thenReturn(jsonMapper.writeValueAsString(runningSession));
-        RunningSession session = connector.startSession(new SessionStartInfo());
-        Assert.assertTrue(session.getIsNew());
-        verifyLongRequest();
+        connector.startSession(listener, new SessionStartInfo());
 
         runningSession.setIsNew(false);
         when(response.getBodyString()).thenReturn(jsonMapper.writeValueAsString(runningSession));
-        session = connector.startSession(new SessionStartInfo());
-        Assert.assertFalse(session.getIsNew());
+        connector.startSession(listener, new SessionStartInfo());
 
         runningSession.setIsNew(null);
         when(response.getBodyString()).thenReturn(jsonMapper.writeValueAsString(runningSession));
-        session = connector.startSession(new SessionStartInfo());
-        Assert.assertFalse(session.getIsNew());
+        connector.startSession(listener, new SessionStartInfo());
 
         when(response.getStatusCode()).thenReturn(HttpStatus.SC_CREATED);
-        session = connector.startSession(new SessionStartInfo());
-        Assert.assertTrue(session.getIsNew());
+        connector.startSession(listener, new SessionStartInfo());
     }
 
     @Test

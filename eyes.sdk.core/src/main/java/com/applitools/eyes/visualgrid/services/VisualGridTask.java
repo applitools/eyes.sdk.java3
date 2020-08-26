@@ -33,17 +33,17 @@ public class VisualGridTask implements Callable<TestResultContainer>, Completabl
     private TaskType type;
 
     private RenderStatusResults renderResult;
-    private List<TaskListener> listeners = new ArrayList<>();
+    private final List<VGTaskListener> listeners = new ArrayList<>();
     private ICheckSettingsInternal checkSettings;
 
-    private RunningTest runningTest;
+    private final RunningTest runningTest;
     private Throwable exception;
     private RenderingTask renderingTask = null;
-    private AtomicBoolean isTaskComplete = new AtomicBoolean(false);
+    private final AtomicBoolean isTaskComplete = new AtomicBoolean(false);
 
     private final List<VisualGridSelector[]> regionSelectors;
 
-    interface TaskListener {
+    interface VGTaskListener {
 
         void onTaskComplete(VisualGridTask visualGridTask);
 
@@ -63,7 +63,7 @@ public class VisualGridTask implements Callable<TestResultContainer>, Completabl
 
     /******** END - PUBLIC FOR TESTING PURPOSES ONLY ********/
 
-    public VisualGridTask(Configuration configuration, TestResults testResults, IEyesConnector eyesConnector, TaskType type, TaskListener runningTestListener,
+    public VisualGridTask(Configuration configuration, TestResults testResults, IEyesConnector eyesConnector, TaskType type, VGTaskListener runningTestListener,
                           ICheckSettings checkSettings, RunningTest runningTest, List<VisualGridSelector[]> regionSelectors, String source) {
         this.configuration = configuration;
         this.testResults = testResults;
@@ -192,19 +192,19 @@ public class VisualGridTask implements Callable<TestResultContainer>, Completabl
     }
 
     private void notifySuccessAllListeners() {
-        for (TaskListener listener : listeners) {
+        for (VGTaskListener listener : listeners) {
             listener.onTaskComplete(this);
         }
     }
 
     private void notifyFailureAllListeners(Error e) {
-        for (TaskListener listener : listeners) {
+        for (VGTaskListener listener : listeners) {
             listener.onTaskFailed(e, this);
         }
     }
 
     private void notifyRenderCompleteAllListeners() {
-        for (TaskListener listener : listeners) {
+        for (VGTaskListener listener : listeners) {
             listener.onRenderComplete(this.renderingTask, exception);
         }
     }
@@ -232,7 +232,7 @@ public class VisualGridTask implements Callable<TestResultContainer>, Completabl
         return isTaskComplete.get();
     }
 
-    public void addListener(TaskListener listener) {
+    public void addListener(VGTaskListener listener) {
         this.listeners.add(listener);
     }
 
@@ -247,7 +247,7 @@ public class VisualGridTask implements Callable<TestResultContainer>, Completabl
         RectangleSize deviceSize = getCorrectDeviceSize(renderRequest);
         renderResult.setDeviceSize(deviceSize);
         logger.verbose("device size: " + deviceSize);
-        for (TaskListener listener : listeners) {
+        for (VGTaskListener listener : listeners) {
             exception = new InstantiationError("Render Failed for " + this.getBrowserInfo() + " (renderId: " + renderId + ") with reason: " + error);
             listener.onTaskFailed(exception, this);
         }

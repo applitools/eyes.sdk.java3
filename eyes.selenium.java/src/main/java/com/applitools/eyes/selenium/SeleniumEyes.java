@@ -536,7 +536,7 @@ public class SeleniumEyes extends EyesBase implements ISeleniumEyes, IBatchClose
             AppOutput appOutput = new AppOutput(name, ImageUtils.encodeAsPng(subScreenshot.getImage()), null, null);
             AppOutputWithScreenshot appOutputWithScreenshot = new AppOutputWithScreenshot(appOutput, subScreenshot, location);
             MatchResult matchResult = mwt.performMatch(new ArrayList<Trigger>(), appOutputWithScreenshot, name, false,
-                    ims, this, source);
+                    ims, this, null, source);
 
             logger.verbose("matchResult.asExcepted: " + matchResult.getAsExpected());
         }
@@ -1533,11 +1533,6 @@ public class SeleniumEyes extends EyesBase implements ISeleniumEyes, IBatchClose
         getConfigurationInstance().setViewportSize(new RectangleSize(size.getWidth(), size.getHeight()));
         return getConfigurationInstance();
     }
-
-    @Override
-    protected void beforeOpen() {
-    }
-
 
     @Override
     protected EyesScreenshot getScreenshot(Region targetRegion, ICheckSettingsInternal checkSettingsInternal) {

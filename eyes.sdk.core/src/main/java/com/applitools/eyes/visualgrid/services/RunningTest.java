@@ -34,7 +34,7 @@ public class RunningTest {
     private String appName;
     private String testName;
 
-    private final VisualGridTask.TaskListener taskListener = new VisualGridTask.TaskListener() {
+    private final VisualGridTask.VGTaskListener taskListener = new VisualGridTask.VGTaskListener() {
         @Override
         public void onTaskComplete(VisualGridTask visualGridTask) {
             logger.verbose("locking runningTest.visualGridTaskList");

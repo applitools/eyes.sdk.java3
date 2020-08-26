@@ -1,5 +1,6 @@
 package com.applitools.connectivity;
 
+import com.applitools.connectivity.api.AsyncRequestCallback;
 import com.applitools.connectivity.api.Response;
 import com.applitools.eyes.*;
 import com.applitools.eyes.visualgrid.model.*;
@@ -17,19 +18,20 @@ public class MockServerConnector extends ServerConnector {
     }
 
     @Override
-    public void deleteSession(TestResults testResults) {
+    public void deleteSession(TaskListener<Void> listener, TestResults testResults) {
         logger.log(String.format("deleting session: %s", testResults.getId()));
+        listener.onComplete(null);
     }
 
     @Override
-    public TestResults stopSession(RunningSession runningSession, boolean isAborted, boolean save) {
+    public void stopSession(TaskListener<TestResults> listener, RunningSession runningSession, boolean isAborted, boolean save) {
         logger.log(String.format("ending session: %s", runningSession.getSessionId()));
-        return new TestResults();
+        listener.onComplete(new TestResults());
     }
 
     @Override
-    public Response uploadData(byte[] bytes, RenderingInfo renderingInfo, final String targetUrl, String contentType, final String mediaType) {
-        return new Response(logger) {
+    public void uploadData(AsyncRequestCallback callback, byte[] bytes, RenderingInfo renderingInfo, final String targetUrl, String contentType, final String mediaType) {
+        callback.onComplete(new Response(logger) {
             @Override
             public int getStatusCode() {
                 return HttpStatus.SC_OK;
@@ -54,7 +56,7 @@ public class MockServerConnector extends ServerConnector {
             public void close() {
 
             }
-        };
+        });
     }
 
     @Override
@@ -63,38 +65,38 @@ public class MockServerConnector extends ServerConnector {
     }
 
     @Override
-    public List<RunningRender> render(RenderRequest... renderRequests) {
+    public void render(TaskListener<List<RunningRender>> listener, RenderRequest... renderRequests) {
         this.renderRequests.addAll(Arrays.asList(renderRequests));
         RunningRender runningRender = new RunningRender();
         runningRender.setRenderId(UUID.randomUUID().toString());
         runningRender.setRenderStatus(RenderStatus.RENDERED);
-        return Collections.singletonList(runningRender);
+        listener.onComplete(Collections.singletonList(runningRender));
     }
 
     @Override
-    public List<RenderStatusResults> renderStatusById(String... renderIds) {
+    public void renderStatusById(TaskListener<List<RenderStatusResults>> listener, String... renderIds) {
         RenderStatusResults renderStatusResults = new RenderStatusResults();
         renderStatusResults.setRenderId(renderIds[0]);
         renderStatusResults.setStatus(RenderStatus.RENDERED);
-        return Collections.singletonList(renderStatusResults);
+        listener.onComplete(Collections.singletonList(renderStatusResults));
     }
 
     @Override
-    public MatchResult matchWindow(RunningSession runningSession, MatchWindowData data) {
+    public void matchWindow(TaskListener<MatchResult> listener, RunningSession runningSession, MatchWindowData data) {
         MatchResult result = new MatchResult();
         result.setAsExpected(this.asExpected);
-        return result;
+        listener.onComplete(result);
     }
 
     @Override
-    public RunningSession startSession(SessionStartInfo sessionStartInfo)
+    public void startSession(TaskListener<RunningSession> listener, SessionStartInfo sessionStartInfo)
     {
         logger.log(String.format("starting session: %s", sessionStartInfo));
 
         RunningSession newSession = new RunningSession();
         newSession.setIsNew(false);
         newSession.setSessionId(UUID.randomUUID().toString());
-        return newSession;
+        listener.onComplete(newSession);
     }
 
     @Override

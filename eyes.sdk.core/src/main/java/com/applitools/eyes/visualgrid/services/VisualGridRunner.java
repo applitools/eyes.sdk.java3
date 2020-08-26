@@ -355,6 +355,7 @@ public class VisualGridRunner extends EyesRunner {
         logger.verbose("found test with mark " + bestMark);
         logger.verbose("calling getNextOpenTaskAndRemove on " + bestScoreTask.toString());
         VisualGridTask nextOpenVisualGridTask = bestScoreTask.getVisualGridTask();
+        logger.verbose(String.format("Found open task for test %s", nextOpenVisualGridTask.getRunningTest().getTestName()));
         return new FutureTask<>(nextOpenVisualGridTask);
     }
 

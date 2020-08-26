@@ -431,7 +431,7 @@ public class Eyes extends EyesBase {
             AppOutput appOutput = new AppOutput(name, ImageUtils.encodeAsPng(subScreenshot.getImage()), null, null);
             AppOutputWithScreenshot appOutputWithScreenshot = new AppOutputWithScreenshot(appOutput, subScreenshot, location);
             MatchResult matchResult = mwt.performMatch(new ArrayList<Trigger>(), appOutputWithScreenshot, name, false,
-                    ims, this, getAppName());
+                    ims, this, null, getAppName());
             logger.verbose("matchResult.asExcepted: " + matchResult.getAsExpected());
         }
     }

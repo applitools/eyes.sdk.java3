@@ -13,8 +13,6 @@ import com.applitools.eyes.visualgrid.services.VisualGridTask;
 import com.applitools.utils.GeneralUtils;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import org.mockito.invocation.InvocationOnMock;
-import org.mockito.stubbing.Answer;
 import org.openqa.selenium.WebDriver;
 import org.testng.Assert;
 import org.testng.annotations.Test;
@@ -22,11 +20,6 @@ import org.testng.annotations.Test;
 import java.io.IOException;
 import java.net.URL;
 import java.util.*;
-
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.doAnswer;
-import static org.mockito.Mockito.spy;
 
 public class TestRenderSerialization {
 
@@ -66,31 +59,37 @@ public class TestRenderSerialization {
     public void testRenderResultSerialization() {
         final List<MatchWindowData> matchWindowDataList = new ArrayList<>();
         final List<RenderStatusResults> renderStatusResults = new ArrayList<>();
-        ServerConnector serverConnector = spy(ServerConnector.class);
-
-        doAnswer(new Answer<MatchResult>() {
+        ServerConnector serverConnector = new ServerConnector() {
             @Override
-            public MatchResult answer(InvocationOnMock invocationOnMock) throws Throwable {
-                matchWindowDataList.add((MatchWindowData) invocationOnMock.getArgument(1));
-                return (MatchResult) invocationOnMock.callRealMethod();
+            public void matchWindow(TaskListener<MatchResult> listener, final RunningSession runningSession, MatchWindowData matchData) throws EyesException {
+                matchWindowDataList.add(matchData);
+                super.matchWindow(listener, runningSession, matchData);
             }
-        }).when(serverConnector).matchWindow(any(RunningSession.class), any(MatchWindowData.class));
 
-        doAnswer(new Answer<List<RenderStatusResults>>() {
             @Override
-            public List<RenderStatusResults> answer(InvocationOnMock invocation) throws Throwable {
-                List<RenderStatusResults> results = (List<RenderStatusResults>) invocation.callRealMethod();
-                for (RenderStatusResults result : results) {
-                    if (result.getStatus().equals(RenderStatus.RENDERED)) {
-                        renderStatusResults.add(result);
+            public void renderStatusById(final TaskListener<List<RenderStatusResults>> listener, String... renderIds) {
+                super.renderStatusById(new TaskListener<List<RenderStatusResults>>() {
+                    @Override
+                    public void onComplete(List<RenderStatusResults> results) {
+                        for (RenderStatusResults result : results) {
+                            if (result.getStatus().equals(RenderStatus.RENDERED)) {
+                                renderStatusResults.add(result);
+                            }
+                        }
+                        listener.onComplete(results);
                     }
-                }
-                return results;
+
+                    @Override
+                    public void onFail() {
+                        listener.onFail();
+                    }
+                }, renderIds);
             }
-        }).when(serverConnector).renderStatusById(anyString());
+        };
 
         EyesRunner runner = new VisualGridRunner(10);
         Eyes eyes = new Eyes(runner);
+        eyes.setLogHandler(new StdoutLogHandler());
         eyes.setServerConnector(serverConnector);
         WebDriver driver = SeleniumUtils.createChromeDriver();
         driver.get("https://applitools.github.io/demo/TestPages/FramesTestPage/");
@@ -107,7 +106,7 @@ public class TestRenderSerialization {
 
         Assert.assertEquals(matchWindowDataList.size(), renderStatusResults.size());
         for (int i = 0; i < matchWindowDataList.size(); i++) {
-            Assert.assertEquals(matchWindowDataList.get(0).getAppOutput().getViewport(), renderStatusResults.get(0).getVisualViewport());
+            Assert.assertEquals(matchWindowDataList.get(i).getAppOutput().getViewport(), renderStatusResults.get(i).getVisualViewport());
         }
     }
 }

@@ -1,6 +1,8 @@
 package com.applitools.eyes;
 
 import com.applitools.connectivity.ServerConnector;
+import com.applitools.connectivity.api.AsyncRequestCallback;
+import com.applitools.connectivity.api.Response;
 import com.applitools.utils.ArgumentGuard;
 import com.applitools.utils.Iso8610CalendarDeserializer;
 import com.fasterxml.jackson.annotation.JsonGetter;
@@ -9,6 +11,7 @@ import com.fasterxml.jackson.annotation.JsonSetter;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 
 import java.util.Calendar;
+import java.util.concurrent.atomic.AtomicReference;
 
 /**
  * Eyes test results.
@@ -418,8 +421,14 @@ public class TestResults {
         return accessibilityStatus;
     }
 
-    public void delete(){
-        serverConnector.deleteSession(this);
+    public void delete() {
+        final AtomicReference<Object> lock = new AtomicReference<>(new Object());
+        serverConnector.deleteSession(new SyncTaskListener<Void>(lock), this);
+        synchronized (lock.get()) {
+            try {
+                lock.get().wait();
+            } catch (InterruptedException ignored) {}
+        }
     }
 
     @Override
@@ -431,5 +440,4 @@ public class TestResults {
                 + ", mismatches:" + getMismatches() + ", missing: "
                 + getMissing() + "] , URL: " + getUrl();
     }
-
 }

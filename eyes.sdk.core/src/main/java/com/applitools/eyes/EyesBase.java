@@ -8,7 +8,6 @@ import com.applitools.eyes.config.Configuration;
 import com.applitools.eyes.debug.DebugScreenshotsProvider;
 import com.applitools.eyes.debug.FileDebugScreenshotsProvider;
 import com.applitools.eyes.debug.NullDebugScreenshotProvider;
-import com.applitools.eyes.diagnostics.ResponseTimeAlgorithm;
 import com.applitools.eyes.events.ISessionEventHandler;
 import com.applitools.eyes.events.SessionEventHandlers;
 import com.applitools.eyes.events.ValidationInfo;
@@ -19,7 +18,6 @@ import com.applitools.eyes.fluent.CheckSettings;
 import com.applitools.eyes.fluent.ICheckSettingsInternal;
 import com.applitools.eyes.positioning.InvalidPositionProvider;
 import com.applitools.eyes.positioning.PositionProvider;
-import com.applitools.eyes.positioning.RegionProvider;
 import com.applitools.eyes.scaling.FixedScaleProvider;
 import com.applitools.eyes.scaling.NullScaleProvider;
 import com.applitools.eyes.triggers.MouseAction;
@@ -33,6 +31,8 @@ import java.awt.image.BufferedImage;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicReference;
 
 /**
  * Applitools Eyes Base for Java API .
@@ -65,21 +65,18 @@ public abstract class EyesBase implements IEyesBase {
     private final List<PropertyData> properties = new ArrayList<>();
 
     private boolean isViewportSizeSet;
-    protected RenderingInfo renderInfo;
 
     private int validationId;
     private final SessionEventHandlers sessionEventHandlers = new SessionEventHandlers();
     protected DebugScreenshotsProvider debugScreenshotsProvider;
 
     public EyesBase() {
-
         if (isDisabled) {
             userInputs = null;
             return;
         }
 
         logger = new Logger();
-
         initProviders();
 
         setServerConnector(new ServerConnector());
@@ -465,51 +462,78 @@ public abstract class EyesBase implements IEyesBase {
      *                             is true.
      */
     public TestResults close(boolean throwEx) {
-        try {
-            if (isDisabled) {
-                logger.verbose("Ignored");
-                return null;
+        AtomicReference<TestResults> reference = new AtomicReference<>();
+        final AtomicReference<Object> lock = new AtomicReference<>(new Object());
+        closeInner(new SyncTaskListener<>(lock, reference), throwEx);
+        synchronized (lock.get()) {
+            try {
+                if (reference.get() == null) {
+                    lock.get().wait();
+                }
+            } catch (InterruptedException e) {
+                throw new EyesException("Failed waiting for close", e);
             }
-            logger.verbose(String.format("close(%b)", throwEx));
-            ArgumentGuard.isValidState(isOpen, "Eyes not open");
-
-            isOpen = false;
-
-            lastScreenshot = null;
-            clearUserInputs();
-
-            initProviders(true);
-
-            if (runningSession == null) {
-                logger.log("Server session was not started --- Empty test ended.");
-                return new TestResults();
-            }
-
-            boolean isNewSession = runningSession.getIsNew();
-
-            logger.verbose("Ending server session...");
-            boolean save = (isNewSession && getConfigurationInstance().getSaveNewTests())
-                    || (!isNewSession && getConfigurationInstance().getSaveFailedTests());
-            logger.verbose("Automatically save test? " + String.valueOf(save));
-            TestResults results = getServerConnector().stopSession(runningSession, false, save);
-
-            results.setNew(isNewSession);
-            results.setUrl(runningSession.getUrl());
-            logger.verbose(results.toString());
-
-            sessionEventHandlers.testEnded(getAUTSessionId(), results);
-
-            logSessionResultsAndThrowException(logger, throwEx, results);
-
-            results.setServerConnector(getServerConnector());
-
-            return results;
-        } finally {
-            // Making sure that we reset the running session even if an
-            // exception was thrown during close.
-            runningSession = null;
-//            logger.getLogHandler().close();
         }
+
+        TestResults testResults = reference.get();
+        if (testResults == null) {
+            throw new EyesException("Failed stopping session");
+        }
+        logSessionResultsAndThrowException(logger, throwEx, testResults);
+        return testResults;
+    }
+
+    public void close(TaskListener<TestResults> listener, boolean throwEx) {
+        closeInner(listener, throwEx);
+    }
+
+    private void closeInner(final TaskListener<TestResults> listener, final boolean throwEx) {
+        if (isDisabled) {
+            logger.verbose("Ignored");
+            listener.onComplete(new TestResults());
+            return;
+        }
+        logger.verbose(String.format("close(%b)", throwEx));
+        ArgumentGuard.isValidState(isOpen, "Eyes not open");
+
+        isOpen = false;
+
+        lastScreenshot = null;
+        clearUserInputs();
+
+        initProviders(true);
+
+        if (runningSession == null) {
+            logger.log("Server session was not started --- Empty test ended.");
+            listener.onComplete(new TestResults());
+            return;
+        }
+
+        final boolean isNewSession = runningSession.getIsNew();
+
+        logger.verbose("Ending server session...");
+        boolean save = (isNewSession && getConfigurationInstance().getSaveNewTests())
+                || (!isNewSession && getConfigurationInstance().getSaveFailedTests());
+        logger.verbose("Automatically save test? " + save);
+        getServerConnector().stopSession(new TaskListener<TestResults>() {
+            @Override
+            public void onComplete(TestResults testResults) {
+                testResults.setNew(isNewSession);
+                testResults.setUrl(runningSession.getUrl());
+                logger.verbose(testResults.toString());
+
+                sessionEventHandlers.testEnded(getAUTSessionId(), testResults);
+                testResults.setServerConnector(getServerConnector());
+                runningSession = null;
+                listener.onComplete(testResults);
+            }
+
+            @Override
+            public void onFail() {
+                runningSession = null;
+                listener.onFail();
+            }
+        }, runningSession, false, save);
     }
 
     public static void logSessionResultsAndThrowException(Logger logger, boolean throwEx, TestResults results) {
@@ -540,123 +564,73 @@ public abstract class EyesBase implements IEyesBase {
         }
     }
 
-    /**
-     * Ends the test.
-     * @param isDeadlineExceeded If {@code true} the test will fail (unless
-     *                           it's a new test).
-     * @throws TestFailedException
-     * @throws NewTestException
-     */
-    protected void closeResponseTime(boolean isDeadlineExceeded) {
-        try {
-            if (isDisabled) {
-                logger.verbose("Ignored");
+    public TestResults abortIfNotClosed() {
+        AtomicReference<TestResults> reference = new AtomicReference<>();
+        final AtomicReference<Object> lock = new AtomicReference<>(new Object());
+        abortInner(new SyncTaskListener<>(lock, reference));
+        synchronized (lock.get()) {
+            try {
+                if (reference.get() == null) {
+                    lock.get().wait();
+                }
+            } catch (InterruptedException e) {
+                throw new EyesException("Failed waiting for abort", e);
             }
-
-            logger.verbose(String.format("closeResponseTime(%b)",
-                    isDeadlineExceeded));
-            ArgumentGuard.isValidState(isOpen, "Eyes not open");
-
-            isOpen = false;
-
-            if (runningSession == null) {
-                logger.verbose("Server session was not started");
-                logger.log("--- Empty test ended.");
-                return;
-            }
-
-            boolean isNewSession = runningSession.getIsNew();
-            String sessionResultsUrl = runningSession.getUrl();
-
-            logger.verbose("Ending server session...");
-            boolean save = (isNewSession && getConfigurationInstance().getSaveNewTests());
-
-            logger.verbose("Automatically save test? " + String.valueOf(save));
-            TestResults results =
-                    getServerConnector().stopSession(runningSession, false,
-                            save);
-
-            results.setNew(isNewSession);
-            results.setUrl(sessionResultsUrl);
-            logger.verbose(results.toString());
-
-            String instructions;
-            if (isDeadlineExceeded && !isNewSession) {
-
-                logger.log("--- Failed test ended. See details at "
-                        + sessionResultsUrl);
-
-                String message =
-                        "'" + sessionStartInfo.getScenarioIdOrName()
-                                + "' of '"
-                                + sessionStartInfo.getAppIdOrName()
-                                + "'. See details at " + sessionResultsUrl;
-                throw new TestFailedException(results, message);
-            }
-
-            if (isNewSession) {
-                instructions = "Please approve the new baseline at "
-                        + sessionResultsUrl;
-
-                logger.log("--- New test ended. " + instructions);
-
-                String message =
-                        "'" + sessionStartInfo.getScenarioIdOrName()
-                                + "' of '" + sessionStartInfo
-                                .getAppIdOrName()
-                                + "'. " + instructions;
-                throw new NewTestException(results, message);
-            }
-
-            // Test passed
-            logger.log("--- Test passed. See details at " + sessionResultsUrl);
-
-        } finally {
-            // Making sure that we reset the running session even if an
-            // exception was thrown during close.
-            runningSession = null;
-            logger.getLogHandler().close();
         }
+
+        TestResults testResults = reference.get();
+        if (testResults == null) {
+            throw new EyesException("Failed stopping session");
+        }
+        return testResults;
+    }
+
+    public void abortIfNotClosed(TaskListener<TestResults> listener) {
+        abortInner(listener);
     }
 
     /**
      * If a test is running, aborts it. Otherwise, does nothing.
      */
-    public TestResults abortIfNotClosed() {
-        try {
-            if (isDisabled) {
-                logger.verbose("Ignored");
-                return null;
-            }
-
-            isOpen = false;
-
-            lastScreenshot = null;
-            clearUserInputs();
-
-            if (null == runningSession) {
-                logger.verbose("Closed");
-                return null;
-            }
-
-            logger.verbose("Aborting server session...");
-            try {
-                // When aborting we do not save the test.
-                boolean isNewSession = runningSession.getIsNew();
-                TestResults results = getServerConnector().stopSession(runningSession, true, false);
-                results.setNew(isNewSession);
-                results.setUrl(runningSession.getUrl());
-                logger.log("--- Test aborted.");
-                return results;
-            } catch (EyesException ex) {
-                logger.log(
-                        "Failed to abort server session: " + ex.getMessage());
-            }
-        } finally {
-            runningSession = null;
-            closeLogger();
+    private void abortInner(final TaskListener<TestResults> listener) {
+        if (isDisabled) {
+            logger.verbose("Ignored");
+            listener.onComplete(new TestResults());
+            return;
         }
-        return null;
+
+        isOpen = false;
+
+        lastScreenshot = null;
+        clearUserInputs();
+
+        if (null == runningSession) {
+            logger.verbose("Closed");
+            listener.onComplete(new TestResults());
+            return;
+        }
+
+        logger.verbose("Aborting server session...");
+        // When aborting we do not save the test.
+        getServerConnector().stopSession(new TaskListener<TestResults>() {
+            @Override
+            public void onComplete(TestResults testResults) {
+                testResults.setNew(runningSession.getIsNew());
+                testResults.setUrl(runningSession.getUrl());
+                logger.log("--- Test aborted.");
+                runningSession = null;
+                closeLogger();
+                listener.onComplete(testResults);
+            }
+
+            @Override
+            public void onFail() {
+                logger.log("Failed to abort server session");
+                runningSession = null;
+                closeLogger();
+                listener.onFail();
+            }
+        }, runningSession, true, false);
     }
 
     public TestResults abort() {
@@ -718,12 +692,6 @@ public abstract class EyesBase implements IEyesBase {
         return this.checkWindowBase(region, new CheckSettings(retryTimeout).withName(tag), source);
     }
 
-    protected void beforeMatchWindow() {
-    }
-
-    protected void afterMatchWindow() {
-    }
-
     protected MatchResult checkWindowBase(Region region, String tag, ICheckSettings checkSettings) {
         return checkWindowBase(region, checkSettings.withName(tag), getAppName());
     }
@@ -760,13 +728,19 @@ public abstract class EyesBase implements IEyesBase {
 
         ArgumentGuard.isValidState(getIsOpen(), "Eyes not open");
 
-        ensureRunningSession();
-
-        beforeMatchWindow();
+        if (runningSession == null) {
+            final AtomicReference<Object> lock = new AtomicReference<>(new Object());
+            ensureRunningSession(new SyncTaskListener<Void>(lock));
+            synchronized (lock.get()) {
+                try {
+                    lock.get().wait();
+                } catch (InterruptedException e) {
+                    throw new EyesException("Failed waiting for open", e);
+                }
+            }
+        }
 
         result = matchWindow(region, tag, checkSettingsInternal, source);
-
-        afterMatchWindow();
 
         logger.verbose("MatchWindow Done!");
 
@@ -852,219 +826,125 @@ public abstract class EyesBase implements IEyesBase {
         this.isDisabled = isDisabled;
     }
 
-
-    /**
-     * Runs a timing test.
-     * @param regionProvider Returns the region to check or the empty rectangle to check the entire window.
-     * @param action         An action to run in parallel to starting the test, or {@code null} if no such action is required.
-     * @param deadline       The expected amount of time until finding a match. (Seconds)
-     * @param timeout        The maximum amount of time to retry matching. (Seconds)
-     * @param matchInterval  The interval for testing for a match. (Milliseconds)
-     * @return The earliest match found, or {@code null} if no match was found.
-     */
-    protected MatchWindowDataWithScreenshot testResponseTimeBase(
-            RegionProvider regionProvider, Runnable action, int deadline,
-            int timeout, long matchInterval) {
-
-        if (getIsDisabled()) {
-            logger.verbose("Ignored");
-            return null;
-        }
-
-        ArgumentGuard.isValidState(getIsOpen(), "Eyes not open");
-        ArgumentGuard.notNull(regionProvider, "regionProvider");
-        ArgumentGuard.greaterThanZero(deadline, "deadline");
-        ArgumentGuard.greaterThanZero(timeout, "timeout");
-        ArgumentGuard.greaterThanZero(matchInterval, "matchInterval");
-
-        logger.verbose(String.format("testResponseTimeBase(regionProvider, %d, %d, %d)",
-                deadline, timeout, matchInterval));
-
-        if (runningSession == null) {
-            logger.verbose("No running session, calling start session..");
-            startSession();
-            logger.verbose("Done!");
-        }
-
-        //If there's an action to do
-        Thread actionThread = null;
-        if (action != null) {
-            logger.verbose("Starting WebDriver action.");
-            actionThread = new Thread(action);
-            actionThread.start();
-        }
-
-        long startTime = System.currentTimeMillis();
-
-        // A callback which will call getAppOutput
-        AppOutputProvider appOutputProvider = new AppOutputProvider() {
-            public AppOutputWithScreenshot getAppOutput(
-                    Region region,
-                    ICheckSettingsInternal checkSettingsInternal, ImageMatchSettings imageMatchSettings) {
-                return getAppOutputWithScreenshot(region, null, imageMatchSettings);
-            }
-        };
-
-        MatchWindowDataWithScreenshot result;
-        if (runningSession.getIsNew()) {
-            ResponseTimeAlgorithm.runNewProgressionSession(logger,
-                    getServerConnector(), runningSession, appOutputProvider,
-                    regionProvider, startTime, deadline);
-            // Since there's never a match for a new session..
-            result = null;
-        } else {
-            result = ResponseTimeAlgorithm.runProgressionSessionForExistingBaseline(
-                    logger, getServerConnector(), runningSession, appOutputProvider, regionProvider, startTime,
-                    deadline, timeout, matchInterval);
-        }
-
-        if (actionThread != null) {
-            // FIXME - Replace join with wait to according to the parameters
-            logger.verbose("Making sure 'action' thread had finished...");
+    protected void openBase() throws EyesException {
+        final AtomicReference<Object> lock = new AtomicReference<>(new Object());
+        openBaseAsync(new SyncTaskListener<Void>(lock));
+        synchronized (lock.get()) {
             try {
-                actionThread.join(30000);
+                lock.get().wait();
             } catch (InterruptedException e) {
-                logger.verbose(
-                        "Got interrupted while waiting for 'action' to finish!");
+                throw new EyesException("Failed waiting for open", e);
             }
         }
 
-        logger.verbose("Done!");
-        return result;
+        if (!isOpen) {
+            throw new EyesException("Failed starting session with the server");
+        }
     }
 
-    protected void beforeOpen() {
-    }
-
-    protected void afterOpen() {
-    }
-
-    /**
-     * Starts a test.
-     * @param appName      The name of the application under test.
-     * @param testName     The test name.
-     * @param viewportSize The client's viewport size (i.e., the visible part
-     *                     of the document's body) or {@code null} to allow
-     *                     any viewport size.
-     * @param sessionType  The type of test (e.g., Progression for timing
-     *                     tests), or {@code null} to use the default.
-     */
-    protected void openBase(String appName, String testName,
-                            RectangleSize viewportSize, SessionType sessionType) {
+    protected void openBaseAsync(final TaskListener<Void> taskListener) throws EyesException {
+        openLogger();
         if (isDisabled) {
             logger.verbose("Ignored");
             return;
         }
 
-        if (getServerConnector() == null) {
-            throw new EyesException("server connector not set.");
+        sessionEventHandlers.testStarted(getAUTSessionId());
+
+        validateApiKey();
+        logOpenBase();
+        validateSessionOpen();
+
+        initProviders();
+
+        this.isViewportSizeSet = false;
+
+        sessionEventHandlers.initStarted();
+
+        RectangleSize viewportSize = getViewportSizeForOpen();
+        if (viewportSize == null) {
+            viewportSize = RectangleSize.EMPTY;
         }
-
-        // If there's no default application name, one must be provided for the current test.
-        if (getAppName() == null) {
-            ArgumentGuard.notNull(appName, "appName");
-            this.getConfigurationInstance().setAppName(appName);
-        }
-
-        ArgumentGuard.notNull(testName, "testName");
-        this.getConfigurationInstance().setTestName(testName);
-
-        logger.log("Agent = " + getFullAgentId());
-        logger.verbose(String.format("openBase('%s', '%s', '%s')", appName,
-                testName, viewportSize));
-
-        getConfigurationInstance().setSessionType(sessionType != null ? sessionType : SessionType.SEQUENTIAL);
         getConfigurationInstance().setViewportSize(viewportSize);
+        if (runningSession != null) {
+            logger.log("session already running.");
+            return;
+        }
 
-        openBase();
-    }
-
-    protected void openBase() throws EyesException {
-        openLogger();
-        int retry = 0;
-        do {
-            try {
-                if (isDisabled) {
-                    logger.verbose("Ignored");
-                    return;
-                }
-
-                sessionEventHandlers.testStarted(getAUTSessionId());
-
-                validateApiKey();
-                logOpenBase();
-                validateSessionOpen();
-
-                initProviders();
-
-                this.isViewportSizeSet = false;
-
-                sessionEventHandlers.initStarted();
-
-                beforeOpen();
-
-                RectangleSize viewportSize = getViewportSizeForOpen();
-                if (viewportSize == null) {
-                    viewportSize = RectangleSize.EMPTY;
-                }
-                getConfigurationInstance().setViewportSize(viewportSize);
-
-                try {
-                    ensureRunningSession();
-                } catch (Exception e) {
-                    GeneralUtils.logExceptionStackTrace(logger, e);
-                    retry++;
-                    if (MAX_ITERATION > retry) {
-                        continue;
-                    }
-                    throw e;
-                }
-
-                this.validationId = -1;
-
+        final AtomicInteger attemptNumber = new AtomicInteger(0);
+        final TaskListener<Void> listener = new TaskListener<Void>() {
+            @Override
+            public void onComplete(Void unused) {
+                validationId = -1;
                 isOpen = true;
-                afterOpen();
-                return;
-            } catch (EyesException e) {
-                logger.log(e.getMessage());
-                logger.getLogHandler().close();
-                throw e;
+                taskListener.onComplete(null);
             }
 
+            @Override
+            public void onFail() {
+                if (attemptNumber.incrementAndGet() < MAX_ITERATION) {
+                    try {
+                        ensureRunningSession(this);
+                        return;
+                    } catch (Throwable e) {
+                        GeneralUtils.logExceptionStackTrace(logger, e);
+                    }
 
-        } while (true);
+                }
+                taskListener.onFail();
+            }
+        };
+
+        ensureRunningSession(listener);
     }
 
     protected RectangleSize getViewportSizeForOpen() {
         return getConfigurationInstance().getViewportSize();
     }
 
-    protected void ensureRunningSession() {
-        if (runningSession != null) {
-            logger.log("session already running.");
-            return;
-        }
-
+    protected void ensureRunningSession(final TaskListener<Void> listener) {
         logger.log("No running session, calling start session...");
-        startSession();
-        logger.setSessionId(runningSession.getSessionId());
-        logger.log("Done!");
+        startSession(new TaskListener<RunningSession>() {
+            @Override
+            public void onComplete(RunningSession result) {
+                runningSession = result;
+                logger.verbose("Server session ID is " + runningSession.getId());
 
-        matchWindowTask = new MatchWindowTask(
-                logger,
-                getServerConnector(),
-                runningSession,
-                getConfigurationInstance().getMatchTimeout(),
-                this,
-                // A callback which will call getAppOutput
-                new AppOutputProvider() {
-                    @Override
-                    public AppOutputWithScreenshot getAppOutput(Region region,
-                                                                ICheckSettingsInternal checkSettingsInternal, ImageMatchSettings imageMatchSettings) {
-                        return getAppOutputWithScreenshot(region, checkSettingsInternal, imageMatchSettings);
-                    }
+                logger.setSessionId(runningSession.getSessionId());
+                String testName = "'" + getTestName() + "'";
+                if (runningSession.getIsNew()) {
+                    logger.log("--- New test started - " + testName);
+                    shouldMatchWindowRunOnceOnTimeout = true;
+                } else {
+                    logger.log("--- Test started - " + testName);
+                    shouldMatchWindowRunOnceOnTimeout = false;
                 }
-        );
+
+                matchWindowTask = new MatchWindowTask(
+                        logger,
+                        getServerConnector(),
+                        runningSession,
+                        getConfigurationInstance().getMatchTimeout(),
+                        EyesBase.this,
+                        // A callback which will call getAppOutput
+                        new AppOutputProvider() {
+                            @Override
+                            public AppOutputWithScreenshot getAppOutput(Region region,
+                                                                        ICheckSettingsInternal checkSettingsInternal,
+                                                                        ImageMatchSettings imageMatchSettings) {
+                                return getAppOutputWithScreenshot(region, checkSettingsInternal, imageMatchSettings);
+                            }
+                        }
+                );
+
+                listener.onComplete(null);
+            }
+
+            @Override
+            public void onFail() {
+                listener.onFail();
+            }
+        });
     }
 
     private void validateApiKey() {
@@ -1140,9 +1020,6 @@ public abstract class EyesBase implements IEyesBase {
      * @return The current title of of the AUT.
      */
     protected abstract String getTitle();
-
-    // FIXME add "GetScreenshotUrl"
-    // FIXME add CloseOrAbort ??
 
     /**
      * Adds a trigger to the current list of user inputs.
@@ -1248,8 +1125,6 @@ public abstract class EyesBase implements IEyesBase {
         logger.verbose(String.format("Added %s", trigger));
     }
 
-    // FIXME add getScreenshot (Wrapper) ?? (Check EyesBase in .NET)
-
     /**
      * Application environment is the environment (e.g., the host OS) which
      * runs the application under test.
@@ -1275,7 +1150,7 @@ public abstract class EyesBase implements IEyesBase {
     /**
      * Start eyes session on the eyes server.
      */
-    protected void startSession() {
+    protected void startSession(TaskListener<RunningSession> listener) {
         logger.verbose("startSession()");
         if (getServerConnector() == null) {
             throw new EyesException("server connector not set.");
@@ -1305,18 +1180,9 @@ public abstract class EyesBase implements IEyesBase {
                 configGetter.getParentBranchName(), configGetter.getBaselineBranchName(), configGetter.getSaveDiffs(), properties);
 
         logger.verbose("Starting server session...");
-        runningSession = getServerConnector().startSession(sessionStartInfo);
-
-        logger.verbose("Server session ID is " + runningSession.getId());
-
         String testInfo = "'" + getTestName() + "' of '" + appName + "' " + appEnv;
-        if (runningSession.getIsNew()) {
-            logger.log("--- New test started - " + testInfo);
-            shouldMatchWindowRunOnceOnTimeout = true;
-        } else {
-            logger.log("--- Test started - " + testInfo);
-            shouldMatchWindowRunOnceOnTimeout = false;
-        }
+        logger.log("--- Starting test - " + testInfo);
+        getServerConnector().startSession(listener, sessionStartInfo);
     }
 
     protected String getTestName() {
@@ -1425,11 +1291,7 @@ public abstract class EyesBase implements IEyesBase {
     }
 
     public RenderingInfo getRenderingInfo() {
-        if (this.renderInfo != null) {
-            return this.renderInfo;
-        }
-        this.renderInfo = getServerConnector().getRenderInfo();
-        return this.renderInfo;
+        return getServerConnector().getRenderInfo();
     }
 
     public Map<String, DeviceSize> getDevicesSizes(String path) {

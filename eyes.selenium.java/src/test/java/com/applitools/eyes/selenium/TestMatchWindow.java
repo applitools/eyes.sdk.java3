@@ -4,6 +4,7 @@ import com.applitools.connectivity.ServerConnector;
 import com.applitools.eyes.*;
 import com.applitools.eyes.utils.ReportingTestSuite;
 import com.applitools.eyes.utils.SeleniumUtils;
+import org.mockito.ArgumentMatchers;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 import org.openqa.selenium.WebDriver;
@@ -53,16 +54,19 @@ public class TestMatchWindow extends ReportingTestSuite {
         doAnswer(new Answer<MatchResult>() {
             @Override
             public MatchResult answer(InvocationOnMock invocationOnMock) {
-                MatchWindowData matchWindowData = invocationOnMock.getArgument(1);
+                TaskListener<MatchResult> listener = invocationOnMock.getArgument(0);
+                MatchWindowData matchWindowData = invocationOnMock.getArgument(2);
                 replaceLastList.add(matchWindowData.getOptions().getReplaceLast());
                 MatchResult matchResult = new MatchResult();
                 matchResult.setAsExpected(false);
-                return matchResult;
+                listener.onComplete(matchResult);
+                return null;
             }
-        }).when(serverConnector).matchWindow(any(RunningSession.class), any(MatchWindowData.class));
+        }).when(serverConnector).matchWindow(ArgumentMatchers.<TaskListener<MatchResult>>any(), any(RunningSession.class), any(MatchWindowData.class));
         EyesRunner runner = new ClassicRunner();
         Eyes eyes = new Eyes(runner);
         eyes.setServerConnector(serverConnector);
+        eyes.setLogHandler(new StdoutLogHandler());
         try {
             driver.get(testedUrl);
             eyes.open(driver, "Applitools Eyes SDK", "testReplaceMatchedStep", new RectangleSize(700, 460));

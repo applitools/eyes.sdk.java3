@@ -1,6 +1,5 @@
 package com.applitools.eyes.selenium;
 
-import com.applitools.eyes.EyesException;
 import com.applitools.eyes.ProxySettings;
 import com.applitools.eyes.utils.ReportingTestSuite;
 import com.applitools.eyes.utils.SeleniumUtils;

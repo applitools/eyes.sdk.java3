@@ -13,7 +13,10 @@ import com.applitools.eyes.selenium.BrowserType;
 import com.applitools.eyes.selenium.Eyes;
 import com.applitools.eyes.selenium.TestDataProvider;
 import com.applitools.eyes.selenium.fluent.Target;
-import com.applitools.eyes.utils.*;
+import com.applitools.eyes.utils.ReportingTestSuite;
+import com.applitools.eyes.utils.SeleniumTestUtils;
+import com.applitools.eyes.utils.SeleniumUtils;
+import com.applitools.eyes.utils.TestUtils;
 import com.applitools.eyes.visualgrid.model.*;
 import com.applitools.eyes.visualgrid.services.IEyesConnector;
 import com.applitools.eyes.visualgrid.services.VisualGridRunner;
@@ -31,10 +34,7 @@ import org.testng.annotations.Test;
 import javax.ws.rs.HttpMethod;
 import java.io.IOException;
 import java.net.UnknownHostException;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.Future;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -161,12 +161,13 @@ public class TestRenderings extends ReportingTestSuite {
     @Test
     public void testRenderFail() throws IOException {
         ServerConnector serverConnector = spy(ServerConnector.class);
-        doThrow(new IllegalStateException()).when(serverConnector).render(any(RenderRequest.class));
+        doThrow(new IllegalStateException()).when(serverConnector).render(ArgumentMatchers.<TaskListener<List<RunningRender>>>any(), any(RenderRequest.class));
 
         EyesRunner runner = new VisualGridRunner(10);
         Eyes eyes = new Eyes(runner);
         SeleniumTestUtils.setupLogging(eyes);
         eyes.setServerConnector(serverConnector);
+        eyes.setLogHandler(new StdoutLogHandler());
 
         com.applitools.eyes.selenium.Configuration config = eyes.getConfiguration();
         config.addBrowser(new DesktopBrowserInfo(new RectangleSize(700, 460), BrowserType.CHROME));
@@ -232,7 +233,6 @@ public class TestRenderings extends ReportingTestSuite {
 
     @Test
     public void testRenderResourceNotFound() {
-        final AtomicBoolean alreadyRendered = new AtomicBoolean(false);
         final Map<String,RGridResource> missingResources = new HashMap<>();
         final String missingUrl = "http://httpstat.us/503";
         final String unknownHostUrl = "http://hostwhichdoesntexist/503";
@@ -269,31 +269,36 @@ public class TestRenderings extends ReportingTestSuite {
 
 
         // Mocking server connector to add fake missing resources to the render request
-        ServerConnector serverConnector = spy(new ServerConnector());
+        final AtomicBoolean alreadyRun = new AtomicBoolean(false);
+        final ServerConnector serverConnector = new ServerConnector() {
+            @Override
+            public void render(final TaskListener<List<RunningRender>> listener, RenderRequest... renderRequests) {
+                super.render(new TaskListener<List<RunningRender>>() {
+                    @Override
+                    public void onComplete(List<RunningRender> runningRenders) {
+                        if (!alreadyRun.get()) {
+                            runningRenders.get(0).setNeedMoreResources(Arrays.asList(missingUrl, unknownHostUrl));
+                            runningRenders.get(0).setRenderStatus(RenderStatus.NEED_MORE_RESOURCE);
+                            alreadyRun.set(true);
+                        }
+
+                        listener.onComplete(runningRenders);
+                    }
+
+                    @Override
+                    public void onFail() {
+                        listener.onFail();
+                    }
+                }, renderRequests);
+            }
+
+            @Override
+            public Future<?> renderPutResource(RunningRender runningRender, RGridResource resource, String userAgent, TaskListener<Boolean> listener) {
+                missingResources.put(resource.getUrl(), resource);
+                return super.renderPutResource(runningRender, resource, userAgent, listener);
+            }
+        };
         serverConnector.updateClient(client);
-        doAnswer(new Answer<List<RunningRender>>() {
-            @Override
-            public List<RunningRender> answer(InvocationOnMock invocation) throws Throwable {
-                List<RunningRender> runningRenders = (List<RunningRender>) invocation.callRealMethod();
-                if (alreadyRendered.get()) {
-                    return runningRenders;
-                }
-
-                alreadyRendered.set(true);
-                runningRenders.get(0).setNeedMoreResources(Arrays.asList(missingUrl, unknownHostUrl));
-                runningRenders.get(0).setRenderStatus(RenderStatus.NEED_MORE_RESOURCE);
-                return runningRenders;
-            }
-        }).when(serverConnector).render(any(RenderRequest.class));
-        doAnswer(new Answer<Future<?>>() {
-            @Override
-            public Future<?> answer(InvocationOnMock invocation) throws Throwable {
-                RGridResource rGridResource = invocation.getArgument(1);
-                missingResources.put(rGridResource.getUrl(), rGridResource);
-                return (Future<?>) invocation.callRealMethod();
-            }
-        }).when(serverConnector).renderPutResource(any(RunningRender.class), any(RGridResource.class), anyString(), ArgumentMatchers.<TaskListener<Boolean>>any());
-
         VisualGridRunner runner = spy(new VisualGridRunner(10));
         doAnswer(new Answer() {
             @Override
