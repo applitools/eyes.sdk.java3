@@ -10,12 +10,14 @@ public class AndroidFullPageCaptureAlgorithm extends AppiumFullPageCaptureAlgori
     private static final int DEFAULT_STITCHING_ADJUSTMENT = 50;
 
     private Integer stitchingAdjustment = DEFAULT_STITCHING_ADJUSTMENT;
+    private String scrollableElementId;
 
     public AndroidFullPageCaptureAlgorithm(Logger logger,
                                            AppiumScrollPositionProvider scrollProvider,
                                            ImageProvider imageProvider, DebugScreenshotsProvider debugScreenshotsProvider,
                                            ScaleProviderFactory scaleProviderFactory, CutProvider cutProvider,
-                                           EyesScreenshotFactory screenshotFactory, int waitBeforeScreenshots, Integer stitchingAdjustment) {
+                                           EyesScreenshotFactory screenshotFactory, int waitBeforeScreenshots,
+                                           Integer stitchingAdjustment, String scrollableElementId) {
 
         super(logger, scrollProvider, imageProvider, debugScreenshotsProvider,
             scaleProviderFactory, cutProvider, screenshotFactory, waitBeforeScreenshots, null);
@@ -25,6 +27,8 @@ public class AndroidFullPageCaptureAlgorithm extends AppiumFullPageCaptureAlgori
         if (stitchingAdjustment != null) {
             this.stitchingAdjustment = stitchingAdjustment;
         }
+        this.scrollableElementId = scrollableElementId;
+        ((AndroidScrollPositionProvider) scrollProvider).setScrollRootElement(scrollableElementId);
     }
 
     @Override
@@ -58,13 +62,27 @@ public class AndroidFullPageCaptureAlgorithm extends AppiumFullPageCaptureAlgori
             currentPosition = new Location(0,
                     scrollViewRegion.getTop() + ((scrollViewRegion.getHeight()) * (step)) - (stitchingAdjustment*step - stitchingAdjustment));
 
-            // We should use release() touch action for the last scroll action
-            // For some applications scrolling is not executed for the last part with cancel() action
-            ((AppiumScrollPositionProvider) scrollProvider).scrollTo(xPos,
-                    scrollViewRegion.getHeight() + scrollViewRegion.getTop() - 1,
-                    xPos,
-                    scrollViewRegion.getTop() + (step != maxScrollSteps ? stitchingAdjustment : 0),
-                    step != maxScrollSteps);
+            int startY = scrollViewRegion.getHeight() + scrollViewRegion.getTop() - 1;
+            int endY = scrollViewRegion.getTop() + (step != maxScrollSteps ? stitchingAdjustment : 0);
+            boolean isScrolledWithHelperLibrary = false;
+            if (scrollableElementId != null) { // it means that we want to scroll on a specific element
+                logger.verbose("Scrollable element id: " + scrollableElementId);
+                isScrolledWithHelperLibrary = ((AndroidScrollPositionProvider) scrollProvider).tryScrollWithHelperLibrary(scrollableElementId, (startY - endY), step, maxScrollSteps);
+                if (step == maxScrollSteps && isScrolledWithHelperLibrary) {
+                    // We should make additional scroll on parent in case of scrollable element inside ScrollView
+                    ((AndroidScrollPositionProvider) scrollProvider).tryScrollWithHelperLibrary(scrollableElementId, (startY - endY), -1, maxScrollSteps);
+                }
+            }
+            if (!isScrolledWithHelperLibrary) {
+                logger.verbose("Scroll root element or helper library is not provided... Using standard scrolling...");
+                // We should use release() touch action for the last scroll action
+                // For some applications scrolling is not executed for the last part with cancel() action
+                ((AppiumScrollPositionProvider) scrollProvider).scrollTo(xPos,
+                        startY,
+                        xPos,
+                        endY,
+                        step != maxScrollSteps);
+            }
 
             if (step == maxScrollSteps) {
                 int cropTo = contentSize.getScrollContentHeight() - (oneScrollStep * (step));
@@ -89,5 +107,16 @@ public class AndroidFullPageCaptureAlgorithm extends AppiumFullPageCaptureAlgori
         }
 
         moveToTopLeft();
+    }
+
+    @Override
+    protected void moveToTopLeft() {
+        boolean isScrolledWithHelperLibrary = false;
+        if (scrollableElementId != null) {
+            isScrolledWithHelperLibrary = ((AndroidScrollPositionProvider) scrollProvider).moveToTop(scrollableElementId);
+        }
+        if (!isScrolledWithHelperLibrary) {
+            super.moveToTopLeft();
+        }
     }
 }

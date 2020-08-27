@@ -20,6 +20,7 @@ import com.applitools.eyes.locators.VisualLocatorsProvider;
 import com.applitools.eyes.scaling.FixedScaleProviderFactory;
 import com.applitools.eyes.scaling.NullScaleProvider;
 import com.applitools.eyes.selenium.EyesDriverUtils;
+import com.applitools.eyes.selenium.StitchMode;
 import com.applitools.eyes.selenium.fluent.SimpleRegionByElement;
 import com.applitools.eyes.selenium.positioning.ImageRotation;
 import com.applitools.eyes.selenium.positioning.NullRegionPositionCompensation;
@@ -29,6 +30,10 @@ import com.applitools.eyes.selenium.regionVisibility.NopRegionVisibilityStrategy
 import com.applitools.eyes.selenium.regionVisibility.RegionVisibilityStrategy;
 import com.applitools.utils.*;
 import io.appium.java_client.AppiumDriver;
+import io.appium.java_client.MobileBy;
+import io.appium.java_client.MobileElement;
+import io.appium.java_client.android.AndroidDriver;
+import io.appium.java_client.android.AndroidElement;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.*;
 import org.openqa.selenium.remote.RemoteWebDriver;
@@ -56,6 +61,7 @@ public class Eyes extends EyesBase {
     private ImageRotation rotation;
     protected WebElement targetElement = null;
     private PropertyHandler<RegionVisibilityStrategy> regionVisibilityStrategyHandler;
+    private String scrollRootElementId = null;
 
     public Eyes() {
         super();
@@ -434,6 +440,7 @@ public class Eyes extends EyesBase {
     public void check(ICheckSettings checkSettings) {
         if (checkSettings instanceof AppiumCheckSettings) {
             updateCutElement((AppiumCheckSettings) checkSettings);
+            this.scrollRootElementId = getScrollRootElementId((AppiumCheckSettings) checkSettings);
         }
 
         if (getIsDisabled()) {
@@ -677,7 +684,8 @@ public class Eyes extends EyesBase {
 
         AppiumCaptureAlgorithmFactory algoFactory = new AppiumCaptureAlgorithmFactory(driver, logger,
                 scrollPositionProvider, imageProvider, debugScreenshotsProvider, scaleProviderFactory,
-                cutProviderHandler.get(), screenshotFactory, getConfigurationInstance().getWaitBeforeScreenshots(), cutElement, getStitchOverlap());
+                cutProviderHandler.get(), screenshotFactory, getConfigurationInstance().getWaitBeforeScreenshots(), cutElement,
+                getStitchOverlap(), scrollRootElementId);
 
         AppiumFullPageCaptureAlgorithm algo = algoFactory.getAlgorithm();
 
@@ -960,5 +968,151 @@ public class Eyes extends EyesBase {
             this.setProxy(proxy);
         }
         this.configuration = new Configuration(configuration);
+    }
+
+    @Override
+    public Object getAgentSetup() {
+        return new EyesAppiumAgentSetup();
+    }
+
+    private String getScrollRootElementId(AppiumCheckSettings checkSettings) {
+        String scrollRootElementId = checkSettings.getScrollRootElementId();
+        if (scrollRootElementId == null) {
+            WebElement webElement = checkSettings.getScrollRootElement();
+            if (webElement == null && checkSettings.getScrollRootElementSelector() != null) {
+                webElement = driver.findElement(checkSettings.getScrollRootElementSelector());
+            }
+            if (webElement != null) {
+                scrollRootElementId = webElement.getAttribute("resourceId").split("/")[1];
+            }
+        }
+        return scrollRootElementId;
+    }
+
+    private String getHelperLibraryVersion() {
+        String version = "";
+        if (driver.getRemoteWebDriver() instanceof AndroidDriver) {
+            try {
+                WebElement hiddenElement = driver.getRemoteWebDriver().findElement(MobileBy.AndroidUIAutomator("new UiSelector().description(\"EyesAppiumHelper_Version\")"));
+                if (hiddenElement != null) {
+                    version = hiddenElement.getText();
+                }
+            } catch (NoSuchElementException | StaleElementReferenceException ignored) {
+            }
+            if (version == null) {
+                try {
+                    WebElement hiddenElement = driver.getRemoteWebDriver().findElement(MobileBy.AndroidUIAutomator("new UiSelector().description(\"EyesAppiumHelper\")"));
+                    if (hiddenElement != null) {
+                        version = "1.0.0";
+                    }
+                } catch (NoSuchElementException | StaleElementReferenceException ignored) {
+                }
+            }
+            if (version == null) {
+                logger.verbose("Appium Helper library is not used...");
+            } else {
+                logger.verbose("Appium Helper library version: " + version);
+            }
+        }
+        return version;
+    }
+
+    class EyesAppiumAgentSetup {
+        class WebDriverInfo {
+            /**
+             * Gets name.
+             * @return the name
+             */
+            public String getName() {
+                return remoteWebDriver.getClass().getName();
+            }
+
+            /**
+             * Gets capabilities.
+             * @return the capabilities
+             */
+            public Capabilities getCapabilities() {
+                return remoteWebDriver.getCapabilities();
+            }
+        }
+
+        /**
+         * Instantiates a new Eyes selenium agent setup.
+         */
+        public EyesAppiumAgentSetup() {
+            remoteWebDriver = driver.getRemoteWebDriver();
+        }
+
+        private RemoteWebDriver remoteWebDriver;
+
+        /**
+         * Gets selenium session id.
+         * @return the selenium session id
+         */
+        public String getAppiumSessionId() {
+            return remoteWebDriver.getSessionId().toString();
+        }
+
+        /**
+         * Gets web driver.
+         * @return the web driver
+         */
+        public WebDriverInfo getWebDriver() {
+            return new WebDriverInfo();
+        }
+
+        /**
+         * Gets device pixel ratio.
+         * @return the device pixel ratio
+         */
+        public double getDevicePixelRatio() {
+            return Eyes.this.getDevicePixelRatio();
+        }
+
+        /**
+         * Gets cut provider.
+         * @return the cut provider
+         */
+        public String getCutProvider() {
+            return Eyes.this.cutProviderHandler.get().getClass().getName();
+        }
+
+        /**
+         * Gets scale provider.
+         * @return the scale provider
+         */
+        public String getScaleProvider() {
+            return Eyes.this.scaleProviderHandler.get().getClass().getName();
+        }
+
+        /**
+         * Gets stitch mode.
+         * @return the stitch mode
+         */
+        public StitchMode getStitchMode() {
+            return Eyes.this.getConfigurationInstance().getStitchMode();
+        }
+
+        /**
+         * Gets hide scrollbars.
+         * @return the hide scrollbars
+         */
+        public boolean getHideScrollbars() {
+            return Eyes.this.getConfigurationInstance().getHideScrollbars();
+        }
+
+        /**
+         * Gets force full page screenshot.
+         * @return the force full page screenshot
+         */
+        public boolean getForceFullPageScreenshot() {
+            Boolean forceFullPageScreenshot = getConfigurationInstance().getForceFullPageScreenshot();
+            if (forceFullPageScreenshot == null) return false;
+            return forceFullPageScreenshot;
+        }
+
+        public String getHelperLibraryVersion() {
+            return Eyes.this.getHelperLibraryVersion();
+        }
     }
 }

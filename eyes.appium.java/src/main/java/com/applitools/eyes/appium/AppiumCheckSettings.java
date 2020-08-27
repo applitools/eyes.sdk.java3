@@ -24,6 +24,9 @@ public class AppiumCheckSettings extends CheckSettings implements ImplicitInitia
     private By cutElementSelector;
     private ElementType cutElementType;
     private Boolean statusBarExists;
+    private String scrollRootElementId;
+    private By scrollRootElementSelector;
+    private WebElement scrollRootElement;
 
     protected AppiumCheckSettings() {
         super();
@@ -67,6 +70,9 @@ public class AppiumCheckSettings extends CheckSettings implements ImplicitInitia
         clone.targetElement = this.targetElement;
         clone.cutElementSelector = this.cutElementSelector;
         clone.cutElementType = this.cutElementType;
+        clone.scrollRootElementId = this.scrollRootElementId;
+        clone.scrollRootElementSelector = this.scrollRootElementSelector;
+        clone.scrollRootElement = this.scrollRootElement;
         return clone;
     }
 
@@ -211,5 +217,35 @@ public class AppiumCheckSettings extends CheckSettings implements ImplicitInitia
     @Override
     public AppiumCheckSettings fully(Boolean fully) {
         return (AppiumCheckSettings) super.fully(fully);
+    }
+
+    public AppiumCheckSettings scrollRootElement(String elementId) {
+        AppiumCheckSettings clone = this.clone();
+        clone.scrollRootElementId = elementId;
+        return clone;
+    }
+
+    public AppiumCheckSettings scrollRootElement(By selector) {
+        AppiumCheckSettings clone = this.clone();
+        clone.scrollRootElementSelector = selector;
+        return clone;
+    }
+
+    public AppiumCheckSettings scrollRootElement(WebElement element) {
+        AppiumCheckSettings clone = this.clone();
+        clone.scrollRootElement = element;
+        return clone;
+    }
+
+    public String getScrollRootElementId() {
+        return this.scrollRootElementId;
+    }
+
+    public By getScrollRootElementSelector() {
+        return this.scrollRootElementSelector;
+    }
+
+    public WebElement getScrollRootElement() {
+        return this.scrollRootElement;
     }
 }

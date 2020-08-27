@@ -22,13 +22,14 @@ public class AppiumCaptureAlgorithmFactory {
     private final int waitBeforeScreenshot;
     private final WebElement cutElement;
     private final Integer stitchingAdjustment;
+    private final String scrollableElementId;
 
     public AppiumCaptureAlgorithmFactory(EyesAppiumDriver driver, Logger logger,
                                          AppiumScrollPositionProvider scrollProvider,
                                          ImageProvider imageProvider, DebugScreenshotsProvider debugScreenshotsProvider,
                                          ScaleProviderFactory scaleProviderFactory, CutProvider cutProvider,
                                          EyesScreenshotFactory screenshotFactory, int waitBeforeScreenshots, WebElement cutElement,
-                                         Integer stitchingAdjustment) {
+                                         Integer stitchingAdjustment, String scrollableElementId) {
 
         this.driver = driver;
         this.logger = logger;
@@ -41,13 +42,14 @@ public class AppiumCaptureAlgorithmFactory {
         this.waitBeforeScreenshot = waitBeforeScreenshots;
         this.cutElement = cutElement;
         this.stitchingAdjustment = stitchingAdjustment;
+        this.scrollableElementId = scrollableElementId;
     }
 
     public AppiumFullPageCaptureAlgorithm getAlgorithm () {
         if (EyesDriverUtils.isAndroid(driver.getRemoteWebDriver())) {
             return new AndroidFullPageCaptureAlgorithm(logger, scrollProvider, imageProvider,
                     debugScreenshotsProvider, scaleProviderFactory, cutProvider, screenshotFactory,
-                    waitBeforeScreenshot, stitchingAdjustment);
+                    waitBeforeScreenshot, stitchingAdjustment, scrollableElementId);
         } else if (EyesDriverUtils.isIOS(driver.getRemoteWebDriver())) {
             return new AppiumFullPageCaptureAlgorithm(logger, scrollProvider, imageProvider,
                     debugScreenshotsProvider, scaleProviderFactory, cutProvider, screenshotFactory,

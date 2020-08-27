@@ -1,6 +1,8 @@
 
 ### Added
 - Implemented test on setting deviceName to appEnvironment data. [Trello 125](https://trello.com/c/ekZqajRU)
+### Updated
+- Scroll mechanism for Android. Added possibility to scroll with helper library. [Trello 1673](https://trello.com/c/CYbkzXia)
 
 ## [3.175.0] - 2020-08-26
 ### Fixed

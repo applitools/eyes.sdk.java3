@@ -83,7 +83,7 @@ jobs:
       script:
         - echo APPLITOOLS_REPORT_ID
         - sh upload_app.sh "https://applitools.bintray.com/Examples/android/1.2/app_android.apk" "app_android"
-        - sh upload_app.sh "https://applitools.bintray.com/Examples/androidx/1.0.0/app_androidx.apk" "app_androidx"
+        - sh upload_app.sh "https://applitools.bintray.com/Examples/androidx/1.1.0/app_androidx.apk" "app_androidx"
         - chmod +x ./runTests.sh
         - ./runTests.sh "eyes.appium.java"
     - stage: Deploy
