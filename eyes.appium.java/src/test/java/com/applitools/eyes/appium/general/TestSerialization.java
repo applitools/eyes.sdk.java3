@@ -5,6 +5,7 @@ import com.applitools.eyes.ImageMatchSettings;
 import com.applitools.eyes.MatchWindowTask;
 import com.applitools.eyes.appium.Target;
 import com.applitools.eyes.appium.TestEyes;
+import com.applitools.eyes.config.Configuration;
 import com.applitools.eyes.fluent.ICheckSettingsInternal;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -67,8 +68,11 @@ public class TestSerialization {
 
     @Test(dataProvider = "four_booleans")
     public void test_ImageMatchSettings_Serialization_Global(boolean ignoreCaret, boolean useDom, boolean enablePatterns, boolean ignoreDisplacements) throws JsonProcessingException {
-        ICheckSettings settings = Target.window().fully().useDom(useDom).enablePatterns(enablePatterns).ignoreCaret(ignoreCaret).ignoreDisplacements(ignoreDisplacements);
+        ICheckSettings settings = Target.window().fully().useDom(useDom).enablePatterns(enablePatterns).ignoreCaret(ignoreCaret);
         TestEyes eyes = new TestEyes();
+        Configuration configuration = eyes.getConfiguration();
+        configuration.setIgnoreDisplacements(ignoreDisplacements);
+        eyes.setConfiguration(configuration);
         ImageMatchSettings imageMatchSettings = MatchWindowTask.createImageMatchSettings((ICheckSettingsInternal)settings, eyes);
 
         String actualSerialization = jsonMapper.writeValueAsString(imageMatchSettings);
