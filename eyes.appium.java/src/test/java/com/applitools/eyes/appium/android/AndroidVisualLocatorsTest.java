@@ -2,7 +2,6 @@ package com.applitools.eyes.appium.android;
 
 import com.applitools.eyes.Location;
 import com.applitools.eyes.Region;
-import com.applitools.eyes.appium.EyesAppiumUtils;
 import com.applitools.eyes.locators.VisualLocator;
 import io.appium.java_client.TouchAction;
 import io.appium.java_client.touch.WaitOptions;
@@ -18,7 +17,7 @@ import java.util.concurrent.TimeUnit;
 public class AndroidVisualLocatorsTest extends AndroidTestSetup {
 
     @Test
-    public void testAndroidVisualLocators() throws InterruptedException {
+    public void testAndroidVisualLocators() throws Exception {
         driver.manage().timeouts().implicitlyWait(10_000, TimeUnit.MILLISECONDS);
 
         eyes.setForceFullPageScreenshot(false);
@@ -55,6 +54,8 @@ public class AndroidVisualLocatorsTest extends AndroidTestSetup {
             Thread.sleep(3000);
 
             eyes.checkWindow("ListView screen");
+        } else {
+            throw new Exception("Locator \"list_view_locator\" was not located...");
         }
 
         locators = eyes.locate(VisualLocator.name("header_locator"));
