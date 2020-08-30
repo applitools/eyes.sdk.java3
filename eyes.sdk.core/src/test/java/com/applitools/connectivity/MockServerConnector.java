@@ -43,31 +43,36 @@ public class MockServerConnector extends ServerConnector {
     }
 
     @Override
-    public void uploadData(AsyncRequestCallback callback, byte[] bytes, RenderingInfo renderingInfo, final String targetUrl, String contentType, final String mediaType) {
-        callback.onComplete(new Response(logger) {
+    public void uploadData(final AsyncRequestCallback callback, byte[] bytes, RenderingInfo renderingInfo, final String targetUrl, String contentType, final String mediaType) {
+        executorService.submit(new Runnable() {
             @Override
-            public int getStatusCode() {
-                return HttpStatus.SC_OK;
-            }
+            public void run() {
+                callback.onComplete(new Response(logger) {
+                    @Override
+                    public int getStatusCode() {
+                        return HttpStatus.SC_OK;
+                    }
 
-            @Override
-            public String getStatusPhrase() {
-                return "";
-            }
+                    @Override
+                    public String getStatusPhrase() {
+                        return "";
+                    }
 
-            @Override
-            public String getHeader(String s, boolean b) {
-                return "";
-            }
+                    @Override
+                    public String getHeader(String s, boolean b) {
+                        return "";
+                    }
 
-            @Override
-            protected void readEntity() {
+                    @Override
+                    protected void readEntity() {
 
-            }
+                    }
 
-            @Override
-            public void close() {
+                    @Override
+                    public void close() {
 
+                    }
+                });
             }
         });
     }
