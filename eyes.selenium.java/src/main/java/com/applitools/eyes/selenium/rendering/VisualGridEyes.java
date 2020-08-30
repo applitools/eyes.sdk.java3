@@ -615,8 +615,7 @@ public class VisualGridEyes implements ISeleniumEyes, IRenderingEyes {
             boolean lastTaskIsNotAClosingTask = lastTaskType != null && lastTaskType != VisualGridTask.TaskType.CLOSE && lastTaskType != VisualGridTask.TaskType.ABORT;
 
             // We are interested in tests which should be opened or are open.
-            if (testIsOpenAndNotClosed || lastTaskIsNotAClosingTask)
-            {
+            if (testIsOpenAndNotClosed || lastTaskIsNotAClosingTask) {
                 filteredTests.add(test);
             }
         }
@@ -723,6 +722,10 @@ public class VisualGridEyes implements ISeleniumEyes, IRenderingEyes {
             checkSettings = checkSettings.ignoreDisplacements(getConfiguration().getIgnoreDisplacements());
         }
 
+        List<VisualGridOption> options = new ArrayList<>();
+        options.addAll(getConfiguration().getVisualGridOptions());
+        options.addAll(checkSettingsInternal.getVisualGridOptions());
+        checkSettings = checkSettings.visualGridOptions(options.size() > 0 ? options.toArray(new VisualGridOption[]{}) : null);
         return (ICheckSettingsInternal) checkSettings;
     }
 

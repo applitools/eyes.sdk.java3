@@ -2,12 +2,10 @@ package com.applitools.eyes.fluent;
 
 import com.applitools.ICheckSettings;
 import com.applitools.eyes.*;
+import com.applitools.eyes.visualgrid.model.VisualGridOption;
 import com.applitools.eyes.visualgrid.model.VisualGridSelector;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * The Match settings object to use in the various Eyes.Check methods.
@@ -33,6 +31,7 @@ public class CheckSettings implements ICheckSettings, ICheckSettingsInternal {
     protected Boolean useDom;
     protected Map<String, String> scriptHooks = new HashMap<>();
     protected Boolean ignoreDisplacements;
+    private List<VisualGridOption> visualGridOptions = new ArrayList<>();
 
     protected CheckSettings() { }
 
@@ -458,6 +457,7 @@ public class CheckSettings implements ICheckSettings, ICheckSettingsInternal {
         clone.ignoreDisplacements = (this.ignoreDisplacements);
         clone.accessibilityRegions = this.accessibilityRegions;
         clone.useDom = (this.useDom);
+        clone.visualGridOptions = this.visualGridOptions;
     }
 
     public void setStitchContent(boolean stitchContent) {
@@ -538,5 +538,22 @@ public class CheckSettings implements ICheckSettings, ICheckSettingsInternal {
     @Override
     public GetAccessibilityRegion[] getAccessibilityRegions() {
         return this.accessibilityRegions.toArray(new GetAccessibilityRegion[0]);
+    }
+
+    @Override
+    public ICheckSettings visualGridOptions(VisualGridOption... options) {
+        CheckSettings clone = clone();
+        clone.visualGridOptions.clear();
+        if (options == null) {
+            return clone;
+        }
+
+        clone.visualGridOptions.addAll(Arrays.asList(options));
+        clone.visualGridOptions.remove(null);
+        return clone;
+    }
+
+    public List<VisualGridOption> getVisualGridOptions() {
+        return visualGridOptions;
     }
 }

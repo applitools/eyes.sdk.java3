@@ -30,6 +30,9 @@
     }
   ],
   "sendDom": true,
+  "options": {
+    "key": "value"
+  },
   "platform": {
     "name": "android"
   },

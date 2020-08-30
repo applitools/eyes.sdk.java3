@@ -42,6 +42,7 @@ public class TestRenderSerialization {
         String xpath = "//html/body/some/path/to/some/element[@with:attribute]";
         Object category = "cat";
         List<VisualGridSelector> selectorsToFindRegionsFor = Collections.singletonList(new VisualGridSelector(xpath, category));
+        List<VisualGridOption> options = Collections.singletonList(new VisualGridOption("key", "value"));
 
         URL webHook = new URL("https://some.uri.com");
         URL url = new URL("https://another.url.co.il");
@@ -52,7 +53,7 @@ public class TestRenderSerialization {
         BrowserType browserName = BrowserType.IE_10;
         VisualGridTask task = new VisualGridTask(VisualGridTask.TaskType.OPEN, null, null);
         RenderRequest request = new RenderRequest(webHook.toString(), url.toString(), dom, resources, renderInfo, platform,
-                browserName, null, selectorsToFindRegionsFor, true, task, stitchingServiceUrl.toString());
+                browserName, null, selectorsToFindRegionsFor, true, task, stitchingServiceUrl.toString(), options);
 
         ObjectMapper mapper = new ObjectMapper();
         ObjectNode actual = (ObjectNode) mapper.readTree(mapper.writeValueAsString(request));

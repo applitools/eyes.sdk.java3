@@ -316,6 +316,7 @@
                     <include name="TestSpecialRendering"/>
                     <include name="testRenderFail"/>
                     <include name="testRenderResourceNotFound"/>
+                    <include name="testVisualGridOptions"/>
                 </methods>
             </class>
         </classes>

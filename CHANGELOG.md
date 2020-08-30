@@ -1,6 +1,7 @@
-
+## [vNext]
 ### Added
 - Implemented test on setting deviceName to appEnvironment data. [Trello 125](https://trello.com/c/ekZqajRU)
+- Supporting `VisualGridOptions` in configuration and in fluent API. [Trello 2089](https://trello.com/c/d4zggQes)
 ### Updated
 - Scroll mechanism for Android. Added possibility to scroll with helper library. [Trello 1673](https://trello.com/c/CYbkzXia)
 

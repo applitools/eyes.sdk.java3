@@ -3,6 +3,7 @@ package com.applitools;
 import com.applitools.eyes.AccessibilityRegionType;
 import com.applitools.eyes.MatchLevel;
 import com.applitools.eyes.Region;
+import com.applitools.eyes.visualgrid.model.VisualGridOption;
 
 /**
  * The interface of the match settings object.
@@ -178,4 +179,6 @@ public interface ICheckSettings {
     ICheckSettings ignoreDisplacements();
 
     ICheckSettings accessibility(Region region, AccessibilityRegionType regionType);
+
+    ICheckSettings visualGridOptions(VisualGridOption... options);
 }

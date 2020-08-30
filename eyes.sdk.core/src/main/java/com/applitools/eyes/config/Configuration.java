@@ -57,6 +57,8 @@ public class Configuration implements IConfiguration {
 
     private Set<Feature> features = new HashSet<>();
 
+    private List<VisualGridOption> visualGridOptions = new ArrayList<>();
+
     public Configuration(Configuration other) {
         this.branchName = other.getBranchName();
         this.parentBranchName = other.getParentBranchName();
@@ -102,6 +104,7 @@ public class Configuration implements IConfiguration {
         this.defaultMatchSettings = new ImageMatchSettings(other.getDefaultMatchSettings());
         this.isVisualGrid = other.isVisualGrid();
         this.features = other.features;
+        this.visualGridOptions = other.visualGridOptions;
     }
 
     public Configuration() {
@@ -702,5 +705,16 @@ public class Configuration implements IConfiguration {
 
     public boolean isFeatureActivated(Feature feature) {
         return features.contains(feature);
+    }
+
+    public void setVisualGridOptions(VisualGridOption option, VisualGridOption... options) {
+        this.visualGridOptions.clear();
+        this.visualGridOptions.add(option);
+        this.visualGridOptions.addAll(Arrays.asList(options));
+        this.visualGridOptions.remove(null);
+    }
+
+    public List<VisualGridOption> getVisualGridOptions() {
+        return visualGridOptions;
     }
 }

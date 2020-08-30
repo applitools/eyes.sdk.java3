@@ -1,7 +1,12 @@
 package com.applitools.eyes.selenium.fluent;
 
-import com.applitools.eyes.*;
-import com.applitools.eyes.fluent.*;
+import com.applitools.eyes.AccessibilityRegionType;
+import com.applitools.eyes.Logger;
+import com.applitools.eyes.MatchLevel;
+import com.applitools.eyes.Region;
+import com.applitools.eyes.fluent.CheckSettings;
+import com.applitools.eyes.fluent.GetRegion;
+import com.applitools.eyes.fluent.ICheckSettingsInternal;
 import com.applitools.eyes.selenium.CheckState;
 import com.applitools.eyes.selenium.EyesSeleniumUtils;
 import com.applitools.eyes.selenium.wrappers.EyesSeleniumDriver;
@@ -23,7 +28,7 @@ public class SeleniumCheckSettings extends CheckSettings implements ISeleniumChe
     public static final String SELECTOR = "selector";
     private By targetSelector;
     private WebElement targetElement;
-    private List<FrameLocator> frameChain = new ArrayList<>();
+    private final List<FrameLocator> frameChain = new ArrayList<>();
     private WebElement scrollRootElement;
     private By scrollRootSelector;
     private VisualGridSelector selector;

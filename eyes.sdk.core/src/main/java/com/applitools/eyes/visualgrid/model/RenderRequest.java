@@ -55,9 +55,12 @@ public class RenderRequest {
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private boolean sendDom;
 
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    private final Map<String, Object> options;
+
     public RenderRequest(String webHook, String url, RGridDom dom, Map<String, RGridResource> resources, RenderInfo renderInfo,
                          String platform, BrowserType browserName, Object scriptHooks, List<VisualGridSelector> selectorsToFindRegionsFor,
-                         boolean sendDom, VisualGridTask visualGridTask, String stitchingService) {
+                         boolean sendDom, VisualGridTask visualGridTask, String stitchingService, List<VisualGridOption> visualGridOptions) {
         this.webhook = webHook;
         this.url = url;
         this.dom = dom;
@@ -71,6 +74,10 @@ public class RenderRequest {
         this.visualGridTask = visualGridTask;
         this.stitchingService = stitchingService;
         this.agentId = "eyes.selenium.visualgrid.java/" + ClassVersionGetter.CURRENT_VERSION;
+        this.options = new HashMap<>();
+        for (VisualGridOption option : visualGridOptions) {
+            this.options.put(option.getKey(), option.getValue());
+        }
     }
 
     public String getUrl() {
@@ -137,6 +144,10 @@ public class RenderRequest {
         this.sendDom = sendDom;
     }
 
+    public Map<String, Object> getOptions() {
+        return options;
+    }
+
     @JsonProperty("browser")
     @JsonInclude(JsonInclude.Include.NON_NULL)
     public Map<String, Object> getBrowser() {
@@ -201,6 +212,7 @@ public class RenderRequest {
                 ", scriptHooks=" + scriptHooks +
                 ", selectorsToFindRegionsFor=" + selectorsToFindRegionsFor +
                 ", sendDom=" + sendDom +
+                ", options=" + options +
                 '}';
     }
 }

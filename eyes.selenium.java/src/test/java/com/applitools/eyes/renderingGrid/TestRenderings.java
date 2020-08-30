@@ -1,6 +1,7 @@
 package com.applitools.eyes.renderingGrid;
 
 import com.applitools.ICheckSettings;
+import com.applitools.connectivity.MockServerConnector;
 import com.applitools.connectivity.MockedResponse;
 import com.applitools.connectivity.ServerConnector;
 import com.applitools.connectivity.TestServerConnector;
@@ -339,5 +340,50 @@ public class TestRenderings extends ReportingTestSuite {
         Assert.assertEquals(unknownHostResource.getUrl(), unknownHostUrl);
         Assert.assertEquals(unknownHostResource.getContent().length, 0);
         Assert.assertEquals(unknownHostResource.getContentType(), "application/empty-response");
+    }
+
+    @Test
+    public void testVisualGridOptions() {
+        VisualGridRunner runner = new VisualGridRunner(10);
+        Eyes eyes = new Eyes(runner);
+        Configuration configuration = eyes.getConfiguration();
+        configuration.addBrowser(800, 600, BrowserType.CHROME);
+        configuration.setVisualGridOptions(new VisualGridOption("option1", "value1"), new VisualGridOption("option2", false));
+        eyes.setConfiguration(configuration);
+        MockServerConnector serverConnector = new MockServerConnector();
+        eyes.setServerConnector(serverConnector);
+        eyes.setLogHandler(new StdoutLogHandler());
+
+        WebDriver driver = SeleniumUtils.createChromeDriver();
+        driver.get("https://applitools.github.io/demo/TestPages/DynamicResolution/desktop.html");
+        try {
+            eyes.open(driver, "Mock app", "Mock test");
+
+            eyes.check(Target.window().visualGridOptions(new VisualGridOption("option3", "value3"), new VisualGridOption("option4", 5)));
+
+            eyes.checkWindow();
+
+            configuration = eyes.getConfiguration();
+            configuration.setVisualGridOptions(null);
+            eyes.setConfiguration(configuration);
+            eyes.checkWindow();
+
+            eyes.closeAsync();
+        } finally {
+            driver.quit();
+            runner.getAllTestResults(false);
+        }
+
+        List<RenderRequest> renderRequests = serverConnector.renderRequests;
+        Map<String, Object> expected = new HashMap<>();
+        Assert.assertEquals(renderRequests.get(2).getOptions(), expected);
+
+        expected.put("option1", "value1");
+        expected.put("option2", false);
+        Assert.assertEquals(renderRequests.get(1).getOptions(), expected);
+
+        expected.put("option3", "value3");
+        expected.put("option4", 5);
+        Assert.assertEquals(renderRequests.get(0).getOptions(), expected);
     }
 }
