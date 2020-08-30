@@ -7,26 +7,39 @@ import com.applitools.eyes.visualgrid.model.*;
 import org.apache.http.HttpStatus;
 
 import java.util.*;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 public class MockServerConnector extends ServerConnector {
 
     public boolean asExpected;
     public List<RenderRequest> renderRequests = new ArrayList<>();
+    ExecutorService executorService = Executors.newSingleThreadExecutor();
 
     @Override
     public void closeBatch(String batchId) {
     }
 
     @Override
-    public void deleteSession(TaskListener<Void> listener, TestResults testResults) {
+    public void deleteSession(final TaskListener<Void> listener, TestResults testResults) {
         logger.log(String.format("deleting session: %s", testResults.getId()));
-        listener.onComplete(null);
+        executorService.submit(new Runnable() {
+            @Override
+            public void run() {
+                listener.onComplete(null);
+            }
+        });
     }
 
     @Override
-    public void stopSession(TaskListener<TestResults> listener, RunningSession runningSession, boolean isAborted, boolean save) {
+    public void stopSession(final TaskListener<TestResults> listener, RunningSession runningSession, boolean isAborted, boolean save) {
         logger.log(String.format("ending session: %s", runningSession.getSessionId()));
-        listener.onComplete(new TestResults());
+        executorService.submit(new Runnable() {
+            @Override
+            public void run() {
+                listener.onComplete(new TestResults());
+            }
+        });
     }
 
     @Override
@@ -65,38 +78,57 @@ public class MockServerConnector extends ServerConnector {
     }
 
     @Override
-    public void render(TaskListener<List<RunningRender>> listener, RenderRequest... renderRequests) {
+    public void render(final TaskListener<List<RunningRender>> listener, RenderRequest... renderRequests) {
         this.renderRequests.addAll(Arrays.asList(renderRequests));
-        RunningRender runningRender = new RunningRender();
+        final RunningRender runningRender = new RunningRender();
         runningRender.setRenderId(UUID.randomUUID().toString());
         runningRender.setRenderStatus(RenderStatus.RENDERED);
-        listener.onComplete(Collections.singletonList(runningRender));
+        executorService.submit(new Runnable() {
+            @Override
+            public void run() {
+                listener.onComplete(Collections.singletonList(runningRender));
+            }
+        });
     }
 
     @Override
-    public void renderStatusById(TaskListener<List<RenderStatusResults>> listener, String... renderIds) {
-        RenderStatusResults renderStatusResults = new RenderStatusResults();
+    public void renderStatusById(final TaskListener<List<RenderStatusResults>> listener, String... renderIds) {
+        final RenderStatusResults renderStatusResults = new RenderStatusResults();
         renderStatusResults.setRenderId(renderIds[0]);
         renderStatusResults.setStatus(RenderStatus.RENDERED);
-        listener.onComplete(Collections.singletonList(renderStatusResults));
+        executorService.submit(new Runnable() {
+            @Override
+            public void run() {
+                listener.onComplete(Collections.singletonList(renderStatusResults));
+            }
+        });
     }
 
     @Override
-    public void matchWindow(TaskListener<MatchResult> listener, RunningSession runningSession, MatchWindowData data) {
-        MatchResult result = new MatchResult();
+    public void matchWindow(final TaskListener<MatchResult> listener, RunningSession runningSession, MatchWindowData data) {
+        final MatchResult result = new MatchResult();
         result.setAsExpected(this.asExpected);
-        listener.onComplete(result);
+        executorService.submit(new Runnable() {
+            @Override
+            public void run() {
+                listener.onComplete(result);
+            }
+        });
     }
 
     @Override
-    public void startSession(TaskListener<RunningSession> listener, SessionStartInfo sessionStartInfo)
-    {
+    public void startSession(final TaskListener<RunningSession> listener, SessionStartInfo sessionStartInfo) {
         logger.log(String.format("starting session: %s", sessionStartInfo));
 
-        RunningSession newSession = new RunningSession();
+        final RunningSession newSession = new RunningSession();
         newSession.setIsNew(false);
         newSession.setSessionId(UUID.randomUUID().toString());
-        listener.onComplete(newSession);
+        executorService.submit(new Runnable() {
+            @Override
+            public void run() {
+                listener.onComplete(newSession);
+            }
+        });
     }
 
     @Override
