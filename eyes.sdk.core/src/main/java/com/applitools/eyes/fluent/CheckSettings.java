@@ -544,12 +544,11 @@ public class CheckSettings implements ICheckSettings, ICheckSettingsInternal {
     public ICheckSettings visualGridOptions(VisualGridOption... options) {
         CheckSettings clone = clone();
         clone.visualGridOptions.clear();
-        if (options == null) {
-            return clone;
+        if (options != null) {
+            clone.visualGridOptions.addAll(Arrays.asList(options));
+            clone.visualGridOptions.remove(null);
         }
 
-        clone.visualGridOptions.addAll(Arrays.asList(options));
-        clone.visualGridOptions.remove(null);
         return clone;
     }
 
