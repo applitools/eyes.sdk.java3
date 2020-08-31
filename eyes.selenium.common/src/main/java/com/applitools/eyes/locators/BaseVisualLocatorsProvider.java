@@ -68,10 +68,11 @@ public abstract class BaseVisualLocatorsProvider implements VisualLocatorsProvid
         logger.verbose("Post visual locators: " + data.toString());
 
         final AtomicReference<Map<String, List<Region>>> reference = new AtomicReference<>();
-        serverConnector.postLocators(new SyncTaskListener<>(lock, reference), data);
-        synchronized (lock.get()) {
+        final AtomicReference<EyesSyncObject> lockObject = new AtomicReference<>(new EyesSyncObject(logger, "getLocators"));
+        serverConnector.postLocators(new SyncTaskListener<>(lockObject, reference), data);
+        synchronized (lockObject.get()) {
             try {
-                lock.get().waitForNotify();
+                lockObject.get().waitForNotify();
             } catch (InterruptedException e) {
                 throw new EyesException("Failed waiting for close batch", e);
             }
