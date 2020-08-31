@@ -1,9 +1,8 @@
 package com.applitools.eyes;
 
 import com.applitools.connectivity.ServerConnector;
-import com.applitools.connectivity.api.AsyncRequestCallback;
-import com.applitools.connectivity.api.Response;
 import com.applitools.utils.ArgumentGuard;
+import com.applitools.utils.EyesSyncObject;
 import com.applitools.utils.Iso8610CalendarDeserializer;
 import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
@@ -422,11 +421,11 @@ public class TestResults {
     }
 
     public void delete() {
-        final AtomicReference<Object> lock = new AtomicReference<>(new Object());
+        final AtomicReference<EyesSyncObject> lock = new AtomicReference<>(new EyesSyncObject(new Logger(), "delete"));
         serverConnector.deleteSession(new SyncTaskListener<Void>(lock), this);
         synchronized (lock.get()) {
             try {
-                lock.get().wait();
+                lock.get().waitForNotify();
             } catch (InterruptedException ignored) {}
         }
     }

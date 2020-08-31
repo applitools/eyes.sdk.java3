@@ -4,14 +4,11 @@ import com.applitools.eyes.*;
 import com.applitools.eyes.visualgrid.model.*;
 
 import java.util.*;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 public class MockServerConnector extends ServerConnector {
 
     public boolean asExpected;
     public List<RenderRequest> renderRequests = new ArrayList<>();
-    ExecutorService executorService = Executors.newSingleThreadExecutor();
 
     @Override
     public void closeBatch(String batchId, boolean forceClose) {
@@ -21,33 +18,18 @@ public class MockServerConnector extends ServerConnector {
     @Override
     public void deleteSession(final TaskListener<Void> listener, TestResults testResults) {
         logger.log(String.format("deleting session: %s", testResults.getId()));
-        executorService.submit(new Runnable() {
-            @Override
-            public void run() {
-                listener.onComplete(null);
-            }
-        });
+        listener.onComplete(null);
     }
 
     @Override
     public void stopSession(final TaskListener<TestResults> listener, RunningSession runningSession, boolean isAborted, boolean save) {
         logger.log(String.format("ending session: %s", runningSession.getSessionId()));
-        executorService.submit(new Runnable() {
-            @Override
-            public void run() {
-                listener.onComplete(new TestResults());
-            }
-        });
+        listener.onComplete(new TestResults());
     }
 
     @Override
     public void uploadData(final TaskListener<String> listener, final byte[] bytes, final String contentType, final String mediaType) {
-        executorService.submit(new Runnable() {
-            @Override
-            public void run() {
-                listener.onComplete("");
-            }
-        });
+        listener.onComplete("");
     }
 
     @Override
@@ -61,12 +43,7 @@ public class MockServerConnector extends ServerConnector {
         final RunningRender runningRender = new RunningRender();
         runningRender.setRenderId(UUID.randomUUID().toString());
         runningRender.setRenderStatus(RenderStatus.RENDERED);
-        executorService.submit(new Runnable() {
-            @Override
-            public void run() {
-                listener.onComplete(Collections.singletonList(runningRender));
-            }
-        });
+        listener.onComplete(Collections.singletonList(runningRender));
     }
 
     @Override
@@ -74,24 +51,14 @@ public class MockServerConnector extends ServerConnector {
         final RenderStatusResults renderStatusResults = new RenderStatusResults();
         renderStatusResults.setRenderId(renderIds[0]);
         renderStatusResults.setStatus(RenderStatus.RENDERED);
-        executorService.submit(new Runnable() {
-            @Override
-            public void run() {
-                listener.onComplete(Collections.singletonList(renderStatusResults));
-            }
-        });
+        listener.onComplete(Collections.singletonList(renderStatusResults));
     }
 
     @Override
     public void matchWindow(final TaskListener<MatchResult> listener, RunningSession runningSession, MatchWindowData data) {
         final MatchResult result = new MatchResult();
         result.setAsExpected(this.asExpected);
-        executorService.submit(new Runnable() {
-            @Override
-            public void run() {
-                listener.onComplete(result);
-            }
-        });
+        listener.onComplete(result);
     }
 
     @Override
@@ -101,12 +68,7 @@ public class MockServerConnector extends ServerConnector {
         final RunningSession newSession = new RunningSession();
         newSession.setIsNew(false);
         newSession.setSessionId(UUID.randomUUID().toString());
-        executorService.submit(new Runnable() {
-            @Override
-            public void run() {
-                listener.onComplete(newSession);
-            }
-        });
+        listener.onComplete(newSession);
     }
 
     @Override

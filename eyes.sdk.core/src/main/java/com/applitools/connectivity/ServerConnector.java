@@ -8,6 +8,7 @@ import com.applitools.eyes.*;
 import com.applitools.eyes.locators.VisualLocatorsData;
 import com.applitools.eyes.visualgrid.model.*;
 import com.applitools.utils.ArgumentGuard;
+import com.applitools.utils.EyesSyncObject;
 import com.applitools.utils.GeneralUtils;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -358,7 +359,7 @@ public class ServerConnector extends UfgConnector {
     }
 
     public void closeBatch(String batchId, boolean forceClose) {
-        final AtomicReference<Object> lock = new AtomicReference<>(new Object());
+        final AtomicReference<EyesSyncObject> lock = new AtomicReference<>(new EyesSyncObject(logger, "closeBatch"));
         boolean dontCloseBatchesStr = GeneralUtils.getDontCloseBatches();
         if (dontCloseBatchesStr && !forceClose) {
             logger.log("APPLITOOLS_DONT_CLOSE_BATCHES environment variable set to true. Skipping batch close.");
@@ -367,7 +368,7 @@ public class ServerConnector extends UfgConnector {
         closeBatchAsync(new SyncTaskListener<Void>(lock), batchId, forceClose);
         synchronized (lock.get()) {
             try {
-                lock.get().wait();
+                lock.get().waitForNotify();
             } catch (InterruptedException e) {
                 throw new EyesException("Failed waiting for close batch", e);
             }

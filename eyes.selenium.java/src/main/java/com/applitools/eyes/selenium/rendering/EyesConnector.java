@@ -9,6 +9,7 @@ import com.applitools.eyes.visualgrid.model.*;
 import com.applitools.eyes.visualgrid.services.IEyesConnector;
 import com.applitools.eyes.visualgrid.services.VisualGridTask;
 import com.applitools.utils.ClassVersionGetter;
+import com.applitools.utils.EyesSyncObject;
 
 import java.net.URI;
 import java.util.List;
@@ -55,11 +56,11 @@ class EyesConnector extends EyesBase implements IEyesConnector, IBatchCloser {
 
     public List<RunningRender> render(RenderRequest... renderRequests) {
         final AtomicReference<List<RunningRender>> reference = new AtomicReference<>();
-        final AtomicReference<Object> lock = new AtomicReference<>(new Object());
+        final AtomicReference<EyesSyncObject> lock = new AtomicReference<>(new EyesSyncObject(logger, "render"));
         getServerConnector().render(new SyncTaskListener<>(lock, reference), renderRequests);
         synchronized (lock.get()) {
             try {
-                lock.get().wait();
+                lock.get().waitForNotify();
             } catch (InterruptedException ignored) {}
         }
 
@@ -68,11 +69,11 @@ class EyesConnector extends EyesBase implements IEyesConnector, IBatchCloser {
 
     public List<RenderStatusResults> renderStatusById(String... renderIds) {
         final AtomicReference<List<RenderStatusResults>> reference = new AtomicReference<>();
-        final AtomicReference<Object> lock = new AtomicReference<>(new Object());
+        final AtomicReference<EyesSyncObject> lock = new AtomicReference<>(new EyesSyncObject(logger, "renderStatusById"));
         getServerConnector().renderStatusById(new SyncTaskListener<>(lock, reference), renderIds);
         synchronized (lock.get()) {
             try {
-                lock.get().wait();
+                lock.get().waitForNotify();
             } catch (InterruptedException ignored) {}
         }
 

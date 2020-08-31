@@ -1,6 +1,3 @@
-/*
- * Applitools SDK for Selenium integration.
- */
 package com.applitools.eyes;
 
 import com.applitools.connectivity.ServerConnector;
@@ -12,6 +9,7 @@ import com.applitools.eyes.visualgrid.model.IGetFloatingRegionOffsets;
 import com.applitools.eyes.visualgrid.model.MutableRegion;
 import com.applitools.eyes.visualgrid.model.VisualGridSelector;
 import com.applitools.utils.ArgumentGuard;
+import com.applitools.utils.EyesSyncObject;
 import com.applitools.utils.GeneralUtils;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -135,12 +133,12 @@ public class MatchWindowTask {
         }
 
         final AtomicReference<MatchResult> matchResult = new AtomicReference<>();
-        final AtomicReference<Object> lock = new AtomicReference<>(new Object());
+        final AtomicReference<EyesSyncObject> lock = new AtomicReference<>(new EyesSyncObject(logger, "preformMatch"));
         TaskListener<MatchResult> listener = new SyncTaskListener<>(lock, matchResult);
         performMatch(listener, userInputs, appOutput, tag, replaceLast, imageMatchSettings, agentSetupStr, renderId, source);
         synchronized (lock.get()) {
             try {
-                lock.get().wait();
+                lock.get().waitForNotify();
             } catch (InterruptedException e) {
                 throw new EyesException("Failed waiting for perform match", e);
             }
@@ -209,11 +207,11 @@ public class MatchWindowTask {
 
     public String tryUploadData(final byte[] bytes, final String contentType, final String mediaType) {
         final AtomicReference<String> reference = new AtomicReference<>();
-        final AtomicReference<Object> lock = new AtomicReference<>(new Object());
+        final AtomicReference<EyesSyncObject> lock = new AtomicReference<>(new EyesSyncObject(logger, "tryUploadData"));
         serverConnector.uploadData(new SyncTaskListener<>(lock, reference), bytes, contentType, mediaType);
         synchronized (lock.get()) {
             try {
-                lock.get().wait();
+                lock.get().waitForNotify();
             } catch (InterruptedException e) {
                 throw new EyesException("Failed waiting for upload", e);
             }

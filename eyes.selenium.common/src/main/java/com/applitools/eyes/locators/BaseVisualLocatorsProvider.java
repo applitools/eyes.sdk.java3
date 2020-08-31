@@ -7,6 +7,7 @@ import com.applitools.eyes.Region;
 import com.applitools.eyes.SyncTaskListener;
 import com.applitools.eyes.debug.DebugScreenshotsProvider;
 import com.applitools.utils.ArgumentGuard;
+import com.applitools.utils.EyesSyncObject;
 import com.applitools.utils.ImageUtils;
 
 import java.awt.image.BufferedImage;
@@ -46,12 +47,12 @@ public abstract class BaseVisualLocatorsProvider implements VisualLocatorsProvid
         byte[] image = ImageUtils.encodeAsPng(viewPortScreenshot);
 
         logger.verbose("Post visual locators screenshot...");
-        final AtomicReference<Object> lock = new AtomicReference<>(new Object());
+        final AtomicReference<EyesSyncObject> lock = new AtomicReference<>(new EyesSyncObject(logger, "getLocators"));
         final AtomicReference<String> urlReference = new AtomicReference<>();
         serverConnector.uploadImage(new SyncTaskListener<>(lock, urlReference), image);
         synchronized (lock.get()) {
             try {
-                lock.get().wait();
+                lock.get().waitForNotify();
             } catch (InterruptedException e) {
                 throw new EyesException("Failed waiting for close batch", e);
             }
@@ -70,7 +71,7 @@ public abstract class BaseVisualLocatorsProvider implements VisualLocatorsProvid
         serverConnector.postLocators(new SyncTaskListener<>(lock, reference), data);
         synchronized (lock.get()) {
             try {
-                lock.get().wait();
+                lock.get().waitForNotify();
             } catch (InterruptedException e) {
                 throw new EyesException("Failed waiting for close batch", e);
             }

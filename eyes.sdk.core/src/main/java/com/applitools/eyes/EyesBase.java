@@ -463,7 +463,7 @@ public abstract class EyesBase implements IEyesBase {
      */
     public TestResults close(boolean throwEx) {
         AtomicReference<TestResults> reference = new AtomicReference<>();
-        final AtomicReference<Object> lock = new AtomicReference<>(new Object());
+        final AtomicReference<EyesSyncObject> lock = new AtomicReference<>(new EyesSyncObject(logger, "close"));
         if (!isOpen) {
             logger.log("WARNING: Eyes not open");
             return new TestResults();
@@ -472,7 +472,7 @@ public abstract class EyesBase implements IEyesBase {
         synchronized (lock.get()) {
             try {
                 if (reference.get() == null) {
-                    lock.get().wait();
+                    lock.get().waitForNotify();
                 }
             } catch (InterruptedException e) {
                 throw new EyesException("Failed waiting for close", e);
@@ -570,12 +570,12 @@ public abstract class EyesBase implements IEyesBase {
 
     public TestResults abortIfNotClosed() {
         AtomicReference<TestResults> reference = new AtomicReference<>();
-        final AtomicReference<Object> lock = new AtomicReference<>(new Object());
+        final AtomicReference<EyesSyncObject> lock = new AtomicReference<>(new EyesSyncObject(logger, "abortIfNotClosed"));
         abortIfNotClosed(new SyncTaskListener<>(lock, reference));
         synchronized (lock.get()) {
             try {
                 if (reference.get() == null) {
-                    lock.get().wait();
+                    lock.get().waitForNotify();
                 }
             } catch (InterruptedException e) {
                 throw new EyesException("Failed waiting for abort", e);
@@ -729,11 +729,11 @@ public abstract class EyesBase implements IEyesBase {
         ArgumentGuard.isValidState(getIsOpen(), "Eyes not open");
 
         if (runningSession == null) {
-            final AtomicReference<Object> lock = new AtomicReference<>(new Object());
+            final AtomicReference<EyesSyncObject> lock = new AtomicReference<>(new EyesSyncObject(logger, "checkWindowBase"));
             ensureRunningSession(new SyncTaskListener<Void>(lock));
             synchronized (lock.get()) {
                 try {
-                    lock.get().wait();
+                    lock.get().waitForNotify();
                 } catch (InterruptedException e) {
                     throw new EyesException("Failed waiting for open", e);
                 }
@@ -827,11 +827,11 @@ public abstract class EyesBase implements IEyesBase {
     }
 
     protected void openBase() throws EyesException {
-        final AtomicReference<Object> lock = new AtomicReference<>(new Object());
+        final AtomicReference<EyesSyncObject> lock = new AtomicReference<>(new EyesSyncObject(logger, "openBase"));
         openBaseAsync(new SyncTaskListener<Void>(lock));
         synchronized (lock.get()) {
             try {
-                lock.get().wait();
+                lock.get().waitForNotify();
             } catch (InterruptedException e) {
                 throw new EyesException("Failed waiting for open", e);
             }
