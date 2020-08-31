@@ -5,6 +5,8 @@
 ### Updated
 - Checking for browserStack specific caps for appEnvironment data. [Trello 2017](https://trello.com/c/3q1wrnYG)
 - Scroll mechanism for Android. Added possibility to scroll with helper library. [Trello 1673](https://trello.com/c/CYbkzXia)
+### Fixed
+- When Y coordinate is smaller than 0 it will be set as 0 to avoid IllegalArgumentException. [Trello 2121](https://trello.com/c/3atHV3Ee)
 
 ## [3.175.0] - 2020-08-26
 ### Fixed

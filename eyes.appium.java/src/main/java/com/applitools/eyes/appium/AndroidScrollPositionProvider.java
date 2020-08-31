@@ -175,8 +175,8 @@ public class AndroidScrollPositionProvider extends AppiumScrollPositionProvider 
     public void scrollTo(int startX, int startY, int endX, int endY, boolean shouldCancel) {
         logger.verbose("Trying to scroll from startX: " + startX + " | startY: " + startY + " | endX: " + endX + " | endY: " + endY);
         TouchAction scrollAction = new TouchAction(driver);
-        scrollAction.press(new PointOption().withCoordinates(startX, startY)).waitAction(new WaitOptions().withDuration(Duration.ofMillis(1500)));;
-        scrollAction.moveTo(new PointOption().withCoordinates(endX, endY - contentSize.touchPadding));
+        scrollAction.press(new PointOption().withCoordinates(startX, startY)).waitAction(new WaitOptions().withDuration(Duration.ofMillis(1500)));
+        scrollAction.moveTo(new PointOption().withCoordinates(endX, Math.max(endY - contentSize.touchPadding, 0)));
         if (shouldCancel) {
             scrollAction.cancel();
         } else {

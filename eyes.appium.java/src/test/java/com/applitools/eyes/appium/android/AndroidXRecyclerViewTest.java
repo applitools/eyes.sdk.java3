@@ -6,7 +6,7 @@ import org.testng.annotations.Test;
 
 public class AndroidXRecyclerViewTest extends AndroidTestSetup {
 
-    @Test(groups = "failed") // Coordinate [x=1.0, y=-21.0] is outside of element rect: [0,0][1080,1794]
+    @Test
     public void testAndroidXRecyclerView() {
         eyes.setMatchTimeout(1000);
 
