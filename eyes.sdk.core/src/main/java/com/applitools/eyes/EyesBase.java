@@ -464,7 +464,11 @@ public abstract class EyesBase implements IEyesBase {
     public TestResults close(boolean throwEx) {
         AtomicReference<TestResults> reference = new AtomicReference<>();
         final AtomicReference<Object> lock = new AtomicReference<>(new Object());
-        closeInner(new SyncTaskListener<>(lock, reference), throwEx);
+        if (!isOpen) {
+            logger.log("WARNING: Eyes not open");
+            return new TestResults();
+        }
+        close(new SyncTaskListener<>(lock, reference), throwEx);
         synchronized (lock.get()) {
             try {
                 if (reference.get() == null) {
@@ -477,24 +481,24 @@ public abstract class EyesBase implements IEyesBase {
 
         TestResults testResults = reference.get();
         if (testResults == null) {
-            throw new EyesException("Failed stopping session");
+            throw new EyesException("Failed closing test");
         }
         logSessionResultsAndThrowException(logger, throwEx, testResults);
         return testResults;
     }
 
-    public void close(TaskListener<TestResults> listener, boolean throwEx) {
-        closeInner(listener, throwEx);
-    }
-
-    private void closeInner(final TaskListener<TestResults> listener, final boolean throwEx) {
+    public void close(final TaskListener<TestResults> listener, boolean throwEx) {
         if (isDisabled) {
             logger.verbose("Ignored");
             listener.onComplete(new TestResults());
             return;
         }
         logger.verbose(String.format("close(%b)", throwEx));
-        ArgumentGuard.isValidState(isOpen, "Eyes not open");
+        if (!isOpen) {
+            logger.log("WARNING: Eyes not open");
+            listener.onComplete(new TestResults());
+            return;
+        }
 
         isOpen = false;
 
@@ -567,7 +571,7 @@ public abstract class EyesBase implements IEyesBase {
     public TestResults abortIfNotClosed() {
         AtomicReference<TestResults> reference = new AtomicReference<>();
         final AtomicReference<Object> lock = new AtomicReference<>(new Object());
-        abortInner(new SyncTaskListener<>(lock, reference));
+        abortIfNotClosed(new SyncTaskListener<>(lock, reference));
         synchronized (lock.get()) {
             try {
                 if (reference.get() == null) {
@@ -585,14 +589,10 @@ public abstract class EyesBase implements IEyesBase {
         return testResults;
     }
 
-    public void abortIfNotClosed(TaskListener<TestResults> listener) {
-        abortInner(listener);
-    }
-
     /**
      * If a test is running, aborts it. Otherwise, does nothing.
      */
-    private void abortInner(final TaskListener<TestResults> listener) {
+    public void abortIfNotClosed(final TaskListener<TestResults> listener) {
         if (isDisabled) {
             logger.verbose("Ignored");
             listener.onComplete(new TestResults());

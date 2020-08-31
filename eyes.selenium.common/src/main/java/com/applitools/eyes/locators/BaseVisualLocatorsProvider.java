@@ -48,7 +48,7 @@ public abstract class BaseVisualLocatorsProvider implements VisualLocatorsProvid
         logger.verbose("Post visual locators screenshot...");
         final AtomicReference<Object> lock = new AtomicReference<>(new Object());
         final AtomicReference<String> urlReference = new AtomicReference<>();
-        serverConnector.postViewportImage(new SyncTaskListener<>(lock, urlReference), image);
+        serverConnector.uploadImage(new SyncTaskListener<>(lock, urlReference), image);
         synchronized (lock.get()) {
             try {
                 lock.get().wait();

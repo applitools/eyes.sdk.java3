@@ -1,10 +1,7 @@
 package com.applitools.connectivity;
 
-import com.applitools.connectivity.api.AsyncRequestCallback;
-import com.applitools.connectivity.api.Response;
 import com.applitools.eyes.*;
 import com.applitools.eyes.visualgrid.model.*;
-import org.apache.http.HttpStatus;
 
 import java.util.*;
 import java.util.concurrent.ExecutorService;
@@ -17,7 +14,8 @@ public class MockServerConnector extends ServerConnector {
     ExecutorService executorService = Executors.newSingleThreadExecutor();
 
     @Override
-    public void closeBatch(String batchId) {
+    public void closeBatch(String batchId, boolean forceClose) {
+        logger.log(String.format("closing batch: %s", batchId));
     }
 
     @Override
@@ -43,36 +41,11 @@ public class MockServerConnector extends ServerConnector {
     }
 
     @Override
-    public void uploadData(final AsyncRequestCallback callback, byte[] bytes, RenderingInfo renderingInfo, final String targetUrl, String contentType, final String mediaType) {
+    public void uploadData(final TaskListener<String> listener, final byte[] bytes, final String contentType, final String mediaType) {
         executorService.submit(new Runnable() {
             @Override
             public void run() {
-                callback.onComplete(new Response(logger) {
-                    @Override
-                    public int getStatusCode() {
-                        return HttpStatus.SC_OK;
-                    }
-
-                    @Override
-                    public String getStatusPhrase() {
-                        return "";
-                    }
-
-                    @Override
-                    public String getHeader(String s, boolean b) {
-                        return "";
-                    }
-
-                    @Override
-                    protected void readEntity() {
-
-                    }
-
-                    @Override
-                    public void close() {
-
-                    }
-                });
+                listener.onComplete("");
             }
         });
     }

@@ -7,7 +7,6 @@ import com.applitools.eyes.utils.ReportingTestSuite;
 import com.applitools.eyes.utils.SeleniumUtils;
 import com.applitools.eyes.utils.TestUtils;
 import com.applitools.eyes.visualgrid.services.VisualGridRunner;
-import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.BeforeMethod;
@@ -52,16 +51,8 @@ public class BasicDemo extends ReportingTestSuite {
         //eyes.setProxy(new ProxySettings("http://localhost:8888"));
         try {
             eyes.open(driver, "Demo App", "BasicDemo" + suffix, new RectangleSize(800, 800));
-
-            // Navigate the browser to the "ACME" demo app.
-            driver.get("https://demo.applitools.com");
-
-            // To see visual bugs after the first run, use the commented line below instead.
-            //driver.get("https://demo.applitools.com/index_v2.html");
-
-            eyes.checkWindow("Login Window");
-            driver.findElement(By.id("log-in")).click();
-            eyes.checkWindow("App Window");
+            driver.get("https://applitools.github.io/demo/TestPages/FramesTestPage/");
+            eyes.checkWindow();
             eyes.closeAsync();
         } finally {
             eyes.abortAsync();

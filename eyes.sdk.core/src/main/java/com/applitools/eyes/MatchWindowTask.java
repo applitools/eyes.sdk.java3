@@ -4,15 +4,12 @@
 package com.applitools.eyes;
 
 import com.applitools.connectivity.ServerConnector;
-import com.applitools.connectivity.api.AsyncRequestCallback;
-import com.applitools.connectivity.api.Response;
 import com.applitools.eyes.capture.AppOutputProvider;
 import com.applitools.eyes.capture.AppOutputWithScreenshot;
 import com.applitools.eyes.config.Configuration;
 import com.applitools.eyes.fluent.*;
 import com.applitools.eyes.visualgrid.model.IGetFloatingRegionOffsets;
 import com.applitools.eyes.visualgrid.model.MutableRegion;
-import com.applitools.eyes.visualgrid.model.RenderingInfo;
 import com.applitools.eyes.visualgrid.model.VisualGridSelector;
 import com.applitools.utils.ArgumentGuard;
 import com.applitools.utils.GeneralUtils;
@@ -20,8 +17,10 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.awt.image.BufferedImage;
-import java.util.*;
-import java.util.concurrent.atomic.AtomicInteger;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
 
 public class MatchWindowTask {
@@ -89,6 +88,26 @@ public class MatchWindowTask {
 
     /**
      * Creates the match model and calls the server connector matchWindow method.
+     * @param appOutput          The application output to be matched.
+     * @param tag                Optional tag to be associated with the match (can be {@code null}).
+     * @param imageMatchSettings The settings to use.
+     * @param renderId           Visual Grid's renderId.
+     * @param source             The tested page URL or tested app name.
+     */
+    public MatchResult performMatch(AppOutputWithScreenshot appOutput,
+                                    String tag, ICheckSettingsInternal checkSettingsInternal,
+                                    ImageMatchSettings imageMatchSettings,
+                                    List<? extends IRegion> regions,
+                                    List<VisualGridSelector[]> regionSelectors,
+                                    EyesBase eyes, String renderId, String source) {
+        collectRegions(imageMatchSettings, regions, regionSelectors);
+        collectRegions(imageMatchSettings, checkSettingsInternal);
+        return performMatch(new ArrayList<Trigger>(), appOutput, tag, false, imageMatchSettings,
+                eyes, renderId, source);
+    }
+
+    /**
+     * Creates the match model and calls the server connector matchWindow method.
      * @param userInputs         The user inputs related to the current appOutput.
      * @param appOutput          The application output to be matched.
      * @param tag                Optional tag to be associated with the match (can be {@code null}).
@@ -131,26 +150,6 @@ public class MatchWindowTask {
         }
         eyes.getLogger().verbose("exit");
         return matchResult.get();
-    }
-
-    /**
-     * Creates the match model and calls the server connector matchWindow method.
-     * @param appOutput          The application output to be matched.
-     * @param tag                Optional tag to be associated with the match (can be {@code null}).
-     * @param imageMatchSettings The settings to use.
-     * @param renderId           Visual Grid's renderId.
-     * @param source             The tested page URL or tested app name.
-     */
-    public MatchResult performMatch(AppOutputWithScreenshot appOutput,
-                                    String tag, ICheckSettingsInternal checkSettingsInternal,
-                                    ImageMatchSettings imageMatchSettings,
-                                    List<? extends IRegion> regions,
-                                    List<VisualGridSelector[]> regionSelectors,
-                                    EyesBase eyes, String renderId, String source) {
-        collectRegions(imageMatchSettings, regions, regionSelectors);
-        collectRegions(imageMatchSettings, checkSettingsInternal);
-        return performMatch(new ArrayList<Trigger>(), appOutput, tag, false, imageMatchSettings,
-                eyes, renderId, source);
     }
 
     private void performMatch(final TaskListener<MatchResult> listener, List<Trigger> userInputs,
@@ -205,14 +204,13 @@ public class MatchWindowTask {
                 taskListener.onComplete(false);
             }
         };
-        byte[] bytes = appOutput.getScreenshotBytes();
-        tryUploadDataAsync(uploadListener, bytes, "image/png", "image/png");
+        serverConnector.uploadImage(uploadListener, appOutput.getScreenshotBytes());
     }
 
     public String tryUploadData(final byte[] bytes, final String contentType, final String mediaType) {
         final AtomicReference<String> reference = new AtomicReference<>();
         final AtomicReference<Object> lock = new AtomicReference<>(new Object());
-        tryUploadDataAsync(new SyncTaskListener<>(lock, reference), bytes, contentType, mediaType);
+        serverConnector.uploadData(new SyncTaskListener<>(lock, reference), bytes, contentType, mediaType);
         synchronized (lock.get()) {
             try {
                 lock.get().wait();
@@ -222,60 +220,6 @@ public class MatchWindowTask {
         }
 
         return reference.get();
-    }
-
-    public void tryUploadDataAsync(final TaskListener<String> listener, final byte[] bytes, final String contentType, final String mediaType) {
-        final String targetUrl;
-
-        final RenderingInfo renderingInfo = serverConnector.getRenderInfo();
-        if (renderingInfo == null || (targetUrl = renderingInfo.getResultsUrl()) == null) {
-            listener.onComplete(null);
-            return;
-        }
-
-        final UUID uuid = UUID.randomUUID();
-        final String finalUrl = targetUrl.replace("__random__", uuid.toString());
-        logger.verbose("uploading " + mediaType + " to " + finalUrl);
-
-        final AtomicInteger attemptNumber = new AtomicInteger(0);
-        AsyncRequestCallback callback = new AsyncRequestCallback() {
-            @Override
-            public void onComplete(Response response) {
-                int statusCode = response.getStatusCode();
-                response.close();
-                if (statusCode == 200 || statusCode == 201) {
-                    logger.verbose("upload " + mediaType + " guid " + uuid + "complete.");
-                    listener.onComplete(finalUrl);
-                    return;
-                }
-                if (statusCode < 500) {
-                    listener.onComplete(null);
-                    return;
-                }
-
-                try {
-                    Thread.sleep(1000);
-                } catch (InterruptedException e) {
-                    onFail(e);
-                    return;
-                }
-
-                if (attemptNumber.incrementAndGet() >= ServerConnector.MAX_CONNECTION_RETRIES) {
-                    listener.onComplete(null);
-                    return;
-                }
-
-                serverConnector.uploadData(this, bytes, renderingInfo, finalUrl, contentType, mediaType);
-            }
-
-            @Override
-            public void onFail(Throwable throwable) {
-                GeneralUtils.logExceptionStackTrace(logger, throwable);
-                listener.onFail();
-            }
-        };
-
-        serverConnector.uploadData(callback, bytes, renderingInfo, finalUrl, contentType, mediaType);
     }
 
     public static void collectRegions(EyesBase eyes, EyesScreenshot screenshot,

@@ -22,7 +22,6 @@ import javax.ws.rs.core.MediaType;
 import java.io.IOException;
 import java.net.URI;
 import java.util.*;
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 
 public class ServerConnector extends UfgConnector {
@@ -310,72 +309,23 @@ public class ServerConnector extends UfgConnector {
         }
     }
 
-    public void uploadData(AsyncRequestCallback callback, byte[] bytes, RenderingInfo renderingInfo,
-                           final String targetUrl, String contentType, final String mediaType) {
+    public void uploadData(final TaskListener<String> listener, final byte[] bytes, final String contentType, final String mediaType) {
+        final RenderingInfo renderingInfo = getRenderInfo();
+        String targetUrl;
+        if (renderingInfo == null || (targetUrl = renderingInfo.getResultsUrl()) == null) {
+            listener.onComplete(null);
+            return;
+        }
 
-        AsyncRequest request = makeEyesRequest(new HttpRequestBuilder() {
-            @Override
-            public AsyncRequest build() {
-                return restClient.target(targetUrl).asyncRequest(mediaType);
-            }
-        });
-        request = request.header("X-Auth-Token", renderingInfo.getAccessToken())
-                .header("x-ms-blob-type", "BlockBlob");
-        sendAsyncRequest(request, HttpMethod.PUT, callback, bytes, contentType);
+        final UUID uuid = UUID.randomUUID();
+        final String finalUrl = targetUrl.replace("__random__", uuid.toString());
+        logger.verbose("uploading viewport image to " + finalUrl);
+        UploadCallback callback = new UploadCallback(listener, this, finalUrl, bytes, contentType, mediaType);
+        callback.uploadDataAsync();
     }
 
-    public void postViewportImage(final TaskListener<String> listener, final byte[] bytes) {
-        final RenderingInfo renderingInfo = getRenderInfo();
-        String targetUrl = renderingInfo.getResultsUrl();
-
-        UUID uuid = UUID.randomUUID();
-        final String finalUrl = targetUrl.replace("__random__", uuid.toString());
-        logger.verbose("uploading viewport image to " + targetUrl);
-
-        final AtomicInteger attemptNumber = new AtomicInteger(0);
-        AsyncRequestCallback callback = new AsyncRequestCallback() {
-            @Override
-            public void onComplete(Response response) {
-                int statusCode = response.getStatusCode();
-                String statusPhrase = response.getStatusPhrase();
-                response.close();
-
-                if (statusCode == HttpStatus.SC_OK || statusCode == HttpStatus.SC_CREATED) {
-                    listener.onComplete(finalUrl);
-                    return;
-                }
-
-                String errorMessage = String.format("Status: %d %s.",
-                        statusCode, statusPhrase);
-
-                if (statusCode < 500) {
-                    onFail(new IOException(String.format("Failed uploading image. %s", errorMessage)));
-                }
-
-                logger.log(String.format("Failed uploading image, retrying. %s", errorMessage));
-                try {
-                    Thread.sleep(200);
-                } catch (InterruptedException e) {
-                    onFail(e);
-                    return;
-                }
-
-                if (attemptNumber.incrementAndGet() >= ServerConnector.MAX_CONNECTION_RETRIES) {
-                    listener.onComplete(null);
-                    return;
-                }
-
-                uploadData(this, bytes, renderingInfo, finalUrl, "image/png", "image/png");
-            }
-
-            @Override
-            public void onFail(Throwable throwable) {
-                GeneralUtils.logExceptionStackTrace(logger, throwable);
-                listener.onFail();
-            }
-        };
-
-        uploadData(callback, bytes, renderingInfo, finalUrl, "image/png", "image/png");
+    public void uploadImage(final TaskListener<String> listener, final byte[] bytes) {
+        uploadData(listener, bytes, "image/png", "image/png");
     }
 
     public void postLocators(TaskListener<Map<String, List<Region>>> listener, VisualLocatorsData visualLocatorsData) {

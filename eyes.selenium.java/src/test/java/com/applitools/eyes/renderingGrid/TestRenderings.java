@@ -357,7 +357,7 @@ public class TestRenderings extends ReportingTestSuite {
         eyes.setConfiguration(configuration);
         MockServerConnector serverConnector = new MockServerConnector();
         eyes.setServerConnector(serverConnector);
-        eyes.setLogHandler(new StdoutLogHandler(true));
+        eyes.setLogHandler(new StdoutLogHandler());
 
         WebDriver driver = SeleniumUtils.createChromeDriver();
         driver.get("https://applitools.github.io/demo/TestPages/DynamicResolution/desktop.html");

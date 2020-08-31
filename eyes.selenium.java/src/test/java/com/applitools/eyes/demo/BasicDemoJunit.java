@@ -12,7 +12,6 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
-import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 
 import java.util.Arrays;
@@ -48,16 +47,8 @@ public class BasicDemoJunit extends ReportingTestSuite {
         eyes.setLogHandler(logger);
         try {
             eyes.open(driver, "Demo App", "BasicDemoJunit" + suffix, new RectangleSize(800, 800));
-
-            // Navigate the browser to the "ACME" demo app.
-            driver.get("https://demo.applitools.com");
-
-            // To see visual bugs after the first run, use the commented line below instead.
-            //driver.get("https://demo.applitools.com/index_v2.html");
-
-            eyes.checkWindow("Login Window");
-            driver.findElement(By.id("log-in")).click();
-            eyes.checkWindow("App Window");
+            driver.get("https://applitools.github.io/demo/TestPages/FramesTestPage/");
+            eyes.checkWindow();
             eyes.closeAsync();
         } finally {
             eyes.abortAsync();
