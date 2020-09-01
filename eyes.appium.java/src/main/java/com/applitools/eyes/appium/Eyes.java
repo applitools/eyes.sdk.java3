@@ -31,9 +31,7 @@ import com.applitools.eyes.selenium.regionVisibility.RegionVisibilityStrategy;
 import com.applitools.utils.*;
 import io.appium.java_client.AppiumDriver;
 import io.appium.java_client.MobileBy;
-import io.appium.java_client.MobileElement;
 import io.appium.java_client.android.AndroidDriver;
-import io.appium.java_client.android.AndroidElement;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.*;
 import org.openqa.selenium.remote.RemoteWebDriver;
@@ -263,7 +261,7 @@ public class Eyes extends EyesBase {
     private void initDriver(WebDriver driver) {
         if (driver instanceof AppiumDriver) {
             logger.verbose("Found an instance of AppiumDriver, so using EyesAppiumDriver instead");
-            this.driver = new EyesAppiumDriver(logger, (AppiumDriver) driver);
+            this.driver = new EyesAppiumDriver(logger, this, (AppiumDriver) driver);
             regionVisibilityStrategyHandler.set(new NopRegionVisibilityStrategy(logger));
         } else {
             logger.verbose("Did not find an instance of AppiumDriver, using regular logic");
@@ -317,7 +315,7 @@ public class Eyes extends EyesBase {
             appEnv.setOs(os);
         }
 
-        appEnv.setDeviceInfo(EyesAppiumUtils.getDeviceName(underlyingDriver));
+        appEnv.setDeviceInfo(EyesDriverUtils.getMobileDeviceName(underlyingDriver));
         logger.log("Done!");
         return appEnv;
     }

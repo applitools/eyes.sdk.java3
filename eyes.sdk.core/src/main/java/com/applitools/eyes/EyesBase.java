@@ -1298,6 +1298,10 @@ public abstract class EyesBase implements IEyesBase {
         return getServerConnector().getUserAgents();
     }
 
+    public Map<String, MobileDeviceInfo> getMobileDeviceInfo() {
+        return getServerConnector().getMobileDevicesInfo();
+    }
+
     /**
      * Sets the batch in which context future tests will run or {@code null}
      * if tests are to run standalone.

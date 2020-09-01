@@ -13,7 +13,7 @@ import org.openqa.selenium.remote.RemoteWebElement;
 import java.awt.image.BufferedImage;
 import java.util.*;
 
-public class EyesAppiumDriver implements EyesWebDriver {
+public class EyesAppiumDriver extends EyesWebDriver {
 
     private final Logger logger;
     private final AppiumDriver driver;
@@ -22,7 +22,8 @@ public class EyesAppiumDriver implements EyesWebDriver {
     private ImageRotation rotation;
     private RectangleSize defaultContentViewportSize = null;
 
-    public EyesAppiumDriver(Logger logger, AppiumDriver driver) {
+    public EyesAppiumDriver(Logger logger, Eyes eyes, AppiumDriver driver) {
+        super(eyes);
         this.logger = logger;
         this.driver = driver;
     }
@@ -60,7 +61,7 @@ public class EyesAppiumDriver implements EyesWebDriver {
         logger.verbose("Viewport Rect Value: " + viewportRectObject.toString());
 
         Map<String, Long> rectMap = (Map<String, Long>) getCachedSessionDetails().get("viewportRect");
-        HashMap<String, Integer> intRectMap = new HashMap<String, Integer>();
+        HashMap<String, Integer> intRectMap = new HashMap<>();
         intRectMap.put("width", rectMap.get("width").intValue());
         intRectMap.put("height", rectMap.get("height").intValue());
         return intRectMap;
@@ -75,7 +76,8 @@ public class EyesAppiumDriver implements EyesWebDriver {
         }
     }
 
-    public double getDevicePixelRatio () {
+    @Override
+    protected double getDevicePixelRatioInner() {
         Object pixelRatio = getCachedSessionDetails().get("pixelRatio");
         if (pixelRatio instanceof Double) {
             return (Double) pixelRatio;
@@ -110,7 +112,7 @@ public class EyesAppiumDriver implements EyesWebDriver {
             throw new EyesException("findElement: Element is not a RemoteWebElement: " + by);
         }
 
-        EyesAppiumElement appiumElement = new EyesAppiumElement(this, webElement, 1/getDevicePixelRatio());
+        EyesAppiumElement appiumElement = new EyesAppiumElement(this, webElement, 1/ getDevicePixelRatio());
 
         // For Remote web elements, we can keep the IDs,
         // for Id based lookup (mainly used for Javascript related

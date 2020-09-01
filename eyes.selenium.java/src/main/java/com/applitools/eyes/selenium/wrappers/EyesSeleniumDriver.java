@@ -23,9 +23,9 @@ import java.util.*;
  * Used so we'll be able to return the users an object with the same
  * functionality as {@link org.openqa.selenium.remote.RemoteWebDriver}.
  */
-public class EyesSeleniumDriver implements HasInputDevices, FindsByClassName,
+public class EyesSeleniumDriver extends EyesWebDriver implements HasInputDevices, FindsByClassName,
         FindsByCssSelector, FindsById, FindsByLinkText, FindsByName, FindsByTagName,
-        FindsByXPath, EyesWebDriver, HasTouchScreen, IEyesJsExecutor {
+        FindsByXPath, HasTouchScreen, IEyesJsExecutor {
 
     private final Logger logger;
     private final SeleniumEyes eyes;
@@ -83,8 +83,8 @@ public class EyesSeleniumDriver implements HasInputDevices, FindsByClassName,
         return normalizedImage;
     }
 
-    public EyesSeleniumDriver(Logger logger, SeleniumEyes eyes, RemoteWebDriver driver)
-            throws EyesException {
+    public EyesSeleniumDriver(Logger logger, SeleniumEyes eyes, RemoteWebDriver driver) throws EyesException {
+        super(eyes);
         ArgumentGuard.notNull(logger, "logger");
         ArgumentGuard.notNull(driver, "driver");
 
@@ -178,6 +178,14 @@ public class EyesSeleniumDriver implements HasInputDevices, FindsByClassName,
         }
 
         return resultElementsList;
+    }
+
+    @Override
+    protected double getDevicePixelRatioInner() {
+        if (EyesDriverUtils.isMobileDevice(this)) {
+            return SeleniumEyes.DEFAULT_DEVICE_PIXEL_RATIO;
+        }
+        return Float.parseFloat(executeScript("return window.devicePixelRatio").toString());
     }
 
     public WebElement findElement(By by) {

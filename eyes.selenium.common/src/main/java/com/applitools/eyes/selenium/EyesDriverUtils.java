@@ -1,6 +1,7 @@
 package com.applitools.eyes.selenium;
 
 import com.applitools.eyes.*;
+import com.applitools.eyes.config.Feature;
 import com.applitools.eyes.selenium.exceptions.EyesDriverOperationException;
 import com.applitools.eyes.selenium.wrappers.EyesWebDriver;
 import com.applitools.utils.ArgumentGuard;
@@ -586,14 +587,22 @@ public class EyesDriverUtils {
     }
 
     /**
-     * Gets device pixel ratio.
-     * @param executor The executor to use.
-     * @return The device pixel ratio.
+     * @param driver The driver to get the platform version from.
+     * @return The device name or 'Unknown' if it is undefined.
      */
-    public static float getDevicePixelRatio(IEyesJsExecutor executor) {
-        return Float.parseFloat(
-                executor.executeScript("return window.devicePixelRatio")
-                        .toString());
+    public static String getMobileDeviceName(HasCapabilities driver) {
+        Capabilities capabilities = driver.getCapabilities();
+
+        Object deviceNameCapability = capabilities.getCapability("deviceName");
+        String deviceName = deviceNameCapability != null ? deviceNameCapability.toString() : "Unknown";
+
+        Object deviceCapability = capabilities.getCapability("device");
+
+        if (deviceCapability != null && !deviceName.toLowerCase().contains(deviceCapability.toString())) {
+            deviceName = deviceCapability.toString();
+        }
+
+        return deviceName;
     }
 
     /**

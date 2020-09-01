@@ -291,7 +291,7 @@ public class SeleniumEyes extends EyesBase implements ISeleniumEyes, IBatchClose
     private void initDevicePixelRatio() {
         logger.verbose("Trying to extract device pixel ratio...");
         try {
-            devicePixelRatio = EyesDriverUtils.getDevicePixelRatio(this.jsExecutor);
+            devicePixelRatio = driver.getDevicePixelRatio();
         } catch (Exception ex) {
             logger.verbose("Failed to extract device pixel ratio! Using default.");
             devicePixelRatio = DEFAULT_DEVICE_PIXEL_RATIO;
@@ -1106,23 +1106,22 @@ public class SeleniumEyes extends EyesBase implements ISeleniumEyes, IBatchClose
         if (scaleProviderHandler.get() instanceof NullScaleProvider) {
             ScaleProviderFactory factory;
             logger.verbose("Trying to extract device pixel ratio...");
+            try {
+                devicePixelRatio = driver.getDevicePixelRatio();
+            } catch (Exception e) {
+                logger.verbose(
+                        "Failed to extract device pixel ratio! Using default.");
+                devicePixelRatio = DEFAULT_DEVICE_PIXEL_RATIO;
+            }
+
+            logger.verbose(String.format("Device pixel ratio: %f", devicePixelRatio));
             if (!EyesDriverUtils.isMobileDevice(driver)) {
-                try {
-                    devicePixelRatio = EyesDriverUtils.getDevicePixelRatio(this.jsExecutor);
-                } catch (Exception e) {
-                    logger.verbose(
-                            "Failed to extract device pixel ratio! Using default.");
-                    devicePixelRatio = DEFAULT_DEVICE_PIXEL_RATIO;
-                }
                 logger.verbose("Setting web scale provider...");
                 factory = getScaleProviderFactory();
             } else {
-                logger.verbose("Native App");
-                devicePixelRatio = DEFAULT_DEVICE_PIXEL_RATIO;
                 logger.verbose("Setting native app scale provider...");
                 factory = new FixedScaleProviderFactory(logger, 1 / devicePixelRatio, scaleProviderHandler);
             }
-            logger.verbose(String.format("Device pixel ratio: %f", devicePixelRatio));
 
             logger.verbose("Done!");
             return factory;
@@ -1834,14 +1833,6 @@ public class SeleniumEyes extends EyesBase implements ISeleniumEyes, IBatchClose
          */
         public WebDriverInfo getWebDriver() {
             return new WebDriverInfo();
-        }
-
-        /**
-         * Gets device pixel ratio.
-         * @return the device pixel ratio
-         */
-        public double getDevicePixelRatio() {
-            return SeleniumEyes.this.getDevicePixelRatio();
         }
 
         /**

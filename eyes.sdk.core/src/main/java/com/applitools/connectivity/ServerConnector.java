@@ -30,7 +30,10 @@ public class ServerConnector extends UfgConnector {
     static final String CLOSE_BATCH = "api/sessions/batches/%s/close/bypointerid";
     static final String RENDER_STATUS = "/render-status";
     static final String RENDER = "/render";
+    static final String MOBILE_DEVICES_PATH = "/app/info/mobile/devices";
     public static final String API_PATH = "/api/sessions/running";
+
+    private Map<String, MobileDeviceInfo> mobileDevicesInfo = null;
 
     /***
      * @param logger    Logger instance.
@@ -420,5 +423,25 @@ public class ServerConnector extends UfgConnector {
 
     public boolean getDontCloseBatches() {
         return "true".equalsIgnoreCase(GeneralUtils.getEnvString("APPLITOOLS_DONT_CLOSE_BATCHES"));
+    }
+
+    public Map<String, MobileDeviceInfo> getMobileDevicesInfo() {
+        if (mobileDevicesInfo != null) {
+            return mobileDevicesInfo;
+        }
+
+        try {
+            mobileDevicesInfo = getFromServer(new HttpRequestBuilder() {
+                @Override
+                public AsyncRequest build() {
+                    return restClient.target(renderingInfo.getServiceUrl()).path(MOBILE_DEVICES_PATH)
+                            .queryParam("apiKey", getApiKey()).asyncRequest();
+                }
+            }, new TypeReference<Map<String, MobileDeviceInfo>>() {});
+        } catch (Throwable t) {
+            GeneralUtils.logExceptionStackTrace(logger, t);
+            mobileDevicesInfo = new HashMap<>();
+        }
+        return mobileDevicesInfo;
     }
 }
