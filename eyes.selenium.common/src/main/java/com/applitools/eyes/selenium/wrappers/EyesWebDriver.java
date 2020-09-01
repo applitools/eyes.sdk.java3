@@ -26,7 +26,7 @@ public abstract class EyesWebDriver implements WebDriver, JavascriptExecutor, Ta
         if (eyesBase.getConfiguration().isFeatureActivated(Feature.OPTIMIZE_MOBILE_DEVICES_INFO)) {
             Map<String, MobileDeviceInfo> mobileDevicesInfo = eyesBase.getMobileDeviceInfo();
             String deviceName = EyesDriverUtils.getMobileDeviceName(this);
-            if (mobileDevicesInfo.containsKey(deviceName) || mobileDevicesInfo.containsKey(deviceName + "GoogleAPI Emulator")) {
+            if (mobileDevicesInfo.containsKey(deviceName) || mobileDevicesInfo.containsKey(deviceName + " GoogleAPI Emulator")) {
                 return mobileDevicesInfo.get(deviceName).getPixelRatio();
             }
         }
