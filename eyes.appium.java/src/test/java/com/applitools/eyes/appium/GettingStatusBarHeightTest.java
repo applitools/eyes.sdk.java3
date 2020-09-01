@@ -51,7 +51,7 @@ public class GettingStatusBarHeightTest extends ReportingTestSuite {
 
     @Test
     public void testGettingStatusBarHeight() {
-        EyesAppiumDriver eyesDriver = new EyesAppiumDriver(new Logger(), driver);
+        EyesAppiumDriver eyesDriver = new EyesAppiumDriver(new Logger(), new Eyes(), driver);
         eyesDriver.getStatusBarHeight();
     }
 }
