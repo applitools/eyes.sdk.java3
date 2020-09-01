@@ -464,10 +464,6 @@ public abstract class EyesBase implements IEyesBase {
     public TestResults close(boolean throwEx) {
         AtomicReference<TestResults> reference = new AtomicReference<>();
         final AtomicReference<EyesSyncObject> lock = new AtomicReference<>(new EyesSyncObject(logger, "close"));
-        if (!isOpen) {
-            logger.log("WARNING: Eyes not open");
-            return new TestResults();
-        }
         close(new SyncTaskListener<>(lock, reference), throwEx);
         synchronized (lock.get()) {
             try {
