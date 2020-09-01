@@ -592,8 +592,14 @@ public class EyesDriverUtils {
      */
     public static String getMobileDeviceName(HasCapabilities driver) {
         Capabilities capabilities = driver.getCapabilities();
+        Object desiredCaps = capabilities.getCapability("desired");
+        if (desiredCaps != null) {
+            Map<String, String> caps = (Map<String, String>) desiredCaps;
+            Object deviceNameCapability = caps.get(MobileCapabilityType.DEVICE_NAME);
+            return deviceNameCapability != null ? deviceNameCapability.toString() : "Unknown";
+        }
 
-        Object deviceNameCapability = capabilities.getCapability("deviceName");
+        Object deviceNameCapability = capabilities.getCapability(MobileCapabilityType.DEVICE_NAME);
         String deviceName = deviceNameCapability != null ? deviceNameCapability.toString() : "Unknown";
 
         Object deviceCapability = capabilities.getCapability("device");

@@ -1738,6 +1738,8 @@ public class SeleniumEyes extends EyesBase implements ISeleniumEyes, IBatchClose
                     logger.verbose("Setting OS: " + os);
                     appEnv.setOs(os);
                 }
+
+                appEnv.setDeviceInfo(EyesDriverUtils.getMobileDeviceName(driver.getRemoteWebDriver()));
             } else {
                 logger.log("No mobile OS detected.");
             }

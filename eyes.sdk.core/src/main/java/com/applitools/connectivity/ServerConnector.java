@@ -434,7 +434,7 @@ public class ServerConnector extends UfgConnector {
             mobileDevicesInfo = getFromServer(new HttpRequestBuilder() {
                 @Override
                 public AsyncRequest build() {
-                    return restClient.target(renderingInfo.getServiceUrl()).path(MOBILE_DEVICES_PATH)
+                    return restClient.target(serverUrl).path(MOBILE_DEVICES_PATH)
                             .queryParam("apiKey", getApiKey()).asyncRequest();
                 }
             }, new TypeReference<Map<String, MobileDeviceInfo>>() {});
