@@ -39,8 +39,6 @@ public class MobileNativeTests extends ReportingTestSuite {
         setCapabilities(capabilities, testName);
         eyes.setBatch(TestDataProvider.batchInfo);
         eyes.setSaveNewTests(false);
-        eyes.setApiKey("97ELuwdIiAilbeumIilysV8yY24tygCeRFFTYEBO7EfE110");
-        eyes.setBranchName("master");
         return eyes;
     }
 
