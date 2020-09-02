@@ -1758,6 +1758,14 @@ public class Eyes implements IEyesBase {
         return this.configuration.getSaveDiffs();
     }
 
+    public void setIgnoreDisplacements(boolean isIgnoreDisplacements) {
+        this.configuration.setIgnoreDisplacements(isIgnoreDisplacements);
+    }
+
+    public boolean getIgnoreDisplacements() {
+        return this.configuration.getIgnoreDisplacements();
+    }
+
     /**
      * Superseded by {@link #setHostOS(String)} and {@link #setHostApp(String)}.
      * Sets the OS (e.g., Windows) and application (e.g., Chrome) that host the application under test.

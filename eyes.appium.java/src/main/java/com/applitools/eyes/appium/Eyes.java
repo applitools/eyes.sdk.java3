@@ -950,6 +950,14 @@ public class Eyes extends EyesBase {
         return configuration.getBaselineBranchName();
     }
 
+    public void setIgnoreDisplacements(boolean isIgnoreDisplacements) {
+        this.configuration.setIgnoreDisplacements(isIgnoreDisplacements);
+    }
+
+    public boolean getIgnoreDisplacements() {
+        return this.configuration.getIgnoreDisplacements();
+    }
+
     public void setConfiguration(Configuration configuration) {
         ArgumentGuard.notNull(configuration, "configuration");
         String apiKey = configuration.getApiKey();
