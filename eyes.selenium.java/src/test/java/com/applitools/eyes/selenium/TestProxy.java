@@ -1,14 +1,25 @@
 package com.applitools.eyes.selenium;
 
+import com.applitools.connectivity.ServerConnector;
+import com.applitools.eyes.AbstractProxySettings;
 import com.applitools.eyes.ProxySettings;
 import com.applitools.eyes.utils.ReportingTestSuite;
 import com.applitools.eyes.utils.SeleniumUtils;
+import com.applitools.utils.GeneralUtils;
+import org.junit.Assert;
+import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.openqa.selenium.WebDriver;
-import org.testng.Assert;
-import org.testng.annotations.Test;
+import org.powermock.api.mockito.PowerMockito;
+import org.powermock.core.classloader.annotations.PrepareForTest;
+import org.powermock.modules.junit4.PowerMockRunner;
 
 import java.io.IOException;
 
+import static org.mockito.Mockito.when;
+
+@RunWith(PowerMockRunner.class)
+@PrepareForTest(GeneralUtils.class)
 public class TestProxy extends ReportingTestSuite {
 
     public TestProxy() {
@@ -52,6 +63,15 @@ public class TestProxy extends ReportingTestSuite {
         }
     }
 
+    @Test
+    public void testProxyNoUrl() {
+        PowerMockito.spy(GeneralUtils.class);
+        when(GeneralUtils.getEnvString(AbstractProxySettings.PROXY_ENV_VAR_NAME)).thenReturn("http://localhost:8888");
+        ServerConnector serverConnector = new ServerConnector();
+        serverConnector.setProxy(new ProxySettings());
+        Assert.assertEquals(serverConnector.getProxy().getUri(), "http://localhost:8888");
+    }
+
     private void startProxyDocker() throws IOException, InterruptedException {
         Process stopDocker = Runtime.getRuntime().exec(new String[]{"bash","-c","docker run -d --name='tinyproxy' -p 8080:8888 dannydirect/tinyproxy:latest ANY"});
         stopDocker.waitFor();
@@ -63,5 +83,4 @@ public class TestProxy extends ReportingTestSuite {
         Process removeDocker = Runtime.getRuntime().exec(new String[]{"bash","-c","docker rm $(docker ps -a -q)"});
         removeDocker.waitFor();
     }
-
 }
