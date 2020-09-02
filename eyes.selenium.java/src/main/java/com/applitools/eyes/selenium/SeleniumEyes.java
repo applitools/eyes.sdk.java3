@@ -1483,6 +1483,11 @@ public class SeleniumEyes extends EyesBase implements ISeleniumEyes, IBatchClose
      */
     @Override
     public RectangleSize getViewportSize() {
+        if (!isOpen && driver == null) {
+            logger.log("Called getViewportSize before calling open");
+            return null;
+        }
+
         RectangleSize vpSize;
         if (!EyesDriverUtils.isMobileDevice(driver)) {
             if (imageProvider instanceof MobileScreenshotImageProvider) {

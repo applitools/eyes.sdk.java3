@@ -7,6 +7,7 @@
 - Checking for browserStack specific caps for appEnvironment data. [Trello 2017](https://trello.com/c/3q1wrnYG)
 - Scroll mechanism for Android. Added possibility to scroll with helper library. [Trello 1673](https://trello.com/c/CYbkzXia)
 - Connection with the server is now asynchronous. [Trello 2094](https://trello.com/c/O74dUDxG)
+- Calling `eyes.getViewportSize` returns `null` instead of throwing an exception. [Trello 1449](https://trello.com/c/twHGaW1X)
 ### Fixed
 - When Y coordinate is smaller than 0 it will be set as 0 to avoid IllegalArgumentException. [Trello 2121](https://trello.com/c/3atHV3Ee)
 

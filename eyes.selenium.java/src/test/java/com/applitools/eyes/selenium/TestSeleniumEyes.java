@@ -191,4 +191,10 @@ public class TestSeleniumEyes extends ReportingTestSuite {
         Assert.assertEquals(serverConnector.getLogger().getLogHandler(), logHandler);
         Assert.assertEquals(EyesConnectivityUtils.getClient(serverConnector).getLogger().getLogHandler(), logHandler);
     }
+
+    @Test
+    public void testGetViewportSizeBeforeOpen() {
+        Eyes eyes = new Eyes(new ClassicRunner());
+        Assert.assertNull(eyes.getViewportSize());
+    }
 }
