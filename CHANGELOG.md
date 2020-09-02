@@ -3,6 +3,7 @@
 - Implemented test on getting status bar height. [Trello 1478](https://trello.com/c/RuPL3v4v)
 - Implemented test on setting deviceName to appEnvironment data. [Trello 125](https://trello.com/c/ekZqajRU)
 - Supporting `VisualGridOptions` in configuration and in fluent API. [Trello 2089](https://trello.com/c/d4zggQes)
+- Added a new feature for getting mobile device pixel ratios from the server. [Trello 301](https://trello.com/c/vGSi2NFz)
 ### Updated
 - Checking for browserStack specific caps for appEnvironment data. [Trello 2017](https://trello.com/c/3q1wrnYG)
 - Scroll mechanism for Android. Added possibility to scroll with helper library. [Trello 1673](https://trello.com/c/CYbkzXia)
