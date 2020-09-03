@@ -33,6 +33,7 @@ public class EyesSeleniumUtils {
         try {
             body = driver.findElement(By.tagName("body"));
         } catch (Throwable t) {
+            // Supporting web pages without the body element
             logger.log("Failed finding the body element");
             return htmlElement;
         }
