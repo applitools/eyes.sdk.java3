@@ -639,15 +639,20 @@ public class EyesRemoteWebElement extends RemoteWebElement {
     }
 
     public static Rectangle getBoundingClientRect(WebElement element, JavascriptExecutor driver, Logger logger) {
+        // In IE the keys are bottom/right while in the rest of the browser they are height/width
         String retVal = (String) driver.executeScript("var r = arguments[0].getBoundingClientRect();" +
-                "return r.left+';'+r.top+';'+r.width+';'+r.height;", element);
+                "return r.left+';'+r.top+';'+r.width+';'+r.height+';'+r.right+';'+r.bottom", element);
         logger.verbose(String.format("Bounding client rect: %s", retVal));
         String[] parts = retVal.split(";");
+        String left = parts[0];
+        String top = parts[1];
+        String height = parts[3].equals("undefined") ? parts[5] : parts[3];
+        String width = parts[2].equals("undefined") ? parts[4] : parts[2];
         return new Rectangle(
-                Math.round(Float.parseFloat(parts[0])),
-                Math.round(Float.parseFloat(parts[1])),
-                Math.round(Float.parseFloat(parts[3])),
-                Math.round(Float.parseFloat(parts[2])));
+                Math.round(Float.parseFloat(left)),
+                Math.round(Float.parseFloat(top)),
+                Math.round(Float.parseFloat(height)),
+                Math.round(Float.parseFloat(width)));
     }
 
     public RectangleSize getScrollSize() {

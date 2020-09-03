@@ -28,8 +28,15 @@ public class EyesSeleniumUtils {
      */
     public static WebElement getDefaultRootElement(Logger logger, EyesSeleniumDriver driver) {
         WebElement html = driver.findElement(By.tagName("html"));
-        WebElement body = driver.findElement(By.tagName("body"));
         EyesRemoteWebElement htmlElement = new EyesRemoteWebElement(logger, driver, html);
+        WebElement body;
+        try {
+            body = driver.findElement(By.tagName("body"));
+        } catch (Throwable t) {
+            logger.log("Failed finding the body element");
+            return htmlElement;
+        }
+
         EyesRemoteWebElement bodyElement = new EyesRemoteWebElement(logger, driver, body);
         if (htmlElement.getBoundingClientRect().height < bodyElement.getBoundingClientRect().height) {
             return bodyElement;

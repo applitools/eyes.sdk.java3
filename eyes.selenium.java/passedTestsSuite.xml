@@ -339,6 +339,9 @@
                     <include name="testChangeTabs"/>
                     <include name="testScreenshotTooBig"/>
                     <include name="testConfiguration"/>
+                    <include name="testGetViewportSizeBeforeOpen"/>
+                    <include name="testGetBoundingClientRect"/>
+                    <include name="testGetRootElementNoBody"/>
                 </methods>
             </class>
         </classes>

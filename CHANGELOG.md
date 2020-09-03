@@ -1,3 +1,8 @@
+## [vNext]
+### Fixed
+- Supporting `getBoundingClientRect()` for web elements in IE Browser. [Trello 2130](https://trello.com/c/U6fhdMOO)
+- Supporting pages without a `body` element. [Trello 2130](https://trello.com/c/U6fhdMOO)
+
 ## [3.176.0] - 2020-09-02
 ### Added
 - Implemented test on getting status bar height. [Trello 1478](https://trello.com/c/RuPL3v4v)

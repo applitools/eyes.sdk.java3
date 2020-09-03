@@ -7,12 +7,14 @@ import com.applitools.eyes.config.Configuration;
 import com.applitools.eyes.config.ConfigurationProvider;
 import com.applitools.eyes.debug.DebugScreenshotsProvider;
 import com.applitools.eyes.selenium.fluent.Target;
+import com.applitools.eyes.selenium.wrappers.EyesRemoteWebElement;
+import com.applitools.eyes.selenium.wrappers.EyesSeleniumDriver;
 import com.applitools.eyes.utils.ReportingTestSuite;
 import com.applitools.eyes.utils.SeleniumUtils;
 import com.applitools.eyes.visualgrid.model.RenderingInfo;
-import org.openqa.selenium.By;
-import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.WebElement;
+import org.mockito.ArgumentMatchers;
+import org.openqa.selenium.*;
+import org.openqa.selenium.remote.RemoteWebElement;
 import org.testng.Assert;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
@@ -21,6 +23,9 @@ import java.awt.image.BufferedImage;
 import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
+
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 public class TestSeleniumEyes extends ReportingTestSuite {
 
@@ -196,5 +201,30 @@ public class TestSeleniumEyes extends ReportingTestSuite {
     public void testGetViewportSizeBeforeOpen() {
         Eyes eyes = new Eyes(new ClassicRunner());
         Assert.assertNull(eyes.getViewportSize());
+    }
+
+    @Test
+    public void testGetBoundingClientRect() {
+        EyesSeleniumDriver driver = mock(EyesSeleniumDriver.class);
+        RemoteWebElement element = mock(RemoteWebElement.class);
+        EyesRemoteWebElement remoteWebElement = new EyesRemoteWebElement(new Logger(), driver, element);
+
+        Rectangle resultRect = new Rectangle(0, 0, 500, 400);
+
+        String result = "0;0;400;500;undefined;undefined";
+        when(driver.executeScript(ArgumentMatchers.<String>any(), ArgumentMatchers.<Object[]>any())).thenReturn(result);
+        Assert.assertEquals(remoteWebElement.getBoundingClientRect(), resultRect);
+
+        result = "0;0;undefined;undefined;400;500";
+        when(driver.executeScript(ArgumentMatchers.<String>any(), ArgumentMatchers.<Object[]>any())).thenReturn(result);
+        Assert.assertEquals(remoteWebElement.getBoundingClientRect(), resultRect);
+    }
+
+    @Test
+    public void testGetRootElementNoBody() {
+        EyesSeleniumDriver driver = mock(EyesSeleniumDriver.class);
+        when(driver.findElement(By.tagName("html"))).thenReturn(mock(RemoteWebElement.class));
+        when(driver.findElement(By.tagName("body"))).thenThrow(new NoSuchElementException(""));
+        EyesSeleniumUtils.getDefaultRootElement(new Logger(), driver);
     }
 }
