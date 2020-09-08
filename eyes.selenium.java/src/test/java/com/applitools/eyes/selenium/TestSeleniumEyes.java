@@ -14,6 +14,7 @@ import com.applitools.eyes.utils.SeleniumUtils;
 import com.applitools.eyes.visualgrid.model.RenderingInfo;
 import org.mockito.ArgumentMatchers;
 import org.openqa.selenium.*;
+import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.remote.RemoteWebElement;
 import org.testng.Assert;
 import org.testng.annotations.BeforeMethod;
@@ -226,5 +227,15 @@ public class TestSeleniumEyes extends ReportingTestSuite {
         when(driver.findElement(By.tagName("html"))).thenReturn(mock(RemoteWebElement.class));
         when(driver.findElement(By.tagName("body"))).thenThrow(new NoSuchElementException(""));
         EyesSeleniumUtils.getDefaultRootElement(new Logger(), driver);
+    }
+
+    @Test
+    public void testSetEmptyViewportSize() {
+        ChromeDriver driver = SeleniumUtils.createChromeDriver();
+        try {
+            EyesDriverUtils.setViewportSize(new Logger(), driver, new RectangleSize(0, 0));
+        } finally {
+            driver.quit();
+        }
     }
 }

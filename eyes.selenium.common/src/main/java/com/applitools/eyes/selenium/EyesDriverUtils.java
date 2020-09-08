@@ -442,8 +442,10 @@ public class EyesDriverUtils {
      * @param size   The size to set as the viewport size.
      */
     public static void setViewportSize(Logger logger, WebDriver driver, RectangleSize size) {
-
         ArgumentGuard.notNull(size, "size");
+        if (size.isEmpty()) {
+            return;
+        }
 
         logger.verbose("setViewportSize(" + size + ")");
 

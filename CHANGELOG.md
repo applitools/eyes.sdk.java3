@@ -1,3 +1,7 @@
+## [vNext]
+### Fixed
+- Setting viewport 0x0 now won't do anything. [Trello 2115](https://trello.com/c/KYKyXSr6)
+
 ## [3.177.0] - 2020-09-07 
 ### Added
 - Use predefined device info for pixel ratio. [Trello 301](https://trello.com/c/vGSi2NFz/)
