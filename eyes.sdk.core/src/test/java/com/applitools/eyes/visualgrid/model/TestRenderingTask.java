@@ -73,6 +73,13 @@ public class TestRenderingTask extends ReportingTestSuite {
         final DomAnalyzer domAnalyzer = new DomAnalyzer(new Logger(), serverConnector, new NullDebugResourceWriter(),
                 frameData, new HashMap<String, RGridResource>(), userAgent);
 
+        RGridResource cachedResource = mock(RGridResource.class);
+        when(cachedResource.getUrl()).thenReturn("12");
+        when(cachedResource.getContentType()).thenReturn("");
+        when(cachedResource.parse(ArgumentMatchers.<Logger>any(), anyString()))
+                .thenReturn(stringsToUris(getInnerMap(urls, "12").keySet()));
+        domAnalyzer.fetchedCacheMap.put("12", cachedResource);
+
         // When RenderingTask tries to get a new resource, this task will be submitted to the ExecutorService
         when(serverConnector.downloadResource(ArgumentMatchers.<URI>any(), anyString(), anyString(), ArgumentMatchers.<TaskListener<RGridResource>>any()))
                 .thenAnswer(new Answer<Future<?>>() {
@@ -83,23 +90,29 @@ public class TestRenderingTask extends ReportingTestSuite {
                         @Override
                         public void run() {
                             synchronized (counter) {
-                                counter.getAndIncrement();
-                                URI url = invocationOnMock.getArgument(0);
-                                Map innerUrls = TestRenderingTask.this.getInnerMap(urls, url.toString());
                                 try {
                                     // Sleeping so the async tasks will take some time to finish
                                     Thread.sleep(500);
                                 } catch (InterruptedException e) {
                                     throw new IllegalStateException(e);
                                 }
-                                if (!Objects.requireNonNull(innerUrls).isEmpty()) {
-                                    try {
-                                        domAnalyzer.fetchAllResources(allBlobs, stringsToUris(innerUrls.keySet()));
-                                    } catch (URISyntaxException e) {
-                                        throw new IllegalStateException(e);
-                                    }
+
+                                counter.getAndIncrement();
+                                URI url = invocationOnMock.getArgument(0);
+                                Map innerUrls = TestRenderingTask.this.getInnerMap(urls, url.toString());
+
+                                RGridResource resource = mock(RGridResource.class);
+                                when(resource.getUrl()).thenReturn(url.toString());
+                                when(resource.getContentType()).thenReturn("");
+                                try {
+                                    when(resource.parse(ArgumentMatchers.<Logger>any(), anyString()))
+                                            .thenReturn(stringsToUris(innerUrls.keySet()));
+                                } catch (URISyntaxException e) {
+                                    throw new IllegalStateException(e);
                                 }
-                                domAnalyzer.resourcesPhaser.arriveAndDeregister();
+
+                                TaskListener<RGridResource> listener = invocationOnMock.getArgument(3);
+                                listener.onComplete(resource);
                             }
                         }
                     });
@@ -113,7 +126,7 @@ public class TestRenderingTask extends ReportingTestSuite {
         // We call the method which activates the process of collecting resources and wait to see if it ends properly.
         domAnalyzer.fetchAllResources(allBlobs, resourceUrls);
         domAnalyzer.resourcesPhaser.awaitAdvanceInterruptibly(0, 30, TimeUnit.SECONDS);
-        Assert.assertEquals(counter.get(), 8);
+        Assert.assertEquals(counter.get(), 7);
     }
 
     @Test

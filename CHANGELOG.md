@@ -1,10 +1,11 @@
 ## [vNext]
 ### Fixed
 - Setting viewport 0x0 now won't do anything. [Trello 2115](https://trello.com/c/KYKyXSr6)
+- Now parsing cached resources when collecting resources before rendering. [Trello 2135](https://trello.com/c/hwkbp14g)
 
 ## [3.177.0] - 2020-09-07 
 ### Added
-- Use predefined device info for pixel ratio. [Trello 301](https://trello.com/c/vGSi2NFz/)
+- Use predefined device info for pixel ratio. [Trello 301](https://trello.com/c/vGSi2NFz)
 ### Fixed
 - Supporting `getBoundingClientRect()` for web elements in IE Browser. [Trello 2130](https://trello.com/c/U6fhdMOO)
 - Supporting pages without a `body` element. [Trello 2130](https://trello.com/c/U6fhdMOO)
