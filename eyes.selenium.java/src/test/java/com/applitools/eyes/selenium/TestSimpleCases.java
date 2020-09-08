@@ -4,6 +4,8 @@ import com.applitools.eyes.RectangleSize;
 import com.applitools.eyes.selenium.fluent.Target;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Capabilities;
+import org.openqa.selenium.JavascriptExecutor;
+import org.openqa.selenium.WebElement;
 import org.testng.annotations.Factory;
 import org.testng.annotations.Listeners;
 import org.testng.annotations.Test;
@@ -21,5 +23,11 @@ public class TestSimpleCases extends TestSetup {
     @Test
     public void TestCheckDivOverflowingThePage() {
         getEyes().check("overflowing div", Target.region(By.id("overflowing-div")).fully());
+    }
+
+    @Test
+    public void TestCheckElementFullyAfterScrollNonScrollableElement() {
+        ((JavascriptExecutor)getDriver()).executeScript("window.scrollTo(0, 500)");
+        getEyes().check("check non scrollable element", Target.region(By.id("overflowing-div")).fully());
     }
 }

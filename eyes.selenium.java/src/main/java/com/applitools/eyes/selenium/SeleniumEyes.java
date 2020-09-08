@@ -917,9 +917,8 @@ public class SeleniumEyes extends EyesBase implements ISeleniumEyes, IBatchClose
         // However, in Scroll stitch mode, we scroll the SRE itself to the get full contents, and it
         // already has an offset caused by "BringRegionToView", so we should consider this offset.
         if (getConfigurationInstance().getStitchMode() == StitchMode.SCROLL && !isScrollableElement) {
-            state.setStitchOffset(new RectangleSize(
-                    originalElementLocation.getX() - elementBounds.getLeft(),
-                    originalElementLocation.getY() - elementBounds.getTop()));
+            EyesRemoteWebElement sre = (EyesRemoteWebElement) getCurrentFrameScrollRootElement();
+            state.setStitchOffset(new RectangleSize(sre.getScrollLeft(), sre.getScrollTop()));
         }
 
         // 2. Intersect the element and the effective viewport
