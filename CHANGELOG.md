@@ -2,6 +2,7 @@
 ### Fixed
 - Setting viewport 0x0 now won't do anything. [Trello 2115](https://trello.com/c/KYKyXSr6)
 - Now parsing cached resources when collecting resources before rendering. [Trello 2135](https://trello.com/c/hwkbp14g)
+- Checking non scrollable elements after scrolling the page works now. [Trello 2100](https://trello.com/c/7TDFAWUn)
 
 ## [3.177.0] - 2020-09-07 
 ### Added
