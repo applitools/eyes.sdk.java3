@@ -1008,12 +1008,11 @@ public class SeleniumEyes extends EyesBase implements ISeleniumEyes, IBatchClose
         // User might still call "fully" on a non-scrollable element, adjust the position provider accordingly.
         if (isScrollableElement) {
             state.setStitchPositionProvider(new ElementPositionProvider(logger, driver, targetElement));
-        } else // Not a scrollable element but an element enclosed within a scroll-root-element
-        {
+        } else { // Not a scrollable element but an element enclosed within a scroll-root-element
             WebElement scrollRootElement = getCurrentFrameScrollRootElement();
             if (getConfigurationInstance().getStitchMode() == StitchMode.CSS) {
                 state.setStitchPositionProvider(new CssTranslatePositionProvider(logger, driver, targetElement));
-                state.setOriginPositionProvider(new SeleniumScrollPositionProvider(logger, driver, scrollRootElement));
+                state.setOriginPositionProvider(new NullPositionProvider());
             } else {
                 state.setStitchPositionProvider(new SeleniumScrollPositionProvider(logger, driver, scrollRootElement));
             }
