@@ -25,7 +25,6 @@
             <class name="com.applitools.eyes.selenium.TestSimpleCases">
                 <methods>
                     <include name="TestCheckDivOverflowingThePage" />
-                    <include name="TestCheckElementFullyAfterScrollNonScrollableElement" />
                 </methods>
             </class>
         </classes>
