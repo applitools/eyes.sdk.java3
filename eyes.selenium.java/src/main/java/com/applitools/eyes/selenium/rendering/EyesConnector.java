@@ -7,23 +7,18 @@ import com.applitools.eyes.config.Configuration;
 import com.applitools.eyes.fluent.ICheckSettingsInternal;
 import com.applitools.eyes.visualgrid.model.*;
 import com.applitools.eyes.visualgrid.services.IEyesConnector;
-import com.applitools.eyes.visualgrid.services.VisualGridTask;
 import com.applitools.utils.ClassVersionGetter;
-import com.applitools.utils.EyesSyncObject;
 
 import java.net.URI;
 import java.util.List;
 import java.util.concurrent.Future;
-import java.util.concurrent.atomic.AtomicReference;
 
 class EyesConnector extends EyesBase implements IEyesConnector, IBatchCloser {
     private final RenderBrowserInfo browserInfo;
-    private String userAgent;
-    private String device;
-    private RectangleSize deviceSize;
     private Configuration configuration;
     private String appName;
     private String testName;
+    private JobInfo jobInfo;
 
     public EyesConnector(Configuration configuration, List<PropertyData> properties, RenderBrowserInfo browserInfo) {
         this.configuration = configuration;
@@ -50,34 +45,22 @@ class EyesConnector extends EyesBase implements IEyesConnector, IBatchCloser {
         return getServerConnector().downloadResource(url, userAgent, refererUrl, listener);
     }
 
-    public Future<?> renderPutResource(RunningRender runningRender, RGridResource resource, String userAgent, TaskListener<Boolean> listener) {
-        return getServerConnector().renderPutResource(runningRender, resource, userAgent, listener);
+    @Override
+    public Future<?> renderPutResource(String renderId, RGridResource resource, TaskListener<Void> listener) {
+        return getServerConnector().renderPutResource(renderId, resource, listener);
     }
 
+    @Override
     public List<RunningRender> render(RenderRequest... renderRequests) {
-        final AtomicReference<List<RunningRender>> reference = new AtomicReference<>();
-        final AtomicReference<EyesSyncObject> lock = new AtomicReference<>(new EyesSyncObject(logger, "render"));
-        getServerConnector().render(new SyncTaskListener<>(lock, reference), renderRequests);
-        synchronized (lock.get()) {
-            try {
-                lock.get().waitForNotify();
-            } catch (InterruptedException ignored) {}
-        }
-
-        return reference.get();
+        SyncTaskListener<List<RunningRender>> listener = new SyncTaskListener<>(logger, "render");
+        getServerConnector().render(listener, renderRequests);
+        return listener.get();
     }
 
     public List<RenderStatusResults> renderStatusById(String... renderIds) {
-        final AtomicReference<List<RenderStatusResults>> reference = new AtomicReference<>();
-        final AtomicReference<EyesSyncObject> lock = new AtomicReference<>(new EyesSyncObject(logger, "renderStatusById"));
-        getServerConnector().renderStatusById(new SyncTaskListener<>(lock, reference), renderIds);
-        synchronized (lock.get()) {
-            try {
-                lock.get().waitForNotify();
-            } catch (InterruptedException ignored) {}
-        }
-
-        return reference.get();
+        final SyncTaskListener<List<RenderStatusResults>> listener = new SyncTaskListener<>(logger, "renderStatusById");
+        getServerConnector().renderStatusById(listener, renderIds);
+        return listener.get();
     }
 
     public MatchResult matchWindow(String resultImageURL, String domLocation, ICheckSettings checkSettings,
@@ -110,7 +93,7 @@ class EyesConnector extends EyesBase implements IEyesConnector, IBatchCloser {
     }
 
     protected String getInferredEnvironment() {
-        return "useragent:" + userAgent;
+        return null;
     }
 
     protected EyesScreenshot getScreenshot(Region targetRegion, ICheckSettingsInternal checkSettingsInternal) {
@@ -132,10 +115,6 @@ class EyesConnector extends EyesBase implements IEyesConnector, IBatchCloser {
 
     public void setRenderInfo(RenderingInfo renderInfo) {
         getServerConnector().setRenderingInfo(renderInfo);
-    }
-
-    public void setUserAgent(String userAgent) {
-        this.userAgent = userAgent;
     }
 
     protected void openLogger() {
@@ -166,56 +145,41 @@ class EyesConnector extends EyesBase implements IEyesConnector, IBatchCloser {
         getConfigurationInstance().setParentBranchName(parentBranchName);
     }
 
-    public void setDevice(String device) {
-        this.device = device;
-    }
-
-    /**
-     * {@inheritDoc}
-     * <p>
-     * This override also checks for mobile operating system.
-     */
-
-    protected AppEnvironment getAppEnvironment() {
-        AppEnvironment appEnv = super.getAppEnvironment();
-        if (appEnv.getDeviceInfo() == null) {
-            appEnv.setDeviceInfo(device);
-        }
-
-        if (userAgent == null) {
-            appEnv.setOs(VisualGridTask.toPascalCase(browserInfo.getPlatform()));
-            String browserName = BrowserNames.getBrowserName(browserInfo.getBrowserType());
-            appEnv.setHostingApp(browserName);
-        }
-        logger.log("Done!");
-        return appEnv;
-    }
-
-    public RectangleSize getDeviceSize() {
-        return deviceSize;
-    }
-
-    public void setDeviceSize(RectangleSize deviceSize) {
-        this.deviceSize = deviceSize;
+    protected Object getAppEnvironment() {
+        return getJobInfo().getEyesEnvironment();
     }
 
     public RunningSession getSession() {
         return this.runningSession;
     }
 
-    protected RectangleSize getViewportSizeForOpen() {
-        if (device != null) {
-            return deviceSize;
-        } else if (browserInfo.getViewportSize() != null) {
-            return browserInfo.getViewportSize();
-        } else {
-            //this means it's a emulationInfo
-            if (browserInfo.getEmulationInfo() instanceof EmulationDevice) {
-                EmulationDevice emulationDevice = (EmulationDevice) browserInfo.getEmulationInfo();
-                return new RectangleSize(emulationDevice.getWidth(), emulationDevice.getHeight());
-            }
+    @Override
+    public void checkResourceStatus(TaskListener<Boolean[]> listener, String renderId, HashObject... hashes) {
+        getServerConnector().checkResourceStatus(listener, renderId, hashes);
+    }
+
+    @Override
+    public JobInfo getJobInfo() {
+        if (jobInfo != null) {
+            return jobInfo;
         }
-        return super.getViewportSizeForOpen();
+
+        SyncTaskListener<JobInfo[]> listener = new SyncTaskListener<>(logger, String.format("getJobInfo %s", browserInfo));
+        RenderInfo renderInfo = new RenderInfo(browserInfo.getWidth(), browserInfo.getHeight(), null, null,
+                null, browserInfo.getEmulationInfo(), browserInfo.getIosDeviceInfo());
+        RenderRequest renderRequest = new RenderRequest(renderInfo, browserInfo.getPlatform(), browserInfo.getBrowserType());
+        getServerConnector().getJobInfo(listener, new RenderRequest[]{renderRequest});
+        JobInfo[] jobInfos = listener.get();
+        if (jobInfos == null) {
+            throw new EyesException("Failed getting job info");
+        }
+        jobInfo = jobInfos[0];
+        return jobInfo;
+    }
+
+    @Override
+    public String getRenderer() {
+        return getJobInfo().getRenderer();
     }
 
     protected String getBaselineEnvName() {

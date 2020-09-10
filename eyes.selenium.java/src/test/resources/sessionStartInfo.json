@@ -64,5 +64,7 @@
       "maxRightOffset" : 20
     } ]
   },
-  "properties" : null
+  "properties" : null,
+  "agentSessionId" : null,
+  "concurrencyVersion" : 1
 }

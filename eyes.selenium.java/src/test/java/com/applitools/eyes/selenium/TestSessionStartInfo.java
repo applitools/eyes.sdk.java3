@@ -16,6 +16,7 @@ import org.testng.annotations.Test;
 import java.io.IOException;
 import java.util.Calendar;
 import java.util.TimeZone;
+import java.util.UUID;
 
 public class TestSessionStartInfo extends ReportingTestSuite {
 
@@ -23,7 +24,7 @@ public class TestSessionStartInfo extends ReportingTestSuite {
         super.setGroupName("selenium");
     }
 
-    @Test()
+    @Test
     public void TestSessionInfo() {
         Calendar instance = Calendar.getInstance();
         instance.set(2017, Calendar.JULY, 29, 11, 1, 0);
@@ -49,6 +50,8 @@ public class TestSessionStartInfo extends ReportingTestSuite {
                 ims, "some branch",
                 "parent branch",
                 "baseline branch",
+                null,
+                null,
                 null,
                 null);
 

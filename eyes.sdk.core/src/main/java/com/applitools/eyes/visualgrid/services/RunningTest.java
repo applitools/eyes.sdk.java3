@@ -6,9 +6,8 @@ import com.applitools.eyes.IBatchCloser;
 import com.applitools.eyes.Logger;
 import com.applitools.eyes.TestResultContainer;
 import com.applitools.eyes.config.Configuration;
-import com.applitools.eyes.visualgrid.model.RenderBrowserInfo;
 import com.applitools.eyes.config.ConfigurationProvider;
-import com.applitools.eyes.visualgrid.model.RenderingTask;
+import com.applitools.eyes.visualgrid.model.RenderBrowserInfo;
 import com.applitools.eyes.visualgrid.model.VisualGridSelector;
 
 import java.util.*;
@@ -17,6 +16,9 @@ import java.util.concurrent.FutureTask;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 public class RunningTest {
+    // The maximum number of steps which can run in parallel
+    static final int PARALLEL_STEPS_LIMIT = 1;
+
     private final List<VisualGridTask> visualGridTaskList = Collections.synchronizedList(new ArrayList<VisualGridTask>());
     private IRenderingEyes eyes;
     private IEyesConnector eyesConnector;
@@ -58,12 +60,15 @@ public class RunningTest {
 
         @Override
         public void onTaskFailed(Throwable e, VisualGridTask visualGridTask) {
+            synchronized (visualGridTaskList) {
+                visualGridTaskList.remove(visualGridTask);
+            }
             setTestInExceptionMode(e);
             listener.onTaskComplete(visualGridTask, eyes);
         }
 
         @Override
-        public void onRenderComplete(RenderingTask renderingTask, Throwable error) {
+        public void onRenderComplete() {
             logger.verbose("enter");
             listener.onRenderComplete();
             logger.verbose("exit");
@@ -163,6 +168,27 @@ public class RunningTest {
         return isTestOpen.get();
     }
 
+    boolean isCheckTaskReadyForRender(VisualGridTask checkTask) {
+        if (!isTestOpen()) {
+            return false;
+        }
+
+        synchronized (visualGridTaskList) {
+            int notRenderedStepsCount = 0;
+            for (VisualGridTask task : visualGridTaskList) {
+                if (task.equals(checkTask)) {
+                    break;
+                }
+
+                if (!task.isTaskReadyToCheck()) {
+                    notRenderedStepsCount++;
+                }
+            }
+
+            return notRenderedStepsCount < PARALLEL_STEPS_LIMIT;
+        }
+    }
+
     public List<VisualGridTask> getVisualGridTaskList() {
         return visualGridTaskList;
     }
@@ -171,46 +197,49 @@ public class RunningTest {
         if (!this.isTestOpen.get() && taskType == VisualGridTask.TaskType.CHECK) {
             return null;
         }
-        int score = 0;
-        VisualGridTask chosenVisualGridTask;
-        synchronized (this.visualGridTaskList) {
-            for (VisualGridTask visualGridTask : this.visualGridTaskList) {
-                if (visualGridTask.isTaskReadyToCheck() && visualGridTask.getType() == VisualGridTask.TaskType.CHECK) {
-                    score++;
-                }
-            }
 
+        int score = 0;
+        synchronized (this.visualGridTaskList) {
             if (this.visualGridTaskList.isEmpty()) {
                 return null;
             }
 
-            chosenVisualGridTask = this.visualGridTaskList.get(0);
-            if (chosenVisualGridTask.getType() != taskType || chosenVisualGridTask.isSent() || (taskType == VisualGridTask.TaskType.OPEN && !chosenVisualGridTask.isTaskReadyToCheck())) {
+            for (VisualGridTask visualGridTask : this.visualGridTaskList) {
+                if (visualGridTask.wasRenderTaskCreated() && visualGridTask.getType() == VisualGridTask.TaskType.CHECK) {
+                    score++;
+                }
+            }
+
+            VisualGridTask chosenVisualGridTask = this.visualGridTaskList.get(0);
+            if (chosenVisualGridTask.getType() != taskType || chosenVisualGridTask.isSent()) {
                 return null;
             }
+
+            return new ScoreTask(chosenVisualGridTask, score);
         }
-        return new ScoreTask(chosenVisualGridTask, score);
     }
 
     public synchronized FutureTask<TestResultContainer> getNextCloseTask() {
         logger.verbose("enter");
-        if (!visualGridTaskList.isEmpty() && isCloseTaskIssued.get()) {
-            VisualGridTask visualGridTask = visualGridTaskList.get(0);
-            VisualGridTask.TaskType type = visualGridTask.getType();
-            if (type != VisualGridTask.TaskType.CLOSE && type != VisualGridTask.TaskType.ABORT) {
-                return null;
-            }
-            logger.verbose("locking visualGridTaskList");
-            synchronized (visualGridTaskList) {
-                logger.verbose("removing visualGridTask " + visualGridTask.toString() + " and exiting");
-                visualGridTaskList.remove(visualGridTask);
-                logger.verbose("tasks in visualGridTaskList: " + visualGridTaskList.size());
-            }
-            logger.verbose("releasing visualGridTaskList");
-            return taskToFutureMapping.get(visualGridTask);
+        if (visualGridTaskList.isEmpty() || !isCloseTaskIssued.get()) {
+            logger.verbose("exit with null");
+            return null;
         }
-        logger.verbose("exit with null");
-        return null;
+
+        VisualGridTask visualGridTask = visualGridTaskList.get(0);
+        VisualGridTask.TaskType type = visualGridTask.getType();
+        if (type != VisualGridTask.TaskType.CLOSE && type != VisualGridTask.TaskType.ABORT) {
+            return null;
+        }
+
+        logger.verbose("locking visualGridTaskList");
+        synchronized (visualGridTaskList) {
+            logger.verbose("removing visualGridTask " + visualGridTask.toString() + " and exiting");
+            visualGridTaskList.remove(visualGridTask);
+            logger.verbose("tasks in visualGridTaskList: " + visualGridTaskList.size());
+        }
+        logger.verbose("releasing visualGridTaskList");
+        return taskToFutureMapping.get(visualGridTask);
     }
 
     public RenderBrowserInfo getBrowserInfo() {
@@ -308,8 +337,9 @@ public class RunningTest {
      * @return true if the only task left is CLOSE task
      */
     public boolean isTestReadyToClose() {
-
-        if (visualGridTaskList.size() != 1) return false;
+        if (visualGridTaskList.size() != 1) {
+            return false;
+        }
 
         for (VisualGridTask visualGridTask : visualGridTaskList) {
             if (visualGridTask.getType() == VisualGridTask.TaskType.CLOSE || visualGridTask.getType() == VisualGridTask.TaskType.ABORT)
@@ -370,5 +400,9 @@ public class RunningTest {
 
     public void setListener(IRenderingEyes.EyesListener eyesListener) {
         this.listener = eyesListener;
+    }
+
+    public boolean isServerConcurrencyLimitReached() {
+        return eyesConnector.isServerConcurrencyLimitReached();
     }
 }

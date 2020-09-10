@@ -64,7 +64,6 @@ public class TestConfigurationSentCorrectlyToServer extends EnvironmentModifier 
             Configuration conf = new Configuration();
             String testName = "Test - " + (useVisualGrid ? "Visual Grid" : "Selenium");
             conf.setAppName("app").setTestName(testName)
-                    .setHostApp("someHostApp").setHostOS("someHostOs")
                     //.setBaselineBranchName("baseline branch")
                     //.setBaselineEnvName("baseline env")
                     .setEnvironmentName("env name")
@@ -93,20 +92,14 @@ public class TestConfigurationSentCorrectlyToServer extends EnvironmentModifier 
 
         Assert.assertNotNull(sessionResults);
 
-        AppEnvironment env = sessionResults.getEnv();
-        Assert.assertEquals("someHostOs", env.getOs());
-        Assert.assertEquals("someHostApp", env.getHostingApp());
-
         Assert.assertEquals(batchInfo.getSequenceName(), sessionResults.getStartInfo().getBatchInfo().getSequenceName());
-        //Assert.assertEquals("baseline branch", sessionResults.BaselineBranchName);
-        //Assert.assertEquals("baseline env", sessionResults.BaselineEnvId);
 
         Assert.assertNotNull(sessionResults.getActualAppOutput());
         Assert.assertEquals(2, sessionResults.getActualAppOutput().length);
         Assert.assertEquals(MatchLevel.LAYOUT2, sessionResults.getActualAppOutput()[0].getImageMatchSettings().getMatchLevel());
         Assert.assertEquals(MatchLevel.CONTENT, sessionResults.getActualAppOutput()[1].getImageMatchSettings().getMatchLevel());
 
-        TestResultsSummary resultsSummary = runner.getAllTestResults(false);
+        runner.getAllTestResults(false);
         eyes.abortIfNotClosed();
     }
 

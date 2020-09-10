@@ -1,17 +1,23 @@
 ## [vNext]
 ### Added
-- UFG skip list functionality. [Trello 1974](https://trello.com/c/44xq8dze)
 - New DOM scripts features. [Trello 2268](https://trello.com/c/x6ImzMue)
+### Updated
+- Moved `open` to be before `render`. [Trello 2152](https://trello.com/c/yNzhBkBh)
+- Using server concurrency limitations. [Trello 2152](https://trello.com/c/yNzhBkBh)
+- Separated resource collection from the rendering task. [Trello 2152](https://trello.com/c/yNzhBkBh)
+- Removing resource contents after uploading to the server. [Trello 2152](https://trello.com/c/yNzhBkBh)
+- Checking resources status and uploading missing resources before rendering. [Trello 2152](https://trello.com/c/yNzhBkBh)
 ### Fixed
+- Fixed `DeviceSize` class to use `landscape` field. [Trello 2150](https://trello.com/c/8xXBu5Wk)
 - Debug resource writer is now working. [Trello 2310](https://trello.com/c/EOSqNaoG)
 
 ## [3.183.0] - 2020-11-09
-### Updated
-- Supporting iPhone 12 in `IosDeviceName` class. [Trello 2269](https://trello.com/c/yWFy2pRE)
-- Assembling test results. [Trello 2286](https://trello.com/c/pVwVbFr1)
 ### Added
 - Stitch overlap functionality for iOS. [Trello 2138](https://trello.com/c/EI2mxmTD)
 - Implemented full-coverage report event. [Trello 2019](https://trello.com/c/3y4UcfXd)
+### Updated
+- Supporting iPhone 12 in `IosDeviceName` class. [Trello 2269](https://trello.com/c/yWFy2pRE)
+- Assembling test results. [Trello 2286](https://trello.com/c/pVwVbFr1)
 ### Fixed
 - Calling check more than once is now possible on images SDK. [Trello 2288](https://trello.com/c/hnnPOkVf)
 - Unifying urls which are similar (`#` or `?` in the end of the url). [Trello 2299](https://trello.com/c/r13tsIrG)
@@ -52,7 +58,7 @@
 ### Fixed
 - DOM capture now parses CSS correctly. [Trello 2173](https://trello.com/c/ccXQpdKy)
 
-## [3.179.0] - 2020-10-01 
+## [3.179.0] - 2020-10-01
 ### Added
 - New API for setting `deviceInfo`, `hostingAppInfo` and `osInfo` in the configuration. [Trello 2140](https://trello.com/c/vGSi2NFz)
 ### Updated
@@ -238,7 +244,6 @@
 ### Added
 - Disabled SSL verification. Accept all certificates. [Trello 1777](https://trello.com/c/ZNSJZ1cf)
 - Added a script for running basic eyes tests for connectivity packages Jersey1 and Jsboss. [Trello 1782](https://trello.com/c/TA7v4Y4t)
-
 
 ## [3.161.0] - 2020-05-05
 ### Fixed

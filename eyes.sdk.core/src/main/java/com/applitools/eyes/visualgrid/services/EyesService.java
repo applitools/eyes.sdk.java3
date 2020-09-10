@@ -8,13 +8,11 @@ import java.util.concurrent.*;
 
 public class EyesService extends Thread {
 
-    protected final int threadPoolSize;
+    protected final int eyesConcurrency;
     protected ExecutorService executor;
     protected final EyesService.EyesServiceListener listener;
-    private final Object debugLock;
     protected final Tasker tasker;
     protected boolean isServiceOn = true;
-    private boolean isPaused;
 
 
     protected Logger logger;
@@ -35,15 +33,13 @@ public class EyesService extends Thread {
         FutureTask<TestResultContainer> getNextTask(Tasker tasker);
     }
 
-    public EyesService(String serviceName, ThreadGroup servicesGroup, Logger logger, int threadPoolSize, Object debugLock, EyesServiceListener listener, Tasker tasker) {
+    public EyesService(String serviceName, ThreadGroup servicesGroup, Logger logger, int eyesConcurrency, EyesServiceListener listener, Tasker tasker) {
         super(servicesGroup, serviceName);
-        this.threadPoolSize = threadPoolSize;
-        this.executor = new ThreadPoolExecutor(this.threadPoolSize, threadPoolSize, 1, TimeUnit.DAYS, new ArrayBlockingQueue<Runnable>(20));
+        this.eyesConcurrency = eyesConcurrency;
+        this.executor = new ThreadPoolExecutor(this.eyesConcurrency, this.eyesConcurrency, 1, TimeUnit.DAYS, new ArrayBlockingQueue<Runnable>(50));
         this.listener = listener;
         this.logger = logger;
-        this.debugLock = debugLock;
         this.tasker = tasker;
-        this.isPaused = debugLock != null;
 }
 
     @Override
@@ -51,7 +47,6 @@ public class EyesService extends Thread {
         try {
             logger.log("Service '" + this.getName() + "' had started");
             while (isServiceOn) {
-                pauseIfNeeded();
                 runNextTask();
             }
             if (this.executor != null) {
@@ -63,38 +58,14 @@ public class EyesService extends Thread {
         }
     }
 
-    protected void pauseIfNeeded() {
-        if (isPaused) {
-            synchronized (debugLock) {
-                try {
-                    debugLock.wait();
-                    this.isPaused = false;
-                } catch (InterruptedException e) {
-                    GeneralUtils.logExceptionStackTrace(logger, e);
-                }
-            }
-        }
-    }
-
     void runNextTask() {
-        if (!isServiceOn) return;
+        if (!isServiceOn) {
+            return;
+        }
         final FutureTask<TestResultContainer> task = this.listener.getNextTask(tasker);
         if (task != null) {
-            pauseIfNeeded();
             this.executor.submit(task);
         }
-    }
-
-    private void debugNotify() {
-        if (debugLock != null) {
-            synchronized (debugLock) {
-                debugLock.notify();
-            }
-        }
-    }
-
-    public void debugPauseService() {
-        this.isPaused = true;
     }
 
     void stopService() {

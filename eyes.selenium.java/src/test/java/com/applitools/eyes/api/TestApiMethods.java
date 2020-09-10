@@ -30,7 +30,7 @@ public class TestApiMethods extends ReportingTestSuite {
     public void TestCloseAsync(boolean useVisualGrid) {
         WebDriver driver = SeleniumUtils.createChromeDriver();
         EyesRunner runner = useVisualGrid ? new VisualGridRunner(10) : new ClassicRunner();
-        runner.setLogHandler(TestUtils.initLogger());
+        runner.setLogHandler(new StdoutLogHandler());
         Eyes eyes = new Eyes(runner);
         eyes.setBatch(TestDataProvider.batchInfo);
         try {

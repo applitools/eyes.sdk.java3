@@ -287,7 +287,7 @@ public class Eyes extends EyesBase {
      */
     @Override
     protected AppEnvironment getAppEnvironment() {
-        AppEnvironment appEnv = super.getAppEnvironment();
+        AppEnvironment appEnv = (AppEnvironment) super.getAppEnvironment();
         RemoteWebDriver underlyingDriver = driver.getRemoteWebDriver();
         // If hostOs isn't set, we'll try and extract and OS ourselves.
         if (appEnv.getOs() != null) {

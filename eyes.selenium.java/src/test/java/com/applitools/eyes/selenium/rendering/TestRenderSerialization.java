@@ -21,6 +21,8 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.*;
 
+import static org.mockito.Mockito.*;
+
 public class TestRenderSerialization {
 
     @Test
@@ -44,7 +46,8 @@ public class TestRenderSerialization {
         Map<String, RGridResource> resources = new HashMap<>();
         String platform = "android";
         BrowserType browserName = BrowserType.IE_10;
-        VisualGridTask task = new VisualGridTask(VisualGridTask.TaskType.OPEN, null, null);
+        VisualGridTask task = spy(new VisualGridTask(VisualGridTask.TaskType.OPEN, null, null));
+        doReturn("rendererId").when(task).getRenderer();
         RenderRequest request = new RenderRequest(webHook.toString(), url.toString(), dom, resources, renderInfo, platform,
                 browserName, null, selectorsToFindRegionsFor, true, task, stitchingServiceUrl.toString(), options);
 

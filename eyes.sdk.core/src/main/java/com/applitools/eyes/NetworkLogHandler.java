@@ -7,13 +7,11 @@ import com.applitools.eyes.logging.ClientEvent;
 import com.applitools.eyes.logging.LogSessionsClientEvents;
 import com.applitools.eyes.logging.TraceLevel;
 import com.applitools.utils.ArgumentGuard;
-import com.applitools.utils.EyesSyncObject;
 import com.applitools.utils.GeneralUtils;
 import org.apache.http.HttpStatus;
 
 import java.util.Calendar;
 import java.util.TimeZone;
-import java.util.concurrent.atomic.AtomicReference;
 
 public class NetworkLogHandler extends LogHandler {
 
@@ -63,8 +61,7 @@ public class NetworkLogHandler extends LogHandler {
                 return;
             }
 
-            AtomicReference<EyesSyncObject> lock = new AtomicReference<>(new EyesSyncObject(null, "sendLogs"));
-            final SyncTaskListener<Void> listener = new SyncTaskListener<>(lock);
+            final SyncTaskListener<Void> listener = new SyncTaskListener<>(null, "sendLogs");
             serverConnector.sendLogs(new AsyncRequestCallback() {
                 @Override
                 public void onComplete(Response response) {
@@ -81,14 +78,8 @@ public class NetworkLogHandler extends LogHandler {
                 }
             }, clientEvents);
 
-            synchronized (lock.get()) {
-                try {
-                    lock.get().waitForNotify();
-                } catch (InterruptedException ignored) {
-                }
-            }
-
-            clientEvents.clear();
+           listener.get();
+           clientEvents.clear();
         }
     }
 

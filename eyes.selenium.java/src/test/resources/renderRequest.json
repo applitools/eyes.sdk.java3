@@ -33,6 +33,7 @@
   "options": {
     "key": "value"
   },
+  "renderer": "rendererId",
   "platform": {
     "name": "android"
   },

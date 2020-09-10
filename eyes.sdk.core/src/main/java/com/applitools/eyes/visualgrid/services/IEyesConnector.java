@@ -33,7 +33,7 @@ public interface IEyesConnector {
 
     RenderingInfo getRenderingInfo();
 
-    Future<?> renderPutResource(RunningRender runningRender, RGridResource resource, String userAgent, TaskListener<Boolean> listener);
+    Future<?> renderPutResource(String renderId, RGridResource resource, TaskListener<Void> listener);
 
     List<RunningRender> render(RenderRequest... renderRequests);
 
@@ -47,8 +47,6 @@ public interface IEyesConnector {
 
     Configuration setBatch(BatchInfo batchInfo);
 
-    void setUserAgent(String userAgent);
-
     String getApiKey();
 
     Configuration setApiKey(String apiKey);
@@ -56,12 +54,6 @@ public interface IEyesConnector {
     void setBranchName(String branchName);
 
     void setParentBranchName(String parentBranchName);
-
-    void setDevice(String device);
-
-    RectangleSize getDeviceSize();
-
-    void setDeviceSize(RectangleSize deviceSize);
 
     RunningSession getSession();
 
@@ -74,4 +66,12 @@ public interface IEyesConnector {
     Map<String, String> getUserAgents();
 
     ServerConnector getServerConnector();
+
+    boolean isServerConcurrencyLimitReached();
+
+    void checkResourceStatus(final TaskListener<Boolean[]> listener, String renderId, HashObject... hashes);
+
+    JobInfo getJobInfo();
+
+    String getRenderer();
 }

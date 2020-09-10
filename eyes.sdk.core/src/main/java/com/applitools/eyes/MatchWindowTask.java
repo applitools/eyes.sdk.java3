@@ -9,7 +9,6 @@ import com.applitools.eyes.visualgrid.model.IGetFloatingRegionOffsets;
 import com.applitools.eyes.visualgrid.model.MutableRegion;
 import com.applitools.eyes.visualgrid.model.VisualGridSelector;
 import com.applitools.utils.ArgumentGuard;
-import com.applitools.utils.EyesSyncObject;
 import com.applitools.utils.GeneralUtils;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -19,7 +18,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicReference;
 
 public class MatchWindowTask {
 
@@ -134,24 +132,16 @@ public class MatchWindowTask {
             }
         }
 
-        final AtomicReference<MatchResult> matchResult = new AtomicReference<>();
-        final AtomicReference<EyesSyncObject> lock = new AtomicReference<>(new EyesSyncObject(logger, "preformMatch"));
-        TaskListener<MatchResult> listener = new SyncTaskListener<>(lock, matchResult);
+        SyncTaskListener<MatchResult> listener = new SyncTaskListener<>(logger, String.format("performMatch %s", runningSession));
         performMatch(listener, userInputs, appOutput, tag, replaceLast, imageMatchSettings, agentSetupStr, renderId, source);
-        synchronized (lock.get()) {
-            try {
-                lock.get().waitForNotify();
-            } catch (InterruptedException e) {
-                throw new EyesException("Failed waiting for perform match", e);
-            }
-        }
-        if (matchResult.get() == null) {
+        MatchResult result = listener.get();
+        if (result == null) {
             throw new EyesException("Failed performing match with the server");
         }
 
         eyes.getLogger().log(String.format("Finished perform match. Render ID: %s", renderId));
         eyes.getLogger().verbose("exit");
-        return matchResult.get();
+        return result;
     }
 
     private void performMatch(final TaskListener<MatchResult> listener, List<Trigger> userInputs,
@@ -175,7 +165,13 @@ public class MatchWindowTask {
                     onFail();
                     return;
                 }
-                serverConnector.matchWindow(listener, runningSession, data);
+
+                try {
+                    serverConnector.matchWindow(listener, runningSession, data);
+                } catch (Throwable t) {
+                    GeneralUtils.logExceptionStackTrace(logger, t);
+                    onFail();
+                }
             }
 
             @Override
@@ -210,18 +206,9 @@ public class MatchWindowTask {
     }
 
     public String tryUploadData(final byte[] bytes, final String contentType, final String mediaType) {
-        final AtomicReference<String> reference = new AtomicReference<>();
-        final AtomicReference<EyesSyncObject> lock = new AtomicReference<>(new EyesSyncObject(logger, "tryUploadData"));
-        serverConnector.uploadData(new SyncTaskListener<>(lock, reference), bytes, contentType, mediaType);
-        synchronized (lock.get()) {
-            try {
-                lock.get().waitForNotify();
-            } catch (InterruptedException e) {
-                throw new EyesException("Failed waiting for upload", e);
-            }
-        }
-
-        return reference.get();
+        SyncTaskListener<String> listener = new SyncTaskListener<>(logger, String.format("tryUploadData %s", runningSession));
+        serverConnector.uploadData(listener, bytes, contentType, mediaType);
+        return listener.get();
     }
 
     public static void collectRegions(EyesBase eyes, EyesScreenshot screenshot,

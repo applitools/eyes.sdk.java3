@@ -12,17 +12,16 @@ import java.util.List;
 import java.util.Map;
 
 public class RenderRequest {
-
     @JsonInclude
     private String renderId;
 
     @JsonIgnore
-    private final VisualGridTask visualGridTask;
+    private VisualGridTask checkTask;
 
-    @JsonInclude
+    @JsonInclude(JsonInclude.Include.NON_NULL)
     private String agentId;
 
-    @JsonInclude
+    @JsonInclude(JsonInclude.Include.NON_NULL)
     private String stitchingService;
 
     @JsonInclude(JsonInclude.Include.NON_NULL)
@@ -52,32 +51,45 @@ public class RenderRequest {
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private List<VisualGridSelector> selectorsToFindRegionsFor;
 
-    @JsonInclude(JsonInclude.Include.NON_NULL)
-    private boolean sendDom;
+    @JsonInclude
+    private boolean sendDom = false;
 
     @JsonInclude(JsonInclude.Include.NON_NULL)
-    private final Map<String, Object> options;
+    private Map<String, Object> options;
+
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    private String renderer;
 
     public RenderRequest(String webHook, String url, RGridDom dom, Map<String, RGridResource> resources, RenderInfo renderInfo,
                          String platform, BrowserType browserName, Object scriptHooks, List<VisualGridSelector> selectorsToFindRegionsFor,
-                         boolean sendDom, VisualGridTask visualGridTask, String stitchingService, List<VisualGridOption> visualGridOptions) {
+                         boolean sendDom, VisualGridTask checkTask, String stitchingService, List<VisualGridOption> visualGridOptions) {
         this.webhook = webHook;
         this.url = url;
         this.dom = dom;
         this.resources = resources;
         this.renderInfo = renderInfo;
+        this.renderer = checkTask.getRenderer();
         this.platform = platform;
         this.browserName = browserName;
         this.scriptHooks = scriptHooks;
         this.selectorsToFindRegionsFor = selectorsToFindRegionsFor;
         this.sendDom = sendDom;
-        this.visualGridTask = visualGridTask;
+        this.checkTask = checkTask;
         this.stitchingService = stitchingService;
         this.agentId = "eyes.selenium.visualgrid.java/" + ClassVersionGetter.CURRENT_VERSION;
         this.options = new HashMap<>();
         for (VisualGridOption option : visualGridOptions) {
             this.options.put(option.getKey(), option.getValue());
         }
+    }
+
+    /**
+     * A smaller constructor for creating a request for job-info
+     */
+    public RenderRequest(RenderInfo renderInfo, String platform, BrowserType browserName) {
+        this.renderInfo = renderInfo;
+        this.platform = platform;
+        this.browserName = browserName;
     }
 
     public String getUrl() {
@@ -164,8 +176,8 @@ public class RenderRequest {
         return map;
     }
 
-    public VisualGridTask getVisualGridTask() {
-        return visualGridTask;
+    public VisualGridTask getCheckTask() {
+        return checkTask;
     }
 
     public String getWebhook() {
@@ -200,7 +212,7 @@ public class RenderRequest {
     public String toString() {
         return "RenderRequest{" +
                 "renderId='" + renderId + '\'' +
-                ", visualGridTask=" + visualGridTask +
+                ", visualGridTask=" + checkTask +
                 ", agentId='" + agentId + '\'' +
                 ", webhook='" + webhook + '\'' +
                 ", url='" + url + '\'' +
@@ -214,5 +226,9 @@ public class RenderRequest {
                 ", sendDom=" + sendDom +
                 ", options=" + options +
                 '}';
+    }
+
+    public String getRenderer() {
+        return renderer;
     }
 }

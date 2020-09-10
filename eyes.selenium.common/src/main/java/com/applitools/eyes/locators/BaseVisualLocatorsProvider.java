@@ -7,14 +7,12 @@ import com.applitools.eyes.Region;
 import com.applitools.eyes.SyncTaskListener;
 import com.applitools.eyes.debug.DebugScreenshotsProvider;
 import com.applitools.utils.ArgumentGuard;
-import com.applitools.utils.EyesSyncObject;
 import com.applitools.utils.ImageUtils;
 
 import java.awt.image.BufferedImage;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.atomic.AtomicReference;
 
 public abstract class BaseVisualLocatorsProvider implements VisualLocatorsProvider {
 
@@ -47,17 +45,9 @@ public abstract class BaseVisualLocatorsProvider implements VisualLocatorsProvid
         byte[] image = ImageUtils.encodeAsPng(viewPortScreenshot);
 
         logger.verbose("Post visual locators screenshot...");
-        final AtomicReference<EyesSyncObject> lock = new AtomicReference<>(new EyesSyncObject(logger, "getLocators"));
-        final AtomicReference<String> urlReference = new AtomicReference<>();
-        serverConnector.uploadImage(new SyncTaskListener<>(lock, urlReference), image);
-        synchronized (lock.get()) {
-            try {
-                lock.get().waitForNotify();
-            } catch (InterruptedException e) {
-                throw new EyesException("Failed waiting for close batch", e);
-            }
-        }
-        String viewportScreenshotUrl = urlReference.get();
+        SyncTaskListener<String> listener = new SyncTaskListener<>(logger, "getLocators");
+        serverConnector.uploadImage(listener, image);
+        String viewportScreenshotUrl = listener.get();
         if (viewportScreenshotUrl == null) {
             throw new EyesException("Failed posting viewport image");
         }
@@ -67,22 +57,14 @@ public abstract class BaseVisualLocatorsProvider implements VisualLocatorsProvid
         VisualLocatorsData data = new VisualLocatorsData(appName, viewportScreenshotUrl, visualLocatorSettings.isFirstOnly(), visualLocatorSettings.getNames());
         logger.verbose("Post visual locators: " + data.toString());
 
-        final AtomicReference<Map<String, List<Region>>> reference = new AtomicReference<>();
-        final AtomicReference<EyesSyncObject> lockObject = new AtomicReference<>(new EyesSyncObject(logger, "getLocators"));
-        serverConnector.postLocators(new SyncTaskListener<>(lockObject, reference), data);
-        synchronized (lockObject.get()) {
-            try {
-                lockObject.get().waitForNotify();
-            } catch (InterruptedException e) {
-                throw new EyesException("Failed waiting for close batch", e);
-            }
-        }
-
-        if (reference.get() == null) {
+        SyncTaskListener<Map<String, List<Region>>> postListener = new SyncTaskListener<>(logger, "getLocators");
+        serverConnector.postLocators(postListener, data);
+        Map<String, List<Region>> result = postListener.get();
+        if (result == null) {
             throw new EyesException("Failed posting locators");
         }
 
-        return reference.get();
+        return result;
     }
 
     protected abstract BufferedImage getViewPortScreenshot();

@@ -1730,8 +1730,8 @@ public class SeleniumEyes extends EyesBase implements ISeleniumEyes, IBatchClose
      * This override also checks for mobile operating system.
      */
     @Override
-    protected AppEnvironment getAppEnvironment() {
-        AppEnvironment appEnv = super.getAppEnvironment();
+    protected Object getAppEnvironment() {
+        AppEnvironment appEnv = (AppEnvironment) super.getAppEnvironment();
         RemoteWebDriver underlyingDriver = driver.getRemoteWebDriver();
         // If hostOs isn't set, we'll try and extract and OS ourselves.
         if (appEnv.getOs() == null) {

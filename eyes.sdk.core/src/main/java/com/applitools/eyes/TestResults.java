@@ -2,7 +2,6 @@ package com.applitools.eyes;
 
 import com.applitools.connectivity.ServerConnector;
 import com.applitools.utils.ArgumentGuard;
-import com.applitools.utils.EyesSyncObject;
 import com.applitools.utils.Iso8610CalendarDeserializer;
 import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
@@ -10,12 +9,10 @@ import com.fasterxml.jackson.annotation.JsonSetter;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 
 import java.util.Calendar;
-import java.util.concurrent.atomic.AtomicReference;
 
 /**
  * Eyes test results.
  */
-@SuppressWarnings("WeakerAccess")
 @JsonIgnoreProperties({"$id", "isPassed"})
 public class TestResults {
     private int steps;
@@ -403,7 +400,7 @@ public class TestResults {
     /**
      * @param status The new test result status.
      */
-    void setStatus(TestResultsStatus status) {
+    public void setStatus(TestResultsStatus status) {
         this.status = status;
     }
 
@@ -421,17 +418,13 @@ public class TestResults {
     }
 
     public void delete() {
-        final AtomicReference<EyesSyncObject> lock = new AtomicReference<>(new EyesSyncObject(new Logger(), "delete"));
         if (serverConnector == null) {
             return;
         }
 
-        serverConnector.deleteSession(new SyncTaskListener<Void>(lock), this);
-        synchronized (lock.get()) {
-            try {
-                lock.get().waitForNotify();
-            } catch (InterruptedException ignored) {}
-        }
+        SyncTaskListener<Void> listener = new SyncTaskListener<Void>(new Logger(), "delete");
+        serverConnector.deleteSession(listener, this);
+        listener.get();
     }
 
     @Override

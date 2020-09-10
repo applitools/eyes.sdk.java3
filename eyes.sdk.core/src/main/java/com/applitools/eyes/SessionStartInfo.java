@@ -3,8 +3,8 @@
  */
 package com.applitools.eyes;
 
-import com.applitools.eyes.config.Configuration;
 import com.applitools.utils.ArgumentGuard;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonRootName;
 
 import java.util.List;
@@ -17,7 +17,6 @@ import java.util.List;
  * We name the root value "startInfo" since this is a requirement of
  * the agent's web API.
  */
-@SuppressWarnings("UnusedDeclaration")
 @JsonRootName(value = "startInfo")
 public class SessionStartInfo {
     private String agentId;
@@ -28,23 +27,26 @@ public class SessionStartInfo {
     private BatchInfo batchInfo;
     private String baselineEnvName;
     private String environmentName;
-    private AppEnvironment environment;
+    private Object environment;
     private String branchName;
     private String parentBranchName;
     private String baselineBranchName;
     private Boolean saveDiffs;
     private ImageMatchSettings defaultMatchSettings;
     private List<PropertyData> properties;
+    private String agentSessionId;
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    private Integer timeout;
+    private final int concurrencyVersion = 1;
 
     public SessionStartInfo(String agentId, SessionType sessionType,
                             String appIdOrName, String verId,
                             String scenarioIdOrName, BatchInfo batchInfo,
                             String baselineEnvName, String environmentName,
-                            AppEnvironment environment,
+                            Object environment,
                             ImageMatchSettings defaultMatchSettings,
                             String branchName, String parentBranchName, String baselineBranchName,
-                            Boolean saveDiffs,
-                            List<PropertyData> properties) {
+                            Boolean saveDiffs, List<PropertyData> properties, String agentSessionId, Integer timeout) {
         ArgumentGuard.notNullOrEmpty(agentId, "agentId");
         ArgumentGuard.notNullOrEmpty(appIdOrName, "appIdOrName");
         ArgumentGuard.notNullOrEmpty(scenarioIdOrName, "scenarioIdOrName");
@@ -66,34 +68,8 @@ public class SessionStartInfo {
         this.baselineBranchName = baselineBranchName;
         this.saveDiffs = saveDiffs;
         this.properties = properties;
-    }
-
-
-    public SessionStartInfo(Configuration config,
-                            String agentId,
-                            String verId,
-                            AppEnvironment environment,
-                            ImageMatchSettings defaultMatchSettings,
-                            List<PropertyData> properties) {
-        ArgumentGuard.notNull(config, "config");
-        ArgumentGuard.notNullOrEmpty(agentId, "agentId");
-        ArgumentGuard.notNull(environment, "environment");
-        ArgumentGuard.notNull(defaultMatchSettings, "defaultMatchSettings");
-        this.agentId = agentId;
-        this.sessionType = config.getSessionType();
-        this.appIdOrName = config.getAppName();
-        this.verId = verId;
-        this.scenarioIdOrName = config.getTestName();
-        this.batchInfo = config.getBatch();
-        this.baselineEnvName = config.getBaselineEnvName();
-        this.environmentName = config.getEnvironmentName();
-        this.environment = environment;
-        this.defaultMatchSettings = defaultMatchSettings;
-        this.branchName = config.getBranchName();
-        this.parentBranchName = config.getParentBranchName();
-        this.baselineBranchName = config.getBaselineBranchName();
-        this.saveDiffs = config.getSaveDiffs();
-        this.properties = properties;
+        this.agentSessionId = agentSessionId;
+        this.timeout = timeout;
     }
 
     public SessionStartInfo() {}
@@ -130,7 +106,7 @@ public class SessionStartInfo {
         return environmentName;
     }
 
-    public AppEnvironment getEnvironment() {
+    public Object getEnvironment() {
         return environment;
     }
 
@@ -156,5 +132,41 @@ public class SessionStartInfo {
 
     public List<PropertyData> getProperties() {
         return properties;
+    }
+
+    public String getAgentSessionId() {
+        return agentSessionId;
+    }
+
+    public int getConcurrencyVersion() {
+        return concurrencyVersion;
+    }
+
+    public Integer getTimeout() {
+        return timeout;
+    }
+
+    @Override
+    public String toString() {
+        return "SessionStartInfo{" +
+                "agentId='" + agentId + '\'' +
+                ", sessionType=" + sessionType +
+                ", appIdOrName='" + appIdOrName + '\'' +
+                ", verId='" + verId + '\'' +
+                ", scenarioIdOrName='" + scenarioIdOrName + '\'' +
+                ", batchInfo=" + batchInfo +
+                ", baselineEnvName='" + baselineEnvName + '\'' +
+                ", environmentName='" + environmentName + '\'' +
+                ", environment=" + environment +
+                ", branchName='" + branchName + '\'' +
+                ", parentBranchName='" + parentBranchName + '\'' +
+                ", baselineBranchName='" + baselineBranchName + '\'' +
+                ", saveDiffs=" + saveDiffs +
+                ", defaultMatchSettings=" + defaultMatchSettings +
+                ", properties=" + properties +
+                ", agentSessionId='" + agentSessionId + '\'' +
+                ", timeout=" + timeout +
+                ", concurrencyVersion=" + concurrencyVersion +
+                '}';
     }
 }

@@ -2,21 +2,20 @@ package com.applitools.eyes.visualgrid.services;
 
 import com.applitools.ICheckSettings;
 import com.applitools.ICheckSettingsInternal;
-import com.applitools.connectivity.ServerConnector;
 import com.applitools.eyes.*;
 import com.applitools.eyes.config.Configuration;
 import com.applitools.eyes.exceptions.DiffsFoundException;
-import com.applitools.eyes.visualgrid.model.*;
-import com.applitools.utils.ArgumentGuard;
+import com.applitools.eyes.visualgrid.model.RenderBrowserInfo;
+import com.applitools.eyes.visualgrid.model.RenderStatusResults;
+import com.applitools.eyes.visualgrid.model.VGRegion;
+import com.applitools.eyes.visualgrid.model.VisualGridSelector;
 import com.applitools.utils.GeneralUtils;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.Callable;
-import java.util.concurrent.atomic.AtomicBoolean;
 
-public class VisualGridTask implements Callable<TestResultContainer>, CompletableTask {
+public class VisualGridTask implements Callable<TestResultContainer> {
 
 
     private final Logger logger;
@@ -38,10 +37,10 @@ public class VisualGridTask implements Callable<TestResultContainer>, Completabl
 
     private final RunningTest runningTest;
     private Throwable exception;
-    private RenderingTask renderingTask = null;
-    private final AtomicBoolean isTaskComplete = new AtomicBoolean(false);
 
     private final List<VisualGridSelector[]> regionSelectors;
+
+    private boolean wasRenderTaskCreated = false;
 
     interface VGTaskListener {
 
@@ -49,7 +48,7 @@ public class VisualGridTask implements Callable<TestResultContainer>, Completabl
 
         void onTaskFailed(Throwable e, VisualGridTask visualGridTask);
 
-        void onRenderComplete(RenderingTask renderTask, Throwable e);
+        void onRenderComplete();
 
     }
 
@@ -103,17 +102,6 @@ public class VisualGridTask implements Callable<TestResultContainer>, Completabl
             switch (type) {
                 case OPEN:
                     logger.verbose("VisualGridTask.run opening task");
-                    if (renderResult != null) {
-                        String userAgent = renderResult.getUserAgent();
-                        RectangleSize deviceSize = renderResult.getDeviceSize();
-                        eyesConnector.setUserAgent(userAgent);
-                        eyesConnector.setDeviceSize(deviceSize);
-                    } else {
-                        // We are in exception mode - trying to do eyes.open() without first render
-                        RenderBrowserInfo browserInfo = runningTest.getBrowserInfo();
-                        //eyesConnector.setUserAgent(craftUserAgent(browserInfo));
-                        eyesConnector.setDeviceSize(browserInfo.getViewportSize());
-                    }
                     eyesConnector.open(configuration, runningTest.getAppName(), runningTest.getTestName());
                     logger.verbose("Eyes Open Done.");
                     break;
@@ -170,13 +158,14 @@ public class VisualGridTask implements Callable<TestResultContainer>, Completabl
 
                 case ABORT:
                     logger.verbose("VisualGridTask.run abort task");
-                    testResults = eyesConnector.abortIfNotClosed();
+                    if (runningTest.isTestOpen()) {
+                        testResults = eyesConnector.abortIfNotClosed();
+                    }
                     logger.verbose("Closing a not opened test");
             }
 
             TestResultContainer testResultContainer = new TestResultContainer(testResults, runningTest.getBrowserInfo(), this.exception);
             notifySuccessAllListeners();
-            this.isTaskComplete.set(true);
             return testResultContainer;
         } catch (Throwable e) {
             GeneralUtils.logExceptionStackTrace(logger, e);
@@ -184,11 +173,6 @@ public class VisualGridTask implements Callable<TestResultContainer>, Completabl
             notifyFailureAllListeners(new Error(e));
         }
         return null;
-    }
-
-    public static String toPascalCase(String str) {
-        ArgumentGuard.notNullOrEmpty(str, "str");
-        return str.substring(0, 1).toUpperCase() + str.substring(1).toLowerCase();
     }
 
     private void notifySuccessAllListeners() {
@@ -205,7 +189,7 @@ public class VisualGridTask implements Callable<TestResultContainer>, Completabl
 
     private void notifyRenderCompleteAllListeners() {
         for (VGTaskListener listener : listeners) {
-            listener.onRenderComplete(this.renderingTask, exception);
+            listener.onRenderComplete();
         }
     }
 
@@ -228,76 +212,17 @@ public class VisualGridTask implements Callable<TestResultContainer>, Completabl
         return runningTest;
     }
 
-    public boolean getIsTaskComplete() {
-        return isTaskComplete.get();
-    }
-
     public void addListener(VGTaskListener listener) {
         this.listeners.add(listener);
     }
 
-    public void setRenderError(String renderId, String error, RenderRequest renderRequest) {
+    public void setRenderError(String renderId, String error) {
         logger.verbose("enter - renderId: " + renderId);
-
-        RenderStatusResults renderResult = new RenderStatusResults();
-        String userAgent = getUserAgent(renderRequest);
-        if (userAgent != null) {
-            renderResult.setUserAgent(userAgent);
-        }
-        RectangleSize deviceSize = getCorrectDeviceSize(renderRequest);
-        renderResult.setDeviceSize(deviceSize);
-        logger.verbose("device size: " + deviceSize);
         for (VGTaskListener listener : listeners) {
             exception = new InstantiationError("Render Failed for " + this.getBrowserInfo() + " (renderId: " + renderId + ") with reason: " + error);
             listener.onTaskFailed(exception, this);
         }
-
-        this.renderResult = renderResult;
         logger.verbose("exit - renderId: " + renderId);
-    }
-
-    private String getUserAgent(RenderRequest renderRequest) {
-        if (renderRequest.getRenderInfo().getEmulationInfo() != null || renderRequest.getRenderInfo().getIosDeviceInfo() != null) {
-            return null;
-        }
-
-        String browser = renderRequest.getBrowserName().getName();
-        Map<String, String> userAgents = eyesConnector.getUserAgents();
-        if (!userAgents.containsKey(browser)) {
-            logger.verbose(String.format("could not find browser %s in list", browser));
-            return null;
-        }
-
-        return userAgents.get(browser);
-    }
-
-    private RectangleSize getCorrectDeviceSize(RenderRequest renderRequest) {
-        IosDeviceInfo iosDeviceInfo = renderRequest.getRenderInfo().getIosDeviceInfo();
-        EmulationBaseInfo emulationBaseInfo = renderRequest.getRenderInfo().getEmulationInfo();
-        if (iosDeviceInfo == null && emulationBaseInfo == null) {
-            return configuration.getViewportSize();
-        }
-
-        if (emulationBaseInfo != null) {
-            return getDeviceSizeFromServer(emulationBaseInfo.getDeviceName(), emulationBaseInfo.getScreenOrientation(),
-                    ServerConnector.EMULATED_DEVICES_PATH);
-        }
-
-        return getDeviceSizeFromServer(iosDeviceInfo.getDeviceName(), iosDeviceInfo.getScreenOrientation(),
-                ServerConnector.IOS_DEVICES_PATH);
-    }
-
-    private RectangleSize getDeviceSizeFromServer(String deviceName, ScreenOrientation screenOrientation, String path) {
-        Map<String, DeviceSize> devicesSizes = eyesConnector.getDevicesSizes(path);
-        if (!devicesSizes.containsKey(deviceName)) {
-            logger.verbose(String.format("could not find device %s in list", deviceName));
-        }
-
-        if (screenOrientation.equals(ScreenOrientation.PORTRAIT)){
-            return devicesSizes.get(deviceName).getPortrait();
-        }
-
-        return devicesSizes.get(deviceName).getLandscapeLeft();
     }
 
     public Throwable getException() {
@@ -322,13 +247,23 @@ public class VisualGridTask implements Callable<TestResultContainer>, Completabl
         return "VisualGridTask - Type: " + type + " ; Browser Info: " + getBrowserInfo();
     }
 
-    public void setRenderingTask(RenderingTask renderingTask) {
-        this.renderingTask = renderingTask;
-    }
-
     public RunningSession getSession() {
         return this.eyesConnector.getSession();
     }
 
-}
+    public boolean wasRenderTaskCreated() {
+        return wasRenderTaskCreated;
+    }
 
+    public void setRenderTaskCreated() {
+        wasRenderTaskCreated = true;
+    }
+
+    public boolean isReadyForRender() {
+        return runningTest.isCheckTaskReadyForRender(this);
+    }
+
+    public String getRenderer() {
+        return eyesConnector.getRenderer();
+    }
+}

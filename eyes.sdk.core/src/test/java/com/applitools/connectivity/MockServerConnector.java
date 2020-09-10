@@ -3,7 +3,9 @@ package com.applitools.connectivity;
 import com.applitools.eyes.*;
 import com.applitools.eyes.visualgrid.model.*;
 
+import java.net.URI;
 import java.util.*;
+import java.util.concurrent.Future;
 
 public class MockServerConnector extends ServerConnector {
 
@@ -24,7 +26,9 @@ public class MockServerConnector extends ServerConnector {
     @Override
     public void stopSession(final TaskListener<TestResults> listener, RunningSession runningSession, boolean isAborted, boolean save) {
         logger.log(String.format("ending session: %s", runningSession.getSessionId()));
-        listener.onComplete(new TestResults());
+        TestResults testResults = new TestResults();
+        testResults.setStatus(TestResultsStatus.Passed);
+        listener.onComplete(testResults);
     }
 
     @Override
@@ -40,10 +44,16 @@ public class MockServerConnector extends ServerConnector {
     @Override
     public void render(final TaskListener<List<RunningRender>> listener, RenderRequest... renderRequests) {
         this.renderRequests.addAll(Arrays.asList(renderRequests));
-        final RunningRender runningRender = new RunningRender();
-        runningRender.setRenderId(UUID.randomUUID().toString());
-        runningRender.setRenderStatus(RenderStatus.RENDERED);
-        listener.onComplete(Collections.singletonList(runningRender));
+
+        List<RunningRender> runningRenders = new ArrayList<>();
+        for (int i = 0; i < renderRequests.length; i++) {
+            final RunningRender runningRender = new RunningRender();
+            runningRender.setRenderId(UUID.randomUUID().toString());
+            runningRender.setRenderStatus(RenderStatus.RENDERED);
+            runningRenders.add(runningRender);
+        }
+
+        listener.onComplete(runningRenders);
     }
 
     @Override
@@ -51,6 +61,8 @@ public class MockServerConnector extends ServerConnector {
         final RenderStatusResults renderStatusResults = new RenderStatusResults();
         renderStatusResults.setRenderId(renderIds[0]);
         renderStatusResults.setStatus(RenderStatus.RENDERED);
+        renderStatusResults.setDomLocation("https://dom.com");
+        renderStatusResults.setImageLocation("https://image.com");
         listener.onComplete(Collections.singletonList(renderStatusResults));
     }
 
@@ -72,6 +84,25 @@ public class MockServerConnector extends ServerConnector {
     }
 
     @Override
+    public void checkResourceStatus(final TaskListener<Boolean[]> listener, String renderId, HashObject... hashes) {
+        listener.onComplete(new Boolean[0]);
+    }
+
+    @Override
+    public Future<?> renderPutResource(final String renderID, final RGridResource resource,
+                                       final TaskListener<Void> listener) {
+        listener.onComplete(null);
+        return null;
+    }
+
+    @Override
+    public Future<?> downloadResource(final URI url, final String userAgent, final String refererUrl,
+                                      final TaskListener<RGridResource> listener) {
+        listener.onComplete(RGridResource.createEmpty(url.toString()));
+        return null;
+    }
+
+    @Override
     public Map<String, DeviceSize> getDevicesSizes(String path)
     {
         return new HashMap<>();
@@ -81,5 +112,10 @@ public class MockServerConnector extends ServerConnector {
     public Map<String, String> getUserAgents()
     {
         return new HashMap<>();
+    }
+
+    @Override
+    public void getJobInfo(TaskListener<JobInfo[]> listener, RenderRequest[] browserInfos) {
+        listener.onComplete(new JobInfo[]{new JobInfo()});
     }
 }

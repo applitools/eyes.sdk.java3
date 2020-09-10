@@ -45,6 +45,7 @@ public class Configuration implements IConfiguration {
     private AccessibilitySettings accessibilitySettings = null;
     private boolean enablePatterns;
     private boolean useDom;
+    private Integer abortIdleTestTimeout;
 
     private Boolean forceFullPageScreenshot;
     private int waitBeforeScreenshots = DEFAULT_WAIT_BEFORE_SCREENSHOTS;
@@ -90,6 +91,7 @@ public class Configuration implements IConfiguration {
         this.isSendDom = other.isSendDom();
         this.apiKey = other.getApiKey();
         this.useDom = other.getUseDom();
+        this.abortIdleTestTimeout = other.getAbortIdleTestTimeout();
         this.enablePatterns = other.getEnablePatterns();
         URI serverUrl = other.getServerUrl();
         if (serverUrl != null) {
@@ -415,7 +417,7 @@ public class Configuration implements IConfiguration {
     @Override
     public boolean getIgnoreCaret() {
         Boolean ignoreCaret = getDefaultMatchSettings().getIgnoreCaret();
-        return ignoreCaret == null ? true : ignoreCaret;
+        return ignoreCaret == null || ignoreCaret;
     }
 
     /**
@@ -766,5 +768,13 @@ public class Configuration implements IConfiguration {
 
     public void setDebugResourceWriter(IDebugResourceWriter debugResourceWriter) {
         this.debugResourceWriter = debugResourceWriter;
+    }
+
+    public Integer getAbortIdleTestTimeout() {
+        return abortIdleTestTimeout;
+    }
+
+    public void setAbortIdleTestTimeout(Integer abortIdleTestTimeout) {
+        this.abortIdleTestTimeout = abortIdleTestTimeout;
     }
 }

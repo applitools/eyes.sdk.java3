@@ -10,6 +10,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
  */
 @JsonIgnoreProperties({"isNewSession", "$id", "steps"})
 public class RunningSession {
+    private boolean isConcurrencyFull;
     private Boolean isNew;
     private String id;
     private String url;
@@ -18,6 +19,7 @@ public class RunningSession {
     private String sessionId;
 
     public RunningSession() {
+        isConcurrencyFull = false;
     }
 
     public Boolean getIsNew() {
@@ -66,5 +68,25 @@ public class RunningSession {
 
     public void setSessionId(String sessionId) {
         this.sessionId = sessionId;
+    }
+
+    public boolean isConcurrencyFull() {
+        return isConcurrencyFull;
+    }
+
+    public void setConcurrencyFull(boolean concurrencyFull) {
+        isConcurrencyFull = concurrencyFull;
+    }
+
+    @Override
+    public String toString() {
+        return "RunningSession{" +
+                "isNew=" + isNew +
+                ", id='" + id + '\'' +
+                ", url='" + url + '\'' +
+                ", baselineId='" + baselineId + '\'' +
+                ", batchId='" + batchId + '\'' +
+                ", sessionId='" + sessionId + '\'' +
+                '}';
     }
 }

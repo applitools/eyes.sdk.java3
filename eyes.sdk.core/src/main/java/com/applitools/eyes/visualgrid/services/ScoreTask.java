@@ -14,7 +14,7 @@ public class ScoreTask {
         return score;
     }
 
-    VisualGridTask getVisualGridTask(){
+    VisualGridTask getVisualGridTask() {
         task.setIsSent();
         return task;
     }

@@ -62,7 +62,6 @@ public class TestSkipList extends ReportingTestSuite {
         eyes.setLogHandler(TestUtils.initLogger());
         eyes.setConfiguration(conf);
         eyes.setServerConnector(serverConnector);
-        eyes.setProxy(new ProxySettings("http://localhost:8888"));
         ChromeDriver driver = SeleniumUtils.createChromeDriver();
 
         try {

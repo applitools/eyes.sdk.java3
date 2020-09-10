@@ -38,4 +38,6 @@ public interface IRenderingEyes {
     }
 
     List<RunningTest> getAllRunningTests();
+
+    boolean isServerConcurrencyLimitReached();
 }

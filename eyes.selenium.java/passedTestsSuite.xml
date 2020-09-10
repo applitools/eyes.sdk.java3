@@ -470,4 +470,18 @@
             </class>
         </classes>
     </test>
+    <test name="TestVisualGridRunner">
+        <classes>
+            <class name="com.applitools.eyes.visualgrid.services.TestVisualGridRunner">
+                <methods>
+                    <include name="testOpenBeforeRender"/>
+                    <include name="testRunnerConcurrency"/>
+                    <include name="testRetryWhenServerConcurrencyLimitReached"/>
+                    <include name="testConcurrencyAmount"/>
+                    <include name="testConcurrencyLogMessage"/>
+                    <include name="testParallelStepsLimitOfTest"/>
+                </methods>
+            </class>
+        </classes>
+    </test>
 </suite>
