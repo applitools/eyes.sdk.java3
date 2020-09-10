@@ -1,6 +1,6 @@
 ## [vNext]
 ### Updated
-Thr `USE_PREDEFINED_DEVICE_INFO` feature now compares device name with all aliases returned from the server. [Trello 301](https://trello.com/c/vGSi2NFz)
+- The `USE_PREDEFINED_DEVICE_INFO` feature now compares device name with all aliases returned from the server. [Trello 301](https://trello.com/c/vGSi2NFz)
 ### Fixed
 - When we take a viewport screenshot, and the client size of the html element is 0 the sdk won't fail anymore. [Trello 2130](https://trello.com/c/U6fhdMOO)
 
