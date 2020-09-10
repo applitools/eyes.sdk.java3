@@ -1,6 +1,7 @@
 package com.applitools.eyes.selenium.wrappers;
 
 import com.applitools.eyes.EyesBase;
+import com.applitools.eyes.Logger;
 import com.applitools.eyes.MobileDeviceInfo;
 import com.applitools.eyes.config.Feature;
 import com.applitools.eyes.selenium.EyesDriverUtils;
@@ -12,9 +13,11 @@ import java.util.Map;
 
 public abstract class EyesWebDriver implements WebDriver, JavascriptExecutor, TakesScreenshot, SearchContext, HasCapabilities {
 
+    protected final Logger logger;
     private final EyesBase eyesBase;
 
-    protected EyesWebDriver(EyesBase eyesBase) {
+    protected EyesWebDriver(Logger logger, EyesBase eyesBase) {
+        this.logger = logger;
         this.eyesBase = eyesBase;
     }
 
@@ -26,9 +29,13 @@ public abstract class EyesWebDriver implements WebDriver, JavascriptExecutor, Ta
         if (eyesBase.getConfiguration().isFeatureActivated(Feature.USE_PREDEFINED_DEVICE_INFO)) {
             Map<String, MobileDeviceInfo> mobileDevicesInfo = eyesBase.getMobileDeviceInfo();
             String deviceName = EyesDriverUtils.getMobileDeviceName(this);
-            for (String name : mobileDevicesInfo.keySet()) {
-                if (deviceName.equals(name) || deviceName.equals(name + " GoogleAPI Emulator")) {
-                    return mobileDevicesInfo.get(name).getPixelRatio();
+            for (MobileDeviceInfo mobileDeviceInfo : mobileDevicesInfo.values()) {
+                for (String name : mobileDeviceInfo.getAliases()) {
+                    if (deviceName.equalsIgnoreCase(name)) {
+                        logger.verbose(String.format("Device name found in the server: %s. Pixel ratio: %f",
+                                deviceName, mobileDeviceInfo.getPixelRatio()));
+                        return mobileDeviceInfo.getPixelRatio();
+                    }
                 }
             }
         }

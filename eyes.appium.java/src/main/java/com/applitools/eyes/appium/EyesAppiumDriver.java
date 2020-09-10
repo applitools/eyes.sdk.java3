@@ -15,7 +15,6 @@ import java.util.*;
 
 public class EyesAppiumDriver extends EyesWebDriver {
 
-    private final Logger logger;
     private final AppiumDriver driver;
     private Map<String, Object> sessionDetails;
     private final Map<String, WebElement> elementsIds = new HashMap<>();
@@ -23,8 +22,7 @@ public class EyesAppiumDriver extends EyesWebDriver {
     private RectangleSize defaultContentViewportSize = null;
 
     public EyesAppiumDriver(Logger logger, Eyes eyes, AppiumDriver driver) {
-        super(eyes);
-        this.logger = logger;
+        super(logger, eyes);
         this.driver = driver;
     }
 

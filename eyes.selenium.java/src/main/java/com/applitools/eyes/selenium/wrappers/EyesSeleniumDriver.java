@@ -27,7 +27,6 @@ public class EyesSeleniumDriver extends EyesWebDriver implements HasInputDevices
         FindsByCssSelector, FindsById, FindsByLinkText, FindsByName, FindsByTagName,
         FindsByXPath, HasTouchScreen, IEyesJsExecutor {
 
-    private final Logger logger;
     private final SeleniumEyes eyes;
     private final RemoteWebDriver driver;
     private final TouchScreen touch;
@@ -84,11 +83,10 @@ public class EyesSeleniumDriver extends EyesWebDriver implements HasInputDevices
     }
 
     public EyesSeleniumDriver(Logger logger, SeleniumEyes eyes, RemoteWebDriver driver) throws EyesException {
-        super(eyes);
+        super(logger, eyes);
         ArgumentGuard.notNull(logger, "logger");
         ArgumentGuard.notNull(driver, "driver");
 
-        this.logger = logger;
         this.eyes = eyes;
         this.driver = driver;
 
