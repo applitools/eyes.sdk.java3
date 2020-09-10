@@ -77,8 +77,9 @@ public class EyesWebDriverScreenshot extends EyesScreenshot {
             e.printStackTrace();
         }
         updateFrameLocationInScreenshot(frameLocationInScreenshot);
+
         RectangleSize frameContentSize = getFrameContentSize();
-        if (!EyesDriverUtils.isMobileDevice(driver) && !frameContentSize.isEmpty()) {
+        if (!frameContentSize.isEmpty()) {
             logger.verbose("Calculating frame window...");
             frameWindow = new Region(this.frameLocationInScreenshot, frameContentSize);
 
@@ -89,6 +90,7 @@ public class EyesWebDriverScreenshot extends EyesScreenshot {
         } else {
             frameWindow = new Region(0, 0, image.getWidth(), image.getHeight());
         }
+
         if (frameWindow.getWidth() <= 0 || frameWindow.getHeight() <= 0) {
             throw new EyesException("Got empty frame window for screenshot!");
         }
@@ -107,6 +109,10 @@ public class EyesWebDriverScreenshot extends EyesScreenshot {
     }
 
     private RectangleSize getFrameContentSize() {
+        if (EyesDriverUtils.isMobileDevice(driver)) {
+            return new RectangleSize(0, 0);
+        }
+
         EyesRemoteWebElement frameDocumentElement = (EyesRemoteWebElement) EyesSeleniumUtils.getDefaultRootElement(logger, driver);
         return frameDocumentElement.getClientSize();
     }
