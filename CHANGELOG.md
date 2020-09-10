@@ -1,3 +1,7 @@
+## [vNext]
+### Fixed
+- When we take a viewport screenshot, and the client size of the html element is 0 the sdk won't fail anymore. [Trello 2130](https://trello.com/c/U6fhdMOO)
+
 ## [3.177.1] - 2020-09-10
 ### Fixed
 - Setting viewport 0x0 now won't do anything. [Trello 2115](https://trello.com/c/KYKyXSr6)

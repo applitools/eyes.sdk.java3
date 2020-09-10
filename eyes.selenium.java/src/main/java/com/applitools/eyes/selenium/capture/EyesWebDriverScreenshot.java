@@ -77,9 +77,8 @@ public class EyesWebDriverScreenshot extends EyesScreenshot {
             e.printStackTrace();
         }
         updateFrameLocationInScreenshot(frameLocationInScreenshot);
-        if (!EyesDriverUtils.isMobileDevice(driver)) {
-            RectangleSize frameContentSize = getFrameContentSize();
-
+        RectangleSize frameContentSize = getFrameContentSize();
+        if (!EyesDriverUtils.isMobileDevice(driver) && !frameContentSize.isEmpty()) {
             logger.verbose("Calculating frame window...");
             frameWindow = new Region(this.frameLocationInScreenshot, frameContentSize);
 
