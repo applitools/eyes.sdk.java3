@@ -1,3 +1,5 @@
+### Updated
+- Use touch action to reach top left corner in Appium iOS. [Trello 2083](https://trello.com/c/bz4C8PMw) 
 ### Fixed
 - Calculation viewport size for Android devices. [Trello 2132](https://trello.com/c/CDfbKUV6)
 
