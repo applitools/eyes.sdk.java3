@@ -32,22 +32,6 @@ public class EyesAppiumUtils {
     public static final String STATUS_BAR = "statusBar";
     public static final String NAVIGATION_BAR = "navigationBar";
 
-    /**
-     * @param driver The driver to get the platform version from.
-     * @return The platform version or {@code null} if it is undefined.
-     */
-    public static String getPlatformVersion(HasCapabilities driver) {
-        Capabilities capabilities = driver.getCapabilities();
-        Object platformVersionObj;
-        if (capabilities.getCapabilityNames().contains("os_version")) {
-            platformVersionObj = capabilities.getCapability("os_version");
-        } else {
-            platformVersionObj = capabilities.getCapability(MobileCapabilityType.PLATFORM_VERSION);
-        }
-
-        return platformVersionObj == null ? null : String.valueOf(platformVersionObj);
-    }
-
     public static WebElement getFirstScrollableView(WebDriver driver) {
         return driver.findElement(By.xpath(SCROLLVIEW_XPATH));
     }

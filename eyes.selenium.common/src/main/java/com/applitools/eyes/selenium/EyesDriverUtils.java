@@ -574,18 +574,19 @@ public class EyesDriverUtils {
     }
 
     /**
-     * Gets platform version.
      * @param driver The driver to get the platform version from.
      * @return The platform version or {@code null} if it is undefined.
      */
     public static String getPlatformVersion(HasCapabilities driver) {
         Capabilities capabilities = driver.getCapabilities();
-        Object platformVersionObj =
-                capabilities.getCapability
-                        (MobileCapabilityType.PLATFORM_VERSION);
+        Object platformVersionObj;
+        if (capabilities.getCapabilityNames().contains("os_version")) {
+            platformVersionObj = capabilities.getCapability("os_version");
+        } else {
+            platformVersionObj = capabilities.getCapability(MobileCapabilityType.PLATFORM_VERSION);
+        }
 
-        return platformVersionObj == null ?
-                null : String.valueOf(platformVersionObj);
+        return platformVersionObj == null ? null : String.valueOf(platformVersionObj);
     }
 
     /**

@@ -301,7 +301,7 @@ public class Eyes extends EyesBase {
         // We only set the OS if we identified the device type.
         if (platformName != null) {
             String os = platformName;
-            String platformVersion = EyesAppiumUtils.getPlatformVersion(underlyingDriver);
+            String platformVersion = EyesDriverUtils.getPlatformVersion(underlyingDriver);
             if (platformVersion != null) {
                 String majorVersion =
                         platformVersion.split("\\.", 2)[0];

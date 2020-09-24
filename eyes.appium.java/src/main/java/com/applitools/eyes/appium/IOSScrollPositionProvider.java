@@ -4,6 +4,7 @@ import com.applitools.eyes.Location;
 import com.applitools.eyes.Logger;
 import com.applitools.eyes.Region;
 import com.applitools.eyes.positioning.PositionMemento;
+import com.applitools.eyes.selenium.EyesDriverUtils;
 import com.applitools.utils.ImageUtils;
 import io.appium.java_client.MobileBy;
 import io.appium.java_client.TouchAction;
@@ -291,7 +292,10 @@ public class IOSScrollPositionProvider extends AppiumScrollPositionProvider {
         }
         Double platformVersion = null;
         try {
-            platformVersion = Double.valueOf((String) driver.getCapabilities().getCapability(MobileCapabilityType.PLATFORM_VERSION));
+            String platformVersionString = EyesDriverUtils.getPlatformVersion(driver);
+            if (platformVersionString != null) {
+                platformVersion = Double.valueOf(platformVersionString);
+            }
         } catch (NumberFormatException e) {
             logger.verbose("Could not extract platform version from capabilities.");
         }
