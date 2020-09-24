@@ -165,8 +165,8 @@ public class VisualGridEyes implements ISeleniumEyes, IRenderingEyes {
         if (getConfiguration().getBatch() == null) {
             getConfiguration().setBatch(new BatchInfo(null));
         }
-        logger.verbose("getting all browsers info...");
         List<RenderBrowserInfo> browserInfoList = getConfiguration().getBrowsersInfo();
+        logger.verbose(String.format("got %d browser infos", browserInfoList.size()));
         logger.verbose("creating test descriptors for each browser info...");
         getConfiguration().setViewportSize(viewportSize);
         if (getConfiguration().getBrowsersInfo() == null) {
@@ -557,7 +557,8 @@ public class VisualGridEyes implements ISeleniumEyes, IRenderingEyes {
 
             checkSettingsInternal = updateCheckSettings(checkSettings);
 
-            List<RunningTest> filteredTests = collectTestsForCheck(testList);
+            List<RunningTest> filteredTests = collectTestsForCheck(logger, testList);
+            logger.verbose(String.format("Collected %d tests", filteredTests.size()));
 
             String source = webDriver.getCurrentUrl();
             for (RunningTest runningTest : filteredTests) {
@@ -565,7 +566,7 @@ public class VisualGridEyes implements ISeleniumEyes, IRenderingEyes {
                 visualGridTaskList.add(checkVisualGridTask);
             }
 
-            logger.verbose("added check tasks  (" + checkSettingsInternal.toString() + ")");
+            logger.verbose(String.format("added %d check tasks", visualGridTaskList.size()));
 
             this.renderingGridRunner.check((ICheckSettings) checkSettingsInternal, debugResourceWriter, scriptResult,
                     this.VGEyesConnector, visualGridTaskList, openVisualGridTasks,
@@ -596,11 +597,12 @@ public class VisualGridEyes implements ISeleniumEyes, IRenderingEyes {
         }
     }
 
-    /******** BEGIN - PUBLIC FOR TESTING PURPOSES ONLY ********/
-    public static List<RunningTest> collectTestsForCheck(List<RunningTest> tests) {
+    public static List<RunningTest> collectTestsForCheck(Logger logger, List<RunningTest> tests) {
+        logger.verbose(String.format("Called with %d tests", tests.size()));
         List<RunningTest> filteredTests = new ArrayList<>();
         for (final RunningTest test : tests) {
             List<VisualGridTask> taskList = test.getVisualGridTaskList();
+            logger.verbose(String.format("test %s has %d tasks", test.getTestName(), taskList.size()));
             VisualGridTask visualGridTask = null;
             if (!taskList.isEmpty()) {
                 visualGridTask = taskList.get(taskList.size() - 1);
@@ -613,15 +615,16 @@ public class VisualGridEyes implements ISeleniumEyes, IRenderingEyes {
 
             boolean testIsOpenAndNotClosed = lastTaskType == null && test.isOpenTaskIssued() && !test.isCloseTaskIssued();
             boolean lastTaskIsNotAClosingTask = lastTaskType != null && lastTaskType != VisualGridTask.TaskType.CLOSE && lastTaskType != VisualGridTask.TaskType.ABORT;
+            logger.verbose(String.format("testIsOpenAndNotClosed: %b, lastTaskIsNotAClosingTask: %b", testIsOpenAndNotClosed, lastTaskIsNotAClosingTask));
 
             // We are interested in tests which should be opened or are open.
             if (testIsOpenAndNotClosed || lastTaskIsNotAClosingTask) {
                 filteredTests.add(test);
             }
         }
+
         return filteredTests;
     }
-    /******** END - PUBLIC FOR TESTING PURPOSES ONLY ********/
 
     private ICheckSettings switchFramesAsNeeded(ICheckSettings checkSettings, EyesTargetLocator switchTo) {
         int switchedToCount = switchToFrame((ISeleniumCheckTarget) checkSettings);
