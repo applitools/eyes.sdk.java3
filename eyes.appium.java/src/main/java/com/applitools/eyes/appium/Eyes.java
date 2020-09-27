@@ -315,7 +315,9 @@ public class Eyes extends EyesBase {
             appEnv.setOs(os);
         }
 
-        appEnv.setDeviceInfo(EyesDriverUtils.getMobileDeviceName(underlyingDriver));
+        if (appEnv.getDeviceInfo() == null) {
+            appEnv.setDeviceInfo(EyesDriverUtils.getMobileDeviceName(underlyingDriver));
+        }
         logger.log("Done!");
         return appEnv;
     }

@@ -1138,6 +1138,18 @@ public abstract class EyesBase implements IEyesBase {
             appEnv.setHostingApp(getConfigurationInstance().getHostApp());
         }
 
+        if (getConfigurationInstance().getHostingAppInfo() != null) {
+            appEnv.setHostingAppInfo(getConfigurationInstance().getHostingAppInfo());
+        }
+
+        if (getConfigurationInstance().getOsInfo() != null) {
+            appEnv.setOsInfo(getConfigurationInstance().getOsInfo());
+        }
+
+        if (getConfigurationInstance().getDeviceInfo() != null) {
+            appEnv.setDeviceInfo(getConfigurationInstance().getDeviceInfo());
+        }
+
         appEnv.setInferred(getInferredEnvironment());
         appEnv.setDisplaySize(getConfigurationInstance().getViewportSize());
         return appEnv;

@@ -31,6 +31,9 @@ public class Configuration implements IConfiguration {
     private int matchTimeout = DEFAULT_MATCH_TIMEOUT;
     private String hostApp;
     private String hostOS;
+    private String deviceInfo;
+    private String hostingAppInfo;
+    private String osInfo;
     // Used for automatic save of a test run.
     private boolean saveNewTests, saveFailedTests;
     private int stitchOverlap = 10;
@@ -76,6 +79,9 @@ public class Configuration implements IConfiguration {
         this.matchTimeout = other.getMatchTimeout();
         this.hostApp = other.getHostApp();
         this.hostOS = other.getHostOS();
+        this.deviceInfo = other.getDeviceInfo();
+        this.hostingAppInfo = other.getHostingAppInfo();
+        this.osInfo = other.getOsInfo();
         this.saveNewTests = other.getSaveNewTests();
         this.saveFailedTests = other.getSaveFailedTests();
         this.stitchOverlap = other.getStitchOverlap();
@@ -103,7 +109,7 @@ public class Configuration implements IConfiguration {
         this.browsersInfo.addAll(other.getBrowsersInfo());
         this.defaultMatchSettings = new ImageMatchSettings(other.getDefaultMatchSettings());
         this.isVisualGrid = other.isVisualGrid();
-        this.features = other.features;
+        this.features = new HashSet<>(other.getFeatures());
         this.visualGridOptions = other.visualGridOptions;
     }
 
@@ -716,5 +722,29 @@ public class Configuration implements IConfiguration {
 
     public List<VisualGridOption> getVisualGridOptions() {
         return visualGridOptions;
+    }
+
+    public String getDeviceInfo() {
+        return deviceInfo;
+    }
+
+    public void setDeviceInfo(String deviceInfo) {
+        this.deviceInfo = deviceInfo;
+    }
+
+    public String getHostingAppInfo() {
+        return hostingAppInfo;
+    }
+
+    public void setHostingAppInfo(String hostingAppInfo) {
+        this.hostingAppInfo = hostingAppInfo;
+    }
+
+    public String getOsInfo() {
+        return osInfo;
+    }
+
+    public void setOsInfo(String osInfo) {
+        this.osInfo = osInfo;
     }
 }

@@ -1701,7 +1701,6 @@ public class SeleniumEyes extends EyesBase implements ISeleniumEyes, IBatchClose
      */
     @Override
     protected AppEnvironment getAppEnvironment() {
-
         AppEnvironment appEnv = super.getAppEnvironment();
         RemoteWebDriver underlyingDriver = driver.getRemoteWebDriver();
         // If hostOs isn't set, we'll try and extract and OS ourselves.
@@ -1737,7 +1736,9 @@ public class SeleniumEyes extends EyesBase implements ISeleniumEyes, IBatchClose
                     appEnv.setOs(os);
                 }
 
-                appEnv.setDeviceInfo(EyesDriverUtils.getMobileDeviceName(driver.getRemoteWebDriver()));
+                if (appEnv.getDeviceInfo() == null) {
+                    appEnv.setDeviceInfo(EyesDriverUtils.getMobileDeviceName(driver.getRemoteWebDriver()));
+                }
             } else {
                 logger.log("No mobile OS detected.");
             }

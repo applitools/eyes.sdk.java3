@@ -28,7 +28,8 @@ public abstract class EyesWebDriver implements WebDriver, JavascriptExecutor, Ta
     public double getDevicePixelRatio() {
         if (eyesBase.getConfiguration().isFeatureActivated(Feature.USE_PREDEFINED_DEVICE_INFO)) {
             Map<String, MobileDeviceInfo> mobileDevicesInfo = eyesBase.getMobileDeviceInfo();
-            String deviceName = EyesDriverUtils.getMobileDeviceName(this);
+            String deviceName = eyesBase.getConfiguration().getDeviceInfo();
+            deviceName = deviceName == null ? EyesDriverUtils.getMobileDeviceName(this) : deviceName;
             for (MobileDeviceInfo mobileDeviceInfo : mobileDevicesInfo.values()) {
                 for (String name : mobileDeviceInfo.getAliases()) {
                     if (deviceName.equalsIgnoreCase(name)) {

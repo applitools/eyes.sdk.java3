@@ -178,7 +178,10 @@ class EyesConnector extends EyesBase implements IEyesConnector, IBatchCloser {
 
     protected AppEnvironment getAppEnvironment() {
         AppEnvironment appEnv = super.getAppEnvironment();
-        appEnv.setDeviceInfo(device);
+        if (appEnv.getDeviceInfo() == null) {
+            appEnv.setDeviceInfo(device);
+        }
+
         if (userAgent == null) {
             appEnv.setOs(VisualGridTask.toPascalCase(browserInfo.getPlatform()));
             String browserName = BrowserNames.getBrowserName(browserInfo.getBrowserType());

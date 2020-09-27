@@ -115,6 +115,7 @@ public class MobileNativeTests extends ReportingTestSuite {
         Eyes eyes = initEyes(capabilities);
         Configuration configuration = eyes.getConfiguration();
         configuration.setFeatures(Feature.USE_PREDEFINED_DEVICE_INFO);
+        eyes.setConfiguration(configuration);
 
         AndroidDriver driver = new AndroidDriver(new URL(SAUCE_SELENIUM_URL), capabilities);
         try {
@@ -141,6 +142,9 @@ public class MobileNativeTests extends ReportingTestSuite {
         Eyes eyes = initEyes(caps);
         Configuration configuration = eyes.getConfiguration();
         configuration.setFeatures(Feature.USE_PREDEFINED_DEVICE_INFO);
+        // Overriding device name for getting the right pixel ratio
+        configuration.setDeviceInfo("iPhone XR");
+        eyes.setConfiguration(configuration);
 
         WebDriver driver = new IOSDriver(new URL(SAUCE_SELENIUM_URL), caps);
         try {
@@ -152,6 +156,7 @@ public class MobileNativeTests extends ReportingTestSuite {
             eyes.abortIfNotClosed();
         }
 
-        Assert.assertEquals(eyes.getDevicePixelRatio(), 3.0);
+        // The pixel ratio of iPhone XR
+        Assert.assertEquals(eyes.getDevicePixelRatio(), 2.0);
     }
 }
