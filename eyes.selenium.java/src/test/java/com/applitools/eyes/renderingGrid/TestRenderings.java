@@ -298,7 +298,6 @@ public class TestRenderings extends ReportingTestSuite {
                 return super.renderPutResource(runningRender, resource, userAgent, listener);
             }
         };
-        serverConnector.updateClient(client);
         VisualGridRunner runner = spy(new VisualGridRunner(10));
         doAnswer(new Answer() {
             @Override
@@ -320,6 +319,7 @@ public class TestRenderings extends ReportingTestSuite {
         try {
             eyes.open(driver, "Applitools Eyes Sdk", "Test Render Resource Not Found", new RectangleSize(800, 800));
             driver.get("http://applitools.github.io/demo");
+            serverConnector.updateClient(client);
             eyes.checkWindow();
             eyes.closeAsync();
         } finally {

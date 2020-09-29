@@ -134,9 +134,6 @@ public abstract class EyesBase implements IEyesBase {
      */
     public void setServerConnector(ServerConnector serverConnector) {
         ArgumentGuard.notNull(serverConnector, "serverConnector");
-        if (serverConnector.getLogger() == null) {
-            serverConnector.setLogger(this.logger);
-        }
         this.serverConnector = serverConnector;
         serverConnector.setLogger(logger);
     }
