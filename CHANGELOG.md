@@ -3,6 +3,7 @@
 New API for setting `deviceInfo`, `hostingAppInfo` and `osInfo` in the configuration. [Trello 2140](https://trello.com/c/vGSi2NFz)
 ### Updated
 - Use touch action to reach top left corner in Appium iOS. [Trello 2083](https://trello.com/c/bz4C8PMw)
+- DeviceName now includes new mobile devices. [Trello 1751](https://trello.com/c/JOyUqzEM)
 ### Fixed
 - Calculation viewport size for Android devices. [Trello 2132](https://trello.com/c/CDfbKUV6)
 - Agent ID contains the real version of the SDK. [Trello 2165](https://trello.com/c/mYiH2zvw)
