@@ -1,3 +1,7 @@
+[vNext]
+### Added
+- A new API for closing batch explicitly: `BatchClose`. [Trello 2189](https://trello.com/c/SlHH9Ssb)
+
 [3.180.0] - 2020-10-09
 ### Updated
 - DeviceName now includes new mobile devices. [Trello 1751](https://trello.com/c/JOyUqzEM)

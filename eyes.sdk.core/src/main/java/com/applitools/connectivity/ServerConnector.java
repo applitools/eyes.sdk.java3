@@ -362,13 +362,18 @@ public class ServerConnector extends UfgConnector {
     }
 
     public void closeBatch(String batchId, boolean forceClose) {
+        closeBatch(batchId, forceClose, serverUrl.toString());
+    }
+
+    public void closeBatch(String batchId, boolean forceClose, String url) {
         final AtomicReference<EyesSyncObject> lock = new AtomicReference<>(new EyesSyncObject(logger, "closeBatch"));
         boolean dontCloseBatchesStr = GeneralUtils.getDontCloseBatches();
         if (dontCloseBatchesStr && !forceClose) {
             logger.log("APPLITOOLS_DONT_CLOSE_BATCHES environment variable set to true. Skipping batch close.");
             return;
         }
-        closeBatchAsync(new SyncTaskListener<Void>(lock), batchId, forceClose);
+
+        closeBatchAsync(new SyncTaskListener<Void>(lock), batchId, forceClose, url);
         synchronized (lock.get()) {
             try {
                 lock.get().waitForNotify();
@@ -378,7 +383,7 @@ public class ServerConnector extends UfgConnector {
         }
     }
 
-    public void closeBatchAsync(final TaskListener<Void> listener, String batchId, boolean forceClose) {
+    public void closeBatchAsync(final TaskListener<Void> listener, String batchId, boolean forceClose, final String url) {
         boolean dontCloseBatchesStr = GeneralUtils.getDontCloseBatches();
         if (dontCloseBatchesStr && !forceClose) {
             logger.log("APPLITOOLS_DONT_CLOSE_BATCHES environment variable set to true. Skipping batch close.");
@@ -388,12 +393,12 @@ public class ServerConnector extends UfgConnector {
         ArgumentGuard.notNull(batchId, "batchId");
         this.logger.log("called with " + batchId);
 
-        final String url = String.format(CLOSE_BATCH, batchId);
+        final String path = String.format(CLOSE_BATCH, batchId);
         initClient();
         AsyncRequest request = makeEyesRequest(new HttpRequestBuilder() {
             @Override
             public AsyncRequest build() {
-                return restClient.target(serverUrl).path(url)
+                return restClient.target(url).path(path)
                         .queryParam("apiKey", getApiKey())
                         .asyncRequest((String) null);
             }
