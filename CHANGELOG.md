@@ -1,3 +1,7 @@
+[vNext]
+### Updated
+- DeviceName now includes new mobile devices. [Trello 1751](https://trello.com/c/JOyUqzEM)
+
 [3.179.0] - 2020-10-01 
 ### Added
 New API for setting `deviceInfo`, `hostingAppInfo` and `osInfo` in the configuration. [Trello 2140](https://trello.com/c/vGSi2NFz)
