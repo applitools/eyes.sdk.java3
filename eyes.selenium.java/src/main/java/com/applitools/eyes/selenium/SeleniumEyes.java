@@ -621,7 +621,7 @@ public class SeleniumEyes extends EyesBase implements ISeleniumEyes, IBatchClose
             PositionProvider positionProvider = ScrollPositionProviderFactory.getScrollPositionProvider(userAgent, logger, jsExecutor, scrollRootElement);
 
             DomCapture domCapture = new DomCapture(this);
-            fullWindowDom = domCapture.getFullWindowDom(positionProvider);
+            fullWindowDom = domCapture.getPageDom(positionProvider);
         } catch (Exception e) {
             GeneralUtils.logExceptionStackTrace(logger, e);
         } finally {

@@ -8,21 +8,18 @@ import com.applitools.eyes.selenium.SeleniumEyes;
 import com.applitools.eyes.selenium.frames.FrameChain;
 import com.applitools.eyes.selenium.wrappers.EyesTargetLocator;
 import com.applitools.eyes.selenium.wrappers.EyesSeleniumDriver;
+import com.applitools.eyes.visualgrid.model.CssTokenizer;
+import com.applitools.eyes.visualgrid.model.RGridResource;
 import com.applitools.utils.EfficientStringReplace;
 import com.applitools.utils.GeneralUtils;
-import com.helger.commons.collection.impl.ICommonsList;
-import com.helger.css.ECSSVersion;
-import com.helger.css.decl.CSSImportRule;
-import com.helger.css.decl.CSSStyleRule;
-import com.helger.css.decl.CascadingStyleSheet;
-import com.helger.css.decl.ICSSTopLevelRule;
-import com.helger.css.reader.CSSReader;
-import com.helger.css.writer.CSSWriterSettings;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
+import org.w3c.dom.css.CSSImportRule;
+import org.w3c.dom.css.CSSRule;
+import org.w3c.dom.css.CSSRuleList;
+import org.w3c.dom.css.CSSStyleRule;
 
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
 import java.net.*;
 import java.util.*;
 import java.util.concurrent.Phaser;
@@ -31,7 +28,75 @@ import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 public class DomCapture {
+    static class CssTreeNode {
+        private final String css;
+        private final List<CssTreeNode> childNodes = new ArrayList<>();
+        private final List<CSSImportRule> importRules = new ArrayList<>();
+        private final List<CSSStyleRule> styleRules = new ArrayList<>();
+
+        public CssTreeNode(String css) {
+            this.css = css;
+        }
+
+        public List<String> getImportedUrls() {
+            List<String> urls = new ArrayList<>();
+            for (CSSImportRule rule : importRules) {
+                urls.add(rule.getHref());
+            }
+
+            return urls;
+        }
+
+        private void parse(Logger logger) {
+            if (css == null || css.isEmpty()) {
+                return;
+            }
+
+            CSSRuleList ruleList;
+            try {
+                ruleList = CssTokenizer.getCssRules(css);
+            } catch (IOException e) {
+                GeneralUtils.logExceptionStackTrace(logger, e);
+                return;
+            }
+
+            for (int i = 0; i < ruleList.getLength(); i++) {
+                CSSRule rule = ruleList.item(i);
+                if (rule instanceof CSSImportRule) {
+                    importRules.add((CSSImportRule) rule);
+                }
+                if (rule instanceof CSSStyleRule) {
+                    styleRules.add((CSSStyleRule) rule);
+                }
+            }
+        }
+
+        @Override
+        public String toString() {
+            StringBuilder sb = new StringBuilder();
+            sb.append(css);
+            for (CssTreeNode node : childNodes) {
+                sb.append(node.toString());
+            }
+
+            for (CSSStyleRule styleRule : styleRules) {
+                sb.append(styleRule.toString());
+            }
+
+            return sb.toString();
+        }
+    }
+
+    private class TimeoutTask extends TimerTask {
+        @Override
+        public void run() {
+            logger.verbose("Check Timer timeout");
+            isCheckTimerTimedOut.set(true);
+        }
+    }
+
     private static String CAPTURE_FRAME_SCRIPT;
+
     private static String CAPTURE_FRAME_SCRIPT_FOR_IE;
 
     private final Phaser cssPhaser = new Phaser(); // Phaser for syncing all callbacks on a single Frame
@@ -47,68 +112,56 @@ public class DomCapture {
         }
     }
 
-    private static long DOM_EXTRACTION_TIMEOUT = 5 * 60 * 1000;
-
-    private static ServerConnector mServerConnector = null;
-    private EyesSeleniumDriver driver;
+    private static final long DOM_EXTRACTION_TIMEOUT = 5 * 60 * 1000;
+    private static ServerConnector serverConnector = null;
+    private final EyesSeleniumDriver driver;
     private final Logger logger;
     private String cssStartToken;
     private String cssEndToken;
-    private Map<String, String> cssData = Collections.synchronizedMap(new HashMap<String, String>());
+    private final Map<String, CssTreeNode> cssNodesToReplace = Collections.synchronizedMap(new HashMap<String, CssTreeNode>());
     private boolean shouldWaitForPhaser = false;
-    private AtomicBoolean isCheckTimerTimedOut = new AtomicBoolean(false);
-    private Timer timer;
+    private final AtomicBoolean isCheckTimerTimedOut = new AtomicBoolean(false);
+
     private final UserAgent userAgent;
 
     public DomCapture(SeleniumEyes eyes) {
-        mServerConnector = eyes.getServerConnector();
+        serverConnector = eyes.getServerConnector();
         logger = eyes.getLogger();
         driver = (EyesSeleniumDriver) eyes.getDriver();
         userAgent = eyes.getUserAgent();
     }
 
-
-    public String getFullWindowDom() {
-        long currentTimeMillis = System.currentTimeMillis();
-        String domJson = getDom();
-        String timeDiff = String.valueOf(System.currentTimeMillis() - currentTimeMillis);
-        logger.verbose("getting th DOM took " + timeDiff + " ms");
-        return domJson;
-    }
-
-    public String getFullWindowDom(PositionProvider positionProvider) {
+    public String getPageDom(PositionProvider positionProvider) {
         PositionMemento originalPosition = positionProvider.getState();
         positionProvider.setPosition(Location.ZERO);
-        String domJson = getDom();
-        positionProvider.restoreState(originalPosition);
-        return domJson;
-    }
-
-    private String getDom() {
         FrameChain originalFC = driver.getFrameChain().clone();
-
-        String dom = getFrameDom();
-
+        String baseUrl = (String) driver.executeScript("return document.location.href");
+        String dom = getFrameDom(baseUrl);
         if (originalFC != null) {
             ((EyesTargetLocator) driver.switchTo()).frames(originalFC);
         }
 
         try {
-
             if (shouldWaitForPhaser) {
                 cssPhaser.awaitAdvanceInterruptibly(0, 30, TimeUnit.SECONDS);
             }
-
         } catch (InterruptedException | TimeoutException e) {
             GeneralUtils.logExceptionStackTrace(logger, e);
         }
-        String inlaidString = EfficientStringReplace.efficientStringReplace(cssStartToken, cssEndToken, dom, cssData);
-        return inlaidString;
+
+
+        Map<String, String> cssStringsToReplace = new HashMap<>();
+        for (String url : cssNodesToReplace.keySet()) {
+            cssStringsToReplace.put(url, cssNodesToReplace.get(url).toString());
+        }
+        String domJson = EfficientStringReplace.efficientStringReplace(cssStartToken, cssEndToken, dom, cssStringsToReplace);
+        positionProvider.restoreState(originalPosition);
+        return domJson;
     }
 
-    private String getFrameDom() {
+    private String getFrameDom(String baseUrl) {
         logger.verbose("Trying to get DOM from driver");
-        timer = new Timer(true);
+        Timer timer = new Timer(true);
         timer.schedule(new TimeoutTask(), DOM_EXTRACTION_TIMEOUT);
         try {
             isCheckTimerTimedOut.set(false);
@@ -133,8 +186,9 @@ public class DomCapture {
             } while (status == ScriptResponse.Status.WIP && !isCheckTimerTimedOut.get());
             timer.cancel();
 
-            if (status == ScriptResponse.Status.ERROR) {
-                throw new EyesException("DomCapture Error: " + scriptResponse.getError());
+            if (scriptResponse == null || status == ScriptResponse.Status.ERROR) {
+                String errorMessage = scriptResponse == null ? "Script response is null" : scriptResponse.getError();
+                throw new EyesException("DomCapture Error: " + errorMessage);
             }
 
             if (isCheckTimerTimedOut.get()) {
@@ -150,26 +204,54 @@ public class DomCapture {
             cssStartToken = separators.cssStartToken;
             cssEndToken = separators.cssEndToken;
 
-            fetchCssFiles(missingCssList);
+            fetchCssFiles(baseUrl, missingCssList, null);
 
-            Map<String, String> framesData = null;
+            Map<String, String> framesData = new HashMap<>();
             try {
                 framesData = recurseFrames(missingFramesList);
             } catch (Exception e) {
-                e.printStackTrace();
+                GeneralUtils.logExceptionStackTrace(logger, e);
             }
 
-            //noinspection UnnecessaryLocalVariable
-            String inlaidString = EfficientStringReplace.efficientStringReplace(
+
+            return EfficientStringReplace.efficientStringReplace(
                     separators.iframeStartToken, separators.iframeEndToken, data.get(0), framesData);
-            return inlaidString;
         } catch (InterruptedException e) {
-            e.printStackTrace();
+            GeneralUtils.logExceptionStackTrace(logger, e);
         }
         finally {
             timer.cancel();
         }
         return "";
+    }
+
+    private Separators parseScriptResult(String scriptResult, List<String> missingCssList, List<String> missingFramesList, List<String> data) {
+        String[] lines = scriptResult.split("\\r?\\n");
+        Separators separators = null;
+        try {
+            separators = GeneralUtils.parseJsonToObject(lines[0], Separators.class);
+
+            ArrayList<List<String>> blocks = new ArrayList<>();
+            blocks.add(missingCssList);
+            blocks.add(missingFramesList);
+            blocks.add(data);
+            int blockIndex = 0;
+            int lineIndex = 1;
+            do {
+                String str = lines[lineIndex++];
+                if (separators.separator.equals(str)) {
+                    blockIndex++;
+                } else {
+                    blocks.get(blockIndex).add(str);
+                }
+            } while (lineIndex < lines.length);
+            logger.verbose("missing css count: " + missingCssList.size());
+            logger.verbose("missing frames count: " + missingFramesList.size());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        shouldWaitForPhaser |= !missingCssList.isEmpty();
+        return separators;
     }
 
     private Map<String, String> recurseFrames(List<String> missingFramesList) {
@@ -194,7 +276,7 @@ public class DomCapture {
                     framesData.put(missingFrameLine, "");
                     continue;
                 }
-                String result = getFrameDom();
+                String result = getFrameDom(locationAfterSwitch);
                 framesData.put(missingFrameLine, result);
             } catch (Exception e) {
                 GeneralUtils.logExceptionStackTrace(logger, e);
@@ -206,223 +288,71 @@ public class DomCapture {
         return framesData;
     }
 
-    private void fetchCssFiles(List<String> missingCssList) {
-        for (final String missingCssUrl : missingCssList) {
-            if (missingCssUrl.startsWith("blob:") || missingCssUrl.startsWith("data:")) {
-                logger.log("Found blob url continuing - " + missingCssUrl);
+    private void fetchCssFiles(final String baseUrl, List<String> cssUrls, final CssTreeNode parentNode) {
+        for (final String cssUrl : cssUrls) {
+            if (cssUrl == null || cssUrl.isEmpty()) {
                 continue;
             }
-            if (missingCssUrl.isEmpty()) continue;
+
+            final URI uri = resolveUriString(baseUrl, cssUrl);
+            if (uri == null) {
+                logger.verbose(String.format("Failed resolving url of css %s", cssUrl));
+                continue;
+            }
             try {
-                logger.verbose("DomCapture.fetchCssFiles() downloading");
-                final CssTreeNode cssTreeNode = new CssTreeNode(new URL(missingCssUrl));
-                downloadCss(cssTreeNode, new TaskListener<String>() {
+                cssPhaser.register();
+                logger.verbose(String.format("Downloading css url %s", uri));
+                serverConnector.downloadResource(uri, userAgent.toString(), baseUrl, new TaskListener<RGridResource>() {
                     @Override
-                    public void onComplete(String taskResponse) {
+                    public void onComplete(RGridResource resource) {
                         try {
-                            logger.verbose("DomCapture.onDownloadComplete  - finished");
-                            parseCSS(cssTreeNode, taskResponse);
-                            if (cssTreeNode.allImportRules != null && !cssTreeNode.allImportRules.isEmpty()) {
-                                cssTreeNode.downloadNodeCss();
+                            logger.verbose(String.format("Css Download Completed. URL: %s", uri));
+                            CssTreeNode node = new CssTreeNode(new String(resource.getContent()));
+                            node.parse(logger);
+                            if (!node.importRules.isEmpty()) {
+                                fetchCssFiles(uri.toString(), node.getImportedUrls(), node);
                             }
-                            cssData.put(missingCssUrl, EfficientStringReplace.CleanForJSON(cssTreeNode.calcCss()));
+
+                            if (parentNode != null) {
+                                parentNode.childNodes.add(node);
+                            } else {
+                                cssNodesToReplace.put(cssUrl, node);
+                            }
                         } catch (Throwable e) {
-                            e.printStackTrace();
+                            GeneralUtils.logExceptionStackTrace(logger, e);
+                        } finally {
+                            cssPhaser.arriveAndDeregister();
+                            logger.verbose("cssPhaser.arriveAndDeregister(); " + uri);
+                            logger.verbose("current missing - " + cssPhaser.getUnarrivedParties());
                         }
                     }
 
                     @Override
                     public void onFail() {
                         logger.verbose("DomCapture.onDownloadFailed");
-                        cssData.put(missingCssUrl, "");
+                        cssNodesToReplace.put(cssUrl, new CssTreeNode(""));
+                        cssPhaser.arriveAndDeregister();
+                        logger.verbose("Download Failed");
+                        logger.verbose("cssPhaser.arriveAndDeregister(); " + uri);
+                        logger.verbose("current missing  - " + cssPhaser.getUnarrivedParties());
                     }
                 });
-
             } catch (Throwable e) {
                 GeneralUtils.logExceptionStackTrace(logger, e);
             }
         }
     }
 
-    private Separators parseScriptResult(String scriptResult, List<String> missingCssList, List<String> missingFramesList, List<String> data) {
-        String[] lines = scriptResult.split("\\r?\\n");
-        Separators separators = null;
+    private URI resolveUriString(String baseUrl, String uri) {
+        if (uri.toLowerCase().startsWith("data:") || uri.toLowerCase().startsWith("javascript:")) {
+            return null;
+        }
         try {
-            separators = GeneralUtils.parseJsonToObject(lines[0], Separators.class);
-
-            ArrayList<List<String>> blocks = new ArrayList<List<String>>();
-            blocks.add(missingCssList);
-            blocks.add(missingFramesList);
-            blocks.add(data);
-            int blockIndex = 0;
-            int lineIndex = 1;
-            do {
-                String str = lines[lineIndex++];
-                if (separators.separator.equals(str)) {
-                    blockIndex++;
-                } else {
-                    blocks.get(blockIndex).add(str);
-                }
-            } while (lineIndex < lines.length);
-            logger.verbose("missing css count: " + missingCssList.size());
-            logger.verbose("missing frames count: " + missingFramesList.size());
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        shouldWaitForPhaser |= !missingCssList.isEmpty();
-        return separators;
-    }
-
-    class CssTreeNode {
-        URL url;
-        String css = "";
-        StringBuilder sb = new StringBuilder();
-        List<CssTreeNode> decedents = new ArrayList<>();
-        ICommonsList<CSSImportRule> allImportRules;
-        ICommonsList<CSSStyleRule> styleRules;
-
-
-        public CssTreeNode(URL url) {
-            this.url = url;
-        }
-
-        String calcCss() {
-            sb.append(css);
-            if (decedents != null) {
-                for (CssTreeNode decedent : decedents) {
-                    sb.append(decedent.calcCss());
-                }
-            }
-
-            if (styleRules != null) {
-                for (CSSStyleRule styleRule : styleRules) {
-                    sb.append(styleRule.getAsCSSString(new CSSWriterSettings()));
-                }
-            }
-
-            return sb.toString();
-        }
-
-        public void setCss(String css) {
-            this.css = css;
-        }
-
-        void downloadNodeCss() {
-            if (allImportRules != null) {
-                for (CSSImportRule importRule : allImportRules) {
-                    final CssTreeNode cssTreeNode;
-                    try {
-                        cssTreeNode = new CssTreeNode(new URL(importRule.getLocation().getURI()));
-                        String uri = importRule.getLocation().getURI();
-                        cssTreeNode.setUrl(uri);
-                        downloadCss(cssTreeNode, new TaskListener<String>() {
-                            @Override
-                            public void onComplete(String taskResponse) {
-                                parseCSS(cssTreeNode, EfficientStringReplace.CleanForJSON(taskResponse));
-                                if (!cssTreeNode.allImportRules.isEmpty()) {
-                                    cssTreeNode.downloadNodeCss();
-
-                                }
-                            }
-
-                            @Override
-                            public void onFail() {
-                                logger.verbose("Download Failed");
-                            }
-                        });
-                        decedents.add(cssTreeNode);
-                    } catch (Throwable e) {
-                        GeneralUtils.logExceptionStackTrace(logger, e);
-                    }
-
-                }
-            }
-        }
-
-        public void setUrl(String url) {
-
-            boolean absolute = false;
-            try {
-                url = URLEncoder.encode(url, "UTF-8");
-                absolute = new URI(url).isAbsolute();
-                this.url = absolute ? new URL(url) : new URL(url);
-            } catch (UnsupportedEncodingException | URISyntaxException | MalformedURLException e) {
-                GeneralUtils.logExceptionStackTrace(logger, e);
-            }
-        }
-
-
-        public void setAllImportRules(ICommonsList<CSSImportRule> allImportRules) {
-            this.allImportRules = allImportRules;
-        }
-
-        public void setAllStyleRules(ICommonsList<CSSStyleRule> allStyleRules) {
-            this.styleRules = allStyleRules;
-        }
-
-
-    }
-
-    private void downloadCss(final CssTreeNode node, final TaskListener<String> listener) {
-        cssPhaser.register();
-        logger.verbose("Given URL to download: " + node.url);
-        mServerConnector.downloadString(node.url, new TaskListener<String>() {
-            @Override
-            public void onComplete(String taskResponse) {
-                try {
-                    logger.verbose("Download Complete");
-                    node.setCss(taskResponse);
-                    listener.onComplete(taskResponse);
-
-                } catch (Throwable e) {
-                    GeneralUtils.logExceptionStackTrace(logger, e);
-                } finally {
-                    cssPhaser.arriveAndDeregister();
-                    logger.verbose("cssPhaser.arriveAndDeregister(); " + node.url);
-                    logger.verbose("current missing - " + cssPhaser.getUnarrivedParties());
-                }
-            }
-
-            @Override
-            public void onFail() {
-                listener.onComplete("");
-                cssPhaser.arriveAndDeregister();
-                logger.verbose("Download Failed");
-                logger.verbose("cssPhaser.arriveAndDeregister(); " + node.url);
-                logger.verbose("current missing  - " + cssPhaser.getUnarrivedParties());
-            }
-        });
-    }
-
-    private void parseCSS(CssTreeNode node, String css) {
-        if (css == null) {
-            return;
-        }
-
-        final CascadingStyleSheet cascadingStyleSheet = CSSReader.readFromString(css, ECSSVersion.CSS30);
-        if (cascadingStyleSheet == null) {
-            return;
-        }
-
-        ICommonsList<ICSSTopLevelRule> allRules = cascadingStyleSheet.getAllRules();
-        if (allRules.isEmpty()) {
-            return;
-        }
-
-        ICommonsList<CSSImportRule> allImportRules = cascadingStyleSheet.getAllImportRules();
-        node.setAllImportRules(allImportRules);
-        node.setAllStyleRules(cascadingStyleSheet.getAllStyleRules());
-    }
-
-    private class TimeoutTask extends TimerTask {
-        @Override
-        public void run() {
-            logger.verbose("Check Timer timeout.");
-            isCheckTimerTimedOut.set(true);
+            return new URI(baseUrl).resolve(uri);
+        } catch (Exception e) {
+            logger.log("Error resolving uri:" + uri);
+            GeneralUtils.logExceptionStackTrace(logger, e);
+            return null;
         }
     }
-
 }
-
-
-

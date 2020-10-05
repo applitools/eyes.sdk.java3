@@ -2,6 +2,9 @@
 ### Updated
 - DeviceName now includes new mobile devices. [Trello 1751](https://trello.com/c/JOyUqzEM)
 - IosDeviceInfo includes the version property. [Trello 2187](https://trello.com/c/25AjSV6V)
+- Cleaned the `DomCapture` class to be more clear and less buggy. [Trello 2173](https://trello.com/c/ccXQpdKy)
+### Fixed
+- DOM capture now parses CSS correctly. [Trello 2173](https://trello.com/c/ccXQpdKy)
 
 [3.179.0] - 2020-10-01 
 ### Added

@@ -169,6 +169,7 @@ public class TestUtils {
                 .build();
 
         RestClient client = new RestClient(new Logger(new StdoutLogHandler()), apiSessionUri, ServerConnector.DEFAULT_CLIENT_TIMEOUT);
+        client.setProxy(new ProxySettings("http://localhost:8888"));
         return client.sendHttpRequest(apiSessionUri.toString(), HttpMethod.GET, MediaType.APPLICATION_JSON).getBodyString();
     }
 }

@@ -8,8 +8,8 @@ import com.applitools.eyes.config.Configuration;
 import com.applitools.eyes.config.ConfigurationProvider;
 import com.applitools.eyes.metadata.ActualAppOutput;
 import com.applitools.eyes.metadata.SessionResults;
+import com.applitools.eyes.selenium.capture.DomCapture;
 import com.applitools.eyes.selenium.fluent.Target;
-import com.applitools.eyes.selenium.wrappers.EyesWebDriver;
 import com.applitools.eyes.utils.ReportingTestSuite;
 import com.applitools.eyes.utils.SeleniumUtils;
 import com.applitools.eyes.utils.TestUtils;
@@ -18,6 +18,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.chrome.ChromeOptions;
 import org.testng.Assert;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
@@ -38,38 +39,20 @@ public final class TestSendDom extends ReportingTestSuite {
         }
     }
 
-    private interface WebDriverInitializer {
-        void initWebDriver(WebDriver webDriver);
-    }
-
-    private static void captureDom(String url, String testName) {
-        captureDom(url, null, testName);
-    }
-
-    private static void captureDom(String url, WebDriverInitializer initCode, String testName) {
+    private static void captureDom(String url, String testName) throws IOException {
         WebDriver webDriver = SeleniumUtils.createChromeDriver();
         webDriver.get(url);
         Logger logger = new Logger();
 
         logger.setLogHandler(TestUtils.initLogger(testName));
-        if (initCode != null) {
-            initCode.initWebDriver(webDriver);
-        }
         Eyes eyes = new Eyes();
         try {
             eyes.setBatch(TestDataProvider.batchInfo);
-            EyesWebDriver eyesWebDriver = (EyesWebDriver) eyes.open(webDriver, "Test Send DOM", testName);
-            //DomCapture domCapture = new DomCapture(logger, eyesWebDriver);
+            eyes.open(webDriver, "Test Send DOM", testName);
             eyes.checkWindow();
             TestResults results = eyes.close(false);
             boolean hasDom = getHasDom(eyes, results);
             Assert.assertTrue(hasDom);
-            //string actualDomJsonString = domCapture.GetFullWindowDom();
-            //WriteDomJson(logger, actualDomJsonString);
-
-        } catch (Exception ex) {
-            GeneralUtils.logExceptionStackTrace(eyes.getLogger(), ex);
-            throw ex;
         } finally {
             eyes.abort();
             webDriver.quit();
@@ -106,21 +89,13 @@ public final class TestSendDom extends ReportingTestSuite {
     public static class DiffPrintingNotARealComparator implements Comparator<JsonNode> {
 
         private JsonNode lastObject;
-        private Logger logger;
+        private final Logger logger;
         public DiffPrintingNotARealComparator(Logger logger) {
             this.logger = logger;
         }
 
         @Override
         public int compare(JsonNode o1, JsonNode o2) {
-            if (o1 == null) {
-                logger.log(String.format("O1 IS NULL! o2: %s, parent: %s", o2, lastObject));
-            }
-
-            if (o2 == null) {
-                logger.log(String.format("O2 IS NULL! o1: %s, parent: %s", o1, lastObject));
-            }
-
             if (!o1.equals(o2)) {
                 logger.log(String.format("JSON diff found! Parent: %s, o1: %s , o2: %s", lastObject, o1, o2));
                 return 1;
@@ -131,14 +106,14 @@ public final class TestSendDom extends ReportingTestSuite {
     }
 
     @Test
-    public void TestSendDOM_FullWindow() {
+    public void TestSendDOM_FullWindow() throws IOException {
         WebDriver webDriver = SeleniumUtils.createChromeDriver();
         webDriver.get("https://applitools.github.io/demo/TestPages/FramesTestPage/");
         DomInterceptingEyes eyes = new DomInterceptingEyes();
         eyes.setBatch(TestDataProvider.batchInfo);
         eyes.getConfigurationInstance().setAppName("Test Send DOM").setTestName("Full Window").setViewportSize(new RectangleSize(1024, 768));
-        EyesWebDriver eyesWebDriver = (EyesWebDriver) eyes.open(webDriver);
         try {
+            eyes.open(webDriver);
             eyes.check("Window", Target.window().fully());
             String actualDomJsonString = eyes.getDomJson();
 
@@ -150,12 +125,11 @@ public final class TestSendDom extends ReportingTestSuite {
                 String expectedDomJson = GeneralUtils.readToEnd(TestSendDom.class.getResourceAsStream("/expected_dom1.json"));
                 JsonNode actual = mapper.readTree(actualDomJsonString);
                 JsonNode expected = mapper.readTree(expectedDomJson);
-                //noinspection SimplifiedTestNGAssertion
                 if (actual == null) {
-                    eyes.getLogger().log("ACTUAL DOM IS NULL!");
+                    Assert.fail("ACTUAL DOM IS NULL!");
                 }
                 if (expected == null) {
-                    eyes.getLogger().log("EXPECTED DOM IS NULL!");
+                    Assert.fail("EXPECTED DOM IS NULL!");
                 }
                 Assert.assertTrue(actual.equals(new DiffPrintingNotARealComparator(eyes.getLogger()), expected));
 
@@ -167,7 +141,7 @@ public final class TestSendDom extends ReportingTestSuite {
                 if (downloaded == null) {
                     eyes.getLogger().log("Downloaded DOM IS NULL!");
                 }
-                Assert.assertTrue(downloaded.equals(expected));
+                Assert.assertEquals(expected, downloaded);
 
             } catch (IOException e) {
                 GeneralUtils.logExceptionStackTrace(eyes.getLogger(), e);
@@ -179,7 +153,35 @@ public final class TestSendDom extends ReportingTestSuite {
     }
 
     @Test
-    public void TestSendDOM_Selector() {
+    public void TestSendDOM_iframe() throws IOException {
+        ChromeOptions options = new ChromeOptions();
+        options.setHeadless(true);
+        WebDriver webDriver = SeleniumUtils.createChromeDriver(options);
+        webDriver.get("https://applitools.github.io/demo/TestPages/CorsTestPage/");
+        DomInterceptingEyes eyes = new DomInterceptingEyes();
+        eyes.setBatch(TestDataProvider.batchInfo);
+        eyes.getConfigurationInstance().setAppName("Test Send DOM").setTestName("TestSendDOM_iframe").setViewportSize(new RectangleSize(1600, 1200));
+        try {
+            eyes.open(webDriver);
+            eyes.check(Target.window().fully());
+            TestResults results = eyes.close();
+
+            boolean hasDom = getHasDom(eyes, results);
+            Assert.assertTrue(hasDom);
+
+            String actualDomString = eyes.getDomJson();
+            String expectedDomString = GeneralUtils.readToEnd(TestSendDom.class.getResourceAsStream("/test_send_dom_cors_iframe.json"));
+            ObjectMapper mapper = new ObjectMapper();
+            JsonNode actual = mapper.readTree(actualDomString);
+            JsonNode expected = mapper.readTree(expectedDomString);
+            Assert.assertTrue(actual.equals(new DiffPrintingNotARealComparator(eyes.getLogger()), expected));
+        } finally {
+            webDriver.quit();
+        }
+    }
+
+    @Test
+    public void TestSendDOM_Selector() throws IOException {
         WebDriver webDriver = SeleniumUtils.createChromeDriver();
         webDriver.get("https://applitools.github.io/demo/TestPages/DomTest/dom_capture.html");
         Eyes eyes = new Eyes();
@@ -197,7 +199,7 @@ public final class TestSendDom extends ReportingTestSuite {
     }
 
     @Test
-    public void TestNotSendDOM() {
+    public void TestNotSendDOM() throws IOException {
         WebDriver webDriver = SeleniumUtils.createChromeDriver();
         webDriver.get("https://applitools.com/helloworld");
         Eyes eyes = new Eyes();
@@ -217,25 +219,40 @@ public final class TestSendDom extends ReportingTestSuite {
     }
 
     @Test
-    public void TestSendDOM_1() {
+    public void TestSendDOM_1() throws IOException {
         captureDom("https://applitools.github.io/demo/TestPages/DomTest/dom_capture.html", "TestSendDOM_1");
     }
 
     @Test
-    public void TestSendDOM_2() {
+    public void TestSendDOM_2() throws IOException {
         captureDom("https://applitools.github.io/demo/TestPages/DomTest/dom_capture_2.html", "TestSendDOM_2");
     }
 
-    private static boolean getHasDom(IEyesBase eyes, TestResults results) {
-        SessionResults sessionResults = null;
+    @Test
+    public void TestCssFetching() {
+        WebDriver webDriver = SeleniumUtils.createChromeDriver();
+        webDriver.get("https://applitools.github.io/demo/TestPages/CorsCssTestPage/");
         try {
-            sessionResults = TestUtils.getSessionResults(eyes.getApiKey(), results);
-        } catch (IOException e) {
-            GeneralUtils.logExceptionStackTrace(eyes.getLogger(), e);
+            DomInterceptingEyes eyes = new DomInterceptingEyes();
+            eyes.open(webDriver, "Test Send DOM", "TestCssFetching", new RectangleSize(700, 460));
+            DomCapture domCapture = new DomCapture(eyes);
+            String dom = domCapture.getPageDom(new NullPositionProvider());
+            eyes.close();
+            Assert.assertTrue(dom.contains("p.corsat11"));
+            Assert.assertTrue(dom.contains("p.corsat12"));
+            Assert.assertTrue(dom.contains("p.corsat13"));
+            Assert.assertTrue(dom.contains("p.corsat21"));
+            Assert.assertTrue(dom.contains("p.corsat22"));
+            Assert.assertTrue(dom.contains("p.corsat23"));
+        } finally {
+            webDriver.quit();
         }
+    }
+
+    private static boolean getHasDom(IEyesBase eyes, TestResults results) throws IOException {
+        SessionResults sessionResults = TestUtils.getSessionResults(eyes.getApiKey(), results);
         ActualAppOutput[] actualAppOutputs = sessionResults.getActualAppOutput();
         Assert.assertEquals(actualAppOutputs.length, 1);
-        boolean hasDom = actualAppOutputs[0].getImage().getHasDom();
-        return hasDom;
+        return actualAppOutputs[0].getImage().getHasDom();
     }
 }

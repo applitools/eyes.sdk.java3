@@ -1,5 +1,8 @@
 package com.applitools.utils;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import java.util.Map;
 
 public class EfficientStringReplace {
@@ -62,59 +65,25 @@ public class EfficientStringReplace {
         return result.toString();
     }
 
-    public static String CleanForJSON(String s)
-    {
-
-        if (s == null || s.length() == 0)
+    /**
+     * Stringify the string for json format
+     */
+    public static String stringify(String s) {
+        if (s == null || s.isEmpty())
         {
             return "";
         }
 
-        char c = '\0';
-        int i;
-        int len = s.length();
-        StringBuilder sb = new StringBuilder(len + 4);
-        String t;
-
-        for (i = 0; i < len; i += 1)
-        {
-            c = s.charAt(i);
-            switch (c)
-            {
-                case '\\':
-                case '"':
-                case '/':
-                    sb.append('\\');
-                    sb.append(c);
-                    break;
-                case '\b':
-                    sb.append("\\b");
-                    break;
-                case '\t':
-                    sb.append("\\t");
-                    break;
-                case '\n':
-                    sb.append("\\n");
-                    break;
-                case '\f':
-                    sb.append("\\f");
-                    break;
-                case '\r':
-                    sb.append("\\r");
-                    break;
-                default:
-                    if (c < ' ')
-                    {
-                        t = String.format("%04x", c);
-                        sb.append("\\u").append(t.substring(t.length() - 4));
-                    }
-                    else
-                    {
-                        sb.append(c);
-                    }
-                    break;
-            }
+        ObjectMapper objectMapper = new ObjectMapper();
+        String cleaned;
+        try {
+            cleaned = objectMapper.writeValueAsString(s);
+            // Remove quotes
+            cleaned = cleaned.substring(1, cleaned.length() - 1);
+        } catch (JsonProcessingException e) {
+            cleaned = "";
         }
-        return sb.toString();
+
+        return cleaned;
     }
 }
