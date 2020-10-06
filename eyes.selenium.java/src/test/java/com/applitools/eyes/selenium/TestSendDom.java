@@ -128,7 +128,7 @@ public final class TestSendDom extends ReportingTestSuite {
                 if (expected == null) {
                     Assert.fail("EXPECTED DOM IS NULL!");
                 }
-                Assert.assertTrue(actual.equals(new DiffPrintingNotARealComparator(new Logger(new StdoutLogHandler(true))), expected));
+                Assert.assertTrue(actual.equals(new DiffPrintingNotARealComparator(eyes.getLogger()), expected));
 
                 SessionResults sessionResults = TestUtils.getSessionResults(eyes.getApiKey(), results);
                 ActualAppOutput[] actualAppOutput = sessionResults.getActualAppOutput();
@@ -137,7 +137,7 @@ public final class TestSendDom extends ReportingTestSuite {
                 if (downloaded == null) {
                     Assert.fail("Downloaded DOM IS NULL!");
                 }
-                Assert.assertTrue(downloaded.equals(new DiffPrintingNotARealComparator(new Logger(new StdoutLogHandler(true))), expected));
+                Assert.assertTrue(downloaded.equals(new DiffPrintingNotARealComparator(eyes.getLogger()), expected));
 
             } catch (IOException e) {
                 GeneralUtils.logExceptionStackTrace(eyes.getLogger(), e);
