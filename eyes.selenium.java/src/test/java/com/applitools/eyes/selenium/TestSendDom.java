@@ -1,9 +1,6 @@
 package com.applitools.eyes.selenium;
 
-import com.applitools.eyes.IEyesBase;
-import com.applitools.eyes.Logger;
-import com.applitools.eyes.RectangleSize;
-import com.applitools.eyes.TestResults;
+import com.applitools.eyes.*;
 import com.applitools.eyes.config.Configuration;
 import com.applitools.eyes.config.ConfigurationProvider;
 import com.applitools.eyes.metadata.ActualAppOutput;
@@ -131,23 +128,22 @@ public final class TestSendDom extends ReportingTestSuite {
                 if (expected == null) {
                     Assert.fail("EXPECTED DOM IS NULL!");
                 }
-                Assert.assertTrue(actual.equals(new DiffPrintingNotARealComparator(eyes.getLogger()), expected));
+                Assert.assertTrue(actual.equals(new DiffPrintingNotARealComparator(new Logger(new StdoutLogHandler(true))), expected));
 
                 SessionResults sessionResults = TestUtils.getSessionResults(eyes.getApiKey(), results);
                 ActualAppOutput[] actualAppOutput = sessionResults.getActualAppOutput();
                 String downloadedDomJsonString = TestUtils.getStepDom(eyes, actualAppOutput[0]);
                 JsonNode downloaded = mapper.readTree(downloadedDomJsonString);
-                //noinspection SimplifiedTestNGAssertion
                 if (downloaded == null) {
-                    eyes.getLogger().log("Downloaded DOM IS NULL!");
+                    Assert.fail("Downloaded DOM IS NULL!");
                 }
-                Assert.assertEquals(expected, downloaded);
+                Assert.assertTrue(downloaded.equals(new DiffPrintingNotARealComparator(new Logger(new StdoutLogHandler(true))), expected));
 
             } catch (IOException e) {
                 GeneralUtils.logExceptionStackTrace(eyes.getLogger(), e);
             }
         } finally {
-            eyes.abort();
+            eyes.abortIfNotClosed();
             webDriver.quit();
         }
     }
