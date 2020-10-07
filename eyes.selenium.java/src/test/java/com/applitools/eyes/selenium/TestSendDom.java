@@ -158,6 +158,7 @@ public final class TestSendDom extends ReportingTestSuite {
         DomInterceptingEyes eyes = new DomInterceptingEyes();
         eyes.setBatch(TestDataProvider.batchInfo);
         eyes.getConfigurationInstance().setAppName("Test Send DOM").setTestName("TestSendDOM_iframe").setViewportSize(new RectangleSize(1600, 1200));
+        eyes.setLogHandler(new StdoutLogHandler());
         try {
             eyes.open(webDriver);
             eyes.check(Target.window().fully());
