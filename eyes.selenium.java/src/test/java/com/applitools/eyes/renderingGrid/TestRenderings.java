@@ -119,7 +119,10 @@ public class TestRenderings extends ReportingTestSuite {
         Eyes eyes = new Eyes(runner);
         Configuration conf = eyes.getConfiguration();
         conf.addBrowser(new IosDeviceInfo(IosDeviceName.iPhone_XR, ScreenOrientation.LANDSCAPE));
+        conf.addBrowser(new IosDeviceInfo(IosDeviceName.iPhone_XR, IosVersion.LATEST));
+        conf.addBrowser(new IosDeviceInfo(IosDeviceName.iPhone_XR, IosVersion.ONE_VERSION_BACK));
         conf.setSaveDiffs(false);
+        conf.setSaveNewTests(false);
         eyes.setConfiguration(conf);
         eyes.setLogHandler(new StdoutLogHandler());
         ChromeDriver driver = SeleniumUtils.createChromeDriver();
