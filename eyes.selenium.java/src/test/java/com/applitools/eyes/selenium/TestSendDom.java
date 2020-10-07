@@ -15,7 +15,6 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.chrome.ChromeOptions;
 import org.testng.Assert;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
@@ -145,35 +144,6 @@ public final class TestSendDom extends ReportingTestSuite {
             }
         } finally {
             eyes.abortIfNotClosed();
-            webDriver.quit();
-        }
-    }
-
-    @Test
-    public void TestSendDOM_iframe() throws IOException {
-        ChromeOptions options = new ChromeOptions();
-        options.setHeadless(true);
-        WebDriver webDriver = SeleniumUtils.createChromeDriver(options);
-        webDriver.get("https://applitools.github.io/demo/TestPages/CorsTestPage/");
-        DomInterceptingEyes eyes = new DomInterceptingEyes();
-        eyes.setBatch(TestDataProvider.batchInfo);
-        eyes.getConfigurationInstance().setAppName("Test Send DOM").setTestName("TestSendDOM_iframe").setViewportSize(new RectangleSize(1600, 1200));
-        eyes.setLogHandler(new StdoutLogHandler());
-        try {
-            eyes.open(webDriver);
-            eyes.check(Target.window().fully());
-            TestResults results = eyes.close();
-
-            boolean hasDom = getHasDom(eyes, results);
-            Assert.assertTrue(hasDom);
-
-            String actualDomString = eyes.getDomJson();
-            String expectedDomString = GeneralUtils.readToEnd(TestSendDom.class.getResourceAsStream("/test_send_dom_cors_iframe.json"));
-            ObjectMapper mapper = new ObjectMapper();
-            JsonNode actual = mapper.readTree(actualDomString);
-            JsonNode expected = mapper.readTree(expectedDomString);
-            Assert.assertTrue(actual.equals(new DiffPrintingNotARealComparator(eyes.getLogger()), expected));
-        } finally {
             webDriver.quit();
         }
     }
