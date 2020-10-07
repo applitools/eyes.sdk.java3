@@ -84,7 +84,6 @@
                     <include name="TestSendDOM_1"/>
                     <include name="TestSendDOM_2"/>
                     <include name="TestSendDOM_FullWindow"/>
-                    <include name="TestSendDOM_iframe"/>
                     <include name="TestCssFetching"/>
                 </methods>
             </class>
