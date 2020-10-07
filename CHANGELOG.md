@@ -1,6 +1,7 @@
 [vNext]
 ### Updated
 - DeviceName now includes new mobile devices. [Trello 1751](https://trello.com/c/JOyUqzEM)
+- IosDeviceInfo includes the version property. [Trello 2187](https://trello.com/c/25AjSV6V)
 
 [3.179.0] - 2020-10-01 
 ### Added
