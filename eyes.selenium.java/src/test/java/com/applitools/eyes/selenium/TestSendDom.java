@@ -11,6 +11,7 @@ import com.applitools.eyes.utils.ReportingTestSuite;
 import com.applitools.eyes.utils.SeleniumUtils;
 import com.applitools.eyes.utils.TestUtils;
 import com.applitools.utils.GeneralUtils;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.openqa.selenium.By;
@@ -197,21 +198,22 @@ public final class TestSendDom extends ReportingTestSuite {
     }
 
     @Test
-    public void TestCssFetching() {
+    public void TestCssFetching() throws IOException {
         WebDriver webDriver = SeleniumUtils.createChromeDriver();
         webDriver.get("https://applitools.github.io/demo/TestPages/CorsCssTestPage/");
+        DomInterceptingEyes eyes = new DomInterceptingEyes();
+        eyes.setLogHandler(new StdoutLogHandler());
         try {
-            DomInterceptingEyes eyes = new DomInterceptingEyes();
             eyes.open(webDriver, "Test Send DOM", "TestCssFetching", new RectangleSize(700, 460));
             DomCapture domCapture = new DomCapture(eyes);
             String dom = domCapture.getPageDom(new NullPositionProvider());
             eyes.close();
-            Assert.assertTrue(dom.contains("p.corsat11"));
-            Assert.assertTrue(dom.contains("p.corsat12"));
-            Assert.assertTrue(dom.contains("p.corsat13"));
-            Assert.assertTrue(dom.contains("p.corsat21"));
-            Assert.assertTrue(dom.contains("p.corsat22"));
-            Assert.assertTrue(dom.contains("p.corsat23"));
+
+            ObjectMapper objectMapper = new ObjectMapper();
+            JsonNode actual = objectMapper.readTree(dom);
+            String expectedDomJson = GeneralUtils.readToEnd(TestSendDom.class.getResourceAsStream("/dom_cors_css.json"));
+            JsonNode expected = objectMapper.readTree(expectedDomJson);
+            Assert.assertTrue(actual.equals(new DiffPrintingNotARealComparator(eyes.getLogger()), expected));
         } finally {
             webDriver.quit();
         }

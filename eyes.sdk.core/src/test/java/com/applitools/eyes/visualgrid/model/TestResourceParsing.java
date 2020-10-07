@@ -38,8 +38,6 @@ public class TestResourceParsing {
         String cssContent = GeneralUtils.readToEnd(getClass().getResourceAsStream("/css_file_with_urls.css"));
         RGridResource resource = new RGridResource( "https://test.com", "text/css", cssContent.getBytes());
         Set<URI> newResources = resource.parse(new Logger(), "");
-
-        // There are exactly 54 imported urls in the resources file but only 36 unique urls
         Assert.assertEquals(newResources.size(), 3);
     }
 

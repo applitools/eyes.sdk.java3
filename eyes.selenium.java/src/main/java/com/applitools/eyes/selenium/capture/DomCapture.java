@@ -8,16 +8,11 @@ import com.applitools.eyes.selenium.SeleniumEyes;
 import com.applitools.eyes.selenium.frames.FrameChain;
 import com.applitools.eyes.selenium.wrappers.EyesTargetLocator;
 import com.applitools.eyes.selenium.wrappers.EyesSeleniumDriver;
-import com.applitools.eyes.visualgrid.model.CssTokenizer;
 import com.applitools.eyes.visualgrid.model.RGridResource;
 import com.applitools.utils.EfficientStringReplace;
 import com.applitools.utils.GeneralUtils;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
-import org.w3c.dom.css.CSSImportRule;
-import org.w3c.dom.css.CSSRule;
-import org.w3c.dom.css.CSSRuleList;
-import org.w3c.dom.css.CSSStyleRule;
 
 import java.io.IOException;
 import java.net.*;
@@ -28,64 +23,6 @@ import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 public class DomCapture {
-    static class CssTreeNode {
-        private final String css;
-        private final List<CssTreeNode> childNodes = new ArrayList<>();
-        private final List<CSSImportRule> importRules = new ArrayList<>();
-        private final List<CSSStyleRule> styleRules = new ArrayList<>();
-
-        public CssTreeNode(String css) {
-            this.css = css;
-        }
-
-        public List<String> getImportedUrls() {
-            List<String> urls = new ArrayList<>();
-            for (CSSImportRule rule : importRules) {
-                urls.add(rule.getHref());
-            }
-
-            return urls;
-        }
-
-        private void parse(Logger logger) {
-            if (css == null || css.isEmpty()) {
-                return;
-            }
-
-            CSSRuleList ruleList;
-            try {
-                ruleList = CssTokenizer.getCssRules(css);
-            } catch (IOException e) {
-                GeneralUtils.logExceptionStackTrace(logger, e);
-                return;
-            }
-
-            for (int i = 0; i < ruleList.getLength(); i++) {
-                CSSRule rule = ruleList.item(i);
-                if (rule instanceof CSSImportRule) {
-                    importRules.add((CSSImportRule) rule);
-                }
-                if (rule instanceof CSSStyleRule) {
-                    styleRules.add((CSSStyleRule) rule);
-                }
-            }
-        }
-
-        @Override
-        public String toString() {
-            StringBuilder sb = new StringBuilder();
-            sb.append(css);
-            for (CssTreeNode node : childNodes) {
-                sb.append(node.toString());
-            }
-
-            for (CSSStyleRule styleRule : styleRules) {
-                sb.append(styleRule.toString());
-            }
-
-            return sb.toString();
-        }
-    }
 
     private class TimeoutTask extends TimerTask {
         @Override
@@ -309,12 +246,13 @@ public class DomCapture {
                             logger.verbose(String.format("Css Download Completed. URL: %s", uri));
                             CssTreeNode node = new CssTreeNode(new String(resource.getContent()));
                             node.parse(logger);
-                            if (!node.importRules.isEmpty()) {
-                                fetchCssFiles(uri.toString(), node.getImportedUrls(), node);
+                            List<String> importedUrls = node.getImportedUrls();
+                            if (!importedUrls.isEmpty()) {
+                                fetchCssFiles(uri.toString(), importedUrls, node);
                             }
 
                             if (parentNode != null) {
-                                parentNode.childNodes.add(node);
+                                parentNode.addChildNode(cssUrl, node);
                             } else {
                                 cssNodesToReplace.put(cssUrl, node);
                             }
@@ -329,12 +267,7 @@ public class DomCapture {
 
                     @Override
                     public void onFail() {
-                        logger.verbose("DomCapture.onDownloadFailed");
-                        cssNodesToReplace.put(cssUrl, new CssTreeNode(""));
-                        cssPhaser.arriveAndDeregister();
-                        logger.verbose("Download Failed");
-                        logger.verbose("cssPhaser.arriveAndDeregister(); " + uri);
-                        logger.verbose("current missing  - " + cssPhaser.getUnarrivedParties());
+                        logger.log("This flow can't be reached. Please verify.");
                     }
                 });
             } catch (Throwable e) {
