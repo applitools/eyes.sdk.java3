@@ -109,6 +109,7 @@ public final class TestSendDom extends ReportingTestSuite {
         DomInterceptingEyes eyes = new DomInterceptingEyes();
         eyes.setBatch(TestDataProvider.batchInfo);
         eyes.getConfigurationInstance().setAppName("Test Send DOM").setTestName("Full Window").setViewportSize(new RectangleSize(1024, 768));
+        eyes.setLogHandler(new StdoutLogHandler());
         try {
             eyes.open(webDriver);
             eyes.check("Window", Target.window().fully());

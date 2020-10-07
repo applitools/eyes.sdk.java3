@@ -168,8 +168,7 @@ public class TestUtils {
                 .queryParam("apiKey", eyes.getApiKey())
                 .build();
 
-        RestClient client = new RestClient(new Logger(new StdoutLogHandler()), apiSessionUri, ServerConnector.DEFAULT_CLIENT_TIMEOUT);
-        client.setProxy(new ProxySettings("http://localhost:8888"));
+        RestClient client = new RestClient(eyes.getLogger(), apiSessionUri, ServerConnector.DEFAULT_CLIENT_TIMEOUT);
         return client.sendHttpRequest(apiSessionUri.toString(), HttpMethod.GET, MediaType.APPLICATION_JSON).getBodyString();
     }
 }
