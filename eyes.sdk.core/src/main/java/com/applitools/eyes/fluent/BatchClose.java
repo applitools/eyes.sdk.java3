@@ -1,6 +1,5 @@
 package com.applitools.eyes.fluent;
 
-import com.applitools.connectivity.ServerConnector;
 import com.applitools.eyes.Logger;
 import com.applitools.utils.ArgumentGuard;
 import com.applitools.utils.GeneralUtils;
@@ -8,25 +7,8 @@ import com.applitools.utils.GeneralUtils;
 import java.util.List;
 
 public class BatchClose {
-
-    public class EnabledBatchClose {
-        ServerConnector serverConnector;
-        private final List<String> batchIds;
-        private EnabledBatchClose(List<String> batchIds) {
-            this.serverConnector = new ServerConnector(logger);
-            this.batchIds = batchIds;
-        }
-
-        public void close() {
-            logger.verbose(String.format("Closing %d batches", batchIds.size()));
-            for (String batchId : batchIds) {
-                serverConnector.closeBatch(batchId, true, serverUrl);
-            }
-        }
-    }
-
-    private final Logger logger;
-    private String serverUrl;
+    protected final Logger logger;
+    protected String serverUrl;
 
     public BatchClose() {
         this(new Logger());
@@ -45,6 +27,6 @@ public class BatchClose {
     public EnabledBatchClose setBatchId(List<String> batchIds) {
         ArgumentGuard.notNull(batchIds, "batchIds");
         ArgumentGuard.notContainsNull(batchIds, "batchIds");
-        return new EnabledBatchClose(batchIds);
+        return new EnabledBatchClose(logger, serverUrl, batchIds);
     }
 }
