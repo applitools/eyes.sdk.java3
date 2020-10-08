@@ -9,10 +9,10 @@ import java.util.List;
 
 public class BatchClose {
 
-    public class EnableBatchClose {
+    public class EnabledBatchClose {
         ServerConnector serverConnector;
         private final List<String> batchIds;
-        private EnableBatchClose(List<String> batchIds) {
+        private EnabledBatchClose(List<String> batchIds) {
             this.serverConnector = new ServerConnector(logger);
             this.batchIds = batchIds;
         }
@@ -42,9 +42,9 @@ public class BatchClose {
         return this;
     }
 
-    public EnableBatchClose setBatchId(List<String> batchIds) {
+    public EnabledBatchClose setBatchId(List<String> batchIds) {
         ArgumentGuard.notNull(batchIds, "batchIds");
         ArgumentGuard.notContainsNull(batchIds, "batchIds");
-        return new EnableBatchClose(batchIds);
+        return new EnabledBatchClose(batchIds);
     }
 }

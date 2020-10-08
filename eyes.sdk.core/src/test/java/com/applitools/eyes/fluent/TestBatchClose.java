@@ -21,12 +21,12 @@ public class TestBatchClose {
         String serverUrl = "customUrl";
 
         BatchClose batchClose = new BatchClose();
-        BatchClose.EnableBatchClose enableBatchClose = batchClose.setUrl(serverUrl).setBatchId(batchIds);
+        BatchClose.EnabledBatchClose enabledBatchClose = batchClose.setUrl(serverUrl).setBatchId(batchIds);
 
         ServerConnector serverConnector = mock(ServerConnector.class);
-        enableBatchClose.serverConnector = serverConnector;
+        enabledBatchClose.serverConnector = serverConnector;
 
-        enableBatchClose.close();
+        enabledBatchClose.close();
         verify(serverConnector).closeBatch("first", true, serverUrl);
         verify(serverConnector).closeBatch("second", true, serverUrl);
         verify(serverConnector).closeBatch("third", true, serverUrl);
