@@ -65,7 +65,7 @@ public class TestImageUtils extends ReportingTestSuite {
         BufferedImage cropped = ImageUtils.cropImage(logger, image, new Region(600, 350, 300, 300));
         Assert.assertEquals(cropped.getWidth(), 200, "widths differ");
         Assert.assertEquals(cropped.getHeight(), 150, "heights differ");
-        Assert.assertTrue(testLogHandler.contains("[LOG    ] {} [1] com.applitools.utils.ImageUtils.cropImage(): WARNING - requested cropped getArea overflows image boundaries."));
+        Assert.assertTrue(testLogHandler.contains("[Notice]\t{} [1] com.applitools.utils.ImageUtils.cropImage(): WARNING - requested cropped getArea overflows image boundaries."));
     }
 
     @Test
@@ -77,6 +77,6 @@ public class TestImageUtils extends ReportingTestSuite {
         BufferedImage cropped = ImageUtils.cropImage(logger, image, new Region(850, 100, 300, 200));
         Assert.assertEquals(cropped.getWidth(), 800, "widths differ");
         Assert.assertEquals(cropped.getHeight(), 500, "heights differ");
-        Assert.assertTrue(testLogHandler.contains("[LOG    ] {} [1] com.applitools.utils.ImageUtils.cropImage(): WARNING - requested cropped getArea results in zero-size image! Cropped not performed. Returning original image."));
+        Assert.assertTrue(testLogHandler.contains("[Notice]\t{} [1] com.applitools.utils.ImageUtils.cropImage(): WARNING - requested cropped getArea results in zero-size image! Cropped not performed. Returning original image."));
     }
 }
