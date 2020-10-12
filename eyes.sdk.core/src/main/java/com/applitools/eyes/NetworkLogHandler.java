@@ -17,10 +17,10 @@ import java.util.concurrent.atomic.AtomicReference;
 
 public class NetworkLogHandler extends LogHandler {
 
-    private static final int MAX_EVENTS_SIZE = 10;
+    private static final int MAX_EVENTS_SIZE = 100;
 
     private final ServerConnector serverConnector;
-    private final LogSessionsClientEvents clientEvents;
+    final LogSessionsClientEvents clientEvents;
 
     protected NetworkLogHandler(ServerConnector serverConnector) {
         super(true);
@@ -87,6 +87,14 @@ public class NetworkLogHandler extends LogHandler {
                 } catch (InterruptedException ignored) {
                 }
             }
+
+            clientEvents.clear();
         }
+    }
+
+    public static void sendSingleLog(ServerConnector serverConnector, TraceLevel level, String message) {
+        NetworkLogHandler logHandler = new NetworkLogHandler(serverConnector);
+        logHandler.onMessage(level, message);
+        logHandler.close();
     }
 }
