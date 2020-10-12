@@ -1,14 +1,16 @@
 package com.applitools.eyes;
 
+import com.applitools.eyes.logging.TraceLevel;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-public class MultiLogHandler implements LogHandler {
-
-    private List<LogHandler> logHandlers = new ArrayList<>();
+public class MultiLogHandler extends LogHandler {
+    private final List<LogHandler> logHandlers = new ArrayList<>();
 
     public MultiLogHandler(LogHandler... logHandlers) {
+        super(true);
         this.logHandlers.addAll(Arrays.asList(logHandlers));
     }
 
@@ -20,9 +22,16 @@ public class MultiLogHandler implements LogHandler {
     }
 
     @Override
-    public void onMessage(boolean verbose, String logString) {
+    public void onMessage(TraceLevel level, String message) {
         for (LogHandler logHandler : logHandlers) {
-            logHandler.onMessage(verbose, logString);
+            logHandler.onMessage(level, message);
+        }
+    }
+
+    @Override
+    public void onMessage(String message) {
+        for (LogHandler logHandler : logHandlers) {
+            logHandler.onMessage(message);
         }
     }
 

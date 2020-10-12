@@ -6,6 +6,7 @@ import com.applitools.connectivity.api.HttpClient;
 import com.applitools.connectivity.api.Response;
 import com.applitools.eyes.*;
 import com.applitools.eyes.locators.VisualLocatorsData;
+import com.applitools.eyes.logging.LogSessionsClientEvents;
 import com.applitools.eyes.visualgrid.model.*;
 import com.applitools.utils.ArgumentGuard;
 import com.applitools.utils.EyesSyncObject;
@@ -32,6 +33,7 @@ public class ServerConnector extends UfgConnector {
     static final String RENDER = "/render";
     static final String MOBILE_DEVICES_PATH = "/app/info/mobile/devices";
     public static final String API_PATH = "/api/sessions/running";
+    private static final String LOG_PATH = "/api/sessions/log";
 
     private Map<String, MobileDeviceInfo> mobileDevicesInfo = null;
 
@@ -77,6 +79,24 @@ public class ServerConnector extends UfgConnector {
 
     public void updateClient(HttpClient client) {
         restClient = client;
+    }
+
+    public void sendLogs(AsyncRequestCallback callback, LogSessionsClientEvents clientEvents) {
+        ArgumentGuard.notNull(clientEvents, "clientEvents");
+        AsyncRequest request = makeEyesRequest(new HttpRequestBuilder() {
+            @Override
+            public AsyncRequest build() {
+                return restClient.target(serverUrl).path(LOG_PATH)
+                        .queryParam("apiKey", getApiKey()).asyncRequest(MediaType.APPLICATION_JSON);
+            }
+        });
+
+        try {
+            String data = jsonMapper.writeValueAsString(clientEvents);
+            sendAsyncRequest(request, HttpMethod.POST, callback, data, MediaType.APPLICATION_JSON);
+        } catch (JsonProcessingException e) {
+            throw new EyesException("Failed converting client events to string", e);
+        }
     }
 
     /**

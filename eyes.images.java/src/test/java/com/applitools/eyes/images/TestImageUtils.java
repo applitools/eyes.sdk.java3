@@ -13,16 +13,20 @@ import java.util.ArrayList;
 
 public class TestImageUtils extends ReportingTestSuite {
 
-    public class TestLogHandler implements LogHandler {
+    public static class TestLogHandler extends LogHandler {
 
-        private ArrayList<String> messages = new ArrayList<>();
+        private final ArrayList<String> messages = new ArrayList<>();
+
+        protected TestLogHandler() {
+            super(false);
+        }
 
         @Override
         public void open() {}
 
         @Override
-        public void onMessage(boolean verbose, String logString) {
-            messages.add(logString);
+        public void onMessage(String message) {
+            messages.add(message);
         }
 
         @Override

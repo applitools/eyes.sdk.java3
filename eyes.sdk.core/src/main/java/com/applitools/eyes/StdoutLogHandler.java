@@ -1,5 +1,6 @@
 package com.applitools.eyes;
 
+import com.applitools.eyes.logging.TraceLevel;
 import com.applitools.utils.GeneralUtils;
 
 import java.util.Calendar;
@@ -8,9 +9,7 @@ import java.util.TimeZone;
 /**
  * Writes log messages to the standard output stream.
  */
-public class StdoutLogHandler implements LogHandler {
-
-    private final boolean isVerbose;
+public class StdoutLogHandler extends LogHandler {
 
     /**
      * Creates a new StdoutLogHandler instance.
@@ -18,7 +17,7 @@ public class StdoutLogHandler implements LogHandler {
      * @param isVerbose Whether to handle or ignore verbose log messages.
      */
     public StdoutLogHandler(boolean isVerbose) {
-        this.isVerbose = isVerbose;
+        super(isVerbose);
     }
 
     /**
@@ -33,13 +32,9 @@ public class StdoutLogHandler implements LogHandler {
         this(false);
     }
 
-    public synchronized void onMessage(boolean verbose, String message) {
-        if (!verbose || this.isVerbose) {
-            String currentTime = GeneralUtils.toISO8601DateTime(
-                    Calendar.getInstance(TimeZone.getTimeZone("UTC")));
-
-            System.out.println(currentTime + " Eyes: " + message);
-        }
+    public synchronized void onMessage(String message) {
+        String currentTime = GeneralUtils.toISO8601DateTime(Calendar.getInstance(TimeZone.getTimeZone("UTC")));
+        System.out.println(currentTime + " Eyes: " + message);
     }
 
     /**

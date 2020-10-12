@@ -480,7 +480,7 @@ public abstract class EyesBase implements IEyesBase {
         return testResults;
     }
 
-    public void close(final TaskListener<TestResults> listener, boolean throwEx) {
+    private void close(final TaskListener<TestResults> listener, boolean throwEx) {
         if (isDisabled) {
             logger.verbose("Ignored");
             listener.onComplete(new TestResults());
@@ -585,7 +585,7 @@ public abstract class EyesBase implements IEyesBase {
     /**
      * If a test is running, aborts it. Otherwise, does nothing.
      */
-    public void abortIfNotClosed(final TaskListener<TestResults> listener) {
+    private void abortIfNotClosed(final TaskListener<TestResults> listener) {
         if (isDisabled) {
             logger.verbose("Ignored");
             listener.onComplete(new TestResults());

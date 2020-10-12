@@ -5,17 +5,17 @@ package com.applitools.eyes;
 
 import com.applitools.utils.ArgumentGuard;
 
-import java.io.*;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 
 /**
  * Writes log messages to a file.
  */
-@SuppressWarnings("UnusedDeclaration")
-public class FileLogger implements LogHandler {
-
-    private final boolean isVerbose;
+public class FileLogger extends LogHandler {
     private final String filename;
     private final boolean append;
     private BufferedWriter fileWriter;
@@ -30,10 +30,10 @@ public class FileLogger implements LogHandler {
      * @param isVerbose Whether to handle or ignore verbose log messages.
      */
     public FileLogger(String filename, boolean append, boolean isVerbose) {
+        super(isVerbose);
         ArgumentGuard.notNullOrEmpty(filename, "filename");
         this.filename = filename;
         this.append = append;
-        this.isVerbose = isVerbose;
         fileWriter = null;
     }
 
@@ -43,7 +43,6 @@ public class FileLogger implements LogHandler {
      * {@code true}.
      * @param isVerbose Whether to handle or ignore verbose log messages.
      */
-    @SuppressWarnings("UnusedDeclaration")
     public FileLogger(boolean isVerbose) {
         this("eyes.log", true, isVerbose);
     }
@@ -62,7 +61,11 @@ public class FileLogger implements LogHandler {
             if (path != null && !path.exists()) {
                 System.out.println("No Folder");
                 boolean success = path.mkdirs();
-                System.out.println("Folder created");
+                if (success) {
+                    System.out.println("Folder created");
+                } else {
+                    System.out.printf("Failed creating folder %s%n", path.getAbsolutePath());
+                }
             }
 
             fileWriter = new BufferedWriter(new FileWriter(file, append));
@@ -71,17 +74,12 @@ public class FileLogger implements LogHandler {
         }
     }
 
-    /**
-     * Handle a message to be logged.
-     * @param verbose   Whether this message is flagged as verbose or not.
-     * @param logString The string to log.
-     */
-    public synchronized void onMessage(boolean verbose, String logString) {
-
-        if (fileWriter != null && (!verbose || this.isVerbose)) {
+    @Override
+    public synchronized void onMessage(String message) {
+        if (fileWriter != null) {
             synchronized (fileWriter) {
                 try {
-                    fileWriter.write(getFormattedTimeStamp() + " Eyes: " + logString);
+                    fileWriter.write(getFormattedTimeStamp() + " Eyes: " + message);
                     fileWriter.newLine();
                     fileWriter.flush();
                 } catch (Exception e) {
@@ -95,12 +93,11 @@ public class FileLogger implements LogHandler {
      * Close the log file for writing.
      */
     public void close() {
-        //noinspection EmptyCatchBlock
         try {
             if (fileWriter != null) {
                 fileWriter.close();
             }
-        } catch (IOException e) {
+        } catch (IOException ignored) {
         }
         fileWriter = null;
     }
