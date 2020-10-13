@@ -32,7 +32,9 @@ public class ReportingListener implements ITestListener {
 
     @Override
     public void onStart(ITestContext context) {
-
+        if (TestUtils.runOnCI && System.getenv("TRAVIS") != null) {
+            System.setProperty("webdriver.chrome.driver", "/home/travis/build/chromedriver"); // for travis build.
+        }
     }
 
     @Override
