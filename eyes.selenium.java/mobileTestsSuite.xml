@@ -1,6 +1,10 @@
 <!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd" >
 
 <suite name="passed tests" verbose="1" parallel="tests" thread-count="20">
+    <listeners>
+        <listener class-name="com.applitools.eyes.selenium.ExcludeFailingTestsListener"/>
+        <listener class-name="com.applitools.eyes.utils.ReportingListener"/>
+    </listeners>
     <test name="TestMobileDevicesIOS">
         <classes>
             <class name="com.applitools.eyes.selenium.TestMobileDevicesIOS">

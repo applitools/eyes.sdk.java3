@@ -60,8 +60,14 @@ jobs:
         - /home/travis/build/chromedriver --version
         - env webdriver.chrome.driver=/home/travis/build/
         - if [[ $TRAVIS_TAG =~ ^FULL_COVERAGE_TESTS ]]; then
-          sed -i 's/regressionTestsSuite.xml/devTestsSuite.xml/g' $TRAVIS_BUILD_DIR/eyes.selenium.java/pom.xml;
+          sed -i 's/passedTestsSuite.xml/devTestsSuite.xml/g' $TRAVIS_BUILD_DIR/eyes.selenium.java/pom.xml;
           fi
+        - chmod +x ./runTests.sh
+        - ./runTests.sh "eyes.selenium.java"
+    - name: Selenium Mobile
+      script:
+        - echo APPLITOOLS_REPORT_ID
+        - sed -i 's/passedTestsSuite.xml/mobileTestsSuite.xml/g' $TRAVIS_BUILD_DIR/eyes.selenium.java/pom.xml;
         - chmod +x ./runTests.sh
         - ./runTests.sh "eyes.selenium.java"
     - name: Generic

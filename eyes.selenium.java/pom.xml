@@ -11,7 +11,7 @@
 
     <properties>
         <defaultSuiteFiles>
-            regressionTestsSuite.xml
+            passedTestsSuite.xml
         </defaultSuiteFiles>
         <suiteFile>${defaultSuiteFiles}</suiteFile>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>

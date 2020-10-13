@@ -1,6 +1,10 @@
 <!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd" >
 
-<suite name="passed tests" verbose="1" parallel="tests" thread-count="10">
+<suite name="passed tests" verbose="1" parallel="tests" thread-count="15">
+    <listeners>
+        <listener class-name="com.applitools.eyes.selenium.ExcludeFailingTestsListener"/>
+        <listener class-name="com.applitools.eyes.utils.ReportingListener"/>
+    </listeners>
     <test name="TestClassicApi">
         <parameter name="dont_run" value="TestCheckInnerFrame+VG,TestCheckFrame+VG, TestCheckWindowFully+VG, TestDoubleCheckWindow+VG, TestCheckWindow+VG, TestCheckRegionInFrame+VG"/>
         <classes>
