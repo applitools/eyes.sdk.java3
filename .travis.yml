@@ -58,7 +58,7 @@ jobs:
         - unzip chromedriver_linux64.zip -d /home/travis/build/
         - chmod +x /home/travis/build/chromedriver
         - /home/travis/build/chromedriver --version
-        - env webdriver.chrome.driver=/home/travis/build/
+        - env webdriver.chrome.driver=/home/travis/build/chromedriver
         - if [[ $TRAVIS_TAG =~ ^FULL_COVERAGE_TESTS ]]; then
           sed -i 's/passedTestsSuite.xml/devTestsSuite.xml/g' $TRAVIS_BUILD_DIR/eyes.selenium.java/pom.xml;
           fi
@@ -72,7 +72,7 @@ jobs:
         - unzip chromedriver_linux64.zip -d /home/travis/build/
         - chmod +x /home/travis/build/chromedriver
         - /home/travis/build/chromedriver --version
-        - env webdriver.chrome.driver=/home/travis/build/
+        - env webdriver.chrome.driver=/home/travis/build/chromedriver
         - sed -i 's/passedTestsSuite.xml/mobileTestsSuite.xml/g' $TRAVIS_BUILD_DIR/eyes.selenium.java/pom.xml;
         - chmod +x ./runTests.sh
         - ./runTests.sh "eyes.selenium.java"
