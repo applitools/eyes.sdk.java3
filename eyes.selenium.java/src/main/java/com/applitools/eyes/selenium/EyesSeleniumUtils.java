@@ -39,6 +39,16 @@ public class EyesSeleniumUtils {
         }
 
         EyesRemoteWebElement bodyElement = new EyesRemoteWebElement(logger, driver, body);
+        boolean scrollableHtml =  htmlElement.canScrollVertically();
+        boolean scrollableBody = bodyElement.canScrollVertically();
+        if (scrollableHtml && !scrollableBody) {
+            return htmlElement;
+        }
+        if (!scrollableHtml && scrollableBody) {
+            return bodyElement;
+        }
+
+        // if both are scrollable or both are not scrollable, we choose the higher one
         if (htmlElement.getBoundingClientRect().height < bodyElement.getBoundingClientRect().height) {
             return bodyElement;
         } else {

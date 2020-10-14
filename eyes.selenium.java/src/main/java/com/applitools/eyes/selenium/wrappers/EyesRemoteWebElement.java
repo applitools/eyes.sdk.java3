@@ -245,6 +245,10 @@ public class EyesRemoteWebElement extends RemoteWebElement {
         return (int) Math.ceil(Double.parseDouble(eyesDriver.executeScript(JS_GET_CLIENT_HEIGHT, this).toString()));
     }
 
+    public boolean canScrollVertically() {
+        return getScrollHeight() > getClientHeight();
+    }
+
     /**
      * @return The width of the left border.
      */

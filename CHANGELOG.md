@@ -9,6 +9,7 @@
 - Supporting check full element with ufg. [Trello 2145](https://trello.com/c/8tPAnz66)
 ### Fixed
 - Fixed ignoring statusBar height on cropping when invisible. [Trello 2202](https://trello.com/c/qEH2mQgP)
+- Now checking if the element is scrollable before choosing default root element. [Trello 2198](https://trello.com/c/DTvpdAj4), [Trello 2207](https://trello.com/c/v5s4lv8u), [Trello 2215](https://trello.com/c/nUzTl0KB)
 ### Updated
 - Removed appium dependency from eyes-selenium-common module. [Trello 2188](https://trello.com/c/uTbDNRdf)
 

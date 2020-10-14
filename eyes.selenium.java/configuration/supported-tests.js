@@ -317,4 +317,7 @@ module.exports = [
   {name: 'TestCheckElementFullyAfterScrollNonScrollableElement', executionMode: {isScrollStitching: true}},
   {name: 'TestCheckElementFullyAfterScrollNonScrollableElement', executionMode: {isCssStitching: true}},
   {name: 'TestCheckElementFullyAfterScrollNonScrollableElement', executionMode: {isVisualGrid: true}},
+  {name: 'TestCheckElementFullyWhenBodyIsGreaterAndNonScrollable', executionMode: {isScrollStitching: true}},
+  {name: 'TestCheckElementFullyWhenBodyIsGreaterAndNonScrollable', executionMode: {isCssStitching: true}},
+  {name: 'TestCheckElementFullyWhenBodyIsGreaterAndNonScrollable', executionMode: {isVisualGrid: true}}
 ]
