@@ -27,6 +27,8 @@ public class VisualGridRunner extends EyesRunner {
     private final Set<IRenderingEyes> allEyes = Collections.synchronizedSet(new HashSet<IRenderingEyes>());
     private final Map<String, RGridResource> cachedResources = Collections.synchronizedMap(new HashMap<String, RGridResource>());
     private final Map<String, RGridResource> putResourceCache = Collections.synchronizedMap(new HashMap<String, RGridResource>());
+    private final Map<String, Set<String>> cachedResourceMapping = Collections.synchronizedMap(new HashMap<String, Set<String>>());
+    private final Set<String> cachedBlobsUrls = Collections.synchronizedSet(new HashSet<String>());
 
     private final Object openerServiceConcurrencyLock = new Object();
     private final Object openerServiceLock = new Object();
@@ -192,6 +194,10 @@ public class VisualGridRunner extends EyesRunner {
 
     public Map<String, RGridResource> getCachedResources() {
         return cachedResources;
+    }
+
+    public Set<String> getCachedBlobsUrls() {
+        return cachedBlobsUrls;
     }
 
     public Map<String, RGridResource> getPutResourceCache() {
@@ -491,7 +497,7 @@ public class VisualGridRunner extends EyesRunner {
                 notifyAllServices();
                 listener.onRenderFailed(e);
             }
-        }, userAgent, selectors);
+        }, userAgent, selectors, cachedBlobsUrls, cachedResourceMapping);
         logger.verbose("locking renderingTaskList");
         synchronized (renderingTaskList) {
             this.renderingTaskList.add(renderingTask);

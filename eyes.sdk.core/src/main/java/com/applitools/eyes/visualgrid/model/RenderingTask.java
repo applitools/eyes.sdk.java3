@@ -36,6 +36,8 @@ public class RenderingTask implements Callable<RenderStatusResults>, Completable
     private final UserAgent userAgent;
     final Map<String, RGridResource> fetchedCacheMap;
     final Map<String, RGridResource> putResourceCache;
+    final Set<String> cachedBlobsUrls;
+    final Map<String, Set<String>> cachedResourceMapping;
     private final Logger logger;
     private final AtomicBoolean isTaskComplete = new AtomicBoolean(false);
     private AtomicBoolean isForcePutNeeded;
@@ -95,11 +97,14 @@ public class RenderingTask implements Callable<RenderStatusResults>, Completable
         putResourceCache = new HashMap<>();
         this.checkSettings = checkSettings;
         this.renderingInfo = new RenderingInfo();
+        this.cachedBlobsUrls = new HashSet<>();
+        this.cachedResourceMapping = new HashMap<>();
     }
 
     public RenderingTask(IEyesConnector eyesConnector, FrameData domData, ICheckSettings checkSettings,
                          List<VisualGridTask> visualGridTaskList, List<VisualGridTask> openVisualGridTasks, VisualGridRunner renderingGridManager,
-                         IDebugResourceWriter debugResourceWriter, RenderTaskListener listener, UserAgent userAgent, List<VisualGridSelector[]> regionSelectors) {
+                         IDebugResourceWriter debugResourceWriter, RenderTaskListener listener, UserAgent userAgent, List<VisualGridSelector[]> regionSelectors,
+                         Set<String> cachedBlobsUrls, Map<String, Set<String>> cachedResourceMapping) {
 
         this.eyesConnector = eyesConnector;
         this.domData = domData;
@@ -116,6 +121,9 @@ public class RenderingTask implements Callable<RenderStatusResults>, Completable
         this.listeners.add(listener);
         String renderingGridForcePut = GeneralUtils.getEnvString("APPLITOOLS_RENDERING_GRID_FORCE_PUT");
         this.isForcePutNeeded = new AtomicBoolean(renderingGridForcePut != null && renderingGridForcePut.equalsIgnoreCase("true"));
+        this.cachedBlobsUrls = cachedBlobsUrls;
+        this.cachedResourceMapping = cachedResourceMapping;
+        collectBlobsFromFrameData(domData);
     }
 
     @Override
@@ -227,6 +235,19 @@ public class RenderingTask implements Callable<RenderStatusResults>, Completable
             for (VisualGridTask visualGridTask : openVisualGridTaskList) {
                 visualGridTask.setRenderingTask(this);
             }
+        }
+    }
+
+    private void collectBlobsFromFrameData(FrameData frameData) {
+        for (BlobData blobData : frameData.getBlobs()) {
+            cachedBlobsUrls.add(GeneralUtils.sanitizeURL(blobData.getUrl(), logger));
+        }
+        for (String url : frameData.getResourceUrls()) {
+            cachedBlobsUrls.add(GeneralUtils.sanitizeURL(url, logger));
+        }
+        for (FrameData fd: frameData.getFrames()) {
+            cachedBlobsUrls.add(GeneralUtils.sanitizeURL(fd.getUrl(), logger));
+            collectBlobsFromFrameData(fd);
         }
     }
 
@@ -376,7 +397,11 @@ public class RenderingTask implements Callable<RenderStatusResults>, Completable
     }
 
     RenderRequest[] prepareDataForRG(FrameData domData) {
-        DomAnalyzer domAnalyzer = new DomAnalyzer(logger, eyesConnector.getServerConnector(), debugResourceWriter, domData, fetchedCacheMap, userAgent);
+        DomAnalyzer domAnalyzer = new DomAnalyzer(logger, eyesConnector.getServerConnector(), debugResourceWriter, domData, fetchedCacheMap, userAgent,
+                cachedBlobsUrls, cachedResourceMapping);
+
+        logger.verbose(String.format("cached resources count: %s", cachedResourceMapping.size()));
+
         Map<String, RGridResource> resourceMap = domAnalyzer.analyze();
         List<RenderRequest> allRequestsForRG = buildRenderRequests(domData, resourceMap);
 

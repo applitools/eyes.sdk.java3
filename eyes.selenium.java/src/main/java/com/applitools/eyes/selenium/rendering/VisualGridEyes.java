@@ -20,6 +20,8 @@ import com.applitools.eyes.visualgrid.services.*;
 import com.applitools.utils.ArgumentGuard;
 import com.applitools.utils.ClassVersionGetter;
 import com.applitools.utils.GeneralUtils;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
@@ -86,9 +88,9 @@ public class VisualGridEyes implements ISeleniumEyes, IRenderingEyes {
     {
         try {
             PROCESS_PAGE = GeneralUtils.readToEnd(VisualGridEyes.class.getResourceAsStream("/processPageAndSerializePoll.js"));
-            PROCESS_PAGE +=  "return __processPageAndSerializePoll();";
+            PROCESS_PAGE +=  "return __processPageAndSerializePoll";
             PROCESS_PAGE_FOR_IE = GeneralUtils.readToEnd(VisualGridEyes.class.getResourceAsStream("/processPageAndSerializePollForIE.js"));
-            PROCESS_PAGE_FOR_IE += "return __processPageAndSerializePollForIE();";
+            PROCESS_PAGE_FOR_IE += "return __processPageAndSerializePollForIE";
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -656,7 +658,7 @@ public class VisualGridEyes implements ISeleniumEyes, IRenderingEyes {
         return isFullPage;
     }
 
-    private FrameData captureDomSnapshot(FrameChain originalFC, EyesTargetLocator switchTo, ICheckSettingsInternal checkSettingsInternal) throws InterruptedException {
+    private FrameData captureDomSnapshot(FrameChain originalFC, EyesTargetLocator switchTo, ICheckSettingsInternal checkSettingsInternal) throws InterruptedException, JsonProcessingException {
         logger.verbose("Dom extraction starting   (" + checkSettingsInternal.toString() + ")");
         timer = new Timer("VG_Check_StopWatch", true);
         timer.schedule(new TimeoutTask(), DOM_EXTRACTION_TIMEOUT);
@@ -664,11 +666,16 @@ public class VisualGridEyes implements ISeleniumEyes, IRenderingEyes {
         ScriptResponse.Status status = null;
         ScriptResponse scriptResponse = null;
         do {
+            String script = PROCESS_PAGE;
             if (userAgent.isInternetExplorer()) {
-                resultAsString = (String) this.webDriver.executeScript(PROCESS_PAGE_FOR_IE);
-            } else {
-                resultAsString = (String) this.webDriver.executeScript(PROCESS_PAGE);
+                script = PROCESS_PAGE_FOR_IE;
             }
+            String skipListJson = new ObjectMapper().writeValueAsString(renderingGridRunner.getCachedBlobsUrls());
+            String arguments = String.format("(document, {skipResources:%s});", skipListJson);
+            logger.verbose("processPageAndSerializePoll: " + arguments);
+            script += arguments;
+
+            resultAsString = (String) this.webDriver.executeScript(script);
 
             try {
                 scriptResponse = GeneralUtils.parseJsonToObject(resultAsString, ScriptResponse.class);

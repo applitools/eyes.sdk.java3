@@ -71,7 +71,7 @@ public class TestRenderingTask extends ReportingTestSuite {
         ServerConnector serverConnector = mock(ServerConnector.class);
 
         final DomAnalyzer domAnalyzer = new DomAnalyzer(new Logger(), serverConnector, new NullDebugResourceWriter(),
-                frameData, new HashMap<String, RGridResource>(), userAgent);
+                frameData, new HashMap<String, RGridResource>(), userAgent, new HashSet<String>(), new HashMap<String, Set<String>>());
 
         RGridResource cachedResource = mock(RGridResource.class);
         when(cachedResource.getUrl()).thenReturn("12");
