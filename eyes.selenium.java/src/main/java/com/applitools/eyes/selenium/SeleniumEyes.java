@@ -724,7 +724,7 @@ public class SeleniumEyes extends EyesBase implements ISeleniumEyes, IBatchClose
                 if (isMobileDevice) {
                     checkNativeElement(checkSettingsInternal, targetElement);
                 } else if (state.isStitchContent()) {
-                    checkFullElement(pageState, checkSettingsInternal, targetElement, targetRegion, state, source);
+                    checkFullElement(checkSettingsInternal, targetElement, targetRegion, state, source);
                 } else {
                     // TODO Verify: if element is outside the viewport, we should still capture entire (outer) bounds
                     checkElement(checkSettingsInternal, targetElement, targetRegion, state, source);
@@ -849,7 +849,7 @@ public class SeleniumEyes extends EyesBase implements ISeleniumEyes, IBatchClose
         checkWindowBase(crop, checkSettingsInternal, source);
     }
 
-    private void checkFullElement(PageState pageState, ICheckSettingsInternal checkSettingsInternal, WebElement targetElement,
+    private void checkFullElement(ICheckSettingsInternal checkSettingsInternal, WebElement targetElement,
                                   Region targetRegion, CheckState state, String source) {
         if (((ISeleniumCheckTarget) checkSettingsInternal).getFrameChain().size() > 0) {
             logger.verbose("Target.Frame(frame)...Region(element).Fully(true)");
