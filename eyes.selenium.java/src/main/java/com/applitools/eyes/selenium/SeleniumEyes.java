@@ -1008,7 +1008,10 @@ public class SeleniumEyes extends EyesBase implements ISeleniumEyes, IBatchClose
             Location boundsPosition = bounds.getLocation();
             Location newFramePosition = boundsPosition.offset(-viewportLocation.getX(), -viewportLocation.getY());
             newFramePosition = newFramePosition.offset(currentFrameOffset);
-            newFramePosition = newFramePosition.offset(currentFrameSRE.getCurrentCssStitchingLocation());
+            Location currentCssLocation = currentFrameSRE.getCurrentCssStitchingLocation();
+            if (currentCssLocation != null) {
+                newFramePosition = newFramePosition.offset(currentCssLocation);
+            }
             Location actualFramePosition = currentFramePositionProvider.setPosition(newFramePosition);
             bounds = bounds.offset(-actualFramePosition.getX(), -actualFramePosition.getY());
             bounds = bounds.offset(currentFramePosition);
