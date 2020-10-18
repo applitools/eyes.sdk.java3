@@ -724,7 +724,7 @@ public class SeleniumEyes extends EyesBase implements ISeleniumEyes, IBatchClose
                 if (isMobileDevice) {
                     checkNativeElement(checkSettingsInternal, targetElement);
                 } else if (state.isStitchContent()) {
-                    checkFullElement(checkSettingsInternal, targetElement, targetRegion, state, source);
+                    checkFullElement(pageState, checkSettingsInternal, targetElement, targetRegion, state, source);
                 } else {
                     // TODO Verify: if element is outside the viewport, we should still capture entire (outer) bounds
                     checkElement(checkSettingsInternal, targetElement, targetRegion, state, source);
@@ -849,7 +849,7 @@ public class SeleniumEyes extends EyesBase implements ISeleniumEyes, IBatchClose
         checkWindowBase(crop, checkSettingsInternal, source);
     }
 
-    private void checkFullElement(ICheckSettingsInternal checkSettingsInternal, WebElement targetElement,
+    private void checkFullElement(PageState pageState, ICheckSettingsInternal checkSettingsInternal, WebElement targetElement,
                                   Region targetRegion, CheckState state, String source) {
         if (((ISeleniumCheckTarget) checkSettingsInternal).getFrameChain().size() > 0) {
             logger.verbose("Target.Frame(frame)...Region(element).Fully(true)");
@@ -876,7 +876,11 @@ public class SeleniumEyes extends EyesBase implements ISeleniumEyes, IBatchClose
 
         String positionStyle = ((EyesRemoteWebElement) targetElement).getComputedStyle("position");
         if (!positionStyle.equalsIgnoreCase("fixed")) {
-            elementBounds = bringRegionToView(elementBounds, state.getEffectiveViewport().getLocation());
+            if (getConfiguration().getStitchMode().equals(StitchMode.CSS)) {
+                elementBounds = bringRegionToViewCss(pageState, elementBounds, state.getEffectiveViewport().getLocation());
+            } else {
+                elementBounds = bringRegionToView(elementBounds, state.getEffectiveViewport().getLocation());
+            }
             Region currentElementRegion;
             if (isScrollableElement) {
                 currentElementRegion = EyesRemoteWebElement.getClientBoundsWithoutBorders(targetElement, driver, logger);
@@ -985,6 +989,32 @@ public class SeleniumEyes extends EyesBase implements ISeleniumEyes, IBatchClose
             offset = offset.offset(frame.getLocation());
         }
         return offset;
+    }
+
+    private Region bringRegionToViewCss(PageState pageState, Region bounds, Location viewportLocation) {
+        FrameChain frames = driver.getFrameChain().clone();
+        if (frames.size() <= 0) {
+            return bringRegionToView(bounds, viewportLocation);
+        }
+
+        Location currentFrameOffset = frames.getCurrentFrameOffset();
+        EyesTargetLocator locator = (EyesTargetLocator) driver.switchTo();
+        locator.defaultContent();
+        try {
+            WebElement currentFrameSRE = getCurrentFrameScrollRootElement();
+            PositionProvider currentFramePositionProvider = PositionProviderFactory.getPositionProvider(
+                    logger, StitchMode.CSS, jsExecutor, currentFrameSRE, userAgent);
+            Location currentFramePosition = currentFramePositionProvider.getCurrentPosition();
+            Location boundsPosition = bounds.getLocation();
+            Location newFramePosition = boundsPosition.offset(-viewportLocation.getX(), -viewportLocation.getY());
+            newFramePosition = newFramePosition.offset(currentFrameOffset);
+            Location actualFramePosition = currentFramePositionProvider.setPosition(newFramePosition);
+            bounds = bounds.offset(-actualFramePosition.getX(), -actualFramePosition.getY());
+            bounds = bounds.offset(currentFramePosition);
+            return bounds;
+        } finally {
+            locator.frames(frames);
+        }
     }
 
     private Region bringRegionToView(Region bounds, Location viewportLocation) {

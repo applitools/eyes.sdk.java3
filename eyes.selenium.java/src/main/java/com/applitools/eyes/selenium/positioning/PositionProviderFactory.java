@@ -14,7 +14,7 @@ import java.util.Map;
 
 public class PositionProviderFactory {
 
-    private static Map<WebElement, PositionProvider> positionProviders = new HashMap<>();
+    private static final Map<WebElement, PositionProvider> positionProviders = new HashMap<>();
 
     public static PositionProvider getPositionProvider(Logger logger, StitchMode stitchMode, IEyesJsExecutor executor, WebElement scrollRootElement) {
         PositionProvider positionProvider = positionProviders.get(scrollRootElement);
@@ -29,17 +29,18 @@ public class PositionProviderFactory {
     public static PositionProvider getPositionProvider(Logger logger, StitchMode stitchMode, IEyesJsExecutor executor, WebElement scrollRootElement, UserAgent userAgent) {
         ArgumentGuard.notNull(logger, "logger");
         ArgumentGuard.notNull(executor, "executor");
+        ArgumentGuard.notNull(stitchMode, "stitchMode");
 
         switch (stitchMode) {
             case CSS:
                 return new CssTranslatePositionProvider(logger, executor, scrollRootElement);
             case SCROLL:
-                if (userAgent != null && userAgent.getBrowser().equalsIgnoreCase(BrowserNames.EDGE))
+                if (userAgent != null && userAgent.getBrowser().equalsIgnoreCase(BrowserNames.EDGE)) {
                     return new EdgeBrowserScrollPositionProvider(logger, executor, scrollRootElement);
-                //else
+                }
                 return new SeleniumScrollPositionProvider(logger, executor, scrollRootElement);
             default:
-                return null;
+                throw new UnsupportedOperationException(String.format("Unknown stitch mode %s", stitchMode));
         }
     }
 

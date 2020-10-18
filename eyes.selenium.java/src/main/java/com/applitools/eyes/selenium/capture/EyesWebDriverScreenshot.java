@@ -117,8 +117,7 @@ public class EyesWebDriverScreenshot extends EyesScreenshot {
         return frameDocumentElement.getClientSize();
     }
 
-    public EyesWebDriverScreenshot(Logger logger, EyesSeleniumDriver driver, BufferedImage image, RectangleSize entireFrameSize, Location frameLocationInScreenshot)
-    {
+    public EyesWebDriverScreenshot(Logger logger, EyesSeleniumDriver driver, BufferedImage image, RectangleSize entireFrameSize, Location frameLocationInScreenshot) {
         super(logger, image);
         ArgumentGuard.notNull(driver, "driver");
         ArgumentGuard.notNull(entireFrameSize, "entireFrameSize");
@@ -131,16 +130,20 @@ public class EyesWebDriverScreenshot extends EyesScreenshot {
         this.frameWindow = new Region(new Location(0, 0), entireFrameSize);
     }
 
-    public static Location calcFrameLocationInScreenshot(Logger logger, EyesSeleniumDriver driver,
-                                                         FrameChain frameChain, ScreenshotType screenshotType) {
-
+    public static Location calcFrameLocationInScreenshot(Logger logger, EyesSeleniumDriver driver, FrameChain frameChain) {
         EyesTargetLocator switchTo = (EyesTargetLocator) driver.switchTo();
         FrameChain currentFC = frameChain.clone();
         switchTo.defaultContent();
         Location locationInScreenshot = new Location(0, 0);
         for (Frame frame : currentFC) {
-            org.openqa.selenium.Rectangle rect = ((EyesRemoteWebElement) frame.getReference()).getBoundingClientRect();
-            SizeAndBorders sizeAndBorders = ((EyesRemoteWebElement) frame.getReference()).getSizeAndBorders();
+            EyesRemoteWebElement eyesFrame;
+            if (frame.getReference() instanceof EyesRemoteWebElement) {
+                eyesFrame = (EyesRemoteWebElement) frame.getReference();
+            } else {
+                eyesFrame = new EyesRemoteWebElement(logger, driver, frame.getReference());
+            }
+            org.openqa.selenium.Rectangle rect = eyesFrame.getBoundingClientRect();
+            SizeAndBorders sizeAndBorders = eyesFrame.getSizeAndBorders();
             Borders borders = sizeAndBorders.getBorders();
             rect.setX(rect.getX() + borders.getLeft());
             rect.setY(rect.getY() + borders.getTop());
@@ -155,7 +158,7 @@ public class EyesWebDriverScreenshot extends EyesScreenshot {
     private void updateFrameLocationInScreenshot(Location location) {
         if (location == null) {
             if (frameChain.size() > 0) {
-                frameLocationInScreenshot = calcFrameLocationInScreenshot(logger, this.driver, frameChain, this.screenshotType);
+                frameLocationInScreenshot = calcFrameLocationInScreenshot(logger, this.driver, frameChain);
             } else {
                 frameLocationInScreenshot = new Location(0, 0);
             }

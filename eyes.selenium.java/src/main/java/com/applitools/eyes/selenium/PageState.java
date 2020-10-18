@@ -23,12 +23,12 @@ import java.util.List;
 import com.applitools.eyes.config.Configuration;
 
 public class PageState {
-    private EyesSeleniumDriver driver;
-    private Logger logger;
+    private final EyesSeleniumDriver driver;
+    private final Logger logger;
     private List<FrameState> frameStates;
     private FrameChain originalFrameChain;
-    private StitchMode stitchMode;
-    private UserAgent userAgent;
+    private final StitchMode stitchMode;
+    private final UserAgent userAgent;
 
     public PageState(Logger logger, EyesSeleniumDriver driver, StitchMode stitchMode, UserAgent userAgent) {
         this.logger = logger;

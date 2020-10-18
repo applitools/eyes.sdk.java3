@@ -10,7 +10,7 @@ public enum StitchMode {
     SCROLL,
 
     /**
-     * ﻿CSS translation based stitching.
+     * CSS translation based stitching.
      */
     CSS
 }
