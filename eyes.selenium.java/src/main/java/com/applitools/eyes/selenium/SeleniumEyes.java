@@ -877,7 +877,7 @@ public class SeleniumEyes extends EyesBase implements ISeleniumEyes, IBatchClose
         String positionStyle = ((EyesRemoteWebElement) targetElement).getComputedStyle("position");
         if (!positionStyle.equalsIgnoreCase("fixed")) {
             if (getConfiguration().getStitchMode().equals(StitchMode.CSS)) {
-                elementBounds = bringRegionToViewCss(pageState, elementBounds, state.getEffectiveViewport().getLocation());
+                elementBounds = bringRegionToViewCss(elementBounds, state.getEffectiveViewport().getLocation());
             } else {
                 elementBounds = bringRegionToView(elementBounds, state.getEffectiveViewport().getLocation());
             }
@@ -991,7 +991,7 @@ public class SeleniumEyes extends EyesBase implements ISeleniumEyes, IBatchClose
         return offset;
     }
 
-    private Region bringRegionToViewCss(PageState pageState, Region bounds, Location viewportLocation) {
+    private Region bringRegionToViewCss(Region bounds, Location viewportLocation) {
         FrameChain frames = driver.getFrameChain().clone();
         if (frames.size() <= 0) {
             return bringRegionToView(bounds, viewportLocation);

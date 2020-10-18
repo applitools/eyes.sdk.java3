@@ -3,6 +3,7 @@
 - Dom Snapshot script version 4.2.2. [Trello 2226](https://trello.com/c/yH8WYHgt)
 ### Fixed
 - Now checking if the element is scrollable before choosing default root element. [Trello 2198](https://trello.com/c/DTvpdAj4), [Trello 2207](https://trello.com/c/v5s4lv8u), [Trello 2215](https://trello.com/c/nUzTl0KB)
+- CSS stitching is now working when checking a frame overlapping with elements from its outer frame. [Trello 1846](https://trello.com/c/grlCdwMs)
 
 ## [3.181.0] - 2020-10-16
 ### Added
