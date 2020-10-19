@@ -458,4 +458,13 @@
             </class>
         </classes>
     </test>
+    <test name="TestEyesRemoteWebElement">
+        <classes>
+            <class name="com.applitools.eyes.selenium.wrappers.TestEyesRemoteWebElement">
+                <methods>
+                    <include name="testCurrentCssLocation"/>
+                </methods>
+            </class>
+        </classes>
+    </test>
 </suite>

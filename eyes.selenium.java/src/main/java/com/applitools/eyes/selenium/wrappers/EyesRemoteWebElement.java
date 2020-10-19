@@ -17,6 +17,7 @@ import org.openqa.selenium.remote.RemoteWebElement;
 import org.openqa.selenium.remote.Response;
 
 import java.lang.reflect.Method;
+import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -667,15 +668,16 @@ public class EyesRemoteWebElement extends RemoteWebElement {
     }
 
     public Location getCurrentCssStitchingLocation() {
-        String data = (String) eyesDriver.executeScript("var el=arguments[0]; return el.style.transform", webElement);
-        if (data == null || !data.startsWith("translate(")) {
-            return null;
-        }
-
         try {
-            String x = data.substring(data.indexOf("(") + 1, data.indexOf("px"));
-            String y = data.substring(data.indexOf(",") + 1, data.lastIndexOf("px"));
-            return new Location(-Integer.parseInt(x.trim()), -Integer.parseInt(y.trim()));
+            String data = (String) eyesDriver.executeScript("var el=arguments[0]; return el.style.transform", webElement);
+            if (data == null || !data.startsWith("translate(")) {
+                return null;
+            }
+            String x = data.substring(data.indexOf("(") + 1, data.indexOf(","));
+            String y = data.substring(data.indexOf(",") + 1, data.lastIndexOf(")"));
+            x = x.split("px")[0];
+            y = y.split("px")[0];
+            return new Location(-NumberFormat.getInstance().parse(x.trim()).intValue(), -NumberFormat.getInstance().parse(y.trim()).intValue());
         } catch (Throwable t) {
             GeneralUtils.logExceptionStackTrace(logger, t);
             return null;
