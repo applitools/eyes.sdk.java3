@@ -10,6 +10,7 @@ import com.applitools.eyes.selenium.frames.Frame;
 import com.applitools.eyes.selenium.frames.FrameChain;
 import com.applitools.eyes.selenium.wrappers.EyesRemoteWebElement;
 import com.applitools.eyes.selenium.wrappers.EyesSeleniumDriver;
+import com.applitools.utils.GeneralUtils;
 import org.openqa.selenium.*;
 
 import java.util.List;
@@ -25,7 +26,14 @@ public class EyesSeleniumUtils {
      */
     public static WebElement getDefaultRootElement(Logger logger, EyesSeleniumDriver driver) {
         EyesRemoteWebElement chosenElement;
-        WebElement scrollingElement = (WebElement) driver.executeScript("return document.scrollingElement");
+        WebElement scrollingElement;
+        try {
+            scrollingElement = (WebElement) driver.executeScript("return document.scrollingElement");
+        } catch (Throwable t) {
+            GeneralUtils.logExceptionStackTrace(logger, t);
+            scrollingElement = null;
+        }
+
         EyesRemoteWebElement eyesScrollingElement = null;
         if (scrollingElement != null) {
             eyesScrollingElement = new EyesRemoteWebElement(logger, driver, scrollingElement);
