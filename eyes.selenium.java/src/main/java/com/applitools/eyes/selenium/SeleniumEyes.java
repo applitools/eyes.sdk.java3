@@ -881,15 +881,14 @@ public class SeleniumEyes extends EyesBase implements ISeleniumEyes, IBatchClose
             } else {
                 elementBounds = bringRegionToView(elementBounds, state.getEffectiveViewport().getLocation());
             }
-            Region currentElementRegion;
-            if (isScrollableElement) {
-                currentElementRegion = EyesRemoteWebElement.getClientBoundsWithoutBorders(targetElement, driver, logger);
-            } else {
-                currentElementRegion = EyesRemoteWebElement.getClientBounds(targetElement, driver, logger);
-            }
 
             if (getConfigurationInstance().getStitchMode().equals(StitchMode.CSS)) {
-                elementBounds = currentElementRegion;
+                if (isScrollableElement) {
+                    elementBounds = EyesRemoteWebElement.getClientBoundsWithoutBorders(targetElement, driver, logger);
+                } else {
+                    elementBounds = EyesRemoteWebElement.getClientBounds(targetElement, driver, logger);
+                }
+                state.setEffectiveViewport(computeEffectiveViewport(driver.getFrameChain().clone(), effectiveViewport.getSize()));
             }
         }
 
