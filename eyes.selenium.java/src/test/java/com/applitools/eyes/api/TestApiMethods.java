@@ -1,9 +1,6 @@
 package com.applitools.eyes.api;
 
-import com.applitools.eyes.EyesRunner;
-import com.applitools.eyes.RectangleSize;
-import com.applitools.eyes.StdoutLogHandler;
-import com.applitools.eyes.TestResultContainer;
+import com.applitools.eyes.*;
 import com.applitools.eyes.config.Configuration;
 import com.applitools.eyes.config.ConfigurationProvider;
 import com.applitools.eyes.selenium.ClassicRunner;
@@ -88,5 +85,13 @@ public class TestApiMethods extends ReportingTestSuite {
 
         eyes.setHostApp(TEST_HOST_APP);
         Assert.assertEquals(eyes.getHostApp(), TEST_HOST_APP);
+    }
+
+    @Test
+    public void TestCloseNoOpen() {
+        Eyes eyes = new Eyes();
+        eyes.setLogHandler(new StdoutLogHandler());
+        TestResults results = eyes.close(false);
+        results.delete();
     }
 }

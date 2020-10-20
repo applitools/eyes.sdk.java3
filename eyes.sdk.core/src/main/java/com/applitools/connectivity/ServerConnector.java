@@ -189,6 +189,11 @@ public class ServerConnector extends UfgConnector {
 
     public void deleteSession(final TaskListener<Void> listener, final TestResults testResults) {
         ArgumentGuard.notNull(testResults, "testResults");
+        if (testResults.getId() == null || testResults.getBatchId() == null || testResults.getSecretToken() == null) {
+            logger.log("Can't delete session, results are null");
+            return;
+        }
+
         AsyncRequest request = makeEyesRequest(new HttpRequestBuilder() {
             @Override
             public AsyncRequest build() {

@@ -489,7 +489,9 @@ public abstract class EyesBase implements IEyesBase {
         logger.verbose(String.format("close(%b)", throwEx));
         if (!isOpen) {
             logger.log("WARNING: Eyes not open");
-            listener.onComplete(new TestResults());
+            TestResults testResults = new TestResults();
+            testResults.setStatus(TestResultsStatus.NotOpened);
+            listener.onComplete(testResults);
             return;
         }
 
@@ -502,7 +504,9 @@ public abstract class EyesBase implements IEyesBase {
 
         if (runningSession == null) {
             logger.log("Server session was not started --- Empty test ended.");
-            listener.onComplete(new TestResults());
+            TestResults testResults = new TestResults();
+            testResults.setStatus(TestResultsStatus.NotOpened);
+            listener.onComplete(testResults);
             return;
         }
 
@@ -538,26 +542,39 @@ public abstract class EyesBase implements IEyesBase {
         String sessionResultsUrl = results.getUrl();
         String scenarioIdOrName = results.getName();
         String appIdOrName = results.getAppName();
-        if (status == TestResultsStatus.Unresolved) {
-            if (results.isNew()) {
-                logger.log("--- New test ended. Please approve the new baseline at " + sessionResultsUrl);
-                if (throwEx) {
-                    throw new NewTestException(results, scenarioIdOrName, appIdOrName);
-                }
-            } else {
+        if (status == null) {
+            throw new EyesException("Status is null in the test results");
+        }
+
+        switch (status) {
+            case Failed:
                 logger.log("--- Failed test ended. See details at " + sessionResultsUrl);
                 if (throwEx) {
-                    throw new DiffsFoundException(results, scenarioIdOrName, appIdOrName);
+                    throw new TestFailedException(results, scenarioIdOrName, appIdOrName);
                 }
-            }
-        } else if (status == TestResultsStatus.Failed) {
-            logger.log("--- Failed test ended. See details at " + sessionResultsUrl);
-            if (throwEx) {
-                throw new TestFailedException(results, scenarioIdOrName, appIdOrName);
-            }
-        } else {
-            // Test passed
-            logger.log("--- Test passed. See details at " + sessionResultsUrl);
+                break;
+            case Passed:
+                logger.log("--- Test passed. See details at " + sessionResultsUrl);
+                break;
+            case NotOpened:
+                logger.log("--- Test was never opened.");
+                if (throwEx) {
+                    throw new EyesException("Called close before calling open");
+                }
+                break;
+            case Unresolved:
+                if (results.isNew()) {
+                    logger.log("--- New test ended. Please approve the new baseline at " + sessionResultsUrl);
+                    if (throwEx) {
+                        throw new NewTestException(results, scenarioIdOrName, appIdOrName);
+                    }
+                } else {
+                    logger.log("--- Failed test ended. See details at " + sessionResultsUrl);
+                    if (throwEx) {
+                        throw new DiffsFoundException(results, scenarioIdOrName, appIdOrName);
+                    }
+                }
+                break;
         }
     }
 
@@ -599,7 +616,9 @@ public abstract class EyesBase implements IEyesBase {
 
         if (null == runningSession) {
             logger.verbose("Closed");
-            listener.onComplete(new TestResults());
+            TestResults testResults = new TestResults();
+            testResults.setStatus(TestResultsStatus.NotOpened);
+            listener.onComplete(testResults);
             return;
         }
 

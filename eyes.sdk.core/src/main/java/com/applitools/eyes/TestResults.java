@@ -422,6 +422,10 @@ public class TestResults {
 
     public void delete() {
         final AtomicReference<EyesSyncObject> lock = new AtomicReference<>(new EyesSyncObject(new Logger(), "delete"));
+        if (serverConnector == null) {
+            return;
+        }
+
         serverConnector.deleteSession(new SyncTaskListener<Void>(lock), this);
         synchronized (lock.get()) {
             try {
