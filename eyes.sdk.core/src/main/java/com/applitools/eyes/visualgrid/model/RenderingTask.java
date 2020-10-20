@@ -398,7 +398,7 @@ public class RenderingTask implements Callable<RenderStatusResults>, Completable
 
     RenderRequest[] prepareDataForRG(FrameData domData) {
         DomAnalyzer domAnalyzer = new DomAnalyzer(logger, eyesConnector.getServerConnector(), debugResourceWriter, domData, fetchedCacheMap, userAgent,
-                cachedBlobsUrls, cachedResourceMapping);
+                cachedResourceMapping);
 
         logger.verbose(String.format("cached resources count: %s", cachedResourceMapping.size()));
 
