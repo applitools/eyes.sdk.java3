@@ -587,10 +587,8 @@ public class EyesDriverUtils {
      */
     public static String getPlatformVersion(HasCapabilities driver) {
         Capabilities capabilities = driver.getCapabilities();
-        Object platformVersionObj;
-        if (capabilities.getCapabilityNames().contains("os_version")) {
-            platformVersionObj = capabilities.getCapability("os_version");
-        } else {
+        Object platformVersionObj = capabilities.getCapability("os_version");
+        if (platformVersionObj == null) {
             platformVersionObj = capabilities.getCapability(PLATFORM_VERSION);
         }
 
