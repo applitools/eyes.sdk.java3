@@ -157,6 +157,11 @@ public class TestRenderingTask extends ReportingTestSuite {
                             }
 
                             @Override
+                            protected Map<String, String> getHeaders() {
+                                return new HashMap<>();
+                            }
+
+                            @Override
                             public String getBodyString() {
                                 return "content";
                             }

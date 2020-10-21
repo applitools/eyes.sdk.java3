@@ -40,6 +40,11 @@ public class MockedResponse extends Response {
     }
 
     @Override
+    protected Map<String, String> getHeaders() {
+        return headers;
+    }
+
+    @Override
     protected void readEntity() {
 
     }
