@@ -169,10 +169,10 @@ function initialize(options) {
       tracker.storeCommand(java`eyes.checkFrame(${findFrame(element)}${extraParameter(matchTimeout)}${extraParameter(tag)});`)
     },
     checkElement(element, matchTimeout, tag) {
-      tracker.storeCommand(java`eyes.checkElement(${element}${extraParameter(matchTimeout)}${extraParameter(tag)});`)
+      tracker.storeCommand(java`eyes.checkRegion(${element}${extraParameter(matchTimeout)}${extraParameter(tag)});`)
     },
     checkElementBy(selector, matchTimeout, tag) {
-      tracker.storeCommand(java`eyes.checkElement(By.cssSelector(${selector})${extraParameter(matchTimeout)}${extraParameter(tag)});`)
+      tracker.storeCommand(java`eyes.checkRegion(By.cssSelector(${selector})${extraParameter(matchTimeout)}${extraParameter(tag)});`)
     },
     checkRegion(region, matchTimeout, tag) {
       tracker.storeCommand(java`eyes.checkRegion(${region},${matchTimeout}, ${tag});`)

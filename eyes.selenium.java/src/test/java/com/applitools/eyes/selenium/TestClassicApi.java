@@ -35,12 +35,12 @@ public class TestClassicApi extends TestSetup {
 
     @Test
     public void TestCheckRegion() {
-        getEyes().checkRegion(By.id("overflowing-div"), "Region", true);
+        getEyes().checkRegion(By.id("overflowing-div"), "Region", false);
     }
 
     @Test
     public void TestCheckRegion2() {
-        getEyes().checkRegion(By.id("overflowing-div-image"), "minions", true);
+        getEyes().checkRegion(By.id("overflowing-div-image"), "minions", false);
     }
 
     @Test
