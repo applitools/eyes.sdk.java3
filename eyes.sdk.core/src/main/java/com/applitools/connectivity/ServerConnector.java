@@ -194,6 +194,7 @@ public class ServerConnector extends UfgConnector {
             return;
         }
 
+        initClient();
         AsyncRequest request = makeEyesRequest(new HttpRequestBuilder() {
             @Override
             public AsyncRequest build() {

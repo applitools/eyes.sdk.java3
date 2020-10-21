@@ -157,13 +157,7 @@ public class TestSeleniumEyes extends ReportingTestSuite {
         Assert.assertEquals(screenshots[0].getHeight(), renderingInfo.getMaxImageHeight());
         TestResultsSummary summary = runner.getAllTestResults(false);
         TestResults results = summary.getAllResults()[0].getTestResults();
-        ServerConnector connector = new ServerConnector();
-        try {
-            results.setServerConnector(connector);
-            results.delete();
-        } finally {
-            connector.closeConnector();
-        }
+        results.delete();
     }
 
     @Test

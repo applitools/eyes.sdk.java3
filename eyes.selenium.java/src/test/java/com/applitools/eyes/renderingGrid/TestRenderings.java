@@ -330,13 +330,7 @@ public class TestRenderings extends ReportingTestSuite {
             eyes.abortAsync();
             TestResultsSummary summary = runner.getAllTestResults(false);
             TestResults results = summary.getAllResults()[0].getTestResults();
-            ServerConnector connector = new ServerConnector();
-            try {
-                results.setServerConnector(connector);
-                results.delete();
-            } finally {
-                connector.closeConnector();
-            }
+            results.delete();
         }
 
         RGridResource missingResource = missingResources.get(missingUrl);

@@ -79,13 +79,7 @@ public class TestMatchWindow extends ReportingTestSuite {
 
         TestResultsSummary summary = runner.getAllTestResults(false);
         TestResults results = summary.getAllResults()[0].getTestResults();
-        ServerConnector connector = new ServerConnector();
-        try {
-            results.setServerConnector(connector);
-            results.delete();
-        } finally {
-            connector.closeConnector();
-        }
+        results.delete();
 
         Assert.assertEquals(replaceLastList, expectedReplaceLastList);
     }
