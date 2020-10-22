@@ -8,9 +8,11 @@ public abstract class EyesRunner {
 
     private TestResultsSummary allTestResults = null;
 
+    private boolean dontCloseBatches = false;
+
     protected Logger logger = new IdPrintingLogger("n/a");
 
-    private Map<String, IBatchCloser> batchesServerConnectorsMap = new HashMap<>();
+    private final Map<String, IBatchCloser> batchesServerConnectorsMap = new HashMap<>();
 
     public abstract TestResultsSummary getAllTestResultsImpl();
 
@@ -36,6 +38,10 @@ public abstract class EyesRunner {
     }
 
     private void deleteAllBatches() {
+        if (dontCloseBatches) {
+            return;
+        }
+
         logger.verbose(String.format("Deleting %d batches", batchesServerConnectorsMap.size()));
         for (String batch : batchesServerConnectorsMap.keySet()) {
             IBatchCloser connector = batchesServerConnectorsMap.get(batch);
@@ -48,6 +54,10 @@ public abstract class EyesRunner {
         if (!logHandler.isOpen()) {
             logHandler.open();
         }
+    }
+
+    public void setDontCloseBatches(boolean dontCloseBatches) {
+        this.dontCloseBatches = dontCloseBatches;
     }
 
     public Logger getLogger() {

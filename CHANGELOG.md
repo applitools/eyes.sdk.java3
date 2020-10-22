@@ -1,6 +1,7 @@
 ## [vNext]
 ### Added
-- new logs for printing dom snapshot result. [Trello 2252](https://trello.com/c/7aalHb28)
+- New logs for printing dom snapshot result. [Trello 2252](https://trello.com/c/7aalHb28)
+- New API `runner.setDontCloseBatched` in case the user doesn't want to close the batches in the end of the test. [Trello 1908](https://trello.com/c/8BGfvXKU)
 ### Updated
 - Dom Snapshot script version 4.2.2. [Trello 2226](https://trello.com/c/yH8WYHgt)
 ### Fixed
