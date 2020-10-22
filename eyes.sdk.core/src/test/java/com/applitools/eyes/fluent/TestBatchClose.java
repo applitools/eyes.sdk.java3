@@ -2,7 +2,6 @@ package com.applitools.eyes.fluent;
 
 import com.applitools.connectivity.ServerConnector;
 import com.applitools.eyes.IBatchCloser;
-import com.applitools.eyes.visualgrid.services.IEyesConnector;
 import com.applitools.eyes.visualgrid.services.VisualGridRunner;
 import org.testng.Assert;
 import org.testng.annotations.Test;
