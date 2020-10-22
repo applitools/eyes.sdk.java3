@@ -549,6 +549,13 @@ public class VisualGridEyes implements ISeleniumEyes, IRenderingEyes {
             List<VisualGridTask> visualGridTaskList = new ArrayList<>();
 
             FrameData scriptResult = captureDomSnapshot(originalFC, switchTo, checkSettingsInternal);
+            String[] blobsUrls = new String[scriptResult.getBlobs().size()];
+            for (int i = 0; i< scriptResult.getBlobs().size(); i++) {
+                blobsUrls[i] = scriptResult.getBlobs().get(i).getUrl();
+            }
+            logger.verbose(String.format("Cdt length: %d", scriptResult.getCdt().size()));
+            logger.verbose(String.format("Blobs urls: %s", Arrays.toString(blobsUrls);
+            logger.verbose(String.format("Resources urls: %s", scriptResult.getResourceUrls().toString()));
 
             List<VisualGridSelector[]> regionsXPaths = getRegionsXPaths(checkSettingsInternal);
             logger.verbose("regionXPaths : " + regionsXPaths);
