@@ -3,8 +3,13 @@ package com.applitools.eyes.fluent;
 import com.applitools.connectivity.ServerConnector;
 import com.applitools.eyes.IBatchCloser;
 import com.applitools.eyes.visualgrid.services.VisualGridRunner;
-import org.testng.Assert;
-import org.testng.annotations.Test;
+import com.applitools.utils.GeneralUtils;
+import org.junit.Assert;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.powermock.api.mockito.PowerMockito;
+import org.powermock.core.classloader.annotations.PrepareForTest;
+import org.powermock.modules.junit4.PowerMockRunner;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -13,6 +18,8 @@ import java.util.Map;
 
 import static org.mockito.Mockito.*;
 
+@RunWith(PowerMockRunner.class)
+@PrepareForTest(GeneralUtils.class)
 public class TestBatchClose {
 
     private VisualGridRunner initRunnerWithBatches(Map<String, IBatchCloser> batchClosers) {
@@ -51,6 +58,9 @@ public class TestBatchClose {
 
     @Test
     public void testBatchCloseFlag() {
+        PowerMockito.spy(GeneralUtils.class);
+        when(GeneralUtils.getDontCloseBatches()).thenReturn(false);
+
         IBatchCloser first = mock(IBatchCloser.class);
         IBatchCloser second = mock(IBatchCloser.class);
         IBatchCloser third = mock(IBatchCloser.class);
