@@ -1,5 +1,7 @@
 package com.applitools.eyes;
 
+import com.applitools.utils.GeneralUtils;
+
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
@@ -39,6 +41,12 @@ public abstract class EyesRunner {
 
     private void deleteAllBatches() {
         if (dontCloseBatches) {
+            return;
+        }
+
+        boolean dontCloseBatchesStr = GeneralUtils.getDontCloseBatches();
+        if (dontCloseBatchesStr) {
+            logger.log("APPLITOOLS_DONT_CLOSE_BATCHES environment variable set to true. Skipping batch close.");
             return;
         }
 

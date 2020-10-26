@@ -384,22 +384,13 @@ public class ServerConnector extends UfgConnector {
     }
 
     public void closeBatch(String batchId) {
-        closeBatch(batchId, false);
+        closeBatch(batchId, serverUrl.toString());
     }
 
-    public void closeBatch(String batchId, boolean forceClose) {
-        closeBatch(batchId, forceClose, serverUrl.toString());
-    }
-
-    public void closeBatch(String batchId, boolean forceClose, String url) {
+    public void closeBatch(String batchId, String url) {
         final AtomicReference<EyesSyncObject> lock = new AtomicReference<>(new EyesSyncObject(logger, "closeBatch"));
-        boolean dontCloseBatchesStr = GeneralUtils.getDontCloseBatches();
-        if (dontCloseBatchesStr && !forceClose) {
-            logger.log("APPLITOOLS_DONT_CLOSE_BATCHES environment variable set to true. Skipping batch close.");
-            return;
-        }
 
-        closeBatchAsync(new SyncTaskListener<Void>(lock), batchId, forceClose, url);
+        closeBatchAsync(new SyncTaskListener<Void>(lock), batchId, url);
         synchronized (lock.get()) {
             try {
                 lock.get().waitForNotify();
@@ -409,13 +400,7 @@ public class ServerConnector extends UfgConnector {
         }
     }
 
-    public void closeBatchAsync(final TaskListener<Void> listener, String batchId, boolean forceClose, final String url) {
-        boolean dontCloseBatchesStr = GeneralUtils.getDontCloseBatches();
-        if (dontCloseBatchesStr && !forceClose) {
-            logger.log("APPLITOOLS_DONT_CLOSE_BATCHES environment variable set to true. Skipping batch close.");
-            listener.onComplete(null);
-            return;
-        }
+    public void closeBatchAsync(final TaskListener<Void> listener, String batchId, final String url) {
         ArgumentGuard.notNull(batchId, "batchId");
         this.logger.log("called with " + batchId);
 
