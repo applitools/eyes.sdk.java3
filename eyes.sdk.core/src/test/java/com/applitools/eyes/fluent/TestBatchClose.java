@@ -44,9 +44,9 @@ public class TestBatchClose {
         enabledBatchClose.serverConnector = serverConnector;
 
         enabledBatchClose.close();
-        verify(serverConnector).closeBatch("first", true, serverUrl2);
-        verify(serverConnector).closeBatch("second", true, serverUrl2);
-        verify(serverConnector).closeBatch("third", true, serverUrl2);
+        verify(serverConnector).closeBatch("first", serverUrl2);
+        verify(serverConnector).closeBatch("second", serverUrl2);
+        verify(serverConnector).closeBatch("third", serverUrl2);
     }
 
     @Test

@@ -34,7 +34,7 @@ public class EnabledBatchClose extends BatchClose {
     public void close() {
         logger.verbose(String.format("Closing %d batches", batchIds.size()));
         for (String batchId : batchIds) {
-            serverConnector.closeBatch(batchId, true, serverUrl);
+            serverConnector.closeBatch(batchId, serverUrl);
         }
     }
 }

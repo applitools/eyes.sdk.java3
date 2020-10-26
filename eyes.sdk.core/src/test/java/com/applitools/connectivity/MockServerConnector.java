@@ -11,7 +11,7 @@ public class MockServerConnector extends ServerConnector {
     public List<RenderRequest> renderRequests = new ArrayList<>();
 
     @Override
-    public void closeBatch(String batchId, boolean forceClose) {
+    public void closeBatch(String batchId) {
         logger.log(String.format("closing batch: %s", batchId));
     }
 
