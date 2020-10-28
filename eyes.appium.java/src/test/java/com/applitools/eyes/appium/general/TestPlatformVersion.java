@@ -5,6 +5,7 @@ import com.applitools.eyes.utils.ReportingTestSuite;
 import io.appium.java_client.AppiumDriver;
 import org.openqa.selenium.remote.DesiredCapabilities;
 import org.springframework.util.Assert;
+import org.testng.annotations.BeforeClass;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
@@ -18,6 +19,11 @@ public class TestPlatformVersion extends ReportingTestSuite {
                 { "platformVersion", "13.0" },
                 { "os_version", "13.0" }
         };
+    }
+
+    @BeforeClass
+    public void beforeClass() {
+        super.setGroupName("appium");
     }
 
     @Test(dataProvider = "capabilities")
