@@ -52,6 +52,7 @@ public class Configuration implements IConfiguration {
     private boolean hideScrollbars = true;
     private boolean hideCaret = true;
     private boolean isVisualGrid = false;
+    private boolean disableBrowserFetching = false;
 
     //Rendering Configuration
     private Boolean isRenderingConfig = false;
@@ -110,7 +111,8 @@ public class Configuration implements IConfiguration {
         this.defaultMatchSettings = new ImageMatchSettings(other.getDefaultMatchSettings());
         this.isVisualGrid = other.isVisualGrid();
         this.features = new HashSet<>(other.getFeatures());
-        this.visualGridOptions = other.visualGridOptions;
+        this.visualGridOptions = other.getVisualGridOptions();
+        this.disableBrowserFetching = other.isDisableBrowserFetching();
     }
 
     public Configuration() {
@@ -746,5 +748,13 @@ public class Configuration implements IConfiguration {
 
     public void setOsInfo(String osInfo) {
         this.osInfo = osInfo;
+    }
+
+    public boolean isDisableBrowserFetching() {
+        return disableBrowserFetching;
+    }
+
+    public void setDisableBrowserFetching(boolean disableBrowserFetching) {
+        this.disableBrowserFetching = disableBrowserFetching;
     }
 }

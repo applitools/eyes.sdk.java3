@@ -5,23 +5,21 @@ import com.applitools.ICheckSettingsInternal;
 import com.applitools.connectivity.ServerConnector;
 import com.applitools.eyes.*;
 import com.applitools.eyes.config.Configuration;
+import com.applitools.eyes.config.ConfigurationProvider;
 import com.applitools.eyes.fluent.CheckSettings;
 import com.applitools.eyes.fluent.GetFloatingRegion;
 import com.applitools.eyes.fluent.GetSimpleRegion;
 import com.applitools.eyes.selenium.*;
-import com.applitools.eyes.config.ConfigurationProvider;
 import com.applitools.eyes.selenium.fluent.*;
 import com.applitools.eyes.selenium.frames.Frame;
 import com.applitools.eyes.selenium.frames.FrameChain;
-import com.applitools.eyes.selenium.wrappers.EyesTargetLocator;
 import com.applitools.eyes.selenium.wrappers.EyesSeleniumDriver;
+import com.applitools.eyes.selenium.wrappers.EyesTargetLocator;
 import com.applitools.eyes.visualgrid.model.*;
 import com.applitools.eyes.visualgrid.services.*;
 import com.applitools.utils.ArgumentGuard;
 import com.applitools.utils.ClassVersionGetter;
 import com.applitools.utils.GeneralUtils;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
@@ -33,11 +31,8 @@ import java.util.*;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.concurrent.FutureTask;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 public class VisualGridEyes implements ISeleniumEyes, IRenderingEyes {
-
-    private static final long DOM_EXTRACTION_TIMEOUT = 5 * 60 * 1000;
     private final Logger logger;
 
     private String apiKey;
@@ -48,8 +43,10 @@ public class VisualGridEyes implements ISeleniumEyes, IRenderingEyes {
     private final List<RunningTest> testsInCloseProcess = Collections.synchronizedList(new ArrayList<RunningTest>());
     List<TestResultContainer> allTestResults = new ArrayList<>();
 
-    private String PROCESS_PAGE;
-    private String PROCESS_PAGE_FOR_IE;
+    private final String PROCESS_PAGE;
+    private final String PROCESS_PAGE_FOR_IE;
+    private final String POLL_RESULT;
+    private final String POLL_RESULT_FOR_IE;
     private EyesSeleniumDriver webDriver;
     private RenderingInfo renderingInfo;
     private IEyesConnector VGEyesConnector;
@@ -61,8 +58,6 @@ public class VisualGridEyes implements ISeleniumEyes, IRenderingEyes {
     private final ConfigurationProvider configurationProvider;
     private UserAgent userAgent = null;
     private RectangleSize viewportSize;
-    private final AtomicBoolean isCheckTimerTimedOut = new AtomicBoolean(false);
-    private Timer timer = null;
     private final List<PropertyData> properties = new ArrayList<>();
 
     private static final String GET_ELEMENT_XPATH_JS =
@@ -84,23 +79,20 @@ public class VisualGridEyes implements ISeleniumEyes, IRenderingEyes {
                     "} while (el !== null);" +
                     "return '/' + xpath;";
 
-
-    {
-        try {
-            PROCESS_PAGE = GeneralUtils.readToEnd(VisualGridEyes.class.getResourceAsStream("/processPageAndSerializePoll.js"));
-            PROCESS_PAGE +=  "return __processPageAndSerializePoll";
-            PROCESS_PAGE_FOR_IE = GeneralUtils.readToEnd(VisualGridEyes.class.getResourceAsStream("/processPageAndSerializePollForIE.js"));
-            PROCESS_PAGE_FOR_IE += "return __processPageAndSerializePollForIE";
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
     public VisualGridEyes(VisualGridRunner renderingGridManager, ConfigurationProvider configurationProvider) {
         this.configurationProvider = configurationProvider;
         ArgumentGuard.notNull(renderingGridManager, "renderingGridRunner");
         this.renderingGridRunner = renderingGridManager;
         this.logger = renderingGridManager.getLogger();
+
+        try {
+            PROCESS_PAGE = GeneralUtils.readToEnd(VisualGridEyes.class.getResourceAsStream("/dom-snapshot/dist/processPagePoll.js"));
+            PROCESS_PAGE_FOR_IE = GeneralUtils.readToEnd(VisualGridEyes.class.getResourceAsStream("/dom-snapshot/dist/processPagePollForIE.js"));
+            POLL_RESULT = GeneralUtils.readToEnd(VisualGridEyes.class.getResourceAsStream("/dom-snapshot/dist/pollResult.js"));
+            POLL_RESULT_FOR_IE = GeneralUtils.readToEnd(VisualGridEyes.class.getResourceAsStream("/dom-snapshot/dist/pollResultForIE.js"));
+        } catch (IOException e) {
+            throw new EyesException("Failed getting resources for dom scripts", e);
+        }
     }
 
     /**
@@ -545,12 +537,11 @@ public class VisualGridEyes implements ISeleniumEyes, IRenderingEyes {
             checkSettings = switchFramesAsNeeded(checkSettings, switchTo);
             ICheckSettingsInternal checkSettingsInternal = (ICheckSettingsInternal) checkSettings;
 
-            isCheckTimerTimedOut.set(false);
-
             List<VisualGridTask> openVisualGridTasks = addOpenTaskToAllRunningTest();
             List<VisualGridTask> visualGridTaskList = new ArrayList<>();
 
-            FrameData scriptResult = captureDomSnapshot(originalFC, switchTo, checkSettingsInternal);
+            FrameData scriptResult = captureDomSnapshot(originalFC, switchTo);
+
             String[] blobsUrls = new String[scriptResult.getBlobs().size()];
             for (int i = 0; i< scriptResult.getBlobs().size(); i++) {
                 blobsUrls[i] = scriptResult.getBlobs().get(i).getUrl();
@@ -599,10 +590,6 @@ public class VisualGridEyes implements ISeleniumEyes, IRenderingEyes {
                 runningTest.setTestInExceptionMode(error);
             }
             GeneralUtils.logExceptionStackTrace(logger, e);
-        } finally {
-            if (timer != null) {
-                timer.cancel();
-            }
         }
     }
 
@@ -658,49 +645,62 @@ public class VisualGridEyes implements ISeleniumEyes, IRenderingEyes {
         return isFullPage;
     }
 
-    private FrameData captureDomSnapshot(FrameChain originalFC, EyesTargetLocator switchTo, ICheckSettingsInternal checkSettingsInternal) throws InterruptedException, JsonProcessingException {
-        logger.verbose("Dom extraction starting   (" + checkSettingsInternal.toString() + ")");
-        timer = new Timer("VG_Check_StopWatch", true);
-        timer.schedule(new TimeoutTask(), DOM_EXTRACTION_TIMEOUT);
-        String resultAsString;
-        ScriptResponse.Status status = null;
-        ScriptResponse scriptResponse = null;
-        do {
-            String script = PROCESS_PAGE;
-            if (userAgent.isInternetExplorer()) {
-                script = PROCESS_PAGE_FOR_IE;
-            }
-            String skipListJson = new ObjectMapper().writeValueAsString(renderingGridRunner.getCachedResources().keySet());
-            String arguments = String.format("(document, {skipResources:%s});", skipListJson);
-            logger.verbose("processPageAndSerializePoll: " + arguments);
-            script += arguments;
+    FrameData captureDomSnapshot(FrameChain originalFC, EyesTargetLocator switchTo) throws Exception {
+        String domScript = userAgent.isInternetExplorer() ? PROCESS_PAGE_FOR_IE : PROCESS_PAGE;
+        String pollingScript = userAgent.isInternetExplorer() ? POLL_RESULT_FOR_IE : POLL_RESULT;
+        Map<String, Object> arguments = new HashMap<String, Object>() {{
+            put("serializeResources", true);
+            put("dontFetchResources", getConfiguration().isDisableBrowserFetching());
+            put("skipResources", renderingGridRunner.getCachedResources().keySet());
+        }};
 
-            resultAsString = (String) this.webDriver.executeScript(script);
+        try {
+            String result = EyesSeleniumUtils.runDomScript(logger, webDriver, userAgent, domScript, arguments, pollingScript);
+            FrameData frameData = GeneralUtils.parseJsonToObject(result, FrameData.class);
+            analyzeFrameData(frameData, switchTo);
+            return frameData;
+        } finally {
+            switchTo.frames(originalFC);
+        }
+    }
+
+    private void analyzeFrameData(FrameData frameData, EyesTargetLocator switchTo) {
+        FrameChain frameChain = webDriver.getFrameChain().clone();
+        for (FrameData.CrossFrame crossFrame : frameData.getCrossFrames()) {
+            if (crossFrame.getSelector() == null) {
+                logger.verbose("cross frame with null selector");
+                continue;
+            }
 
             try {
-                scriptResponse = GeneralUtils.parseJsonToObject(resultAsString, ScriptResponse.class);
-                logger.verbose("Dom extraction polling...");
-                status = scriptResponse.getStatus();
-            } catch (IOException e) {
-                GeneralUtils.logExceptionStackTrace(logger, e);
+                WebElement frame = webDriver.findElement(By.cssSelector(crossFrame.getSelector()));
+                switchTo.frame(frame);
+                FrameData result = captureDomSnapshot(frameChain, switchTo);
+                frameData.addFrame(result);
+                frameData.getCdt().get(crossFrame.getIndex()).attributes.add(new AttributeData("data-applitools-src", result.getUrl()));
+            } catch (Throwable t) {
+                logger.verbose(String.format("Failed finding cross frame with selector %s. Reason: %s", crossFrame.getSelector(), t.getMessage()));
+            } finally {
+                switchTo.frames(frameChain);
             }
-            Thread.sleep(200);
-        } while (status == ScriptResponse.Status.WIP && !isCheckTimerTimedOut.get());
-        timer.cancel();
-
-        if (status == ScriptResponse.Status.ERROR) {
-            switchTo.frames(originalFC);
-            throw new EyesException("DomSnapshot Error: " + scriptResponse.getError());
         }
 
-        if (isCheckTimerTimedOut.get()) {
-            switchTo.frames(originalFC);
-            throw new EyesException("Domsnapshot Timed out");
-        }
-        FrameData scriptResult = scriptResponse != null ? scriptResponse.getValue() : null;
+        for (FrameData frame : frameData.getFrames()) {
+            if (frame.getSelector() == null) {
+                logger.verbose("cross frame with null selector");
+                continue;
+            }
 
-        logger.verbose("Dom extracted  (" + checkSettingsInternal.toString() + ")");
-        return scriptResult;
+            try {
+                WebElement frameElement = webDriver.findElement(By.cssSelector(frame.getSelector()));
+                switchTo.frame(frameElement);
+                analyzeFrameData(frame, switchTo);
+            } catch (Throwable t) {
+                logger.verbose(String.format("Failed finding cross frame with selector %s. Reason: %s", frame.getSelector(), t.getMessage()));
+            } finally {
+                switchTo.frames(frameChain);
+            }
+        }
     }
 
     private void waitBeforeDomSnapshot() {
@@ -976,14 +976,6 @@ public class VisualGridEyes implements ISeleniumEyes, IRenderingEyes {
      */
     public void clearProperties() {
         properties.clear();
-    }
-
-    private class TimeoutTask extends TimerTask {
-        @Override
-        public void run() {
-            logger.verbose("Check Timer timeout.");
-            isCheckTimerTimedOut.set(true);
-        }
     }
 
     @SuppressWarnings("BooleanMethodIsAlwaysInverted")

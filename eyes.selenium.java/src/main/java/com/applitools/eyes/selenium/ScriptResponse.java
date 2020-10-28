@@ -1,24 +1,21 @@
-package com.applitools.eyes.selenium.capture;
+package com.applitools.eyes.selenium;
+
+import com.fasterxml.jackson.databind.JsonNode;
 
 public class ScriptResponse {
-    String value;
+    JsonNode value;
     Status status;
     String error;
-
-    public ScriptResponse(String value, Status status, String error) {
-        this.value = value;
-        this.status = status;
-        this.error = error;
-    }
+    boolean done;
 
     public ScriptResponse() {
     }
 
-    public String getValue() {
+    public JsonNode getValue() {
         return value;
     }
 
-    public void setValue(String value) {
+    public void setValue(JsonNode value) {
         this.value = value;
     }
 
@@ -38,11 +35,20 @@ public class ScriptResponse {
         this.error = error;
     }
 
+    public boolean isDone() {
+        return done;
+    }
+
+    public void setDone(boolean done) {
+        this.done = done;
+    }
+
 
 
     public enum Status {
         WIP("WIP"),
         ERROR("ERROR"),
+        SUCCESS_CHUNKED("SUCCESS_CHUNKED"),
         SUCCESS("SUCCESS");
 
         String status;

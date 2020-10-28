@@ -3,23 +3,46 @@
  */
 package com.applitools.eyes.selenium;
 
-import com.applitools.eyes.*;
+import com.applitools.eyes.EyesException;
+import com.applitools.eyes.Logger;
+import com.applitools.eyes.UserAgent;
 import com.applitools.eyes.selenium.fluent.FrameLocator;
 import com.applitools.eyes.selenium.fluent.IScrollRootElementContainer;
 import com.applitools.eyes.selenium.frames.Frame;
 import com.applitools.eyes.selenium.frames.FrameChain;
 import com.applitools.eyes.selenium.wrappers.EyesRemoteWebElement;
 import com.applitools.eyes.selenium.wrappers.EyesSeleniumDriver;
+import com.applitools.eyes.selenium.wrappers.EyesWebDriver;
 import com.applitools.utils.GeneralUtils;
-import org.openqa.selenium.*;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.openqa.selenium.By;
+import org.openqa.selenium.WebElement;
 
-import java.util.List;
+import java.util.*;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * We named this class EyesSeleniumUtils because there's a SeleniumUtils
  * class, and it caused collision.
  */
 public class EyesSeleniumUtils {
+
+    private static final long DOM_EXTRACTION_TIMEOUT = 5 * 60 * 1000;
+    private static final String DOM_SCRIPTS_WRAPPER = "return (%s)(%s);";
+
+    private static class TimeoutTask extends TimerTask {
+        private final AtomicBoolean isCheckTimerTimedOut;
+        public TimeoutTask(AtomicBoolean isCheckTimerTimedOut) {
+            this.isCheckTimerTimedOut = isCheckTimerTimedOut;
+        }
+
+        @Override
+        public void run() {
+            isCheckTimerTimedOut.set(true);
+        }
+
+    }
+
     /**
      * #internal
      * This method gets the default root element of the page. It will be "html" or "body".
@@ -48,7 +71,7 @@ public class EyesSeleniumUtils {
         } else if (!doesBodyExist(logger, driver)) {
             chosenElement = htmlElement;
         } else {
-            WebElement body = driver.findElement(By.tagName("body"));;
+            WebElement body = driver.findElement(By.tagName("body"));
             EyesRemoteWebElement bodyElement = new EyesRemoteWebElement(logger, driver, body);
             boolean scrollableHtml =  htmlElement.canScrollVertically();
             boolean scrollableBody = bodyElement.canScrollVertically();
@@ -156,5 +179,75 @@ public class EyesSeleniumUtils {
         }
 
         return scrollRootElement;
+    }
+
+    public static String runDomScript(Logger logger, EyesWebDriver driver, UserAgent userAgent, String domScript,
+                                      Map<String, Object> domScriptArguments, String pollingScript) throws Exception {
+        logger.verbose("Starting dom extraction");
+        if (domScriptArguments == null) {
+            domScriptArguments = new HashMap<>();
+        }
+
+        Map<String, Object> pollingScriptArguments = new HashMap<>();
+
+        int chunkByteLength = userAgent.getOS().toLowerCase().contains("ios") ? 10 * 1024 * 1024 : 256 * 1024 * 1024;
+        domScriptArguments.put("chunkByteLength", chunkByteLength);
+        pollingScriptArguments.put("chunkByteLength", chunkByteLength);
+        ObjectMapper mapper = new ObjectMapper();
+        String domScriptWrapped = String.format(DOM_SCRIPTS_WRAPPER, domScript, mapper.writeValueAsString(domScriptArguments));
+        String pollingScriptWrapped = String.format(DOM_SCRIPTS_WRAPPER, pollingScript, mapper.writeValueAsString(pollingScriptArguments));
+
+        AtomicBoolean isCheckTimerTimedOut = new AtomicBoolean(false);
+        Timer timer = new Timer("VG_Check_StopWatch", true);
+        timer.schedule(new TimeoutTask(isCheckTimerTimedOut), DOM_EXTRACTION_TIMEOUT);
+        try {
+            String resultAsString = (String) driver.executeScript(domScriptWrapped);
+            ScriptResponse scriptResponse = GeneralUtils.parseJsonToObject(resultAsString, ScriptResponse.class);
+            ScriptResponse.Status status = scriptResponse.getStatus();
+
+            while (status == ScriptResponse.Status.WIP && !isCheckTimerTimedOut.get()) {
+                logger.verbose("Dom script polling...");
+                resultAsString = (String) driver.executeScript(pollingScriptWrapped);
+                scriptResponse = GeneralUtils.parseJsonToObject(resultAsString, ScriptResponse.class);
+                status = scriptResponse.getStatus();
+                Thread.sleep(200);
+            }
+
+            if (status == ScriptResponse.Status.ERROR) {
+                throw new EyesException("DomSnapshot Error: " + scriptResponse.getError());
+            }
+
+            if (isCheckTimerTimedOut.get()) {
+                throw new EyesException("Domsnapshot Timed out");
+            }
+
+            if (status == ScriptResponse.Status.SUCCESS) {
+                return scriptResponse.getValue().toString();
+            }
+
+            StringBuilder value = new StringBuilder();
+            while (status == ScriptResponse.Status.SUCCESS_CHUNKED && !scriptResponse.isDone() && !isCheckTimerTimedOut.get()) {
+                logger.verbose("Dom script chunks polling...");
+                value.append(GeneralUtils.parseJsonToObject(scriptResponse.getValue().toString(), String.class));
+                resultAsString = (String) driver.executeScript(pollingScriptWrapped);
+                scriptResponse = GeneralUtils.parseJsonToObject(resultAsString, ScriptResponse.class);
+                status = scriptResponse.getStatus();
+                Thread.sleep(200);
+            }
+
+            if (status == ScriptResponse.Status.ERROR) {
+                throw new EyesException("DomSnapshot Error: " + scriptResponse.getError());
+            }
+
+            if (isCheckTimerTimedOut.get()) {
+                throw new EyesException("Domsnapshot Timed out");
+            }
+
+            value.append(GeneralUtils.parseJsonToObject(scriptResponse.getValue().toString(), String.class));
+            return value.toString();
+        } finally {
+            timer.cancel();
+            logger.verbose("Finished dom extraction");
+        }
     }
 }

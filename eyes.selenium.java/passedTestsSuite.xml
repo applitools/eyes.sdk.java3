@@ -95,7 +95,7 @@
     </test>
     <test name="TestDoubleOpenClose">
         <classes>
-            <class name="com.applitools.eyes.renderingGrid.TestDoubleOpenClose">
+            <class name="com.applitools.eyes.selenium.rendering.TestDoubleOpenClose">
                 <methods>
                     <include name="TestDoubleOpenCheckClose"/>
                     <include name="TestDoubleOpenCheckCloseAsync"/>
@@ -197,7 +197,7 @@
     </test>
     <test name="TestSpecialCharacters" parallel="methods">
         <classes>
-            <class name="com.applitools.eyes.renderingGrid.TestSpecialCharacters">
+            <class name="com.applitools.eyes.selenium.rendering.TestSpecialCharacters">
                 <methods>
                     <include name="TestRenderSpecialCharacters" />
                 </methods>
@@ -219,7 +219,7 @@
     </test>
     <test name="TestVGServerConfigs" parallel="methods">
         <classes>
-            <class name="com.applitools.eyes.renderingGrid.TestVGServerConfigs">
+            <class name="com.applitools.eyes.selenium.rendering.TestVGServerConfigs">
                 <methods>
                     <include name="TestVGDoubleCloseNoCheck" />
                     <include name="TestVGChangeConfigAfterOpen"/>
@@ -269,7 +269,7 @@
     </test>
     <test name="TestIEyesSelenium" parallel="methods">
         <classes>
-            <class name="com.applitools.eyes.renderingGrid.TestIEyesSelenium">
+            <class name="com.applitools.eyes.selenium.rendering.TestIEyesSelenium">
                 <methods>
                     <include name="Test_GetAllResults" />
                 </methods>
@@ -278,7 +278,7 @@
     </test>
     <test name="TestVGNoMissingSteps" parallel="methods">
         <classes>
-            <class name="com.applitools.eyes.renderingGrid.TestVGNoMissingSteps">
+            <class name="com.applitools.eyes.selenium.rendering.TestVGNoMissingSteps">
                 <methods>
                     <include name="TestNoMissingSteps_UT"/>
                 </methods>
@@ -314,7 +314,7 @@
     </test>
     <test name="TestRenderings" parallel="methods">
         <classes>
-            <class name="com.applitools.eyes.renderingGrid.TestRenderings">
+            <class name="com.applitools.eyes.selenium.rendering.TestRenderings">
                 <methods>
                     <include name="TestMobileOnly"/>
                     <include name="testRenderingIosSimulator"/>
@@ -324,6 +324,7 @@
                     <include name="testRenderResourceNotFound"/>
                     <include name="testVisualGridOptions"/>
                     <include name="testRenderStatusNull"/>
+                    <include name="testCaptureDomSnapshot"/>
                 </methods>
             </class>
         </classes>
@@ -416,7 +417,7 @@
     </test>
     <test name="TestBadSelectors" parallel="methods">
         <classes>
-            <class name="com.applitools.eyes.renderingGrid.TestBadSelectors">
+            <class name="com.applitools.eyes.selenium.rendering.TestBadSelectors">
                 <methods>
                     <include name="TestCheckRegionWithBadSelector"/>
                 </methods>
@@ -425,7 +426,7 @@
     </test>
     <test name="TestRenderSerialization" parallel="methods">
         <classes>
-            <class name="com.applitools.eyes.renderingGrid.TestRenderSerialization">
+            <class name="com.applitools.eyes.selenium.rendering.TestRenderSerialization">
                 <methods>
                     <include name="testRenderRequestSerialization"/>
                     <include name="testRenderResultSerialization"/>
@@ -444,7 +445,7 @@
     </test>
     <test name="TestVGWithBadWebhook">
         <classes>
-            <class name="com.applitools.eyes.renderingGrid.TestVGWithBadWebhook">
+            <class name="com.applitools.eyes.selenium.rendering.TestVGWithBadWebhook">
                 <methods>
                     <include name="testVGWithBadWebhook"/>
                 </methods>

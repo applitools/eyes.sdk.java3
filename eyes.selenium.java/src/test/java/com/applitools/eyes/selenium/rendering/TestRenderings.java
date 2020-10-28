@@ -1,4 +1,4 @@
-package com.applitools.eyes.renderingGrid;
+package com.applitools.eyes.selenium.rendering;
 
 import com.applitools.ICheckSettings;
 import com.applitools.connectivity.MockServerConnector;
@@ -8,11 +8,15 @@ import com.applitools.connectivity.TestServerConnector;
 import com.applitools.connectivity.api.*;
 import com.applitools.eyes.*;
 import com.applitools.eyes.config.Configuration;
+import com.applitools.eyes.config.ConfigurationProvider;
 import com.applitools.eyes.metadata.SessionResults;
 import com.applitools.eyes.selenium.BrowserType;
 import com.applitools.eyes.selenium.Eyes;
 import com.applitools.eyes.selenium.TestDataProvider;
 import com.applitools.eyes.selenium.fluent.Target;
+import com.applitools.eyes.selenium.frames.FrameChain;
+import com.applitools.eyes.selenium.wrappers.EyesSeleniumDriver;
+import com.applitools.eyes.selenium.wrappers.EyesTargetLocator;
 import com.applitools.eyes.utils.ReportingTestSuite;
 import com.applitools.eyes.utils.SeleniumTestUtils;
 import com.applitools.eyes.utils.SeleniumUtils;
@@ -418,5 +422,35 @@ public class TestRenderings extends ReportingTestSuite {
         } catch (Throwable t) {
             Assert.assertTrue(t.getMessage().contains("Render status result was null"));
         }
+    }
+
+    @Test
+    public void testCaptureDomSnapshot() throws Exception {
+        final Configuration configuration = new Configuration();
+        ConfigurationProvider configurationProvider = new ConfigurationProvider() {
+            @Override
+            public Configuration get() {
+                return configuration;
+            }
+        };
+        WebDriver driver = SeleniumUtils.createChromeDriver();
+        driver.get("https://applitools.github.io/demo/TestPages/CorsTestPage/");
+        VisualGridEyes eyes = new VisualGridEyes(new VisualGridRunner(10), configurationProvider);
+        driver = eyes.open(driver, "test", "test", new RectangleSize(800, 800));
+        FrameChain frameChain = ((EyesSeleniumDriver) driver).getFrameChain().clone();
+        EyesTargetLocator switchTo = ((EyesTargetLocator) driver.switchTo());
+        FrameData frameData = eyes.captureDomSnapshot(frameChain, switchTo);
+        driver.quit();
+        Assert.assertEquals(frameData.getFrames().size(), 1);
+
+        FrameData innerFrame = frameData.getFrames().get(0);
+        Assert.assertEquals(innerFrame.getCrossFrames().size(), 1);
+        Assert.assertEquals(innerFrame.getFrames().size(), 1);
+
+        int cdtIndex = innerFrame.getCrossFrames().get(0).getIndex();
+        List<AttributeData> attributeData = innerFrame.getCdt().get(cdtIndex).attributes;
+        AttributeData applitoolsSrc = attributeData.get(attributeData.size() - 1);
+        Assert.assertEquals(applitoolsSrc.name, "data-applitools-src");
+        Assert.assertEquals(applitoolsSrc.value, innerFrame.getFrames().get(0).getUrl());
     }
 }

@@ -1,8 +1,7 @@
-package com.applitools.eyes.renderingGrid;
+package com.applitools.eyes.selenium.rendering;
 
 import com.applitools.eyes.Logger;
 import com.applitools.eyes.config.Configuration;
-import com.applitools.eyes.selenium.rendering.VisualGridEyes;
 import com.applitools.eyes.utils.ReportingTestSuite;
 import com.applitools.eyes.utils.TestUtils;
 import com.applitools.eyes.visualgrid.model.RenderBrowserInfo;

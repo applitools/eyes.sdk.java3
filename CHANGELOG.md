@@ -1,6 +1,7 @@
 ## [vNext]
 ### Added
 - UFG skip list functionality. [Trello 1974](https://trello.com/c/44xq8dze)
+- New DOM scripts features. [Trello 2268](https://trello.com/c/x6ImzMue)
 
 ## [3.183.0] - 2020-11-09
 ### Updated
