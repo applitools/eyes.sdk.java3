@@ -361,7 +361,9 @@ public class Eyes extends EyesBase implements IConfiguration {
             setViewportSize(new RectangleSize(image.getWidth(), image.getHeight()));
         }
 
-        openBase();
+        if (!isOpen) {
+            openBase();
+        }
 
         // We verify that the image is indeed in the correct format.
         image = ImageUtils.normalizeImageType(image);

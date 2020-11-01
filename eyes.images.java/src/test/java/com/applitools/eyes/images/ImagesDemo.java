@@ -25,6 +25,8 @@ public class ImagesDemo extends ReportingTestSuite {
     public void testSanity() {
         Eyes eyes = new Eyes();
         eyes.setLogHandler(new StdoutLogHandler());
+        eyes.setBranchName("master");
+        eyes.setApiKey("97ELuwdIiAilbeumIilysV8yY24tygCeRFFTYEBO7EfE110");
         BufferedImage img;
         try {
             // Start visual testing
@@ -33,6 +35,7 @@ public class ImagesDemo extends ReportingTestSuite {
             // Load page image and validate
             img = ImageIO.read(new URL("https://applitools.github.io/upload/appium.png"));
             // Visual validation point #1
+            eyes.check("Contact page", Target.image(img));
             eyes.check("Contact page", Target.image(img));
 
             // End visual testing. Validate visual correctness.

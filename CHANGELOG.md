@@ -1,3 +1,7 @@
+## [vNext]
+### Fixed
+- Calling check more than once is now possible on images SDK. [Trello 2288](https://trello.com/c/hnnPOkVf)
+
 ## [3.182.0] - 2020-10-28 
 ### Added
 - New logs for printing dom snapshot result. [Trello 2252](https://trello.com/c/7aalHb28)
