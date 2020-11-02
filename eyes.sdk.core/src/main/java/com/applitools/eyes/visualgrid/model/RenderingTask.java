@@ -240,13 +240,11 @@ public class RenderingTask implements Callable<RenderStatusResults>, Completable
 
     private void collectBlobsFromFrameData(FrameData frameData) {
         for (BlobData blobData : frameData.getBlobs()) {
-            cachedBlobsUrls.add(GeneralUtils.sanitizeURL(blobData.getUrl(), logger));
+            cachedBlobsUrls.add(blobData.getUrl());
         }
-        for (String url : frameData.getResourceUrls()) {
-            cachedBlobsUrls.add(GeneralUtils.sanitizeURL(url, logger));
-        }
+        cachedBlobsUrls.addAll(frameData.getResourceUrls());
         for (FrameData fd: frameData.getFrames()) {
-            cachedBlobsUrls.add(GeneralUtils.sanitizeURL(fd.getUrl(), logger));
+            cachedBlobsUrls.add(fd.getUrl());
             collectBlobsFromFrameData(fd);
         }
     }
@@ -403,6 +401,8 @@ public class RenderingTask implements Callable<RenderStatusResults>, Completable
         logger.verbose(String.format("cached resources count: %s", cachedResourceMapping.size()));
 
         Map<String, RGridResource> resourceMap = domAnalyzer.analyze();
+        cachedBlobsUrls.addAll(resourceMap.keySet());
+
         List<RenderRequest> allRequestsForRG = buildRenderRequests(domData, resourceMap);
 
         RenderRequest[] asArray = allRequestsForRG.toArray(new RenderRequest[0]);
