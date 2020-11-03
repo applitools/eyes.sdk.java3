@@ -1,3 +1,7 @@
+## [vNext]
+### Added
+- UFG skip list functionality. [Trello 1974](https://trello.com/c/44xq8dze)
+
 ## [3.183.0] - 2020-11-09
 ### Updated
 - Supporting iPhone 12 in `IosDeviceName` class. [Trello 2269](https://trello.com/c/yWFy2pRE)
@@ -31,6 +35,7 @@
 ### Added
 - A new API for closing batch explicitly: `BatchClose`. [Trello 2189](https://trello.com/c/SlHH9Ssb)
 - A new log handler for sending logs to the eyes server. [Trello 2206](https://trello.com/c/EX8JfK7W)
+- Supporting check full element with ufg. [Trello 2145](https://trello.com/c/8tPAnz66)
 ### Fixed
 - Fixed ignoring statusBar height on cropping when invisible. [Trello 2202](https://trello.com/c/qEH2mQgP)
 ### Updated

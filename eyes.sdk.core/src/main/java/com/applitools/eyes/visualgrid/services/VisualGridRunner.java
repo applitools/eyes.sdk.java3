@@ -497,7 +497,7 @@ public class VisualGridRunner extends EyesRunner {
                 notifyAllServices();
                 listener.onRenderFailed(e);
             }
-        }, userAgent, selectors, cachedBlobsUrls, cachedResourceMapping);
+        }, userAgent, selectors, cachedBlobsUrls);
         logger.verbose("locking renderingTaskList");
         synchronized (renderingTaskList) {
             this.renderingTaskList.add(renderingTask);

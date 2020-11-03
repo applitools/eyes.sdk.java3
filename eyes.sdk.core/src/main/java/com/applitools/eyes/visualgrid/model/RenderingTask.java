@@ -37,7 +37,6 @@ public class RenderingTask implements Callable<RenderStatusResults>, Completable
     final Map<String, RGridResource> fetchedCacheMap;
     final Map<String, RGridResource> putResourceCache;
     final Set<String> cachedBlobsUrls;
-    final Map<String, Set<String>> cachedResourceMapping;
     private final Logger logger;
     private final AtomicBoolean isTaskComplete = new AtomicBoolean(false);
     private AtomicBoolean isForcePutNeeded;
@@ -98,13 +97,12 @@ public class RenderingTask implements Callable<RenderStatusResults>, Completable
         this.checkSettings = checkSettings;
         this.renderingInfo = new RenderingInfo();
         this.cachedBlobsUrls = new HashSet<>();
-        this.cachedResourceMapping = new HashMap<>();
     }
 
     public RenderingTask(IEyesConnector eyesConnector, FrameData domData, ICheckSettings checkSettings,
                          List<VisualGridTask> visualGridTaskList, List<VisualGridTask> openVisualGridTasks, VisualGridRunner renderingGridManager,
                          IDebugResourceWriter debugResourceWriter, RenderTaskListener listener, UserAgent userAgent, List<VisualGridSelector[]> regionSelectors,
-                         Set<String> cachedBlobsUrls, Map<String, Set<String>> cachedResourceMapping) {
+                         Set<String> cachedBlobsUrls) {
 
         this.eyesConnector = eyesConnector;
         this.domData = domData;
@@ -122,7 +120,6 @@ public class RenderingTask implements Callable<RenderStatusResults>, Completable
         String renderingGridForcePut = GeneralUtils.getEnvString("APPLITOOLS_RENDERING_GRID_FORCE_PUT");
         this.isForcePutNeeded = new AtomicBoolean(renderingGridForcePut != null && renderingGridForcePut.equalsIgnoreCase("true"));
         this.cachedBlobsUrls = cachedBlobsUrls;
-        this.cachedResourceMapping = cachedResourceMapping;
         collectBlobsFromFrameData(domData);
     }
 
@@ -396,9 +393,9 @@ public class RenderingTask implements Callable<RenderStatusResults>, Completable
 
     RenderRequest[] prepareDataForRG(FrameData domData) {
         DomAnalyzer domAnalyzer = new DomAnalyzer(logger, eyesConnector.getServerConnector(), debugResourceWriter, domData, fetchedCacheMap, userAgent,
-                cachedResourceMapping);
+                cachedBlobsUrls);
 
-        logger.verbose(String.format("cached resources count: %s", cachedResourceMapping.size()));
+        logger.verbose(String.format("cached resources count: %s", cachedBlobsUrls.size()));
 
         Map<String, RGridResource> resourceMap = domAnalyzer.analyze();
         cachedBlobsUrls.addAll(resourceMap.keySet());

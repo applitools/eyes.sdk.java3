@@ -19,7 +19,7 @@ import java.util.TreeSet;
 public class TestSkipList {
 
     @Test
-    public void TestSkipList() {
+    public void TestSkipList() throws InterruptedException {
         VisualGridRunner runner = new VisualGridRunner(30);
         Eyes eyes = new Eyes(runner);
 
@@ -40,6 +40,7 @@ public class TestSkipList {
             eyes.open(driver);
             driver.get("https://applitools.github.io/demo/TestPages/VisualGridTestPage/");
             eyes.check("Check1", Target.window());
+
             Set<String> expectedUrls = new TreeSet<>();
             expectedUrls.add("https://applitools.github.io/demo/TestPages/VisualGridTestPage/AbrilFatface-Regular.woff2");
             expectedUrls.add("https://applitools.github.io/demo/TestPages/VisualGridTestPage/applitools_logo_combined.svg");
@@ -50,17 +51,17 @@ public class TestSkipList {
             expectedUrls.add("https://applitools.github.io/demo/TestPages/VisualGridTestPage/innerstyle2.css");
             expectedUrls.add("https://applitools.github.io/demo/TestPages/VisualGridTestPage/logo.svg");
             expectedUrls.add("https://applitools.github.io/demo/TestPages/VisualGridTestPage/minions-800x500_green_sideways.png");
-//            expectedUrls.add("https://applitools.github.io/demo/TestPages/VisualGridTestPage/minions-800x500.jpg");
+            expectedUrls.add("https://applitools.github.io/demo/TestPages/VisualGridTestPage/minions-800x500.jpg");
             expectedUrls.add("https://applitools.github.io/demo/TestPages/VisualGridTestPage/slogan.svg");
             expectedUrls.add("https://applitools.github.io/demo/TestPages/VisualGridTestPage/style0.css");
             expectedUrls.add("https://applitools.github.io/demo/TestPages/VisualGridTestPage/style1.css");
             expectedUrls.add("https://fonts.googleapis.com/css?family=Raleway");
             expectedUrls.add("https://fonts.googleapis.com/css?family=Unlock");
-//            expectedUrls.add("https://fonts.gstatic.com/s/raleway/v18/1Ptxg8zYS_SKggPN4iEgvnHyvveLxVvaorCFPrEHJA.woff2");
-//            expectedUrls.add("https://fonts.gstatic.com/s/raleway/v18/1Ptxg8zYS_SKggPN4iEgvnHyvveLxVvaorCGPrEHJA.woff2");
-//            expectedUrls.add("https://fonts.gstatic.com/s/raleway/v18/1Ptxg8zYS_SKggPN4iEgvnHyvveLxVvaorCHPrEHJA.woff2");
-//            expectedUrls.add("https://fonts.gstatic.com/s/raleway/v18/1Ptxg8zYS_SKggPN4iEgvnHyvveLxVvaorCIPrE.woff2");
-//            expectedUrls.add("https://fonts.gstatic.com/s/raleway/v18/1Ptxg8zYS_SKggPN4iEgvnHyvveLxVvaorCMPrEHJA.woff2");
+            expectedUrls.add("https://fonts.gstatic.com/s/raleway/v18/1Ptxg8zYS_SKggPN4iEgvnHyvveLxVvaorCFPrEHJA.woff2");
+            expectedUrls.add("https://fonts.gstatic.com/s/raleway/v18/1Ptxg8zYS_SKggPN4iEgvnHyvveLxVvaorCGPrEHJA.woff2");
+            expectedUrls.add("https://fonts.gstatic.com/s/raleway/v18/1Ptxg8zYS_SKggPN4iEgvnHyvveLxVvaorCHPrEHJA.woff2");
+            expectedUrls.add("https://fonts.gstatic.com/s/raleway/v18/1Ptxg8zYS_SKggPN4iEgvnHyvveLxVvaorCIPrE.woff2");
+            expectedUrls.add("https://fonts.gstatic.com/s/raleway/v18/1Ptxg8zYS_SKggPN4iEgvnHyvveLxVvaorCMPrEHJA.woff2");
             expectedUrls.add("https://fonts.gstatic.com/s/unlock/v10/7Au-p_8ykD-cDl72LwLT.woff2");
             expectedUrls.add("https://use.fontawesome.com/releases/v5.8.2/css/all.css");
             expectedUrls.add("https://use.fontawesome.com/releases/v5.8.2/webfonts/fa-brands-400.eot");
@@ -79,9 +80,14 @@ public class TestSkipList {
             expectedUrls.add("https://use.fontawesome.com/releases/v5.8.2/webfonts/fa-solid-900.woff");
             expectedUrls.add("https://use.fontawesome.com/releases/v5.8.2/webfonts/fa-solid-900.woff2");
 
-            Assert.assertEquals(new TreeSet<>(runner.getCachedBlobsUrls()), expectedUrls);
+            Thread.sleep(5_000);
+
             eyes.check("Check2", Target.window());
-            eyes.close();
+
+            eyes.closeAsync();
+
+            Assert.assertEquals(new TreeSet<>(runner.getCachedBlobsUrls()), expectedUrls);
+
             runner.getAllTestResults();
         } finally {
             driver.quit();
