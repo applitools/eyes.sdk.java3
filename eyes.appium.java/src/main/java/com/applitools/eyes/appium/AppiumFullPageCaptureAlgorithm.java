@@ -20,7 +20,7 @@ import java.awt.image.Raster;
 
 public class AppiumFullPageCaptureAlgorithm {
 
-    private static final int MIN_SCREENSHOT_PART_HEIGHT = 10;
+    protected static final int DEFAULT_STITCHING_ADJUSTMENT = 50;
 
     protected Logger logger;
 
@@ -47,13 +47,15 @@ public class AppiumFullPageCaptureAlgorithm {
     protected final ScrollPositionProvider scrollProvider;
 
     private final WebElement cutElement;
+    protected Integer stitchingAdjustment = DEFAULT_STITCHING_ADJUSTMENT;
 
     public AppiumFullPageCaptureAlgorithm(Logger logger, PositionProvider originProvider,
                                           PositionProvider positionProvider,
                                           ScrollPositionProvider scrollProvider,
                                           ImageProvider imageProvider, DebugScreenshotsProvider debugScreenshotsProvider,
                                           ScaleProviderFactory scaleProviderFactory, CutProvider cutProvider,
-                                          EyesScreenshotFactory screenshotFactory, int waitBeforeScreenshots, WebElement cutElement) {
+                                          EyesScreenshotFactory screenshotFactory, int waitBeforeScreenshots, WebElement cutElement,
+                                          Integer stitchingAdjustment) {
         ArgumentGuard.notNull(logger, "logger");
         this.logger = logger;
         this.originProvider = originProvider;
@@ -73,19 +75,23 @@ public class AppiumFullPageCaptureAlgorithm {
         this.currentPosition = null;
         this.coordinatesAreScaled = false;
         this.cutElement = cutElement;
+        if (stitchingAdjustment != null) {
+            this.stitchingAdjustment = stitchingAdjustment;
+        }
     }
 
     public AppiumFullPageCaptureAlgorithm(Logger logger,
                                           AppiumScrollPositionProvider scrollProvider,
                                           ImageProvider imageProvider, DebugScreenshotsProvider debugScreenshotsProvider,
                                           ScaleProviderFactory scaleProviderFactory, CutProvider cutProvider,
-                                          EyesScreenshotFactory screenshotFactory, int waitBeforeScreenshots, WebElement cutElement) {
+                                          EyesScreenshotFactory screenshotFactory, int waitBeforeScreenshots, WebElement cutElement,
+                                          Integer stitchingAdjustment) {
 
         // ensure that all the scroll/position providers used by the superclass are the same object;
         // getting the current position for appium is very expensive!
         this(logger, scrollProvider, scrollProvider, scrollProvider, imageProvider,
                 debugScreenshotsProvider, scaleProviderFactory, cutProvider, screenshotFactory,
-                waitBeforeScreenshots, cutElement);
+                waitBeforeScreenshots, cutElement, stitchingAdjustment);
     }
 
     protected RectangleSize captureAndStitchCurrentPart(Region partRegion) {
@@ -128,17 +134,17 @@ public class AppiumFullPageCaptureAlgorithm {
 
         int xPos = downscaleSafe(scrollViewRegion.getLeft() + 1);
         Region regionToCrop;
-        int oneScrollStep = downscaleSafe(scrollViewRegion.getHeight());
+        int oneScrollStep = downscaleSafe(scrollViewRegion.getHeight() - stitchingAdjustment);
         int maxScrollSteps = contentSize.getScrollContentHeight() / oneScrollStep;
         logger.verbose("maxScrollSteps: " + maxScrollSteps);
 
         int startY = downscaleSafe(scrollViewRegion.getHeight() + scrollViewRegion.getTop()) - 1;
-        int endY = startY - oneScrollStep + 2;
+        int endY = startY - oneScrollStep + 2 + stitchingAdjustment;
         for (int step = 1; step <= maxScrollSteps; step++) {
             regionToCrop = new Region(0,
-                    scrollViewRegion.getTop(),
+                    scrollViewRegion.getTop() + stitchingAdjustment,
                     initialPartSize.getWidth(),
-                    scrollViewRegion.getHeight());
+                    scrollViewRegion.getHeight() - stitchingAdjustment);
 
             ((AppiumScrollPositionProvider) scrollProvider).scrollTo(xPos, startY, xPos, endY, false);
 
@@ -149,7 +155,7 @@ public class AppiumFullPageCaptureAlgorithm {
             // We should set left = 0 because we need to a region from the start of viewport
             Region scrolledRegion = new Region(scrollViewRegion.getLeft(), scrollViewRegion.getTop() + 1, scrollViewRegion.getWidth(),
                     scrollViewRegion.getHeight());
-            currentPosition = new Location(currentPosition.getX(), currentPosition.getY() + 1);
+            currentPosition = new Location(currentPosition.getX(), currentPosition.getY() + 1 + stitchingAdjustment);
             logger.verbose("The region to capture will be " + scrolledRegion);
 
             lastSuccessfulPartSize = captureAndStitchCurrentPart(regionToCrop);
@@ -158,16 +164,20 @@ public class AppiumFullPageCaptureAlgorithm {
         int heightUnderScrollableView = initialPartSize.getHeight() - scaleSafe(oneScrollStep) - scrollViewRegion.getTop();
         if (heightUnderScrollableView > 0) { // check if there is views under the scrollable view
             logger.verbose("There are extra space under the scrollable element. (height: " + heightUnderScrollableView + ")");
-            regionToCrop = new Region(0, scrollViewRegion.getHeight() + scrollViewRegion.getTop(), initialPartSize.getWidth(), heightUnderScrollableView);
+            regionToCrop = new Region(
+                    0,
+                    scrollViewRegion.getHeight() + scrollViewRegion.getTop() - stitchingAdjustment,
+                    initialPartSize.getWidth(),
+                    heightUnderScrollableView);
 
-            currentPosition = new Location(currentPosition.getX(), currentPosition.getY() + lastSuccessfulPartSize.getHeight());
+            currentPosition = new Location(currentPosition.getX(), currentPosition.getY() + lastSuccessfulPartSize.getHeight() - stitchingAdjustment);
 
             lastSuccessfulPartSize = captureAndStitchCurrentPart(regionToCrop);
         }
 
         cleanupStitch(originalStitchedState, currentPosition, lastSuccessfulPartSize, entireSize);
 
-        moveToTopLeft(xPos, endY + statusBarHeight, xPos, startY + statusBarHeight);
+        moveToTopLeft(xPos, endY + statusBarHeight + stitchingAdjustment, xPos, startY + statusBarHeight);
     }
 
 
@@ -213,7 +223,7 @@ public class AppiumFullPageCaptureAlgorithm {
             ((AppiumScrollPositionProvider) scrollProvider).scrollTo(startX, startY, endX, endY, false);
             GeneralUtils.sleep(waitBeforeScreenshots);
             currentPosition = originProvider.getCurrentPosition();
-            if (currentPosition.getX() == 0 && currentPosition.getY() == 0) {
+            if (currentPosition.getX() <= 0 && currentPosition.getY() <= 0) {
                 break;
             }
         } while (true);

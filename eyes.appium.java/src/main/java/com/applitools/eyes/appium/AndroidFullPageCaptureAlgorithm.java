@@ -7,9 +7,6 @@ import com.applitools.eyes.debug.DebugScreenshotsProvider;
 
 public class AndroidFullPageCaptureAlgorithm extends AppiumFullPageCaptureAlgorithm {
 
-    private static final int DEFAULT_STITCHING_ADJUSTMENT = 50;
-
-    private Integer stitchingAdjustment = DEFAULT_STITCHING_ADJUSTMENT;
     private String scrollableElementId;
 
     public AndroidFullPageCaptureAlgorithm(Logger logger,
@@ -20,13 +17,10 @@ public class AndroidFullPageCaptureAlgorithm extends AppiumFullPageCaptureAlgori
                                            Integer stitchingAdjustment, String scrollableElementId) {
 
         super(logger, scrollProvider, imageProvider, debugScreenshotsProvider,
-            scaleProviderFactory, cutProvider, screenshotFactory, waitBeforeScreenshots, null);
+            scaleProviderFactory, cutProvider, screenshotFactory, waitBeforeScreenshots, null, stitchingAdjustment);
 
         // Android returns pixel coordinates which are already scaled according to the pixel ratio
         this.coordinatesAreScaled = true;
-        if (stitchingAdjustment != null) {
-            this.stitchingAdjustment = stitchingAdjustment;
-        }
         this.scrollableElementId = scrollableElementId;
         ((AndroidScrollPositionProvider) scrollProvider).setScrollRootElement(scrollableElementId);
     }

@@ -53,7 +53,7 @@ public class AppiumCaptureAlgorithmFactory {
         } else if (EyesDriverUtils.isIOS(driver.getRemoteWebDriver())) {
             return new AppiumFullPageCaptureAlgorithm(logger, scrollProvider, imageProvider,
                     debugScreenshotsProvider, scaleProviderFactory, cutProvider, screenshotFactory,
-                    waitBeforeScreenshot, cutElement);
+                    waitBeforeScreenshot, cutElement, stitchingAdjustment);
         }
         throw new Error("Could not find driver type for getting capture algorithm");
     }
