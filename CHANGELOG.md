@@ -2,7 +2,7 @@
 ### Updated
 - Supporting iPhone 12 in `IosDeviceName` class. [Trello 2269](https://trello.com/c/yWFy2pRE)
 ### Added
-- Stitch overlay functionality for iOS. [Trello 2138](https://trello.com/c/EI2mxmTD)
+- Stitch overlap functionality for iOS. [Trello 2138](https://trello.com/c/EI2mxmTD)
 ### Fixed
 - Calling check more than once is now possible on images SDK. [Trello 2288](https://trello.com/c/hnnPOkVf)
 - Unifying urls which are similar (`#` or `?` in the end of the url). [Trello 2299](https://trello.com/c/r13tsIrG)
