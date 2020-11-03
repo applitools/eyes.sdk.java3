@@ -20,7 +20,7 @@ import java.awt.image.Raster;
 
 public class AppiumFullPageCaptureAlgorithm {
 
-    protected static final int DEFAULT_STITCHING_ADJUSTMENT = 50;
+    protected static final int DEFAULT_STITCHING_ADJUSTMENT = 0;
 
     protected Logger logger;
 
