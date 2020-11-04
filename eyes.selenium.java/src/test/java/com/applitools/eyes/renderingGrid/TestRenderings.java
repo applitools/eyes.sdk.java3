@@ -388,4 +388,35 @@ public class TestRenderings extends ReportingTestSuite {
         expected.put("option4", 5);
         Assert.assertEquals(renderRequests.get(0).getOptions(), expected);
     }
+
+    @Test
+    public void testRenderStatusNull() {
+        MockServerConnector mockServerConnector = new MockServerConnector() {
+            public void renderStatusById(final TaskListener<List<RenderStatusResults>> listener, String... renderIds) {
+                listener.onComplete(new ArrayList<RenderStatusResults>() {{add(null);}});
+            }
+        };
+
+        VisualGridRunner runner = new VisualGridRunner(10);
+        Eyes eyes = new Eyes(runner);
+        eyes.setLogHandler(new StdoutLogHandler());
+        eyes.setServerConnector(mockServerConnector);
+        ChromeDriver driver = SeleniumUtils.createChromeDriver();
+        try {
+            eyes.open(driver, "Applitools Eyes Sdk", "Test Render Status Null", new RectangleSize(800, 800));
+            driver.get("http://applitools.github.io/demo");
+            eyes.checkWindow();
+            eyes.closeAsync();
+        } finally {
+            driver.quit();
+            eyes.abortAsync();
+        }
+
+        try {
+            runner.getAllTestResults();
+            Assert.fail("Test should fail");
+        } catch (Throwable t) {
+            Assert.assertTrue(t.getMessage().contains("Render status result was null"));
+        }
+    }
 }

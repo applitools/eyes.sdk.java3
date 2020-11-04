@@ -323,6 +323,7 @@
                     <include name="testRenderFail"/>
                     <include name="testRenderResourceNotFound"/>
                     <include name="testVisualGridOptions"/>
+                    <include name="testRenderStatusNull"/>
                 </methods>
             </class>
         </classes>

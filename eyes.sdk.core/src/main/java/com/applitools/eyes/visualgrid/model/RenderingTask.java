@@ -22,7 +22,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 @SuppressWarnings("WeakerAccess")
 public class RenderingTask implements Callable<RenderStatusResults>, CompletableTask {
 
-    private static final int FETCH_TIMEOUT_SECONDS = 60;
+    private static final int FETCH_TIMEOUT_MS = 60 * 60 * 1000;
     public static final String FULLPAGE = "full-page";
     public static final String VIEWPORT = "viewport";
     public static final int HOUR = 60 * 60 * 1000;
@@ -134,6 +134,7 @@ public class RenderingTask implements Callable<RenderStatusResults>, Completable
             long elapsedTimeStart = System.currentTimeMillis();
             boolean isForcePutAlreadyDone = false;
             List<RunningRender> runningRenders;
+            RenderStatus worstStatus;
             do {
                 try {
                     runningRenders = this.eyesConnector.render(requests);
@@ -164,8 +165,7 @@ public class RenderingTask implements Callable<RenderStatusResults>, Completable
                 logger.verbose("step 3.2");
 
                 RunningRender runningRender = runningRenders.get(0);
-                RenderStatus worstStatus = runningRender.getRenderStatus();
-
+                worstStatus = runningRender.getRenderStatus();
                 worstStatus = calcWorstStatus(runningRenders, worstStatus);
 
                 boolean isNeedMoreDom = runningRender.isNeedMoreDom();
@@ -175,7 +175,7 @@ public class RenderingTask implements Callable<RenderStatusResults>, Completable
                     isForcePutAlreadyDone = true;
                     try {
                         if (resourcesPhaser.getRegisteredParties() > 0) {
-                            resourcesPhaser.awaitAdvanceInterruptibly(0, 30, TimeUnit.SECONDS);
+                            resourcesPhaser.awaitAdvanceInterruptibly(0, 10, TimeUnit.MINUTES);
                         }
                     } catch (InterruptedException | TimeoutException e) {
                         GeneralUtils.logExceptionStackTrace(logger, e);
@@ -184,13 +184,13 @@ public class RenderingTask implements Callable<RenderStatusResults>, Completable
                 }
 
                 logger.verbose("step 3.3");
-                double elapsedTime = ((double) System.currentTimeMillis() - elapsedTimeStart) / 1000;
-                stillRunning = (worstStatus == RenderStatus.NEED_MORE_RESOURCE || isNeedMoreDom) && elapsedTime < FETCH_TIMEOUT_SECONDS;
+                double elapsedTime = System.currentTimeMillis() - elapsedTimeStart;
+                stillRunning = (worstStatus == RenderStatus.NEED_MORE_RESOURCE || isNeedMoreDom) && elapsedTime < FETCH_TIMEOUT_MS;
                 if (stillRunning) {
                     sendMissingResources(runningRenders, requests[0].getDom(), requests[0].getResources(), isNeedMoreDom);
                     try {
                         if (resourcesPhaser.getRegisteredParties() > 0) {
-                            resourcesPhaser.awaitAdvanceInterruptibly(0, 30, TimeUnit.SECONDS);
+                            resourcesPhaser.awaitAdvanceInterruptibly(0, 10, TimeUnit.MINUTES);
                         }
                     } catch (InterruptedException | TimeoutException e) {
                         GeneralUtils.logExceptionStackTrace(logger, e);
@@ -201,6 +201,11 @@ public class RenderingTask implements Callable<RenderStatusResults>, Completable
                 logger.verbose("step 3.4");
 
             } while (stillRunning);
+
+            if (worstStatus != RenderStatus.RENDERED && worstStatus != RenderStatus.RENDERING) {
+                setRenderErrorToTasks(requests);
+                throw new EyesException(String.format("Bad status for render requests: %s", worstStatus));
+            }
 
             Map<RunningRender, RenderRequest> mapping = mapRequestToRunningRender(runningRenders, requests);
 
@@ -453,7 +458,7 @@ public class RenderingTask implements Callable<RenderStatusResults>, Completable
                 GeneralUtils.logExceptionStackTrace(logger, e);
                 continue;
             }
-            if (renderStatusResultsList == null || renderStatusResultsList.isEmpty() || renderStatusResultsList.get(0) == null) {
+            if (renderStatusResultsList == null || renderStatusResultsList.isEmpty()) {
                 try {
                     Thread.sleep(500);
                 } catch (InterruptedException e) {
@@ -507,7 +512,10 @@ public class RenderingTask implements Callable<RenderStatusResults>, Completable
         for (int i = 0, j = 0; i < renderStatusResultsList.size(); i++) {
             RenderStatusResults renderStatusResults = renderStatusResultsList.get(i);
             if (renderStatusResults == null) {
-                continue;
+                renderStatusResults = new RenderStatusResults();
+                renderStatusResults.setStatus(RenderStatus.ERROR);
+                renderStatusResults.setError("Render status result was null");
+                renderStatusResults.setRenderId(ids.get(j));
             }
 
             RenderStatus renderStatus = renderStatusResults.getStatus();
@@ -515,9 +523,7 @@ public class RenderingTask implements Callable<RenderStatusResults>, Completable
             boolean isErrorStatus = renderStatus == RenderStatus.ERROR;
             logger.verbose("renderStatusResults - " + renderStatusResults);
             if (isRenderedStatus || isErrorStatus) {
-
                 String removedId = ids.remove(j);
-
                 for (Map.Entry<RunningRender, RenderRequest> kvp: runningRenders.entrySet()) {
                     RunningRender renderedRender = kvp.getKey();
                     RenderRequest renderRequest = kvp.getValue();
@@ -543,8 +549,9 @@ public class RenderingTask implements Callable<RenderStatusResults>, Completable
                         if (error != null) {
                             GeneralUtils.logExceptionStackTrace(logger, new Exception(error));
                             visualGridTask.setRenderError(renderId, error, renderRequest);
+                        } else {
+                            visualGridTask.setRenderResult(renderStatusResults);
                         }
-                        visualGridTask.setRenderResult(renderStatusResults);
                         break;
                     }
                 }
