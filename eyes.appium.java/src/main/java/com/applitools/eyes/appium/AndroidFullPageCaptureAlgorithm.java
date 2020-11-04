@@ -23,7 +23,6 @@ public class AndroidFullPageCaptureAlgorithm extends AppiumFullPageCaptureAlgori
         this.coordinatesAreScaled = true;
         this.scrollableElementId = scrollableElementId;
         ((AndroidScrollPositionProvider) scrollProvider).setScrollRootElement(scrollableElementId);
-        this.stitchingAdjustment = 50;
     }
 
     @Override
