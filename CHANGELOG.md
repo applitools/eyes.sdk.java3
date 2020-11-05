@@ -1,6 +1,9 @@
 ## [vNext]
 ### Fixed
 - Calling check more than once is now possible on images SDK. [Trello 2288](https://trello.com/c/hnnPOkVf)
+- Unifying urls which are similar (`#` or `?` in the end of the url). [Trello 2299](https://trello.com/c/r13tsIrG)
+- Fixed a bug in the css tokenizer. [Trello 2299](https://trello.com/c/r13tsIrG)
+- Now sanitizing relative urls. [Trello 2299](https://trello.com/c/r13tsIrG)
 
 ## [3.182.0] - 2020-10-28 
 ### Added
