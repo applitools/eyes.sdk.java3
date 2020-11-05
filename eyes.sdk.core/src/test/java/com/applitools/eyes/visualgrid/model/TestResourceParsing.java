@@ -57,4 +57,16 @@ public class TestResourceParsing {
         CSSRuleList cssRuleList = CssTokenizer.getCssRules(cssContent);
         Assert.assertEquals(cssRuleList.getLength(), 4);
     }
+
+    @Test
+    void testGetImportedUrls() throws IOException {
+        Set<String> imported = CssTokenizer.getImportedUrls(
+                "@import url('innerstyle2.css');\n" +
+                        "p {\n" +
+                        "    text-shadow: 1px 2px 3px rgba(0,0,0,0.5);\n" +
+                        "    font-family: 'Raleway', sans-serif;\n" +
+                        "}");
+        Assert.assertEquals(imported.size(), 1);
+        Assert.assertTrue(imported.contains("innerstyle2.css"));
+    }
 }
