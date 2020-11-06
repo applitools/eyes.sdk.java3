@@ -469,4 +469,13 @@
             </class>
         </classes>
     </test>
+    <test name="TestSkipList">
+        <classes>
+            <class name="com.applitools.eyes.renderingGrid.TestSkipList">
+                <methods>
+                    <include name="Test"/>
+                </methods>
+            </class>
+        </classes>
+    </test>
 </suite>

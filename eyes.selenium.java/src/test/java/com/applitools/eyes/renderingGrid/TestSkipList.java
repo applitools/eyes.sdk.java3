@@ -1,6 +1,5 @@
 package com.applitools.eyes.renderingGrid;
 
-import com.applitools.eyes.StdoutLogHandler;
 import com.applitools.eyes.config.Configuration;
 import com.applitools.eyes.selenium.Eyes;
 import com.applitools.eyes.selenium.TestDataProvider;
@@ -12,19 +11,17 @@ import org.openqa.selenium.chrome.ChromeDriver;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
-import java.util.HashSet;
 import java.util.Set;
 import java.util.TreeSet;
 
 public class TestSkipList {
 
     @Test
-    public void TestSkipList() throws InterruptedException {
+    public void Test() throws InterruptedException {
         VisualGridRunner runner = new VisualGridRunner(30);
         Eyes eyes = new Eyes(runner);
 
-//        eyes.setLogHandler(TestUtils.initLogger());
-        eyes.setLogHandler(new StdoutLogHandler(true));
+        eyes.setLogHandler(TestUtils.initLogger());
 
         Configuration conf = new Configuration();
         conf.setTestName("Skip List");

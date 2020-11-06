@@ -237,11 +237,13 @@ public class RenderingTask implements Callable<RenderStatusResults>, Completable
 
     private void collectBlobsFromFrameData(FrameData frameData) {
         for (BlobData blobData : frameData.getBlobs()) {
-            cachedBlobsUrls.add(blobData.getUrl());
+            cachedBlobsUrls.add(GeneralUtils.sanitizeURL(blobData.getUrl()));
         }
-        cachedBlobsUrls.addAll(frameData.getResourceUrls());
+        for (String url : frameData.getResourceUrls()) {
+            cachedBlobsUrls.add(GeneralUtils.sanitizeURL(url));
+        }
         for (FrameData fd: frameData.getFrames()) {
-            cachedBlobsUrls.add(fd.getUrl());
+            cachedBlobsUrls.add(GeneralUtils.sanitizeURL(fd.getUrl()));
             collectBlobsFromFrameData(fd);
         }
     }
