@@ -43,6 +43,7 @@ import java.util.*;
 public class Eyes extends EyesBase {
     private static final int USE_DEFAULT_MATCH_TIMEOUT = -1;
     private static final int DEFAULT_STITCH_OVERLAP = 50;
+    private static final int IOS_STITCH_OVERLAP = 0;
 
     public static final double UNKNOWN_DEVICE_PIXEL_RATIO = 0;
     public static final double DEFAULT_DEVICE_PIXEL_RATIO = 1;
@@ -263,8 +264,15 @@ public class Eyes extends EyesBase {
             logger.verbose("Found an instance of AppiumDriver, so using EyesAppiumDriver instead");
             this.driver = new EyesAppiumDriver(logger, this, (AppiumDriver) driver);
             regionVisibilityStrategyHandler.set(new NopRegionVisibilityStrategy(logger));
+            adjustStitchOverlap(driver);
         } else {
             logger.verbose("Did not find an instance of AppiumDriver, using regular logic");
+        }
+    }
+
+    private void adjustStitchOverlap(WebDriver driver) {
+        if (EyesDriverUtils.isIOS(driver)) {
+            configuration.setStitchOverlap(IOS_STITCH_OVERLAP);
         }
     }
 
