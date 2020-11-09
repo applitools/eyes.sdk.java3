@@ -670,7 +670,7 @@ public class VisualGridEyes implements ISeleniumEyes, IRenderingEyes {
             if (userAgent.isInternetExplorer()) {
                 script = PROCESS_PAGE_FOR_IE;
             }
-            String skipListJson = new ObjectMapper().writeValueAsString(renderingGridRunner.getCachedBlobsUrls());
+            String skipListJson = new ObjectMapper().writeValueAsString(renderingGridRunner.getCachedResources().keySet());
             String arguments = String.format("(document, {skipResources:%s});", skipListJson);
             logger.verbose("processPageAndSerializePoll: " + arguments);
             script += arguments;

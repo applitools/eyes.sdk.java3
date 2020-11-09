@@ -1,5 +1,6 @@
 package com.applitools.eyes.renderingGrid;
 
+import com.applitools.eyes.StdoutLogHandler;
 import com.applitools.eyes.config.Configuration;
 import com.applitools.eyes.selenium.Eyes;
 import com.applitools.eyes.selenium.TestDataProvider;
@@ -21,7 +22,8 @@ public class TestSkipList {
         VisualGridRunner runner = new VisualGridRunner(30);
         Eyes eyes = new Eyes(runner);
 
-        eyes.setLogHandler(TestUtils.initLogger());
+//        eyes.setLogHandler(TestUtils.initLogger());
+        eyes.setLogHandler(new StdoutLogHandler(true));
 
         Configuration conf = new Configuration();
         conf.setTestName("Skip List");
@@ -83,7 +85,7 @@ public class TestSkipList {
 
             eyes.closeAsync();
 
-            Assert.assertEquals(new TreeSet<>(runner.getCachedBlobsUrls()), expectedUrls);
+            Assert.assertEquals(new TreeSet<>(runner.getCachedResources().keySet()), expectedUrls);
 
             runner.getAllTestResults();
         } finally {
