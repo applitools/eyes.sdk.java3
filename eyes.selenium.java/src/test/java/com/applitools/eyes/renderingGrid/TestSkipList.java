@@ -1,6 +1,5 @@
 package com.applitools.eyes.renderingGrid;
 
-import com.applitools.eyes.StdoutLogHandler;
 import com.applitools.eyes.config.Configuration;
 import com.applitools.eyes.selenium.Eyes;
 import com.applitools.eyes.selenium.TestDataProvider;
@@ -22,8 +21,7 @@ public class TestSkipList {
         VisualGridRunner runner = new VisualGridRunner(30);
         Eyes eyes = new Eyes(runner);
 
-//        eyes.setLogHandler(TestUtils.initLogger());
-        eyes.setLogHandler(new StdoutLogHandler(true));
+        eyes.setLogHandler(TestUtils.initLogger());
 
         Configuration conf = new Configuration();
         conf.setTestName("Skip List");
@@ -44,7 +42,6 @@ public class TestSkipList {
             expectedUrls.add("https://applitools.github.io/demo/TestPages/VisualGridTestPage/AbrilFatface-Regular.woff2");
             expectedUrls.add("https://applitools.github.io/demo/TestPages/VisualGridTestPage/applitools_logo_combined.svg");
             expectedUrls.add("https://applitools.github.io/demo/TestPages/VisualGridTestPage/company_name.png");
-            expectedUrls.add("https://applitools.github.io/demo/TestPages/VisualGridTestPage/frame.html");
             expectedUrls.add("https://applitools.github.io/demo/TestPages/VisualGridTestPage/innerstyle0.css");
             expectedUrls.add("https://applitools.github.io/demo/TestPages/VisualGridTestPage/innerstyle1.css");
             expectedUrls.add("https://applitools.github.io/demo/TestPages/VisualGridTestPage/innerstyle2.css");
