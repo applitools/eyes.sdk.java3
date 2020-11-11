@@ -531,16 +531,16 @@ public class VisualGridEyes implements ISeleniumEyes, IRenderingEyes {
 
         waitBeforeDomSnapshot();
 
+        FrameChain originalFC = webDriver.getFrameChain().clone();
+        EyesTargetLocator switchTo = ((EyesTargetLocator) webDriver.switchTo());
         try {
-            FrameChain originalFC = webDriver.getFrameChain().clone();
-            EyesTargetLocator switchTo = ((EyesTargetLocator) webDriver.switchTo());
             checkSettings = switchFramesAsNeeded(checkSettings, switchTo);
             ICheckSettingsInternal checkSettingsInternal = (ICheckSettingsInternal) checkSettings;
 
             List<VisualGridTask> openVisualGridTasks = addOpenTaskToAllRunningTest();
             List<VisualGridTask> visualGridTaskList = new ArrayList<>();
 
-            FrameData scriptResult = captureDomSnapshot(originalFC, switchTo);
+            FrameData scriptResult = captureDomSnapshot(switchTo);
 
             String[] blobsUrls = new String[scriptResult.getBlobs().size()];
             for (int i = 0; i< scriptResult.getBlobs().size(); i++) {
@@ -582,7 +582,6 @@ public class VisualGridEyes implements ISeleniumEyes, IRenderingEyes {
                         }
                     }, regionsXPaths, userAgent);
             logger.verbose("created renderTask  (" + checkSettings.toString() + ")");
-            switchTo.frames(originalFC);
         } catch (Throwable e) {
             Error error = new Error(e);
             abort(e);
@@ -590,6 +589,8 @@ public class VisualGridEyes implements ISeleniumEyes, IRenderingEyes {
                 runningTest.setTestInExceptionMode(error);
             }
             GeneralUtils.logExceptionStackTrace(logger, e);
+        } finally {
+            switchTo.frames(originalFC);
         }
     }
 
@@ -645,23 +646,19 @@ public class VisualGridEyes implements ISeleniumEyes, IRenderingEyes {
         return isFullPage;
     }
 
-    FrameData captureDomSnapshot(FrameChain originalFC, EyesTargetLocator switchTo) throws Exception {
+    FrameData captureDomSnapshot(EyesTargetLocator switchTo) throws Exception {
         String domScript = userAgent.isInternetExplorer() ? PROCESS_PAGE_FOR_IE : PROCESS_PAGE;
         String pollingScript = userAgent.isInternetExplorer() ? POLL_RESULT_FOR_IE : POLL_RESULT;
         Map<String, Object> arguments = new HashMap<String, Object>() {{
             put("serializeResources", true);
             put("dontFetchResources", getConfiguration().isDisableBrowserFetching());
-            put("skipResources", renderingGridRunner.getCachedResources().keySet());
+            put("skipResources", new HashSet<>());
         }};
 
-        try {
-            String result = EyesSeleniumUtils.runDomScript(logger, webDriver, userAgent, domScript, arguments, pollingScript);
-            FrameData frameData = GeneralUtils.parseJsonToObject(result, FrameData.class);
-            analyzeFrameData(frameData, switchTo);
-            return frameData;
-        } finally {
-            switchTo.frames(originalFC);
-        }
+        String result = EyesSeleniumUtils.runDomScript(logger, webDriver, userAgent, domScript, arguments, pollingScript);
+        FrameData frameData = GeneralUtils.parseJsonToObject(result, FrameData.class);
+        analyzeFrameData(frameData, switchTo);
+        return frameData;
     }
 
     private void analyzeFrameData(FrameData frameData, EyesTargetLocator switchTo) {
@@ -675,7 +672,7 @@ public class VisualGridEyes implements ISeleniumEyes, IRenderingEyes {
             try {
                 WebElement frame = webDriver.findElement(By.cssSelector(crossFrame.getSelector()));
                 switchTo.frame(frame);
-                FrameData result = captureDomSnapshot(frameChain, switchTo);
+                FrameData result = captureDomSnapshot(switchTo);
                 frameData.addFrame(result);
                 frameData.getCdt().get(crossFrame.getIndex()).attributes.add(new AttributeData("data-applitools-src", result.getUrl()));
             } catch (Throwable t) {

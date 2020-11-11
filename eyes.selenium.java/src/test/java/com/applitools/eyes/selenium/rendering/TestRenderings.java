@@ -437,9 +437,8 @@ public class TestRenderings extends ReportingTestSuite {
         driver.get("https://applitools.github.io/demo/TestPages/CorsTestPage/");
         VisualGridEyes eyes = new VisualGridEyes(new VisualGridRunner(10), configurationProvider);
         driver = eyes.open(driver, "test", "test", new RectangleSize(800, 800));
-        FrameChain frameChain = ((EyesSeleniumDriver) driver).getFrameChain().clone();
         EyesTargetLocator switchTo = ((EyesTargetLocator) driver.switchTo());
-        FrameData frameData = eyes.captureDomSnapshot(frameChain, switchTo);
+        FrameData frameData = eyes.captureDomSnapshot(switchTo);
         driver.quit();
         Assert.assertEquals(frameData.getFrames().size(), 1);
 
