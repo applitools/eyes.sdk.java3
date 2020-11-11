@@ -652,7 +652,6 @@ public class VisualGridEyes implements ISeleniumEyes, IRenderingEyes {
         Map<String, Object> arguments = new HashMap<String, Object>() {{
             put("serializeResources", true);
             put("dontFetchResources", getConfiguration().isDisableBrowserFetching());
-            put("skipResources", new HashSet<>());
         }};
 
         String result = EyesSeleniumUtils.runDomScript(logger, webDriver, userAgent, domScript, arguments, pollingScript);
