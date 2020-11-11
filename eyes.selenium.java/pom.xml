@@ -55,9 +55,6 @@
             <resource>
                 <directory>src/main/node_resources/node_modules/@applitools</directory>
             </resource>
-            <resource>
-                <directory>src/main/node_resources/node_modules/@applitools</directory>
-            </resource>
         </resources>
         <plugins>
             <plugin>
