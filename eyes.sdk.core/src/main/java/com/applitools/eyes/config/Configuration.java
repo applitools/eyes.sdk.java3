@@ -53,6 +53,7 @@ public class Configuration implements IConfiguration {
     private boolean hideCaret = true;
     private boolean isVisualGrid = false;
     private boolean disableBrowserFetching = false;
+    private IDebugResourceWriter debugResourceWriter = new NullDebugResourceWriter();
 
     //Rendering Configuration
     private Boolean isRenderingConfig = false;
@@ -113,6 +114,7 @@ public class Configuration implements IConfiguration {
         this.features = new HashSet<>(other.getFeatures());
         this.visualGridOptions = other.getVisualGridOptions();
         this.disableBrowserFetching = other.isDisableBrowserFetching();
+        this.debugResourceWriter = other.getDebugResourceWriter();
     }
 
     public Configuration() {
@@ -756,5 +758,13 @@ public class Configuration implements IConfiguration {
 
     public void setDisableBrowserFetching(boolean disableBrowserFetching) {
         this.disableBrowserFetching = disableBrowserFetching;
+    }
+
+    public IDebugResourceWriter getDebugResourceWriter() {
+        return debugResourceWriter;
+    }
+
+    public void setDebugResourceWriter(IDebugResourceWriter debugResourceWriter) {
+        this.debugResourceWriter = debugResourceWriter;
     }
 }

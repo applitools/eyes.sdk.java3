@@ -50,7 +50,6 @@ public class VisualGridEyes implements ISeleniumEyes, IRenderingEyes {
     private EyesSeleniumDriver webDriver;
     private RenderingInfo renderingInfo;
     private IEyesConnector VGEyesConnector;
-    private IDebugResourceWriter debugResourceWriter;
     private String url;
     private Set<Future<TestResultContainer>> closeFuturesSet = new HashSet<>();
     private Boolean isDisabled = Boolean.FALSE;
@@ -568,8 +567,8 @@ public class VisualGridEyes implements ISeleniumEyes, IRenderingEyes {
 
             logger.verbose(String.format("added %d check tasks", visualGridTaskList.size()));
 
-            this.renderingGridRunner.check((ICheckSettings) checkSettingsInternal, debugResourceWriter, scriptResult,
-                    this.VGEyesConnector, visualGridTaskList, openVisualGridTasks,
+            this.renderingGridRunner.check((ICheckSettings) checkSettingsInternal, getConfiguration().getDebugResourceWriter(),
+                    scriptResult, this.VGEyesConnector, visualGridTaskList, openVisualGridTasks,
                     new VisualGridRunner.RenderListener() {
                         @Override
                         public void onRenderSuccess() {
@@ -837,10 +836,6 @@ public class VisualGridEyes implements ISeleniumEyes, IRenderingEyes {
 
     public List<RunningTest> getAllRunningTests() {
         return testList;
-    }
-
-    public void setDebugResourceWriter(IDebugResourceWriter debugResourceWriter) {
-        this.debugResourceWriter = debugResourceWriter;
     }
 
     @Override

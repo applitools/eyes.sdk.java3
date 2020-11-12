@@ -19,6 +19,7 @@ import com.applitools.eyes.selenium.positioning.ImageRotation;
 import com.applitools.eyes.selenium.rendering.VisualGridEyes;
 import com.applitools.eyes.selenium.wrappers.EyesSeleniumDriver;
 import com.applitools.eyes.triggers.MouseAction;
+import com.applitools.eyes.visualgrid.model.IDebugResourceWriter;
 import com.applitools.eyes.visualgrid.model.RenderingInfo;
 import com.applitools.eyes.visualgrid.services.VisualGridRunner;
 import com.applitools.utils.ArgumentGuard;
@@ -1764,6 +1765,10 @@ public class Eyes implements IEyesBase {
 
     public boolean getIgnoreDisplacements() {
         return this.configuration.getIgnoreDisplacements();
+    }
+
+    public void setDebugResourceWriter(IDebugResourceWriter debugResourceWriter) {
+        this.configuration.setDebugResourceWriter(debugResourceWriter);
     }
 
     /**

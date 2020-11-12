@@ -91,7 +91,6 @@ public class TestRenderings extends ReportingTestSuite {
         LogHandler logHandler = TestUtils.initLogger("TestSpecialRendering", logsPath);
         Eyes eyes = new Eyes(runner);
         eyes.setLogHandler(logHandler);
-        runner.setDebugResourceWriter(new FileDebugResourceWriter(eyes.getLogger(), logsPath, null, null));
 
         Configuration sconf = new Configuration();
         sconf.setTestName(testName);
