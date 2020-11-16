@@ -22,6 +22,7 @@ import com.applitools.utils.ArgumentGuard;
 import com.applitools.utils.ClassVersionGetter;
 import com.applitools.utils.GeneralUtils;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
@@ -644,6 +645,7 @@ public class VisualGridEyes implements ISeleniumEyes, IRenderingEyes {
         Map<String, Object> arguments = new HashMap<String, Object>() {{
             put("serializeResources", true);
             put("dontFetchResources", getConfiguration().isDisableBrowserFetching());
+            put("skipResources", new ObjectMapper().writeValueAsString(renderingGridRunner.getResourcesCacheMap()));
         }};
 
         String result = EyesSeleniumUtils.runDomScript(logger, webDriver, userAgent, domScript, arguments, pollingScript);

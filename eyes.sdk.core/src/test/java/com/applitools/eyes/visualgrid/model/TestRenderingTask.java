@@ -124,7 +124,11 @@ public class TestRenderingTask extends ReportingTestSuite {
         });
 
         // We call the method which activates the process of collecting resources and wait to see if it ends properly.
-        domAnalyzer.fetchAllResources(resourceUrls);
+        Map<URI, FrameData> resourceMap = new HashMap<>();
+        for (URI uri : resourceUrls) {
+            resourceMap.put(uri, frameData);
+        }
+        domAnalyzer.fetchAllResources(resourceMap);
         domAnalyzer.resourcesPhaser.awaitAdvanceInterruptibly(0, 30, TimeUnit.SECONDS);
         Assert.assertEquals(counter.get(), 7);
     }

@@ -1,6 +1,7 @@
 ## [vNext]
 ### Added
 - New DOM scripts features. [Trello 2268](https://trello.com/c/x6ImzMue)
+- UFG skip list functionality. [Trello 1974](https://trello.com/c/44xq8dze)
 ### Updated
 - Moved `open` to be before `render`. [Trello 2152](https://trello.com/c/yNzhBkBh)
 - Using server concurrency limitations. [Trello 2152](https://trello.com/c/yNzhBkBh)

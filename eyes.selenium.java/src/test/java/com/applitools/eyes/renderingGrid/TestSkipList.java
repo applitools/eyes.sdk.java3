@@ -1,11 +1,8 @@
 package com.applitools.eyes.renderingGrid;
 
-import com.applitools.ICheckSettings;
 import com.applitools.connectivity.ServerConnector;
-import com.applitools.eyes.ProxySettings;
 import com.applitools.eyes.TaskListener;
 import com.applitools.eyes.config.Configuration;
-import com.applitools.eyes.fluent.CheckSettings;
 import com.applitools.eyes.selenium.Eyes;
 import com.applitools.eyes.selenium.TestDataProvider;
 import com.applitools.eyes.selenium.fluent.Target;
@@ -22,10 +19,14 @@ import org.openqa.selenium.chrome.ChromeDriver;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.doAnswer;
+import static org.mockito.Mockito.spy;
 
 public class TestSkipList extends ReportingTestSuite {
 
@@ -35,7 +36,7 @@ public class TestSkipList extends ReportingTestSuite {
 
     @Test
     public void Test() throws InterruptedException {
-        final Set<Set<String>> resourceMaps = new HashSet<>();
+        final List<Set<String>> resourceMaps = new ArrayList<>();
 
         ServerConnector serverConnector = spy(new ServerConnector());
         doAnswer(new Answer<Void>() {
@@ -56,11 +57,9 @@ public class TestSkipList extends ReportingTestSuite {
         conf.setTestName("Skip List");
         conf.setAppName("Visual Grid Render Test");
         conf.setBatch(TestDataProvider.batchInfo);
-        conf.setUseDom(true);
-        conf.setSendDom(true);
+        eyes.setConfiguration(conf);
 
         eyes.setLogHandler(TestUtils.initLogger());
-        eyes.setConfiguration(conf);
         eyes.setServerConnector(serverConnector);
         ChromeDriver driver = SeleniumUtils.createChromeDriver();
 
@@ -116,7 +115,8 @@ public class TestSkipList extends ReportingTestSuite {
         expectedUrls.add("https://use.fontawesome.com/releases/v5.8.2/webfonts/fa-solid-900.woff2");
         expectedUrls.add("https://applitools.github.io/demo/TestPages/VisualGridTestPage/frame.html");
 
-        Assert.assertEquals(resourceMaps.size(), 1);
-        Assert.assertEquals(resourceMaps.iterator().next(), expectedUrls);
+        Assert.assertEquals(resourceMaps.size(), 2);
+        Assert.assertEquals(resourceMaps.get(0), expectedUrls);
+        Assert.assertEquals(resourceMaps.get(1), expectedUrls);
     }
 }
