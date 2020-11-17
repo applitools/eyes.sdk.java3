@@ -1,23 +1,28 @@
 package com.applitools.eyes.visualgrid.services;
 
+import com.applitools.connectivity.ServerConnector;
 import com.applitools.eyes.Logger;
-import com.applitools.eyes.TestResultContainer;
-import com.applitools.utils.GeneralUtils;
+import org.apache.commons.lang3.tuple.Pair;
 
-import java.util.concurrent.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
-public class EyesService extends Thread {
-
-    protected final int eyesConcurrency;
-    protected ExecutorService executor;
-    protected final EyesService.EyesServiceListener listener;
-    protected final Tasker tasker;
-    protected boolean isServiceOn = true;
-
-
+public abstract class EyesService<INPUT, OUTPUT> {
     protected Logger logger;
+    protected ServerConnector serverConnector;
+
+    protected final List<Pair<String, INPUT>> inputQueue = new ArrayList<>();
+    protected final List<Pair<String, OUTPUT>> outputQueue = Collections.synchronizedList(new ArrayList<Pair<String, OUTPUT>>());
+    protected final List<Pair<String, Throwable>> errorQueue = Collections.synchronizedList(new ArrayList<Pair<String, Throwable>>());
+
+    public EyesService(Logger logger, ServerConnector serverConnector) {
+        this.logger = logger;
+        this.serverConnector = serverConnector;
+    }
 
     public void setLogger(Logger logger) {
+        serverConnector.setLogger(logger);
         if (this.logger == null) {
             this.logger = logger;
         } else {
@@ -25,51 +30,29 @@ public class EyesService extends Thread {
         }
     }
 
-    interface Tasker {
-        FutureTask<TestResultContainer> getNextTask();
+    public void setServerConnector(ServerConnector serverConnector) {
+        this.serverConnector = serverConnector;
     }
 
-    public interface EyesServiceListener {
-        FutureTask<TestResultContainer> getNextTask(Tasker tasker);
+    public abstract void run();
+
+    public void addInput(String id, INPUT input) {
+        inputQueue.add(Pair.of(id, input));
     }
 
-    public EyesService(String serviceName, ThreadGroup servicesGroup, Logger logger, int eyesConcurrency, EyesServiceListener listener, Tasker tasker) {
-        super(servicesGroup, serviceName);
-        this.eyesConcurrency = eyesConcurrency;
-        this.executor = new ThreadPoolExecutor(this.eyesConcurrency, this.eyesConcurrency, 1, TimeUnit.DAYS, new ArrayBlockingQueue<Runnable>(50));
-        this.listener = listener;
-        this.logger = logger;
-        this.tasker = tasker;
-}
-
-    @Override
-    public void run() {
-        try {
-            logger.log("Service '" + this.getName() + "' had started");
-            while (isServiceOn) {
-                runNextTask();
-            }
-            if (this.executor != null) {
-                this.executor.shutdown();
-            }
-            logger.log("Service '" + this.getName() + "' is finished");
-        } catch (Throwable e) {
-            GeneralUtils.logExceptionStackTrace(logger, e);
+    public List<Pair<String, OUTPUT>> getSucceededTasks() {
+        synchronized (outputQueue) {
+            List<Pair<String, OUTPUT>> succeededTasks = new ArrayList<>(outputQueue);
+            outputQueue.clear();
+            return succeededTasks;
         }
     }
 
-    void runNextTask() {
-        if (!isServiceOn) {
-            return;
+    public List<Pair<String, Throwable>> getFailedTasks() {
+        synchronized (errorQueue) {
+            List<Pair<String, Throwable>> failedTasks = new ArrayList<>(errorQueue);
+            errorQueue.clear();
+            return failedTasks;
         }
-        final FutureTask<TestResultContainer> task = this.listener.getNextTask(tasker);
-        if (task != null) {
-            this.executor.submit(task);
-        }
-    }
-
-    void stopService() {
-        logger.verbose(this.getName() + " service is Stopped");
-        this.isServiceOn = false;
     }
 }

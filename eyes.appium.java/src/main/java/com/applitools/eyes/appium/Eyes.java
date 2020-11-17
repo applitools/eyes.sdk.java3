@@ -438,8 +438,9 @@ public class Eyes extends EyesBase {
             Location location = subScreenshot.getLocationInScreenshot(Location.ZERO, CoordinatesType.SCREENSHOT_AS_IS);
             AppOutput appOutput = new AppOutput(name, ImageUtils.encodeAsPng(subScreenshot.getImage()), null, null);
             AppOutputWithScreenshot appOutputWithScreenshot = new AppOutputWithScreenshot(appOutput, subScreenshot, location);
-            MatchResult matchResult = mwt.performMatch(new ArrayList<Trigger>(), appOutputWithScreenshot, name, false,
+            MatchWindowData data = mwt.prepareForMatch(new ArrayList<Trigger>(), appOutputWithScreenshot, name, false,
                     ims, this, null, getAppName());
+            MatchResult matchResult = mwt.performMatch(data);
             logger.verbose("matchResult.asExcepted: " + matchResult.getAsExpected());
         }
     }
@@ -503,7 +504,6 @@ public class Eyes extends EyesBase {
 
         ValidationResult validationResult = new ValidationResult();
         validationResult.setAsExpected(result.getAsExpected());
-        getSessionEventHandlers().validationEnded(getAUTSessionId(), validationInfo.getValidationId(), validationResult);
 
         logger.verbose("check - done!");
     }

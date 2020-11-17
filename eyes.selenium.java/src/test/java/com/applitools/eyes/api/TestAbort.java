@@ -50,7 +50,7 @@ public class TestAbort extends ReportingTestSuite {
     @AfterClass
     public void TearDown() {
         driver.quit();
-        runner.getAllTestResults();
+        runner.getAllTestResults(false);
     }
 
     @Test

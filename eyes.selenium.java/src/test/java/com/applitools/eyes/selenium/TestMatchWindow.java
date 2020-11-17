@@ -57,14 +57,14 @@ public class TestMatchWindow extends ReportingTestSuite {
             @Override
             public MatchResult answer(InvocationOnMock invocationOnMock) {
                 TaskListener<MatchResult> listener = invocationOnMock.getArgument(0);
-                MatchWindowData matchWindowData = invocationOnMock.getArgument(2);
+                MatchWindowData matchWindowData = invocationOnMock.getArgument(1);
                 replaceLastList.add(matchWindowData.getOptions().getReplaceLast());
                 MatchResult matchResult = new MatchResult();
                 matchResult.setAsExpected(false);
                 listener.onComplete(matchResult);
                 return null;
             }
-        }).when(serverConnector).matchWindow(ArgumentMatchers.<TaskListener<MatchResult>>any(), any(RunningSession.class), any(MatchWindowData.class));
+        }).when(serverConnector).matchWindow(ArgumentMatchers.<TaskListener<MatchResult>>any(), any(MatchWindowData.class));
         EyesRunner runner = new ClassicRunner();
         Eyes eyes = new Eyes(runner);
         eyes.setServerConnector(serverConnector);

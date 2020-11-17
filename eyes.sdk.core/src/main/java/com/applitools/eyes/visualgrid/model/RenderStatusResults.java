@@ -26,6 +26,14 @@ public class RenderStatusResults {
 
     private RectangleSize visualViewport = null;
 
+    public static RenderStatusResults createError(String renderId) {
+        RenderStatusResults renderStatusResults = new RenderStatusResults();
+        renderStatusResults.setStatus(RenderStatus.ERROR);
+        renderStatusResults.setError("Render status result was null");
+        renderStatusResults.setRenderId(renderId);
+        return renderStatusResults;
+    }
+
     public RenderStatus getStatus() {
         return status;
     }

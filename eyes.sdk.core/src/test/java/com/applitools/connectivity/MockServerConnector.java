@@ -24,8 +24,8 @@ public class MockServerConnector extends ServerConnector {
     }
 
     @Override
-    public void stopSession(final TaskListener<TestResults> listener, RunningSession runningSession, boolean isAborted, boolean save) {
-        logger.log(String.format("ending session: %s", runningSession.getSessionId()));
+    public void stopSession(final TaskListener<TestResults> listener, SessionStopInfo sessionStopInfo) {
+        logger.log("ending session");
         TestResults testResults = new TestResults();
         testResults.setStatus(TestResultsStatus.Passed);
         listener.onComplete(testResults);
@@ -58,16 +58,20 @@ public class MockServerConnector extends ServerConnector {
 
     @Override
     public void renderStatusById(final TaskListener<List<RenderStatusResults>> listener, String... renderIds) {
-        final RenderStatusResults renderStatusResults = new RenderStatusResults();
-        renderStatusResults.setRenderId(renderIds[0]);
-        renderStatusResults.setStatus(RenderStatus.RENDERED);
-        renderStatusResults.setDomLocation("https://dom.com");
-        renderStatusResults.setImageLocation("https://image.com");
-        listener.onComplete(Collections.singletonList(renderStatusResults));
+        List<RenderStatusResults> results = new ArrayList<>();
+        for (String renderId : renderIds) {
+            RenderStatusResults renderStatusResults = new RenderStatusResults();
+            renderStatusResults.setRenderId(renderId);
+            renderStatusResults.setStatus(RenderStatus.RENDERED);
+            renderStatusResults.setDomLocation("https://dom.com");
+            renderStatusResults.setImageLocation("https://image.com");
+            results.add(renderStatusResults);
+        }
+        listener.onComplete(results);
     }
 
     @Override
-    public void matchWindow(final TaskListener<MatchResult> listener, RunningSession runningSession, MatchWindowData data) {
+    public void matchWindow(final TaskListener<MatchResult> listener, MatchWindowData data) {
         final MatchResult result = new MatchResult();
         result.setAsExpected(this.asExpected);
         listener.onComplete(result);
@@ -85,7 +89,11 @@ public class MockServerConnector extends ServerConnector {
 
     @Override
     public void checkResourceStatus(final TaskListener<Boolean[]> listener, String renderId, HashObject... hashes) {
-        listener.onComplete(new Boolean[0]);
+        Boolean[] result = new Boolean[hashes.length];
+        for (int i = 0; i < hashes.length; i++) {
+            result[i] = false;
+        }
+        listener.onComplete(result);
     }
 
     @Override

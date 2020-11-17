@@ -182,7 +182,7 @@ public class TestAbort2 extends ReportingTestSuite {
     }
 
     private void AfterEachTest() {
-        if (eyes.getIsOpen()) {
+        if (eyes.isOpen()) {
             eyes.close(false);
         } else {
             eyes.abort();

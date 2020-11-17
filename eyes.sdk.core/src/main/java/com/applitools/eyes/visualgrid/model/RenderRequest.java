@@ -1,7 +1,6 @@
 package com.applitools.eyes.visualgrid.model;
 
 import com.applitools.eyes.selenium.BrowserType;
-import com.applitools.eyes.visualgrid.services.VisualGridTask;
 import com.applitools.utils.ClassVersionGetter;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
@@ -16,7 +15,7 @@ public class RenderRequest {
     private String renderId;
 
     @JsonIgnore
-    private VisualGridTask checkTask;
+    private String stepId;
 
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private String agentId;
@@ -62,19 +61,19 @@ public class RenderRequest {
 
     public RenderRequest(String webHook, String url, RGridDom dom, Map<String, RGridResource> resources, RenderInfo renderInfo,
                          String platform, BrowserType browserName, Object scriptHooks, List<VisualGridSelector> selectorsToFindRegionsFor,
-                         boolean sendDom, VisualGridTask checkTask, String stitchingService, List<VisualGridOption> visualGridOptions) {
+                         boolean sendDom, String renderer, String stepId, String stitchingService, List<VisualGridOption> visualGridOptions) {
         this.webhook = webHook;
         this.url = url;
         this.dom = dom;
         this.resources = resources;
         this.renderInfo = renderInfo;
-        this.renderer = checkTask.getRenderer();
+        this.renderer = renderer;
+        this.stepId = stepId;
         this.platform = platform;
         this.browserName = browserName;
         this.scriptHooks = scriptHooks;
         this.selectorsToFindRegionsFor = selectorsToFindRegionsFor;
         this.sendDom = sendDom;
-        this.checkTask = checkTask;
         this.stitchingService = stitchingService;
         this.agentId = "eyes.selenium.visualgrid.java/" + ClassVersionGetter.CURRENT_VERSION;
         this.options = new HashMap<>();
@@ -176,8 +175,8 @@ public class RenderRequest {
         return map;
     }
 
-    public VisualGridTask getCheckTask() {
-        return checkTask;
+    public String getStepId() {
+        return stepId;
     }
 
     public String getWebhook() {
@@ -212,7 +211,7 @@ public class RenderRequest {
     public String toString() {
         return "RenderRequest{" +
                 "renderId='" + renderId + '\'' +
-                ", visualGridTask=" + checkTask +
+                ", stepId=" + stepId +
                 ", agentId='" + agentId + '\'' +
                 ", webhook='" + webhook + '\'' +
                 ", url='" + url + '\'' +

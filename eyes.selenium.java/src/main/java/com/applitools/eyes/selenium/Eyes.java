@@ -6,7 +6,6 @@ import com.applitools.eyes.*;
 import com.applitools.eyes.config.Configuration;
 import com.applitools.eyes.config.ConfigurationProvider;
 import com.applitools.eyes.debug.DebugScreenshotsProvider;
-import com.applitools.eyes.events.ISessionEventHandler;
 import com.applitools.eyes.exceptions.TestFailedException;
 import com.applitools.eyes.locators.VisualLocatorSettings;
 import com.applitools.eyes.locators.VisualLocatorsProvider;
@@ -400,8 +399,8 @@ public class Eyes implements IEyesBase {
      * Gets is open.
      * @return Whether a session is open.
      */
-    public boolean getIsOpen() {
-        return activeEyes.getIsOpen();
+    public boolean isOpen() {
+        return activeEyes.isOpen();
     }
 
     /**
@@ -1645,29 +1644,6 @@ public class Eyes implements IEyesBase {
      */
     public void log(String message) {
         activeEyes.getLogger().log(message);
-    }
-
-    /**
-     * Add session event handler.
-     * @param eventHandler adds the event handler
-     */
-    public void addSessionEventHandler(ISessionEventHandler eventHandler) {
-        this.seleniumEyes.addSessionEventHandler(eventHandler);
-    }
-
-    /**
-     * Remove session event handler.
-     * @param eventHandler sets the event handler
-     */
-    public void removeSessionEventHandler(ISessionEventHandler eventHandler) {
-        this.seleniumEyes.removeSessionEventHandler(eventHandler);
-    }
-
-    /**
-     * clears session event.
-     */
-    public void clearSessionEventHandlers() {
-        this.seleniumEyes.clearSessionEventHandlers();
     }
 
     /**

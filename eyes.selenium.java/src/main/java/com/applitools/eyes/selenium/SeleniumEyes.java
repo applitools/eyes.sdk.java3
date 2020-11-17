@@ -535,8 +535,9 @@ public class SeleniumEyes extends EyesBase implements ISeleniumEyes, IBatchClose
             Location location = subScreenshot.getLocationInScreenshot(Location.ZERO, CoordinatesType.SCREENSHOT_AS_IS);
             AppOutput appOutput = new AppOutput(name, ImageUtils.encodeAsPng(subScreenshot.getImage()), null, null);
             AppOutputWithScreenshot appOutputWithScreenshot = new AppOutputWithScreenshot(appOutput, subScreenshot, location);
-            MatchResult matchResult = mwt.performMatch(new ArrayList<Trigger>(), appOutputWithScreenshot, name, false,
+            MatchWindowData data = mwt.prepareForMatch(new ArrayList<Trigger>(), appOutputWithScreenshot, name, false,
                     ims, this, null, source);
+            MatchResult matchResult = mwt.performMatch(data);
 
             logger.verbose("matchResult.asExcepted: " + matchResult.getAsExpected());
         }

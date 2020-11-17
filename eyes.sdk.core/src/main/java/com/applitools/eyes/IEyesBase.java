@@ -14,7 +14,7 @@ public interface IEyesBase {
 
     String getFullAgentId();
 
-    boolean getIsOpen();
+    boolean isOpen();
 
     void setLogHandler(LogHandler logHandler);
 

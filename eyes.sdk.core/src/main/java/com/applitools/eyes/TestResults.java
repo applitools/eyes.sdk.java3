@@ -385,7 +385,7 @@ public class TestResults {
     /**
      * @param url The URL of the test results.
      */
-    void setUrl(String url) {
+    public void setUrl(String url) {
         this.url = url;
     }
 
@@ -393,7 +393,7 @@ public class TestResults {
      * @param isNew Whether or not this test has an existing baseline.
      */
     @JsonSetter("isNew")
-    void setNew(boolean isNew) {
+    public void setNew(boolean isNew) {
         this.isNew = isNew;
     }
 

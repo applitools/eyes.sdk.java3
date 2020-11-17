@@ -243,7 +243,6 @@
             <class name="com.applitools.eyes.api.TestApiMethods">
                 <methods>
                     <include name="TestCloseAsync" />
-                    <include name="TestWaitBeforeClose"/>
                     <include name="TestGetHostApp"/>
                     <include name="TestCloseNoOpen"/>
                 </methods>
@@ -273,15 +272,6 @@
             <class name="com.applitools.eyes.selenium.rendering.TestIEyesSelenium">
                 <methods>
                     <include name="Test_GetAllResults" />
-                </methods>
-            </class>
-        </classes>
-    </test>
-    <test name="TestVGNoMissingSteps" parallel="methods">
-        <classes>
-            <class name="com.applitools.eyes.selenium.rendering.TestVGNoMissingSteps">
-                <methods>
-                    <include name="TestNoMissingSteps_UT"/>
                 </methods>
             </class>
         </classes>

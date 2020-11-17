@@ -1,43 +1,33 @@
 package com.applitools.eyes.visualgrid.services;
 
+import com.applitools.eyes.AbstractProxySettings;
 import com.applitools.eyes.IBatchCloser;
 import com.applitools.eyes.Logger;
 import com.applitools.eyes.TestResultContainer;
 
-import java.util.Collection;
+import java.net.URI;
 import java.util.List;
-import java.util.concurrent.Future;
+import java.util.Map;
 
 public interface IRenderingEyes {
 
     boolean isEyesClosed();
 
-    RunningTest getNextTestToClose();
-
-    void setListener(EyesListener listener);
-
-    ScoreTask getBestScoreTaskForCheck();
-
-    ScoreTask getBestScoreTaskForOpen();
-
-    Collection<Future<TestResultContainer>> close();
-
     Logger getLogger();
-
-    List<TestResultContainer> getAllTestResults();
 
     IBatchCloser getBatchCloser();
 
     String getBatchId();
 
-    interface EyesListener{
+    Map<String, RunningTest> getAllRunningTests();
 
-        void onTaskComplete(VisualGridTask visualGridTask, IRenderingEyes eyes);
+    List<TestResultContainer> getAllTestResults();
 
-        void onRenderComplete();
-    }
+    boolean isCompleted();
 
-    List<RunningTest> getAllRunningTests();
+    URI getServerUrl();
 
-    boolean isServerConcurrencyLimitReached();
+    String getApiKey();
+
+    AbstractProxySettings getProxy();
 }

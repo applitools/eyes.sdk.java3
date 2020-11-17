@@ -25,7 +25,7 @@ public class MatchWindowTask {
     private EyesScreenshot lastScreenshot = null;
     private Region lastScreenshotBounds;
     private String lastScreenshotHash;
-    private int defaultRetryTimeout;
+    private final int defaultRetryTimeout;
 
     protected Logger logger;
     protected ServerConnector serverConnector;
@@ -33,9 +33,6 @@ public class MatchWindowTask {
     protected AppOutputProvider appOutputProvider;
     protected MatchResult matchResult;
     protected EyesBase eyes;
-
-    protected MatchWindowTask() {
-    }
 
     /**
      * @param logger            A logger instance.
@@ -82,40 +79,77 @@ public class MatchWindowTask {
         this.appOutputProvider = null;
     }
 
+
+    public MatchResult performMatch(MatchWindowData data) {
+        SyncTaskListener<MatchResult> listener = new SyncTaskListener<>(logger, String.format("performMatch %s", runningSession));
+        performMatch(listener, data);
+        MatchResult result = listener.get();
+        if (result == null) {
+            throw new EyesException("Failed performing match with the server");
+        }
+
+        eyes.getLogger().log(String.format("Finished perform match. Render ID: %s", data.getRenderId()));
+        eyes.getLogger().verbose("exit");
+        return result;
+    }
+
+    private void performMatch(final TaskListener<MatchResult> listener, final MatchWindowData data) {
+        tryUploadImage(new TaskListener<Boolean>() {
+            @Override
+            public void onComplete(Boolean result) {
+                if (!result) {
+                    onFail();
+                    return;
+                }
+
+                try {
+                    serverConnector.matchWindow(listener, data);
+                } catch (Throwable t) {
+                    GeneralUtils.logExceptionStackTrace(logger, t);
+                    onFail();
+                }
+            }
+
+            @Override
+            public void onFail() {
+                listener.onFail();
+            }
+        }, data);
+    }
+
     /**
-     * Creates the match model and calls the server connector matchWindow method.
+     * Creates the match model
      * @param appOutput          The application output to be matched.
      * @param tag                Optional tag to be associated with the match (can be {@code null}).
      * @param imageMatchSettings The settings to use.
      * @param renderId           Visual Grid's renderId.
      * @param source             The tested page URL or tested app name.
      */
-    public MatchResult performMatch(AppOutputWithScreenshot appOutput,
-                                    String tag, ICheckSettingsInternal checkSettingsInternal,
-                                    ImageMatchSettings imageMatchSettings,
-                                    List<? extends IRegion> regions,
-                                    List<VisualGridSelector[]> regionSelectors,
-                                    EyesBase eyes, String renderId, String source) {
+    public MatchWindowData prepareForMatch(AppOutputWithScreenshot appOutput,
+                                           String tag, ICheckSettingsInternal checkSettingsInternal,
+                                           ImageMatchSettings imageMatchSettings,
+                                           List<? extends IRegion> regions,
+                                           List<VisualGridSelector[]> regionSelectors,
+                                           EyesBase eyes, String renderId, String source) {
         collectRegions(imageMatchSettings, regions, regionSelectors);
         collectRegions(imageMatchSettings, checkSettingsInternal);
-        return performMatch(new ArrayList<Trigger>(), appOutput, tag, false, imageMatchSettings,
-                eyes, renderId, source);
+        return prepareForMatch(new ArrayList<Trigger>(), appOutput, tag, false, imageMatchSettings, eyes, renderId, source);
     }
 
     /**
-     * Creates the match model and calls the server connector matchWindow method.
+     * Creates the match model
      * @param userInputs         The user inputs related to the current appOutput.
      * @param appOutput          The application output to be matched.
      * @param tag                Optional tag to be associated with the match (can be {@code null}).
      * @param replaceLast        Whether to instruct the server to replace the screenshot of the last step.
      * @param imageMatchSettings The settings to use.
-     * @return The match result.
+     * @return The match model.
      */
-    public MatchResult performMatch(List<Trigger> userInputs,
-                                    AppOutputWithScreenshot appOutput,
-                                    String tag, boolean replaceLast,
-                                    ImageMatchSettings imageMatchSettings,
-                                    EyesBase eyes, String renderId, String source) {
+    public MatchWindowData prepareForMatch(List<Trigger> userInputs,
+                                           AppOutputWithScreenshot appOutput,
+                                           String tag, boolean replaceLast,
+                                           ImageMatchSettings imageMatchSettings,
+                                           EyesBase eyes, String renderId, String source) {
         eyes.getLogger().log(String.format("Starting perform match. Render ID: %s", renderId));
 
         // called from regular flow and from check many flow.
@@ -132,53 +166,11 @@ public class MatchWindowTask {
             }
         }
 
-        SyncTaskListener<MatchResult> listener = new SyncTaskListener<>(logger, String.format("performMatch %s", runningSession));
-        performMatch(listener, userInputs, appOutput, tag, replaceLast, imageMatchSettings, agentSetupStr, renderId, source);
-        MatchResult result = listener.get();
-        if (result == null) {
-            throw new EyesException("Failed performing match with the server");
-        }
-
-        eyes.getLogger().log(String.format("Finished perform match. Render ID: %s", renderId));
-        eyes.getLogger().verbose("exit");
-        return result;
-    }
-
-    private void performMatch(final TaskListener<MatchResult> listener, List<Trigger> userInputs,
-                              AppOutputWithScreenshot appOutput,
-                              String tag, boolean replaceLast,
-                              ImageMatchSettings imageMatchSettings,
-                              String agentSetupStr, String renderId,
-                              String source) {
-        // Prepare match data.
         MatchWindowData.Options options = new MatchWindowData.Options(tag, userInputs.toArray(new Trigger[0]), replaceLast,
                 false, false, false, false, imageMatchSettings, source, renderId);
 
-        final MatchWindowData data = new MatchWindowData(userInputs.toArray(new Trigger[0]), appOutput.getAppOutput(), tag,
-                false, options, agentSetupStr, renderId);
-
-
-        tryUploadImage(new TaskListener<Boolean>() {
-            @Override
-            public void onComplete(Boolean result) {
-                if (!result) {
-                    onFail();
-                    return;
-                }
-
-                try {
-                    serverConnector.matchWindow(listener, runningSession, data);
-                } catch (Throwable t) {
-                    GeneralUtils.logExceptionStackTrace(logger, t);
-                    onFail();
-                }
-            }
-
-            @Override
-            public void onFail() {
-                listener.onFail();
-            }
-        }, data);
+        return new MatchWindowData(runningSession, userInputs.toArray(new Trigger[0]),
+                appOutput.getAppOutput(), tag, false, options, agentSetupStr, renderId);
     }
 
     private void tryUploadImage(final TaskListener<Boolean> taskListener, MatchWindowData data) {
@@ -585,8 +577,9 @@ public class MatchWindowTask {
         }
 
         ImageMatchSettings matchSettings = createImageMatchSettings(checkSettingsInternal, screenshot, eyes);
-        matchResult = performMatch(Arrays.asList(userInputs), appOutput, tag, lastScreenshotHash != null,
+        MatchWindowData data = prepareForMatch(Arrays.asList(userInputs), appOutput, tag, lastScreenshotHash != null,
                 matchSettings, eyes, null, source);
+        matchResult = performMatch(data);
         lastScreenshotHash = currentScreenshotHash;
         return screenshot;
     }

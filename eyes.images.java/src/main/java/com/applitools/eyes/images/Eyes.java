@@ -7,7 +7,6 @@ import com.applitools.ICheckSettings;
 import com.applitools.eyes.*;
 import com.applitools.eyes.config.Configuration;
 import com.applitools.eyes.config.IConfiguration;
-import com.applitools.eyes.events.ValidationInfo;
 import com.applitools.eyes.events.ValidationResult;
 import com.applitools.eyes.exceptions.TestFailedException;
 import com.applitools.eyes.fluent.CheckSettings;
@@ -20,7 +19,6 @@ import com.applitools.utils.ImageUtils;
 
 import java.awt.image.BufferedImage;
 
-@SuppressWarnings({"WeakerAccess", "UnusedReturnValue"})
 public class Eyes extends EyesBase implements IConfiguration {
 
     private String title;
@@ -381,15 +379,9 @@ public class Eyes extends EyesBase implements IConfiguration {
         // Set the title to be linked to the screenshot.
         title = (tag != null) ? tag : "";
 
-        ValidationInfo validationInfo = this.fireValidationWillStartEvent(tag);
-
         MatchResult result = checkWindowBase(regionProvider.getRegion((ICheckSettingsInternal)checkSettings), checkSettings.withName(tag), null);
-
         ValidationResult validationResult = new ValidationResult();
         validationResult.setAsExpected(result.getAsExpected());
-
-        getSessionEventHandlers().validationEnded(getAUTSessionId(), validationInfo.getValidationId(), validationResult);
-
         return result.getAsExpected();
     }
 
