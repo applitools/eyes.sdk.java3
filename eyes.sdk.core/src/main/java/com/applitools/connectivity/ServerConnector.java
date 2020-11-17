@@ -172,20 +172,20 @@ public class ServerConnector extends UfgConnector {
 
     /**
      * Stops the running session.
-     * @param runningSession The running session to be stopped.
+     * @param sessionStopInfo The info of the session to be stopped.
      * @throws EyesException For invalid status codes, or if response parsing
      *                       failed.
      */
-    public void stopSession(TaskListener<TestResults> listener, final RunningSession runningSession,
-                            final boolean isAborted, final boolean save) throws EyesException {
-        ArgumentGuard.notNull(runningSession, "runningSession");
+    public void stopSession(TaskListener<TestResults> listener, final SessionStopInfo sessionStopInfo) throws EyesException {
+        ArgumentGuard.notNull(sessionStopInfo, "sessionStopInfo");
+        ArgumentGuard.notNull(sessionStopInfo.getRunningSession(), "runningSession");
         AsyncRequest request = makeEyesRequest(new HttpRequestBuilder() {
             @Override
             public AsyncRequest build() {
-                return restClient.target(serverUrl).path(API_PATH).path(runningSession.getId())
+                return restClient.target(serverUrl).path(API_PATH).path(sessionStopInfo.getRunningSession().getId())
                         .queryParam("apiKey", getApiKey())
-                        .queryParam("aborted", String.valueOf(isAborted))
-                        .queryParam("updateBaseline", String.valueOf(save))
+                        .queryParam("aborted", String.valueOf(sessionStopInfo.isAborted()))
+                        .queryParam("updateBaseline", String.valueOf(sessionStopInfo.shouldSave()))
                         .asyncRequest(MediaType.APPLICATION_JSON);
             }
         });
@@ -235,14 +235,13 @@ public class ServerConnector extends UfgConnector {
     /**
      * Matches the current window (held by the WebDriver) to the expected
      * window.
-     * @param runningSession The current agent's running session.
      * @param matchData      Encapsulation of a capture taken from the application.
      * @throws EyesException For invalid status codes, or response parsing
      *                       failed.
      */
-    public void matchWindow(TaskListener<MatchResult> listener, final RunningSession runningSession, MatchWindowData matchData) throws EyesException {
-        ArgumentGuard.notNull(runningSession, "runningSession");
-        ArgumentGuard.notNull(matchData, "model");
+    public void matchWindow(TaskListener<MatchResult> listener, final MatchWindowData matchData) throws EyesException {
+        ArgumentGuard.notNull(matchData, "matchData");
+        ArgumentGuard.notNull(matchData.getRunningSession(), "runningSession");
 
         // Serializing model into JSON (we'll treat it as binary later).
         String jsonData;
@@ -255,7 +254,7 @@ public class ServerConnector extends UfgConnector {
         AsyncRequest request = makeEyesRequest(new HttpRequestBuilder() {
             @Override
             public AsyncRequest build() {
-                return restClient.target(serverUrl).path(API_PATH).path(runningSession.getId())
+                return restClient.target(serverUrl).path(API_PATH).path(matchData.getRunningSession().getId())
                         .queryParam("apiKey", getApiKey())
                         .asyncRequest(MediaType.APPLICATION_JSON);
             }
@@ -274,7 +273,6 @@ public class ServerConnector extends UfgConnector {
         request.header("X-Auth-Token", getRenderInfo().getAccessToken());
         List<Integer> validStatusCodes = new ArrayList<>();
         validStatusCodes.add(HttpStatus.SC_OK);
-        validStatusCodes.add(HttpStatus.SC_NOT_FOUND);
 
         try {
             ObjectMapper objectMapper = new ObjectMapper();
@@ -284,7 +282,7 @@ public class ServerConnector extends UfgConnector {
             ResponseParsingCallback<RunningRender[]> callback = new ResponseParsingCallback<>(this, validStatusCodes, new TaskListener<RunningRender[]>() {
                 @Override
                 public void onComplete(RunningRender[] runningRenders) {
-                    listener.onComplete(runningRenders == null ? null : Arrays.asList(runningRenders));
+                    listener.onComplete(runningRenders == null ? null : new ArrayList<>(Arrays.asList(runningRenders)));
                 }
 
                 @Override
@@ -313,7 +311,6 @@ public class ServerConnector extends UfgConnector {
 
             List<Integer> validStatusCodes = new ArrayList<>();
             validStatusCodes.add(HttpStatus.SC_OK);
-            validStatusCodes.add(HttpStatus.SC_NOT_FOUND);
 
             ObjectMapper objectMapper = new ObjectMapper();
             objectMapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
@@ -334,7 +331,7 @@ public class ServerConnector extends UfgConnector {
                         }
                     }
 
-                    listener.onComplete(Arrays.asList(renderStatusResults));
+                    listener.onComplete(new ArrayList<>(Arrays.asList(renderStatusResults)));
                 }
 
                 @Override
@@ -489,10 +486,6 @@ public class ServerConnector extends UfgConnector {
         if (restClient != null) {
             restClient.close();
         }
-    }
-
-    public boolean getDontCloseBatches() {
-        return "true".equalsIgnoreCase(GeneralUtils.getEnvString("APPLITOOLS_DONT_CLOSE_BATCHES"));
     }
 
     public Map<String, MobileDeviceInfo> getMobileDevicesInfo() {

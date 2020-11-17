@@ -74,6 +74,7 @@ public class TestConfigurationSentCorrectlyToServer extends EnvironmentModifier 
                     .setBatch(batchInfo);
 
             eyes.setConfiguration(conf);
+            eyes.setLogHandler(new StdoutLogHandler());
             eyes.open(driver);
 
             eyes.setMatchLevel(MatchLevel.LAYOUT);

@@ -18,6 +18,7 @@ import com.applitools.eyes.locators.VisualLocatorSettings;
 import com.applitools.eyes.locators.VisualLocatorsProvider;
 import com.applitools.eyes.scaling.FixedScaleProviderFactory;
 import com.applitools.eyes.scaling.NullScaleProvider;
+import com.applitools.eyes.selenium.ClassicRunner;
 import com.applitools.eyes.selenium.EyesDriverUtils;
 import com.applitools.eyes.selenium.StitchMode;
 import com.applitools.eyes.selenium.fluent.SimpleRegionByElement;
@@ -62,7 +63,7 @@ public class Eyes extends EyesBase {
     private String scrollRootElementId = null;
 
     public Eyes() {
-        super();
+        super(new ClassicRunner());
         regionVisibilityStrategyHandler = new SimplePropertyHandler<>();
         regionVisibilityStrategyHandler.set(new MoveToRegionVisibilityStrategy(logger));
         configuration.setStitchOverlap(DEFAULT_STITCH_OVERLAP);
@@ -404,14 +405,13 @@ public class Eyes extends EyesBase {
             return;
         }
 
-        MatchWindowTask mwt = new MatchWindowTask(logger, getServerConnector(), runningSession, getMatchTimeout(), this);
         EyesScreenshot screenshot = getFullPageScreenshot();
         for (int i = 0; i < checkSettings.length; ++i) {
             if (((Hashtable<Integer, GetSimpleRegion>) getRegions).containsKey(i)) {
                 GetSimpleRegion getRegion = getRegions.get(i);
                 ICheckSettingsInternal checkSettingsInternal = checkSettingsInternalDictionary.get(i);
                 List<EyesScreenshot> subScreenshots = getSubScreenshots(screenshot, getRegion);
-                matchRegion(checkSettingsInternal, mwt, subScreenshots);
+                matchRegion(checkSettingsInternal, subScreenshots);
             }
         }
     }
@@ -428,7 +428,7 @@ public class Eyes extends EyesBase {
         return subScreenshots;
     }
 
-    private void matchRegion(ICheckSettingsInternal checkSettingsInternal, MatchWindowTask mwt, List<EyesScreenshot> subScreenshots) {
+    private void matchRegion(ICheckSettingsInternal checkSettingsInternal, List<EyesScreenshot> subScreenshots) {
         String name = checkSettingsInternal.getName();
         for (EyesScreenshot subScreenshot : subScreenshots) {
             debugScreenshotsProvider.save(subScreenshot.getImage(), String.format("subscreenshot_%s", name));
@@ -436,8 +436,9 @@ public class Eyes extends EyesBase {
             ImageMatchSettings ims = MatchWindowTask.createImageMatchSettings(checkSettingsInternal, subScreenshot, this);
             Location location = subScreenshot.getLocationInScreenshot(Location.ZERO, CoordinatesType.SCREENSHOT_AS_IS);
             AppOutput appOutput = new AppOutput(name, subScreenshot, null, null, location);
-            MatchResult matchResult = mwt.performMatch(new ArrayList<Trigger>(), appOutput, name, false,
+            MatchWindowData data = prepareForMatch(new ArrayList<Trigger>(), appOutput, name, false,
                     ims, this, null, getAppName());
+            MatchResult matchResult = performMatch(data);
             logger.verbose("matchResult.asExcepted: " + matchResult.getAsExpected());
         }
     }
@@ -501,7 +502,6 @@ public class Eyes extends EyesBase {
 
         ValidationResult validationResult = new ValidationResult();
         validationResult.setAsExpected(result.getAsExpected());
-        getSessionEventHandlers().validationEnded(getAUTSessionId(), validationInfo.getValidationId(), validationResult);
 
         logger.verbose("check - done!");
     }
@@ -517,7 +517,6 @@ public class Eyes extends EyesBase {
                 throw e;
             }
         }
-        getServerConnector().closeConnector();
         return results;
     }
 
@@ -819,17 +818,6 @@ public class Eyes extends EyesBase {
             return result;
         } else {
             return screenshot.getSubScreenshot(region, false);
-        }
-    }
-
-    @Override
-    protected String getAUTSessionId() {
-        try {
-            return driver.getRemoteWebDriver().getSessionId().toString();
-        } catch (Exception e) {
-            logger.log("WARNING: Failed to get AUT session ID! (maybe driver is not available?). Error: "
-                    + e.getMessage());
-            return "";
         }
     }
 

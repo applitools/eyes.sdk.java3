@@ -51,8 +51,8 @@ public class TestVisualGridRunner {
         doAnswer(new Answer() {
             @Override
             public Object answer(InvocationOnMock invocation) throws Throwable {
-                IRenderingEyes eyes = runner.allEyes.iterator().next();
-                if (!eyes.getAllRunningTests().get(0).isTestOpen()) {
+                IEyes eyes = runner.allEyes.iterator().next();
+                if (!eyes.getAllRunningTests().values().iterator().next().isOpen()) {
                     errorMessage.set("Render called before open");
                 }
 
@@ -76,7 +76,7 @@ public class TestVisualGridRunner {
         } finally {
             eyes.abortAsync();
             driver.quit();
-            runner.getAllTestResults(false);
+            runner.getAllTestResults();
         }
 
         Assert.assertNull(errorMessage.get(), errorMessage.get());
@@ -108,8 +108,8 @@ public class TestVisualGridRunner {
             }
 
             @Override
-            public void stopSession(final TaskListener<TestResults> listener, RunningSession runningSession, boolean isAborted, boolean save) {
-                super.stopSession(listener, runningSession, isAborted, save);
+            public void stopSession(final TaskListener<TestResults> listener, SessionStopInfo sessionStopInfo) {
+                super.stopSession(listener, sessionStopInfo);
                 currentlyOpenTests.decrementAndGet();
             }
         };
@@ -131,7 +131,7 @@ public class TestVisualGridRunner {
         } finally {
             eyes.abortAsync();
             driver.quit();
-            runner.getAllTestResults(false);
+            runner.getAllTestResults();
         }
 
         Assert.assertFalse(isFail.get(), "Number of open tests was higher than the concurrency limit");
@@ -158,18 +158,6 @@ public class TestVisualGridRunner {
         };
 
         VisualGridEyes eyes = spy(new VisualGridEyes(runner, configurationProvider));
-        final AtomicBoolean wasConcurrencyFull = new AtomicBoolean(false);
-        doAnswer(new Answer<Boolean>() {
-            @Override
-            public Boolean answer(InvocationOnMock invocation) throws Throwable {
-                Boolean result = (Boolean) invocation.callRealMethod();
-                if (result) {
-                    wasConcurrencyFull.set(true);
-                }
-
-                return result;
-            }
-        }).when(eyes).isServerConcurrencyLimitReached();
 
         eyes.setLogHandler(new StdoutLogHandler());
         eyes.setServerConnector(serverConnector);
@@ -183,11 +171,9 @@ public class TestVisualGridRunner {
         } finally {
             eyes.abortAsync();
             driver.quit();
-            runner.getAllTestResults(false);
+            runner.getAllTestResults();
         }
 
-        Assert.assertTrue(wasConcurrencyFull.get());
-        Assert.assertFalse(eyes.isServerConcurrencyLimitReached());
         Assert.assertEquals(counter.get(), 4);
     }
 
@@ -261,7 +247,7 @@ public class TestVisualGridRunner {
         VisualGridRunner runner = new VisualGridRunner();
         MockServerConnector serverConnector = new MockServerConnector() {
             public void render(final TaskListener<List<RunningRender>> listener, RenderRequest... renderRequests) {
-                if (runningRendersCount.getAndIncrement() >= RunningTest.PARALLEL_STEPS_LIMIT) {
+                if (runningRendersCount.getAndIncrement() >= VisualGridRunningTest.PARALLEL_STEPS_LIMIT) {
                     isOnlyOneRender.set(false);
                 }
 
@@ -302,7 +288,7 @@ public class TestVisualGridRunner {
         } finally {
             eyes.abortAsync();
             driver.quit();
-            runner.getAllTestResults(false);
+            runner.getAllTestResults();
         }
 
         Assert.assertTrue(isOnlyOneRender.get());

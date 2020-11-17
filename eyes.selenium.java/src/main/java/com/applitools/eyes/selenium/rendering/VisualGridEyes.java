@@ -9,7 +9,6 @@ import com.applitools.eyes.config.ConfigurationProvider;
 import com.applitools.eyes.fluent.CheckSettings;
 import com.applitools.eyes.fluent.GetFloatingRegion;
 import com.applitools.eyes.fluent.GetSimpleRegion;
-import com.applitools.eyes.logging.TraceLevel;
 import com.applitools.eyes.selenium.*;
 import com.applitools.eyes.selenium.fluent.*;
 import com.applitools.eyes.selenium.frames.Frame;
@@ -17,11 +16,12 @@ import com.applitools.eyes.selenium.frames.FrameChain;
 import com.applitools.eyes.selenium.wrappers.EyesSeleniumDriver;
 import com.applitools.eyes.selenium.wrappers.EyesTargetLocator;
 import com.applitools.eyes.visualgrid.model.*;
-import com.applitools.eyes.visualgrid.services.*;
+import com.applitools.eyes.visualgrid.services.CheckTask;
+import com.applitools.eyes.visualgrid.services.VisualGridRunningTest;
+import com.applitools.eyes.visualgrid.services.VisualGridRunner;
 import com.applitools.utils.ArgumentGuard;
 import com.applitools.utils.ClassVersionGetter;
 import com.applitools.utils.GeneralUtils;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
@@ -30,32 +30,25 @@ import org.openqa.selenium.remote.RemoteWebDriver;
 
 import java.io.IOException;
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.*;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Future;
-import java.util.concurrent.FutureTask;
 
-public class VisualGridEyes implements ISeleniumEyes, IRenderingEyes {
+public class VisualGridEyes implements ISeleniumEyes {
     private final Logger logger;
+    private String apiKey = null;
+    private String serverUrl = null;
 
-    private String apiKey;
-    private String serverUrl;
-
-    private final VisualGridRunner renderingGridRunner;
-    private final List<RunningTest> testList = Collections.synchronizedList(new ArrayList<RunningTest>());
-    List<TestResultContainer> allTestResults = new ArrayList<>();
+    private final VisualGridRunner runner;
+    private final Map<String, RunningTest> testList = new HashMap<>();
+    private boolean isOpen = false;
 
     private final String PROCESS_PAGE;
     private final String PROCESS_PAGE_FOR_IE;
     private final String POLL_RESULT;
     private final String POLL_RESULT_FOR_IE;
     private EyesSeleniumDriver webDriver;
-    private RenderingInfo renderingInfo;
-    private IEyesConnector eyesConnector;
     private String url;
-    private Set<Future<TestResultContainer>> closeFuturesSet = new HashSet<>();
     private Boolean isDisabled = Boolean.FALSE;
-    private ServerConnector serverConnector = null;
     private final ConfigurationProvider configurationProvider;
     private UserAgent userAgent = null;
     private RectangleSize viewportSize;
@@ -83,7 +76,7 @@ public class VisualGridEyes implements ISeleniumEyes, IRenderingEyes {
     public VisualGridEyes(VisualGridRunner renderingGridManager, ConfigurationProvider configurationProvider) {
         this.configurationProvider = configurationProvider;
         ArgumentGuard.notNull(renderingGridManager, "renderingGridRunner");
-        this.renderingGridRunner = renderingGridManager;
+        this.runner = renderingGridManager;
         this.logger = renderingGridManager.getLogger();
 
         try {
@@ -123,10 +116,6 @@ public class VisualGridEyes implements ISeleniumEyes, IRenderingEyes {
         setServerUrl(serverUrl);
     }
 
-    public void serverUrl(URI serverUrl) {
-        setServerUrl(serverUrl.toString());
-    }
-
     @Override
     public WebDriver open(WebDriver driver, String appName, String testName, RectangleSize viewportSize) throws EyesException {
         getConfiguration().setAppName(appName).setTestName(testName);
@@ -138,13 +127,19 @@ public class VisualGridEyes implements ISeleniumEyes, IRenderingEyes {
 
     public WebDriver open(WebDriver webDriver) {
         logger.verbose("enter");
-
-        if (!validateEyes()) return webDriver;
+        if (getIsDisabled()) {
+            return webDriver;
+        }
 
         ArgumentGuard.notNull(webDriver, "webDriver");
         ArgumentGuard.notNullOrEmpty(getConfiguration().getAppName(), "appIdOrName");
         ArgumentGuard.notNullOrEmpty(getConfiguration().getTestName(), "scenarioIdOrName");
+        if (isOpen) {
+            logger.log("WARNING: called open more than once! Ignoring");
+            return this.webDriver != null ? this.webDriver : webDriver;
+        }
 
+        isOpen = true;
         initDriver(webDriver);
 
         String uaString = this.webDriver.getUserAgent();
@@ -169,14 +164,22 @@ public class VisualGridEyes implements ISeleniumEyes, IRenderingEyes {
             getConfiguration().addBrowser(new RenderBrowserInfo(viewportSize.getWidth(), viewportSize.getHeight(), BrowserType.CHROME, getConfiguration().getBaselineEnvName()));
         }
 
+        if (runner.getAgentId() == null ) {
+            runner.setAgentId(getFullAgentId());
+        }
+
+        runner.setLogger(logger);
+
+        List<VisualGridRunningTest> newTests = new ArrayList<>();
         for (RenderBrowserInfo browserInfo : browserInfoList) {
             logger.verbose("creating test descriptor");
-            RunningTest test = new RunningTest(this, createEyesConnector(browserInfo), configurationProvider, browserInfo, logger);
-            this.testList.add(test);
+            VisualGridRunningTest test = new VisualGridRunningTest(getConfiguration(), browserInfo, this.properties, logger);
+            this.testList.put(test.getTestId(), test);
+            newTests.add(test);
         }
 
         logger.verbose(String.format("opening %d tests...", testList.size()));
-        this.renderingGridRunner.open(this, renderingInfo);
+        runner.open(this, newTests);
         logger.verbose("done");
         return this.webDriver != null ? this.webDriver : webDriver;
     }
@@ -215,118 +218,94 @@ public class VisualGridEyes implements ISeleniumEyes, IRenderingEyes {
         }
     }
 
-    private IEyesConnector createEyesConnector(RenderBrowserInfo browserInfo) {
-        logger.verbose("creating VisualGridEyes server connector");
-        EyesConnector eyesConnector = new EyesConnector(getConfiguration(), this.properties, browserInfo);
-        eyesConnector.setLogHandler(this.logger.getLogHandler());
-        eyesConnector.setProxy(this.getConfiguration().getProxy());
-        if (serverConnector != null) {
-            eyesConnector.setServerConnector(serverConnector);
-        }
-
-        URI serverUri = this.getServerUrl();
-        if (serverUri != null) {
-            eyesConnector.setServerUrl(serverUri.toString());
-        }
-
-        String apiKey = this.getApiKey();
-        if (apiKey != null) {
-            eyesConnector.setApiKey(apiKey);
-        } else {
-            throw new EyesException("Missing API key");
-        }
-
-        if (this.renderingInfo == null) {
-            logger.verbose("initializing rendering info...");
-            this.renderingInfo = eyesConnector.getRenderingInfo();
-        }
-        eyesConnector.setRenderInfo(this.renderingInfo);
-
-        this.eyesConnector = eyesConnector;
-        return eyesConnector;
-    }
-
     private void initDriver(WebDriver webDriver) {
         if (webDriver instanceof RemoteWebDriver) {
             SeleniumEyes seleniumEyes = new SeleniumEyes(configurationProvider, new ClassicRunner());
             this.webDriver = new EyesSeleniumDriver(logger, seleniumEyes, (RemoteWebDriver) webDriver);
         }
-        @SuppressWarnings("UnnecessaryLocalVariable") String currentUrl = webDriver.getCurrentUrl();
-        this.url = currentUrl;
-    }
-
-    public RunningTest getNextTestToClose() {
-        synchronized (testList) {
-            for (RunningTest runningTest : testList) {
-                if (!runningTest.isTestClose() && runningTest.isTestReadyToClose()) {
-                    return runningTest;
-                }
-            }
-        }
-        return null;
-    }
-
-    public Collection<Future<TestResultContainer>> close() {
-        logger.verbose("enter");
-        if (!validateEyes()) {
-            return new ArrayList<>();
-        }
-        return closeAndReturnResults(false);
+        this.url = webDriver.getCurrentUrl();
     }
 
     public TestResults close(boolean throwException) {
-        Collection<Future<TestResultContainer>> close = close();
-        return parseCloseFutures(close, throwException);
-    }
-
-    private TestResults parseCloseFutures(Collection<Future<TestResultContainer>> close, boolean shouldThrowException) {
-        if (close != null && !close.isEmpty()) {
-            TestResultContainer errorResult = null;
-            TestResultContainer firstResult = null;
-            try {
-                for (Future<TestResultContainer> closeFuture : close) {
-                    TestResultContainer testResultContainer = closeFuture.get();
-                    if (firstResult == null) {
-                        firstResult = testResultContainer;
-                    }
-                    Throwable error = testResultContainer.getException();
-                    if (error != null && errorResult == null) {
-                        errorResult = testResultContainer;
-                    }
-
-                }
-//                    return firstCloseFuture.get().getTestResults();
-            } catch (InterruptedException | ExecutionException e) {
-                e.printStackTrace();
-            }
-
-            if (errorResult != null) {
-                if (shouldThrowException) {
-                    throw new Error(errorResult.getException());
-                } else {
-                    return errorResult.getTestResults();
-                }
-            } else { // returning the first result
-                if (firstResult != null) {
-                    return firstResult.getTestResults();
-                }
-            }
-
-        }
-        return null;
+        closeAsync();
+        return waitForEyesToFinish(throwException);
     }
 
     public TestResults abortIfNotClosed() {
-        List<Future<TestResultContainer>> futures = abortAndCollectTasks();
-        return parseCloseFutures(futures, false);
+        abortAsync();
+        return waitForEyesToFinish(false);
     }
 
-    public boolean getIsOpen() {
+    public TestResults abort() {
+        return abortIfNotClosed();
+    }
+
+    public void closeAsync() {
+        logger.verbose("enter");
+        if (getIsDisabled()) {
+            return;
+        }
+
+        isOpen = false;
+        logger.verbose(String.format("closing %d running tests", testList.size()));
+        for (RunningTest runningTest : testList.values()) {
+            VisualGridRunningTest vgRunningTest = (VisualGridRunningTest) runningTest;
+            logger.verbose("running test name: " + getConfiguration().getTestName());
+            logger.verbose("running test device info: " + vgRunningTest.getBrowserInfo());
+            logger.verbose("is current running test open: " + vgRunningTest.isOpen());
+            logger.verbose("is current running test ready to close: " + vgRunningTest.isTestReadyToClose());
+            logger.verbose("is current running test closed: " + vgRunningTest.isCompleted());
+            logger.verbose("closing current running test");
+            vgRunningTest.issueClose();
+        }
+    }
+
+    public void abortAsync() {
+        for (RunningTest runningTest : testList.values()) {
+            runningTest.issueAbort(new EyesException("eyes.close wasn't called. Aborted the test"), false);
+        }
+    }
+
+    private TestResults waitForEyesToFinish(boolean throwException) {
+        while (!isCompleted()) {
+            try {
+                Thread.sleep(500);
+            } catch (InterruptedException ignored) {}
+        }
+
+        List<TestResultContainer> allResults = getAllTestResults();
+        TestResultContainer errorResult = null;
+        TestResults firstResult = null;
+        for (TestResultContainer result : allResults) {
+            if (firstResult == null) {
+                firstResult = result.getTestResults();
+            }
+            if (result.getException() != null) {
+                errorResult = result;
+                break;
+            }
+        }
+
+        if (errorResult != null) {
+            if (throwException) {
+                throw new Error(errorResult.getException());
+            }
+            return errorResult.getTestResults();
+        }
+
+        return firstResult;
+    }
+
+    public boolean isOpen() {
         return !isEyesClosed();
     }
 
     public String getApiKey() {
-        return this.apiKey == null ? this.renderingGridRunner.getApiKey() : this.apiKey;
+        if (apiKey == null) {
+            apiKey = runner.getApiKey();
+        }
+
+        return apiKey;
     }
 
     public void setApiKey(String apiKey) {
@@ -338,174 +317,57 @@ public class VisualGridEyes implements ISeleniumEyes, IRenderingEyes {
     }
 
     public boolean getIsDisabled() {
-        return this.isDisabled == null ? this.renderingGridRunner.getIsDisabled() : this.isDisabled;
+        return this.isDisabled == null ? this.runner.getIsDisabled() : this.isDisabled;
     }
 
     public URI getServerUrl() {
-        if (this.eyesConnector != null) {
-            URI uri = this.eyesConnector.getServerUrl();
-            if (uri != null) return uri;
-        }
-        String str = this.serverUrl == null ? this.renderingGridRunner.getServerUrl() : this.serverUrl;
-        return str == null ? null : URI.create(str);
-    }
-
-    private Collection<Future<TestResultContainer>> closeAndReturnResults(boolean throwException) {
-        logger.verbose("enter " + getConfiguration().getBatch());
-        if (!validateEyes()) {
-            return new ArrayList<>();
+        if (serverUrl == null) {
+            serverUrl = runner.getServerUrl();
         }
 
-        if (this.closeFuturesSet == null) {
-            closeFuturesSet = new HashSet<>();
-        }
-        Throwable exception = null;
         try {
-            Collection<Future<TestResultContainer>> futureList = closeAsync();
-            this.renderingGridRunner.close(this);
-            for (Future<TestResultContainer> future : futureList) {
-                try {
-                    TestResultContainer testResultContainer = future.get();
-                    if (exception == null && testResultContainer.getException() != null) {
-                        exception = testResultContainer.getException();
-                    }
-                } catch (Throwable e) {
-                    GeneralUtils.logExceptionStackTrace(logger, e);
-                    if (exception == null) {
-                        exception = e;
-                    }
-                }
-
-
-            }
-        } catch (Throwable e) {
+            return new URI(serverUrl);
+        } catch (URISyntaxException e) {
             GeneralUtils.logExceptionStackTrace(logger, e);
+            return null;
         }
-        if (throwException && exception != null) {
-            throw new Error(exception);
-        }
-        return closeFuturesSet;
-    }
-
-    public Collection<Future<TestResultContainer>> closeAsync() {
-        logger.verbose("enter");
-        if (!validateEyes()) {
-            return new ArrayList<>();
-        }
-        List<Future<TestResultContainer>> futureList = null;
-        try {
-            futureList = new ArrayList<>();
-            logger.verbose(String.format("closing %d running tests", testList.size()));
-            for (RunningTest runningTest : testList) {
-                logger.verbose("running test name: " + getConfiguration().getTestName());
-                logger.verbose("running test device info: " + runningTest.getBrowserInfo());
-                logger.verbose("is current running test open: " + runningTest.isTestOpen());
-                logger.verbose("is current running test ready to close: " + runningTest.isTestReadyToClose());
-                logger.verbose("is current running test closed: " + runningTest.isTestClose());
-                logger.verbose("closing current running test");
-                FutureTask<TestResultContainer> closeFuture = runningTest.close();
-                if (closeFuture == null) {
-                    continue;
-                }
-                futureList.addAll(Collections.singleton(closeFuture));
-                logger.verbose("adding closeFuture to futureList");
-            }
-            closeFuturesSet.addAll(futureList);
-        } catch (Throwable e) {
-            GeneralUtils.logExceptionStackTrace(logger, e);
-        }
-
-        logger.verbose("exit");
-        return futureList;
-    }
-
-    @Override
-    public synchronized ScoreTask getBestScoreTaskForCheck() {
-
-        int bestScore = -1;
-
-        ScoreTask currentBest = null;
-        for (RunningTest runningTest : testList) {
-
-            List<VisualGridTask> visualGridTaskList = runningTest.getVisualGridTaskList();
-
-            VisualGridTask visualGridTask;
-            //noinspection SynchronizationOnLocalVariableOrMethodParameter
-            synchronized (visualGridTaskList) {
-                if (visualGridTaskList.isEmpty()) {
-                    continue;
-                }
-
-                visualGridTask = visualGridTaskList.get(0);
-                if (!runningTest.isTestOpen() || visualGridTask.getType() != VisualGridTask.TaskType.CHECK || !visualGridTask.isTaskReadyToCheck()) {
-                    continue;
-                }
-            }
-
-
-            ScoreTask scoreTask = runningTest.getScoreTaskObjectByType(VisualGridTask.TaskType.CHECK);
-
-            if (scoreTask == null) {
-                continue;
-            }
-
-            if (bestScore < scoreTask.getScore()) {
-                currentBest = scoreTask;
-                bestScore = scoreTask.getScore();
-            }
-        }
-        return currentBest;
-    }
-
-    @Override
-    public ScoreTask getBestScoreTaskForOpen() {
-        int bestMark = -1;
-        ScoreTask currentBest = null;
-        synchronized (testList) {
-            for (RunningTest runningTest : testList) {
-                ScoreTask currentScoreTask = runningTest.getScoreTaskObjectByType(VisualGridTask.TaskType.OPEN);
-                if (currentScoreTask == null) {
-                    continue;
-                }
-
-                if (bestMark < currentScoreTask.getScore()) {
-                    bestMark = currentScoreTask.getScore();
-                    currentBest = currentScoreTask;
-                }
-            }
-        }
-        return currentBest;
     }
 
     public void setServerUrl(String serverUrl) {
         this.serverUrl = serverUrl;
     }
 
+    public AbstractProxySettings getProxy() {
+        if (getConfiguration().getProxy() == null) {
+            return runner.getProxy();
+        }
+
+        return getConfiguration().getProxy();
+    }
+
     @Override
     public boolean isEyesClosed() {
         boolean isVGEyesClosed = true;
-        for (RunningTest runningTest : testList) {
-            isVGEyesClosed = isVGEyesClosed && runningTest.isTestClose();
+        for (RunningTest runningTest : testList.values()) {
+            isVGEyesClosed = isVGEyesClosed && runningTest.isCompleted();
         }
         return isVGEyesClosed;
     }
 
-    public void setListener(EyesListener listener) {
-        for (RunningTest test : testList) {
-            test.setListener(listener);
-        }
-    }
-
-
     public void check(ICheckSettings... checkSettings) {
-        if (!validateEyes()) return;
+        if (getIsDisabled()) {
+            return;
+        }
         for (ICheckSettings checkSetting : checkSettings) {
             this.check(checkSetting);
         }
     }
 
     public void check(String name, ICheckSettings checkSettings) {
-        if (!validateEyes()) return;
+        if (getIsDisabled()) {
+            return;
+        }
+
         ArgumentGuard.notNull(checkSettings, "checkSettings");
         if (name != null) {
             checkSettings = checkSettings.withName(name);
@@ -515,35 +377,22 @@ public class VisualGridEyes implements ISeleniumEyes, IRenderingEyes {
 
     public void check(ICheckSettings checkSettings) {
         logger.verbose("enter");
-
-        if (!validateEyes()) {
+        if (getIsDisabled()) {
             return;
-        }
-
-        ArgumentGuard.notOfType(checkSettings, ICheckSettings.class, "checkSettings");
-        if (checkSettings instanceof ISeleniumCheckTarget) {
-            ((ISeleniumCheckTarget) checkSettings).init(logger, webDriver);
-        }
-
-        waitBeforeDomSnapshot();
-
-        try {
-            String logMessage = renderingGridRunner.getConcurrencyLog();
-            if (logMessage != null) {
-                NetworkLogHandler.sendSingleLog(eyesConnector.getServerConnector(), TraceLevel.Notice, logMessage);
-            }
-        } catch (JsonProcessingException e) {
-            GeneralUtils.logExceptionStackTrace(logger, e);
         }
 
         FrameChain originalFC = webDriver.getFrameChain().clone();
         EyesTargetLocator switchTo = ((EyesTargetLocator) webDriver.switchTo());
         try {
+            ArgumentGuard.notOfType(checkSettings, ICheckSettings.class, "checkSettings");
+            if (checkSettings instanceof ISeleniumCheckTarget) {
+                ((ISeleniumCheckTarget) checkSettings).init(logger, webDriver);
+            }
+
+            waitBeforeDomSnapshot();
+
             checkSettings = switchFramesAsNeeded(checkSettings, switchTo);
             ICheckSettingsInternal checkSettingsInternal = (ICheckSettingsInternal) checkSettings;
-
-            addOpenTaskToAllRunningTest();
-            List<VisualGridTask> checkVisualGridTasks = new ArrayList<>();
 
             FrameData scriptResult = captureDomSnapshot(switchTo);
 
@@ -562,58 +411,29 @@ public class VisualGridEyes implements ISeleniumEyes, IRenderingEyes {
 
             checkSettingsInternal = updateCheckSettings(checkSettings);
 
-            List<RunningTest> filteredTests = collectTestsForCheck(logger, testList);
-            logger.verbose(String.format("Collected %d tests", filteredTests.size()));
-
             String source = webDriver.getCurrentUrl();
-            for (RunningTest runningTest : filteredTests) {
-                VisualGridTask checkVisualGridTask = runningTest.check((ICheckSettings) checkSettingsInternal, regionsXPaths, source);
-                checkVisualGridTasks.add(checkVisualGridTask);
+            List<CheckTask> checkTasks = new ArrayList<>();
+            for (RunningTest runningTest : testList.values()) {
+                if (runningTest.isCloseTaskIssued()) {
+                    continue;
+                }
+
+                checkTasks.add(runningTest.issueCheck((ICheckSettings) checkSettingsInternal, regionsXPaths, source));
             }
 
-            logger.verbose(String.format("added %d check tasks", checkVisualGridTasks.size()));
-            this.renderingGridRunner.check((ICheckSettings) checkSettingsInternal, getConfiguration().getDebugResourceWriter(), scriptResult,
-                    this.eyesConnector, checkVisualGridTasks, regionsXPaths, userAgent);
+            scriptResult.setUserAgent(userAgent);
+            this.runner.setDebugResourceWriter(getConfiguration().getDebugResourceWriter());
+            this.runner.check(scriptResult, checkTasks);
             logger.verbose("created renderTask  (" + checkSettings.toString() + ")");
         } catch (Throwable e) {
             Error error = new Error(e);
-            abort(e);
-            for (RunningTest runningTest : testList) {
+            for (RunningTest runningTest : testList.values()) {
                 runningTest.setTestInExceptionMode(error);
             }
             GeneralUtils.logExceptionStackTrace(logger, e);
         } finally {
             switchTo.frames(originalFC);
         }
-    }
-
-    public static List<RunningTest> collectTestsForCheck(Logger logger, List<RunningTest> tests) {
-        logger.verbose(String.format("Called with %d tests", tests.size()));
-        List<RunningTest> filteredTests = new ArrayList<>();
-        for (final RunningTest test : tests) {
-            List<VisualGridTask> taskList = test.getVisualGridTaskList();
-            logger.verbose(String.format("test %s has %d tasks", test.getTestName(), taskList.size()));
-            VisualGridTask visualGridTask = null;
-            if (!taskList.isEmpty()) {
-                visualGridTask = taskList.get(taskList.size() - 1);
-            }
-
-            VisualGridTask.TaskType lastTaskType = null;
-            if (visualGridTask != null) {
-                lastTaskType = visualGridTask.getType();
-            }
-
-            boolean testIsOpenAndNotClosed = lastTaskType == null && test.isOpenTaskIssued() && !test.isCloseTaskIssued();
-            boolean lastTaskIsNotAClosingTask = lastTaskType != null && lastTaskType != VisualGridTask.TaskType.CLOSE && lastTaskType != VisualGridTask.TaskType.ABORT;
-            logger.verbose(String.format("testIsOpenAndNotClosed: %b, lastTaskIsNotAClosingTask: %b", testIsOpenAndNotClosed, lastTaskIsNotAClosingTask));
-
-            // We are interested in tests which should be opened or are open.
-            if (testIsOpenAndNotClosed || lastTaskIsNotAClosingTask) {
-                filteredTests.add(test);
-            }
-        }
-
-        return filteredTests;
     }
 
     private ICheckSettings switchFramesAsNeeded(ICheckSettings checkSettings, EyesTargetLocator switchTo) {
@@ -644,8 +464,8 @@ public class VisualGridEyes implements ISeleniumEyes, IRenderingEyes {
         String pollingScript = userAgent.isInternetExplorer() ? POLL_RESULT_FOR_IE : POLL_RESULT;
 
         final String skipList;
-        synchronized (renderingGridRunner.getResourcesCacheMap()) {
-            skipList = new ObjectMapper().writeValueAsString(new HashSet<>(renderingGridRunner.getResourcesCacheMap().keySet()));
+        synchronized (runner.getResourcesCacheMap()) {
+            skipList = new ObjectMapper().writeValueAsString(new HashSet<>(runner.getResourcesCacheMap().keySet()));
         }
 
         Map<String, Object> arguments = new HashMap<String, Object>() {{
@@ -817,21 +637,11 @@ public class VisualGridEyes implements ISeleniumEyes, IRenderingEyes {
         frame.setScrollRootElement(rootElement);
     }
 
-    private synchronized void addOpenTaskToAllRunningTest() {
-    logger.verbose(String.format("Add open tasks for %d tests", testList.size()));
-        for (RunningTest runningTest : testList) {
-            if (!runningTest.isOpenTaskIssued()) {
-                runningTest.open();
-            }
-        }
-        logger.verbose("exit");
-    }
-
     public Logger getLogger() {
         return logger;
     }
 
-    public List<RunningTest> getAllRunningTests() {
+    public Map<String, RunningTest> getAllRunningTests() {
         return testList;
     }
 
@@ -841,9 +651,11 @@ public class VisualGridEyes implements ISeleniumEyes, IRenderingEyes {
     }
 
     public void setServerConnector(ServerConnector serverConnector) {
-        this.serverConnector = serverConnector;
+        if (serverConnector != null && serverConnector.getAgentId() == null) {
+            serverConnector.setAgentId(getFullAgentId());
+        }
+        runner.setServerConnector(serverConnector);
     }
-
 
     /**
      * @return The full agent id composed of both the base agent id and the
@@ -861,9 +673,7 @@ public class VisualGridEyes implements ISeleniumEyes, IRenderingEyes {
         return configurationProvider.get();
     }
 
-    @SuppressWarnings("WeakerAccess")
-    public String getBaseAgentId() {
-        //noinspection SpellCheckingInspection
+    private String getBaseAgentId() {
         return "eyes.selenium.visualgrid.java/" + ClassVersionGetter.CURRENT_VERSION;
     }
 
@@ -873,7 +683,7 @@ public class VisualGridEyes implements ISeleniumEyes, IRenderingEyes {
      * @param batch The batch info to set.
      */
     public void setBatch(BatchInfo batch) {
-        if (isDisabled) {
+        if (getIsDisabled()) {
             logger.verbose("Ignored");
             return;
         }
@@ -887,14 +697,13 @@ public class VisualGridEyes implements ISeleniumEyes, IRenderingEyes {
         List<VisualGridSelector[]> result = new ArrayList<>();
         List<WebElementRegion>[] elementLists = collectSeleniumRegions(csInternal);
         for (List<WebElementRegion> elementList : elementLists) {
-            //noinspection SpellCheckingInspection
-            List<VisualGridSelector> xpaths = new ArrayList<>();
+            List<VisualGridSelector> xPaths = new ArrayList<>();
             for (WebElementRegion webElementRegion : elementList) {
                 if (webElementRegion.getElement() == null) continue;
                 String xpath = (String) webDriver.executeScript(GET_ELEMENT_XPATH_JS, webElementRegion.getElement());
-                xpaths.add(new VisualGridSelector(xpath, webElementRegion.getRegion()));
+                xPaths.add(new VisualGridSelector(xpath, webElementRegion.getRegion()));
             }
-            result.add(xpaths.toArray(new VisualGridSelector[0]));
+            result.add(xPaths.toArray(new VisualGridSelector[0]));
         }
         return result;
     }
@@ -949,31 +758,13 @@ public class VisualGridEyes implements ISeleniumEyes, IRenderingEyes {
         properties.clear();
     }
 
-    @SuppressWarnings("BooleanMethodIsAlwaysInverted")
-    private boolean validateEyes() {
-        if (isDisabled) {
-            logger.verbose("WARNING! Invalid Operation - Eyes Disabled!");
-            return false;
-        }
-        if (!renderingGridRunner.isServicesOn()) {
-            logger.verbose("WARNING! Invalid Operation - visualGridRunner.getAllTestResults already called!");
-            return false;
-        }
-        return true;
-    }
-
-    @Override
-    public List<TestResultContainer> getAllTestResults() {
-        return allTestResults;
-    }
-
     public EyesSeleniumDriver getDriver() {
         return webDriver;
     }
 
     @Override
     public IBatchCloser getBatchCloser() {
-        return this.testList.get(0).getBatchCloser();
+        return this.testList.values().iterator().next();
     }
 
     @Override
@@ -981,39 +772,24 @@ public class VisualGridEyes implements ISeleniumEyes, IRenderingEyes {
         return this.getConfiguration().getBatch().getId();
     }
 
-    private void abort(Throwable e) {
-        for (RunningTest runningTest : testList) {
-            runningTest.abort(true, e);
-        }
-    }
-
-    public void abortAsync() {
-        abortAndCollectTasks();
-    }
-
-    public TestResults abort() {
-        List<Future<TestResultContainer>> tasks = abortAndCollectTasks();
-        return parseCloseFutures(tasks, false);
-    }
-
-    private List<Future<TestResultContainer>> abortAndCollectTasks() {
-        List<Future<TestResultContainer>> tasks = new ArrayList<>();
-        for (RunningTest runningTest : testList) {
-            Future<TestResultContainer> task = runningTest.abort(false, null);
-            tasks.add(task);
-        }
-
-        return tasks;
-    }
-
-    @Override
-    public boolean isServerConcurrencyLimitReached() {
-        for (RunningTest runningTest : testList) {
-            if (runningTest.isServerConcurrencyLimitReached()) {
-                return true;
+    /**
+     *
+     * @return If all tests completed, returns their results. Otherwise, returns null
+     */
+    public List<TestResultContainer> getAllTestResults() {
+        List<TestResultContainer> allResults = new ArrayList<>();
+        for (RunningTest runningTest : testList.values()) {
+            if (!runningTest.isCompleted()) {
+                return null;
             }
+
+            allResults.add(runningTest.getTestResultContainer());
         }
 
-        return false;
+        return allResults;
+    }
+
+    public boolean isCompleted() {
+        return getAllTestResults() != null;
     }
 }

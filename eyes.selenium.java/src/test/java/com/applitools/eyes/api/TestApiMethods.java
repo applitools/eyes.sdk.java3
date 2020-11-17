@@ -1,24 +1,20 @@
 package com.applitools.eyes.api;
 
-import com.applitools.eyes.*;
-import com.applitools.eyes.config.Configuration;
-import com.applitools.eyes.config.ConfigurationProvider;
+import com.applitools.eyes.EyesRunner;
+import com.applitools.eyes.RectangleSize;
+import com.applitools.eyes.StdoutLogHandler;
+import com.applitools.eyes.TestResults;
 import com.applitools.eyes.selenium.ClassicRunner;
 import com.applitools.eyes.selenium.Eyes;
 import com.applitools.eyes.selenium.TestDataProvider;
 import com.applitools.eyes.selenium.fluent.Target;
-import com.applitools.eyes.selenium.rendering.VisualGridEyes;
 import com.applitools.eyes.utils.ReportingTestSuite;
 import com.applitools.eyes.utils.SeleniumUtils;
-import com.applitools.eyes.utils.TestUtils;
 import com.applitools.eyes.visualgrid.services.VisualGridRunner;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.testng.Assert;
 import org.testng.annotations.Test;
-
-import java.util.List;
-import java.util.concurrent.Future;
 
 public class TestApiMethods extends ReportingTestSuite {
 
@@ -46,34 +42,6 @@ public class TestApiMethods extends ReportingTestSuite {
             runner.getAllTestResults();
         } finally {
             driver.quit();
-        }
-    }
-
-    @Test
-    public void TestWaitBeforeClose() throws InterruptedException {
-        final Configuration configuration = new Configuration();
-        VisualGridRunner runner = new VisualGridRunner(10);
-        VisualGridEyes eyes = new VisualGridEyes(runner, new ConfigurationProvider() {
-            @Override
-            public Configuration get() {
-                return configuration;
-            }
-        });
-        eyes.setLogHandler(new StdoutLogHandler());
-
-        WebDriver driver = SeleniumUtils.createChromeDriver();
-        driver.get("https://applitools.com/helloworld");
-        try {
-            eyes.open(driver, "TestApiMethods", "TestWaitBeforeClose", new RectangleSize(800, 600));
-            eyes.check(Target.window());
-            Thread.sleep(30000);
-            List<Future<TestResultContainer>> futureList = (List<Future<TestResultContainer>>) eyes.closeAsync();
-            Assert.assertEquals(1, futureList.size());
-            Assert.assertNotNull(futureList.get(0));
-        } finally {
-            driver.quit();
-            eyes.abortAsync();
-            runner.getAllTestResultsImpl();
         }
     }
 

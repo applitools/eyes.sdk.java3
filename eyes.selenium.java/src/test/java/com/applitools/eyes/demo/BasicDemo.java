@@ -16,7 +16,7 @@ import org.testng.annotations.Test;
 public class BasicDemo extends ReportingTestSuite {
     private static BatchInfo batch;
     private WebDriver driver;
-    private final LogHandler logger = new StdoutLogHandler(false);
+    private final LogHandler logger = new StdoutLogHandler();
 
     public BasicDemo(){
         super.setGroupName("selenium");

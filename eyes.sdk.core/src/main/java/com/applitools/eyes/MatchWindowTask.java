@@ -9,10 +9,7 @@ import com.applitools.eyes.visualgrid.model.MutableRegion;
 import com.applitools.eyes.visualgrid.model.VisualGridSelector;
 import com.applitools.utils.ArgumentGuard;
 import com.applitools.utils.GeneralUtils;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 
-import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -22,9 +19,8 @@ public class MatchWindowTask {
 
     private static final int MATCH_INTERVAL = 500; // Milliseconds
     private EyesScreenshot lastScreenshot = null;
-    private Region lastScreenshotBounds;
     private String lastScreenshotHash;
-    private int defaultRetryTimeout;
+    private final int defaultRetryTimeout;
 
     protected Logger logger;
     protected ServerConnector serverConnector;
@@ -32,9 +28,6 @@ public class MatchWindowTask {
     protected AppOutputProvider appOutputProvider;
     protected MatchResult matchResult;
     protected EyesBase eyes;
-
-    protected MatchWindowTask() {
-    }
 
     /**
      * @param logger            A logger instance.
@@ -60,159 +53,8 @@ public class MatchWindowTask {
         this.appOutputProvider = appOutputProvider;
     }
 
-    /**
-     * @param logger          A logger instance.
-     * @param serverConnector Our gateway to the agent
-     * @param runningSession  The running session in which we should match the window
-     * @param retryTimeout    The default total time to retry matching (ms).
-     */
-    public MatchWindowTask(Logger logger, ServerConnector serverConnector,
-                           RunningSession runningSession, int retryTimeout,
-                           EyesBase eyes) {
-        ArgumentGuard.notNull(serverConnector, "serverConnector");
-        ArgumentGuard.notNull(runningSession, "runningSession");
-        ArgumentGuard.greaterThanOrEqualToZero(retryTimeout, "retryTimeout");
-
-        this.logger = logger;
-        this.serverConnector = serverConnector;
-        this.runningSession = runningSession;
-        this.defaultRetryTimeout = retryTimeout;
-        this.eyes = eyes;
-        this.appOutputProvider = null;
-    }
-
-    /**
-     * Creates the match model and calls the server connector matchWindow method.
-     * @param appOutput          The application output to be matched.
-     * @param tag                Optional tag to be associated with the match (can be {@code null}).
-     * @param imageMatchSettings The settings to use.
-     * @param renderId           Visual Grid's renderId.
-     * @param source             The tested page URL or tested app name.
-     */
-    public MatchResult performMatch(AppOutput appOutput,
-                                    String tag, ICheckSettingsInternal checkSettingsInternal,
-                                    ImageMatchSettings imageMatchSettings,
-                                    List<? extends IRegion> regions,
-                                    List<VisualGridSelector[]> regionSelectors,
-                                    EyesBase eyes, String renderId, String source) {
-        collectRegions(imageMatchSettings, appOutput.getLocation(), regions, regionSelectors);
-        collectRegions(imageMatchSettings, checkSettingsInternal);
-        return performMatch(new ArrayList<Trigger>(), appOutput, tag, false, imageMatchSettings,
-                eyes, renderId, source);
-    }
-
-    /**
-     * Creates the match model and calls the server connector matchWindow method.
-     * @param userInputs         The user inputs related to the current appOutput.
-     * @param appOutput          The application output to be matched.
-     * @param tag                Optional tag to be associated with the match (can be {@code null}).
-     * @param replaceLast        Whether to instruct the server to replace the screenshot of the last step.
-     * @param imageMatchSettings The settings to use.
-     * @return The match result.
-     */
-    public MatchResult performMatch(List<Trigger> userInputs,
-                                    AppOutput appOutput,
-                                    String tag, boolean replaceLast,
-                                    ImageMatchSettings imageMatchSettings,
-                                    EyesBase eyes, String renderId, String source) {
-        eyes.getLogger().log(String.format("Starting perform match. Render ID: %s", renderId));
-
-        // called from regular flow and from check many flow.
-        eyes.getLogger().verbose(String.format("replaceLast: %b", replaceLast));
-
-        String agentSetupStr = "";
-        Object agentSetup = eyes.getAgentSetup();
-        if (agentSetup != null) {
-            ObjectMapper jsonMapper = new ObjectMapper();
-            try {
-                agentSetupStr = jsonMapper.writeValueAsString(agentSetup);
-            } catch (JsonProcessingException e) {
-                GeneralUtils.logExceptionStackTrace(logger, e);
-            }
-        }
-
-        SyncTaskListener<MatchResult> listener = new SyncTaskListener<>(logger, String.format("performMatch %s", runningSession));
-        performMatch(listener, userInputs, appOutput, tag, replaceLast, imageMatchSettings, agentSetupStr, renderId, source);
-        MatchResult result = listener.get();
-        if (result == null) {
-            throw new EyesException("Failed performing match with the server");
-        }
-
-        eyes.getLogger().log(String.format("Finished perform match. Render ID: %s", renderId));
-        eyes.getLogger().verbose("exit");
-        return result;
-    }
-
-    private void performMatch(final TaskListener<MatchResult> listener, List<Trigger> userInputs,
-                              AppOutput appOutput,
-                              String tag, boolean replaceLast,
-                              ImageMatchSettings imageMatchSettings,
-                              String agentSetupStr, String renderId,
-                              String source) {
-        // Prepare match data.
-        MatchWindowData.Options options = new MatchWindowData.Options(tag, userInputs.toArray(new Trigger[0]), replaceLast,
-                false, false, false, false, imageMatchSettings, source, renderId);
-
-        final MatchWindowData data = new MatchWindowData(userInputs.toArray(new Trigger[0]), appOutput, tag,
-                false, options, agentSetupStr, renderId);
-
-
-        tryUploadImage(new TaskListener<Boolean>() {
-            @Override
-            public void onComplete(Boolean result) {
-                if (!result) {
-                    onFail();
-                    return;
-                }
-
-                try {
-                    serverConnector.matchWindow(listener, runningSession, data);
-                } catch (Throwable t) {
-                    GeneralUtils.logExceptionStackTrace(logger, t);
-                    onFail();
-                }
-            }
-
-            @Override
-            public void onFail() {
-                listener.onFail();
-            }
-        }, data);
-    }
-
-    private void tryUploadImage(final TaskListener<Boolean> taskListener, MatchWindowData data) {
-        final AppOutput appOutput = data.getAppOutput();
-        if (appOutput.getScreenshotUrl() != null) {
-            taskListener.onComplete(true);
-            return;
-        }
-
-        // Getting the screenshot's bytes
-        TaskListener<String> uploadListener = new TaskListener<String>() {
-            @Override
-            public void onComplete(String s) {
-                appOutput.setScreenshotUrl(s);
-                taskListener.onComplete(s != null);
-            }
-
-            @Override
-            public void onFail() {
-                appOutput.setScreenshotUrl(null);
-                taskListener.onComplete(false);
-            }
-        };
-        serverConnector.uploadImage(uploadListener, appOutput.getScreenshotBytes());
-    }
-
-    public String tryUploadData(final byte[] bytes, final String contentType, final String mediaType) {
-        SyncTaskListener<String> listener = new SyncTaskListener<>(logger, String.format("tryUploadData %s", runningSession));
-        serverConnector.uploadData(listener, bytes, contentType, mediaType);
-        return listener.get();
-    }
-
     public static void collectRegions(EyesBase eyes, EyesScreenshot screenshot,
-                                      ICheckSettingsInternal checkSettingsInternal, ImageMatchSettings imageMatchSettings)
-    {
+                                      ICheckSettingsInternal checkSettingsInternal, ImageMatchSettings imageMatchSettings) {
         eyes.getLogger().verbose("enter");
         collectSimpleRegions(eyes, checkSettingsInternal, imageMatchSettings, screenshot);
         collectFloatingRegions(checkSettingsInternal, imageMatchSettings, screenshot);
@@ -221,7 +63,7 @@ public class MatchWindowTask {
         eyes.getLogger().verbose("exit");
     }
 
-    private void collectRegions(ImageMatchSettings imageMatchSettings, ICheckSettingsInternal checkSettingsInternal) {
+    public static void collectRegions(ImageMatchSettings imageMatchSettings, ICheckSettingsInternal checkSettingsInternal) {
         imageMatchSettings.setIgnoreRegions(convertSimpleRegions(checkSettingsInternal.getIgnoreRegions(), imageMatchSettings.getIgnoreRegions()));
         imageMatchSettings.setContentRegions(convertSimpleRegions(checkSettingsInternal.getContentRegions(), imageMatchSettings.getContentRegions()));
         imageMatchSettings.setLayoutRegions(convertSimpleRegions(checkSettingsInternal.getLayoutRegions(), imageMatchSettings.getLayoutRegions()));
@@ -230,7 +72,7 @@ public class MatchWindowTask {
         imageMatchSettings.setAccessibility(convertAccessibilityRegions(checkSettingsInternal.getAccessibilityRegions(), imageMatchSettings.getAccessibility()));
     }
 
-    private AccessibilityRegionByRectangle[] convertAccessibilityRegions(GetAccessibilityRegion[] accessibilityRegions, AccessibilityRegionByRectangle[] currentRegions) {
+    private static AccessibilityRegionByRectangle[] convertAccessibilityRegions(GetAccessibilityRegion[] accessibilityRegions, AccessibilityRegionByRectangle[] currentRegions) {
         List<AccessibilityRegionByRectangle> mutableRegions = new ArrayList<>();
         if (currentRegions != null) {
             mutableRegions.addAll(Arrays.asList(currentRegions));
@@ -260,7 +102,7 @@ public class MatchWindowTask {
         return mutableRegions.toArray(new Region[0]);
     }
 
-    private FloatingMatchSettings[] convertFloatingRegions(GetFloatingRegion[] floatingRegions, FloatingMatchSettings[] currentRegions) {
+    private static FloatingMatchSettings[] convertFloatingRegions(GetFloatingRegion[] floatingRegions, FloatingMatchSettings[] currentRegions) {
         List<FloatingMatchSettings> mutableRegions = new ArrayList<>();
         if (currentRegions != null) {
             Collections.addAll(mutableRegions, currentRegions);
@@ -275,7 +117,7 @@ public class MatchWindowTask {
         return mutableRegions.toArray(new FloatingMatchSettings[0]);
     }
 
-    private static void collectRegions(ImageMatchSettings imageMatchSettings, Location location, List<? extends IRegion> regions, List<VisualGridSelector[]> regionSelectors) {
+    public static void collectRegions(ImageMatchSettings imageMatchSettings, Location location, List<? extends IRegion> regions, List<VisualGridSelector[]> regionSelectors) {
         if (regions == null) return;
 
         int currentCounter = 0;
@@ -365,29 +207,6 @@ public class MatchWindowTask {
             }
         }
         return list.toArray(new MutableRegion[0]);
-    }
-
-
-    private static void collectSimpleRegions(ICheckSettingsInternal checkSettingsInternal,
-                                             ImageMatchSettings imageMatchSettings,
-                                             EyesScreenshot screenshot) {
-        imageMatchSettings.setIgnoreRegions(collectSimpleRegions(screenshot, checkSettingsInternal.getIgnoreRegions()));
-        imageMatchSettings.setStrictRegions(collectSimpleRegions(screenshot, checkSettingsInternal.getStrictRegions()));
-        imageMatchSettings.setLayoutRegions(collectSimpleRegions(screenshot, checkSettingsInternal.getLayoutRegions()));
-        imageMatchSettings.setContentRegions(collectSimpleRegions(screenshot, checkSettingsInternal.getContentRegions()));
-    }
-
-    private static Region[] collectSimpleRegions(EyesScreenshot screenshot, GetSimpleRegion[] regionProviders) {
-        List<List<Region>> mutableRegions = new ArrayList<>();
-        for (GetSimpleRegion regionProvider : regionProviders) {
-            mutableRegions.add(regionProvider.getRegions(screenshot));
-        }
-
-        List<Region> allRegions = new ArrayList<>();
-        for (List<Region> mutableRegion : mutableRegions) {
-            allRegions.addAll(mutableRegion);
-        }
-        return allRegions.toArray(new Region[0]);
     }
 
     private static void collectFloatingRegions(ICheckSettingsInternal checkSettingsInternal,
@@ -574,8 +393,9 @@ public class MatchWindowTask {
         }
 
         ImageMatchSettings matchSettings = createImageMatchSettings(checkSettingsInternal, screenshot, eyes);
-        matchResult = performMatch(Arrays.asList(userInputs), appOutput, tag, lastScreenshotHash != null,
+        MatchWindowData data = eyes.prepareForMatch(Arrays.asList(userInputs), appOutput, tag, lastScreenshotHash != null,
                 matchSettings, eyes, null, source);
+        matchResult = eyes.performMatch(data);
         lastScreenshotHash = currentScreenshotHash;
         return screenshot;
     }
@@ -586,22 +406,8 @@ public class MatchWindowTask {
         }
     }
 
-    private void updateBounds(Region region) {
-        if (region.isSizeEmpty()) {
-            if (lastScreenshot == null) {
-                // We set an "infinite" image size since we don't know what the screenshot size is...
-                lastScreenshotBounds = new Region(0, 0, Integer.MAX_VALUE, Integer.MAX_VALUE);
-            } else {
-                BufferedImage image = lastScreenshot.getImage();
-                lastScreenshotBounds = new Region(0, 0, image.getWidth(), image.getHeight());
-            }
-        } else {
-            lastScreenshotBounds = region;
-        }
-    }
-
-    public Region getLastScreenshotBounds() {
-        return lastScreenshotBounds;
+    public EyesScreenshot getLastScreenshot() {
+        return lastScreenshot;
     }
 
     private static void collectAccessibilityRegions(ICheckSettingsInternal checkSettingsInternal,

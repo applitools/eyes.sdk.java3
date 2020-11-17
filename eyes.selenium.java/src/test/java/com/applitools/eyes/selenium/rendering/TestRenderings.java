@@ -1,6 +1,5 @@
 package com.applitools.eyes.selenium.rendering;
 
-import com.applitools.ICheckSettings;
 import com.applitools.connectivity.MockServerConnector;
 import com.applitools.connectivity.MockedResponse;
 import com.applitools.connectivity.ServerConnector;
@@ -19,9 +18,8 @@ import com.applitools.eyes.utils.SeleniumTestUtils;
 import com.applitools.eyes.utils.SeleniumUtils;
 import com.applitools.eyes.utils.TestUtils;
 import com.applitools.eyes.visualgrid.model.*;
-import com.applitools.eyes.visualgrid.services.IEyesConnector;
+import com.applitools.eyes.visualgrid.services.CheckTask;
 import com.applitools.eyes.visualgrid.services.VisualGridRunner;
-import com.applitools.eyes.visualgrid.services.VisualGridTask;
 import com.applitools.utils.GeneralUtils;
 import org.mockito.ArgumentMatchers;
 import org.mockito.invocation.InvocationOnMock;
@@ -289,15 +287,13 @@ public class TestRenderings extends ReportingTestSuite {
         doAnswer(new Answer() {
             @Override
             public Object answer(InvocationOnMock invocation) throws Throwable {
-                FrameData frameData = invocation.getArgument(2);
+                FrameData frameData = invocation.getArgument(0);
                 frameData.getResourceUrls().add(missingUrl);
                 frameData.getResourceUrls().add(unknownHostUrl);
                 invocation.callRealMethod();
                 return null;
             }
-        }).when(runner).check(any(ICheckSettings.class), nullable(IDebugResourceWriter.class), any(FrameData.class),
-                any(IEyesConnector.class), ArgumentMatchers.<List<VisualGridTask>>any(),
-                ArgumentMatchers.<List<VisualGridSelector[]>>any(), any(UserAgent.class));
+        }).when(runner).check(any(FrameData.class), ArgumentMatchers.<List<CheckTask>>any());
 
         Eyes eyes = new Eyes(runner);
         eyes.setLogHandler(new StdoutLogHandler());

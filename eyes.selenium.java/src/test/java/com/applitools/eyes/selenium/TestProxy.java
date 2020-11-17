@@ -56,7 +56,7 @@ public class TestProxy extends ReportingTestSuite {
             Eyes eyes = new Eyes();
             eyes.setProxy(new ProxySettings("http://127.0.0.1", 8080));
             eyes.open(driver1, "ProxyTest", "proxy test");
-            Assert.assertTrue(eyes.getIsOpen());
+            Assert.assertTrue(eyes.isOpen());
             eyes.close();
         } finally {
             driver1.quit();

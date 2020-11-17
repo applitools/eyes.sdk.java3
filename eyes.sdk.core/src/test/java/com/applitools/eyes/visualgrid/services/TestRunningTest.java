@@ -1,8 +1,8 @@
 package com.applitools.eyes.visualgrid.services;
 
+import com.applitools.ICheckSettings;
 import com.applitools.eyes.Logger;
 import com.applitools.eyes.config.Configuration;
-import com.applitools.eyes.config.ConfigurationProvider;
 import com.applitools.eyes.utils.ReportingTestSuite;
 import com.applitools.eyes.visualgrid.model.RenderBrowserInfo;
 import org.testng.Assert;
@@ -11,19 +11,11 @@ import org.testng.annotations.Test;
 
 import java.util.List;
 
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.mock;
 
 public class TestRunningTest extends ReportingTestSuite {
 
-    RenderBrowserInfo browserInfo = mock(RenderBrowserInfo.class);
-    Logger logger = mock(Logger.class);
-    ConfigurationProvider configurationProvider = mock(ConfigurationProvider.class);
-
-    RunningTest runningTest;
-    VisualGridTask openTask;
-    VisualGridTask checkTask;
-    VisualGridTask closeTask;
+    VisualGridRunningTest runningTest;
 
     public TestRunningTest() {
         super.setGroupName("core");
@@ -31,85 +23,48 @@ public class TestRunningTest extends ReportingTestSuite {
 
     @BeforeMethod
     public void beforeEach() {
-        doNothing().when(logger).verbose(anyString());
-        doNothing().when(logger).log(anyString());
-
-        when(configurationProvider.get()).thenReturn(new Configuration());
-
-        runningTest = new RunningTest(browserInfo, logger, configurationProvider);
-        openTask = new VisualGridTask(VisualGridTask.TaskType.OPEN, logger, runningTest);
-        checkTask = new VisualGridTask(VisualGridTask.TaskType.CHECK, logger, runningTest);
-        closeTask = new VisualGridTask(VisualGridTask.TaskType.CLOSE, logger, runningTest);
+        runningTest = new VisualGridRunningTest(mock(RenderBrowserInfo.class), mock(Logger.class), new Configuration());
+        runningTest.issueCheck(mock(ICheckSettings.class), mock(List.class), "");
+        runningTest.issueCheck(mock(ICheckSettings.class), mock(List.class), "");
+        runningTest.issueCheck(mock(ICheckSettings.class), mock(List.class), "");
     }
 
     @Test
     public void testAbortWhenCloseCalled() {
-        List<VisualGridTask> tasks = runningTest.getVisualGridTaskList();
-        tasks.add(openTask);
-        tasks.add(checkTask);
-        tasks.add(closeTask);
-        runningTest.setCloseTask(closeTask);
-        runningTest.abort(false, null);
+        Assert.assertFalse(runningTest.isCloseTaskIssued());
+        runningTest.issueClose();
+        runningTest.issueAbort(new Exception(""), false);
 
-        Assert.assertEquals(3, tasks.size());
-        Assert.assertEquals(tasks.get(0), openTask);
-        Assert.assertEquals(tasks.get(1), checkTask);
-        Assert.assertEquals(tasks.get(2), closeTask);
+        Assert.assertEquals(runningTest.checkTasks.size(), 3);
+        Assert.assertTrue(runningTest.isCloseTaskIssued());
+        Assert.assertFalse(runningTest.isTestAborted());
     }
 
     @Test
     public void testForceAbortWhenCloseCalled() {
-        List<VisualGridTask> tasks = runningTest.getVisualGridTaskList();
-        tasks.add(openTask);
-        tasks.add(checkTask);
-        tasks.add(closeTask);
-        runningTest.setCloseTask(closeTask);
+        runningTest.issueClose();
+        runningTest.issueAbort(new Exception(""), true);
 
-        Exception exception = new Exception();
-        runningTest.abort(true, exception);
-
-        Assert.assertEquals(2, tasks.size());
-        Assert.assertEquals(tasks.get(0), openTask);
-        Assert.assertEquals(tasks.get(1), closeTask);
-        Assert.assertEquals(closeTask.getType(), VisualGridTask.TaskType.ABORT);
-        Assert.assertEquals(closeTask.getException(), exception);
+        Assert.assertEquals(runningTest.checkTasks.size(), 0);
+        Assert.assertTrue(runningTest.isCloseTaskIssued());
+        Assert.assertTrue(runningTest.isTestAborted());
     }
 
     @Test
     public void testAbortWhenCloseNotCalled() {
-        List<VisualGridTask> tasks = runningTest.getVisualGridTaskList();
-        tasks.add(openTask);
-        tasks.add(checkTask);
-        runningTest.setOpenTask(openTask);
+        runningTest.issueAbort(new Exception(""), false);
 
-        Exception exception = new Exception();
-        runningTest.abort(false, exception);
-
-        Assert.assertEquals(2, tasks.size());
-        Assert.assertEquals(tasks.get(0), openTask);
-        Assert.assertEquals(openTask.getException(), exception);
-
-        VisualGridTask abortTask = tasks.get(1);
-        Assert.assertEquals(abortTask.getType(), VisualGridTask.TaskType.ABORT);
-        Assert.assertEquals(runningTest.getCloseTask(), abortTask);
+        Assert.assertEquals(runningTest.checkTasks.size(), 0);
+        Assert.assertTrue(runningTest.isCloseTaskIssued());
+        Assert.assertTrue(runningTest.isTestAborted());
     }
 
     @Test
     public void testForceAbortWhenCloseNotCalled() {
-        List<VisualGridTask> tasks = runningTest.getVisualGridTaskList();
-        tasks.add(openTask);
-        tasks.add(checkTask);
-        runningTest.setOpenTask(openTask);
+        runningTest.issueAbort(new Exception(""), true);
 
-        Exception exception = new Exception();
-        runningTest.abort(true, exception);
-
-        Assert.assertEquals(2, tasks.size());
-        Assert.assertEquals(tasks.get(0), openTask);
-        Assert.assertEquals(openTask.getException(), exception);
-
-        VisualGridTask abortTask = tasks.get(1);
-        Assert.assertEquals(abortTask.getType(), VisualGridTask.TaskType.ABORT);
-        Assert.assertEquals(runningTest.getCloseTask(), abortTask);
+        Assert.assertEquals(runningTest.checkTasks.size(), 0);
+        Assert.assertTrue(runningTest.isCloseTaskIssued());
+        Assert.assertTrue(runningTest.isTestAborted());
     }
 }

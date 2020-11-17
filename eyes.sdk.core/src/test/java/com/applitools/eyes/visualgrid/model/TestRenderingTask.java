@@ -1,23 +1,11 @@
 package com.applitools.eyes.visualgrid.model;
 
 import com.applitools.connectivity.ServerConnector;
-import com.applitools.connectivity.TestServerConnector;
-import com.applitools.connectivity.api.AsyncRequest;
-import com.applitools.connectivity.api.AsyncRequestCallback;
-import com.applitools.connectivity.api.Response;
-import com.applitools.eyes.Logger;
-import com.applitools.eyes.RectangleSize;
-import com.applitools.eyes.TaskListener;
-import com.applitools.eyes.UserAgent;
-import com.applitools.eyes.fluent.CheckSettings;
-import com.applitools.eyes.selenium.BrowserType;
+import com.applitools.eyes.*;
 import com.applitools.eyes.utils.ReportingTestSuite;
-import com.applitools.eyes.visualgrid.services.IEyesConnector;
-import com.applitools.eyes.visualgrid.services.VisualGridTask;
 import com.applitools.utils.GeneralUtils;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.apache.http.HttpStatus;
+import org.apache.commons.lang3.tuple.Pair;
 import org.mockito.ArgumentMatchers;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
@@ -34,10 +22,10 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.concurrent.atomic.AtomicReference;
 
 import static org.mockito.ArgumentMatchers.*;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 public class TestRenderingTask extends ReportingTestSuite {
 
@@ -66,12 +54,14 @@ public class TestRenderingTask extends ReportingTestSuite {
         when(future.get(anyLong(), (TimeUnit) any())).thenThrow(new IllegalStateException());
         UserAgent userAgent = mock(UserAgent.class);
         when(userAgent.getOriginalUserAgentString()).thenReturn("");
+        when(frameData.getUserAgent()).thenReturn(userAgent);
 
         final AtomicInteger counter = new AtomicInteger();
         ServerConnector serverConnector = mock(ServerConnector.class);
 
+        final SyncTaskListener<Map<String, RGridResource>> listener = new SyncTaskListener<>(new Logger(new StdoutLogHandler()), "dom analyzer");
         final DomAnalyzer domAnalyzer = new DomAnalyzer(new Logger(), serverConnector, new NullDebugResourceWriter(),
-                frameData, new HashMap<String, RGridResource>(), userAgent);
+                frameData, new HashMap<String, RGridResource>(), listener);
 
         RGridResource cachedResource = mock(RGridResource.class);
         when(cachedResource.getUrl()).thenReturn("12");
@@ -124,196 +114,16 @@ public class TestRenderingTask extends ReportingTestSuite {
         });
 
         // We call the method which activates the process of collecting resources and wait to see if it ends properly.
-        Map<URI, FrameData> resourceMap = new HashMap<>();
         for (URI uri : resourceUrls) {
-            resourceMap.put(uri, frameData);
+            domAnalyzer.resourcesToDownload.add(Pair.of(frameData, uri));
         }
-        domAnalyzer.fetchAllResources(resourceMap);
-        domAnalyzer.resourcesPhaser.awaitAdvanceInterruptibly(0, 30, TimeUnit.SECONDS);
+
+        while(!domAnalyzer.run()) {
+            Thread.sleep(10);
+        }
+
+        Assert.assertEquals(listener.get().size(), 8);
         Assert.assertEquals(counter.get(), 7);
-    }
-
-    @Test
-    public void testPutResources() throws Exception {
-        final ServerConnector serverConnector = TestServerConnector.getOfflineServerConnector(null,
-                new AsyncRequest(new Logger()) {
-                    @Override
-                    public AsyncRequest header(String name, String value) {
-                        return this;
-                    }
-
-                    @Override
-                    public Future<?> method(String method, AsyncRequestCallback callback, Object data, String contentType, boolean logIfError) {
-                        callback.onComplete(new Response(new Logger()) {
-                            @Override
-                            public int getStatusCode() {
-                                return HttpStatus.SC_OK;
-                            }
-
-                            @Override
-                            public String getStatusPhrase() {
-                                return "";
-                            }
-
-                            @Override
-                            public String getHeader(String name, boolean ignoreCase) {
-                                return "";
-                            }
-
-                            @Override
-                            protected Map<String, String> getHeaders() {
-                                return new HashMap<>();
-                            }
-
-                            @Override
-                            public String getBodyString() {
-                                return "content";
-                            }
-
-                            @Override
-                            protected void readEntity() {}
-
-
-                            @Override
-                            public void close() {}
-                        });
-                        return null;
-                    }
-                });
-        RenderingInfo renderingInfo = new RenderingInfo("", "", "", "", 0, 0);
-        serverConnector.setRenderingInfo(renderingInfo);
-
-        final Future<?> future = mock(Future.class);
-        when(future.get()).thenThrow(new IllegalStateException());
-        when(future.get(anyLong(), (TimeUnit) any())).thenThrow(new IllegalStateException());
-        IEyesConnector eyesConnector = mock(IEyesConnector.class);
-        final ResourceCollectionTask resourceCollectionTask = new ResourceCollectionTask(eyesConnector, null,
-                null, null, null, null);
-
-        when(eyesConnector.renderPutResource(any(String.class), any(RGridResource.class),  ArgumentMatchers.<TaskListener<Void>>any()))
-                .thenAnswer(new Answer<Future<?>>() {
-                    @Override
-                    public Future<?> answer(InvocationOnMock invocation) throws Throwable {
-                        serverConnector.renderPutResource(
-                                (String) invocation.getArgument(0),
-                                (RGridResource) invocation.getArgument(1),
-                                (TaskListener<Void>) invocation.getArgument(2));
-                        return future;
-                    }
-                });
-
-        List<RGridResource> resourceMap = new ArrayList<>();
-        resourceMap.add(new RGridResource("1", "", "1".getBytes()));
-        resourceMap.add(new RGridResource("2", "", "2".getBytes()));
-        resourceMap.add(new RGridResource("3", "", "3".getBytes()));
-        resourceMap.add(new RGridResource("4", "", "4".getBytes()));
-        resourceCollectionTask.uploadResources(resourceMap);
-    }
-
-    @Test
-    public void testResourcesCaching() {
-        VisualGridTask visualGridTask = mock(VisualGridTask.class);
-        IEyesConnector eyesConnector = mock(IEyesConnector.class);
-        when(visualGridTask.getEyesConnector()).thenReturn(eyesConnector);
-        RenderBrowserInfo browserInfo = new RenderBrowserInfo(new RectangleSize(800, 800), BrowserType.CHROME);
-        when(visualGridTask.getBrowserInfo()).thenReturn(browserInfo);
-        UserAgent userAgent = mock(UserAgent.class);
-        when(userAgent.getOriginalUserAgentString()).thenReturn("");
-        CheckSettings checkSettings = mock(CheckSettings.class);
-        when(checkSettings.getSizeMode()).thenReturn("viewport");
-        when(checkSettings.isStitchContent()).thenReturn(true);
-
-        List<String> urls = Arrays.asList("http://1.com", "http://2.com", "http://3.com");
-        FrameData frameData = new FrameData();
-        frameData.setUrl("http://random.com");
-        frameData.setResourceUrls(urls);
-        frameData.setBlobs(new ArrayList<BlobData>());
-        frameData.setFrames(new ArrayList<FrameData>());
-        frameData.setCdt(new ArrayList<CdtData>());
-        frameData.setSrcAttr("");
-
-        final AtomicReference<List<RenderingTask>> reference = new AtomicReference<>();
-        ResourceCollectionTask resourceCollectionTask = new ResourceCollectionTask(eyesConnector,
-                Collections.singletonList(visualGridTask), frameData, userAgent, checkSettings, new TaskListener<List<RenderingTask>>() {
-            @Override
-            public void onComplete(List<RenderingTask> renderingTasks) {
-                reference.set(renderingTasks);
-            }
-
-            @Override
-            public void onFail() {
-
-            }
-        });
-
-        doAnswer(new Answer() {
-            @Override
-            public Object answer(InvocationOnMock invocation) {
-                TaskListener<Boolean[]> listener = invocation.getArgument(0);
-                listener.onComplete(new Boolean[0]);
-                return null;
-            }
-        }).when(eyesConnector).checkResourceStatus(ArgumentMatchers.<TaskListener<Boolean[]>>any(), ArgumentMatchers.<String>isNull(), ArgumentMatchers.<HashObject[]>any());
-
-        for (String url : urls) {
-            RGridResource resource = new RGridResource(url, "contentType", url.getBytes());
-            resourceCollectionTask.resourcesCacheMap.put(url, resource);
-        }
-
-        resourceCollectionTask.call();
-
-        Map<String, RGridResource> resourceMap = reference.get().get(0).renderRequests.get(0).getResources();
-        Assert.assertEquals(resourceMap.keySet(), new HashSet<>(urls));
-    }
-
-    @Test
-    public void testCheckResources() throws JsonProcessingException {
-        IEyesConnector eyesConnector = mock(IEyesConnector.class);
-        ResourceCollectionTask resourceCollectionTask = new ResourceCollectionTask(eyesConnector, null, null, null, null, null);
-        resourceCollectionTask.uploadedResourcesCache.put("2", null);
-        resourceCollectionTask.uploadedResourcesCache.put("4", null);
-
-        final AtomicReference<List<String>> checkedHashes = new AtomicReference<>();
-        doAnswer(new Answer<Void>() {
-            @Override
-            public Void answer(InvocationOnMock invocation) {
-                TaskListener<Boolean[]> listener = invocation.getArgument(0);
-                List<String> hashes = new ArrayList<>();
-                for (int i = 2 ; i < invocation.getArguments().length; i++) {
-                    HashObject hashObject = invocation.getArgument(i);
-                    hashes.add(hashObject.getHash());
-                }
-
-                checkedHashes.set(hashes);
-
-                listener.onComplete(new Boolean[]{true, false, null, false});
-                return null;
-            }
-        }).when(eyesConnector).checkResourceStatus(ArgumentMatchers.<TaskListener<Boolean[]>>any(), ArgumentMatchers.<String>isNull(), ArgumentMatchers.<HashObject[]>any());
-
-        Map<String, RGridResource> resourceMap = new HashMap<>();
-        for (int i = 0; i < 5; i++) {
-            RGridResource resource = mock(RGridResource.class);
-            when(resource.getHashFormat()).thenCallRealMethod();
-            when(resource.getSha256()).thenReturn(String.valueOf(i));
-            when(resource.getUrl()).thenReturn(String.format("http://url%d.com", i));
-            resourceMap.put(resource.getUrl(), resource);
-        }
-
-        RGridDom dom = mock(RGridDom.class);
-        RGridResource domResource = mock(RGridResource.class);
-        when(dom.asResource()).thenReturn(domResource);
-        when(domResource.getSha256()).thenReturn("5");
-
-        // Dom has the same url as one of the resources
-        when(domResource.getUrl()).thenReturn("http://url1.com");
-
-        List<RGridResource> missingResources = resourceCollectionTask.checkResourcesStatus(dom, resourceMap);
-        Assert.assertEquals(checkedHashes.get().toArray(), new String[] {"0", "1", "3", "5"});
-        Assert.assertEquals(missingResources.size(), 3);
-        Assert.assertEquals(missingResources.get(0).getSha256(), "1");
-        Assert.assertEquals(missingResources.get(1).getSha256(), "3");
-        Assert.assertEquals(missingResources.get(2).getSha256(), "5");
     }
 
     /**

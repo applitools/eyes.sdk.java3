@@ -4,6 +4,7 @@
 package com.applitools.eyes;
 
 import com.applitools.utils.ArgumentGuard;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 /**
  * Encapsulates the model to be sent to the agent on a "matchWindow" command.
@@ -14,6 +15,7 @@ public class MatchWindowData {
      * Encapsulates the "Options" section of the MatchExpectedOutput body model.
      */
     public static class Options {
+
         private final Trigger[] userInputs;
         private final String name;
         private final boolean replaceLast;
@@ -23,8 +25,7 @@ public class MatchWindowData {
         private final boolean forceMatch;
         private final ImageMatchSettings imageMatchSettings;
         private final String source;
-        private String renderId;
-
+        private final String renderId;
 
         /**
          * @param name               The tag of the window to be matched.
@@ -44,7 +45,6 @@ public class MatchWindowData {
 *                           process and mark the current window
 *                           as a match.
          * @param imageMatchSettings Settings specifying how the server should compare the image.
-         * @param renderId
          */
         public Options(String name, Trigger[] userInputs, boolean replaceLast,
                        boolean ignoreMismatch, boolean ignoreMatch,
@@ -104,17 +104,20 @@ public class MatchWindowData {
         public String getRenderId() {
             return renderId;
         }
+
     }
 
-
     // TODO Remove redundancy: userInputs and ignoreMismatch should only be inside Options. (requires server version update).
+
     private final Trigger[] userInputs;
-    private AppOutput appOutput;
-    private String tag;
-    private boolean ignoreMismatch;
-    private Options options;
+    private final AppOutput appOutput;
+    private final String tag;
+    private final boolean ignoreMismatch;
+    private final Options options;
     private final Object agentSetup;
     private String renderId;
+    @JsonIgnore
+    private final RunningSession runningSession;
 
     /**
      * @param userInputs     A list of triggers between the previous matchWindow
@@ -125,9 +128,8 @@ public class MatchWindowData {
      * @param ignoreMismatch A flag indicating whether the server should ignore the image in case of a mismatch.
      * @param options        A set of match options for the server.
      * @param agentSetup     An object representing the configuration used to create the image.
-     * @param renderId
      */
-    public MatchWindowData(Trigger[] userInputs, AppOutput appOutput,
+    public MatchWindowData(RunningSession runningSession, Trigger[] userInputs, AppOutput appOutput,
                            String tag, boolean ignoreMismatch,
                            Options options, Object agentSetup, String renderId) {
 
@@ -140,6 +142,7 @@ public class MatchWindowData {
         this.options = options;
         this.agentSetup = agentSetup;
         this.renderId = renderId;
+        this.runningSession = runningSession;
     }
 
     public String getRenderId() {
@@ -172,5 +175,9 @@ public class MatchWindowData {
 
     public Object getAgentSetup() {
         return agentSetup;
+    }
+
+    public RunningSession getRunningSession() {
+        return runningSession;
     }
 }

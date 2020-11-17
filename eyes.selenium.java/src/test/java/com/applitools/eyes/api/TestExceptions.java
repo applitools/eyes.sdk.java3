@@ -1,6 +1,7 @@
 package com.applitools.eyes.api;
 
 import com.applitools.eyes.EyesRunner;
+import com.applitools.eyes.StdoutLogHandler;
 import com.applitools.eyes.config.Configuration;
 import com.applitools.eyes.selenium.ClassicRunner;
 import com.applitools.eyes.selenium.Eyes;
@@ -24,6 +25,7 @@ public class TestExceptions extends ReportingTestSuite {
         final WebDriver driver = SeleniumUtils.createChromeDriver();
         final EyesRunner runner = useVisualGrid ? new VisualGridRunner(10) : new ClassicRunner();
         final Eyes eyes = new Eyes(runner);
+        eyes.setLogHandler(new StdoutLogHandler());
         try {
             IllegalArgumentException ex1 = Assert.expectThrows(IllegalArgumentException.class, new Assert.ThrowingRunnable() {
                 @Override

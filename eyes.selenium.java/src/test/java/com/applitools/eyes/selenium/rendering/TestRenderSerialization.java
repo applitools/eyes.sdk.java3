@@ -9,7 +9,6 @@ import com.applitools.eyes.selenium.fluent.Target;
 import com.applitools.eyes.utils.SeleniumUtils;
 import com.applitools.eyes.visualgrid.model.*;
 import com.applitools.eyes.visualgrid.services.VisualGridRunner;
-import com.applitools.eyes.visualgrid.services.VisualGridTask;
 import com.applitools.utils.GeneralUtils;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -46,10 +45,8 @@ public class TestRenderSerialization {
         Map<String, RGridResource> resources = new HashMap<>();
         String platform = "android";
         BrowserType browserName = BrowserType.IE_10;
-        VisualGridTask task = spy(new VisualGridTask(VisualGridTask.TaskType.OPEN, null, null));
-        doReturn("rendererId").when(task).getRenderer();
         RenderRequest request = new RenderRequest(webHook.toString(), url.toString(), dom, resources, renderInfo, platform,
-                browserName, null, selectorsToFindRegionsFor, true, task, stitchingServiceUrl.toString(), options);
+                browserName, null, selectorsToFindRegionsFor, true, "rendererId", "", stitchingServiceUrl.toString(), options);
 
         ObjectMapper mapper = new ObjectMapper();
         ObjectNode actual = (ObjectNode) mapper.readTree(mapper.writeValueAsString(request));
@@ -64,9 +61,9 @@ public class TestRenderSerialization {
         final List<RenderStatusResults> renderStatusResults = new ArrayList<>();
         ServerConnector serverConnector = new ServerConnector() {
             @Override
-            public void matchWindow(TaskListener<MatchResult> listener, final RunningSession runningSession, MatchWindowData matchData) throws EyesException {
+            public void matchWindow(TaskListener<MatchResult> listener, MatchWindowData matchData) throws EyesException {
                 matchWindowDataList.add(matchData);
-                super.matchWindow(listener, runningSession, matchData);
+                super.matchWindow(listener, matchData);
             }
 
             @Override
