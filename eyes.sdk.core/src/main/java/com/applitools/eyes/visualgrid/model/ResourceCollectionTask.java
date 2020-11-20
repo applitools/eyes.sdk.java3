@@ -92,7 +92,10 @@ public class ResourceCollectionTask implements Callable<TestResultContainer> {
                 }
             }
 
-            logger.verbose("exit - returning renderRequest array of length: " + renderRequests.size());
+            logger.verbose("Uploading missing resources");
+            List<RGridResource> missingResources = checkResourcesStatus(renderRequests.get(0).getDom(), resourceMap);
+            uploadResources(missingResources);
+
             List<RenderingTask> renderingTasks = new ArrayList<>();
             for (int i = 0; i < renderRequests.size(); i++) {
                 VisualGridTask checkTask = checkTasks.get(i);
@@ -100,10 +103,6 @@ public class ResourceCollectionTask implements Callable<TestResultContainer> {
                 renderingTasks.add(new RenderingTask(logger, eyesConnector, renderRequests.get(i), checkTask, renderTaskListener));
             }
 
-            logger.verbose("Uploading missing resources");
-            Map<String, RGridResource> missingResources;
-            missingResources = checkResourcesStatus(renderRequests.get(0).getDom(), resourceMap);
-            uploadResources(missingResources);
             listener.onComplete(renderingTasks);
         } catch (Throwable t) {
             GeneralUtils.logExceptionStackTrace(logger, t);
@@ -163,7 +162,7 @@ public class ResourceCollectionTask implements Callable<TestResultContainer> {
      * Checks with the server what resources are missing.
      * @return All the missing resources to upload.
      */
-    Map<String, RGridResource> checkResourcesStatus(RGridDom dom, Map<String, RGridResource> resourceMap) throws JsonProcessingException {
+    List<RGridResource> checkResourcesStatus(RGridDom dom, Map<String, RGridResource> resourceMap) throws JsonProcessingException {
         List<HashObject> hashesToCheck = new ArrayList<>();
         Map<String, String> hashToResourceUrl = new HashMap<>();
         for (RGridResource  resource : resourceMap.values()) {
@@ -187,7 +186,7 @@ public class ResourceCollectionTask implements Callable<TestResultContainer> {
         }
 
         if (hashesToCheck.isEmpty()) {
-            return new HashMap<>();
+            return new ArrayList<>();
         }
 
         SyncTaskListener<Boolean[]> listener = new SyncTaskListener<>(logger, "checkResourceStatus");
@@ -199,13 +198,14 @@ public class ResourceCollectionTask implements Callable<TestResultContainer> {
         }
 
         // Analyzing the server response and find the missing resources
-        Map<String, RGridResource> missingResources = new HashMap<>();
+        List<RGridResource> missingResources = new ArrayList<>();
         for (int i = 0; i < result.length; i++) {
-            String resourceUrl = hashToResourceUrl.get(hashesArray[i].getHash());
+            String hash = hashesArray[i].getHash();
+            String resourceUrl = hashToResourceUrl.get(hash);
             if (result[i] != null && result[i]) {
                 synchronized (uploadedResourcesCache) {
                     RGridResource resource;
-                    if (resourceUrl.equals(domResource.getUrl())) {
+                    if (resourceUrl.equals(domResource.getUrl()) && hash.equals(domResource.getSha256())) {
                         resource = domResource;
                     } else {
                         resource = resourceMap.get(resourceUrl);
@@ -217,19 +217,19 @@ public class ResourceCollectionTask implements Callable<TestResultContainer> {
                 continue;
             }
 
-            if (resourceUrl.equals(domResource.getUrl())) {
-                missingResources.put(resourceUrl, domResource);
+            if (resourceUrl.equals(domResource.getUrl()) && hash.equals(domResource.getSha256())) {
+                missingResources.add(domResource);
                 continue;
             }
 
-            missingResources.put(resourceUrl, resourceMap.get(resourceUrl));
+            missingResources.add(resourceMap.get(resourceUrl));
         }
 
         return missingResources;
     }
 
-    void uploadResources(Map<String, RGridResource> resources) {
-        for (RGridResource resource : resources.values()) {
+    void uploadResources(List<RGridResource> resources) {
+        for (RGridResource resource : resources) {
             synchronized (uploadedResourcesCache) {
                 if (uploadedResourcesCache.containsKey(resource.getSha256())) {
                     continue;
@@ -242,7 +242,7 @@ public class ResourceCollectionTask implements Callable<TestResultContainer> {
         }
 
         // Wait for all resources to be uploaded
-        for (RGridResource resource : resources.values()) {
+        for (RGridResource resource : resources) {
             // A blocking call
             SyncTaskListener<Void> listener = uploadedResourcesCache.get(resource.getSha256());
             if (listener != null) {

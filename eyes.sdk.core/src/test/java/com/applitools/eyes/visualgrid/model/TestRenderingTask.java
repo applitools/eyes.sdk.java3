@@ -202,11 +202,11 @@ public class TestRenderingTask extends ReportingTestSuite {
                     }
                 });
 
-        Map<String, RGridResource> resourceMap = new HashMap<>();
-        resourceMap.put("1", new RGridResource("1", "", "1".getBytes()));
-        resourceMap.put("2", new RGridResource("2", "", "2".getBytes()));
-        resourceMap.put("3", new RGridResource("3", "", "3".getBytes()));
-        resourceMap.put("4", new RGridResource("4", "", "4".getBytes()));
+        List<RGridResource> resourceMap = new ArrayList<>();
+        resourceMap.add(new RGridResource("1", "", "1".getBytes()));
+        resourceMap.add(new RGridResource("2", "", "2".getBytes()));
+        resourceMap.add(new RGridResource("3", "", "3".getBytes()));
+        resourceMap.add(new RGridResource("4", "", "4".getBytes()));
         resourceCollectionTask.uploadResources(resourceMap);
     }
 
@@ -271,7 +271,7 @@ public class TestRenderingTask extends ReportingTestSuite {
         IEyesConnector eyesConnector = mock(IEyesConnector.class);
         ResourceCollectionTask resourceCollectionTask = new ResourceCollectionTask(eyesConnector, null, null, null, null, null);
         resourceCollectionTask.uploadedResourcesCache.put("2", null);
-        resourceCollectionTask.uploadedResourcesCache.put("5", null);
+        resourceCollectionTask.uploadedResourcesCache.put("4", null);
 
         final AtomicReference<List<String>> checkedHashes = new AtomicReference<>();
         doAnswer(new Answer<Void>() {
@@ -286,7 +286,7 @@ public class TestRenderingTask extends ReportingTestSuite {
 
                 checkedHashes.set(hashes);
 
-                listener.onComplete(new Boolean[]{true, false, null, true});
+                listener.onComplete(new Boolean[]{true, false, null, false});
                 return null;
             }
         }).when(eyesConnector).checkResourceStatus(ArgumentMatchers.<TaskListener<Boolean[]>>any(), ArgumentMatchers.<String>isNull(), ArgumentMatchers.<HashObject[]>any());
@@ -304,12 +304,14 @@ public class TestRenderingTask extends ReportingTestSuite {
         RGridResource domResource = mock(RGridResource.class);
         when(dom.asResource()).thenReturn(domResource);
         when(domResource.getSha256()).thenReturn("5");
+        when(domResource.getUrl()).thenReturn("1");
 
-        Map<String, RGridResource> missingResources = resourceCollectionTask.checkResourcesStatus(dom, resourceMap);
-        Assert.assertEquals(checkedHashes.get().toArray(), new String[] {"0", "1", "3", "4"});
-        Assert.assertEquals(missingResources.size(), 2);
-        Assert.assertTrue(missingResources.containsKey("1"));
-        Assert.assertTrue(missingResources.containsKey("3"));
+        List<RGridResource> missingResources = resourceCollectionTask.checkResourcesStatus(dom, resourceMap);
+        Assert.assertEquals(checkedHashes.get().toArray(), new String[] {"0", "1", "3", "5"});
+        Assert.assertEquals(missingResources.size(), 3);
+        Assert.assertEquals(missingResources.get(0).getSha256(), "1");
+        Assert.assertEquals(missingResources.get(1).getSha256(), "3");
+        Assert.assertEquals(missingResources.get(2).getSha256(), "5");
     }
 
     /**

@@ -1,3 +1,7 @@
+## [vNext]
+### Fixed
+- Fixed a bug in the resource collection task. [Trello 2336](https://trello.com/c/zzgVhf4a)
+
 ## [3.185.0] - 2020-11-18
 ## Fixed
 - URLs sanitizing for skip list. [Trello 1974](https://trello.com/c/44xq8dze)
