@@ -296,7 +296,7 @@ public class TestRenderingTask extends ReportingTestSuite {
             RGridResource resource = mock(RGridResource.class);
             when(resource.getHashFormat()).thenCallRealMethod();
             when(resource.getSha256()).thenReturn(String.valueOf(i));
-            when(resource.getUrl()).thenReturn(String.valueOf(i));
+            when(resource.getUrl()).thenReturn(String.format("http://url%d.com", i));
             resourceMap.put(resource.getUrl(), resource);
         }
 
@@ -304,7 +304,9 @@ public class TestRenderingTask extends ReportingTestSuite {
         RGridResource domResource = mock(RGridResource.class);
         when(dom.asResource()).thenReturn(domResource);
         when(domResource.getSha256()).thenReturn("5");
-        when(domResource.getUrl()).thenReturn("1");
+
+        // Dom has the same url as one of the resources
+        when(domResource.getUrl()).thenReturn("http://url1.com");
 
         List<RGridResource> missingResources = resourceCollectionTask.checkResourcesStatus(dom, resourceMap);
         Assert.assertEquals(checkedHashes.get().toArray(), new String[] {"0", "1", "3", "5"});
