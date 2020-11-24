@@ -1,7 +1,6 @@
 #!/bin/sh
 
 send_test_results() {
-  echo "Json to send:"
   jq -s '.[0].results = [.[].results[]] | .[0]' "$1"*.json |
     curl -sS \
       -X POST \
