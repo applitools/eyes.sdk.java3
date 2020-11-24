@@ -2,8 +2,8 @@
 
 send_test_results() {
   echo "Json to send:"
-  jq -s '.[0].results = [.[].results | add] | .[0]' "$1"*.json
-  jq -s '.[0].results = [.[].results | add] | .[0]' "$1"*.json |
+  jq -s '.[0].results = [.[].results[]] | .[0]' "$1"*.json
+  jq -s '.[0].results = [.[].results[]] | .[0]' "$1"*.json |
     curl -sS \
       -X POST \
       -H 'Content-Type: application/json' \
