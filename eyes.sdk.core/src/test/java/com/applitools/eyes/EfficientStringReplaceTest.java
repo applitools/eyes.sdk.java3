@@ -1,6 +1,5 @@
 package com.applitools.eyes;
 
-import com.applitools.eyes.utils.ReportingTestSuite;
 import com.applitools.utils.EfficientStringReplace;
 import org.testng.Assert;
 import org.testng.annotations.DataProvider;
@@ -9,11 +8,7 @@ import org.testng.annotations.Test;
 import java.util.HashMap;
 import java.util.Map;
 
-public class EfficientStringReplaceTest extends ReportingTestSuite {
-
-    public EfficientStringReplaceTest() {
-        super.setGroupName("core");
-    }
+public class EfficientStringReplaceTest {
 
     @DataProvider(name = "dp")
     public static Object[][] dp() {
@@ -34,14 +29,7 @@ public class EfficientStringReplaceTest extends ReportingTestSuite {
 
     @Test(dataProvider = "dp")
     public void efficientStringReplace(String refIdOpenToken, String refIdCloseToken, String input, Map<String, String> replacements, String expectedResult) {
-        super.addSuiteArg("refIdOpenToken", refIdOpenToken);
-        super.addSuiteArg("refIdCloseToken", refIdCloseToken);
-        super.addSuiteArg("input", input);
-        super.addSuiteArg("replacements", replacements);
-        super.addSuiteArg("expectedResult", expectedResult);
         String result = EfficientStringReplace.efficientStringReplace( refIdOpenToken, refIdCloseToken, input, replacements);
         Assert.assertEquals(result, expectedResult);
     }
-
-
 }
