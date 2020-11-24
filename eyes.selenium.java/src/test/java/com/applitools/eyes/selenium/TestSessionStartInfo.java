@@ -82,6 +82,9 @@ public class TestSessionStartInfo extends ReportingTestSuite {
 
     @Test(dataProvider = "three_booleans")
     public void TestFluentApiSerialization(boolean useDom, boolean enablePatterns, boolean ignoreDisplacements) {
+        super.addSuiteArg("useDom", useDom);
+        super.addSuiteArg("enablePatterns", enablePatterns);
+        super.addSuiteArg("ignoreDisplacements", ignoreDisplacements);
         ICheckSettings settings = Target.window().fully().useDom(useDom).enablePatterns(enablePatterns).ignoreDisplacements(ignoreDisplacements);
         EyesBase eyes = new TestEyes();
         EyesScreenshot screenshot = new TestEyesScreenshot();
@@ -101,6 +104,9 @@ public class TestSessionStartInfo extends ReportingTestSuite {
 
     @Test(dataProvider = "three_booleans")
     public void TestImageMatchSettingsSerialization(boolean useDom, boolean enablePatterns, boolean ignoreDisplacements) {
+        super.addSuiteArg("useDom", useDom);
+        super.addSuiteArg("enablePatterns", enablePatterns);
+        super.addSuiteArg("ignoreDisplacements", ignoreDisplacements);
         ICheckSettings settings = Target.window().fully().useDom(useDom).enablePatterns(enablePatterns).ignoreDisplacements(ignoreDisplacements);
         TestEyes eyes = new TestEyes();
         ExactMatchSettings exactMatchSettings = new ExactMatchSettings();
@@ -122,6 +128,9 @@ public class TestSessionStartInfo extends ReportingTestSuite {
 
     @Test(dataProvider = "three_booleans")
     public void TestImageMatchSettingsSerialization_Global(boolean useDom, boolean enablePatterns, boolean ignoreDisplacements) {
+        super.addSuiteArg("useDom", useDom);
+        super.addSuiteArg("enablePatterns", enablePatterns);
+        super.addSuiteArg("ignoreDisplacements", ignoreDisplacements);
         ICheckSettings settings = Target.window().fully().useDom(useDom).enablePatterns(enablePatterns);
         TestEyes eyes = new TestEyes();
         Configuration configuration = eyes.getConfiguration();
@@ -146,6 +155,9 @@ public class TestSessionStartInfo extends ReportingTestSuite {
 
     @Test(dataProvider = "three_booleans")
     public void TestConfigurationSerialization(boolean useDom, boolean enablePatterns, boolean ignoreDisplacements) {
+        super.addSuiteArg("useDom", useDom);
+        super.addSuiteArg("enablePatterns", enablePatterns);
+        super.addSuiteArg("ignoreDisplacements", ignoreDisplacements);
         ICheckSettings settings = Target.window().fully();
         TestEyes eyes = new TestEyes();
         Configuration configuration = eyes.getConfiguration();

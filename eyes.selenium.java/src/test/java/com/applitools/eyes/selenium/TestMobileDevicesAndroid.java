@@ -21,8 +21,12 @@ public class TestMobileDevicesAndroid extends TestMobileDevices {
     }
 
     @Factory(dataProvider = "androidDevices")
-    public TestMobileDevicesAndroid(String deviceName, String platformVersion, ScreenOrientation deviceOrientation, String page) {
-        super(deviceName, platformVersion, deviceOrientation, page);
+    public TestMobileDevicesAndroid(String deviceName, String platformVersion, ScreenOrientation screenOrientation, String page) {
+        super(deviceName, platformVersion, screenOrientation, page);
+        super.addSuiteArg("deviceName", deviceName);
+        super.addSuiteArg("platformVersion", platformVersion);
+        super.addSuiteArg("screenOrientation", screenOrientation);
+        super.addSuiteArg("page", page);
     }
 
     @Test

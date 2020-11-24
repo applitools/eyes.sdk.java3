@@ -22,11 +22,12 @@ public class TestAbort extends ReportingTestSuite {
     private WebDriver driver;
     private Eyes eyes;
     private EyesRunner runner;
-    private boolean useVisualGrid;
+    private final boolean useVisualGrid;
 
     @Factory(dataProvider = "booleanDP", dataProviderClass = TestDataProvider.class)
     public TestAbort(boolean useVisualGrid) {
         super.setGroupName("selenium");
+        super.addSuiteArg("isVisualGrid", useVisualGrid);
         this.useVisualGrid = useVisualGrid;
     }
 

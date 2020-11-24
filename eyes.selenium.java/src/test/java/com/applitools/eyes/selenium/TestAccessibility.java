@@ -32,6 +32,7 @@ public class TestAccessibility extends ReportingTestSuite {
 
     @Test(dataProvider = "booleanDP")
     public void testAccessibility(boolean useVisualGrid) throws IOException {
+        super.addSuiteArg("isVisualGrid", useVisualGrid);
         EyesRunner runner = useVisualGrid ? new VisualGridRunner(10) : new ClassicRunner();
         runner.setLogHandler(new StdoutLogHandler());
         String suffix = useVisualGrid ? "_VG" : "";

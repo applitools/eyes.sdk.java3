@@ -1,6 +1,7 @@
 package com.applitools.eyes.visualgrid.model;
 
 import com.applitools.eyes.Logger;
+import com.applitools.eyes.utils.ReportingTestSuite;
 import com.applitools.utils.GeneralUtils;
 import com.steadystate.css.parser.SACParserCSS3Constants;
 import com.steadystate.css.parser.Token;
@@ -13,7 +14,12 @@ import java.net.URI;
 import java.util.HashSet;
 import java.util.Set;
 
-public class TestResourceParsing {
+public class TestResourceParsing extends ReportingTestSuite {
+
+    public TestResourceParsing() {
+        super.setGroupName("core");
+    }
+
     @Test
     public void testCssTokenizer() throws IOException {
         String cssContent = GeneralUtils.readToEnd(getClass().getResourceAsStream("/clientlibs_all.default.css"));

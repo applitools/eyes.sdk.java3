@@ -28,6 +28,7 @@ public class TestApiMethods extends ReportingTestSuite {
 
     @Test(dataProvider = "booleanDP", dataProviderClass = TestDataProvider.class)
     public void TestCloseAsync(boolean useVisualGrid) {
+        super.addSuiteArg("isVisualGrid", useVisualGrid);
         WebDriver driver = SeleniumUtils.createChromeDriver();
         EyesRunner runner = useVisualGrid ? new VisualGridRunner(10) : new ClassicRunner();
         runner.setLogHandler(new StdoutLogHandler());

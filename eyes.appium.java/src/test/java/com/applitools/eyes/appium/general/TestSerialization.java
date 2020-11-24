@@ -7,6 +7,7 @@ import com.applitools.eyes.appium.Target;
 import com.applitools.eyes.appium.TestEyes;
 import com.applitools.eyes.config.Configuration;
 import com.applitools.eyes.fluent.ICheckSettingsInternal;
+import com.applitools.eyes.utils.ReportingTestSuite;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.testng.Assert;
@@ -14,7 +15,7 @@ import org.testng.annotations.BeforeClass;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
-public class TestSerialization {
+public class TestSerialization extends ReportingTestSuite {
 
     /**
      * Used for serialization testing
@@ -48,8 +49,16 @@ public class TestSerialization {
         };
     }
 
+    public TestSerialization() {
+        super.setGroupName("appium");
+    }
+
     @Test(dataProvider = "four_booleans")
     public void test_ImageMatchSettings_Serialization(boolean ignoreCaret, boolean useDom, boolean enablePatterns, boolean ignoreDisplacements) throws JsonProcessingException {
+        super.addSuiteArg("ignoreCaret", ignoreCaret);
+        super.addSuiteArg("useDom", useDom);
+        super.addSuiteArg("enablePatterns", enablePatterns);
+        super.addSuiteArg("ignoreDisplacements", ignoreDisplacements);
         ImageMatchSettings ims = new ImageMatchSettings();
         ims.setIgnoreCaret(ignoreCaret);
         ims.setUseDom(useDom);
@@ -68,6 +77,10 @@ public class TestSerialization {
 
     @Test(dataProvider = "four_booleans")
     public void test_ImageMatchSettings_Serialization_Global(boolean ignoreCaret, boolean useDom, boolean enablePatterns, boolean ignoreDisplacements) throws JsonProcessingException {
+        super.addSuiteArg("ignoreCaret", ignoreCaret);
+        super.addSuiteArg("useDom", useDom);
+        super.addSuiteArg("enablePatterns", enablePatterns);
+        super.addSuiteArg("ignoreDisplacements", ignoreDisplacements);
         ICheckSettings settings = Target.window().fully().useDom(useDom).enablePatterns(enablePatterns).ignoreCaret(ignoreCaret);
         TestEyes eyes = new TestEyes();
         Configuration configuration = eyes.getConfiguration();

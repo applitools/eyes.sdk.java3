@@ -28,6 +28,7 @@ public class TestDoubleOpenClose extends ReportingTestSuite {
 
     @Test(dataProvider = "booleanDP")
     public void TestDoubleOpenCheckClose(boolean useVisualGrid) {
+        super.addSuiteArg("isVisualGrid", useVisualGrid);
         EyesRunner runner = useVisualGrid ? new VisualGridRunner(10, "TestDoubleOpenCheckClose") : new ClassicRunner();
         final WebDriver driver = SeleniumUtils.createChromeDriver();
         try {
@@ -52,6 +53,7 @@ public class TestDoubleOpenClose extends ReportingTestSuite {
 
     @Test(dataProvider = "booleanDP")
     public void TestDoubleOpenCheckCloseAsync(boolean useVisualGrid) {
+        super.addSuiteArg("isVisualGrid", useVisualGrid);
         EyesRunner runner = useVisualGrid ? new VisualGridRunner(10, "TestDoubleOpenCheckCloseAsync") : new ClassicRunner();
         final WebDriver driver = SeleniumUtils.createChromeDriver();
         try {
@@ -76,6 +78,7 @@ public class TestDoubleOpenClose extends ReportingTestSuite {
 
     @Test(dataProvider = "booleanDP")
     public void TestDoubleOpenCheckCloseWithDifferentInstances(boolean useVisualGrid) {
+        super.addSuiteArg("isVisualGrid", useVisualGrid);
         final WebDriver driver = SeleniumUtils.createChromeDriver();
         EyesRunner runner = useVisualGrid ? new VisualGridRunner(10) : new ClassicRunner();
         try {
@@ -103,6 +106,7 @@ public class TestDoubleOpenClose extends ReportingTestSuite {
 
     @Test(dataProvider = "booleanDP")
     public void TestDoubleOpenCheckCloseAsyncWithDifferentInstances(boolean useVisualGrid) {
+        super.addSuiteArg("isVisualGrid", useVisualGrid);
         EyesRunner runner = useVisualGrid ? new VisualGridRunner(10, "TestDoubleOpenCheckCloseAsyncWithDifferentInstances") : new ClassicRunner();
         final WebDriver driver = SeleniumUtils.createChromeDriver();
         try {
@@ -128,8 +132,9 @@ public class TestDoubleOpenClose extends ReportingTestSuite {
         }
     }
 
-    //@Test(dataProvider = "booleanDP")
+    @Test(dataProvider = "booleanDP")
     public void TestDoubleCheckDontGetAllResults(boolean useVisualGrid) {
+        super.addSuiteArg("isVisualGrid", useVisualGrid);
         EyesRunner runner = useVisualGrid ? new VisualGridRunner(10, "TestDoubleCheckDontGetAllResults") : new ClassicRunner();
         final WebDriver driver = SeleniumUtils.createChromeDriver();
         driver.get("https://applitools.com/helloworld");

@@ -28,6 +28,7 @@ public class TestBadSelectors extends ReportingTestSuite {
 
     @Test(dataProvider = "booleanDP")
     public void TestCheckRegionWithBadSelector(boolean useVisualGrid) {
+        super.addSuiteArg("isVisualGrid", useVisualGrid);
         runner = useVisualGrid ? new VisualGridRunner(10) : new ClassicRunner();
         final WebDriver driver = SeleniumUtils.createChromeDriver();
         final Eyes eyes = new Eyes(runner);

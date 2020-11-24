@@ -5,6 +5,7 @@ import com.applitools.connectivity.api.AsyncRequestCallback;
 import com.applitools.connectivity.api.Request;
 import com.applitools.connectivity.api.Response;
 import com.applitools.eyes.Logger;
+import com.applitools.eyes.utils.ReportingTestSuite;
 import com.applitools.utils.EyesSyncObject;
 import org.testng.Assert;
 import org.testng.annotations.Test;
@@ -16,7 +17,12 @@ import java.util.concurrent.atomic.AtomicReference;
 
 import static org.mockito.Mockito.*;
 
-public class TestApi {
+public class TestApi extends ReportingTestSuite {
+
+    public TestApi() {
+        super.setGroupName("core");
+    }
+
     @Test
     public void testRequestFail() {
         final Response mockedResponse = mock(Response.class);

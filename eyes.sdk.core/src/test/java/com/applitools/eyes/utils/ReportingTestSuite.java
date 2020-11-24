@@ -66,7 +66,12 @@ public abstract class ReportingTestSuite {
 
     @AfterClass
     public void oneTimeTearDown(ITestContext testContext) {
-        System.out.println(String.format("Reporting test %s: %s", this.getClass().getName(), reportSummary));
+        if (reportSummary.getTestResults().isEmpty()) {
+            System.out.printf("No results for test %s%n", this.getClass().getName());
+            return;
+        }
+
+        System.out.printf("Reporting test %s: %s%n", this.getClass().getName(), reportSummary);
         createTestResultFile();
     }
 

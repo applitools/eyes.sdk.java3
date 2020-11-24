@@ -7,13 +7,14 @@ import com.applitools.eyes.MatchLevel;
 import com.applitools.eyes.TestResults;
 import com.applitools.eyes.selenium.Eyes;
 import com.applitools.eyes.selenium.fluent.Target;
+import com.applitools.eyes.utils.ReportingTestSuite;
 import com.applitools.eyes.utils.SeleniumUtils;
 import com.applitools.eyes.utils.TestUtils;
 import org.openqa.selenium.WebDriver;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
-public abstract class TestIEyesBase {
+public abstract class TestIEyesBase extends ReportingTestSuite {
 
     protected final LogHandler logHandler;
     protected final String SERVER_URL = "https://eyes.applitools.com/";
@@ -45,6 +46,7 @@ public abstract class TestIEyesBase {
     }
 
     protected TestIEyesBase(String fixtureName) {
+        super.setGroupName("selenium");
         LogPath = TestUtils.initLogPath(fixtureName);
         logHandler = TestUtils.initLogger(fixtureName, LogPath);
     }
@@ -52,6 +54,8 @@ public abstract class TestIEyesBase {
 
     @Test(dataProvider = "TTS")
     public void TestEyesDifferentRunners(String testedUrl, MatchLevel matchLevel) {
+        super.addSuiteArg("testUrl", testedUrl);
+        super.addSuiteArg("matchLevel", matchLevel);
         WebDriver webDriver = SeleniumUtils.createChromeDriver();
         Logger logger;
         Eyes eyes = null;

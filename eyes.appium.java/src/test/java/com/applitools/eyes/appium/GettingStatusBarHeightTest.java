@@ -1,7 +1,6 @@
 package com.applitools.eyes.appium;
 
 import com.applitools.eyes.Logger;
-import com.applitools.eyes.appium.EyesAppiumDriver;
 import com.applitools.eyes.utils.ReportingTestSuite;
 import io.appium.java_client.AppiumDriver;
 import org.junit.Before;

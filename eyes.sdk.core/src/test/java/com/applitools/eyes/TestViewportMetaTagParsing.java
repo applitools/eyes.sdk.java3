@@ -24,8 +24,11 @@ public class TestViewportMetaTagParsing extends ReportingTestSuite {
     }
 
     @Test(dataProvider = "dp")
-    public void TestParseViewportMetaTag(String viewportMetaTag, boolean expectedFollowDeviceWidth, float expectedDeviceWidth, float expectedInitialScale)
-    {
+    public void TestParseViewportMetaTag(String viewportMetaTag, boolean expectedFollowDeviceWidth, float expectedDeviceWidth, float expectedInitialScale) {
+        super.addSuiteArg("viewportMetaTag", viewportMetaTag);
+        super.addSuiteArg("expectedFollowDeviceWidth", expectedFollowDeviceWidth);
+        super.addSuiteArg("expectedDeviceWidth", expectedDeviceWidth);
+        super.addSuiteArg("expectedInitialScale", expectedInitialScale);
         ViewportMetaTag data = ViewportMetaTag.parseViewportMetaTag(viewportMetaTag);
         Assert.assertEquals( data.getFollowDeviceWidth(), expectedFollowDeviceWidth, "FollowDeviceWidth");
         Assert.assertEquals( data.getDeviceWidth(), expectedDeviceWidth, "DeviceWidth");

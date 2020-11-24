@@ -63,6 +63,11 @@ public class TestIOSCrop extends ReportingTestSuite {
 
     @Test(dataProvider = "IOSDevices")
     public void TestIOSSafariCrop(String deviceName, String platformVersion, ScreenOrientation deviceOrientation, int vpWidth, int vpHeight) {
+        super.addSuiteArg("deviceName", deviceName);
+        super.addSuiteArg("platformVersion", platformVersion);
+        super.addSuiteArg("deviceOrientation", deviceOrientation);
+        super.addSuiteArg("vpWidth", vpWidth);
+        super.addSuiteArg("vpHeight", vpHeight);
         String testName = deviceName + " " + platformVersion + " " + deviceOrientation;
         String sanitizedTestName = testName.replaceAll("[^\\.A-Za-z0-9]", "_");
 

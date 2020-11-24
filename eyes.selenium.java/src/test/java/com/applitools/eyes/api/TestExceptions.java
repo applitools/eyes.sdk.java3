@@ -20,6 +20,7 @@ public class TestExceptions extends ReportingTestSuite {
 
     @Test(dataProvider = "booleanDP", dataProviderClass = TestDataProvider.class)
     public void TestEyesExceptions(boolean useVisualGrid) {
+        super.addSuiteArg("isVisualGrid", useVisualGrid);
         final WebDriver driver = SeleniumUtils.createChromeDriver();
         final EyesRunner runner = useVisualGrid ? new VisualGridRunner(10) : new ClassicRunner();
         final Eyes eyes = new Eyes(runner);

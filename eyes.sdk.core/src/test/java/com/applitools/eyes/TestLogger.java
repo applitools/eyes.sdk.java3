@@ -3,10 +3,15 @@ package com.applitools.eyes;
 import com.applitools.connectivity.ServerConnector;
 import com.applitools.eyes.logging.ClientEvent;
 import com.applitools.eyes.logging.TraceLevel;
+import com.applitools.eyes.utils.ReportingTestSuite;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
-public class TestLogger {
+public class TestLogger extends ReportingTestSuite {
+
+    public TestLogger() {
+        super.setGroupName("core");
+    }
 
     @Test
     public void testNetworkLogger() {

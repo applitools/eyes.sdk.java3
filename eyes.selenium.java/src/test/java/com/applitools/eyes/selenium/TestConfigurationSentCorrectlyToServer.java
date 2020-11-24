@@ -33,6 +33,9 @@ public class TestConfigurationSentCorrectlyToServer extends EnvironmentModifier 
 
     @Test(dataProvider = "dp")
     public void TestEyesConfiguration(boolean useVisualGrid, String sequenceName, String sequenceNameEnvVar) {
+        super.addSuiteArg("isVisualGrid", useVisualGrid);
+        super.addSuiteArg("sequenceName", sequenceName);
+        super.addSuiteArg("sequenceNameEnvVar", sequenceNameEnvVar);
         EyesRunner runner = useVisualGrid ? new VisualGridRunner(10) : new ClassicRunner();
         Eyes eyes = new Eyes(runner);
 

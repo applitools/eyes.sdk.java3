@@ -7,6 +7,7 @@ import com.applitools.eyes.selenium.ClassicRunner;
 import com.applitools.eyes.selenium.Eyes;
 import com.applitools.eyes.selenium.TestDataProvider;
 import com.applitools.eyes.selenium.fluent.Target;
+import com.applitools.eyes.utils.ReportingTestSuite;
 import com.applitools.eyes.utils.SeleniumUtils;
 import com.applitools.eyes.visualgrid.model.DeviceName;
 import com.applitools.eyes.visualgrid.model.ScreenOrientation;
@@ -18,7 +19,7 @@ import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Factory;
 import org.testng.annotations.Test;
 
-public class TestAbort2 {
+public class TestAbort2 extends ReportingTestSuite {
     private final int concurrentSessions = 5;
     private final int viewPortWidth = 800;
     private final int viewPortHeight = 600;
@@ -34,6 +35,8 @@ public class TestAbort2 {
 
     @Factory(dataProvider = "booleanDP", dataProviderClass = TestDataProvider.class)
     public TestAbort2(boolean useVisualGrid) {
+        super.setGroupName("selenium");
+        super.addSuiteArg("isVisualGrid", useVisualGrid);
         useVisualGrid_ = useVisualGrid;
     }
 

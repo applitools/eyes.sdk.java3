@@ -1,12 +1,17 @@
 package com.applitools.eyes.visualgrid.model;
 
+import com.applitools.eyes.utils.ReportingTestSuite;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
-public class TestDeviceInfo {
+public class TestDeviceInfo extends ReportingTestSuite {
+
+    public TestDeviceInfo() {
+        super.setGroupName("core");
+    }
 
     @Test
     public void testIosDeviceInfo() throws JsonProcessingException {

@@ -27,6 +27,7 @@ public class BasicDemoJunit extends ReportingTestSuite {
     public BasicDemoJunit(boolean useVisualGrid) {
         this.useVisualGrid = useVisualGrid;
         super.setGroupName("selenium");
+        super.addSuiteArg("isVisualGrid", useVisualGrid);
     }
 
     @Parameterized.Parameters

@@ -1,5 +1,6 @@
 package com.applitools.eyes;
 
+import com.applitools.eyes.utils.ReportingTestSuite;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
@@ -8,7 +9,11 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
 
-public class TestSyncTaskListener {
+public class TestSyncTaskListener extends ReportingTestSuite {
+
+    public TestSyncTaskListener() {
+        super.setGroupName("core");
+    }
 
     @Test
     public void testTwoThreadsWaiting() throws InterruptedException {

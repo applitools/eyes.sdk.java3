@@ -28,6 +28,8 @@ public class TestPlatformVersion extends ReportingTestSuite {
 
     @Test(dataProvider = "capabilities")
     public void testPlatformVersion(String capabilityName, String version) {
+        super.addSuiteArg("capabilityName", capabilityName);
+        super.addSuiteArg("version", version);
         DesiredCapabilities capabilities = new DesiredCapabilities();
         capabilities.setCapability(capabilityName, version);
 

@@ -1,6 +1,7 @@
 package com.applitools.eyes.selenium;
 
 import org.openqa.selenium.ScreenOrientation;
+import org.testng.ITestContext;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Factory;
 import org.testng.annotations.Test;
@@ -46,8 +47,12 @@ public class TestMobileDevicesIOS extends TestMobileDevices {
     }
 
     @Factory(dataProvider = "IOSDevices")
-    public TestMobileDevicesIOS(String deviceName, String platformVersion, ScreenOrientation deviceOrientation, String page) {
-        super(deviceName, platformVersion, deviceOrientation, page);
+    public TestMobileDevicesIOS(String deviceName, String platformVersion, ScreenOrientation screenOrientation, String page) {
+        super(deviceName, platformVersion, screenOrientation, page);
+        super.addSuiteArg("deviceName", deviceName);
+        super.addSuiteArg("platformVersion", platformVersion);
+        super.addSuiteArg("screenOrientation", screenOrientation);
+        super.addSuiteArg("page", page);
     }
 
     @Test

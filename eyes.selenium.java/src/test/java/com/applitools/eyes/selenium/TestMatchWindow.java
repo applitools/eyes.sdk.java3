@@ -49,6 +49,8 @@ public class TestMatchWindow extends ReportingTestSuite {
 
     @Test(dataProvider = "testParameters")
     public void testReplaceMatchedStep(String testedUrl, List<Boolean> expectedReplaceLastList) {
+        super.addSuiteArg("testedUrl", testedUrl);
+        super.addSuiteArg("expectedReplaceLastList", expectedReplaceLastList);
         ServerConnector serverConnector = spy(ServerConnector.class);
         final List<Boolean> replaceLastList = new ArrayList<>();
         doAnswer(new Answer<MatchResult>() {

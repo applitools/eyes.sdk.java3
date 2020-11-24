@@ -246,6 +246,10 @@ public class TestSerialization extends ReportingTestSuite {
 
     @Test(dataProvider = "four_booleans")
     public void test_ImageMatchSettings_Serialization(boolean ignoreCaret, boolean useDom, boolean enablePatterns, boolean ignoreDisplacements) throws JsonProcessingException {
+        super.addSuiteArg("ignoreCaret", ignoreCaret);
+        super.addSuiteArg("useDom", useDom);
+        super.addSuiteArg("enablePatterns", enablePatterns);
+        super.addSuiteArg("ignoreDisplacements", ignoreDisplacements);
         ImageMatchSettings ims = new ImageMatchSettings();
         ims.setIgnoreCaret(ignoreCaret);
         ims.setUseDom(useDom);
@@ -264,6 +268,10 @@ public class TestSerialization extends ReportingTestSuite {
 
     @Test(dataProvider = "four_booleans")
     public void test_ImageMatchSettings_Serialization_Global(boolean ignoreCaret, boolean useDom, boolean enablePatterns, boolean ignoreDisplacements) throws JsonProcessingException {
+        super.addSuiteArg("ignoreCaret", ignoreCaret);
+        super.addSuiteArg("useDom", useDom);
+        super.addSuiteArg("enablePatterns", enablePatterns);
+        super.addSuiteArg("ignoreDisplacements", ignoreDisplacements);
         ICheckSettings settings = new CheckSettings(0).fully().useDom(useDom).enablePatterns(enablePatterns).ignoreCaret(ignoreCaret);
         TestEyes eyes = new TestEyes();
         Configuration configuration = eyes.getConfigurationInstance();

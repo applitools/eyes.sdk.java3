@@ -43,6 +43,7 @@ public class BasicDemo extends ReportingTestSuite {
 
     @Test(dataProvider = "booleanDP")
     public void basicDemo(boolean useVisualGrid) {
+        super.addSuiteArg("isVisualGrid", useVisualGrid);
         EyesRunner runner = useVisualGrid ? new VisualGridRunner(10) : new ClassicRunner();
         String suffix = useVisualGrid ? "_VG" : "";
         Eyes eyes = new Eyes(runner);
