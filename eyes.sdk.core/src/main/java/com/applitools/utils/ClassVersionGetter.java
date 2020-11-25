@@ -14,5 +14,5 @@ public class ClassVersionGetter {
         }
     }
 
-    public static String CURRENT_VERSION = properties.getProperty("version");
+    public static String CURRENT_VERSION = properties.getProperty("applitools_sdk_version");
 }
