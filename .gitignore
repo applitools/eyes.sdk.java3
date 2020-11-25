@@ -33,6 +33,7 @@ venv
 **/test/java/coverage/generic/
 coverage-test-report.xml
 coverage-tests-metadata.json
+package-lock.json
 
 # yarn
 .yarn
