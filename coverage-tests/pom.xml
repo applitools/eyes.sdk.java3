@@ -36,11 +36,6 @@
         </dependency>
         <dependency>
             <groupId>com.applitools</groupId>
-            <artifactId>eyes-selenium-common-java3</artifactId>
-            <version>3.185.1</version>
-        </dependency>
-        <dependency>
-            <groupId>com.applitools</groupId>
             <artifactId>eyes-sdk-core-java3</artifactId>
             <version>3.185.1</version>
             <type>test-jar</type>
