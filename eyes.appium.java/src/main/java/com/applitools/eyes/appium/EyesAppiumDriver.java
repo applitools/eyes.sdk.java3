@@ -76,14 +76,18 @@ public class EyesAppiumDriver extends EyesWebDriver {
 
     private int ensureViewportHeight(int viewportHeight) {
         if (EyesDriverUtils.isAndroid(driver)) {
-            int height = getDeviceHeight();
-            Map<String, Integer> systemBarsHeights = getSystemBarsHeights();
-            for (Integer barHeight : systemBarsHeights.values()) {
-                if (barHeight != null && barHeight < height) {
-                    height -= barHeight;
+            try {
+                int height = getDeviceHeight();
+                Map<String, Integer> systemBarsHeights = getSystemBarsHeights();
+                for (Integer barHeight : systemBarsHeights.values()) {
+                    if (barHeight != null && barHeight < height) {
+                        height -= barHeight;
+                    }
                 }
+                return height;
+            } catch (Exception ignored) {
+                logger.log("WARNING: There was an error while getting system bars height. Using original viewport size");
             }
-            return height;
         }
 
         return viewportHeight;
