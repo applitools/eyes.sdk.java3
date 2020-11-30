@@ -118,4 +118,9 @@ public class MockServerConnector extends ServerConnector {
     public void getJobInfo(TaskListener<JobInfo[]> listener, RenderRequest[] browserInfos) {
         listener.onComplete(new JobInfo[]{new JobInfo()});
     }
+
+    @Override
+    public void closeBatch(String batchId, String url) {
+
+    }
 }

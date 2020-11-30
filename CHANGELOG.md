@@ -1,3 +1,7 @@
+## [vNext]
+### Fixed
+- Added setApiKey and setProxy to BatchClose. [Trello 2189](https://trello.com/c/SlHH9Ssb)
+
 ## [3.186.0] - 2020-11-23
 ### Updated
 - Agent ID property name (Internal). [Trello 2344](https://trello.com/c/hNfSbXNe)

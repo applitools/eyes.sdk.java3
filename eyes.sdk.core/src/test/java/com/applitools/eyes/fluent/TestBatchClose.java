@@ -2,6 +2,7 @@ package com.applitools.eyes.fluent;
 
 import com.applitools.connectivity.ServerConnector;
 import com.applitools.eyes.IBatchCloser;
+import com.applitools.eyes.ProxySettings;
 import com.applitools.eyes.visualgrid.services.VisualGridRunner;
 import com.applitools.utils.GeneralUtils;
 import org.junit.Assert;
@@ -42,13 +43,15 @@ public class TestBatchClose {
         String serverUrl2 = "customUrl2";
 
         BatchClose batchClose = new BatchClose();
-        EnabledBatchClose enabledBatchClose = batchClose.setUrl(serverUrl1).setBatchId(batchIds);
+        EnabledBatchClose enabledBatchClose = batchClose.setUrl(serverUrl1).setApiKey("key").setProxy(new ProxySettings("")).setBatchId(batchIds);
         Assert.assertEquals(enabledBatchClose.serverUrl, serverUrl1);
         enabledBatchClose.setUrl(serverUrl2);
         Assert.assertEquals(enabledBatchClose.serverUrl, serverUrl2);
 
         ServerConnector serverConnector = mock(ServerConnector.class);
         enabledBatchClose.serverConnector = serverConnector;
+        Assert.assertEquals(enabledBatchClose.apiKey, "key");
+        Assert.assertNotNull(enabledBatchClose.proxySettings);
 
         enabledBatchClose.close();
         verify(serverConnector).closeBatch("first", serverUrl2);
