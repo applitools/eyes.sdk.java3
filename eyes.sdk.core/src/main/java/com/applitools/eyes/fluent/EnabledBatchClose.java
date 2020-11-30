@@ -20,25 +20,24 @@ public class EnabledBatchClose extends BatchClose {
 
     @Override
     public EnabledBatchClose setUrl(String url) {
+        ArgumentGuard.notNull(url, "url");
         serverUrl = url;
         return this;
     }
 
     @Override
     public EnabledBatchClose setApiKey(String apiKey) {
+        ArgumentGuard.notNull(apiKey, "apiKey");
         this.apiKey = apiKey;
-        if (apiKey != null) {
-            serverConnector.setApiKey(apiKey);
-        }
+        serverConnector.setApiKey(apiKey);
         return this;
     }
 
     @Override
     public EnabledBatchClose setProxy(ProxySettings proxySettings) {
+        ArgumentGuard.notNull(proxySettings, "proxySettings");
         this.proxySettings = proxySettings;
-        if (proxySettings != null) {
-            serverConnector.setProxy(proxySettings);
-        }
+        serverConnector.setProxy(proxySettings);
         return this;
     }
 

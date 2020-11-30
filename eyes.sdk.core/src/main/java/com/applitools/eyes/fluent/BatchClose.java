@@ -23,16 +23,19 @@ public class BatchClose {
     }
 
     public BatchClose setUrl(String url) {
+        ArgumentGuard.notNull(url, "url");
         serverUrl = url;
         return this;
     }
 
     public BatchClose setApiKey(String apiKey) {
+        ArgumentGuard.notNull(apiKey, "apiKey");
         this.apiKey = apiKey;
         return this;
     }
 
     public BatchClose setProxy(ProxySettings proxySettings) {
+        ArgumentGuard.notNull(proxySettings, "proxySettings");
         this.proxySettings = proxySettings;
         return this;
     }
@@ -40,6 +43,15 @@ public class BatchClose {
     public EnabledBatchClose setBatchId(List<String> batchIds) {
         ArgumentGuard.notNull(batchIds, "batchIds");
         ArgumentGuard.notContainsNull(batchIds, "batchIds");
-        return new EnabledBatchClose(logger, serverUrl, batchIds).setApiKey(apiKey).setProxy(proxySettings);
+        EnabledBatchClose enabledBatchClose = new EnabledBatchClose(logger, serverUrl, batchIds);
+        if (apiKey != null) {
+            enabledBatchClose.setApiKey(apiKey);
+        }
+
+        if (proxySettings != null) {
+            enabledBatchClose.setProxy(proxySettings);
+        }
+
+        return enabledBatchClose;
     }
 }
