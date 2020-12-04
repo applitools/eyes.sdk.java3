@@ -138,8 +138,8 @@ public class AppiumFullPageCaptureAlgorithm {
         int maxScrollSteps = contentSize.getScrollContentHeight() / oneScrollStep;
         logger.verbose("maxScrollSteps: " + maxScrollSteps);
 
-        int startY = downscaleSafe(scrollViewRegion.getHeight() + scrollViewRegion.getTop()) - 1;
-        int endY = startY - oneScrollStep + 2 + stitchingAdjustment;
+        int startY = downscaleSafe(scrollViewRegion.getHeight() + scrollViewRegion.getTop()) - 1 - stitchingAdjustment/2;
+        int endY = startY - oneScrollStep + 2 + stitchingAdjustment/2;
         for (int step = 1; step <= maxScrollSteps; step++) {
             regionToCrop = new Region(0,
                     scrollViewRegion.getTop() + stitchingAdjustment,

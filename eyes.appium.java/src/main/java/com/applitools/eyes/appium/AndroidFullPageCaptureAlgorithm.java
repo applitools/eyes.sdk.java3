@@ -56,8 +56,8 @@ public class AndroidFullPageCaptureAlgorithm extends AppiumFullPageCaptureAlgori
             currentPosition = new Location(0,
                     scrollViewRegion.getTop() + ((scrollViewRegion.getHeight()) * (step)) - (stitchingAdjustment*step - stitchingAdjustment));
 
-            int startY = scrollViewRegion.getHeight() + scrollViewRegion.getTop() - 1;
-            int endY = scrollViewRegion.getTop() + (step != maxScrollSteps ? stitchingAdjustment : 0);
+            int startY = scrollViewRegion.getHeight() + scrollViewRegion.getTop() - 1 - (step != maxScrollSteps ? stitchingAdjustment/2 : 0);
+            int endY = scrollViewRegion.getTop() + (step != maxScrollSteps ? stitchingAdjustment/2 : 0);
             boolean isScrolledWithHelperLibrary = false;
             if (scrollableElementId != null) { // it means that we want to scroll on a specific element
                 logger.verbose("Scrollable element id: " + scrollableElementId);
