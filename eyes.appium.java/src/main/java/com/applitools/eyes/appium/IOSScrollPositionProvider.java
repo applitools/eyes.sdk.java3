@@ -29,7 +29,8 @@ public class IOSScrollPositionProvider extends AppiumScrollPositionProvider {
     private static final String SCROLL_DIRECTION_DOWN = "down";
     private static final String SCROLL_DIRECTION_LEFT = "left";
     private static final String SCROLL_DIRECTION_RIGHT = "right";
-    private WebElement firstVisibleChild;
+    private WebElement firstVisibleChild = null;
+    private Integer cachedEntireScrollableHeight = null;
 
     public IOSScrollPositionProvider(Logger logger, EyesAppiumDriver driver) {
         super(logger, driver);
@@ -157,60 +158,59 @@ public class IOSScrollPositionProvider extends AppiumScrollPositionProvider {
                 (int) (element.getSize().getHeight() * devicePixelRatio));;
         logger.verbose("Element is instance of " + element.getAttribute("type"));
         if (shouldStitchContent) {
-            try {
-                ContentSize contentSize = EyesAppiumUtils.getContentSize(driver, element);
-                /*
-                * The result of EyesAppiumUtils.getContentSize() is different in the same conditions for different types of views.
-                * E.g. contentSize.top value for type 'XCUIElementTypeTable' INcludes the size of status bar(of cause if
-                * it is visible). But contentSize.top for type 'XCUIElementTypeScrollView' returnes value
-                * EXcluding size of status bar.
-                *
-                * It happens so because Appium gives us the result of content size for 'XCUIElementTypeTable'. In case
-                * 'XCUIElementTypeScrollView' Appium throws an exception and contentSize is set manually from
-                * element.getSize() and element.getLocation() values, where element.getLocation().getY() value
-                * does NOT include status bar size.
-                *
-                * Let's imagine we got iPhone 8, status bar is visible(height = 20 points),
-                * navigation bar exists as well(height = 44 points). Under navigation bar locates or table view, or scroll view.
-                * Frame of both views will be the same: {(0, 64), (375, 603)}. Height of internal content equals 1000 for both views.
-                * So result of EyesAppiumUtils.getContentSize() for views will be like that:
-                * - table view: {(0, 64), (375, 1000)}
-                * - scroll view: {(0, 44), (375, 1000)}
-                *
-                * Value element.getRect().getY() always INcludes status bar size. Let's use it in calculations.
-                * */
-                switch (element.getAttribute("type")) {
-                    case "XCUIElementTypeTable":
-                        List<WebElement> list = element.findElements(MobileBy.xpath("//XCUIElementTypeTable[1]/*"));
-                        if (!list.isEmpty()) {
-                            WebElement lastElement = list.get(list.size()-1);
-                            contentSize.scrollableOffset = lastElement.getLocation().getY() + lastElement.getSize().getHeight()
-                                    - element.getRect().getY() + eyesDriver.getStatusBarHeight();
-                        }
-                        break;
-                    case "XCUIElementTypeScrollView":
-                        list = element.findElements(MobileBy.xpath("//XCUIElementTypeScrollView[1]/*"));
-                        if (!list.isEmpty()) {
-                            WebElement firstElement = list.get(0);
-                            contentSize.scrollableOffset = firstElement.getLocation().getY() + firstElement.getSize().getHeight()
-                                    - element.getRect().getY() + eyesDriver.getStatusBarHeight();
-                        }
-                        break;
-                }
-
-                // Correct Y coordinate by status bar size.
-                contentSize.top = positionCorrectionRegardingStatusBar(element.getRect().getY(), statusBarExists);
-                if (contentSize.scrollableOffset == 0) {
-                    contentSize.scrollableOffset = contentSize.height;
-                }
-
-                region = new Region((int) (contentSize.left * devicePixelRatio),
-                        (int) (contentSize.top * devicePixelRatio),
-                        (int) (contentSize.width * devicePixelRatio),
-                        (int) (contentSize.getScrollContentHeight() * devicePixelRatio));
-            } catch (IOException e) {
-                logger.verbose("Could not get element content size.");
+            ContentSize contentSize = getCachedContentSize();
+            if (contentSize == null) {
+                contentSize = EyesAppiumUtils.initContentSize(element);
             }
+            /*
+            * The result of EyesAppiumUtils.getContentSize() is different in the same conditions for different types of views.
+            * E.g. contentSize.top value for type 'XCUIElementTypeTable' INcludes the size of status bar(of cause if
+            * it is visible). But contentSize.top for type 'XCUIElementTypeScrollView' returnes value
+            * EXcluding size of status bar.
+            *
+            * It happens so because Appium gives us the result of content size for 'XCUIElementTypeTable'. In case
+            * 'XCUIElementTypeScrollView' Appium throws an exception and contentSize is set manually from
+            * element.getSize() and element.getLocation() values, where element.getLocation().getY() value
+            * does NOT include status bar size.
+            *
+            * Let's imagine we got iPhone 8, status bar is visible(height = 20 points),
+            * navigation bar exists as well(height = 44 points). Under navigation bar locates or table view, or scroll view.
+            * Frame of both views will be the same: {(0, 64), (375, 603)}. Height of internal content equals 1000 for both views.
+            * So result of EyesAppiumUtils.getContentSize() for views will be like that:
+            * - table view: {(0, 64), (375, 1000)}
+            * - scroll view: {(0, 44), (375, 1000)}
+            *
+            * Value element.getRect().getY() always INcludes status bar size. Let's use it in calculations.
+            * */
+            switch (element.getAttribute("type")) {
+                case "XCUIElementTypeTable":
+                    List<WebElement> list = element.findElements(MobileBy.xpath("//XCUIElementTypeTable[1]/*"));
+                    if (!list.isEmpty()) {
+                        WebElement lastElement = list.get(list.size()-1);
+                        contentSize.scrollableOffset = lastElement.getLocation().getY() + lastElement.getSize().getHeight()
+                                - element.getRect().getY() + eyesDriver.getStatusBarHeight();
+                    }
+                    break;
+                case "XCUIElementTypeScrollView":
+                    list = element.findElements(MobileBy.xpath("//XCUIElementTypeScrollView[1]/*"));
+                    if (!list.isEmpty()) {
+                        WebElement firstElement = list.get(0);
+                        contentSize.scrollableOffset = firstElement.getLocation().getY() + firstElement.getSize().getHeight()
+                                - element.getRect().getY() + eyesDriver.getStatusBarHeight();
+                    }
+                    break;
+            }
+
+            // Correct Y coordinate by status bar size.
+            contentSize.top = positionCorrectionRegardingStatusBar(element.getRect().getY(), statusBarExists);
+            if (contentSize.scrollableOffset == 0) {
+                contentSize.scrollableOffset = contentSize.height;
+            }
+
+            region = new Region((int) (contentSize.left * devicePixelRatio),
+                    (int) (contentSize.top * devicePixelRatio),
+                    (int) (contentSize.width * devicePixelRatio),
+                    (int) (contentSize.getScrollContentHeight() * devicePixelRatio));
         }
         return region;
     }
@@ -219,11 +219,12 @@ public class IOSScrollPositionProvider extends AppiumScrollPositionProvider {
     @Override
     protected ContentSize getCachedContentSize() {
         try {
-            WebElement activeScroll = EyesAppiumUtils.getFirstScrollableView(driver);
+            WebElement activeScroll = getActiveScrollElement(driver);
             logger.verbose("Scrollable element is type of " + activeScroll.getAttribute("type"));
             try {
-                contentSize = EyesAppiumUtils.getContentSize(driver, activeScroll);
-
+                if (contentSize == null) {
+                    contentSize = EyesAppiumUtils.getContentSize(driver, activeScroll);
+                }
                 contentSize.scrollableOffset = getEntireScrollableHeight(activeScroll, contentSize);
             } catch (IOException e) {
                 logger.log("WARNING: could not retrieve content size from active scroll element");
@@ -237,8 +238,8 @@ public class IOSScrollPositionProvider extends AppiumScrollPositionProvider {
             * To get more information about view hierarchy we printed page source to the logs
             * and saving debug screenshot for current screen
              */
-            String base64 = driver.getScreenshotAs(OutputType.BASE64);
-            BufferedImage image = ImageUtils.imageFromBase64(base64);
+//            String base64 = driver.getScreenshotAs(OutputType.BASE64);
+//            BufferedImage image = ImageUtils.imageFromBase64(base64);
 
             logger.verbose(driver.getPageSource());
         }
@@ -248,7 +249,7 @@ public class IOSScrollPositionProvider extends AppiumScrollPositionProvider {
 
     @Override
     protected WebElement getCachedFirstVisibleChild () {
-        WebElement activeScroll = EyesAppiumUtils.getFirstScrollableView(driver);
+        WebElement activeScroll = getActiveScrollElement(driver);
         if (firstVisibleChild == null) {
             logger.verbose("Could not find first visible child in cache, getting (this could take a while)");
             firstVisibleChild = getFirstChild(activeScroll);
@@ -347,6 +348,9 @@ public class IOSScrollPositionProvider extends AppiumScrollPositionProvider {
         * We should calculate entire scrollable height for some element types
         * because Appium returns wrong scrollable height.
          */
+        if (cachedEntireScrollableHeight != null) {
+            return cachedEntireScrollableHeight;
+        }
         int scrollableOffset = contentSize.scrollableOffset;
         switch (element.getAttribute("type")) {
             case "XCUIElementTypeTable":
@@ -368,6 +372,14 @@ public class IOSScrollPositionProvider extends AppiumScrollPositionProvider {
                 }
                 break;
         }
-        return scrollableOffset;
+        cachedEntireScrollableHeight = scrollableOffset;
+        return cachedEntireScrollableHeight;
+    }
+
+    @Override
+    public void cleanupCachedElements() {
+        super.cleanupCachedElements();
+        cachedEntireScrollableHeight = null;
+        firstVisibleChild = null;
     }
 }

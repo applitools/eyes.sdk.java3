@@ -178,6 +178,7 @@ public class AppiumFullPageCaptureAlgorithm {
         cleanupStitch(originalStitchedState, currentPosition, lastSuccessfulPartSize, entireSize);
 
         moveToTopLeft(xPos, endY + statusBarHeight + stitchingAdjustment, xPos, startY + statusBarHeight);
+        cleanupCachedElements();
     }
 
 
@@ -521,6 +522,10 @@ public class AppiumFullPageCaptureAlgorithm {
         regionInScreenshot.intersect(new Region(0, 0, image.getWidth(), image.getHeight()));
         logger.verbose("Region after intersect: " + regionInScreenshot);
         return regionInScreenshot;
+    }
+
+    protected void cleanupCachedElements() {
+        ((AppiumScrollPositionProvider) scrollProvider).cleanupCachedElements();
     }
 
     protected RectangleSize scaleSafe(RectangleSize rs) {

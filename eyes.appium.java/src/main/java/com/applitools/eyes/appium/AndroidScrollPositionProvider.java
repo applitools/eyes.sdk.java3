@@ -36,7 +36,7 @@ public class AndroidScrollPositionProvider extends AppiumScrollPositionProvider 
         if (scrollableViewLoc == null) {
             WebElement activeScroll;
             try {
-                activeScroll = EyesAppiumUtils.getFirstScrollableView(driver);
+                activeScroll = getActiveScrollElement(driver);
             } catch (NoSuchElementException e) {
                 logger.verbose("WARNING: could not find a scrollable view, using (0,0)");
                 return new Location(0, 0);
@@ -118,7 +118,7 @@ public class AndroidScrollPositionProvider extends AppiumScrollPositionProvider 
     public void setPosition(WebElement element) {
         logger.log("Warning: can only scroll back to elements that have already been seen");
         try {
-            WebElement activeScroll = EyesAppiumUtils.getFirstScrollableView(driver);
+            WebElement activeScroll = getActiveScrollElement(driver);
             EyesAppiumUtils.scrollBackToElement((AndroidDriver) driver, (RemoteWebElement) activeScroll,
                 (RemoteWebElement) element);
 
@@ -356,7 +356,7 @@ public class AndroidScrollPositionProvider extends AppiumScrollPositionProvider 
             if (scrollRootElement != null) {
                 activeScroll = driver.findElement(MobileBy.id(scrollRootElement));
             } else {
-                activeScroll = EyesAppiumUtils.getFirstScrollableView(driver);
+                activeScroll = getActiveScrollElement(driver);
             }
             logger.verbose("Scrollable element is instance of " + activeScroll.getAttribute("className"));
             String className = activeScroll.getAttribute("className");

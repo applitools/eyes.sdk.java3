@@ -65,12 +65,7 @@ public class EyesAppiumUtils {
             contentSize = objectMapper.readValue(contentSizeJson, ContentSize.class);
             contentSize.setDriver(driver);
         } catch (WebDriverException e) {
-            contentSize = new ContentSize();
-            contentSize.height = element.getSize().getHeight();
-            contentSize.width = element.getSize().getWidth();
-            contentSize.top = element.getLocation().getY();
-            contentSize.left = element.getLocation().getX();
-            contentSize.scrollableOffset = element.getSize().getHeight();
+            contentSize = initContentSize(element);
         }
         return contentSize;
     }
@@ -216,5 +211,15 @@ public class EyesAppiumUtils {
         int navigationBarHeight = driver.getDeviceHeight() - driver.getViewportRect().get("height") - statusBarHeight;
         systemBarHeights.put(STATUS_BAR, statusBarHeight);
         systemBarHeights.put(NAVIGATION_BAR, navigationBarHeight);
+    }
+
+    public static ContentSize initContentSize(WebElement element) {
+        ContentSize contentSize = new ContentSize();
+        contentSize.height = element.getSize().getHeight();
+        contentSize.width = element.getSize().getWidth();
+        contentSize.top = element.getLocation().getY();
+        contentSize.left = element.getLocation().getX();
+        contentSize.scrollableOffset = element.getSize().getHeight();
+        return contentSize;
     }
 }

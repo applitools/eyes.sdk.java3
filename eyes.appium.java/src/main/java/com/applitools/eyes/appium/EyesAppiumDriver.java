@@ -63,7 +63,7 @@ public class EyesAppiumDriver extends EyesWebDriver {
         logger.verbose("Viewport Rect Type: " + viewportRectObject.getClass());
         logger.verbose("Viewport Rect Value: " + viewportRectObject.toString());
 
-        Map<String, Long> rectMap = (Map<String, Long>) getCachedSessionDetails().get("viewportRect");
+        Map<String, Long> rectMap = (Map<String, Long>) viewportRectObject;
         int width = rectMap.get("width").intValue();
         int height = ensureViewportHeight(rectMap.get("height").intValue());
 

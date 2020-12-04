@@ -3,6 +3,7 @@
 - Added setApiKey and setProxy to BatchClose. [Trello 2189](https://trello.com/c/SlHH9Ssb)
 ### Updated
 - Use default viewport height value if we get an exception after `driver.getSystemBars()` call. [Trello 2307](https://trello.com/c/8VCtSmfN)
+- Reuse data from cache instead of getting them from Appium each time. [Trello 1854](https://trello.com/c/Sdzfuue2)
 
 ## [3.186.0] - 2020-11-23
 ### Updated

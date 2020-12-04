@@ -101,6 +101,7 @@ public class AndroidFullPageCaptureAlgorithm extends AppiumFullPageCaptureAlgori
         }
 
         moveToTopLeft();
+        cleanupCachedElements();
     }
 
     @Override
