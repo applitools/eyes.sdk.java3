@@ -1,15 +1,13 @@
 package com.applitools.connectivity;
 
 import com.applitools.connectivity.api.*;
-import com.applitools.eyes.Logger;
-import com.applitools.eyes.RunningSession;
-import com.applitools.eyes.SessionStartInfo;
-import com.applitools.eyes.TaskListener;
+import com.applitools.eyes.*;
 import com.applitools.eyes.utils.ReportingTestSuite;
 import com.applitools.eyes.visualgrid.model.RGridResource;
 import com.applitools.utils.GeneralUtils;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.apache.commons.lang3.tuple.Pair;
 import org.apache.http.HttpStatus;
 import org.mockito.ArgumentMatchers;
 import org.mockito.Mock;
@@ -20,10 +18,14 @@ import org.testng.Assert;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
+import javax.ws.rs.HttpMethod;
 import java.net.URI;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.concurrent.Future;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
@@ -47,8 +49,8 @@ public class TestServerConnector extends ReportingTestSuite {
     public static class MockedAsyncRequest extends AsyncRequest {
         final Map<String,String> headers = new HashMap<>();
 
-        public MockedAsyncRequest(Logger logger) {
-            super(logger);
+        public MockedAsyncRequest() {
+            super(new Logger());
         }
 
         @Override
@@ -60,6 +62,66 @@ public class TestServerConnector extends ReportingTestSuite {
         @Override
         public Future<?> method(String method, AsyncRequestCallback callback, Object data, String contentType, boolean logIfError) {
             return null;
+        }
+    }
+
+    public static class MockedResponse extends Response {
+
+        private final int statusCode;
+        private final Map<String, String> headers;
+
+        @SafeVarargs
+        public MockedResponse(int statusCode, Pair<String, String>... headers) {
+            super(new Logger());
+            this.statusCode =  statusCode;
+            this.headers = new HashMap<>();
+            if (headers == null || headers.length == 0) {
+                return;
+            }
+
+            for (Pair<String, String> header : headers) {
+                this.headers.put(header.getLeft(), header.getRight());
+            }
+        }
+
+        @Override
+        public int getStatusCode() {
+            return statusCode;
+        }
+
+        @Override
+        public String getStatusPhrase() {
+            return null;
+        }
+
+        @Override
+        public String getHeader(String name, boolean ignoreCase) {
+            if (!ignoreCase) {
+                return headers.get(name);
+            }
+
+            for (String key : headers.keySet()) {
+                if (key.equalsIgnoreCase(name)) {
+                    return headers.get(key);
+                }
+            }
+
+            return null;
+        }
+
+        @Override
+        protected Map<String, String> getHeaders() {
+            return headers;
+        }
+
+        @Override
+        protected void readEntity() {
+
+        }
+
+        @Override
+        public void close() {
+
         }
     }
 
@@ -116,9 +178,9 @@ public class TestServerConnector extends ReportingTestSuite {
         };
 
         ServerConnector connector = spy(new ServerConnector());
-        doAnswer(new Answer() {
+        doAnswer(new Answer<Void>() {
             @Override
-            public Object answer(InvocationOnMock invocation) {
+            public Void answer(InvocationOnMock invocation) {
                 AsyncRequestCallback callback = invocation.getArgument(2);
                 callback.onComplete(response);
                 return null;
@@ -161,7 +223,7 @@ public class TestServerConnector extends ReportingTestSuite {
         // Regular Domain
         URI url = new URI("http://downloadResource.com");
         ConnectivityTarget target = mock(ConnectivityTarget.class);
-        MockedAsyncRequest mockedAsyncRequest = new MockedAsyncRequest(new Logger());
+        MockedAsyncRequest mockedAsyncRequest = new MockedAsyncRequest();
         when(restClient.target(url.toString())).thenReturn(target);
         when(target.asyncRequest(anyString())).thenReturn(mockedAsyncRequest);
 
@@ -174,7 +236,7 @@ public class TestServerConnector extends ReportingTestSuite {
         // Filtered Domain
         URI filteredUrl = new URI("https://fonts.googleapis.com");
         target = mock(ConnectivityTarget.class);
-        mockedAsyncRequest = new MockedAsyncRequest(new Logger());
+        mockedAsyncRequest = new MockedAsyncRequest();
         when(restClient.target(filteredUrl.toString())).thenReturn(target);
         when(target.asyncRequest(anyString())).thenReturn(mockedAsyncRequest);
 
@@ -207,5 +269,72 @@ public class TestServerConnector extends ReportingTestSuite {
 
         request.header("1", null);
         asyncRequest.header("2", null);
+    }
+
+    @Test
+    public void testLongRequest() {
+        ServerConnector serverConnector = spy(new ServerConnector());
+        MockedAsyncRequest request = new MockedAsyncRequest();
+        doAnswer(new Answer<Void>() {
+            @Override
+            public Void answer(InvocationOnMock invocation) {
+                AsyncRequestCallback callback = invocation.getArgument(2);
+                callback.onComplete(new MockedResponse(HttpStatus.SC_ACCEPTED, Pair.of("location", "url1")));
+                return null;
+            }
+        }).when(serverConnector).sendAsyncRequest(eq(request), anyString(), ArgumentMatchers.<AsyncRequestCallback>any(), ArgumentMatchers.<String>isNull(), ArgumentMatchers.<String>isNull());
+
+        final AtomicBoolean wasPolling = new AtomicBoolean(false);
+        doAnswer(new Answer<Void>() {
+            @Override
+            public Void answer(InvocationOnMock invocation) {
+                AsyncRequestCallback callback = invocation.getArgument(0);
+                if (!wasPolling.get()) {
+                    wasPolling.set(true);
+                    callback.onComplete(new MockedResponse(HttpStatus.SC_OK));
+                } else {
+                    callback.onComplete(new MockedResponse(HttpStatus.SC_OK, Pair.of("location", "url2")));
+                }
+                return null;
+            }
+        }).when(serverConnector).sendAsyncRequest(ArgumentMatchers.<RequestPollingCallback>any(), eq("url1"), eq(HttpMethod.GET));
+
+        doAnswer(new Answer<Void>() {
+            @Override
+            public Void answer(InvocationOnMock invocation) {
+                AsyncRequestCallback callback = invocation.getArgument(0);
+                callback.onComplete(new MockedResponse(HttpStatus.SC_CREATED, Pair.of("location", "url3")));
+                return null;
+            }
+        }).when(serverConnector).sendAsyncRequest(ArgumentMatchers.<AsyncRequestCallback>any(), eq("url2"), eq(HttpMethod.GET));
+
+        doAnswer(new Answer<Void>() {
+            @Override
+            public Void answer(InvocationOnMock invocation) {
+                AsyncRequestCallback callback = invocation.getArgument(0);
+                callback.onComplete(new MockedResponse(HttpStatus.SC_OK, Pair.of("finished", "true")));
+                return null;
+            }
+        }).when(serverConnector).sendAsyncRequest(ArgumentMatchers.<AsyncRequestCallback>any(), eq("url3"), eq(HttpMethod.DELETE));
+
+        final SyncTaskListener<Response> listener = new SyncTaskListener<>(new Logger(new StdoutLogHandler()), "test long request");
+        serverConnector.sendLongRequest(request, HttpMethod.GET, new AsyncRequestCallback() {
+            @Override
+            public void onComplete(Response response) {
+                listener.onComplete(response);
+            }
+
+            @Override
+            public void onFail(Throwable throwable) {
+                listener.onFail();
+            }
+        }, null, null);
+
+        Response response = listener.get();
+        Assert.assertEquals(response.getStatusCode(), HttpStatus.SC_OK);
+        Assert.assertEquals(response.getHeader("finished", false), "true");
+        Assert.assertEquals(request.headers.keySet(), new HashSet<>(Arrays.asList("Eyes-Expect-Version", "Eyes-Expect", "Eyes-Date")));
+        verify(serverConnector, times(1)).sendAsyncRequest(ArgumentMatchers.<AsyncRequest>any(), anyString(), ArgumentMatchers.<AsyncRequestCallback>any(), ArgumentMatchers.<String>isNull(), ArgumentMatchers.<String>isNull());
+        verify(serverConnector, times(4)).sendAsyncRequest(ArgumentMatchers.<AsyncRequestCallback>any(), anyString(), anyString());
     }
 }

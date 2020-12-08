@@ -37,7 +37,7 @@ public class SessionStartInfo {
     private String agentSessionId;
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private Integer timeout;
-    private final int concurrencyVersion = 1;
+    private final int concurrencyVersion = 2;
 
     public SessionStartInfo(String agentId, SessionType sessionType,
                             String appIdOrName, String verId,

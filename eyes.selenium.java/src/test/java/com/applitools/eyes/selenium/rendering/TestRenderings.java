@@ -242,7 +242,7 @@ public class TestRenderings extends ReportingTestSuite {
         // Mocking async request to get status code 503 when downloading resource
         ConnectivityTarget target1 = mock(ConnectivityTarget.class);
         when(client.target(missingUrl)).thenReturn(target1);
-        AsyncRequest request1 = spy(new TestServerConnector.MockedAsyncRequest(new Logger()));
+        AsyncRequest request1 = spy(new TestServerConnector.MockedAsyncRequest());
         when(target1.asyncRequest(anyString())).thenReturn(request1);
         doAnswer(new Answer() {
             @Override
@@ -256,7 +256,7 @@ public class TestRenderings extends ReportingTestSuite {
         // Mocking async request to get an exception when downloading resource
         ConnectivityTarget target2 = mock(ConnectivityTarget.class);
         when(client.target(unknownHostUrl)).thenReturn(target2);
-        AsyncRequest request2 = spy(new TestServerConnector.MockedAsyncRequest(new Logger()));
+        AsyncRequest request2 = spy(new TestServerConnector.MockedAsyncRequest());
         when(target2.asyncRequest(anyString())).thenReturn(request2);
         doAnswer(new Answer() {
             @Override
