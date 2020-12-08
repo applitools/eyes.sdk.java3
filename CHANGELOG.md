@@ -1,6 +1,7 @@
 ## [vNext]
 ### Updated
 - Concurrency version 2. [Trello 2368](https://trello.com/c/0qi2c0jW)
+- Agent ID is now hardcoded instead of property. [Trello 2344](https://trello.com/c/hNfSbXNe)
 
 ## [3.187.0] - 2020-11-23
 ### Fixed
