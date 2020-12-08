@@ -1,3 +1,7 @@
+## [vNext]
+### Updated
+- Concurrency version 2. [Trello 2368](https://trello.com/c/0qi2c0jW)
+
 ## [3.187.0] - 2020-11-23
 ### Fixed
 - Added setApiKey and setProxy to BatchClose. [Trello 2189](https://trello.com/c/SlHH9Ssb)
