@@ -291,7 +291,7 @@ public class TestServerConnector extends ReportingTestSuite {
                 AsyncRequestCallback callback = invocation.getArgument(0);
                 if (!wasPolling.get()) {
                     wasPolling.set(true);
-                    callback.onComplete(new MockedResponse(HttpStatus.SC_OK));
+                    callback.onComplete(new MockedResponse(HttpStatus.SC_OK, Pair.of("Retry-After", "1")));
                 } else {
                     callback.onComplete(new MockedResponse(HttpStatus.SC_OK, Pair.of("location", "url2")));
                 }
