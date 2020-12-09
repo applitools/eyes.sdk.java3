@@ -1,4 +1,6 @@
 ## [vNext]
+### Fixed
+- Visual locators user-defined scale provider didn't work properly. [Trello 2300](https://trello.com/c/RdB0I4G2)
 ### Updated
 - Concurrency version 2. [Trello 2368](https://trello.com/c/0qi2c0jW)
 - Agent ID is now hardcoded instead of property. [Trello 2344](https://trello.com/c/hNfSbXNe)
@@ -8,11 +10,11 @@
 - Added setApiKey and setProxy to BatchClose. [Trello 2189](https://trello.com/c/SlHH9Ssb)
 ### Updated
 - Use default viewport height value if we get an exception after `driver.getSystemBars()` call. [Trello 2307](https://trello.com/c/8VCtSmfN)
+- Disabled skip list feature temporarily. [Trello 2349](https://trello.com/c/V8ldfbZu)
 
 ## [3.186.0] - 2020-11-23
 ### Updated
 - Agent ID property name (Internal). [Trello 2344](https://trello.com/c/hNfSbXNe)
-- Disabled skip list feature temporarily. [Trello 2349](https://trello.com/c/V8ldfbZu)
 
 ## [3.185.1] - 2020-11-23
 ### Fixed

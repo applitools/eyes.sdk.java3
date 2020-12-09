@@ -41,13 +41,13 @@ public class SeleniumVisualLocatorsProvider extends BaseVisualLocatorsProvider {
             debugScreenshotsProvider.save(image, "visual_locators_cut");
         }
 
-        double scaleRatio = devicePixelRatio;
+        double scaleRatio = 1 / devicePixelRatio;
         logger.verbose(String.format("scale ratio: %f", scaleRatio));
         if (eyes.getIsScaleProviderExplicitlySet()) {
             scaleRatio = eyes.getScaleProvider().getScaleRatio();
             logger.verbose(String.format("scale ratio from user: %f", scaleRatio));
         }
 
-        return ImageUtils.scaleImage(image, 1 / scaleRatio);
+        return ImageUtils.scaleImage(image, scaleRatio);
     }
 }

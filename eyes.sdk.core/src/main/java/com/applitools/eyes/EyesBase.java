@@ -52,6 +52,7 @@ public abstract class EyesBase implements IEyesBase {
     protected PropertyHandler<ScaleProvider> scaleProviderHandler;
     protected PropertyHandler<CutProvider> cutProviderHandler;
     protected PropertyHandler<PositionProvider> positionProviderHandler;
+    private boolean isScaleProviderSetByUser = false;
 
     // Will be checked <b>before</b> any argument validation. If true,
     // all method will immediately return without performing any action.
@@ -341,7 +342,7 @@ public abstract class EyesBase implements IEyesBase {
     }
 
     public boolean getIsScaleProviderExplicitlySet() {
-        return scaleProviderHandler != null && !(scaleProviderHandler.get() instanceof NullScaleProvider);
+        return isScaleProviderSetByUser;
     }
 
     /**
@@ -351,10 +352,12 @@ public abstract class EyesBase implements IEyesBase {
      */
     public void setScaleRatio(Double scaleRatio) {
         if (scaleRatio != null) {
+            isScaleProviderSetByUser = true;
             FixedScaleProvider scaleProvider = new FixedScaleProvider(logger, scaleRatio);
             scaleProviderHandler = new ReadOnlyPropertyHandler<ScaleProvider>(
                     logger, scaleProvider);
         } else {
+            isScaleProviderSetByUser = false;
             scaleProviderHandler = new SimplePropertyHandler<>();
             scaleProviderHandler.set(new NullScaleProvider(logger));
         }

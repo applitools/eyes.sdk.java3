@@ -35,6 +35,7 @@ public class TestVisualLocators extends ReportingTestSuite {
         String suffix = useVisualGrid ? "_VG" : "";
         Eyes eyes = new Eyes(runner);
         eyes.setLogHandler(new StdoutLogHandler());
+        eyes.setSaveNewTests(false);
         RemoteWebDriver driver = SeleniumUtils.createChromeDriver();
         driver.get("https://applitools.github.io/demo/TestPages/FramesTestPage/");
         try {
@@ -42,6 +43,9 @@ public class TestVisualLocators extends ReportingTestSuite {
             Map<String, List<Region>> result = eyes.locate(VisualLocator.name("applitools_title"));
             eyes.setImageCut(new FixedCutProvider(19, 0, 3, 0));
             Map<String, List<Region>> resultCut = eyes.locate(VisualLocator.name("applitools_title"));
+            eyes.setImageCut(null);
+            eyes.setScaleRatio(2.0);
+            Map<String, List<Region>> resultScale = eyes.locate(VisualLocator.name("applitools_title_scaled"));
             eyes.closeAsync();
 
             Assert.assertEquals(result.size(), 1);
@@ -55,6 +59,12 @@ public class TestVisualLocators extends ReportingTestSuite {
             Assert.assertEquals(regionList.size(), 1);
             region = regionList.get(0);
             Assert.assertEquals(region, new Region(0, 0, 158, 38));
+
+            Assert.assertEquals(resultScale.size(), 1);
+            regionList = resultScale.get("applitools_title_scaled");
+            Assert.assertEquals(regionList.size(), 1);
+            region = regionList.get(0);
+            Assert.assertEquals(region, new Region(5, 27, 318, 100));
         } finally {
             driver.quit();
             eyes.abortAsync();
