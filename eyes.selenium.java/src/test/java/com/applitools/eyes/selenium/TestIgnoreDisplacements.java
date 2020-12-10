@@ -24,8 +24,6 @@ public class TestIgnoreDisplacements {
 
         Configuration configuration = eyes.getConfiguration();
 
-        configuration.setProxy(new ProxySettings("http://127.0.0.1", 8888, null, null));
-
         eyes.setConfiguration(configuration);
 
         eyes.setLogHandler(new StdoutLogHandler(TestUtils.verboseLogs));

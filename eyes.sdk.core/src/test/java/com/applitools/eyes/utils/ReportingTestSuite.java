@@ -13,7 +13,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
-@Listeners({PostTestResultsListener.class, RetryListener.class})
+@Listeners({RetryListener.class})
 public abstract class ReportingTestSuite {
 
     private static final String TEST_RESULT_FILENAME_PARTS_SEPARATOR = "_";

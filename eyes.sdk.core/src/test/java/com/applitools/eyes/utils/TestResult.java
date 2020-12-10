@@ -8,12 +8,14 @@ public class TestResult {
 
     private final boolean passed;
     private final Map<String, Object> parameters;
-    private String testName;
+    private final String testName;
 
     public TestResult(String testName, boolean passed, Map<String, Object> parameters) {
         this.testName = testName;
         this.parameters = parameters;
         this.passed = passed;
+
+        System.out.printf("New test result. Test name: %s. is passed? %b%n", testName, passed);
     }
 
     @JsonProperty("test_name")
