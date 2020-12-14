@@ -25,7 +25,7 @@ import java.util.regex.Pattern;
 public class EyesAppiumUtils {
 
     private static final String NATIVE_APP = "NATIVE_APP";
-    private static String SCROLLVIEW_XPATH = "//*[@scrollable='true']";
+    static String SCROLLVIEW_XPATH = "//*[@scrollable='true']";
     private static String FIRST_VIS_XPATH = "/*[@firstVisible='true']";
 
     public static final String STATUS_BAR = "statusBar";

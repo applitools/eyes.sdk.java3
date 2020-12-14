@@ -219,7 +219,7 @@ public class IOSScrollPositionProvider extends AppiumScrollPositionProvider {
     @Override
     protected ContentSize getCachedContentSize() {
         try {
-            WebElement activeScroll = EyesAppiumUtils.getFirstScrollableView(driver);
+            WebElement activeScroll = getFirstScrollableView();
             logger.verbose("Scrollable element is type of " + activeScroll.getAttribute("type"));
             try {
                 contentSize = EyesAppiumUtils.getContentSize(driver, activeScroll);
@@ -248,7 +248,7 @@ public class IOSScrollPositionProvider extends AppiumScrollPositionProvider {
 
     @Override
     protected WebElement getCachedFirstVisibleChild () {
-        WebElement activeScroll = EyesAppiumUtils.getFirstScrollableView(driver);
+        WebElement activeScroll = getFirstScrollableView();
         if (firstVisibleChild == null) {
             logger.verbose("Could not find first visible child in cache, getting (this could take a while)");
             firstVisibleChild = getFirstChild(activeScroll);

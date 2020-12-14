@@ -44,7 +44,7 @@ public abstract class AppiumScrollPositionProvider implements ScrollPositionProv
     }
 
     protected WebElement getCachedFirstVisibleChild () {
-        WebElement activeScroll = EyesAppiumUtils.getFirstScrollableView(driver);
+        WebElement activeScroll = getFirstScrollableView();
         if (firstVisibleChild == null) {
             logger.verbose("Could not find first visible child in cache, getting (this could take a while)");
             firstVisibleChild = EyesAppiumUtils.getFirstVisibleChild(activeScroll);
@@ -65,7 +65,7 @@ public abstract class AppiumScrollPositionProvider implements ScrollPositionProv
         }
 
         try {
-            WebElement activeScroll = EyesAppiumUtils.getFirstScrollableView(driver);
+            WebElement activeScroll = getFirstScrollableView();
             contentSize = EyesAppiumUtils.getContentSize(driver, activeScroll);
             logger.verbose("Retrieved contentSize, it is: " + contentSize);
         } catch (NoSuchElementException e) {
@@ -82,7 +82,7 @@ public abstract class AppiumScrollPositionProvider implements ScrollPositionProv
         WebElement activeScroll, firstVisChild;
         Point scrollLoc, firstVisChildLoc;
         try {
-            activeScroll = EyesAppiumUtils.getFirstScrollableView(driver);
+            activeScroll = getFirstScrollableView();
             firstVisChild = getCachedFirstVisibleChild();
         } catch (NoSuchElementException e) {
             return new Location(0, 0);
@@ -105,7 +105,7 @@ public abstract class AppiumScrollPositionProvider implements ScrollPositionProv
         WebElement activeScroll;
         Region reg;
         try {
-            activeScroll = EyesAppiumUtils.getFirstScrollableView(driver);
+            activeScroll = getFirstScrollableView();
             Location scrollLoc = getScrollableViewLocation();
             Dimension scrollDim = activeScroll.getSize();
             reg = new Region(scrollLoc.getX(), scrollLoc.getY(), scrollDim.width, scrollDim.height - verticalScrollGap);
@@ -212,4 +212,8 @@ public abstract class AppiumScrollPositionProvider implements ScrollPositionProv
     }
 
     public abstract Region getElementRegion(WebElement element, boolean shouldStitchContent, Boolean statusBarExists);
+
+    protected WebElement getFirstScrollableView() {
+        return EyesAppiumUtils.getFirstScrollableView(driver);
+    }
 }
