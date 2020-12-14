@@ -1,3 +1,7 @@
+##[vNext]
+### Updated
+- Adjusted scroll coordinates on a stitchOverlap value. [Trello 2138](https://trello.com/c/EI2mxmTD)
+
 ## [3.188.0] - 2020-12-09
 ### Fixed
 - Visual locators user-defined scale provider. [Trello 2300](https://trello.com/c/RdB0I4G2)
