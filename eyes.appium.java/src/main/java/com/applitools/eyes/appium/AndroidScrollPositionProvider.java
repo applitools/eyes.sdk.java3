@@ -237,7 +237,7 @@ public class AndroidScrollPositionProvider extends AppiumScrollPositionProvider 
                 double devicePixelRatio = eyesDriver.getDevicePixelRatio();
                 ContentSize contentSize = EyesAppiumUtils.getContentSize(driver, element);
                 region = new Region(contentSize.left,
-                        contentSize.top,
+                        (int) (element.getLocation().y * devicePixelRatio),
                         contentSize.width,
                         contentSize.getScrollContentHeight());
                 if (element.getAttribute("className").equals("android.support.v7.widget.RecyclerView") ||
