@@ -147,8 +147,8 @@ public final class TestSendDom extends ReportingTestSuite {
 
                 SessionResults sessionResults = TestUtils.getSessionResults(eyes.getApiKey(), results);
                 ActualAppOutput[] actualAppOutput = sessionResults.getActualAppOutput();
-                String downloadedDomJsonString = TestUtils.getStepDom(eyes, actualAppOutput[0]);
-                JsonNode downloaded = mapper.readTree(downloadedDomJsonString);
+                JsonNode downloaded = TestUtils.getStepDom(eyes.getLogger(), eyes.getServerUrl().toString(),
+                        eyes.getApiKey(), actualAppOutput[0].getImage().getDomId());
                 if (downloaded == null) {
                     Assert.fail("Downloaded DOM IS NULL!");
                 }

@@ -7,12 +7,16 @@ import com.applitools.eyes.selenium.Eyes;
 import com.applitools.eyes.selenium.StitchMode;
 import com.applitools.eyes.visualgrid.model.*;
 import com.applitools.eyes.visualgrid.services.VisualGridRunner;
+import com.fasterxml.jackson.databind.JsonNode;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.Actions;
 import com.applitools.eyes.metadata.SessionResults;
 import com.applitools.eyes.utils.TestUtils;
 import org.testng.Assert;
+
+import java.util.ArrayList;
+import java.util.List;
 
 
 public class TestSetup extends GlobalSetup {
@@ -74,6 +78,35 @@ public class TestSetup extends GlobalSetup {
                 Assert.fail("Exception appeared while getting session results");
             }
         return sessionResults;
+    }
+
+    public JsonNode getDom(TestResults results, String domId) {
+        JsonNode dom = null;
+        try {
+            dom = TestUtils.getStepDom(eyes.getLogger(), eyes.getServerUrl().toString(), eyes.getApiKey(), domId);
+        } catch (Throwable e) {
+            e.printStackTrace();
+            Assert.fail("Exception appeared while getting session results");
+        }
+        return dom;
+    }
+
+    public List<JsonNode> getNodesByAttributes(JsonNode dom, String attribute) {
+        List<JsonNode> nodes = new ArrayList<>();
+        if (dom.get("attributes") != null && dom.get("attributes").get(attribute) != null) {
+            nodes.add(dom);
+        }
+
+        JsonNode children = dom.get("childNodes");
+        if (children == null) {
+            return nodes;
+        }
+
+        for (int i = 0; i < children.size(); i++) {
+            nodes.addAll(getNodesByAttributes(children.get(i), attribute));
+        }
+
+        return nodes;
     }
 
     public EyesRunner getRunner(){

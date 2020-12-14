@@ -6,7 +6,9 @@ import com.applitools.eyes.*;
 import com.applitools.eyes.metadata.ActualAppOutput;
 import com.applitools.eyes.metadata.SessionResults;
 import com.applitools.utils.ArgumentGuard;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import javax.ws.rs.HttpMethod;
@@ -158,19 +160,22 @@ public class TestUtils {
         }
     }
 
-    public static String getStepDom(EyesBase eyes, ActualAppOutput actualAppOutput) {
-        ArgumentGuard.notNull(eyes, "eyes");
-        ArgumentGuard.notNull(actualAppOutput, "actualAppOutput");
+    public static JsonNode getStepDom(Logger logger, String serverUrl, String apiKey, String domId) throws JsonProcessingException {
+        ArgumentGuard.notNull(logger, "logger");
+        ArgumentGuard.notNull(serverUrl, "serverUrl");
+        ArgumentGuard.notNull(apiKey, "apiKey");
+        ArgumentGuard.notNull(domId, "domId");
 
-        String apiSessionUrl = eyes.getServerUrl().toString();
-        URI apiSessionUri = UriBuilder.fromUri(apiSessionUrl)
+        URI apiSessionUri = UriBuilder.fromUri(serverUrl)
                 .path("api/images/dom")
-                .path(actualAppOutput.getImage().getDomId())
-                .queryParam("apiKey", eyes.getApiKey())
+                .path(domId)
+                .queryParam("apiKey", apiKey)
                 .build();
 
-        RestClient client = new RestClient(eyes.getLogger(), apiSessionUri, ServerConnector.DEFAULT_CLIENT_TIMEOUT);
-        return client.sendHttpRequest(apiSessionUri.toString(), HttpMethod.GET, MediaType.APPLICATION_JSON).getBodyString();
+        RestClient client = new RestClient(logger, apiSessionUri, ServerConnector.DEFAULT_CLIENT_TIMEOUT);
+        ObjectMapper mapper = new ObjectMapper();
+        String dom = client.sendHttpRequest(apiSessionUri.toString(), HttpMethod.GET, MediaType.APPLICATION_JSON).getBodyString();
+        return mapper.readTree(dom);
     }
 
     public static boolean createTestResultsDirIfNotExists() {

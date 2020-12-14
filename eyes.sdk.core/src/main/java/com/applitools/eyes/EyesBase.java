@@ -3,7 +3,6 @@ package com.applitools.eyes;
 import com.applitools.ICheckSettings;
 import com.applitools.connectivity.ServerConnector;
 import com.applitools.eyes.capture.AppOutputProvider;
-import com.applitools.eyes.capture.AppOutputWithScreenshot;
 import com.applitools.eyes.config.Configuration;
 import com.applitools.eyes.debug.DebugScreenshotsProvider;
 import com.applitools.eyes.debug.FileDebugScreenshotsProvider;
@@ -27,7 +26,6 @@ import com.applitools.eyes.visualgrid.model.DeviceSize;
 import com.applitools.eyes.visualgrid.model.RenderingInfo;
 import com.applitools.utils.*;
 
-import java.awt.image.BufferedImage;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.*;
@@ -912,7 +910,7 @@ public abstract class EyesBase implements IEyesBase {
                         // A callback which will call getAppOutput
                         new AppOutputProvider() {
                             @Override
-                            public AppOutputWithScreenshot getAppOutput(Region region,
+                            public AppOutput getAppOutput(Region region,
                                                                         ICheckSettingsInternal checkSettingsInternal,
                                                                         ImageMatchSettings imageMatchSettings) {
                                 return getAppOutputWithScreenshot(region, checkSettingsInternal, imageMatchSettings);
@@ -1225,17 +1223,13 @@ public abstract class EyesBase implements IEyesBase {
      * @param region The region of the screenshot which will be set in the application output.
      * @return The updated app output and screenshot.
      */
-    private AppOutputWithScreenshot getAppOutputWithScreenshot(Region region, ICheckSettingsInternal checkSettingsInternal, ImageMatchSettings imageMatchSettings) {
+    private AppOutput getAppOutputWithScreenshot(Region region, ICheckSettingsInternal checkSettingsInternal, ImageMatchSettings imageMatchSettings) {
         logger.verbose("getting screenshot...");
         // Getting the screenshot (abstract function implemented by each SDK).
         EyesScreenshot screenshot = getScreenshot(region, checkSettingsInternal);
-        byte[] screenshotBytes = null;
         logger.verbose("Done getting screenshot!");
         String domUrl = null;
         if (screenshot != null) {
-            logger.verbose("Getting image bytes (encoded as PNG)...");
-            BufferedImage screenshotImage = screenshot.getImage();
-            screenshotBytes = ImageUtils.encodeAsPng(screenshotImage);
             domUrl = screenshot.domUrl;
         }
 
@@ -1245,8 +1239,11 @@ public abstract class EyesBase implements IEyesBase {
         String title = getTitle();
         logger.verbose("Done!");
 
-        AppOutputWithScreenshot result = new AppOutputWithScreenshot(new AppOutput(title, screenshotBytes, domUrl, null),
-                screenshot, region == null || region.isEmpty() ? null : region.getLocation());
+        Location location = region == null ? null : region.getLocation();
+        if (screenshot != null && screenshot.getOriginalLocation() != null) {
+            location = screenshot.getOriginalLocation();
+        }
+        AppOutput result = new AppOutput(title, screenshot, domUrl, null, location);
         logger.verbose("Done!");
         return result;
     }

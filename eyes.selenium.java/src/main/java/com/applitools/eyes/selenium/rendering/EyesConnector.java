@@ -2,7 +2,6 @@ package com.applitools.eyes.selenium.rendering;
 
 import com.applitools.ICheckSettings;
 import com.applitools.eyes.*;
-import com.applitools.eyes.capture.AppOutputWithScreenshot;
 import com.applitools.eyes.config.Configuration;
 import com.applitools.eyes.fluent.ICheckSettingsInternal;
 import com.applitools.eyes.visualgrid.model.*;
@@ -74,9 +73,8 @@ class EyesConnector extends EyesBase implements IEyesConnector, IBatchCloser {
         MatchWindowTask matchWindowTask = new MatchWindowTask(this.logger, getServerConnector(), this.runningSession, getConfigurationInstance().getMatchTimeout(), this);
         ImageMatchSettings imageMatchSettings = MatchWindowTask.createImageMatchSettings(checkSettingsInternal, this);
         String tag = checkSettingsInternal.getName();
-        AppOutput appOutput = new AppOutput(tag, null, domLocation, resultImageURL, virtualViewport);
-        AppOutputWithScreenshot appOutputWithScreenshot = new AppOutputWithScreenshot(appOutput, null, location);
-        return matchWindowTask.performMatch(appOutputWithScreenshot, tag, checkSettingsInternal, imageMatchSettings, regions, regionSelectors, this, renderId, source);
+        AppOutput appOutput = new AppOutput(tag, null, domLocation, resultImageURL, location, virtualViewport);
+        return matchWindowTask.performMatch(appOutput, tag, checkSettingsInternal, imageMatchSettings, regions, regionSelectors, this, renderId, source);
     }
 
     protected String getBaseAgentId() {

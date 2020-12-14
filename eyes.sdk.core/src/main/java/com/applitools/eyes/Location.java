@@ -9,6 +9,11 @@ public final class Location implements Cloneable {
 
     public static final Location ZERO = new Location(0, 0);
 
+    public Location() {
+        x = ZERO.x;
+        y = ZERO.y;
+    }
+
     /**
      * Creates a Location instance.
      * @param x The X coordinate of this location.

@@ -4,7 +4,7 @@ import com.applitools.ICheckSettings;
 import com.applitools.ICheckSettingsInternal;
 import com.applitools.eyes.*;
 import com.applitools.eyes.config.Configuration;
-import com.applitools.eyes.exceptions.DiffsFoundException;
+import com.applitools.eyes.exceptions.TestFailedException;
 import com.applitools.eyes.visualgrid.model.RenderBrowserInfo;
 import com.applitools.eyes.visualgrid.model.RenderStatusResults;
 import com.applitools.eyes.visualgrid.model.VGRegion;
@@ -127,16 +127,9 @@ public class VisualGridTask implements Callable<TestResultContainer> {
                         logger.verbose("CHECKING IMAGE WITH NULL LOCATION - ");
                         logger.verbose(renderResult.toString());
                     }
-                    Location location = null;
-                    if (regionSelectors.size() > 0) {
-                        VisualGridSelector[] targetSelector = regionSelectors.get(regionSelectors.size() - 1);
-                        if (targetSelector.length > 0 && "target".equals(targetSelector[0].getCategory())) {
-                            location = regions.get(regions.size() - 1).getLocation();
-                        }
-                    }
 
                     eyesConnector.matchWindow(imageLocation, domLocation, (ICheckSettings) checkSettings, regions,
-                            this.regionSelectors, location, renderResult.getRenderId(), source, renderResult.getVisualViewport());
+                            this.regionSelectors, renderResult.getImagePositionInActiveFrame(), renderResult.getRenderId(), source, renderResult.getVisualViewport());
                     logger.verbose("match done");
                     break;
 
@@ -146,8 +139,8 @@ public class VisualGridTask implements Callable<TestResultContainer> {
                         testResults = eyesConnector.close(true);
                     } catch (Throwable e) {
                         GeneralUtils.logExceptionStackTrace(logger, e);
-                        if (e instanceof DiffsFoundException) {
-                            DiffsFoundException diffException = (DiffsFoundException) e;
+                        if (e instanceof TestFailedException) {
+                            TestFailedException diffException = (TestFailedException) e;
                             testResults = diffException.getTestResults();
                         }
                         this.exception = e;

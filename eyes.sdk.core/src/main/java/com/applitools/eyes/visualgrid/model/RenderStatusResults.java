@@ -1,5 +1,6 @@
 package com.applitools.eyes.visualgrid.model;
 
+import com.applitools.eyes.Location;
 import com.applitools.eyes.RectangleSize;
 
 import java.util.List;
@@ -25,6 +26,8 @@ public class RenderStatusResults {
     private RectangleSize deviceSize = null;
 
     private RectangleSize visualViewport = null;
+
+    private Location imagePositionInActiveFrame = null;
 
     public RenderStatus getStatus() {
         return status;
@@ -106,6 +109,10 @@ public class RenderStatusResults {
         this.renderId = renderId;
     }
 
+    public Location getImagePositionInActiveFrame() {
+        return imagePositionInActiveFrame;
+    }
+
     @Override
     public String toString() {
         return "RenderStatusResults{" +
@@ -132,5 +139,4 @@ public class RenderStatusResults {
                 selectorRegions == null;
 
     }
-
 }

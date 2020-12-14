@@ -1,6 +1,7 @@
 
 package com.applitools.eyes.metadata;
 
+import com.applitools.eyes.Location;
 import com.applitools.eyes.RectangleSize;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -21,6 +22,8 @@ public class Image {
     private boolean hasDom;
     @JsonProperty("domId")
     private String domId;
+    @JsonProperty("location")
+    private Location location;
 
     @JsonProperty("id")
     public String getId() {
@@ -60,5 +63,15 @@ public class Image {
     @JsonProperty("domId")
     public void setDomId(String domId) {
         this.domId = domId;
+    }
+
+    @JsonProperty("location")
+    public Location getLocation() {
+        return location;
+    }
+
+    @JsonProperty("location")
+    public void setLocation(Location location) {
+        this.location = location;
     }
 }

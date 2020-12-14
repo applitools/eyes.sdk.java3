@@ -29,7 +29,8 @@ const types = {
             return `new ArrayList<${paramType.name(param)}>()
             {{ ${value.map(region => `add(${paramType.constructor(region)});`).join(' ')} }}`
         },
-        name: (type) => `List<${type.generic[0].name}>`
+        name: (type) => `List<${type.generic[0].name}>`,
+        get: (target, key) => Number.isInteger(Number(key)) ? `${target}.get(${key})` : `${target}.${key}()`
     },
     "RectangleSize": {
         constructor: (value) => `new RectangleSize(${value.width}, ${value.height})`,
@@ -39,6 +40,10 @@ const types = {
     "TestInfo": {
         get: simpleGetter,
         name: () => 'SessionResults',
+    },
+    "JsonNode": {
+        get: (target, key) => `${target}.get(${Number.isInteger(Number(key)) ? key : `"${key}"`})`,
+        name: () => 'JsonNode'
     },
     "TestResults": {
         name: () => 'TestResults',
@@ -99,6 +104,9 @@ const types = {
     },
     "AccessibilityGuidelinesVersion":{
         constructor: (value) => `AccessibilityGuidelinesVersion.${value}`
+    },
+    "Location": {
+        constructor: (value) => `new Location(${value.x}, ${value.y})`
     },
     "BrowsersInfo": {
         constructor: (value) => {

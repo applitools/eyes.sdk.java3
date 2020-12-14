@@ -5,7 +5,6 @@ package com.applitools.eyes.selenium;
 
 import com.applitools.ICheckSettings;
 import com.applitools.eyes.*;
-import com.applitools.eyes.capture.AppOutputWithScreenshot;
 import com.applitools.eyes.capture.EyesScreenshotFactory;
 import com.applitools.eyes.capture.ImageProvider;
 import com.applitools.eyes.config.Configuration;
@@ -27,8 +26,8 @@ import com.applitools.eyes.selenium.regionVisibility.MoveToRegionVisibilityStrat
 import com.applitools.eyes.selenium.regionVisibility.NopRegionVisibilityStrategy;
 import com.applitools.eyes.selenium.regionVisibility.RegionVisibilityStrategy;
 import com.applitools.eyes.selenium.wrappers.EyesRemoteWebElement;
-import com.applitools.eyes.selenium.wrappers.EyesTargetLocator;
 import com.applitools.eyes.selenium.wrappers.EyesSeleniumDriver;
+import com.applitools.eyes.selenium.wrappers.EyesTargetLocator;
 import com.applitools.eyes.triggers.MouseAction;
 import com.applitools.eyes.visualgrid.model.RenderingInfo;
 import com.applitools.utils.*;
@@ -49,9 +48,8 @@ import java.util.List;
 @SuppressWarnings("WeakerAccess")
 public class SeleniumEyes extends EyesBase implements ISeleniumEyes, IBatchCloser {
 
-    private FrameChain originalFC;
-    private WebElement userDefinedSRE;
-    private PositionProvider currentFramePositionProvider;
+    private static final String SCROLL_ELEMENT_ATTRIBUTE = "data-applitools-scroll";
+    private static final String ACTIVE_FRAME_ATTRIBUTE = "data-applitools-active-frame";
 
     /**
      * The constant UNKNOWN_DEVICE_PIXEL_RATIO.
@@ -69,6 +67,10 @@ public class SeleniumEyes extends EyesBase implements ISeleniumEyes, IBatchClose
 
     // Seconds
     private static final int RESPONSE_TIME_DEFAULT_DIFF_FROM_DEADLINE = 20;
+
+    private FrameChain originalFC;
+    private WebElement userDefinedSRE;
+    private PositionProvider currentFramePositionProvider;
 
     private EyesSeleniumDriver driver;
     private boolean doNotGetTitle;
@@ -482,7 +484,6 @@ public class SeleniumEyes extends EyesBase implements ISeleniumEyes, IBatchClose
             }
         }
         region.intersect(effectiveViewport);
-        markElementForLayoutRCA(null);
 
         BufferedImage screenshotImage = algo.getStitchedRegion(
                 region, bBox, positionProviderHandler.get(), positionProviderHandler.get(), RectangleSize.EMPTY);
@@ -531,11 +532,10 @@ public class SeleniumEyes extends EyesBase implements ISeleniumEyes, IBatchClose
 
             debugScreenshotsProvider.save(subScreenshot.getImage(), String.format("subscreenshot_%s", name));
 
-            ImageMatchSettings ims = mwt.createImageMatchSettings(checkSettingsInternal, subScreenshot, this);
+            ImageMatchSettings ims = MatchWindowTask.createImageMatchSettings(checkSettingsInternal, subScreenshot, this);
             Location location = subScreenshot.getLocationInScreenshot(Location.ZERO, CoordinatesType.SCREENSHOT_AS_IS);
-            AppOutput appOutput = new AppOutput(name, ImageUtils.encodeAsPng(subScreenshot.getImage()), null, null);
-            AppOutputWithScreenshot appOutputWithScreenshot = new AppOutputWithScreenshot(appOutput, subScreenshot, location);
-            MatchResult matchResult = mwt.performMatch(new ArrayList<Trigger>(), appOutputWithScreenshot, name, false,
+            AppOutput appOutput = new AppOutput(name, subScreenshot, null, null, location);
+            MatchResult matchResult = mwt.performMatch(new ArrayList<Trigger>(), appOutput, name, false,
                     ims, this, null, source);
 
             logger.verbose("matchResult.asExcepted: " + matchResult.getAsExpected());
@@ -746,7 +746,7 @@ public class SeleniumEyes extends EyesBase implements ISeleniumEyes, IBatchClose
                 if (state.isStitchContent()) {
                     checkFullWindow(checkSettingsInternal, state, scrollRootElement, source);
                 } else {
-                    checkWindow(checkSettingsInternal, source);
+                    checkWindow(checkSettingsInternal, state, scrollRootElement, source);
                 }
             }
 
@@ -769,7 +769,7 @@ public class SeleniumEyes extends EyesBase implements ISeleniumEyes, IBatchClose
         WebElement currentFrameSRE = getCurrentFrameScrollRootElement();
         RectangleSize currentSREScrollSize = EyesRemoteWebElement.getScrollSize(currentFrameSRE, driver, logger);
         state.setFullRegion(new Region(state.getEffectiveViewport().getLocation(), currentSREScrollSize));
-
+        state.setOriginalLocation(Location.ZERO);
         checkWindowBase(null, checkSettingsInternal, source);
     }
 
@@ -814,11 +814,12 @@ public class SeleniumEyes extends EyesBase implements ISeleniumEyes, IBatchClose
         FrameChain currentFrameChain = driver.getFrameChain().clone();
         Region bounds = EyesRemoteWebElement.getClientBounds(targetElement, driver, logger);
 
-        Location visualOffset = getFrameChainOffset(currentFrameChain);
-        bounds = bounds.offset(visualOffset);
         WebElement currentFrameSRE = getCurrentFrameScrollRootElement();
         PositionProvider currentFramePositionProvider = getPositionProviderForScrollRootElement(currentFrameSRE);
         Location currentFramePosition = currentFramePositionProvider.getCurrentPosition();
+        state.setOriginalLocation(bounds.offset(currentFramePosition).getLocation());
+        Location visualOffset = getFrameChainOffset(currentFrameChain);
+        bounds = bounds.offset(visualOffset);
         currentFramePositionProvider.setPosition(bounds.offset(currentFramePosition).getLocation());
         Region actualElementBounds = EyesRemoteWebElement.getClientBounds(targetElement, driver, logger);
         actualElementBounds = actualElementBounds.offset(visualOffset);
@@ -872,6 +873,8 @@ public class SeleniumEyes extends EyesBase implements ISeleniumEyes, IBatchClose
         }
         initPositionProvidersForCheckElement(isScrollableElement, targetElement, state);
 
+        Location location = SeleniumScrollPositionProvider.getCurrentPosition(driver, getCurrentFrameScrollRootElement());
+        state.setOriginalLocation(elementBounds.offset(location).getLocation());
         Location originalElementLocation = elementBounds.getLocation();
 
         String positionStyle = ((EyesRemoteWebElement) targetElement).getComputedStyle("position");
@@ -942,15 +945,20 @@ public class SeleniumEyes extends EyesBase implements ISeleniumEyes, IBatchClose
         checkWindowBase(region, checkSettingsInternal, null);
     }
 
-
-    private void checkWindow(ICheckSettingsInternal checkSettingsInternal, String source) {
+    private void checkWindow(ICheckSettingsInternal checkSettingsInternal, CheckState state, WebElement scrollRootElement, String source) {
         logger.verbose("Target.Window()");
+        Location location = Location.ZERO;
+        if (!EyesDriverUtils.isMobileDevice(driver)) {
+            location = SeleniumScrollPositionProvider.getCurrentPosition(driver, scrollRootElement);
+        }
+        state.setOriginalLocation(location);
         checkWindowBase(null, checkSettingsInternal, source);
     }
 
     private void checkFullWindow(ICheckSettingsInternal checkSettingsInternal, CheckState state, WebElement scrollRootElement, String source) {
         logger.verbose("Target.Window().Fully(true)");
         initPositionProvidersForCheckWindow(state, scrollRootElement);
+        state.setOriginalLocation(Location.ZERO);
         checkWindowBase(null, checkSettingsInternal, source);
     }
 
@@ -1172,40 +1180,6 @@ public class SeleniumEyes extends EyesBase implements ISeleniumEyes, IBatchClose
      */
     public WebElement getCurrentFrameScrollRootElement() {
         return EyesSeleniumUtils.getCurrentFrameScrollRootElement(logger, driver, userDefinedSRE);
-    }
-
-    /**
-     * Verifies the current frame.
-     * @param matchTimeout The amount of time to retry matching. (Milliseconds)
-     * @param tag          An optional tag to be associated with the snapshot.
-     */
-    protected void checkCurrentFrame(int matchTimeout, String tag, String source) {
-        try {
-            logger.verbose(String.format("CheckCurrentFrame(%d, '%s')", matchTimeout, tag));
-
-            checkFrameOrElement = true;
-
-            logger.verbose("Getting screenshot as base64..");
-            String screenshot64 = driver.getScreenshotAs(OutputType.BASE64);
-            logger.verbose("Done! Creating image object...");
-            BufferedImage screenshotImage = ImageUtils.imageFromBase64(screenshot64);
-
-            // FIXME - Scaling should be handled in a single place instead
-            ScaleProvider scaleProvider = updateScalingParams().getScaleProvider(screenshotImage.getWidth());
-
-            screenshotImage = ImageUtils.scaleImage(screenshotImage, scaleProvider.getScaleRatio());
-            logger.verbose("Done! Building required object...");
-            final EyesWebDriverScreenshot screenshot = new EyesWebDriverScreenshot(logger, driver, screenshotImage);
-            logger.verbose("Done!");
-
-            logger.verbose("replacing regionToCheck");
-            setRegionToCheck(screenshot.getFrameWindow());
-
-            super.checkWindowBase(null, tag, matchTimeout, source);
-        } finally {
-            checkFrameOrElement = false;
-            regionToCheck = null;
-        }
     }
 
     /**
@@ -1568,6 +1542,9 @@ public class SeleniumEyes extends EyesBase implements ISeleniumEyes, IBatchClose
 
     @Override
     protected EyesScreenshot getScreenshot(Region targetRegion, ICheckSettingsInternal checkSettingsInternal) {
+        if (!EyesDriverUtils.isMobileDevice(driver)) {
+            setElementAttribute(driver.findElement(By.tagName("html")), ACTIVE_FRAME_ATTRIBUTE, "true");
+        }
 
         ScaleProviderFactory scaleProviderFactory = updateScalingParams();
 
@@ -1588,7 +1565,7 @@ public class SeleniumEyes extends EyesBase implements ISeleniumEyes, IBatchClose
             result = getViewportScreenshot(scaleProviderFactory);
         }
 
-        if (targetRegion != null) {
+        if (targetRegion != null && !targetRegion.isSizeEmpty()) {
             result = result.getSubScreenshot(targetRegion, false);
             debugScreenshotsProvider.save(result.getImage(), "SUB_SCREENSHOT");
         }
@@ -1597,6 +1574,7 @@ public class SeleniumEyes extends EyesBase implements ISeleniumEyes, IBatchClose
             result.setDomUrl(tryCaptureAndPostDom(checkSettingsInternal));
         }
 
+        result.setOriginalLocation(state.getOriginalLocation());
         return result;
     }
 
@@ -1606,8 +1584,8 @@ public class SeleniumEyes extends EyesBase implements ISeleniumEyes, IBatchClose
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-        EyesWebDriverScreenshot result = getScaledAndCroppedScreenshot(scaleProviderFactory);
-        return result;
+
+        return getScaledAndCroppedScreenshot(scaleProviderFactory);
     }
 
     boolean shouldTakeFullPageScreenshot(ICheckSettingsInternal checkSettingsInternal) {
@@ -1643,7 +1621,10 @@ public class SeleniumEyes extends EyesBase implements ISeleniumEyes, IBatchClose
         if (originPositionProvider == null) {
             originPositionProvider = new NullPositionProvider();
         }
-        markElementForLayoutRCA(positionProvider);
+
+        if (state.isStitchContent()) {
+            setElementAttribute(((ISeleniumPositionProvider) positionProvider).getScrolledElement(), SCROLL_ELEMENT_ATTRIBUTE, "true");
+        }
         BufferedImage entireFrameOrElement = algo.getStitchedRegion(state.getEffectiveViewport(), state.getFullRegion(), positionProvider, originPositionProvider, state.getStitchOffset());
 
         logger.verbose("Building screenshot object...");
@@ -1672,20 +1653,20 @@ public class SeleniumEyes extends EyesBase implements ISeleniumEyes, IBatchClose
             debugScreenshotsProvider.save(screenshotImage, "cut");
         }
 
-        EyesWebDriverScreenshot result = new EyesWebDriverScreenshot(logger, driver, screenshotImage);
-        return result;
+        return new EyesWebDriverScreenshot(logger, driver, screenshotImage);
     }
 
     private long getWaitBeforeScreenshots() {
         return getConfigurationInstance().getWaitBeforeScreenshots();
     }
 
-    private void markElementForLayoutRCA(PositionProvider elemPositionProvider) {
-        ISeleniumPositionProvider positionProvider = elemPositionProvider != null ? (ISeleniumPositionProvider) elemPositionProvider : ((ISeleniumPositionProvider) getPositionProvider());
-        WebElement scrolledElement = positionProvider.getScrolledElement();
-        if (scrolledElement != null) {
+    private void setElementAttribute(WebElement element, String key, String value) {
+        if (EyesDriverUtils.isMobileDevice(driver)) {
+            return;
+        }
+        if (element != null) {
             try {
-                jsExecutor.executeScript("var e = arguments[0]; if (e != null) e.setAttribute('data-applitools-scroll','true');", scrolledElement);
+                jsExecutor.executeScript(String.format("var e = arguments[0]; if (e != null) e.setAttribute('%s','%s');", key, value), element);
             } catch (Exception e) {
                 GeneralUtils.logExceptionStackTrace(logger, e);
             }

@@ -1,11 +1,12 @@
 package com.applitools.eyes;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.applitools.utils.ImageUtils;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonInclude;
 
 /**
  * An application output (title, image, etc).
  */
-@JsonIgnoreProperties({"screenshotBytes"})
 public class AppOutput {
 
     /**
@@ -14,24 +15,36 @@ public class AppOutput {
     private final String title;
     private final String domUrl;
     private String screenshotUrl;
-    private final byte[] screenshotBytes;
+
+    @JsonInclude(JsonInclude.Include.NON_NULL)
     private RectangleSize viewport;
+
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    private final Location location;
+
+    @JsonIgnore
+    private final EyesScreenshot screenshot;
+
+    @JsonIgnore
+    private final byte[] screenshotBytes;
 
     /**
      * @param title           The title of the window.
-     * @param screenshotBytes The screenshot's bytes.
+     * @param screenshot      The screenshot.
      * @param domUrl          A URL to a DOM snapshot.
      * @param screenshotUrl   A URL to a screenshot.
      */
-    public AppOutput(String title, byte[] screenshotBytes, String domUrl, String screenshotUrl) {
+    public AppOutput(String title, EyesScreenshot screenshot, String domUrl, String screenshotUrl, Location location) {
         this.title = title;
-        this.screenshotBytes = screenshotBytes;
         this.domUrl = domUrl;
         this.screenshotUrl = screenshotUrl;
+        this.location = location;
+        this.screenshot = screenshot;
+        this.screenshotBytes = screenshot == null ? null : ImageUtils.encodeAsPng(screenshot.getImage());
     }
 
-    public AppOutput(String title, byte[] screenshotBytes, String domUrl, String screenshotUrl, RectangleSize viewport) {
-        this(title, screenshotBytes, domUrl, screenshotUrl);
+    public AppOutput(String title, EyesScreenshot screenshot, String domUrl, String screenshotUrl, Location location, RectangleSize viewport) {
+        this(title, screenshot, domUrl, screenshotUrl, location);
         this.viewport = viewport;
     }
 
@@ -57,5 +70,13 @@ public class AppOutput {
 
     public RectangleSize getViewport() {
         return viewport;
+    }
+
+    public Location getLocation() {
+        return location;
+    }
+
+    public EyesScreenshot getScreenshot() {
+        return screenshot;
     }
 }

@@ -5,7 +5,6 @@ import com.applitools.eyes.*;
 import com.applitools.eyes.appium.capture.ImageProviderFactory;
 import com.applitools.eyes.appium.locators.AndroidVisualLocatorProvider;
 import com.applitools.eyes.appium.locators.IOSVisualLocatorProvider;
-import com.applitools.eyes.capture.AppOutputWithScreenshot;
 import com.applitools.eyes.capture.EyesScreenshotFactory;
 import com.applitools.eyes.capture.ImageProvider;
 import com.applitools.eyes.config.Configuration;
@@ -436,9 +435,8 @@ public class Eyes extends EyesBase {
 
             ImageMatchSettings ims = MatchWindowTask.createImageMatchSettings(checkSettingsInternal, subScreenshot, this);
             Location location = subScreenshot.getLocationInScreenshot(Location.ZERO, CoordinatesType.SCREENSHOT_AS_IS);
-            AppOutput appOutput = new AppOutput(name, ImageUtils.encodeAsPng(subScreenshot.getImage()), null, null);
-            AppOutputWithScreenshot appOutputWithScreenshot = new AppOutputWithScreenshot(appOutput, subScreenshot, location);
-            MatchResult matchResult = mwt.performMatch(new ArrayList<Trigger>(), appOutputWithScreenshot, name, false,
+            AppOutput appOutput = new AppOutput(name, subScreenshot, null, null, location);
+            MatchResult matchResult = mwt.performMatch(new ArrayList<Trigger>(), appOutput, name, false,
                     ims, this, null, getAppName());
             logger.verbose("matchResult.asExcepted: " + matchResult.getAsExpected());
         }

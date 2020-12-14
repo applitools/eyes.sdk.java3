@@ -61,10 +61,12 @@ public class DomCapture {
         PositionMemento originalPosition = positionProvider.getState();
         positionProvider.setPosition(Location.ZERO);
         FrameChain originalFC = driver.getFrameChain().clone();
+        EyesTargetLocator switchTo = (EyesTargetLocator) driver.switchTo();
+        switchTo.defaultContent();
         String baseUrl = (String) driver.executeScript("return document.location.href");
         String dom = getFrameDom(baseUrl, Collections.singletonList(baseUrl));
         if (originalFC != null) {
-            ((EyesTargetLocator) driver.switchTo()).frames(originalFC);
+            switchTo.frames(originalFC);
         }
 
         try {

@@ -11,6 +11,7 @@ import java.awt.image.BufferedImage;
  * Base class for handling screenshots.
  */
 public abstract class EyesScreenshot {
+    private Location originalLocation;
     protected final BufferedImage image;
     protected final Logger logger;
 
@@ -118,5 +119,13 @@ public abstract class EyesScreenshot {
         logger.verbose("updated location: " + updatedLocation);
 
         return new Region(updatedLocation, region.getSize());
+    }
+
+    public Location getOriginalLocation() {
+        return originalLocation;
+    }
+
+    public void setOriginalLocation(Location originalLocation) {
+        this.originalLocation = originalLocation;
     }
 }

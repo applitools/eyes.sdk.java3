@@ -914,24 +914,7 @@ public class VisualGridEyes implements ISeleniumEyes, IRenderingEyes {
         List<WebElementRegion> contentElements = getElementsFromRegions(Arrays.asList(contentRegions));
         List<WebElementRegion> floatingElements = getElementsFromRegions(Arrays.asList(floatingRegions));
         List<WebElementRegion> accessibilityElements = getElementsFromRegions(Arrays.asList(accessibilityRegions));
-
-
-        ISeleniumCheckTarget iSeleniumCheckTarget = (ISeleniumCheckTarget) csInternal;
-        WebElement targetElement = iSeleniumCheckTarget.getTargetElement();
-
-        if (targetElement == null) {
-            By targetSelector = iSeleniumCheckTarget.getTargetSelector();
-            if (targetSelector != null) {
-                targetElement = webDriver.findElement(targetSelector);
-            }
-        }
-
-        WebElementRegion target = new WebElementRegion(targetElement, "target");
-        List<WebElementRegion> targetElementList = new ArrayList<>();
-        targetElementList.add(target);
-        //noinspection UnnecessaryLocalVariable,unchecked
-        List<WebElementRegion>[] lists = new List[]{ignoreElements, layoutElements, strictElements, contentElements, floatingElements, accessibilityElements, targetElementList};
-        return lists;
+        return (List<WebElementRegion>[]) new List[]{ignoreElements, layoutElements, strictElements, contentElements, floatingElements, accessibilityElements};
     }
 
 

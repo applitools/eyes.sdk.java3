@@ -2,7 +2,6 @@ package com.applitools.eyes;
 
 import com.applitools.connectivity.ServerConnector;
 import com.applitools.eyes.capture.AppOutputProvider;
-import com.applitools.eyes.capture.AppOutputWithScreenshot;
 import com.applitools.eyes.config.Configuration;
 import com.applitools.eyes.fluent.*;
 import com.applitools.eyes.visualgrid.model.IGetFloatingRegionOffsets;
@@ -90,13 +89,13 @@ public class MatchWindowTask {
      * @param renderId           Visual Grid's renderId.
      * @param source             The tested page URL or tested app name.
      */
-    public MatchResult performMatch(AppOutputWithScreenshot appOutput,
+    public MatchResult performMatch(AppOutput appOutput,
                                     String tag, ICheckSettingsInternal checkSettingsInternal,
                                     ImageMatchSettings imageMatchSettings,
                                     List<? extends IRegion> regions,
                                     List<VisualGridSelector[]> regionSelectors,
                                     EyesBase eyes, String renderId, String source) {
-        collectRegions(imageMatchSettings, regions, regionSelectors);
+        collectRegions(imageMatchSettings, appOutput.getLocation(), regions, regionSelectors);
         collectRegions(imageMatchSettings, checkSettingsInternal);
         return performMatch(new ArrayList<Trigger>(), appOutput, tag, false, imageMatchSettings,
                 eyes, renderId, source);
@@ -112,7 +111,7 @@ public class MatchWindowTask {
      * @return The match result.
      */
     public MatchResult performMatch(List<Trigger> userInputs,
-                                    AppOutputWithScreenshot appOutput,
+                                    AppOutput appOutput,
                                     String tag, boolean replaceLast,
                                     ImageMatchSettings imageMatchSettings,
                                     EyesBase eyes, String renderId, String source) {
@@ -145,7 +144,7 @@ public class MatchWindowTask {
     }
 
     private void performMatch(final TaskListener<MatchResult> listener, List<Trigger> userInputs,
-                              AppOutputWithScreenshot appOutput,
+                              AppOutput appOutput,
                               String tag, boolean replaceLast,
                               ImageMatchSettings imageMatchSettings,
                               String agentSetupStr, String renderId,
@@ -154,7 +153,7 @@ public class MatchWindowTask {
         MatchWindowData.Options options = new MatchWindowData.Options(tag, userInputs.toArray(new Trigger[0]), replaceLast,
                 false, false, false, false, imageMatchSettings, source, renderId);
 
-        final MatchWindowData data = new MatchWindowData(userInputs.toArray(new Trigger[0]), appOutput.getAppOutput(), tag,
+        final MatchWindowData data = new MatchWindowData(userInputs.toArray(new Trigger[0]), appOutput, tag,
                 false, options, agentSetupStr, renderId);
 
 
@@ -276,7 +275,7 @@ public class MatchWindowTask {
         return mutableRegions.toArray(new FloatingMatchSettings[0]);
     }
 
-    private static void collectRegions(ImageMatchSettings imageMatchSettings, List<? extends IRegion> regions, List<VisualGridSelector[]> regionSelectors) {
+    private static void collectRegions(ImageMatchSettings imageMatchSettings, Location location, List<? extends IRegion> regions, List<VisualGridSelector[]> regionSelectors) {
         if (regions == null) return;
 
         int currentCounter = 0;
@@ -290,7 +289,6 @@ public class MatchWindowTask {
         mutableRegions.add(new ArrayList<MutableRegion>()); // Content Regions
         mutableRegions.add(new ArrayList<MutableRegion>()); // Floating Regions
         mutableRegions.add(new ArrayList<MutableRegion>()); // Accessibility Regions
-        mutableRegions.add(new ArrayList<MutableRegion>()); // Target Element Location
 
         for (IRegion region : regions) {
             boolean canAddRegion = false;
@@ -306,14 +304,6 @@ public class MatchWindowTask {
             }
             MutableRegion mr = new MutableRegion(region);
             mutableRegions.get(currentTypeIndex).add(mr);
-        }
-
-        Location location = Location.ZERO;
-
-        // If target element location available
-        int selectorRegionsIndex = mutableRegions.size() - 1;
-        if (mutableRegions.get(selectorRegionsIndex).size() > 0) {
-            location = mutableRegions.get(selectorRegionsIndex).get(0).getLocation();
         }
 
         imageMatchSettings.setIgnoreRegions(filterEmptyEntries(mutableRegions.get(0), location));
@@ -575,10 +565,9 @@ public class MatchWindowTask {
     private EyesScreenshot tryTakeScreenshot(Trigger[] userInputs, Region region, String tag,
                                              ICheckSettingsInternal checkSettingsInternal,
                                              ImageMatchSettings imageMatchSettings, String source) {
-        AppOutputWithScreenshot appOutput = appOutputProvider.getAppOutput(region, checkSettingsInternal, imageMatchSettings);
+        AppOutput appOutput = appOutputProvider.getAppOutput(region, checkSettingsInternal, imageMatchSettings);
         EyesScreenshot screenshot = appOutput.getScreenshot();
-        AppOutput output = appOutput.getAppOutput();
-        String currentScreenshotHash = GeneralUtils.getSha256hash(output.getScreenshotBytes());
+        String currentScreenshotHash = GeneralUtils.getSha256hash(appOutput.getScreenshotBytes());
         if (currentScreenshotHash.equals(lastScreenshotHash)) {
             logger.log("Got the same screenshot in retry. Not sending to the server.");
             return screenshot;

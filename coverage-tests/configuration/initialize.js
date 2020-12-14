@@ -59,6 +59,15 @@ module.exports = function (tracker, test) {
     return (typeof param === 'undefined') ? emptyValue() : (addToEnd) ? `, ${param}` : `${param}, `
   }
 
+  function extraParameters(params) {
+    let result = ''
+    for (const param of params) {
+      if (param === undefined) break
+      result += java`, ${param}`
+    }
+    return insert(result)
+  }
+
   addHook('deps', `package coverage.generic;`)
   addHook('deps', ``)
   // Selenium
@@ -80,6 +89,7 @@ module.exports = function (tracker, test) {
   addHook('deps', `import org.testng.Assert;`)
   addHook('deps', `import java.util.*;`)
   addHook('deps', `import com.applitools.eyes.locators.VisualLocatorSettings;`)
+  addHook('deps', 'import com.fasterxml.jackson.databind.JsonNode;');
 
   addSyntax('var', variable)
   addSyntax('getter', getter)
@@ -115,8 +125,7 @@ module.exports = function (tracker, test) {
       addCommand(java`getDriver().get(${url});`)
     },
     executeScript(script, ...args) {
-      const input = args.length === 0 ? undefined : args.join(', ')
-      return addCommand(java`((JavascriptExecutor) getDriver()).executeScript(${script}${extraParameter(input)});`)
+      return addCommand(java`((JavascriptExecutor) getDriver()).executeScript(${script}${extraParameters(args)});`)
     },
     switchToFrame(selector) {
       addCommand(java`getDriver().switchTo().frame(${selector});`)
@@ -240,13 +249,15 @@ module.exports = function (tracker, test) {
   }
 
   const assert = {
-    equal(actual, expected, message){
+    equal(actual, expected, message) {
       if(expected.isRef) {
         const typeCasting = actual.type().name === 'Number' ? insert(` (long) `) : emptyValue()
         addCommand(java`Assert.assertEquals(${typeCasting}${actual}, ${expected}${extraParameter(message)});`)
       } else {
         const type = getTypeName(actual)
-        if(type !== 'Map') {
+        if (type === 'JsonNode') {
+          addCommand(java`Assert.assertEquals(${actual}.asText(""), ${expected}${extraParameter(message)});`)
+        } else if (type !== 'Map') {
           addCommand(java`Assert.assertEquals(${actual}, ${addType(expected, type)}${extraParameter(message)});`)
         } else {
           addCommand(java`Assert.assertEqualsDeep(${actual}, ${addType(expected, type, actual.type().generic)}${extraParameter(message)});`)
@@ -287,12 +298,21 @@ module.exports = function (tracker, test) {
               schema: {
                 image: {
                   type: 'Image',
-                  schema: {hasDom: 'Boolean'},
+                  schema: {hasDom: 'Boolean', location: "Location"},
                 },
                 imageMatchSettings: imageMatchSettings,
               }},
           },
         },
+      })
+    },
+    getDom(result, domId) {
+      return addCommand(java`getDom(${result},${domId});`).type({type: 'JsonNode', recursive: true}).methods({
+        getNodesByAttribute: (dom, attr) => addCommand(java`getNodesByAttributes(${dom}, ${attr});`).type({
+          type: 'List<JsonNode>',
+          schema: {length: {rename: 'size'}},
+          items: {type: 'JsonNode', recursive: true}
+        })
       })
     }
   }

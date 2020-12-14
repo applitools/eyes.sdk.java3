@@ -1,5 +1,6 @@
 package com.applitools.eyes.selenium;
 
+import com.applitools.eyes.Location;
 import com.applitools.eyes.RectangleSize;
 import com.applitools.eyes.Region;
 import com.applitools.eyes.positioning.PositionProvider;
@@ -13,6 +14,7 @@ public class CheckState {
     private Region fullRegion = Region.EMPTY;
     private PositionProvider originPositionProvider = new NullPositionProvider();
     private RectangleSize stitchOffset = RectangleSize.EMPTY;
+    private Location originalLocation;
 
     public WebElement getTargetElementInternal() {
         return targetElementInternal;
@@ -68,5 +70,13 @@ public class CheckState {
 
     public void setStitchOffset(RectangleSize stitchOffset) {
         this.stitchOffset = stitchOffset;
+    }
+
+    public Location getOriginalLocation() {
+        return originalLocation;
+    }
+
+    public void setOriginalLocation(Location originalLocation) {
+        this.originalLocation = originalLocation;
     }
 }
