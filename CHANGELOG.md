@@ -1,5 +1,6 @@
-##[vNext]
-### Updated
+## [vNext]
+### Updated 
+- Ignore horizontal scrollable views on searching for the scrollable element. Updated method for searching scrollable view. [Trello 2347](https://trello.com/c/FDZ1oWF9) 
 - Adjusted scroll coordinates on a stitchOverlap value. [Trello 2138](https://trello.com/c/EI2mxmTD)
 
 ## [3.188.0] - 2020-12-09
