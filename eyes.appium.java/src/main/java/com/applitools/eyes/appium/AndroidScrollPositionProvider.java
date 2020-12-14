@@ -421,7 +421,6 @@ public class AndroidScrollPositionProvider extends AppiumScrollPositionProvider 
                 return child.isEmpty() ? element : child.get(0);
             }
         }
-        logger.verbose("$$$$$$$$$$$ - " + scrollableView.getAttribute("className"));
         return scrollableView;
     }
 }
