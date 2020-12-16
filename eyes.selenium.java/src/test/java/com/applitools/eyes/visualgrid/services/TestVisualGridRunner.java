@@ -51,7 +51,7 @@ public class TestVisualGridRunner {
         doAnswer(new Answer() {
             @Override
             public Object answer(InvocationOnMock invocation) throws Throwable {
-                IRenderingEyes eyes = runner.allEyes.iterator().next();
+                IEyes eyes = runner.allEyes.iterator().next();
                 if (!eyes.getAllRunningTests().values().iterator().next().isOpen()) {
                     errorMessage.set("Render called before open");
                 }
@@ -247,7 +247,7 @@ public class TestVisualGridRunner {
         VisualGridRunner runner = new VisualGridRunner();
         MockServerConnector serverConnector = new MockServerConnector() {
             public void render(final TaskListener<List<RunningRender>> listener, RenderRequest... renderRequests) {
-                if (runningRendersCount.getAndIncrement() >= RunningTest.PARALLEL_STEPS_LIMIT) {
+                if (runningRendersCount.getAndIncrement() >= VisualGridRunningTest.PARALLEL_STEPS_LIMIT) {
                     isOnlyOneRender.set(false);
                 }
 

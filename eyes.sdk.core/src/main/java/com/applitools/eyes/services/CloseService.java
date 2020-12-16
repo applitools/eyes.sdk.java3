@@ -1,7 +1,8 @@
-package com.applitools.eyes.visualgrid.services;
+package com.applitools.eyes.services;
 
 import com.applitools.connectivity.ServerConnector;
 import com.applitools.eyes.*;
+import com.applitools.eyes.visualgrid.services.ServiceTaskListener;
 import org.apache.commons.lang3.tuple.Pair;
 
 public class CloseService extends EyesService<SessionStopInfo, TestResults> {
@@ -29,7 +30,7 @@ public class CloseService extends EyesService<SessionStopInfo, TestResults> {
         }
     }
 
-    private void operate(final SessionStopInfo sessionStopInfo, final ServiceTaskListener<TestResults> listener) {
+    public void operate(final SessionStopInfo sessionStopInfo, final ServiceTaskListener<TestResults> listener) {
         if (sessionStopInfo == null) {
             TestResults testResults = new TestResults();
             testResults.setStatus(TestResultsStatus.NotOpened);

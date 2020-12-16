@@ -15,7 +15,7 @@ import static org.mockito.Mockito.mock;
 
 public class TestRunningTest extends ReportingTestSuite {
 
-    RunningTest runningTest;
+    VisualGridRunningTest runningTest;
 
     public TestRunningTest() {
         super.setGroupName("core");
@@ -23,7 +23,7 @@ public class TestRunningTest extends ReportingTestSuite {
 
     @BeforeMethod
     public void beforeEach() {
-        runningTest = new RunningTest(mock(RenderBrowserInfo.class), mock(Logger.class), new Configuration());
+        runningTest = new VisualGridRunningTest(mock(RenderBrowserInfo.class), mock(Logger.class), new Configuration());
         runningTest.issueCheck(mock(ICheckSettings.class), mock(List.class), "");
         runningTest.issueCheck(mock(ICheckSettings.class), mock(List.class), "");
         runningTest.issueCheck(mock(ICheckSettings.class), mock(List.class), "");

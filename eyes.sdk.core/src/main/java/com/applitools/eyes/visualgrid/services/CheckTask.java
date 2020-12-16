@@ -11,14 +11,14 @@ import java.util.UUID;
 
 public class CheckTask {
     private final String stepId = UUID.randomUUID().toString();
-    private final RunningTest runningTest;
+    private final VisualGridRunningTest runningTest;
     private final ICheckSettings checkSettings;
     private final List<VisualGridSelector[]> regionSelectors;
     private final String source;
 
     private RenderStatusResults renderStatusResults;
 
-    public CheckTask(RunningTest runningTest, ICheckSettings checkSettings, List<VisualGridSelector[]> regionSelectors, String source) {
+    public CheckTask(VisualGridRunningTest runningTest, ICheckSettings checkSettings, List<VisualGridSelector[]> regionSelectors, String source) {
         this.runningTest = runningTest;
         this.checkSettings = checkSettings;
         this.regionSelectors = regionSelectors;

@@ -1,9 +1,10 @@
-package com.applitools.eyes.visualgrid.services;
+package com.applitools.eyes.services;
 
 import com.applitools.connectivity.ServerConnector;
 import com.applitools.eyes.EyesException;
 import com.applitools.eyes.Logger;
 import com.applitools.eyes.TaskListener;
+import com.applitools.eyes.services.EyesService;
 import com.applitools.eyes.visualgrid.model.*;
 import com.applitools.utils.GeneralUtils;
 import org.apache.commons.lang3.tuple.Pair;

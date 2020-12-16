@@ -12,6 +12,7 @@ import com.applitools.eyes.exceptions.TestFailedException;
 import com.applitools.eyes.fluent.CheckSettings;
 import com.applitools.eyes.fluent.ICheckSettingsInternal;
 import com.applitools.eyes.positioning.RegionProvider;
+import com.applitools.eyes.selenium.ClassicRunner;
 import com.applitools.eyes.triggers.MouseAction;
 import com.applitools.utils.ArgumentGuard;
 import com.applitools.utils.ClassVersionGetter;
@@ -27,6 +28,7 @@ public class Eyes extends EyesBase implements IConfiguration {
     private Configuration config = new Configuration();
 
     public Eyes() {
+        super(new ClassicRunner());
     }
 
     /**

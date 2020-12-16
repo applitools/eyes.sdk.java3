@@ -19,12 +19,12 @@ import java.io.IOException;
 
 public class CommunicationUtils {
 
-    private static HttpClient createClient() {
-        return new HttpClientImpl(new Logger(new StdoutLogHandler()), ServerConnector.DEFAULT_CLIENT_TIMEOUT, null);
+    private static HttpClient createClient(Logger logger) {
+        return new HttpClientImpl(logger, ServerConnector.DEFAULT_CLIENT_TIMEOUT, null);
     }
 
-    public static <Tin> void jsonRequest(String url, Tin data, HttpAuth creds, String httpMethod) {
-        HttpClient httpClient = createClient();
+    public static <Tin> void jsonRequest(Logger logger, String url, Tin data, HttpAuth creds, String httpMethod) {
+        HttpClient httpClient = createClient(logger);
         Response response = null;
         try {
             Request request = httpClient.target(url).request();
@@ -61,9 +61,9 @@ public class CommunicationUtils {
         return json;
     }
 
-    public static BatchInfo getBatch(String batchId, String serverUrl, String apikey) throws Exception {
-        BatchInfo batchInfo = null;
-        HttpClient httpClient = createClient();
+    public static BatchInfo getBatch(Logger logger, String batchId, String serverUrl, String apikey) throws Exception {
+        BatchInfo batchInfo;
+        HttpClient httpClient = createClient(logger);
         try {
             String url = String.format("%s/api/sessions/batches/%s/bypointerid?apikey=%s", serverUrl, batchId, apikey);
             Request request = httpClient.target(url).request();
@@ -71,6 +71,7 @@ public class CommunicationUtils {
             String data = response.getBodyString();
             response.close();
             if (response.getStatusCode() != HttpStatus.SC_OK) {
+                logger.log(String.format("Bad status code from getBatch: %d", response.getStatusCode()));
                 throw new IOException("Failed getting batch info from the server");
             }
 

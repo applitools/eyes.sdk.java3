@@ -1,7 +1,8 @@
-package com.applitools.eyes.visualgrid.services;
+package com.applitools.eyes.services;
 
 import com.applitools.connectivity.ServerConnector;
 import com.applitools.eyes.*;
+import com.applitools.eyes.visualgrid.services.ServiceTaskListener;
 import org.apache.commons.lang3.tuple.Pair;
 
 import java.util.concurrent.atomic.AtomicInteger;
@@ -44,7 +45,7 @@ public class OpenService extends EyesService<SessionStartInfo, RunningSession> {
         }
     }
 
-    private void operate(final SessionStartInfo sessionStartInfo, final ServiceTaskListener<RunningSession> listener) {
+    public void operate(final SessionStartInfo sessionStartInfo, final ServiceTaskListener<RunningSession> listener) {
         final AtomicInteger timePassed = new AtomicInteger(0);
         final AtomicInteger sleepDuration = new AtomicInteger(2 * 1000);
         logger.log(String.format("Calling start session with agentSessionId %s", sessionStartInfo.getAgentSessionId()));

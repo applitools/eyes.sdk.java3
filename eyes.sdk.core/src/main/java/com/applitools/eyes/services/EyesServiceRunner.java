@@ -1,16 +1,20 @@
-package com.applitools.eyes.visualgrid.services;
+package com.applitools.eyes.services;
 
 import com.applitools.ICheckSettingsInternal;
 import com.applitools.connectivity.ServerConnector;
 import com.applitools.eyes.*;
+import com.applitools.eyes.services.*;
 import com.applitools.eyes.visualgrid.model.*;
+import com.applitools.eyes.visualgrid.services.CheckTask;
+import com.applitools.eyes.visualgrid.services.IEyes;
+import com.applitools.eyes.visualgrid.services.VisualGridRunningTest;
 import com.applitools.utils.GeneralUtils;
 import org.apache.commons.lang3.tuple.Pair;
 
 import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-class EyesServiceRunner extends Thread {
+public class EyesServiceRunner extends Thread {
     private static final String FULLPAGE = "full-page";
     private static final String VIEWPORT = "viewport";
 
@@ -20,7 +24,7 @@ class EyesServiceRunner extends Thread {
     private Logger logger;
     private RenderingInfo renderingInfo;
 
-    private final Set<IRenderingEyes> allEyes;
+    private final Set<IEyes> allEyes;
     private final Map<String, Pair<FrameData, List<CheckTask>>> resourceCollectionTasksMapping = new HashMap<>();
     private final List<RenderRequest> waitingRenderRequests = new ArrayList<>();
     private final Map<String, CheckTask> waitingCheckTasks = new HashMap<>();
@@ -31,7 +35,7 @@ class EyesServiceRunner extends Thread {
     private final ResourceCollectionService resourceCollectionService;
     private final RenderService renderService;
 
-    public EyesServiceRunner(Logger logger, ServerConnector serverConnector, Set<IRenderingEyes> allEyes, int testConcurrency,
+    public EyesServiceRunner(Logger logger, ServerConnector serverConnector, Set<IEyes> allEyes, int testConcurrency,
                              IDebugResourceWriter debugResourceWriter, Map<String, RGridResource> resourcesCacheMap) {
         this.logger = logger;
         this.allEyes = allEyes;
@@ -74,8 +78,8 @@ class EyesServiceRunner extends Thread {
         renderService.setServerConnector(serverConnector);
     }
 
-    public void openTests(Collection<RunningTest> runningTests) {
-        for (RunningTest runningTest : runningTests) {
+    public void openTests(Collection<VisualGridRunningTest> runningTests) {
+        for (VisualGridRunningTest runningTest : runningTests) {
             openService.addInput(runningTest.getTestId(), runningTest.prepareForOpen());
         }
     }
@@ -145,7 +149,7 @@ class EyesServiceRunner extends Thread {
     private void closeServiceIteration() {
         // Check if tests are ready to be closed
         synchronized (allEyes) {
-            for (IRenderingEyes eyes : allEyes) {
+            for (IEyes eyes : allEyes) {
                 for (RunningTest runningTest : eyes.getAllRunningTests().values()) {
                     if (runningTest.isTestReadyToClose()) {
                         if (!runningTest.isOpen()) {
@@ -233,7 +237,7 @@ class EyesServiceRunner extends Thread {
 
     private RunningTest findTestById(String testId) {
         synchronized (allEyes) {
-            for (IRenderingEyes eyes : allEyes) {
+            for (IEyes eyes : allEyes) {
                 if (eyes.getAllRunningTests().containsKey(testId)) {
                     return eyes.getAllRunningTests().get(testId);
                 }

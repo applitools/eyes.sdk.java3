@@ -19,6 +19,7 @@ import com.applitools.eyes.locators.VisualLocatorSettings;
 import com.applitools.eyes.locators.VisualLocatorsProvider;
 import com.applitools.eyes.scaling.FixedScaleProviderFactory;
 import com.applitools.eyes.scaling.NullScaleProvider;
+import com.applitools.eyes.selenium.ClassicRunner;
 import com.applitools.eyes.selenium.EyesDriverUtils;
 import com.applitools.eyes.selenium.StitchMode;
 import com.applitools.eyes.selenium.fluent.SimpleRegionByElement;
@@ -63,7 +64,7 @@ public class Eyes extends EyesBase {
     private String scrollRootElementId = null;
 
     public Eyes() {
-        super();
+        super(new ClassicRunner());
         regionVisibilityStrategyHandler = new SimplePropertyHandler<>();
         regionVisibilityStrategyHandler.set(new MoveToRegionVisibilityStrategy(logger));
         configuration.setStitchOverlap(DEFAULT_STITCH_OVERLAP);
@@ -405,14 +406,13 @@ public class Eyes extends EyesBase {
             return;
         }
 
-        MatchWindowTask mwt = new MatchWindowTask(logger, getServerConnector(), runningSession, getMatchTimeout(), this);
         EyesScreenshot screenshot = getFullPageScreenshot();
         for (int i = 0; i < checkSettings.length; ++i) {
             if (((Hashtable<Integer, GetSimpleRegion>) getRegions).containsKey(i)) {
                 GetSimpleRegion getRegion = getRegions.get(i);
                 ICheckSettingsInternal checkSettingsInternal = checkSettingsInternalDictionary.get(i);
                 List<EyesScreenshot> subScreenshots = getSubScreenshots(screenshot, getRegion);
-                matchRegion(checkSettingsInternal, mwt, subScreenshots);
+                matchRegion(checkSettingsInternal, subScreenshots);
             }
         }
     }
@@ -429,7 +429,7 @@ public class Eyes extends EyesBase {
         return subScreenshots;
     }
 
-    private void matchRegion(ICheckSettingsInternal checkSettingsInternal, MatchWindowTask mwt, List<EyesScreenshot> subScreenshots) {
+    private void matchRegion(ICheckSettingsInternal checkSettingsInternal, List<EyesScreenshot> subScreenshots) {
         String name = checkSettingsInternal.getName();
         for (EyesScreenshot subScreenshot : subScreenshots) {
             debugScreenshotsProvider.save(subScreenshot.getImage(), String.format("subscreenshot_%s", name));
@@ -438,9 +438,9 @@ public class Eyes extends EyesBase {
             Location location = subScreenshot.getLocationInScreenshot(Location.ZERO, CoordinatesType.SCREENSHOT_AS_IS);
             AppOutput appOutput = new AppOutput(name, ImageUtils.encodeAsPng(subScreenshot.getImage()), null, null);
             AppOutputWithScreenshot appOutputWithScreenshot = new AppOutputWithScreenshot(appOutput, subScreenshot, location);
-            MatchWindowData data = mwt.prepareForMatch(new ArrayList<Trigger>(), appOutputWithScreenshot, name, false,
+            MatchWindowData data = prepareForMatch(new ArrayList<Trigger>(), appOutputWithScreenshot, name, false,
                     ims, this, null, getAppName());
-            MatchResult matchResult = mwt.performMatch(data);
+            MatchResult matchResult = performMatch(data);
             logger.verbose("matchResult.asExcepted: " + matchResult.getAsExpected());
         }
     }
