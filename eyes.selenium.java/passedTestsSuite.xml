@@ -89,6 +89,7 @@
                     <include name="TestSendDOM_2"/>
                     <include name="TestSendDOM_FullWindow"/>
                     <include name="TestCssFetching"/>
+                    <include name="TestBidirectionalFrameDependency"/>
                 </methods>
             </class>
         </classes>

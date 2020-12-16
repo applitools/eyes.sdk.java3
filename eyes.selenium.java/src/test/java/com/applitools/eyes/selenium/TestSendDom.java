@@ -1,5 +1,7 @@
 package com.applitools.eyes.selenium;
 
+import com.applitools.connectivity.MockServerConnector;
+import com.applitools.connectivity.ServerConnector;
 import com.applitools.eyes.*;
 import com.applitools.eyes.config.Configuration;
 import com.applitools.eyes.config.ConfigurationProvider;
@@ -7,20 +9,33 @@ import com.applitools.eyes.metadata.ActualAppOutput;
 import com.applitools.eyes.metadata.SessionResults;
 import com.applitools.eyes.selenium.capture.DomCapture;
 import com.applitools.eyes.selenium.fluent.Target;
+import com.applitools.eyes.selenium.frames.FrameChain;
+import com.applitools.eyes.selenium.wrappers.EyesSeleniumDriver;
+import com.applitools.eyes.selenium.wrappers.EyesTargetLocator;
 import com.applitools.eyes.utils.ReportingTestSuite;
 import com.applitools.eyes.utils.SeleniumUtils;
 import com.applitools.eyes.utils.TestUtils;
 import com.applitools.utils.GeneralUtils;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.mockito.ArgumentMatchers;
+import org.mockito.invocation.InvocationOnMock;
+import org.mockito.stubbing.Answer;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
 import org.testng.Assert;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.Comparator;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.atomic.AtomicReference;
+
+import static org.mockito.Mockito.*;
 
 public final class TestSendDom extends ReportingTestSuite {
 
@@ -216,6 +231,58 @@ public final class TestSendDom extends ReportingTestSuite {
         } finally {
             webDriver.quit();
         }
+    }
+
+    @Test
+    public void TestBidirectionalFrameDependency() {
+        EyesSeleniumDriver driver = mock(EyesSeleniumDriver.class);
+        when(driver.getFrameChain()).thenReturn(new FrameChain(new Logger()));
+        when(driver.switchTo()).thenReturn(mock(EyesTargetLocator.class));
+
+        final AtomicReference<String> currentUrl = new AtomicReference<>();
+        when(driver.findElement(ArgumentMatchers.<By>any())).thenAnswer(new Answer<WebElement>() {
+            @Override
+            public WebElement answer(InvocationOnMock invocation) {
+                By arg = invocation.getArgument(0);
+                if (arg.equals(By.xpath("url1"))) {
+                    currentUrl.set("url1");
+                }
+
+                if (arg.equals(By.xpath("url2"))) {
+                    currentUrl.set("url2");
+                }
+
+                return mock(WebElement.class);
+            }
+        });
+
+        when(driver.executeScript("return document.location.href")).thenAnswer(new Answer<Object>() {
+            @Override
+            public Object answer(InvocationOnMock invocation) {
+                return currentUrl.get();
+            }
+        });
+
+
+        ServerConnector serverConnector = new MockServerConnector();
+        SeleniumEyes eyes = mock(SeleniumEyes.class);
+
+        when(eyes.getServerConnector()).thenReturn(serverConnector);
+        when(eyes.getLogger()).thenReturn(new Logger());
+        when(eyes.getUserAgent()).thenReturn(UserAgent.parseUserAgentString("Mozilla/5.0 (Windows NT 6.1; WOW64; rv:54.0) Gecko/20100101 Firefox/54.0"));
+        when(eyes.getDriver()).thenReturn(driver);
+
+        DomCapture domCapture = spy(new DomCapture(eyes));
+        List<String> missingFrame = Arrays.asList("url1", "url2");
+        List<String> path = Arrays.asList("url3", "url1", "url4");
+        doReturn("content").when(domCapture).getFrameDom(anyString(), ArgumentMatchers.<String>anyList());
+
+        Map<String, String> result = domCapture.recurseFrames(missingFrame, path);
+        Assert.assertEquals(result.size(), 2);
+        Assert.assertEquals(result.get("url1"), "");
+        Assert.assertEquals(result.get("url2"), "content");
+        verify(domCapture, never()).getFrameDom(eq("url1"), ArgumentMatchers.<String>anyList());
+        verify(domCapture, times(1)).getFrameDom("url2", Arrays.asList("url3", "url1", "url4", "url2"));
     }
 
     private static boolean getHasDom(IEyesBase eyes, TestResults results) throws IOException {

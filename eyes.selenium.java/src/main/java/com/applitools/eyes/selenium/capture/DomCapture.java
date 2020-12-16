@@ -62,20 +62,20 @@ public class DomCapture {
         positionProvider.setPosition(Location.ZERO);
         FrameChain originalFC = driver.getFrameChain().clone();
         String baseUrl = (String) driver.executeScript("return document.location.href");
-        String dom = getFrameDom(baseUrl);
+        String dom = getFrameDom(baseUrl, Collections.singletonList(baseUrl));
         if (originalFC != null) {
             ((EyesTargetLocator) driver.switchTo()).frames(originalFC);
         }
 
         try {
             if (shouldWaitForPhaser) {
-                cssPhaser.awaitAdvanceInterruptibly(0, 10, TimeUnit.MINUTES);
+                cssPhaser.awaitAdvanceInterruptibly(0, 5, TimeUnit.MINUTES);
             }
         } catch (InterruptedException | TimeoutException e) {
             GeneralUtils.logExceptionStackTrace(logger, e);
         }
 
-
+        shouldWaitForPhaser = false;
         Map<String, String> cssStringsToReplace = new HashMap<>();
         for (String url : cssNodesToReplace.keySet()) {
             cssStringsToReplace.put(url, cssNodesToReplace.get(url).toString());
@@ -85,7 +85,7 @@ public class DomCapture {
         return domJson;
     }
 
-    private String getFrameDom(String baseUrl) {
+    public String getFrameDom(String baseUrl, List<String> framesPath) {
         logger.verbose("Trying to get DOM from driver");
         String domScript = userAgent.isInternetExplorer() ? CAPTURE_DOM_FOR_IE : CAPTURE_DOM;
         String pollingScript = userAgent.isInternetExplorer() ? POLL_RESULT_FOR_IE : POLL_RESULT;
@@ -109,7 +109,7 @@ public class DomCapture {
 
         Map<String, String> framesData = new HashMap<>();
         try {
-            framesData = recurseFrames(missingFramesList);
+            framesData = recurseFrames(missingFramesList, framesPath);
         } catch (Exception e) {
             GeneralUtils.logExceptionStackTrace(logger, e);
         }
@@ -142,7 +142,6 @@ public class DomCapture {
         } catch (IOException e) {
             GeneralUtils.logExceptionStackTrace(logger, e);
         }
-        shouldWaitForPhaser |= !missingCssList.isEmpty();
         return separators;
     }
 
@@ -160,6 +159,7 @@ public class DomCapture {
             try {
                 cssPhaser.register();
                 logger.verbose(String.format("Downloading css url %s", uri));
+                shouldWaitForPhaser = true;
                 serverConnector.downloadResource(uri, userAgent.toString(), baseUrl, new TaskListener<RGridResource>() {
                     @Override
                     public void onComplete(RGridResource resource) {
@@ -169,6 +169,7 @@ public class DomCapture {
                             node.parse(logger);
                             List<String> importedUrls = node.getImportedUrls();
                             if (!importedUrls.isEmpty()) {
+                                logger.verbose(String.format("New urls parsed from %s: %s", uri.toString(), Arrays.toString(importedUrls.toArray())));
                                 fetchCssFiles(uri.toString(), importedUrls, node);
                             }
 
@@ -200,14 +201,13 @@ public class DomCapture {
         }
     }
 
-    private Map<String, String> recurseFrames(List<String> missingFramesList) {
+    public Map<String, String> recurseFrames(List<String> missingFramesList, List<String> framesPath) {
         Map<String, String> framesData = new HashMap<>();
         EyesTargetLocator switchTo = (EyesTargetLocator) driver.switchTo();
 
         FrameChain fc = driver.getFrameChain().clone();
         for (String missingFrameLine : missingFramesList) {
             logger.verbose("Switching to frame line :" + missingFrameLine);
-            String originLocation = (String) driver.executeScript("return document.location.href");
             try {
                 String[] missingFrameXpaths = missingFrameLine.split(",");
                 for (String missingFrameXpath : missingFrameXpaths) {
@@ -217,18 +217,22 @@ public class DomCapture {
                     switchTo.frame(frame);
                 }
                 String locationAfterSwitch = (String) driver.executeScript("return document.location.href");
-                if (locationAfterSwitch.equals(originLocation)) {
-                    logger.verbose("Switching to frame failed");
+                if (framesPath.contains(locationAfterSwitch)) {
+                    logger.verbose("Found a bidirectional dependency. not switching to frame");
                     framesData.put(missingFrameLine, "");
                     continue;
                 }
-                String result = getFrameDom(locationAfterSwitch);
+
+                List<String> newFramePath = new ArrayList<>(framesPath);
+                newFramePath.add(locationAfterSwitch);
+                String result = getFrameDom(locationAfterSwitch, newFramePath);
                 framesData.put(missingFrameLine, result);
             } catch (Exception e) {
                 GeneralUtils.logExceptionStackTrace(logger, e);
                 framesData.put(missingFrameLine, "");
+            } finally {
+                switchTo.frames(fc);
             }
-            switchTo.frames(fc);
         }
 
         return framesData;
