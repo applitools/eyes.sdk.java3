@@ -5,6 +5,7 @@
 - Dom snapshot 4.4.1. [Trello 2360](https://trello.com/c/Nkq5X4dJ)
 - Updated method for searching scrollable view. Ignore horizontal scrollable views on searching for the scrollable element. [Trello 2347](https://trello.com/c/FDZ1oWF9) 
 - Adjusted scroll coordinates on a stitchOverlap value. [Trello 2138](https://trello.com/c/EI2mxmTD)
+- Added new browser for UFG tests: SAFARI_EARLY_ACCESS. [Trello 2385](https://trello.com/c/5PncFGDO)
 
 ## [3.188.0] - 2020-12-09
 ### Fixed
