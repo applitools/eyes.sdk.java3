@@ -17,7 +17,7 @@ public class TestAPI extends ReportingTestSuite {
     @Test
     public void TestBrowserNames() {
         List<BrowserType> browsers = new ArrayList<>(Arrays.asList(BrowserType.values()));
-        Assert.assertEquals(browsers.size(), 15, "wrong number of browser types");
+        Assert.assertEquals(browsers.size(), 16, "wrong number of browser types");
         for (BrowserType browser : browsers) {
             Assert.assertNotNull(BrowserNames.getBrowserName(browser), "BrowserType." + browser.name() + " is not covered by BrowserNames.getBrowserName");
         }
@@ -41,6 +41,8 @@ public class TestAPI extends ReportingTestSuite {
         browsers.remove(BrowserType.SAFARI_ONE_VERSION_BACK);
         Assert.assertEquals(BrowserNames.SAFARI, BrowserNames.getBrowserName(BrowserType.SAFARI_TWO_VERSIONS_BACK));
         browsers.remove(BrowserType.SAFARI_TWO_VERSIONS_BACK);
+        Assert.assertEquals(BrowserNames.SAFARI, BrowserNames.getBrowserName(BrowserType.SAFARI_EARLY_ACCESS));
+        browsers.remove(BrowserType.SAFARI_EARLY_ACCESS);
 
         Assert.assertEquals(BrowserNames.IE + " 10", BrowserNames.getBrowserName(BrowserType.IE_10));
         browsers.remove(BrowserType.IE_10);
