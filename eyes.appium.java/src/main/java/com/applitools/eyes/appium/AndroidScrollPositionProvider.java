@@ -232,42 +232,38 @@ public class AndroidScrollPositionProvider extends AppiumScrollPositionProvider 
                 element.getSize().getWidth(),
                 element.getSize().getHeight());
         if (shouldStitchContent) {
-            try {
-                logger.verbose("Element is instance of " + element.getAttribute("className"));
-                double devicePixelRatio = eyesDriver.getDevicePixelRatio();
-                ContentSize contentSize = EyesAppiumUtils.getContentSize(driver, element);
-                region = new Region(contentSize.left,
-                        (int) (element.getLocation().y * devicePixelRatio),
-                        contentSize.width,
-                        contentSize.getScrollContentHeight());
-                if (element.getAttribute("className").equals("android.support.v7.widget.RecyclerView") ||
-                        element.getAttribute("className").equals("androidx.recyclerview.widget.RecyclerView") ||
-                        element.getAttribute("className").equals("androidx.viewpager2.widget.ViewPager2") ||
-                        element.getAttribute("className").equals("android.widget.ListView") ||
-                        element.getAttribute("className").equals("android.widget.GridView")) {
-                    try {
-                        MobileElement hiddenElement = ((AndroidDriver<AndroidElement>) driver).findElement(MobileBy.AndroidUIAutomator("new UiSelector().description(\"EyesAppiumHelper\")"));
-                        if (hiddenElement != null) {
-                            hiddenElement.click();
+            logger.verbose("Element is instance of " + element.getAttribute("className"));
+            double devicePixelRatio = eyesDriver.getDevicePixelRatio();
+            ContentSize contentSize = EyesAppiumUtils.getContentSize(driver, element);
+            region = new Region(contentSize.left,
+                    (int) (element.getLocation().y * devicePixelRatio),
+                    contentSize.width,
+                    contentSize.getScrollContentHeight());
+            if (element.getAttribute("className").equals("android.support.v7.widget.RecyclerView") ||
+                    element.getAttribute("className").equals("androidx.recyclerview.widget.RecyclerView") ||
+                    element.getAttribute("className").equals("androidx.viewpager2.widget.ViewPager2") ||
+                    element.getAttribute("className").equals("android.widget.ListView") ||
+                    element.getAttribute("className").equals("android.widget.GridView")) {
+                try {
+                    MobileElement hiddenElement = ((AndroidDriver<AndroidElement>) driver).findElement(MobileBy.AndroidUIAutomator("new UiSelector().description(\"EyesAppiumHelper\")"));
+                    if (hiddenElement != null) {
+                        hiddenElement.click();
 
-                            String scrollableContentSize = hiddenElement.getText();
-                            try {
-                                int scrollableHeight = Integer.valueOf(scrollableContentSize);
-                                logger.verbose("Scrollable height received from EyesAppiumHelper = " + scrollableContentSize);
-                                region = new Region((int) (element.getLocation().getX() * devicePixelRatio),
-                                        (int) (element.getLocation().getY() * devicePixelRatio),
-                                        (int) (element.getSize().getWidth() * devicePixelRatio),
-                                        scrollableHeight);
-                            } catch (NumberFormatException nfe) {
-                                logger.verbose("Could not parse scrollable content height");
-                            }
+                        String scrollableContentSize = hiddenElement.getText();
+                        try {
+                            int scrollableHeight = Integer.valueOf(scrollableContentSize);
+                            logger.verbose("Scrollable height received from EyesAppiumHelper = " + scrollableContentSize);
+                            region = new Region((int) (element.getLocation().getX() * devicePixelRatio),
+                                    (int) (element.getLocation().getY() * devicePixelRatio),
+                                    (int) (element.getSize().getWidth() * devicePixelRatio),
+                                    scrollableHeight);
+                        } catch (NumberFormatException nfe) {
+                            logger.verbose("Could not parse scrollable content height");
                         }
-                    } catch (NoSuchElementException | StaleElementReferenceException ignored) {
-                        logger.verbose("Could not get EyesAppiumHelper element.");
                     }
+                } catch (NoSuchElementException | StaleElementReferenceException ignored) {
+                    logger.verbose("Could not get EyesAppiumHelper element.");
                 }
-            } catch (IOException e) {
-                logger.verbose("Could not get element content size.");
             }
         }
         return region;

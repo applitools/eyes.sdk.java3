@@ -70,8 +70,6 @@ public abstract class AppiumScrollPositionProvider implements ScrollPositionProv
             logger.verbose("Retrieved contentSize, it is: " + contentSize);
         } catch (NoSuchElementException e) {
             logger.log("WARNING: No active scroll element, so no content size to retrieve");
-        } catch (IOException e) {
-            logger.log("WARNING: could not retrieve content size from active scroll element");
         }
 
         return contentSize;

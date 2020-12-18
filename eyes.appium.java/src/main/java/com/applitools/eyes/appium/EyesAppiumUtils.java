@@ -57,14 +57,14 @@ public class EyesAppiumUtils {
         driver.executeScript("mobile: scrollBackTo", args);
     }
 
-    public static ContentSize getContentSize(AppiumDriver driver, WebElement element) throws IOException {
+    public static ContentSize getContentSize(AppiumDriver driver, WebElement element) {
         ContentSize contentSize;
         try {
             String contentSizeJson = element.getAttribute("contentSize");
             ObjectMapper objectMapper = new ObjectMapper();
             contentSize = objectMapper.readValue(contentSizeJson, ContentSize.class);
             contentSize.setDriver(driver);
-        } catch (WebDriverException e) {
+        } catch (WebDriverException | IOException e) {
             contentSize = new ContentSize();
             contentSize.height = element.getSize().getHeight();
             contentSize.width = element.getSize().getWidth();

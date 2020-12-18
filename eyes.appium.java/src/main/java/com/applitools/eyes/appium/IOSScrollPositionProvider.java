@@ -157,60 +157,56 @@ public class IOSScrollPositionProvider extends AppiumScrollPositionProvider {
                 (int) (element.getSize().getHeight() * devicePixelRatio));;
         logger.verbose("Element is instance of " + element.getAttribute("type"));
         if (shouldStitchContent) {
-            try {
-                ContentSize contentSize = EyesAppiumUtils.getContentSize(driver, element);
-                /*
-                * The result of EyesAppiumUtils.getContentSize() is different in the same conditions for different types of views.
-                * E.g. contentSize.top value for type 'XCUIElementTypeTable' INcludes the size of status bar(of cause if
-                * it is visible). But contentSize.top for type 'XCUIElementTypeScrollView' returnes value
-                * EXcluding size of status bar.
-                *
-                * It happens so because Appium gives us the result of content size for 'XCUIElementTypeTable'. In case
-                * 'XCUIElementTypeScrollView' Appium throws an exception and contentSize is set manually from
-                * element.getSize() and element.getLocation() values, where element.getLocation().getY() value
-                * does NOT include status bar size.
-                *
-                * Let's imagine we got iPhone 8, status bar is visible(height = 20 points),
-                * navigation bar exists as well(height = 44 points). Under navigation bar locates or table view, or scroll view.
-                * Frame of both views will be the same: {(0, 64), (375, 603)}. Height of internal content equals 1000 for both views.
-                * So result of EyesAppiumUtils.getContentSize() for views will be like that:
-                * - table view: {(0, 64), (375, 1000)}
-                * - scroll view: {(0, 44), (375, 1000)}
-                *
-                * Value element.getRect().getY() always INcludes status bar size. Let's use it in calculations.
-                * */
-                switch (element.getAttribute("type")) {
-                    case "XCUIElementTypeTable":
-                        List<WebElement> list = element.findElements(MobileBy.xpath("//XCUIElementTypeTable[1]/*"));
-                        if (!list.isEmpty()) {
-                            WebElement lastElement = list.get(list.size()-1);
-                            contentSize.scrollableOffset = lastElement.getLocation().getY() + lastElement.getSize().getHeight()
-                                    - element.getRect().getY() + eyesDriver.getStatusBarHeight();
-                        }
-                        break;
-                    case "XCUIElementTypeScrollView":
-                        list = element.findElements(MobileBy.xpath("//XCUIElementTypeScrollView[1]/*"));
-                        if (!list.isEmpty()) {
-                            WebElement firstElement = list.get(0);
-                            contentSize.scrollableOffset = firstElement.getLocation().getY() + firstElement.getSize().getHeight()
-                                    - element.getRect().getY() + eyesDriver.getStatusBarHeight();
-                        }
-                        break;
-                }
-
-                // Correct Y coordinate by status bar size.
-                contentSize.top = positionCorrectionRegardingStatusBar(element.getRect().getY(), statusBarExists);
-                if (contentSize.scrollableOffset == 0) {
-                    contentSize.scrollableOffset = contentSize.height;
-                }
-
-                region = new Region((int) (contentSize.left * devicePixelRatio),
-                        (int) (contentSize.top * devicePixelRatio),
-                        (int) (contentSize.width * devicePixelRatio),
-                        (int) (contentSize.getScrollContentHeight() * devicePixelRatio));
-            } catch (IOException e) {
-                logger.verbose("Could not get element content size.");
+            ContentSize contentSize = EyesAppiumUtils.getContentSize(driver, element);
+            /*
+            * The result of EyesAppiumUtils.getContentSize() is different in the same conditions for different types of views.
+            * E.g. contentSize.top value for type 'XCUIElementTypeTable' INcludes the size of status bar(of cause if
+            * it is visible). But contentSize.top for type 'XCUIElementTypeScrollView' returnes value
+            * EXcluding size of status bar.
+            *
+            * It happens so because Appium gives us the result of content size for 'XCUIElementTypeTable'. In case
+            * 'XCUIElementTypeScrollView' Appium throws an exception and contentSize is set manually from
+            * element.getSize() and element.getLocation() values, where element.getLocation().getY() value
+            * does NOT include status bar size.
+            *
+            * Let's imagine we got iPhone 8, status bar is visible(height = 20 points),
+            * navigation bar exists as well(height = 44 points). Under navigation bar locates or table view, or scroll view.
+            * Frame of both views will be the same: {(0, 64), (375, 603)}. Height of internal content equals 1000 for both views.
+            * So result of EyesAppiumUtils.getContentSize() for views will be like that:
+            * - table view: {(0, 64), (375, 1000)}
+            * - scroll view: {(0, 44), (375, 1000)}
+            *
+            * Value element.getRect().getY() always INcludes status bar size. Let's use it in calculations.
+            * */
+            switch (element.getAttribute("type")) {
+                case "XCUIElementTypeTable":
+                    List<WebElement> list = element.findElements(MobileBy.xpath("//XCUIElementTypeTable[1]/*"));
+                    if (!list.isEmpty()) {
+                        WebElement lastElement = list.get(list.size()-1);
+                        contentSize.scrollableOffset = lastElement.getLocation().getY() + lastElement.getSize().getHeight()
+                                - element.getRect().getY() + eyesDriver.getStatusBarHeight();
+                    }
+                    break;
+                case "XCUIElementTypeScrollView":
+                    list = element.findElements(MobileBy.xpath("//XCUIElementTypeScrollView[1]/*"));
+                    if (!list.isEmpty()) {
+                        WebElement firstElement = list.get(0);
+                        contentSize.scrollableOffset = firstElement.getLocation().getY() + firstElement.getSize().getHeight()
+                                - element.getRect().getY() + eyesDriver.getStatusBarHeight();
+                    }
+                    break;
             }
+
+            // Correct Y coordinate by status bar size.
+            contentSize.top = positionCorrectionRegardingStatusBar(element.getRect().getY(), statusBarExists);
+            if (contentSize.scrollableOffset == 0) {
+                contentSize.scrollableOffset = contentSize.height;
+            }
+
+            region = new Region((int) (contentSize.left * devicePixelRatio),
+                    (int) (contentSize.top * devicePixelRatio),
+                    (int) (contentSize.width * devicePixelRatio),
+                    (int) (contentSize.getScrollContentHeight() * devicePixelRatio));
         }
         return region;
     }
@@ -221,14 +217,8 @@ public class IOSScrollPositionProvider extends AppiumScrollPositionProvider {
         try {
             WebElement activeScroll = getFirstScrollableView();
             logger.verbose("Scrollable element is type of " + activeScroll.getAttribute("type"));
-            try {
-                contentSize = EyesAppiumUtils.getContentSize(driver, activeScroll);
-
-                contentSize.scrollableOffset = getEntireScrollableHeight(activeScroll, contentSize);
-            } catch (IOException e) {
-                logger.log("WARNING: could not retrieve content size from active scroll element");
-                contentSize = null;
-            }
+            contentSize = EyesAppiumUtils.getContentSize(driver, activeScroll);
+            contentSize.scrollableOffset = getEntireScrollableHeight(activeScroll, contentSize);
         } catch (NoSuchElementException e) {
             logger.log("WARNING: No active scroll element, so no content size to retrieve");
             contentSize = null;
