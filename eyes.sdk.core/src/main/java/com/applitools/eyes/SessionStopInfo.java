@@ -34,4 +34,13 @@ public class SessionStopInfo {
     public void setShouldSave(boolean shouldSave) {
         this.shouldSave = shouldSave;
     }
+
+    @Override
+    public String toString() {
+        return "SessionStopInfo{" +
+                "runningSession=" + runningSession +
+                ", isAborted=" + isAborted +
+                ", shouldSave=" + shouldSave +
+                '}';
+    }
 }

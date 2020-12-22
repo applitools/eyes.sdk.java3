@@ -505,7 +505,8 @@ public abstract class EyesBase implements IEyesBase {
         TestResults testResults = runner.close(sessionStopInfo);
         runningSession = null;
         if (testResults == null) {
-            throw new EyesException("Failed stopping session");
+            logger.log("Failed stopping session");
+            throw new EyesException(String.format("Failed stopping session. SessionStopInfo: %s", sessionStopInfo));
         }
         return testResults;
     }
