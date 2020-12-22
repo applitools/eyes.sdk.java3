@@ -519,7 +519,6 @@ public class Eyes extends EyesBase {
                 throw e;
             }
         }
-        getServerConnector().closeConnector();
         return results;
     }
 

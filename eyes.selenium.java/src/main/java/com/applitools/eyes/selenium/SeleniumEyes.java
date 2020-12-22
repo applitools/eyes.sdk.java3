@@ -1152,11 +1152,6 @@ public class SeleniumEyes extends RunningTest implements ISeleniumEyes {
         return targetElement;
     }
 
-    @Override
-    public void closeBatch(String batchId) {
-        this.getServerConnector().closeBatch(batchId);
-    }
-
     /**
      * Updates the state of scaling related parameters.
      * @return the scale provider factory
@@ -1863,7 +1858,6 @@ public class SeleniumEyes extends RunningTest implements ISeleniumEyes {
             this.runner.aggregateResult(testResultContainer);
         }
         this.cachedAUTSessionId = null;
-        getServerConnector().closeConnector();
         return results;
     }
 

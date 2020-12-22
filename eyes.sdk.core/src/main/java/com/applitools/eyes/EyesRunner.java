@@ -39,6 +39,8 @@ public abstract class EyesRunner {
         } finally {
             deleteAllBatches();
         }
+
+        serverConnector.closeConnector();
         return allTestResults;
     }
 
