@@ -3,6 +3,7 @@ package com.applitools.eyes.visualgrid.services;
 import com.applitools.connectivity.ServerConnector;
 import com.applitools.eyes.*;
 import com.applitools.eyes.logging.TraceLevel;
+import com.applitools.eyes.services.EyesServiceRunner;
 import com.applitools.eyes.visualgrid.model.FrameData;
 import com.applitools.eyes.visualgrid.model.IDebugResourceWriter;
 import com.applitools.eyes.visualgrid.model.RGridResource;
@@ -12,8 +13,6 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.util.*;
 
 public class VisualGridRunner extends EyesRunner {
@@ -43,12 +42,11 @@ public class VisualGridRunner extends EyesRunner {
     private EyesServiceRunner eyesServiceRunner;
     final TestConcurrency testConcurrency;
     private boolean wasConcurrencyLogSent = false;
-    final Set<IRenderingEyes> allEyes = Collections.synchronizedSet(new HashSet<IRenderingEyes>());
+    final Set<IEyes> allEyes = Collections.synchronizedSet(new HashSet<IEyes>());
     private final Map<String, RGridResource> resourcesCacheMap = Collections.synchronizedMap(new HashMap<String, RGridResource>());
 
     private RenderingInfo renderingInfo;
     private IDebugResourceWriter debugResourceWriter;
-    private ServerConnector serverConnector = new ServerConnector();
     private boolean isDisabled;
 
     private String suiteName;
@@ -93,7 +91,7 @@ public class VisualGridRunner extends EyesRunner {
         logger.verbose("rendering grid manager is built");
     }
 
-    public void open(IRenderingEyes eyes, List<RunningTest> newTests) {
+    public void open(IEyes eyes, List<VisualGridRunningTest> newTests) {
         logger.verbose("enter");
 
         setApiKey(eyes.getApiKey());
@@ -129,17 +127,13 @@ public class VisualGridRunner extends EyesRunner {
         eyesServiceRunner.addResourceCollectionTask(domData, checkTasks);
     }
 
-    public TestResultsSummary getAllTestResultsImpl() {
-        return getAllTestResults(true);
-    }
-
     public TestResultsSummary getAllTestResultsImpl(boolean throwException) {
         logger.log("enter");
         boolean isRunning = true;
         while (isRunning && eyesServiceRunner.getError() == null) {
             isRunning = false;
             synchronized (allEyes) {
-                for (IRenderingEyes eyes : allEyes) {
+                for (IEyes eyes : allEyes) {
                     isRunning = isRunning || !eyes.isCompleted();
                 }
             }
@@ -158,7 +152,7 @@ public class VisualGridRunner extends EyesRunner {
         Throwable exception = null;
         List<TestResultContainer> allResults = new ArrayList<>();
         synchronized (allEyes) {
-            for (IRenderingEyes eyes : allEyes) {
+            for (IEyes eyes : allEyes) {
                 List<TestResultContainer> eyesResults = eyes.getAllTestResults();
                 for (TestResultContainer result : eyesResults) {
                     if (exception == null && result.getException() != null) {
@@ -194,6 +188,12 @@ public class VisualGridRunner extends EyesRunner {
         }
     }
 
+    @Override
+    public void setServerConnector(ServerConnector serverConnector) {
+        super.setServerConnector(serverConnector);
+        eyesServiceRunner.setServerConnector(serverConnector);
+    }
+
     public String getConcurrencyLog() throws JsonProcessingException {
         if (wasConcurrencyLogSent) {
             return null;
@@ -210,71 +210,6 @@ public class VisualGridRunner extends EyesRunner {
 
     public Map<String, RGridResource> getResourcesCacheMap() {
         return resourcesCacheMap;
-    }
-
-    public void setServerUrl(String serverUrl) {
-        if (serverUrl != null) {
-            if (serverConnector.getServerUrl().equals(GeneralUtils.getServerUrl())) {
-                try {
-                    serverConnector.setServerUrl(new URI(serverUrl));
-                } catch (URISyntaxException e) {
-                    GeneralUtils.logExceptionStackTrace(logger, e);
-                }
-            } else if (!serverConnector.getServerUrl().toString().equals(serverUrl)) {
-                throw new EyesException(String.format("Server url was already set to %s", serverConnector.getServerUrl()));
-            }
-        }
-    }
-
-    public String getServerUrl() {
-        return serverConnector.getServerUrl().toString();
-    }
-
-    public String getApiKey() {
-        return serverConnector.getApiKey();
-    }
-
-    public void setApiKey(String apiKey) {
-        if (apiKey != null) {
-            if (!serverConnector.wasApiKeySet()) {
-                serverConnector.setApiKey(apiKey);
-            } else if (!serverConnector.getApiKey().equals(apiKey)) {
-                throw new EyesException(String.format("Api key was already set to %s", serverConnector.getApiKey()));
-            }
-        }
-    }
-
-    public void setServerConnector(ServerConnector serverConnector) {
-        this.serverConnector = serverConnector;
-        eyesServiceRunner.setServerConnector(serverConnector);
-    }
-
-    public ServerConnector getServerConnector() {
-        return serverConnector;
-    }
-
-    public void setProxy(AbstractProxySettings proxySettings) {
-        if (proxySettings != null) {
-            if (serverConnector.getProxy() == null) {
-                serverConnector.setProxy(proxySettings);
-            } else if (!serverConnector.getProxy().equals(proxySettings)) {
-                throw new EyesException("Proxy was already set");
-            }
-        }
-    }
-
-    public AbstractProxySettings getProxy() {
-        return serverConnector.getProxy();
-    }
-
-    public void setAgentId(String agentId) {
-        if (agentId != null) {
-            serverConnector.setAgentId(agentId);
-        }
-    }
-
-    public String getAgentId() {
-        return serverConnector.getAgentId();
     }
 
     public void setIsDisabled(boolean isDisabled) {

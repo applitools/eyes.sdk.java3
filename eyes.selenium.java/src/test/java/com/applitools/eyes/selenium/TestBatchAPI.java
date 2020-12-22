@@ -31,7 +31,7 @@ public final class TestBatchAPI extends ReportingTestSuite {
 
             eyes.open(driver, "Applitools Eyes Java SDK", "Test Close Batch", new RectangleSize(1200, 800));
 
-            BatchInfo batchBeforeDelete = CommunicationUtils.getBatch(batchInfo.getId(), eyes.getServerUrl().toString(), eyes.getApiKey());
+            BatchInfo batchBeforeDelete = CommunicationUtils.getBatch(eyes.getLogger(), batchInfo.getId(), eyes.getServerUrl().toString(), eyes.getApiKey());
 
             Assert.assertFalse(batchBeforeDelete.isCompleted());
 
@@ -44,6 +44,6 @@ public final class TestBatchAPI extends ReportingTestSuite {
         }
 
         // Getting 200 for the request is enough for the test
-        CommunicationUtils.getBatch(batchInfo.getId(), eyes.getServerUrl().toString(), eyes.getApiKey());
+        CommunicationUtils.getBatch(eyes.getLogger(), batchInfo.getId(), eyes.getServerUrl().toString(), eyes.getApiKey());
     }
 }

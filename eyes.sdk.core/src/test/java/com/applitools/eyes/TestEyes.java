@@ -39,11 +39,6 @@ public class TestEyes extends EyesBase {
     }
 
     @Override
-    protected String getAUTSessionId() {
-        return null;
-    }
-
-    @Override
     protected Configuration getConfigurationInstance() {
         return configuration;
     }

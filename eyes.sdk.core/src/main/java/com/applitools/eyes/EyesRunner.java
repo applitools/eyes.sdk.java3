@@ -1,13 +1,16 @@
 package com.applitools.eyes;
 
+import com.applitools.connectivity.ServerConnector;
 import com.applitools.utils.GeneralUtils;
 
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
 public abstract class EyesRunner {
-
+    protected ServerConnector serverConnector = new ServerConnector();
     private TestResultsSummary allTestResults = null;
 
     private boolean dontCloseBatches = false;
@@ -15,8 +18,6 @@ public abstract class EyesRunner {
     protected Logger logger = new IdPrintingLogger("n/a");
 
     private final Map<String, IBatchCloser> batchesServerConnectorsMap = new HashMap<>();
-
-    public abstract TestResultsSummary getAllTestResultsImpl();
 
     public abstract TestResultsSummary getAllTestResultsImpl(boolean shouldThrowException);
 
@@ -36,6 +37,9 @@ public abstract class EyesRunner {
         } finally {
             deleteAllBatches();
         }
+
+        serverConnector.closeConnector();
+        logger.getLogHandler().close();
         return allTestResults;
     }
 
@@ -95,5 +99,69 @@ public abstract class EyesRunner {
         public String getPrefix() {
             return super.getPrefix() + suiteName + " (runnerId: " + runnerId + ") ";
         }
+    }
+
+    public void setServerUrl(String serverUrl) {
+        if (serverUrl != null) {
+            if (serverConnector.getServerUrl().equals(GeneralUtils.getServerUrl())) {
+                try {
+                    serverConnector.setServerUrl(new URI(serverUrl));
+                } catch (URISyntaxException e) {
+                    GeneralUtils.logExceptionStackTrace(logger, e);
+                }
+            } else if (!serverConnector.getServerUrl().toString().equals(serverUrl)) {
+                throw new EyesException(String.format("Server url was already set to %s", serverConnector.getServerUrl()));
+            }
+        }
+    }
+
+    public String getServerUrl() {
+        return serverConnector.getServerUrl().toString();
+    }
+
+    public String getApiKey() {
+        return serverConnector.getApiKey();
+    }
+
+    public void setApiKey(String apiKey) {
+        if (apiKey != null) {
+            if (!serverConnector.wasApiKeySet()) {
+                serverConnector.setApiKey(apiKey);
+            } else if (!serverConnector.getApiKey().equals(apiKey)) {
+                throw new EyesException(String.format("Api key was already set to %s", serverConnector.getApiKey()));
+            }
+        }
+    }
+
+    public void setServerConnector(ServerConnector serverConnector) {
+        this.serverConnector = serverConnector;
+    }
+
+    public ServerConnector getServerConnector() {
+        return serverConnector;
+    }
+
+    public void setProxy(AbstractProxySettings proxySettings) {
+        if (proxySettings != null) {
+            if (serverConnector.getProxy() == null) {
+                serverConnector.setProxy(proxySettings);
+            } else if (!serverConnector.getProxy().equals(proxySettings)) {
+                throw new EyesException("Proxy was already set");
+            }
+        }
+    }
+
+    public AbstractProxySettings getProxy() {
+        return serverConnector.getProxy();
+    }
+
+    public void setAgentId(String agentId) {
+        if (agentId != null) {
+            serverConnector.setAgentId(agentId);
+        }
+    }
+
+    public String getAgentId() {
+        return serverConnector.getAgentId();
     }
 }

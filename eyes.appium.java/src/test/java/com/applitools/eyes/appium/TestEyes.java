@@ -48,11 +48,6 @@ public class TestEyes extends EyesBase {
         return "TestEyes_Title";
     }
 
-    @Override
-    protected String getAUTSessionId() {
-        return null;
-    }
-
     public void setConfiguration(Configuration configuration) {
         this.configuration = configuration;
     }

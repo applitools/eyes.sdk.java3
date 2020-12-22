@@ -1,6 +1,3 @@
-/*
- * Applitools SDK for Selenium integration.
- */
 package com.applitools.eyes.selenium;
 
 import com.applitools.ICheckSettings;
@@ -27,10 +24,12 @@ import com.applitools.eyes.selenium.regionVisibility.MoveToRegionVisibilityStrat
 import com.applitools.eyes.selenium.regionVisibility.NopRegionVisibilityStrategy;
 import com.applitools.eyes.selenium.regionVisibility.RegionVisibilityStrategy;
 import com.applitools.eyes.selenium.wrappers.EyesRemoteWebElement;
-import com.applitools.eyes.selenium.wrappers.EyesTargetLocator;
 import com.applitools.eyes.selenium.wrappers.EyesSeleniumDriver;
+import com.applitools.eyes.selenium.wrappers.EyesTargetLocator;
 import com.applitools.eyes.triggers.MouseAction;
 import com.applitools.eyes.visualgrid.model.RenderingInfo;
+import com.applitools.eyes.visualgrid.model.VisualGridSelector;
+import com.applitools.eyes.visualgrid.services.CheckTask;
 import com.applitools.utils.*;
 import org.apache.http.annotation.Obsolete;
 import org.openqa.selenium.*;
@@ -38,16 +37,13 @@ import org.openqa.selenium.remote.RemoteWebDriver;
 
 import java.awt.image.BufferedImage;
 import java.net.URI;
-import java.util.ArrayList;
-import java.util.Dictionary;
-import java.util.Hashtable;
-import java.util.List;
+import java.util.*;
 
 /**
  * The main API gateway for the SDK.
  */
 @SuppressWarnings("WeakerAccess")
-public class SeleniumEyes extends EyesBase implements ISeleniumEyes, IBatchCloser {
+public class SeleniumEyes extends RunningTest implements ISeleniumEyes {
 
     private FrameChain originalFC;
     private WebElement userDefinedSRE;
@@ -64,18 +60,11 @@ public class SeleniumEyes extends EyesBase implements ISeleniumEyes, IBatchClose
 
     private static final int USE_DEFAULT_MATCH_TIMEOUT = -1;
 
-    // Seconds
-    private static final int RESPONSE_TIME_DEFAULT_DEADLINE = 10;
-
-    // Seconds
-    private static final int RESPONSE_TIME_DEFAULT_DIFF_FROM_DEADLINE = 20;
-
     private EyesSeleniumDriver driver;
     private boolean doNotGetTitle;
 
     public boolean checkFrameOrElement;
     private Region regionToCheck;
-    private String originalOverflow;
 
     private ImageRotation rotation;
     private double devicePixelRatio;
@@ -88,9 +77,7 @@ public class SeleniumEyes extends EyesBase implements ISeleniumEyes, IBatchClose
     private Region effectiveViewport;
 
     private EyesScreenshotFactory screenshotFactory;
-    private String cachedAUTSessionId;
     private final ConfigurationProvider configurationProvider;
-    private ClassicRunner runner;
 
     /**
      * Should stitch content boolean.
@@ -118,14 +105,13 @@ public class SeleniumEyes extends EyesBase implements ISeleniumEyes, IBatchClose
      * service.
      */
     public SeleniumEyes(ConfigurationProvider configurationProvider, ClassicRunner runner) {
-        super();
+        super(runner);
         this.configurationProvider = configurationProvider;
         checkFrameOrElement = false;
         doNotGetTitle = false;
         devicePixelRatio = UNKNOWN_DEVICE_PIXEL_RATIO;
         regionVisibilityStrategyHandler = new SimplePropertyHandler<>();
         regionVisibilityStrategyHandler.set(new MoveToRegionVisibilityStrategy(logger));
-        this.runner = runner;
     }
 
     @Override
@@ -135,6 +121,42 @@ public class SeleniumEyes extends EyesBase implements ISeleniumEyes, IBatchClose
 
     public void apiKey(String apiKey) {
         setApiKey(apiKey);
+    }
+
+    @Override
+    public boolean isEyesClosed() {
+        return isCompleted();
+    }
+
+    @Override
+    public IBatchCloser getBatchCloser() {
+        return this;
+    }
+
+    @Override
+    public String getBatchId() {
+        return getConfiguration().getBatch().getId();
+    }
+
+    @Override
+    public Map<String, RunningTest> getAllRunningTests() {
+        Map<String, RunningTest> map = new HashMap<>();
+        map.put(getTestId(), this);
+        return map;
+    }
+
+    @Override
+    public List<TestResultContainer> getAllTestResults() {
+        if (!isCompleted()) {
+            return null;
+        }
+
+        return Collections.singletonList(testResultContainer);
+    }
+
+    @Override
+    public boolean isCompleted() {
+        return testResultContainer != null;
     }
 
     public void serverUrl(String serverUrl) {
@@ -252,7 +274,6 @@ public class SeleniumEyes extends EyesBase implements ISeleniumEyes, IBatchClose
     public WebDriver open(WebDriver driver) throws EyesException {
 
         openLogger();
-        this.cachedAUTSessionId = null;
 
         if (getIsDisabled()) {
             logger.verbose("Ignored");
@@ -443,8 +464,6 @@ public class SeleniumEyes extends EyesBase implements ISeleniumEyes, IBatchClose
 
         Region bBox = findBoundingBox(getRegions, checkSettings);
 
-        MatchWindowTask mwt = new MatchWindowTask(logger, getServerConnector(), runningSession, getConfigurationInstance().getMatchTimeout(), this);
-
         ScaleProviderFactory scaleProviderFactory = updateScalingParams();
         FullPageCaptureAlgorithm algo = createFullPageCaptureAlgorithm(scaleProviderFactory, new RenderingInfo());
 
@@ -495,7 +514,7 @@ public class SeleniumEyes extends EyesBase implements ISeleniumEyes, IBatchClose
                 GetSimpleRegion simpleRegion = getRegions.get(i);
                 ICheckSettingsInternal checkSettingsInternal = checkSettingsInternalDictionary.get(i);
                 List<EyesScreenshot> subScreenshots = getSubScreenshots(hasFrames ? Region.EMPTY : bBox, screenshot, simpleRegion);
-                matchRegion(checkSettingsInternal, mwt, subScreenshots);
+                matchRegion(checkSettingsInternal, subScreenshots);
             }
         }
 
@@ -523,7 +542,7 @@ public class SeleniumEyes extends EyesBase implements ISeleniumEyes, IBatchClose
         return subScreenshots;
     }
 
-    private void matchRegion(ICheckSettingsInternal checkSettingsInternal, MatchWindowTask mwt, List<EyesScreenshot> subScreenshots) {
+    private void matchRegion(ICheckSettingsInternal checkSettingsInternal, List<EyesScreenshot> subScreenshots) {
 
         String name = checkSettingsInternal.getName();
         String source = EyesDriverUtils.isMobileDevice(driver) ? null : driver.getCurrentUrl();
@@ -531,13 +550,13 @@ public class SeleniumEyes extends EyesBase implements ISeleniumEyes, IBatchClose
 
             debugScreenshotsProvider.save(subScreenshot.getImage(), String.format("subscreenshot_%s", name));
 
-            ImageMatchSettings ims = mwt.createImageMatchSettings(checkSettingsInternal, subScreenshot, this);
+            ImageMatchSettings ims = MatchWindowTask.createImageMatchSettings(checkSettingsInternal, subScreenshot, this);
             Location location = subScreenshot.getLocationInScreenshot(Location.ZERO, CoordinatesType.SCREENSHOT_AS_IS);
             AppOutput appOutput = new AppOutput(name, ImageUtils.encodeAsPng(subScreenshot.getImage()), null, null);
             AppOutputWithScreenshot appOutputWithScreenshot = new AppOutputWithScreenshot(appOutput, subScreenshot, location);
-            MatchWindowData data = mwt.prepareForMatch(new ArrayList<Trigger>(), appOutputWithScreenshot, name, false,
+            MatchWindowData data = prepareForMatch(new ArrayList<Trigger>(), appOutputWithScreenshot, name, false,
                     ims, this, null, source);
-            MatchResult matchResult = mwt.performMatch(data);
+            MatchResult matchResult = performMatch(data);
 
             logger.verbose("matchResult.asExcepted: " + matchResult.getAsExpected());
         }
@@ -1121,11 +1140,6 @@ public class SeleniumEyes extends EyesBase implements ISeleniumEyes, IBatchClose
         return targetElement;
     }
 
-    @Override
-    public void closeBatch(String batchId) {
-        this.getServerConnector().closeBatch(batchId);
-    }
-
     /**
      * Updates the state of scaling related parameters.
      * @return the scale provider factory
@@ -1503,6 +1517,21 @@ public class SeleniumEyes extends EyesBase implements ISeleniumEyes, IBatchClose
         addTextTrigger(elementRegion, text);
     }
 
+    @Override
+    public MatchWindowData prepareForMatch(CheckTask checkTask) {
+        return null;
+    }
+
+    @Override
+    public CheckTask issueCheck(ICheckSettings checkSettings, List<VisualGridSelector[]> regionSelectors, String source) {
+        return null;
+    }
+
+    @Override
+    public void checkCompleted(CheckTask checkTask, MatchResult matchResult) {
+
+    }
+
     /**
      * Use this method only if you made a previous call to {@link #open
      * (WebDriver, String, String)} or one of its variants.
@@ -1784,35 +1813,24 @@ public class SeleniumEyes extends EyesBase implements ISeleniumEyes, IBatchClose
     }
 
     @Override
-    protected String getAUTSessionId() {
-        try {
-            if (this.cachedAUTSessionId == null) {
-                this.cachedAUTSessionId = driver.getRemoteWebDriver().getSessionId().toString();
-            }
-            return this.cachedAUTSessionId;
-        } catch (Exception e) {
-            logger.log("WARNING: Failed to get AUT session ID! (maybe driver is not available?). Error: "
-                    + e.getMessage());
-            return "";
-        }
-    }
-
-    @Override
     public TestResults close(boolean throwEx) {
-        TestResults results = null;
+        TestResults results;
         try {
-            results = super.close(throwEx);
+            results = stopSession(false);
+            closeCompleted(results);
         } catch (Throwable e) {
-            logger.log(e.getMessage());
-            if (throwEx) {
-                throw e;
-            }
+            GeneralUtils.logExceptionStackTrace(logger, e);
+            closeFailed(e);
+            throw e;
         }
+
+        if (error != null && throwEx) {
+            throw new Error(error);
+        }
+
         if (runner != null) {
-            this.runner.aggregateResult(results);
+            this.runner.aggregateResult(testResultContainer);
         }
-        this.cachedAUTSessionId = null;
-        getServerConnector().closeConnector();
         return results;
     }
 

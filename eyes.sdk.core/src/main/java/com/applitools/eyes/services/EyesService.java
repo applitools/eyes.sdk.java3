@@ -1,4 +1,4 @@
-package com.applitools.eyes.visualgrid.services;
+package com.applitools.eyes.services;
 
 import com.applitools.connectivity.ServerConnector;
 import com.applitools.eyes.Logger;

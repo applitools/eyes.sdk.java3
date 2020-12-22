@@ -17,8 +17,7 @@ import com.applitools.eyes.selenium.wrappers.EyesSeleniumDriver;
 import com.applitools.eyes.selenium.wrappers.EyesTargetLocator;
 import com.applitools.eyes.visualgrid.model.*;
 import com.applitools.eyes.visualgrid.services.CheckTask;
-import com.applitools.eyes.visualgrid.services.IRenderingEyes;
-import com.applitools.eyes.visualgrid.services.RunningTest;
+import com.applitools.eyes.visualgrid.services.VisualGridRunningTest;
 import com.applitools.eyes.visualgrid.services.VisualGridRunner;
 import com.applitools.utils.ArgumentGuard;
 import com.applitools.utils.ClassVersionGetter;
@@ -34,7 +33,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.*;
 
-public class VisualGridEyes implements ISeleniumEyes, IRenderingEyes {
+public class VisualGridEyes implements ISeleniumEyes {
     private final Logger logger;
     private String apiKey = null;
     private String serverUrl = null;
@@ -171,10 +170,10 @@ public class VisualGridEyes implements ISeleniumEyes, IRenderingEyes {
 
         runner.setLogger(logger);
 
-        List<RunningTest> newTests = new ArrayList<>();
+        List<VisualGridRunningTest> newTests = new ArrayList<>();
         for (RenderBrowserInfo browserInfo : browserInfoList) {
             logger.verbose("creating test descriptor");
-            RunningTest test = new RunningTest(getConfiguration(), browserInfo, this.properties, logger);
+            VisualGridRunningTest test = new VisualGridRunningTest(getConfiguration(), browserInfo, this.properties, logger);
             this.testList.put(test.getTestId(), test);
             newTests.add(test);
         }
@@ -250,13 +249,14 @@ public class VisualGridEyes implements ISeleniumEyes, IRenderingEyes {
         isOpen = false;
         logger.verbose(String.format("closing %d running tests", testList.size()));
         for (RunningTest runningTest : testList.values()) {
+            VisualGridRunningTest vgRunningTest = (VisualGridRunningTest) runningTest;
             logger.verbose("running test name: " + getConfiguration().getTestName());
-            logger.verbose("running test device info: " + runningTest.getBrowserInfo());
-            logger.verbose("is current running test open: " + runningTest.isOpen());
-            logger.verbose("is current running test ready to close: " + runningTest.isTestReadyToClose());
-            logger.verbose("is current running test closed: " + runningTest.isTestCompleted());
+            logger.verbose("running test device info: " + vgRunningTest.getBrowserInfo());
+            logger.verbose("is current running test open: " + vgRunningTest.isOpen());
+            logger.verbose("is current running test ready to close: " + vgRunningTest.isTestReadyToClose());
+            logger.verbose("is current running test closed: " + vgRunningTest.isCompleted());
             logger.verbose("closing current running test");
-            runningTest.issueClose();
+            vgRunningTest.issueClose();
         }
     }
 
@@ -349,7 +349,7 @@ public class VisualGridEyes implements ISeleniumEyes, IRenderingEyes {
     public boolean isEyesClosed() {
         boolean isVGEyesClosed = true;
         for (RunningTest runningTest : testList.values()) {
-            isVGEyesClosed = isVGEyesClosed && runningTest.isTestCompleted();
+            isVGEyesClosed = isVGEyesClosed && runningTest.isCompleted();
         }
         return isVGEyesClosed;
     }
@@ -796,7 +796,7 @@ public class VisualGridEyes implements ISeleniumEyes, IRenderingEyes {
     public List<TestResultContainer> getAllTestResults() {
         List<TestResultContainer> allResults = new ArrayList<>();
         for (RunningTest runningTest : testList.values()) {
-            if (!runningTest.isTestCompleted()) {
+            if (!runningTest.isCompleted()) {
                 return null;
             }
 

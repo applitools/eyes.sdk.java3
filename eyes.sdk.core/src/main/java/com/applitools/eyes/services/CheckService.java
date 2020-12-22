@@ -1,7 +1,8 @@
-package com.applitools.eyes.visualgrid.services;
+package com.applitools.eyes.services;
 
 import com.applitools.connectivity.ServerConnector;
 import com.applitools.eyes.*;
+import com.applitools.eyes.visualgrid.services.ServiceTaskListener;
 import com.applitools.utils.GeneralUtils;
 import org.apache.commons.lang3.tuple.Pair;
 
@@ -53,16 +54,11 @@ public class CheckService extends EyesService<MatchWindowData, MatchResult> {
                 }
             };
 
-            try {
-                serverConnector.matchWindow(listener, matchWindowData);
-            } catch (Throwable t) {
-                GeneralUtils.logExceptionStackTrace(logger, t);
-                listener.onFail();
-            }
+            matchWindow(matchWindowData, listener);
         }
     }
 
-    private void tryUploadImage(MatchWindowData data, final ServiceTaskListener<Void> taskListener) {
+    public void tryUploadImage(MatchWindowData data, final ServiceTaskListener<Void> taskListener) {
         final AppOutput appOutput = data.getAppOutput();
         if (appOutput.getScreenshotUrl() != null) {
             taskListener.onComplete(null);
@@ -94,6 +90,15 @@ public class CheckService extends EyesService<MatchWindowData, MatchResult> {
             serverConnector.uploadImage(uploadListener, appOutput.getScreenshotBytes());
         } catch (Throwable t) {
             taskListener.onFail(t);
+        }
+    }
+
+    public void matchWindow(MatchWindowData data, final TaskListener<MatchResult> listener) {
+        try {
+            serverConnector.matchWindow(listener, data);
+        } catch (Throwable t) {
+            GeneralUtils.logExceptionStackTrace(logger, t);
+            listener.onFail();
         }
     }
 }
