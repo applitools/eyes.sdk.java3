@@ -35,7 +35,7 @@ public class ServerConnector extends UfgConnector {
     public static final String API_PATH = "/api/sessions/running";
     private static final String LOG_PATH = "/api/sessions/log";
 
-    private Map<String, MobileDeviceInfo> mobileDevicesInfo = null;
+    private static Map<String, MobileDeviceInfo> mobileDevicesInfo = null;
 
     /***
      * @param logger    Logger instance.

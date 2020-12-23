@@ -12,13 +12,12 @@ import com.applitools.eyes.selenium.EyesSeleniumUtils;
 import com.applitools.eyes.selenium.wrappers.EyesSeleniumDriver;
 import com.applitools.eyes.selenium.wrappers.EyesWebDriver;
 import com.applitools.eyes.visualgrid.model.VisualGridSelector;
+import com.applitools.utils.ArgumentGuard;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class SeleniumCheckSettings extends CheckSettings implements ISeleniumCheckTarget, Cloneable {
 
@@ -34,6 +33,9 @@ public class SeleniumCheckSettings extends CheckSettings implements ISeleniumChe
     private By scrollRootSelector;
     private VisualGridSelector selector;
     private CheckState state;
+
+    private boolean isDefaultLayoutBreakpointsSet = false;
+    private List<Integer> layoutBreakpoints = new ArrayList<>();
 
     public SeleniumCheckSettings() {
     }
@@ -538,6 +540,36 @@ public class SeleniumCheckSettings extends CheckSettings implements ISeleniumChe
 
     public CheckState getState(){
         return this.state;
+    }
+
+    public SeleniumCheckSettings layoutBreakpoints(boolean shouldSet) {
+        this.isDefaultLayoutBreakpointsSet = shouldSet;
+        layoutBreakpoints.clear();
+        return this;
+    }
+
+    public boolean isDefaultLayoutBreakpointsSet() {
+        return isDefaultLayoutBreakpointsSet;
+    }
+
+    public SeleniumCheckSettings layoutBreakpoints(Integer... breakpoints) {
+        isDefaultLayoutBreakpointsSet = false;
+        layoutBreakpoints.clear();
+        if (breakpoints == null || breakpoints.length == 0) {
+            return this;
+        }
+
+        for (int breakpoint : breakpoints) {
+            ArgumentGuard.greaterThanZero(breakpoint, "breakpoint");
+            layoutBreakpoints.add(breakpoint);
+        }
+
+        Collections.sort(layoutBreakpoints);
+        return this;
+    }
+
+    public List<Integer> getLayoutBreakpoints() {
+        return layoutBreakpoints;
     }
 
     public void sanitizeSettings(Logger logger, EyesSeleniumDriver driver, boolean isFully) {

@@ -2,6 +2,7 @@ package com.applitools.eyes.visualgrid.services;
 
 
 import com.applitools.ICheckSettings;
+import com.applitools.connectivity.ServerConnector;
 import com.applitools.eyes.*;
 import com.applitools.eyes.config.Configuration;
 import com.applitools.eyes.fluent.ICheckSettingsInternal;
@@ -10,6 +11,7 @@ import com.applitools.utils.ClassVersionGetter;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 public class VisualGridRunningTest extends RunningTest {
     // The maximum number of steps which can run in parallel
@@ -27,6 +29,14 @@ public class VisualGridRunningTest extends RunningTest {
     public VisualGridRunningTest(Configuration configuration, RenderBrowserInfo browserInfo,
                                  List<PropertyData> properties, Logger logger) {
         this(browserInfo, logger, configuration);
+        if (browserInfo.getEmulationInfo() != null) {
+            Map<String, DeviceSize> deviceSizes = getDevicesSizes(ServerConnector.EMULATED_DEVICES_PATH);
+            browserInfo.setEmulationDeviceSize(deviceSizes.get(browserInfo.getEmulationInfo().getDeviceName()));
+        }
+        if (browserInfo.getIosDeviceInfo() != null) {
+            Map<String, DeviceSize> deviceSizes = getDevicesSizes(ServerConnector.IOS_DEVICES_PATH);
+            browserInfo.setIosDeviceSize(deviceSizes.get(browserInfo.getIosDeviceInfo().getDeviceName()));
+        }
         if (properties != null) {
             for (PropertyData property : properties) {
                 this.addProperty(property);
@@ -60,10 +70,6 @@ public class VisualGridRunningTest extends RunningTest {
         }
 
         return notRenderedStepsCount < PARALLEL_STEPS_LIMIT;
-    }
-
-    public RenderBrowserInfo getBrowserInfo() {
-        return browserInfo;
     }
 
     @Override

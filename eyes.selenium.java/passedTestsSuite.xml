@@ -316,6 +316,7 @@
                     <include name="testVisualGridOptions"/>
                     <include name="testRenderStatusNull"/>
                     <include name="testCaptureDomSnapshot"/>
+                    <include name="testMapRunningTestsToRequiredBrowserWidth"/>
                 </methods>
             </class>
         </classes>

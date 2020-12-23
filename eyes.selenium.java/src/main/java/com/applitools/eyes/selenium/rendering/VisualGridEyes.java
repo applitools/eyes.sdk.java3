@@ -131,6 +131,10 @@ public class VisualGridEyes implements ISeleniumEyes {
             return webDriver;
         }
 
+        runner.setApiKey(getApiKey());
+        runner.setServerUrl(getServerUrl().toString());
+        runner.setProxy(getProxy());
+
         ArgumentGuard.notNull(webDriver, "webDriver");
         ArgumentGuard.notNullOrEmpty(getConfiguration().getAppName(), "appIdOrName");
         ArgumentGuard.notNullOrEmpty(getConfiguration().getTestName(), "scenarioIdOrName");
@@ -190,14 +194,13 @@ public class VisualGridEyes implements ISeleniumEyes {
         }
     }
 
-    private void setViewportSize(EyesSeleniumDriver webDriver) {
+    void setViewportSize(EyesSeleniumDriver webDriver) {
         viewportSize = getConfiguration().getViewportSize();
-
         if (viewportSize == null) {
             List<RenderBrowserInfo> browserInfoList = getConfiguration().getBrowsersInfo();
             if (browserInfoList != null && !browserInfoList.isEmpty()) {
                 for (RenderBrowserInfo deviceInfo : browserInfoList) {
-                    if (deviceInfo.getEmulationInfo() != null) {
+                    if (deviceInfo.getEmulationInfo() != null || deviceInfo.getIosDeviceInfo() != null) {
                         continue;
                     }
                     viewportSize = new RectangleSize(deviceInfo.getWidth(), deviceInfo.getHeight());
@@ -210,9 +213,7 @@ public class VisualGridEyes implements ISeleniumEyes {
         }
 
         try {
-
             EyesDriverUtils.setViewportSize(logger, webDriver, viewportSize);
-
         } catch (Exception e) {
             GeneralUtils.logExceptionStackTrace(logger, e);
         }
@@ -393,38 +394,24 @@ public class VisualGridEyes implements ISeleniumEyes {
 
             checkSettings = switchFramesAsNeeded(checkSettings, switchTo);
             ICheckSettingsInternal checkSettingsInternal = (ICheckSettingsInternal) checkSettings;
-
-            FrameData scriptResult = captureDomSnapshot(switchTo);
-
-            String[] blobsUrls = new String[scriptResult.getBlobs().size()];
-            for (int i = 0; i< scriptResult.getBlobs().size(); i++) {
-                blobsUrls[i] = scriptResult.getBlobs().get(i).getUrl();
-            }
-            logger.verbose(String.format("Cdt length: %d", scriptResult.getCdt().size()));
-            logger.verbose(String.format("Blobs urls: %s", Arrays.toString(blobsUrls)));
-            logger.verbose(String.format("Resources urls: %s", scriptResult.getResourceUrls().toString()));
-
+            SeleniumCheckSettings seleniumCheckSettings = (SeleniumCheckSettings) checkSettings;
             List<VisualGridSelector[]> regionsXPaths = getRegionsXPaths(checkSettingsInternal);
             logger.verbose("regionXPaths : " + regionsXPaths);
 
-            trySetTargetSelector((SeleniumCheckSettings) checkSettings);
+            trySetTargetSelector(seleniumCheckSettings);
 
             checkSettingsInternal = updateCheckSettings(checkSettings);
 
             String source = webDriver.getCurrentUrl();
-            List<CheckTask> checkTasks = new ArrayList<>();
-            for (RunningTest runningTest : testList.values()) {
-                if (runningTest.isCloseTaskIssued()) {
-                    continue;
-                }
-
-                checkTasks.add(runningTest.issueCheck((ICheckSettings) checkSettingsInternal, regionsXPaths, source));
+            Map<Integer, List<RunningTest>> requiredWidths = mapRunningTestsToRequiredBrowserWidth(seleniumCheckSettings);
+            if (requiredWidths.isEmpty()) {
+                captureDomForResourceCollection(0, testList.values(), switchTo, checkSettingsInternal, regionsXPaths, source);
+                return;
             }
 
-            scriptResult.setUserAgent(userAgent);
-            this.runner.setDebugResourceWriter(getConfiguration().getDebugResourceWriter());
-            this.runner.check(scriptResult, checkTasks);
-            logger.verbose("created renderTask  (" + checkSettings.toString() + ")");
+            for (Map.Entry<Integer, List<RunningTest>> entry : requiredWidths.entrySet()) {
+                captureDomForResourceCollection(entry.getKey(), entry.getValue(), switchTo, checkSettingsInternal, regionsXPaths, source);
+            }
         } catch (Throwable e) {
             Error error = new Error(e);
             for (RunningTest runningTest : testList.values()) {
@@ -457,6 +444,89 @@ public class VisualGridEyes implements ISeleniumEyes {
             isFullPage = b;
         }
         return isFullPage;
+    }
+
+    Map<Integer, List<RunningTest>> mapRunningTestsToRequiredBrowserWidth(SeleniumCheckSettings seleniumCheckSettings) {
+        List<Integer> layoutBreakpoint;
+        boolean isDefaultLayoutBreakpointsSet;
+        if (!seleniumCheckSettings.getLayoutBreakpoints().isEmpty() || seleniumCheckSettings.isDefaultLayoutBreakpointsSet()) {
+            layoutBreakpoint = seleniumCheckSettings.getLayoutBreakpoints();
+            isDefaultLayoutBreakpointsSet = seleniumCheckSettings.isDefaultLayoutBreakpointsSet();
+        } else {
+            layoutBreakpoint = getConfiguration().getLayoutBreakpoints();
+            isDefaultLayoutBreakpointsSet = getConfiguration().isDefaultLayoutBreakpointsSet();
+        }
+
+        Map<Integer, List<RunningTest>> requiredWidths = new HashMap<>();
+        if (isDefaultLayoutBreakpointsSet || !layoutBreakpoint.isEmpty()) {
+            for (RunningTest runningTest : testList.values()) {
+                int width = runningTest.getBrowserInfo().getDeviceSize().getWidth();
+                if (width <= 0) {
+                    width = viewportSize.getWidth();
+                }
+
+                if (!layoutBreakpoint.isEmpty()) {
+                    for (int i = layoutBreakpoint.size() - 1; i >= 0; i--) {
+                        if (width >= layoutBreakpoint.get(i)) {
+                            width = layoutBreakpoint.get(i);
+                            break;
+                        }
+                    }
+
+                    if (width < layoutBreakpoint.get(0)) {
+                        width = layoutBreakpoint.get(0) - 1;
+                        logger.log(String.format("WARNING: Device width is smaller than the smallest breakpoint %d", layoutBreakpoint.get(0)));
+                    }
+                }
+
+                if (requiredWidths.containsKey(width)) {
+                    requiredWidths.get(width).add(runningTest);
+                } else {
+                    List<RunningTest> list = new ArrayList<>();
+                    list.add(runningTest);
+                    requiredWidths.put(width, list);
+                }
+            }
+        }
+
+        return requiredWidths;
+    }
+
+    private void captureDomForResourceCollection(int width, Collection<RunningTest> tests, EyesTargetLocator switchTo,
+                                                 ICheckSettingsInternal checkSettingsInternal,
+                                                 List<VisualGridSelector[]> regionsXPaths,String source) throws Exception {
+        if (width != 0) {
+            try {
+                logger.verbose(String.format("Trying to set viewport width to %d", width));
+                EyesDriverUtils.setViewportSize(logger, webDriver, new RectangleSize(width, viewportSize.getHeight()));
+            } catch (Throwable t) {
+                GeneralUtils.logExceptionStackTrace(logger, t);
+                logger.log(String.format("WARNING: Failed to set viewport width to %d.", width));
+            }
+        }
+
+        FrameData scriptResult = captureDomSnapshot(switchTo);
+        String[] blobsUrls = new String[scriptResult.getBlobs().size()];
+        for (int i = 0; i< scriptResult.getBlobs().size(); i++) {
+            blobsUrls[i] = scriptResult.getBlobs().get(i).getUrl();
+        }
+        logger.verbose(String.format("Cdt length: %d", scriptResult.getCdt().size()));
+        logger.verbose(String.format("Blobs urls: %s", Arrays.toString(blobsUrls)));
+        logger.verbose(String.format("Resources urls: %s", scriptResult.getResourceUrls().toString()));
+
+        List<CheckTask> checkTasks = new ArrayList<>();
+        for (RunningTest runningTest : tests) {
+            if (runningTest.isCloseTaskIssued()) {
+                continue;
+            }
+
+            checkTasks.add(runningTest.issueCheck((ICheckSettings) checkSettingsInternal, regionsXPaths, source));
+        }
+
+        scriptResult.setUserAgent(userAgent);
+        this.runner.setDebugResourceWriter(getConfiguration().getDebugResourceWriter());
+        this.runner.check(scriptResult, checkTasks);
+        logger.verbose("created  resource collection task  (" + checkSettingsInternal.toString() + ")");
     }
 
     FrameData captureDomSnapshot(EyesTargetLocator switchTo) throws Exception {

@@ -159,6 +159,10 @@ public abstract class RunningTest extends EyesBase implements IBatchCloser {
         getServerConnector().closeBatch(batchId);
     }
 
+    public RenderBrowserInfo getBrowserInfo() {
+        return browserInfo;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) {

@@ -61,6 +61,11 @@ public class TestSetup extends GlobalSetup {
             current.setAccessibilitySettings(settings);
             eyes.setDefaultMatchSettings(current);
     }
+    public void setLayoutBreakpoints(int... breakpoints) {
+        Configuration conf = eyes.getConfiguration();
+        conf.setLayoutBreakpoints(breakpoints);
+        eyes.setConfiguration(conf);
+    }
 
     // Open
 

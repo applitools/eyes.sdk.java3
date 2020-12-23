@@ -1,4 +1,6 @@
 ## [vNext]
+### Added
+- New JS layout feature and `setLayoutBreakpoints' API. [Trello 2387](https://trello.com/c/8caokJ19)
 ### Updated
 - Updated `isMobileDevice()` method to make `isBrowser()` accessible. [Trello 2307](https://trello.com/c/8VCtSmfN)
 - Now sending screenshot location in match window data and setting correct scrolled element for dom capture. [Trello 2379](https://trello.com/c/Wn9Fp4XN)

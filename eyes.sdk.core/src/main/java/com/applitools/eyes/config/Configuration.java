@@ -4,6 +4,7 @@ import com.applitools.eyes.*;
 import com.applitools.eyes.selenium.BrowserType;
 import com.applitools.eyes.selenium.StitchMode;
 import com.applitools.eyes.visualgrid.model.*;
+import com.applitools.utils.ArgumentGuard;
 import com.applitools.utils.GeneralUtils;
 
 import java.net.URI;
@@ -65,6 +66,9 @@ public class Configuration implements IConfiguration {
 
     private List<VisualGridOption> visualGridOptions = new ArrayList<>();
 
+    private boolean isDefaultLayoutBreakpointsSet = false;
+    private List<Integer> layoutBreakpoints = new ArrayList<>();
+
     public Configuration(Configuration other) {
         this.branchName = other.getBranchName();
         this.parentBranchName = other.getParentBranchName();
@@ -117,6 +121,8 @@ public class Configuration implements IConfiguration {
         this.visualGridOptions = other.getVisualGridOptions();
         this.disableBrowserFetching = other.isDisableBrowserFetching();
         this.debugResourceWriter = other.getDebugResourceWriter();
+        this.isDefaultLayoutBreakpointsSet = other.isDefaultLayoutBreakpointsSet();
+        this.layoutBreakpoints = other.getLayoutBreakpoints();
     }
 
     public Configuration() {
@@ -784,5 +790,35 @@ public class Configuration implements IConfiguration {
     public Configuration setAbortIdleTestTimeout(Integer abortIdleTestTimeout) {
         this.abortIdleTestTimeout = abortIdleTestTimeout;
         return this;
+    }
+
+    public Configuration setLayoutBreakpoints(boolean shouldSet) {
+        this.isDefaultLayoutBreakpointsSet = shouldSet;
+        layoutBreakpoints.clear();
+        return this;
+    }
+
+    public boolean isDefaultLayoutBreakpointsSet() {
+        return isDefaultLayoutBreakpointsSet;
+    }
+
+    public Configuration setLayoutBreakpoints(int... breakpoints) {
+        isDefaultLayoutBreakpointsSet = false;
+        layoutBreakpoints.clear();
+        if (breakpoints == null || breakpoints.length == 0) {
+            return this;
+        }
+
+        for (int breakpoint : breakpoints) {
+            ArgumentGuard.greaterThanZero(breakpoint, "breakpoint");
+            layoutBreakpoints.add(breakpoint);
+        }
+
+        Collections.sort(layoutBreakpoints);
+        return this;
+    }
+
+    public List<Integer> getLayoutBreakpoints() {
+        return layoutBreakpoints;
     }
 }

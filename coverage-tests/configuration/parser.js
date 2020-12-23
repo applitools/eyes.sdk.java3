@@ -23,6 +23,7 @@ function checkSettings(cs, native) {
     if (cs.sendDom !== undefined) options += `.sendDom(${serialize(cs.sendDom)})`
     if (cs.matchLevel) options += `.matchLevel(MatchLevel.${cs.matchLevel.toUpperCase()})`
     if (cs.name) options += `.withName(${cs.name})`
+    if (cs.layoutBreakpoints) options+= `.layoutBreakpoints(${cs.layoutBreakpoints})`
     if (cs.isFully === true) {
         options += '.fully()'
     } else if (cs.isFully === false) {

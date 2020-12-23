@@ -11,7 +11,9 @@ import com.applitools.eyes.config.ConfigurationProvider;
 import com.applitools.eyes.selenium.BrowserType;
 import com.applitools.eyes.selenium.Eyes;
 import com.applitools.eyes.selenium.TestDataProvider;
+import com.applitools.eyes.selenium.fluent.SeleniumCheckSettings;
 import com.applitools.eyes.selenium.fluent.Target;
+import com.applitools.eyes.selenium.wrappers.EyesSeleniumDriver;
 import com.applitools.eyes.selenium.wrappers.EyesTargetLocator;
 import com.applitools.eyes.utils.ReportingTestSuite;
 import com.applitools.eyes.utils.SeleniumTestUtils;
@@ -26,16 +28,15 @@ import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
+import org.openqa.selenium.remote.RemoteWebDriver;
+import org.openqa.selenium.remote.SessionId;
 import org.testng.Assert;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
 import javax.ws.rs.HttpMethod;
 import java.net.UnknownHostException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.Future;
 
 import static org.mockito.ArgumentMatchers.any;
@@ -420,5 +421,83 @@ public class TestRenderings extends ReportingTestSuite {
         AttributeData applitoolsSrc = attributeData.get(attributeData.size() - 1);
         Assert.assertEquals(applitoolsSrc.name, "data-applitools-src");
         Assert.assertEquals(applitoolsSrc.value, innerFrame.getFrames().get(0).getUrl());
+    }
+
+    @Test
+    public void testMapRunningTestsToRequiredBrowserWidth() {
+        final Configuration configuration = new Configuration();
+        ConfigurationProvider configurationProvider = new ConfigurationProvider() {
+            @Override
+            public Configuration get() {
+                return configuration;
+            }
+        };
+        configuration.addBrowser(new DesktopBrowserInfo(1000, 500, BrowserType.CHROME));
+        configuration.addBrowser(new DesktopBrowserInfo(1000, 700, BrowserType.CHROME));
+        configuration.addBrowser(new DesktopBrowserInfo(700, 500, BrowserType.CHROME));
+        VisualGridEyes eyes = spy(new VisualGridEyes(new VisualGridRunner(10), configurationProvider));
+        doNothing().when(eyes).setViewportSize(ArgumentMatchers.<EyesSeleniumDriver>any());
+        eyes.setServerConnector(new MockServerConnector());
+
+        RemoteWebDriver driver = mock(RemoteWebDriver.class);
+        when(driver.getSessionId()).thenReturn(mock(SessionId.class));
+        eyes.open(driver, "app", "test", new RectangleSize(800, 800));
+
+        SeleniumCheckSettings seleniumCheckSettings = Target.window();
+        Map<Integer, List<RunningTest>> map = eyes.mapRunningTestsToRequiredBrowserWidth(seleniumCheckSettings);
+        Assert.assertTrue(map.isEmpty());
+
+        seleniumCheckSettings = Target.window().layoutBreakpoints(false);
+        map = eyes.mapRunningTestsToRequiredBrowserWidth(seleniumCheckSettings);
+        Assert.assertTrue(map.isEmpty());
+
+        seleniumCheckSettings = Target.window().layoutBreakpoints(true);
+        map = eyes.mapRunningTestsToRequiredBrowserWidth(seleniumCheckSettings);
+        Assert.assertEquals(map.keySet(), new HashSet<>(Arrays.asList(700, 1000)));
+        Assert.assertEquals(map.get(700).size(), 1);
+        Assert.assertEquals(map.get(1000).size(), 2);
+
+        seleniumCheckSettings = Target.window().layoutBreakpoints(750, 1200);
+        map = eyes.mapRunningTestsToRequiredBrowserWidth(seleniumCheckSettings);
+        Assert.assertEquals(map.keySet(), new HashSet<>(Arrays.asList(749, 750)));
+        Assert.assertEquals(map.get(749).size(), 1);
+        Assert.assertEquals(map.get(750).size(), 2);
+
+        seleniumCheckSettings = Target.window().layoutBreakpoints(700);
+        map = eyes.mapRunningTestsToRequiredBrowserWidth(seleniumCheckSettings);
+        Assert.assertEquals(map.keySet(), new HashSet<>(Collections.singletonList(700)));
+        Assert.assertEquals(map.get(700).size(), 3);
+
+        configuration.setLayoutBreakpoints(false);
+        seleniumCheckSettings = Target.window();
+        map = eyes.mapRunningTestsToRequiredBrowserWidth(seleniumCheckSettings);
+        Assert.assertTrue(map.isEmpty());
+
+        configuration.setLayoutBreakpoints(true);
+        seleniumCheckSettings = Target.window();
+        map = eyes.mapRunningTestsToRequiredBrowserWidth(seleniumCheckSettings);
+        Assert.assertEquals(map.keySet(), new HashSet<>(Arrays.asList(700, 1000)));
+        Assert.assertEquals(map.get(700).size(), 1);
+        Assert.assertEquals(map.get(1000).size(), 2);
+
+        configuration.setLayoutBreakpoints(750, 1200);
+        seleniumCheckSettings = Target.window();
+        map = eyes.mapRunningTestsToRequiredBrowserWidth(seleniumCheckSettings);
+        Assert.assertEquals(map.keySet(), new HashSet<>(Arrays.asList(749, 750)));
+        Assert.assertEquals(map.get(749).size(), 1);
+        Assert.assertEquals(map.get(750).size(), 2);
+
+        configuration.setLayoutBreakpoints(750, 1200);
+        seleniumCheckSettings = Target.window().layoutBreakpoints(true);
+        map = eyes.mapRunningTestsToRequiredBrowserWidth(seleniumCheckSettings);
+        Assert.assertEquals(map.keySet(), new HashSet<>(Arrays.asList(700, 1000)));
+        Assert.assertEquals(map.get(700).size(), 1);
+        Assert.assertEquals(map.get(1000).size(), 2);
+
+        configuration.setLayoutBreakpoints(750, 1200);
+        seleniumCheckSettings = Target.window().layoutBreakpoints(700);
+        map = eyes.mapRunningTestsToRequiredBrowserWidth(seleniumCheckSettings);
+        Assert.assertEquals(map.keySet(), new HashSet<>(Collections.singletonList(700)));
+        Assert.assertEquals(map.get(700).size(), 3);
     }
 }

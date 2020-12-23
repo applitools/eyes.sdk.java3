@@ -21,8 +21,6 @@ module.exports = {
     'should set viewport size on edge legacy': {skip: true}, // java.lang.IllegalArgumentException: width < 0
     'should send ignore displacements with vg': {skip: true}, // diffs
     // window
-    'check window with layout breakpoints in config': {skipEmit: true}, // layout breakpoints are not implemented
-    'check window with layout breakpoints': {skipEmit: true}, // layout breakpoints are not implemented
     'check window fully on android chrome emulator on desktop page': {skip: true}, // have diffs
     'check window fully on android chrome emulator on mobile page': {skip: true}, // have diffs
     'check window fully on android chrome emulator on mobile page with horizontal scroll': {skip: true}, // have diffs

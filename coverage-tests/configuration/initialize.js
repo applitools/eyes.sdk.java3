@@ -99,7 +99,7 @@ module.exports = function (tracker, test) {
   addHook('beforeEach', java`initEyes(${argumentCheck(test.vg, false)}, ${argumentCheck(test.config.stitchMode, 'Scroll')}, ${argumentCheck(test.branchName, "master")});`,)
   addHook('beforeEach', java`buildDriver(${JSON.stringify(test.env) || emptyValue()});`)
   addHook('beforeEach', java`System.out.println(getClass().getName());`)
-  const specific = ['baselineName', 'browsersInfo', 'appName', 'defaultMatchSettings'];
+  const specific = ['baselineName', 'browsersInfo', 'appName', 'defaultMatchSettings', 'layoutBreakpoints'];
   Object.keys(test.config).filter(property => !specific.includes(property))
       .forEach(property => addHook('beforeEach', java`set${insert(capitalizeFirstLetter(property))}(${test.config[property]});`))
   if(test.config.browsersInfo) {
@@ -112,6 +112,9 @@ module.exports = function (tracker, test) {
     Object.keys(defaultMatchSettings)
         .forEach(property => addHook('beforeEach',
             java`set${insert(capitalizeFirstLetter(property))}(${{value: defaultMatchSettings[property], ...imageMatchSettings.schema[property]}});` ))
+  }
+  if (test.config.layoutBreakpoints) {
+    addHook('beforeEach', `setLayoutBreakpoints(${test.config.layoutBreakpoints});`)
   }
 
   addHook('afterEach', java`driver.quit();`)

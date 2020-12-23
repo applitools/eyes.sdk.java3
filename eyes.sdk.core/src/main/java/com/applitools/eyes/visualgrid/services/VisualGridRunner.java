@@ -93,11 +93,6 @@ public class VisualGridRunner extends EyesRunner {
 
     public void open(IEyes eyes, List<VisualGridRunningTest> newTests) {
         logger.verbose("enter");
-
-        setApiKey(eyes.getApiKey());
-        setServerUrl(eyes.getServerUrl().toString());
-        setProxy(eyes.getProxy());
-
         if (renderingInfo == null) {
             renderingInfo = serverConnector.getRenderInfo();
         }

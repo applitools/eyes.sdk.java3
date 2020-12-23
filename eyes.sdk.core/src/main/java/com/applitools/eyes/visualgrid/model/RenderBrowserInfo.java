@@ -65,6 +65,42 @@ public class RenderBrowserInfo implements IRenderingBrowserInfo {
         this.platform = getPlatform();
     }
 
+    public RectangleSize getDeviceSize() {
+        if (viewportSize != null) {
+            return viewportSize;
+        }
+
+        if (emulationInfo != null && emulationInfo.size != null) {
+            return emulationInfo.size;
+        }
+
+        if (iosDeviceInfo != null && iosDeviceInfo.size != null) {
+            return iosDeviceInfo.size;
+        }
+
+        return RectangleSize.EMPTY;
+    }
+
+    public void setEmulationDeviceSize(DeviceSize size) {
+        if (size != null && emulationInfo != null) {
+            if (emulationInfo.screenOrientation.equals(ScreenOrientation.PORTRAIT)) {
+                emulationInfo.size = size.getPortrait();
+            } else {
+                emulationInfo.size = size.getLandscape();
+            }
+        }
+    }
+
+    public void setIosDeviceSize(DeviceSize size) {
+        if (size != null && iosDeviceInfo != null) {
+            if (iosDeviceInfo.getScreenOrientation().equals(ScreenOrientation.PORTRAIT)) {
+                iosDeviceInfo.size = size.getPortrait();
+            } else {
+                iosDeviceInfo.size = size.getLandscape();
+            }
+        }
+    }
+
     public int getWidth() {
         if (viewportSize != null) {
             return viewportSize.getWidth();
@@ -127,6 +163,10 @@ public class RenderBrowserInfo implements IRenderingBrowserInfo {
 
     public String getSizeMode() {
         return this.sizeMode;
+    }
+
+    public void setViewportSize(RectangleSize viewportSize) {
+        this.viewportSize = viewportSize;
     }
 
     @Override
