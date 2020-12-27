@@ -1,16 +1,12 @@
 package com.applitools.utils;
 
-import com.applitools.eyes.Logger;
-
 /**
  * A property handler for read-only properties (i.e., set always fails).
  */
 public class ReadOnlyPropertyHandler<T> implements PropertyHandler<T> {
-    private final Logger logger;
     private final T obj;
 
-    public ReadOnlyPropertyHandler(Logger logger, T obj) {
-        this.logger = logger;
+    public ReadOnlyPropertyHandler(T obj) {
         this.obj = obj;
     }
 
@@ -20,8 +16,6 @@ public class ReadOnlyPropertyHandler<T> implements PropertyHandler<T> {
      * @return Always returns false.
      */
     public boolean set(T obj) {
-        logger.verbose(String.format("Ignored. (%s)",
-                getClass().getSimpleName()));
         return false;
     }
 

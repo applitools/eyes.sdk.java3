@@ -3,12 +3,11 @@ package com.applitools.eyes.selenium;
 import com.applitools.eyes.Logger;
 import com.applitools.eyes.RectangleSize;
 import com.applitools.eyes.ScaleProvider;
+import com.applitools.eyes.logging.Stage;
+import com.applitools.eyes.logging.TraceLevel;
 import com.applitools.utils.ArgumentGuard;
+import org.apache.commons.lang3.tuple.Pair;
 
-@SuppressWarnings("SpellCheckingInspection")
-/**
- * Scale provider which determines the scale ratio according to the context.
- */
 public class ContextBasedScaleProvider implements ScaleProvider {
 
     // Allowed deviations for viewport size and default content entire size.
@@ -16,7 +15,7 @@ public class ContextBasedScaleProvider implements ScaleProvider {
     private static final int ALLOWED_DCES_DEVIATION = 10;
     private static final int UNKNOWN_SCALE_RATIO = 0;
 
-    private Logger logger;
+    private final Logger logger;
 
     private final double devicePixelRatio;
     private final RectangleSize topLevelContextEntireSize;
@@ -82,17 +81,13 @@ public class ContextBasedScaleProvider implements ScaleProvider {
                 && (imageToScaleWidth <= viewportWidth + ALLOWED_VS_DEVIATION))
                 || ((imageToScaleWidth >= dcesWidth - ALLOWED_DCES_DEVIATION)
                 && imageToScaleWidth <= dcesWidth + ALLOWED_DCES_DEVIATION)) {
-            logger.verbose("Image is already scaled correctly.");
             scaleRatio = 1;
         } else {
-            logger.verbose("Calculating the scale ratio..");
             scaleRatio = 1 / devicePixelRatio;
             if (isMobileDevice) {
-                logger.verbose("Mobile device, so using 2 step calculation for scale ratio...");
-                logger.verbose("Scale ratio based on DRP: " + scaleRatio);
                 scaleRatio = getScaleRatioToViewport(viewportWidth, imageToScaleWidth, scaleRatio);
             }
-            logger.verbose("Final scale ratio: " + scaleRatio);
+            logger.log(TraceLevel.Info, null, Stage.GENERAL, Pair.of("scaleRatio", scaleRatio));
         }
     }
 }

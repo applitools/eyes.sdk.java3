@@ -2,6 +2,8 @@ package com.applitools.eyes.selenium;
 
 import com.applitools.connectivity.ServerConnector;
 import com.applitools.eyes.*;
+import com.applitools.eyes.logging.Stage;
+import com.applitools.eyes.logging.Type;
 import com.applitools.eyes.services.CheckService;
 import com.applitools.eyes.services.CloseService;
 import com.applitools.eyes.services.OpenService;
@@ -48,9 +50,9 @@ public class ClassicRunner extends EyesRunner {
         closeService.setServerConnector(serverConnector);
     }
 
-    public RunningSession open(SessionStartInfo sessionStartInfo) {
+    public RunningSession open(final String testId, SessionStartInfo sessionStartInfo) {
         final SyncTaskListener<RunningSession> listener = new SyncTaskListener<>(logger, String.format("openBase %s", sessionStartInfo));
-        openService.operate(sessionStartInfo, new ServiceTaskListener<RunningSession>() {
+        openService.operate(testId, sessionStartInfo, new ServiceTaskListener<RunningSession>() {
             @Override
             public void onComplete(RunningSession taskResponse) {
                 listener.onComplete(taskResponse);
@@ -58,16 +60,16 @@ public class ClassicRunner extends EyesRunner {
 
             @Override
             public void onFail(Throwable t) {
-                GeneralUtils.logExceptionStackTrace(logger, t);
+                GeneralUtils.logExceptionStackTrace(logger, Stage.OPEN, t, testId);
                 listener.onFail();
             }
         });
         return listener.get();
     }
 
-    public MatchResult check(MatchWindowData matchWindowData) {
+    public MatchResult check(final String testId, MatchWindowData matchWindowData) {
         final SyncTaskListener<Boolean> listener = new SyncTaskListener<>(logger, String.format("uploadImage %s", matchWindowData.getRunningSession()));
-        checkService.tryUploadImage(matchWindowData, new ServiceTaskListener<Void>() {
+        checkService.tryUploadImage(testId, matchWindowData, new ServiceTaskListener<Void>() {
             @Override
             public void onComplete(Void taskResponse) {
                 listener.onComplete(true);
@@ -75,7 +77,7 @@ public class ClassicRunner extends EyesRunner {
 
             @Override
             public void onFail(Throwable t) {
-                GeneralUtils.logExceptionStackTrace(logger, t);
+                GeneralUtils.logExceptionStackTrace(logger, Stage.CHECK, Type.UPLOAD_COMPLETE, t, testId);
                 listener.onFail();
             }
         });
@@ -86,13 +88,24 @@ public class ClassicRunner extends EyesRunner {
         }
 
         final SyncTaskListener<MatchResult> matchListener = new SyncTaskListener<>(logger, String.format("performMatch %s", matchWindowData.getRunningSession()));
-        checkService.matchWindow(matchWindowData, matchListener);
+        checkService.matchWindow(testId, matchWindowData, new ServiceTaskListener<MatchResult>() {
+            @Override
+            public void onComplete(MatchResult taskResponse) {
+                matchListener.onComplete(taskResponse);
+            }
+
+            @Override
+            public void onFail(Throwable t) {
+                GeneralUtils.logExceptionStackTrace(logger, Stage.CHECK, Type.MATCH_COMPLETE, t, testId);
+                listener.onFail();
+            }
+        });
         return matchListener.get();
     }
 
-    public TestResults close(SessionStopInfo sessionStopInfo) {
+    public TestResults close(final String testId, SessionStopInfo sessionStopInfo) {
         final SyncTaskListener<TestResults> listener = new SyncTaskListener<>(logger, String.format("stop session %s. isAborted: %b", sessionStopInfo.getRunningSession(), sessionStopInfo.isAborted()));
-        closeService.operate(sessionStopInfo, new ServiceTaskListener<TestResults>() {
+        closeService.operate(testId, sessionStopInfo, new ServiceTaskListener<TestResults>() {
             @Override
             public void onComplete(TestResults taskResponse) {
                 listener.onComplete(taskResponse);
@@ -100,7 +113,7 @@ public class ClassicRunner extends EyesRunner {
 
             @Override
             public void onFail(Throwable t) {
-                GeneralUtils.logExceptionStackTrace(logger, t);
+                GeneralUtils.logExceptionStackTrace(logger, Stage.CLOSE, t, testId);
                 listener.onFail();
             }
         });

@@ -11,9 +11,9 @@ public class ImageProviderFactory {
     public static ImageProvider getImageProvider(Logger logger, EyesWebDriver driver, boolean viewportImage) {
         if (viewportImage) {
             if (EyesDriverUtils.isAndroid(driver.getRemoteWebDriver())) {
-                return new AndroidViewportScreenshotImageProvider(logger, driver);
+                return new AndroidViewportScreenshotImageProvider(driver);
             }
-            return new MobileViewportScreenshotImageProvider(logger, driver);
+            return new MobileViewportScreenshotImageProvider(driver);
         }
         return new TakesScreenshotImageProvider(logger, (TakesScreenshot) driver);
     }

@@ -4,7 +4,11 @@ import com.applitools.eyes.*;
 import com.applitools.eyes.fluent.GetFloatingRegion;
 import com.applitools.eyes.selenium.EyesDriverUtils;
 import com.applitools.eyes.selenium.wrappers.EyesWebDriver;
+import com.applitools.eyes.serializers.BySerializer;
+import com.applitools.eyes.serializers.WebElementSerializer;
 import com.applitools.eyes.visualgrid.model.IGetFloatingRegionOffsets;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import org.openqa.selenium.*;
 
 import java.util.ArrayList;
@@ -12,8 +16,11 @@ import java.util.List;
 
 public class FloatingRegionBySelector implements GetFloatingRegion , IGetSeleniumRegion, IGetFloatingRegionOffsets, ImplicitInitiation {
 
+    @JsonIgnore
     private Logger logger;
+    @JsonIgnore
     private EyesWebDriver driver;
+    @JsonSerialize(using = BySerializer.class)
     private final By selector;
     private final int maxUpOffset;
     private final int maxDownOffset;

@@ -27,7 +27,7 @@ public class TestImagesApi_OpenWithSize extends ReportingTestSuite {
     public void setup(Method method) {
         eyes = new Eyes();
 
-        LogHandler logHandler = new StdoutLogHandler(true);
+        LogHandler logHandler = new StdoutLogHandler();
         eyes.setLogHandler(logHandler);
 
         eyes.setBatch(batchInfo);

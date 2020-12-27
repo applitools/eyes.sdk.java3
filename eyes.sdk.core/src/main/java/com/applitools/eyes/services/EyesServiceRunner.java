@@ -3,7 +3,7 @@ package com.applitools.eyes.services;
 import com.applitools.ICheckSettingsInternal;
 import com.applitools.connectivity.ServerConnector;
 import com.applitools.eyes.*;
-import com.applitools.eyes.services.*;
+import com.applitools.eyes.logging.Stage;
 import com.applitools.eyes.visualgrid.model.*;
 import com.applitools.eyes.visualgrid.services.CheckTask;
 import com.applitools.eyes.visualgrid.services.IEyes;
@@ -63,11 +63,7 @@ public class EyesServiceRunner extends Thread {
         closeService.setLogger(logger);
         resourceCollectionService.setLogger(logger);
         renderService.setLogger(logger);
-        if (this.logger == null) {
-            this.logger = logger;
-        } else {
-            this.logger.setLogHandler(logger.getLogHandler());
-        }
+        this.logger = logger;
     }
 
     public void setServerConnector(ServerConnector serverConnector) {
@@ -86,6 +82,11 @@ public class EyesServiceRunner extends Thread {
 
     public void addResourceCollectionTask(FrameData domData, List<CheckTask> checkTasks) {
         String resourceCollectionTaskId = UUID.randomUUID().toString();
+        Set<String> testIds = new HashSet<>();
+        for (CheckTask checkTask : checkTasks) {
+            testIds.add(checkTask.getTestId());
+        }
+        domData.setTestIds(testIds);
         resourceCollectionService.addInput(resourceCollectionTaskId, domData);
         resourceCollectionTasksMapping.put(resourceCollectionTaskId, Pair.of(domData, checkTasks));
     }
@@ -107,7 +108,7 @@ public class EyesServiceRunner extends Thread {
         } catch (Throwable e) {
             isRunning.set(false);
             error = e;
-            GeneralUtils.logExceptionStackTrace(logger, e);
+            GeneralUtils.logExceptionStackTrace(logger, Stage.GENERAL, e);
         }
     }
 
@@ -255,8 +256,6 @@ public class EyesServiceRunner extends Thread {
             regionSelectorsList.addAll(Arrays.asList(regionSelector));
         }
 
-        logger.verbose("region selectors count: " + regionSelectorsList.size());
-        logger.verbose("check tasks count: " + checkTasks.size());
         for (CheckTask checkTask : checkTasks) {
             if (!checkTask.isTestActive()) {
                 continue;
@@ -272,7 +271,7 @@ public class EyesServiceRunner extends Thread {
                     sizeMode, checkSettingsInternal.getTargetRegion(), checkSettingsInternal.getVGTargetSelector(),
                     browserInfo.getEmulationInfo(), browserInfo.getIosDeviceInfo());
 
-            RenderRequest request = new RenderRequest(this.renderingInfo.getResultsUrl(), result.getUrl(), dom,
+            RenderRequest request = new RenderRequest(checkTask.getTestId(), this.renderingInfo.getResultsUrl(), result.getUrl(), dom,
                     resourceMapping, renderInfo, browserInfo.getPlatform(), browserInfo.getBrowserType(),
                     checkSettingsInternal.getScriptHooks(), regionSelectorsList, checkSettingsInternal.isSendDom(),
                     checkTask.getRenderer(), checkTask.getStepId(), this.renderingInfo.getStitchingServiceUrl(), checkSettingsInternal.getVisualGridOptions());

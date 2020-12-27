@@ -98,17 +98,12 @@ public final class TestSendDom extends ReportingTestSuite {
 
     // This is used for rhe
     public static class DiffPrintingNotARealComparator implements Comparator<JsonNode> {
-
         private JsonNode lastObject;
-        private final Logger logger;
-        public DiffPrintingNotARealComparator(Logger logger) {
-            this.logger = logger;
-        }
 
         @Override
         public int compare(JsonNode o1, JsonNode o2) {
             if (!o1.equals(o2)) {
-                logger.log(String.format("JSON diff found! Parent: %s, o1: %s , o2: %s", lastObject, o1, o2));
+                System.out.printf("JSON diff found! Parent: %s, o1: %s , o2: %s%n", lastObject, o1, o2);
                 return 1;
             }
             lastObject = o1;
@@ -143,7 +138,7 @@ public final class TestSendDom extends ReportingTestSuite {
                 if (expected == null) {
                     Assert.fail("EXPECTED DOM IS NULL!");
                 }
-                Assert.assertTrue(actual.equals(new DiffPrintingNotARealComparator(eyes.getLogger()), expected));
+                Assert.assertTrue(actual.equals(new DiffPrintingNotARealComparator(), expected));
 
                 SessionResults sessionResults = TestUtils.getSessionResults(eyes.getApiKey(), results);
                 ActualAppOutput[] actualAppOutput = sessionResults.getActualAppOutput();
@@ -152,10 +147,10 @@ public final class TestSendDom extends ReportingTestSuite {
                 if (downloaded == null) {
                     Assert.fail("Downloaded DOM IS NULL!");
                 }
-                Assert.assertTrue(downloaded.equals(new DiffPrintingNotARealComparator(eyes.getLogger()), expected));
+                Assert.assertTrue(downloaded.equals(new DiffPrintingNotARealComparator(), expected));
 
             } catch (IOException e) {
-                GeneralUtils.logExceptionStackTrace(eyes.getLogger(), e);
+                e.printStackTrace();
             }
         } finally {
             eyes.abortIfNotClosed();
@@ -227,7 +222,7 @@ public final class TestSendDom extends ReportingTestSuite {
             JsonNode actual = objectMapper.readTree(dom);
             String expectedDomJson = GeneralUtils.readToEnd(TestSendDom.class.getResourceAsStream("/dom_cors_css.json"));
             JsonNode expected = objectMapper.readTree(expectedDomJson);
-            Assert.assertTrue(actual.equals(new DiffPrintingNotARealComparator(eyes.getLogger()), expected));
+            Assert.assertTrue(actual.equals(new DiffPrintingNotARealComparator(), expected));
         } finally {
             webDriver.quit();
         }

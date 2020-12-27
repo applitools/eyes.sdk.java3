@@ -1,6 +1,7 @@
 package com.applitools.eyes.selenium.wrappers;
 
 import com.applitools.eyes.*;
+import com.applitools.eyes.logging.Stage;
 import com.applitools.eyes.selenium.*;
 import com.applitools.eyes.selenium.frames.FrameChain;
 import com.applitools.eyes.selenium.positioning.ImageRotation;
@@ -8,6 +9,7 @@ import com.applitools.eyes.selenium.triggers.EyesKeyboard;
 import com.applitools.eyes.selenium.triggers.EyesMouse;
 import com.applitools.eyes.triggers.MouseTrigger;
 import com.applitools.utils.ArgumentGuard;
+import com.applitools.utils.GeneralUtils;
 import com.applitools.utils.ImageUtils;
 import org.openqa.selenium.*;
 import org.openqa.selenium.interactions.*;
@@ -63,7 +65,6 @@ public class EyesSeleniumDriver extends EyesWebDriver implements HasInputDevices
             }
         } else { // Do automatic rotation if necessary
             try {
-                logger.verbose("Trying to automatically normalize rotation...");
                 if (EyesDriverUtils.isMobileDevice(driver) &&
                         EyesDriverUtils.isLandscapeOrientation(logger, driver)
                         && image.getHeight() > image.getWidth()) {
@@ -74,8 +75,7 @@ public class EyesSeleniumDriver extends EyesWebDriver implements HasInputDevices
                     normalizedImage = ImageUtils.rotateImage(image, degrees);
                 }
             } catch (Exception e) {
-                logger.verbose("Got exception: " + e.getMessage());
-                logger.verbose("Skipped automatic rotation handling.");
+                GeneralUtils.logExceptionStackTrace(logger, Stage.GENERAL, e);
             }
         }
 
@@ -102,13 +102,11 @@ public class EyesSeleniumDriver extends EyesWebDriver implements HasInputDevices
             // If an exception occurred, we simply won't instantiate "touch".
         }
         if (null != executeMethod) {
-            touch = new EyesTouchScreen(logger, this,
+            touch = new EyesTouchScreen(this,
                     new RemoteTouchScreen(executeMethod));
         } else {
             touch = null;
         }
-
-        logger.verbose("Driver session is " + getSessionId());
     }
 
     public SeleniumEyes getEyes() {
@@ -245,7 +243,7 @@ public class EyesSeleniumDriver extends EyesWebDriver implements HasInputDevices
     }
 
     public Mouse getMouse() {
-        return new EyesMouse(logger, this, driver.getMouse());
+        return new EyesMouse(this, driver.getMouse());
     }
 
     public Keyboard getKeyboard() {
@@ -368,10 +366,7 @@ public class EyesSeleniumDriver extends EyesWebDriver implements HasInputDevices
      * @return The viewport size of the default content (outer most frame).
      */
     public RectangleSize getDefaultContentViewportSize(boolean forceQuery) {
-        logger.verbose("getDefaultContentViewportSize(forceQuery: " + forceQuery + ")");
-
         if (defaultContentViewportSize != null && !forceQuery) {
-            logger.verbose("Using cached viewport size: " + defaultContentViewportSize);
             return defaultContentViewportSize;
         }
 
@@ -388,10 +383,7 @@ public class EyesSeleniumDriver extends EyesWebDriver implements HasInputDevices
             switchTo.defaultContent();
         }
 
-        logger.verbose("Extracting viewport size...");
         defaultContentViewportSize = EyesDriverUtils.getViewportSizeOrDisplaySize(logger, this);
-        logger.verbose("Done! Viewport size: " + defaultContentViewportSize);
-
         if (currentFrames.size() > 0) {
             switchTo.frames(currentFrames);
         }
@@ -431,20 +423,12 @@ public class EyesSeleniumDriver extends EyesWebDriver implements HasInputDevices
         try {
             if (!EyesDriverUtils.isMobileDevice(driver)) {
                 userAgent = (String) this.driver.executeScript("return navigator.userAgent");
-                logger.verbose("user agent: " + userAgent);
-            } else {
-                logger.verbose("no user agent for native apps");
             }
         } catch (Exception e) {
-            logger.verbose("Failed to obtain user-agent string");
+            GeneralUtils.logExceptionStackTrace(logger, Stage.GENERAL, e);
             userAgent = null;
         }
 
         return userAgent;
-    }
-
-    private String getSessionId() {
-        // extract remote web driver information
-        return driver.getSessionId().toString();
     }
 }

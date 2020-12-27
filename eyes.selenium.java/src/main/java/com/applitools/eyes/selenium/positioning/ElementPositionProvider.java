@@ -9,7 +9,6 @@ import com.applitools.utils.ArgumentGuard;
 import org.openqa.selenium.*;
 
 public class ElementPositionProvider implements PositionProvider ,ISeleniumPositionProvider{
-    private final Logger logger;
     private final EyesRemoteWebElement element;
 
     public ElementPositionProvider(Logger logger, EyesSeleniumDriver driver, WebElement element) {
@@ -17,11 +16,8 @@ public class ElementPositionProvider implements PositionProvider ,ISeleniumPosit
         ArgumentGuard.notNull(driver, "driver");
         ArgumentGuard.notNull(element, "element");
 
-        this.logger = logger;
         this.element = (element instanceof EyesRemoteWebElement) ?
                 (EyesRemoteWebElement) element : new EyesRemoteWebElement(logger, driver, element);
-
-        logger.verbose("creating ElementPositionProvider");
         }
 
 
@@ -30,13 +26,7 @@ public class ElementPositionProvider implements PositionProvider ,ISeleniumPosit
      * @return The scroll position of the current element.
      */
     public Location getCurrentPosition() {
-        logger.verbose("getCurrentScrollPosition()");
-
-        Location result = new Location(element.getScrollLeft(), element.getScrollTop());
-
-        logger.verbose(String.format("Current position: %s", result));
-
-        return result;
+        return new Location(element.getScrollLeft(), element.getScrollTop());
     }
 
     /**
@@ -44,12 +34,7 @@ public class ElementPositionProvider implements PositionProvider ,ISeleniumPosit
      * @param location The position to scroll to.
      */
     public Location setPosition(Location location) {
-        logger.verbose(String.format("Scrolling element to %s", location));
-
-        Location result = element.scrollTo(location);
-
-        logger.verbose("Done scrolling element! result: " + result);
-        return result;
+        return element.scrollTo(location);
     }
 
     /**
@@ -57,12 +42,7 @@ public class ElementPositionProvider implements PositionProvider ,ISeleniumPosit
      * to.
      */
     public RectangleSize getEntireSize() {
-        logger.verbose("enter");
-
-        RectangleSize result = new RectangleSize(element.getScrollWidth(), element.getScrollHeight());
-
-        logger.verbose("Entire size: " + result);
-        return result;
+        return new RectangleSize(element.getScrollWidth(), element.getScrollHeight());
     }
 
     public PositionMemento getState() {

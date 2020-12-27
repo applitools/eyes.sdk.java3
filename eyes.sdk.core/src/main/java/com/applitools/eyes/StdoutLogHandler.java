@@ -1,10 +1,9 @@
 package com.applitools.eyes;
 
+import com.applitools.eyes.logging.ClientEvent;
 import com.applitools.eyes.logging.TraceLevel;
-import com.applitools.utils.GeneralUtils;
-
-import java.util.Calendar;
-import java.util.TimeZone;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
  * Writes log messages to the standard output stream.
@@ -17,13 +16,8 @@ public class StdoutLogHandler extends LogHandler {
      * @param isVerbose Whether to handle or ignore verbose log messages.
      */
     public StdoutLogHandler(boolean isVerbose) {
-        super(isVerbose);
+        super(isVerbose ? TraceLevel.Debug : TraceLevel.Notice);
     }
-
-    /**
-     * Does nothing.
-     */
-    public void open() {}
 
     /**
      * Creates a new StdoutLogHandler that ignores verbose log messages.
@@ -32,9 +26,22 @@ public class StdoutLogHandler extends LogHandler {
         this(false);
     }
 
-    public synchronized void onMessage(String message) {
-        String currentTime = GeneralUtils.toISO8601DateTime(Calendar.getInstance(TimeZone.getTimeZone("UTC")));
-        System.out.println(currentTime + " Eyes: " + message);
+    public StdoutLogHandler(TraceLevel level) {
+        super(level);
+    }
+
+    /**
+     * Does nothing.
+     */
+    public void open() {}
+
+    @Override
+    public void onMessageInner(ClientEvent event) {
+        try {
+            System.out.println(new ObjectMapper().writeValueAsString(event));
+        } catch (JsonProcessingException e) {
+            e.printStackTrace();
+        }
     }
 
     /**
@@ -45,5 +52,15 @@ public class StdoutLogHandler extends LogHandler {
     @Override
     public boolean isOpen() {
         return true;
+    }
+
+    @Override
+    public boolean equals(Object other) {
+        return other instanceof StdoutLogHandler;
+    }
+
+    @Override
+    public int hashCode() {
+        return StdoutLogHandler.class.hashCode();
     }
 }

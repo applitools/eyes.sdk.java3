@@ -5,6 +5,9 @@ import com.applitools.eyes.EyesException;
 import com.applitools.eyes.Logger;
 import com.applitools.eyes.SyncTaskListener;
 import com.applitools.eyes.TaskListener;
+import com.applitools.eyes.logging.Stage;
+import com.applitools.eyes.logging.TraceLevel;
+import com.applitools.eyes.logging.Type;
 import com.applitools.eyes.visualgrid.model.*;
 import com.applitools.eyes.visualgrid.services.ServiceTaskListener;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -42,13 +45,13 @@ public class ResourceCollectionService extends EyesService<FrameData, Map<String
                 @Override
                 public void onComplete(final Map<String, RGridResource> resourceMap) {
                     RGridDom dom = new RGridDom(frameData.getCdt(), resourceMap, frameData.getUrl());
+                    dom.setTestIds(frameData.getTestIds());
                     waitingForUploadQueue.add(Pair.of(nextInput.getLeft(), Pair.of(dom, resourceMap)));
                     tasksInDomAnalyzingProcess.remove(nextInput.getLeft());
                 }
 
                 @Override
                 public void onFail() {
-                    logger.log(String.format("Failed completing task on input %s", nextInput));
                     errorQueue.add(Pair.<String, Throwable>of(nextInput.getLeft(), new EyesException("Dom analyzer failed")));
                     tasksInDomAnalyzingProcess.remove(nextInput.getLeft());
                 }
@@ -73,7 +76,7 @@ public class ResourceCollectionService extends EyesService<FrameData, Map<String
                 @Override
                 public void onComplete(List<RGridResource> resources) {
                     try {
-                        uploadResources(resources);
+                        uploadResources(pair.getLeft().getTestIds(), resources);
                     } catch (Throwable t) {
                         onFail(t);
                         return;
@@ -84,7 +87,6 @@ public class ResourceCollectionService extends EyesService<FrameData, Map<String
 
                 @Override
                 public void onFail(Throwable t) {
-                    logger.log(String.format("Failed completing task on input %s", nextInput));
                     errorQueue.add(Pair.of(nextInput.getLeft(), t));
                 }
             };
@@ -100,7 +102,7 @@ public class ResourceCollectionService extends EyesService<FrameData, Map<String
     /**
      * Checks with the server what resources are missing.
      */
-    void checkResourcesStatus(RGridDom dom, final Map<String, RGridResource> resourceMap,
+    void checkResourcesStatus(final RGridDom dom, final Map<String, RGridResource> resourceMap,
                               final ServiceTaskListener<List<RGridResource>> listener) throws JsonProcessingException {
         List<HashObject> hashesToCheck = new ArrayList<>();
         final Map<String, String> hashToResourceUrl = new HashMap<>();
@@ -138,6 +140,7 @@ public class ResourceCollectionService extends EyesService<FrameData, Map<String
                     return;
                 }
 
+                logger.log(TraceLevel.Info, dom.getTestIds(), Stage.RESOURCE_COLLECTION, Type.CHECK_RESOURCE, Pair.of("result", result));
                 // Analyzing the server response and find the missing resources
                 List<RGridResource> missingResources = new ArrayList<>();
                 for (int i = 0; i < result.length; i++) {
@@ -173,18 +176,19 @@ public class ResourceCollectionService extends EyesService<FrameData, Map<String
             public void onFail() {
                 listener.onFail(new EyesException("Failed checking resources with the server"));
             }
-        }, null, hashesArray);
+        }, dom.getTestIds(), null, hashesArray);
     }
 
-    void uploadResources(List<RGridResource> resources) {
+    void uploadResources(Set<String> testIds, List<RGridResource> resources) {
+        logger.log(TraceLevel.Info, testIds, Stage.RESOURCE_COLLECTION, Type.UPLOAD_RESOURCE, Pair.of("resources", resources));
         for (RGridResource resource : resources) {
             synchronized (uploadedResourcesCache) {
                 if (uploadedResourcesCache.containsKey(resource.getSha256())) {
                     continue;
                 }
-                logger.verbose("resource(" + resource.getUrl() + ") hash : " + resource.getSha256());
+
                 SyncTaskListener<Void> listener = new SyncTaskListener<>(logger, String.format("uploadResource %s %s", resource.getSha256(), resource.getUrl()));
-                serverConnector.renderPutResource("NONE", resource, listener);
+                serverConnector.renderPutResource(testIds, "NONE", resource, listener);
                 uploadedResourcesCache.put(resource.getSha256(), listener);
             }
         }
@@ -197,5 +201,7 @@ public class ResourceCollectionService extends EyesService<FrameData, Map<String
                 listener.get();
             }
         }
+
+        logger.log(TraceLevel.Info, testIds, Stage.RESOURCE_COLLECTION, Type.UPLOAD_RESOURCE, Pair.of("completed", true));
     }
 }

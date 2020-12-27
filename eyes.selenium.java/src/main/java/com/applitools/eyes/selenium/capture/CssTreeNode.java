@@ -1,6 +1,8 @@
 package com.applitools.eyes.selenium.capture;
 
 import com.applitools.eyes.Logger;
+import com.applitools.eyes.logging.Stage;
+import com.applitools.eyes.logging.Type;
 import com.applitools.eyes.visualgrid.model.CssTokenizer;
 import com.applitools.utils.GeneralUtils;
 import org.w3c.dom.css.CSSImportRule;
@@ -62,7 +64,7 @@ class CssTreeNode {
         try {
             ruleList = CssTokenizer.getCssRules(css);
         } catch (IOException e) {
-            GeneralUtils.logExceptionStackTrace(logger, e);
+            GeneralUtils.logExceptionStackTrace(logger, Stage.CHECK, Type.DOM_SCRIPT, e);
             return;
         }
 

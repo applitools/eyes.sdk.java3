@@ -33,8 +33,6 @@ public abstract class EyesWebDriver implements WebDriver, JavascriptExecutor, Ta
             for (MobileDeviceInfo mobileDeviceInfo : mobileDevicesInfo.values()) {
                 for (String name : mobileDeviceInfo.getAliases()) {
                     if (deviceName.equalsIgnoreCase(name)) {
-                        logger.verbose(String.format("Device name found in the server: %s. Pixel ratio: %f",
-                                deviceName, mobileDeviceInfo.getPixelRatio()));
                         return mobileDeviceInfo.getPixelRatio();
                     }
                 }

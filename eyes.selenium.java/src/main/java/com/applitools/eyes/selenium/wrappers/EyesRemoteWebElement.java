@@ -1,6 +1,7 @@
 package com.applitools.eyes.selenium.wrappers;
 
 import com.applitools.eyes.*;
+import com.applitools.eyes.logging.Stage;
 import com.applitools.eyes.positioning.PositionProvider;
 import com.applitools.eyes.selenium.EyesDriverUtils;
 import com.applitools.eyes.selenium.SeleniumEyes;
@@ -21,17 +22,13 @@ import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Scanner;
-import java.util.regex.Pattern;
 
-@SuppressWarnings("FieldCanBeLocal")
 public class EyesRemoteWebElement extends RemoteWebElement {
     private final Logger logger;
     private final EyesSeleniumDriver eyesDriver;
     private final RemoteWebElement webElement;
-    private Method executeMethod;
 
-    private final String JS_GET_COMPUTED_STYLE_FORMATTED_STR =
+    private static final String JS_GET_COMPUTED_STYLE_FORMATTED_STR =
             "var elem = arguments[0]; " +
                     "var styleProp = '%s'; " +
                     "if (window.getComputedStyle) { " +
@@ -43,40 +40,40 @@ public class EyesRemoteWebElement extends RemoteWebElement {
                     "return null;" +
                     "}";
 
-    private final String JS_GET_SCROLL_LEFT =
+    private static final String JS_GET_SCROLL_LEFT =
             "return arguments[0].scrollLeft;";
 
-    private final String JS_GET_SCROLL_TOP =
+    private static final String JS_GET_SCROLL_TOP =
             "return arguments[0].scrollTop;";
 
-    private final String JS_GET_SCROLL_WIDTH =
+    private static final String JS_GET_SCROLL_WIDTH =
             "return arguments[0].scrollWidth;";
 
-    private final String JS_GET_SCROLL_HEIGHT =
+    private static final String JS_GET_SCROLL_HEIGHT =
             "return arguments[0].scrollHeight;";
 
     private static final String JS_GET_SCROLL_SIZE =
             "return arguments[0].scrollWidth+ ';' + arguments[0].scrollHeight;";
 
-    private final String JS_SCROLL_TO_FORMATTED_STR =
+    private static final String JS_SCROLL_TO_FORMATTED_STR =
             "arguments[0].scrollLeft = %d;" +
                     "arguments[0].scrollTop = %d;";
 
-    private final String JS_GET_SCROLL_POSITION =
+    private static final String JS_GET_SCROLL_POSITION =
             "return arguments[0].scrollLeft + ';' + arguments[0].scrollTop;";
 
-    private final String JS_GET_OVERFLOW =
+    private static final String JS_GET_OVERFLOW =
             "return arguments[0].style.overflow;";
 
-    private final String JS_SET_OVERFLOW_FORMATTED_STR =
+    private static final String JS_SET_OVERFLOW_FORMATTED_STR =
             "arguments[0].style.overflow = '%s'";
 
-    private final String JS_GET_CLIENT_WIDTH = "return arguments[0].clientWidth;";
-    private final String JS_GET_CLIENT_HEIGHT = "return arguments[0].clientHeight;";
+    private static final String JS_GET_CLIENT_WIDTH = "return arguments[0].clientWidth;";
+    private static final String JS_GET_CLIENT_HEIGHT = "return arguments[0].clientHeight;";
 
     public static final String JS_GET_CLIENT_SIZE = "return arguments[0].clientWidth + ';' + arguments[0].clientHeight;";
 
-    private final String JS_GET_BORDER_WIDTHS_ARR =
+    private static final String JS_GET_BORDER_WIDTHS_ARR =
             "var retVal = retVal || [];" +
                     "if (window.getComputedStyle) { " +
                     "var computedStyle = window.getComputedStyle(elem, null);" +
@@ -93,11 +90,10 @@ public class EyesRemoteWebElement extends RemoteWebElement {
                     "retVal.push(0,0,0,0);" +
                     "}";
 
-    @SuppressWarnings("unused")
     private final String JS_GET_BORDER_WIDTHS =
             JS_GET_BORDER_WIDTHS_ARR + "return retVal;";
 
-    private final String JS_GET_SIZE_AND_BORDER_WIDTHS =
+    private static final String JS_GET_SIZE_AND_BORDER_WIDTHS =
             "var elem = arguments[0]; " +
                     "var retVal = [elem.clientWidth, elem.clientHeight]; " +
                     JS_GET_BORDER_WIDTHS_ARR +
@@ -120,8 +116,6 @@ public class EyesRemoteWebElement extends RemoteWebElement {
         this.logger = logger;
         this.eyesDriver = eyesDriver;
 
-
-        logger.verbose(String.format("Element type: %s", webElement.getClass().getName()));
         webElement = EyesDriverUtils.getWrappedWebElement(webElement);
         if (webElement instanceof RemoteWebElement) {
             this.webElement = (RemoteWebElement) webElement;
@@ -136,7 +130,7 @@ public class EyesRemoteWebElement extends RemoteWebElement {
             // We can't call the execute method directly because it is
             // protected, and we must override this function since we don't
             // have the "parent" and "id" of the aggregated object.
-            executeMethod = RemoteWebElement.class.getDeclaredMethod("execute",
+            Method executeMethod = RemoteWebElement.class.getDeclaredMethod("execute",
                     String.class, Map.class);
             executeMethod.setAccessible(true);
         } catch (NoSuchMethodException e) {
@@ -144,14 +138,12 @@ public class EyesRemoteWebElement extends RemoteWebElement {
         }
     }
 
-    public static Region getClientBoundsWithoutBorders(WebElement element, EyesSeleniumDriver driver, Logger logger) {
+    public static Region getClientBoundsWithoutBorders(WebElement element, EyesSeleniumDriver driver) {
         String result = (String) driver.executeScript(JS_GET_BOUNDING_CLIENT_RECT_WITHOUT_BORDERS, element);
-        if (logger != null) logger.verbose(result);
         String[] data = result.split(";");
-        Region rect = new Region(
-                Math.round(Float.valueOf(data[0])), Math.round(Float.valueOf(data[1])),
-                Math.round(Float.valueOf(data[2])), Math.round(Float.valueOf(data[3])));
-        return rect;
+        return new Region(
+                Math.round(Float.parseFloat(data[0])), Math.round(Float.parseFloat(data[1])),
+                Math.round(Float.parseFloat(data[2])), Math.round(Float.parseFloat(data[3])));
     }
 
     public Region getBounds() {
@@ -200,7 +192,7 @@ public class EyesRemoteWebElement extends RemoteWebElement {
      * @return The integer value of a computed style.
      */
     public int getComputedStyleInteger(String propStyle) {
-        return Math.round(Float.valueOf(getComputedStyle(propStyle).trim().
+        return Math.round(Float.parseFloat(getComputedStyle(propStyle).trim().
                 replace("px", "")));
     }
 
@@ -314,7 +306,6 @@ public class EyesRemoteWebElement extends RemoteWebElement {
             // Letting the driver know about the current action.
             Region currentControl = getBounds();
             eyes.addMouseTrigger(MouseAction.Click, this);
-            logger.verbose(String.format("click(%s)", currentControl));
         }
 
         webElement.click();
@@ -650,7 +641,6 @@ public class EyesRemoteWebElement extends RemoteWebElement {
         // In IE the keys are bottom/right while in the rest of the browser they are height/width
         String retVal = (String) driver.executeScript("var r = arguments[0].getBoundingClientRect();" +
                 "return r.left+';'+r.top+';'+r.width+';'+r.height+';'+r.right+';'+r.bottom", element);
-        logger.verbose(String.format("Bounding client rect: %s", retVal));
         String[] parts = retVal.split(";");
         String left = parts[0];
         String top = parts[1];
@@ -679,7 +669,7 @@ public class EyesRemoteWebElement extends RemoteWebElement {
             y = y.split("px")[0];
             return new Location(-NumberFormat.getInstance().parse(x.trim()).intValue(), -NumberFormat.getInstance().parse(y.trim()).intValue());
         } catch (Throwable t) {
-            GeneralUtils.logExceptionStackTrace(logger, t);
+            GeneralUtils.logExceptionStackTrace(logger, Stage.GENERAL, t);
             return null;
         }
     }

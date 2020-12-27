@@ -40,7 +40,6 @@ public class PositionProviderFactory {
                 }
                 return new SeleniumScrollPositionProvider(logger, executor, scrollRootElement);
             default:
-                logger.log(String.format("Unknown stitch mode %s", stitchMode));
                 return getPositionProvider(logger, StitchMode.SCROLL, executor, scrollRootElement, userAgent);
         }
     }

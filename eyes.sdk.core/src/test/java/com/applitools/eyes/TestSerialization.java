@@ -301,7 +301,7 @@ public class TestSerialization extends ReportingTestSuite {
         bi.setId("37a587aa-17d0-4e86-bf0e-566656a84dda");
         String agentSessionId = UUID.randomUUID().toString();
 
-        SessionStartInfo ssi = new SessionStartInfo("some agent", SessionType.SEQUENTIAL,
+        SessionStartInfo ssi = new SessionStartInfo("id", "some agent", SessionType.SEQUENTIAL,
                 "my app", "1.0.0", "some scenario",
                 bi,
                 "some baseline name", "env name",

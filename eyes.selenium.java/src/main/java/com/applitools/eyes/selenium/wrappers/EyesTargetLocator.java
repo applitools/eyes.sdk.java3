@@ -84,32 +84,20 @@ public class EyesTargetLocator implements WebDriver.TargetLocator {
     }
 
     public WebDriver frame(int index) {
-        logger.verbose(String.format("(%d)", index));
-        // Finding the target element so and reporting it using onWillSwitch.
-        logger.verbose("Getting frames list...");
         List<WebElement> frames = driver.findElementsByCssSelector("frame, iframe");
         if (index > frames.size()) {
             throw new NoSuchFrameException(String.format("Frame index [%d] is invalid!", index));
         }
-        logger.verbose("Done! getting the specific frame...");
+
         WebElement targetFrame = frames.get(index);
-        logger.verbose("Done! Making preparations...");
         willSwitchToFrame(targetFrame);
-        logger.verbose("Done! Switching to frame...");
         targetLocator.frame(index);
-        logger.verbose("Done!");
         return driver;
     }
 
     public WebDriver frame(String nameOrId) {
-        logger.verbose(String.format("('%s')", nameOrId));
-        // Finding the target element so we can report it.
-        // We use find elements(plural) to avoid exception when the element
-        // is not found.
-        logger.verbose("Getting frames by name...");
         List<WebElement> frames = driver.findElementsByName(nameOrId);
         if (frames.size() == 0) {
-            logger.verbose("No frames Found! Trying by id...");
             // If there are no frames by that name, we'll try the id
             frames = driver.findElementsById(nameOrId);
             if (frames.size() == 0) {
@@ -118,37 +106,27 @@ public class EyesTargetLocator implements WebDriver.TargetLocator {
                         "No frame with name or id '%s' exists!", nameOrId));
             }
         }
-        logger.verbose("Done! Making preparations...");
         willSwitchToFrame(frames.get(0));
-        logger.verbose("Done! Switching to frame " + nameOrId + "...");
         targetLocator.frame(nameOrId);
-        logger.verbose("Done!");
         return driver;
     }
 
     public WebDriver frame(WebElement frameElement) {
-        logger.verbose("Making preparations...");
         willSwitchToFrame(frameElement);
-        logger.verbose("Done! Switching to frame...");
         targetLocator.frame(frameElement);
-        logger.verbose("Done!");
         return driver;
     }
 
     public WebDriver parentFrame() {
-        logger.verbose("enter");
         if (driver.getFrameChain().size() != 0) {
-            logger.verbose("Making preparations...");
             driver.getFrameChain().pop();
-            logger.verbose("Done! Switching to parent frame...");
             parentFrame(logger, targetLocator, driver.getFrameChain());
         }
-        logger.verbose("Done!");
+
         return driver;
     }
 
     public static void parentFrame(Logger logger, WebDriver.TargetLocator targetLocator, FrameChain frameChainToParent) {
-        logger.verbose("enter (static)");
         try {
             targetLocator.parentFrame();
         } catch (Exception WebDriverException) {
@@ -166,24 +144,18 @@ public class EyesTargetLocator implements WebDriver.TargetLocator {
      * @param frameChain The path to the frame to switch to.
      * @return The WebDriver with the switched context.
      */
-    @SuppressWarnings("UnusedReturnValue")
     public WebDriver framesDoScroll(FrameChain frameChain) {
-        logger.verbose("enter");
         this.defaultContent();
         PositionProvider scrollProvider = ScrollPositionProviderFactory.getScrollPositionProvider(driver.getUserAgent(), logger, jsExecutor, driver.getEyes().getCurrentFrameScrollRootElement());
         defaultContentPositionMemento = scrollProvider.getState();
         for (Frame frame : frameChain) {
-            logger.verbose("Scrolling by parent scroll position...");
             Location frameLocation = frame.getLocation();
             scrollProvider.setPosition(frameLocation);
-            logger.verbose("Done! Switching to frame...");
             this.frame(frame.getReference());
             Frame newFrame = driver.getFrameChain().peek();
             newFrame.setScrollRootElement(frame.getScrollRootElement());
-            logger.verbose("Done!");
         }
 
-        logger.verbose("Done switching into nested frames!");
         return driver;
     }
 
@@ -193,17 +165,13 @@ public class EyesTargetLocator implements WebDriver.TargetLocator {
      * @param frameChain The path to the frame to switch to.
      * @return The WebDriver with the switched context.
      */
-    @SuppressWarnings("UnusedReturnValue")
     public WebDriver frames(FrameChain frameChain) {
-        logger.verbose("enter");
         this.defaultContent();
         for (Frame frame : frameChain) {
             this.frame(frame.getReference());
-            logger.verbose(String.format("frame.Reference: %s ; frame.ScrollRootElement: %s", frame.getReference(), frame.getScrollRootElement()));
             Frame newFrame = driver.getFrameChain().peek();
             newFrame.setScrollRootElement(frame.getScrollRootElement());
         }
-        logger.verbose("Done switching into nested frames!");
         return driver;
     }
 
@@ -216,60 +184,43 @@ public class EyesTargetLocator implements WebDriver.TargetLocator {
      * @return The WebDriver with the switched context.
      */
     public WebDriver frames(String[] framesPath) {
-        logger.verbose("enter");
         for (String frameNameOrId : framesPath) {
-            logger.verbose("Switching to frame...");
             targetLocator.frame(frameNameOrId);
-            logger.verbose("Done!");
         }
-        logger.verbose("Done switching into nested frames!");
         return driver;
     }
 
     public WebDriver window(String nameOrHandle) {
-        logger.verbose("enter");
         driver.getFrameChain().clear();
-        logger.verbose("Done! Switching to window...");
         targetLocator.window(nameOrHandle);
-        logger.verbose("Done!");
         return driver;
     }
 
     public WebDriver defaultContent() {
-        logger.verbose("enter");
         if (driver.getFrameChain().size() != 0) {
-            logger.verbose("Making preparations...");
             driver.getFrameChain().clear();
-            logger.verbose("Done! Switching to default content...");
             targetLocator.defaultContent();
         } else if (!configuration.isFeatureActivated(Feature.NO_SWITCH_WITHOUT_FRAME_CHAIN)) {
             targetLocator.defaultContent();
         }
 
-        logger.verbose("Done!");
         return driver;
     }
 
     public WebElement activeElement() {
-        logger.verbose("Switching to element...");
         WebElement element = targetLocator.activeElement();
         if (!(element instanceof RemoteWebElement)) {
             throw new EyesException("Not a remote web element!");
         }
-        EyesRemoteWebElement result = new EyesRemoteWebElement(logger, driver, element);
-        logger.verbose("Done!");
-        return result;
+        return new EyesRemoteWebElement(logger, driver, element);
     }
 
     public Alert alert() {
-        logger.verbose("Switching to alert...");
         Alert result = targetLocator.alert();
-        logger.verbose("Done!");
         return result;
     }
 
     public void resetScroll() {
-        logger.verbose("enter");
         if (this.driver.getEyes() != null) {
             this.scrollPosition = ScrollPositionProviderFactory.getScrollPositionProvider(driver.getUserAgent(), logger, jsExecutor, driver.getEyes().getCurrentFrameScrollRootElement());
         }

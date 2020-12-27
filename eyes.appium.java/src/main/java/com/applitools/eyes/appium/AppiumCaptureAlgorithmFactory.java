@@ -13,6 +13,7 @@ public class AppiumCaptureAlgorithmFactory {
 
     private final EyesAppiumDriver driver;
     private final Logger logger;
+    private final String testId;
     private final AppiumScrollPositionProvider scrollProvider;
     private final ImageProvider imageProvider;
     private final DebugScreenshotsProvider debugScreenshotsProvider;
@@ -24,15 +25,15 @@ public class AppiumCaptureAlgorithmFactory {
     private final Integer stitchingAdjustment;
     private final String scrollableElementId;
 
-    public AppiumCaptureAlgorithmFactory(EyesAppiumDriver driver, Logger logger,
+    public AppiumCaptureAlgorithmFactory(EyesAppiumDriver driver, Logger logger, String testId,
                                          AppiumScrollPositionProvider scrollProvider,
                                          ImageProvider imageProvider, DebugScreenshotsProvider debugScreenshotsProvider,
                                          ScaleProviderFactory scaleProviderFactory, CutProvider cutProvider,
                                          EyesScreenshotFactory screenshotFactory, int waitBeforeScreenshots, WebElement cutElement,
                                          Integer stitchingAdjustment, String scrollableElementId) {
-
         this.driver = driver;
         this.logger = logger;
+        this.testId = testId;
         this.scrollProvider = scrollProvider;
         this.imageProvider = imageProvider;
         this.debugScreenshotsProvider = debugScreenshotsProvider;
@@ -45,13 +46,13 @@ public class AppiumCaptureAlgorithmFactory {
         this.scrollableElementId = scrollableElementId;
     }
 
-    public AppiumFullPageCaptureAlgorithm getAlgorithm () {
+    public AppiumFullPageCaptureAlgorithm getAlgorithm() {
         if (EyesDriverUtils.isAndroid(driver.getRemoteWebDriver())) {
-            return new AndroidFullPageCaptureAlgorithm(logger, scrollProvider, imageProvider,
+            return new AndroidFullPageCaptureAlgorithm(logger, testId, scrollProvider, imageProvider,
                     debugScreenshotsProvider, scaleProviderFactory, cutProvider, screenshotFactory,
                     waitBeforeScreenshot, stitchingAdjustment, scrollableElementId);
         } else if (EyesDriverUtils.isIOS(driver.getRemoteWebDriver())) {
-            return new AppiumFullPageCaptureAlgorithm(logger, scrollProvider, imageProvider,
+            return new AppiumFullPageCaptureAlgorithm(logger, testId, scrollProvider, imageProvider,
                     debugScreenshotsProvider, scaleProviderFactory, cutProvider, screenshotFactory,
                     waitBeforeScreenshot, cutElement, stitchingAdjustment);
         }

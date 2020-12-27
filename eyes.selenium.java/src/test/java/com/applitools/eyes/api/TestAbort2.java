@@ -194,33 +194,8 @@ public class TestAbort2 extends ReportingTestSuite {
     public void AfterTestSuite() {
         // Wait until the test results are available and retrieve them
         TestResultsSummary allTestResults = runner.getAllTestResults(false);
-        for(TestResultContainer result : allTestResults)
-        {
-            handleTestResults(result);
-        }
-    }
-
-    private void handleTestResults(TestResultContainer summary) {
-        Throwable ex = summary.getException();
-        if (ex != null) {
-            runner.getLogger().log("System error occurred while checking target.");
-        }
-        TestResults result = summary.getTestResults();
-        if (result == null) {
-            runner.getLogger().log("No test results information available");
-        } else {
-            runner.getLogger().log(String.format(
-                    "AppName = %s, testname = %s, Browser = %s, OS = %s viewport = %dx%d, matched = %d, mismatched = %d, missing = %d, aborted = %s\n",
-                    result.getAppName(),
-                    result.getName(),
-                    result.getHostApp(),
-                    result.getHostOS(),
-                    result.getHostDisplaySize().getWidth(),
-                    result.getHostDisplaySize().getHeight(),
-                    result.getMatches(),
-                    result.getMismatches(),
-                    result.getMissing(),
-                    (result.isAborted() ? "aborted" : "no")));
+        for(TestResultContainer result : allTestResults) {
+            System.out.println(result);
         }
     }
 }

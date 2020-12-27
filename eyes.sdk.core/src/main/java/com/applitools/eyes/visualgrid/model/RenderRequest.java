@@ -12,6 +12,9 @@ import java.util.Map;
 
 public class RenderRequest {
     @JsonInclude
+    private String testId;
+
+    @JsonInclude
     private String renderId;
 
     @JsonIgnore
@@ -59,9 +62,10 @@ public class RenderRequest {
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private String renderer;
 
-    public RenderRequest(String webHook, String url, RGridDom dom, Map<String, RGridResource> resources, RenderInfo renderInfo,
+    public RenderRequest(String testId, String webHook, String url, RGridDom dom, Map<String, RGridResource> resources, RenderInfo renderInfo,
                          String platform, BrowserType browserName, Object scriptHooks, List<VisualGridSelector> selectorsToFindRegionsFor,
                          boolean sendDom, String renderer, String stepId, String stitchingService, List<VisualGridOption> visualGridOptions) {
+        this.testId = testId;
         this.webhook = webHook;
         this.url = url;
         this.dom = dom;
@@ -210,6 +214,7 @@ public class RenderRequest {
     @Override
     public String toString() {
         return "RenderRequest{" +
+                "testId='" + testId + '\'' +
                 "renderId='" + renderId + '\'' +
                 ", stepId=" + stepId +
                 ", agentId='" + agentId + '\'' +
@@ -229,5 +234,13 @@ public class RenderRequest {
 
     public String getRenderer() {
         return renderer;
+    }
+
+    public String getTestId() {
+        return testId;
+    }
+
+    public void setTestId(String testId) {
+        this.testId = testId;
     }
 }

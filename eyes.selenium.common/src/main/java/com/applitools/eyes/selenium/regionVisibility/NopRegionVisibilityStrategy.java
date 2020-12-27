@@ -17,10 +17,8 @@ public class NopRegionVisibilityStrategy implements RegionVisibilityStrategy {
 
     public void moveToRegion(PositionProvider positionProvider,
                              Location location) {
-        logger.verbose("Ignored (no op).");
     }
 
     public void returnToOriginalPosition(PositionProvider positionProvider) {
-        logger.verbose("Ignored (no op).");
     }
 }

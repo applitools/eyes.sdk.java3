@@ -20,7 +20,7 @@ import java.util.List;
  */
 public class FrameChain implements Iterable<Frame> {
     private final Logger logger;
-    private List<Frame> frames;
+    private final List<Frame> frames;
 
     /**
      * Compares two frame chains.
@@ -148,9 +148,7 @@ public class FrameChain implements Iterable<Frame> {
      * @return The size of the current frame.
      */
     public RectangleSize getCurrentFrameSize() {
-        logger.verbose("getCurrentFrameSize()");
         RectangleSize result = frames.get(frames.size() - 1).getOuterSize();
-        logger.verbose("Done!");
         return result;
     }
 
@@ -159,9 +157,7 @@ public class FrameChain implements Iterable<Frame> {
      * @return The inner size of the current frame.
      */
     public RectangleSize getCurrentFrameInnerSize() {
-        logger.verbose("GetCurrentFrameInnerSize()");
         RectangleSize result = frames.get(frames.size() - 1).getInnerSize();
-        logger.verbose("Done!");
         return result;
     }
 

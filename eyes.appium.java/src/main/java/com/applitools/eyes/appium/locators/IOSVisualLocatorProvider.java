@@ -11,9 +11,9 @@ import java.util.Map;
 
 public class IOSVisualLocatorProvider extends MobileVisualLocatorProvider {
 
-    public IOSVisualLocatorProvider(Logger logger, EyesAppiumDriver driver, ServerConnector serverConnector,
+    public IOSVisualLocatorProvider(Logger logger, String testId, EyesAppiumDriver driver, ServerConnector serverConnector,
                              double devicePixelRatio, String appName, DebugScreenshotsProvider debugScreenshotsProvider) {
-        super(logger, driver, serverConnector, devicePixelRatio, appName, debugScreenshotsProvider);
+        super(logger, testId, driver, serverConnector, devicePixelRatio, appName, debugScreenshotsProvider);
     }
 
     @Override

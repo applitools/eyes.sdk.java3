@@ -7,6 +7,9 @@ import com.applitools.connectivity.api.Response;
 import com.applitools.eyes.*;
 import com.applitools.eyes.locators.VisualLocatorsData;
 import com.applitools.eyes.logging.LogSessionsClientEvents;
+import com.applitools.eyes.logging.Stage;
+import com.applitools.eyes.logging.TraceLevel;
+import com.applitools.eyes.logging.Type;
 import com.applitools.eyes.visualgrid.model.*;
 import com.applitools.utils.ArgumentGuard;
 import com.applitools.utils.GeneralUtils;
@@ -16,6 +19,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.MapperFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
+import org.apache.commons.lang3.tuple.Pair;
 import org.apache.http.HttpStatus;
 
 import javax.ws.rs.HttpMethod;
@@ -58,8 +62,8 @@ public class ServerConnector extends UfgConnector {
     }
 
     public void setAgentId(String agentId) {
-        logger.log(String.format("Setting agent id: %s", agentId));
         this.agentId = agentId;
+        logger.setAgentId(agentId);
     }
 
     public String getAgentId() {
@@ -108,9 +112,8 @@ public class ServerConnector extends UfgConnector {
      * @throws EyesException For invalid status codes, or if response parsing
      *                       failed.
      */
-    public void startSession(final TaskListener<RunningSession> listener, SessionStartInfo sessionStartInfo) throws EyesException {
+    public void startSession(final TaskListener<RunningSession> listener, final SessionStartInfo sessionStartInfo) throws EyesException {
         ArgumentGuard.notNull(sessionStartInfo, "sessionStartInfo");
-        logger.verbose("enter");
         initClient();
         String postData;
         try {
@@ -163,7 +166,7 @@ public class ServerConnector extends UfgConnector {
 
             @Override
             public void onFail(Throwable throwable) {
-                GeneralUtils.logExceptionStackTrace(logger, throwable);
+                GeneralUtils.logExceptionStackTrace(logger, Stage.OPEN, throwable, sessionStartInfo.getTestId());
                 listener.onFail();
             }
         };
@@ -200,7 +203,6 @@ public class ServerConnector extends UfgConnector {
     public void deleteSession(final TaskListener<Void> listener, final TestResults testResults) {
         ArgumentGuard.notNull(testResults, "testResults");
         if (testResults.getId() == null || testResults.getBatchId() == null || testResults.getSecretToken() == null) {
-            logger.log("Can't delete session, results are null");
             return;
         }
 
@@ -266,9 +268,11 @@ public class ServerConnector extends UfgConnector {
         sendLongRequest(request, HttpMethod.POST, callback, jsonData, MediaType.APPLICATION_JSON);
     }
 
-    public void render(final TaskListener<List<RunningRender>> listener, RenderRequest... renderRequests) {
+    public void render(final TaskListener<List<RunningRender>> listener, List<RenderRequest> renderRequests) {
         ArgumentGuard.notNull(renderRequests, "renderRequests");
-        this.logger.verbose("called with " + Arrays.toString(renderRequests));
+        for (RenderRequest renderRequest : renderRequests) {
+            logger.log(TraceLevel.Info, renderRequest.getTestId(), Stage.RENDER, Pair.of("renderRequest", renderRequest));
+        }
         AsyncRequest request = restClient.target(getRenderInfo().getServiceUrl()).path(RENDER).asyncRequest(MediaType.APPLICATION_JSON);
         request.header("X-Auth-Token", getRenderInfo().getAccessToken());
         List<Integer> validStatusCodes = new ArrayList<>();
@@ -292,23 +296,27 @@ public class ServerConnector extends UfgConnector {
             }, new TypeReference<RunningRender[]>() {});
             sendAsyncRequest(request, HttpMethod.POST, callback, json, MediaType.APPLICATION_JSON);
         } catch (JsonProcessingException e) {
-            GeneralUtils.logExceptionStackTrace(logger, e);
-            listener.onComplete(null);
+            throw new EyesException("Render failed", e);
         }
     }
 
-    public void renderStatusById(final TaskListener<List<RenderStatusResults>> listener, String... renderIds) {
+    public void renderStatusById(final TaskListener<List<RenderStatusResults>> listener, List<String> testIds, List<String> renderIds) {
         try {
+            ArgumentGuard.notNull(testIds, "testIds");
             ArgumentGuard.notNull(renderIds, "renderIds");
-            this.logger.verbose("called for render: " + Arrays.toString(renderIds));
+
+            for (int i = 0; i < testIds.size(); i++) {
+                logger.log(TraceLevel.Info, Collections.singleton(testIds.get(i)), Stage.RENDER, Type.RENDER_STATUS, Pair.of("renderId", renderIds.get(i)));
+            }
+
             AsyncRequest request = makeEyesRequest(new HttpRequestBuilder() {
                 @Override
                 public AsyncRequest build() {
                     return restClient.target(getRenderInfo().getServiceUrl()).path((RENDER_STATUS)).asyncRequest(MediaType.TEXT_PLAIN);
                 }
             });
-            request.header("X-Auth-Token", getRenderInfo().getAccessToken());
 
+            request.header("X-Auth-Token", getRenderInfo().getAccessToken());
             List<Integer> validStatusCodes = new ArrayList<>();
             validStatusCodes.add(HttpStatus.SC_OK);
 
@@ -325,12 +333,6 @@ public class ServerConnector extends UfgConnector {
                         return;
                     }
 
-                    for (RenderStatusResults renderStatusResult : renderStatusResults) {
-                        if (renderStatusResult != null && renderStatusResult.getStatus() == RenderStatus.ERROR) {
-                            logger.verbose("error on render id - " + renderStatusResult);
-                        }
-                    }
-
                     listener.onComplete(new ArrayList<>(Arrays.asList(renderStatusResults)));
                 }
 
@@ -341,14 +343,15 @@ public class ServerConnector extends UfgConnector {
             }, new TypeReference<RenderStatusResults[]>() {});
             sendAsyncRequest(request, HttpMethod.POST, callback, json, MediaType.APPLICATION_JSON);
         } catch (Exception e) {
-            GeneralUtils.logExceptionStackTrace(logger, e);
+            GeneralUtils.logExceptionStackTrace(logger, Stage.RENDER, Type.RENDER_STATUS, e, testIds.toArray(new String[0]));
             listener.onComplete(null);
         }
     }
 
-    public void checkResourceStatus(final TaskListener<Boolean[]> listener, String renderId, HashObject... hashes) {
+    public void checkResourceStatus(final TaskListener<Boolean[]> listener, Set<String> testIds, String renderId, HashObject... hashes) {
         try {
             ArgumentGuard.notNull(hashes, "hashes");
+            logger.log(TraceLevel.Info, testIds, Stage.RESOURCE_COLLECTION, Type.CHECK_RESOURCE, Pair.of("hashes", hashes));
             renderId = renderId == null ? "NONE" : renderId;
             AsyncRequest request = restClient.target(getRenderInfo().getServiceUrl()).queryParam("rg_render-id", renderId)
                     .path(RESOURCE_STATUS).asyncRequest(MediaType.APPLICATION_JSON);
@@ -363,7 +366,7 @@ public class ServerConnector extends UfgConnector {
             ResponseParsingCallback<Boolean[]> callback = new ResponseParsingCallback<>(this, validStatusCodes, listener, new TypeReference<Boolean[]>() {});
             sendAsyncRequest(request, HttpMethod.POST, callback, json, MediaType.APPLICATION_JSON);
         } catch (Throwable e) {
-            GeneralUtils.logExceptionStackTrace(logger, e);
+            GeneralUtils.logExceptionStackTrace(logger, Stage.RESOURCE_COLLECTION, Type.CHECK_RESOURCE, e, testIds.toArray(new String[0]));
             listener.onComplete(null);
         }
     }
@@ -384,7 +387,11 @@ public class ServerConnector extends UfgConnector {
             ResponseParsingCallback<JobInfo[]> callback = new ResponseParsingCallback<>(this, validStatusCodes, listener, new TypeReference<JobInfo[]>() {});
             sendAsyncRequest(request, HttpMethod.POST, callback, json, MediaType.APPLICATION_JSON);
         } catch (Throwable t) {
-            GeneralUtils.logExceptionStackTrace(logger, t);
+            Set<String> testIds = new HashSet<>();
+            for (RenderRequest renderRequest : browserInfos) {
+                testIds.add(renderRequest.getTestId());
+            }
+            GeneralUtils.logExceptionStackTrace(logger, Stage.OPEN, Type.JOB_INFO, t, testIds.toArray(new String[0]));
             listener.onFail();
         }
     }
@@ -399,7 +406,6 @@ public class ServerConnector extends UfgConnector {
 
         final UUID uuid = UUID.randomUUID();
         final String finalUrl = targetUrl.replace("__random__", uuid.toString());
-        logger.verbose("uploading viewport image to " + finalUrl);
         UploadCallback callback = new UploadCallback(listener, this, finalUrl, bytes, contentType, mediaType);
         callback.uploadDataAsync();
     }
@@ -443,10 +449,8 @@ public class ServerConnector extends UfgConnector {
         listener.get();
     }
 
-    public void closeBatchAsync(final TaskListener<Void> listener, String batchId, final String url) {
+    public void closeBatchAsync(final TaskListener<Void> listener, final String batchId, final String url) {
         ArgumentGuard.notNull(batchId, "batchId");
-        this.logger.log("called with " + batchId);
-
         final String path = String.format(CLOSE_BATCH, batchId);
         initClient();
         AsyncRequest request = makeEyesRequest(new HttpRequestBuilder() {
@@ -458,13 +462,14 @@ public class ServerConnector extends UfgConnector {
             }
         });
 
+        logger.log(new HashSet<String>(), Stage.CLOSE, Type.CLOSE_BATCH, Pair.of("batchId", batchId));
         sendAsyncRequest(request, HttpMethod.DELETE, new AsyncRequestCallback() {
             @Override
             public void onComplete(Response response) {
                 try {
                     closeConnector();
                 } catch (Throwable t) {
-                    GeneralUtils.logExceptionStackTrace(logger, t);
+                    GeneralUtils.logExceptionStackTrace(logger, Stage.CLOSE, Type.CLOSE_BATCH, t);
                 } finally {
                     listener.onComplete(null);
                 }
@@ -473,7 +478,7 @@ public class ServerConnector extends UfgConnector {
             @Override
             public void onFail(Throwable throwable) {
                 try {
-                    GeneralUtils.logExceptionStackTrace(logger, throwable);
+                    GeneralUtils.logExceptionStackTrace(logger, Stage.CLOSE, Type.CLOSE_BATCH, throwable);
                     closeConnector();
                 } finally {
                     listener.onFail();
@@ -502,7 +507,7 @@ public class ServerConnector extends UfgConnector {
                 }
             }, new TypeReference<Map<String, MobileDeviceInfo>>() {});
         } catch (Throwable t) {
-            GeneralUtils.logExceptionStackTrace(logger, t);
+            GeneralUtils.logExceptionStackTrace(logger, Stage.GENERAL, t);
             mobileDevicesInfo = new HashMap<>();
         }
         return mobileDevicesInfo;

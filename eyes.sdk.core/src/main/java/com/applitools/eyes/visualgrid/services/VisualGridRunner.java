@@ -2,6 +2,7 @@ package com.applitools.eyes.visualgrid.services;
 
 import com.applitools.connectivity.ServerConnector;
 import com.applitools.eyes.*;
+import com.applitools.eyes.logging.Stage;
 import com.applitools.eyes.logging.TraceLevel;
 import com.applitools.eyes.services.EyesServiceRunner;
 import com.applitools.eyes.visualgrid.model.FrameData;
@@ -84,15 +85,11 @@ public class VisualGridRunner extends EyesRunner {
 
     private void init(String suiteName) {
         this.suiteName = suiteName;
-        this.logger = new IdPrintingLogger(suiteName);
-        logger.log("runner created");
         eyesServiceRunner = new EyesServiceRunner(logger, serverConnector, allEyes, testConcurrency.actualConcurrency, debugResourceWriter, resourcesCacheMap);
         eyesServiceRunner.start();
-        logger.verbose("rendering grid manager is built");
     }
 
     public void open(IEyes eyes, List<VisualGridRunningTest> newTests) {
-        logger.verbose("enter");
         if (renderingInfo == null) {
             renderingInfo = serverConnector.getRenderInfo();
         }
@@ -111,7 +108,7 @@ public class VisualGridRunner extends EyesRunner {
                 NetworkLogHandler.sendSingleLog(serverConnector, TraceLevel.Notice, logMessage);
             }
         } catch (JsonProcessingException e) {
-            GeneralUtils.logExceptionStackTrace(logger, e);
+            GeneralUtils.logExceptionStackTrace(logger, Stage.OPEN, e);
         }
 
         this.addBatch(eyes.getBatchId(), eyes.getBatchCloser());
@@ -123,7 +120,6 @@ public class VisualGridRunner extends EyesRunner {
     }
 
     public TestResultsSummary getAllTestResultsImpl(boolean throwException) {
-        logger.log("enter");
         boolean isRunning = true;
         while (isRunning && eyesServiceRunner.getError() == null) {
             isRunning = false;
@@ -176,11 +172,7 @@ public class VisualGridRunner extends EyesRunner {
 
     public void setLogger(Logger logger) {
         eyesServiceRunner.setLogger(logger);
-        if (this.logger == null) {
-            this.logger = logger;
-        } else {
-            this.logger.setLogHandler(logger.getLogHandler());
-        }
+        this.logger = logger;
     }
 
     @Override

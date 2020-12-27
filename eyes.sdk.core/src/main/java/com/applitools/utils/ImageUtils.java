@@ -512,27 +512,20 @@ public class ImageUtils {
 
     public static BufferedImage cropImage(Logger logger, BufferedImage image,
                                           Rectangle regionToCrop) {
-        return cropImage(logger, image, new Region(regionToCrop.x, regionToCrop.y, regionToCrop.width, regionToCrop.height));
+        return cropImage(image, new Region(regionToCrop.x, regionToCrop.y, regionToCrop.width, regionToCrop.height));
     }
 
     /**
      * Removes a given region from the image.
-     * @param logger       The logger to use.
      * @param image        The image to crop.
      * @param regionToCrop The region to crop from the image.
      * @return A new image without the cropped region.
      */
-    public static BufferedImage cropImage(Logger logger, BufferedImage image,
-                                          Region regionToCrop) {
+    public static BufferedImage cropImage(BufferedImage image, Region regionToCrop) {
         Region imageRegion = new Region(0, 0, image.getWidth(), image.getHeight());
         imageRegion.intersect(regionToCrop);
         if (imageRegion.isSizeEmpty()) {
-            logger.log("WARNING - requested cropped getArea results in zero-size image! Cropped not performed. Returning original image.");
             return image;
-        }
-
-        if (!imageRegion.equals(regionToCrop)) {
-            logger.log("WARNING - requested cropped getArea overflows image boundaries.");
         }
 
         BufferedImage croppedImage = Scalr.crop(image, imageRegion.getLeft(),
@@ -544,19 +537,15 @@ public class ImageUtils {
 
     /**
      * Save image to local file system
-     * @param logger   The logger to use.
      * @param image    The image to save.
      * @param filename The path to save image
      */
-    public static void saveImage(Logger logger, BufferedImage image, String filename) {
+    public static void saveImage(BufferedImage image, String filename) {
         try {
-            logger.verbose("Saving file: " + filename);
             File file = new File(filename);
             File path = file.getParentFile();
             if (path != null && !path.exists()) {
-                logger.log("No Folder " + path.getAbsolutePath());
-                boolean success = path.mkdirs();
-                logger.log("Folder created");
+                path.mkdirs();
             }
             ImageIO.write(image, "png", file);
         } catch (IOException e) {

@@ -7,7 +7,6 @@ import com.applitools.eyes.metadata.SessionResults;
 import com.applitools.eyes.selenium.fluent.Target;
 import com.applitools.eyes.utils.SeleniumUtils;
 import com.applitools.eyes.utils.TestUtils;
-import com.applitools.utils.GeneralUtils;
 import org.openqa.selenium.WebDriver;
 import org.testng.Assert;
 import org.testng.annotations.Test;
@@ -53,7 +52,7 @@ public class TestBrowserResize {
             Assert.assertEquals(actualAppOutput3.length, 1);
             Assert.assertEquals(actualAppOutput3[0].getImage().getSize(), new RectangleSize(1024, 768));
         } catch (IOException ex) {
-            GeneralUtils.logExceptionStackTrace(eyes.getLogger(), ex);
+            ex.printStackTrace();
         } finally {
             webDriver.quit();
             eyes.abort();

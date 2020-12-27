@@ -16,6 +16,9 @@ import com.applitools.eyes.fluent.ICheckSettingsInternal;
 import com.applitools.eyes.fluent.SimpleRegionByRectangle;
 import com.applitools.eyes.locators.VisualLocatorSettings;
 import com.applitools.eyes.locators.VisualLocatorsProvider;
+import com.applitools.eyes.logging.Stage;
+import com.applitools.eyes.logging.TraceLevel;
+import com.applitools.eyes.logging.Type;
 import com.applitools.eyes.scaling.FixedScaleProviderFactory;
 import com.applitools.eyes.scaling.NullScaleProvider;
 import com.applitools.eyes.selenium.ClassicRunner;
@@ -32,6 +35,7 @@ import com.applitools.utils.*;
 import io.appium.java_client.AppiumDriver;
 import io.appium.java_client.MobileBy;
 import io.appium.java_client.android.AndroidDriver;
+import org.apache.commons.lang3.tuple.Pair;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.*;
 import org.openqa.selenium.remote.RemoteWebDriver;
@@ -65,7 +69,7 @@ public class Eyes extends EyesBase {
     public Eyes() {
         super(new ClassicRunner());
         regionVisibilityStrategyHandler = new SimplePropertyHandler<>();
-        regionVisibilityStrategyHandler.set(new MoveToRegionVisibilityStrategy(logger));
+        regionVisibilityStrategyHandler.set(new MoveToRegionVisibilityStrategy());
         configuration.setStitchOverlap(DEFAULT_STITCH_OVERLAP);
     }
 
@@ -80,6 +84,10 @@ public class Eyes extends EyesBase {
      */
     public WebDriver open(WebDriver driver, String appName, String testName,
                           RectangleSize viewportSize) {
+        logger.log(TraceLevel.Info, Collections.singleton(getTestId()), Stage.OPEN, Type.CALLED,
+                Pair.of("appName", appName),
+                Pair.of("testName", testName),
+                Pair.of("viewportSize", viewportSize == null ? "default" : viewportSize));
         configuration.setAppName(appName);
         configuration.setTestName(testName);
         configuration.setViewportSize(viewportSize);
@@ -87,6 +95,9 @@ public class Eyes extends EyesBase {
     }
 
     public WebDriver open(WebDriver driver, String appName, String testName) {
+        logger.log(TraceLevel.Info, Collections.singleton(getTestId()), Stage.OPEN, Type.CALLED,
+                Pair.of("appName", appName),
+                Pair.of("testName", testName));
         configuration.setAppName(appName);
         configuration.setTestName(testName);
         return open(driver);
@@ -109,6 +120,11 @@ public class Eyes extends EyesBase {
      */
     protected WebDriver open(WebDriver driver, String appName, String testName,
                              RectangleSize viewportSize, SessionType sessionType) {
+        logger.log(TraceLevel.Info, Collections.singleton(getTestId()), Stage.OPEN, Type.CALLED,
+                Pair.of("appName", appName),
+                Pair.of("testName", testName),
+                Pair.of("viewportSize", viewportSize == null ? "default" : viewportSize),
+                Pair.of("sessionType", sessionType));
         configuration.setAppName(appName);
         configuration.setTestName(testName);
         configuration.setViewportSize(viewportSize);
@@ -118,7 +134,6 @@ public class Eyes extends EyesBase {
 
     private WebDriver open(WebDriver webDriver) {
         if (getIsDisabled()) {
-            logger.verbose("Ignored");
             return webDriver;
         }
 
@@ -161,7 +176,6 @@ public class Eyes extends EyesBase {
 
     public void check(String name, ICheckSettings checkSettings) {
         if (getIsDisabled()) {
-            logger.log(String.format("check('%s', %s): Ignored", name, checkSettings));
             return;
         }
 
@@ -205,9 +219,9 @@ public class Eyes extends EyesBase {
 
     public void setScrollToRegion(boolean shouldScroll) {
         if (shouldScroll) {
-            regionVisibilityStrategyHandler = new ReadOnlyPropertyHandler<RegionVisibilityStrategy>(logger, new MoveToRegionVisibilityStrategy(logger));
+            regionVisibilityStrategyHandler = new ReadOnlyPropertyHandler<RegionVisibilityStrategy>(new MoveToRegionVisibilityStrategy());
         } else {
-            regionVisibilityStrategyHandler = new ReadOnlyPropertyHandler<RegionVisibilityStrategy>(logger, new NopRegionVisibilityStrategy(logger));
+            regionVisibilityStrategyHandler = new ReadOnlyPropertyHandler<RegionVisibilityStrategy>(new NopRegionVisibilityStrategy(logger));
         }
     }
 
@@ -251,7 +265,6 @@ public class Eyes extends EyesBase {
     }
 
     private void initDriverBasedPositionProviders() {
-        logger.verbose("Initializing Appium position provider");
         setPositionProvider(new AppiumScrollPositionProviderFactory(logger, driver).getScrollPositionProvider());
     }
 
@@ -261,12 +274,9 @@ public class Eyes extends EyesBase {
 
     private void initDriver(WebDriver driver) {
         if (driver instanceof AppiumDriver) {
-            logger.verbose("Found an instance of AppiumDriver, so using EyesAppiumDriver instead");
             this.driver = new EyesAppiumDriver(logger, this, (AppiumDriver) driver);
             regionVisibilityStrategyHandler.set(new NopRegionVisibilityStrategy(logger));
             adjustStitchOverlap(driver);
-        } else {
-            logger.verbose("Did not find an instance of AppiumDriver, using regular logic");
         }
     }
 
@@ -294,17 +304,11 @@ public class Eyes extends EyesBase {
             return appEnv;
         }
 
-        logger.log("No OS set, checking for mobile OS...");
         String platformName = null;
-        logger.log("Mobile device detected! Checking device type..");
         if (EyesDriverUtils.isAndroid(underlyingDriver)) {
-            logger.log("Android detected.");
             platformName = "Android";
         } else if (EyesDriverUtils.isIOS(underlyingDriver)) {
-            logger.log("iOS detected.");
             platformName = "iOS";
-        } else {
-            logger.log("Unknown device type.");
         }
         // We only set the OS if we identified the device type.
         if (platformName != null) {
@@ -318,15 +322,12 @@ public class Eyes extends EyesBase {
                     os += " " + majorVersion;
                 }
             }
-
-            logger.verbose("Setting OS: " + os);
             appEnv.setOs(os);
         }
 
         if (appEnv.getDeviceInfo() == null) {
             appEnv.setDeviceInfo(EyesDriverUtils.getMobileDeviceName(underlyingDriver));
         }
-        logger.log("Done!");
         return appEnv;
     }
 
@@ -335,15 +336,13 @@ public class Eyes extends EyesBase {
     }
 
     protected void tryUpdateDevicePixelRatio() {
-        logger.verbose("Trying to update device pixel ratio...");
         try {
             devicePixelRatio = driver.getDevicePixelRatio();
         } catch (Exception e) {
-            logger.verbose(
-                    "Failed to extract device pixel ratio! Using default.");
+            GeneralUtils.logExceptionStackTrace(logger, Stage.GENERAL, e, getTestId());
             devicePixelRatio = DEFAULT_DEVICE_PIXEL_RATIO;
         }
-        logger.verbose(String.format("Device pixel ratio: %f", devicePixelRatio));
+        logger.log(getTestId(), Stage.GENERAL, Pair.of("devicePixelRatio", devicePixelRatio));
     }
 
     private void updateCutElement(AppiumCheckSettings checkSettings) {
@@ -352,14 +351,13 @@ public class Eyes extends EyesBase {
                 return;
             }
             cutElement = getDriver().findElement(checkSettings.getCutElementSelector());
-        } catch (NoSuchElementException ignored) {
-            logger.verbose("Element to cut is not found with selector: " + checkSettings.getCutElementSelector());
+        } catch (NoSuchElementException e) {
+            GeneralUtils.logExceptionStackTrace(logger, Stage.GENERAL, e, getTestId());
         }
     }
 
     public void check(ICheckSettings... checkSettings) {
         if (getIsDisabled()) {
-            logger.log(String.format("check(ICheckSettings[%d]): Ignored", checkSettings.length));
             return;
         }
 
@@ -419,9 +417,7 @@ public class Eyes extends EyesBase {
     private List<EyesScreenshot> getSubScreenshots(EyesScreenshot screenshot, GetSimpleRegion getRegion) {
         List<EyesScreenshot> subScreenshots = new ArrayList<>();
         for (Region r : getRegion.getRegions(screenshot)) {
-            logger.verbose("original sub-region: " + r);
             r = regionPositionCompensation.compensateRegionPosition(r, getDevicePixelRatio());
-            logger.verbose("sub-region after compensation: " + r);
             EyesScreenshot subScreenshot = screenshot.getSubScreenshot(r, false);
             subScreenshots.add(subScreenshot);
         }
@@ -437,20 +433,22 @@ public class Eyes extends EyesBase {
             Location location = subScreenshot.getLocationInScreenshot(Location.ZERO, CoordinatesType.SCREENSHOT_AS_IS);
             AppOutput appOutput = new AppOutput(name, subScreenshot, null, null, location);
             MatchWindowData data = prepareForMatch(new ArrayList<Trigger>(), appOutput, name, false,
-                    ims, this, null, getAppName());
-            MatchResult matchResult = performMatch(data);
-            logger.verbose("matchResult.asExcepted: " + matchResult.getAsExpected());
+                    ims, null, getAppName());
+            performMatch(data);
         }
     }
 
     public void check(ICheckSettings checkSettings) {
+        logger.log(TraceLevel.Info, Collections.singleton(getTestId()), Stage.CHECK, Type.CALLED,
+                Pair.of("configuration", getConfiguration()),
+                Pair.of("checkSettings", checkSettings));
+
         if (checkSettings instanceof AppiumCheckSettings) {
             updateCutElement((AppiumCheckSettings) checkSettings);
             this.scrollRootElementId = getScrollRootElementId((AppiumCheckSettings) checkSettings);
         }
 
         if (getIsDisabled()) {
-            logger.log(String.format("check(%s): Ignored", checkSettings));
             return;
         }
 
@@ -463,8 +461,6 @@ public class Eyes extends EyesBase {
         }
         String name = checkSettingsInternal.getName();
 
-        logger.verbose(String.format("check(\"%s\", checkSettings) - begin", name));
-
         ValidationInfo validationInfo = this.fireValidationWillStartEvent(name);
 
         this.stitchContent = checkSettingsInternal.getStitchContent() == null ? false : checkSettingsInternal.getStitchContent();
@@ -474,13 +470,11 @@ public class Eyes extends EyesBase {
         MatchResult result = null;
 
         if (targetRegion != null) {
-            logger.verbose("have target region");
             Region region = new Region(targetRegion.getLocation(), targetRegion.getSize(), CoordinatesType.CONTEXT_RELATIVE);
             result = this.checkWindowBase(region, name, checkSettings);
         } else if (appiumCheckTarget != null) {
             WebElement targetElement = getTargetElement(appiumCheckTarget);
             if (targetElement != null) {
-                logger.verbose("have target element");
                 this.targetElement = targetElement;
                 if (this.stitchContent) {
                     result = this.checkElement(targetElement, name, checkSettings);
@@ -489,7 +483,6 @@ public class Eyes extends EyesBase {
                 }
                 this.targetElement = null;
             } else {
-                logger.verbose("default case");
                 result = this.checkWindowBase(null, name, checkSettings);
             }
         }
@@ -502,17 +495,16 @@ public class Eyes extends EyesBase {
 
         ValidationResult validationResult = new ValidationResult();
         validationResult.setAsExpected(result.getAsExpected());
-
-        logger.verbose("check - done!");
     }
 
     @Override
     public TestResults close(boolean throwEx) {
+        logger.log(getTestId(), Stage.CLOSE, Type.CALLED, Pair.of("throwEx", throwEx));
         TestResults results = null;
         try {
             results = super.close(throwEx);
         } catch (Throwable e) {
-            logger.log(e.getMessage());
+            GeneralUtils.logExceptionStackTrace(logger, Stage.GENERAL, e, getTestId());
             if (throwEx) {
                 throw e;
             }
@@ -527,11 +519,9 @@ public class Eyes extends EyesBase {
     public void setMatchTimeout(int ms) {
         final int MIN_MATCH_TIMEOUT = 500;
         if (getIsDisabled()) {
-            logger.verbose("Ignored");
             return;
         }
 
-        logger.verbose("Setting match timeout to: " + ms);
         if ((ms != 0) && (MIN_MATCH_TIMEOUT > ms)) {
             throw new IllegalArgumentException("Match timeout must be set in milliseconds, and must be > " +
                     MIN_MATCH_TIMEOUT);
@@ -550,8 +540,6 @@ public class Eyes extends EyesBase {
 
     @Override
     protected EyesScreenshot getScreenshot(Region targetRegion, ICheckSettingsInternal checkSettingsInternal) {
-        logger.verbose("getScreenshot()");
-
         EyesScreenshot result;
 
         if (getForceFullPageScreenshot() || stitchContent) {
@@ -561,11 +549,10 @@ public class Eyes extends EyesBase {
         }
 
         if (targetRegion != null && !targetRegion.isEmpty()) {
-            result = getSubScreenshot(result, targetRegion, checkSettingsInternal);
+            result = getSubScreenshot(result, targetRegion);
             debugScreenshotsProvider.save(result.getImage(), "SUB_SCREENSHOT");
         }
 
-        logger.verbose("Done!");
         return result;
     }
 
@@ -621,7 +608,6 @@ public class Eyes extends EyesBase {
         // Update the scaling params only if we haven't done so yet, and the user hasn't set anything else manually.
         if (scaleProviderHandler.get() instanceof NullScaleProvider) {
             ScaleProviderFactory factory = new FixedScaleProviderFactory(logger, 1 / getDevicePixelRatio(), scaleProviderHandler);
-            logger.verbose("Done!");
             return factory;
         }
         // If we already have a scale provider set, we'll just use it, and pass a mock as provider handler.
@@ -678,15 +664,12 @@ public class Eyes extends EyesBase {
     }
 
     protected EyesAppiumScreenshot getFullPageScreenshot() {
-
-        logger.verbose("Full page Appium screenshot requested.");
-
         EyesScreenshotFactory screenshotFactory = new EyesAppiumScreenshotFactory(logger, driver);
         ScaleProviderFactory scaleProviderFactory = updateScalingParams();
 
         AppiumScrollPositionProvider scrollPositionProvider = (AppiumScrollPositionProvider) getPositionProvider();
 
-        AppiumCaptureAlgorithmFactory algoFactory = new AppiumCaptureAlgorithmFactory(driver, logger,
+        AppiumCaptureAlgorithmFactory algoFactory = new AppiumCaptureAlgorithmFactory(driver, logger, getTestId(),
                 scrollPositionProvider, imageProvider, debugScreenshotsProvider, scaleProviderFactory,
                 cutProviderHandler.get(), screenshotFactory, getConfigurationInstance().getWaitBeforeScreenshots(), cutElement,
                 getStitchOverlap(), scrollRootElementId);
@@ -699,27 +682,21 @@ public class Eyes extends EyesBase {
 
     protected EyesAppiumScreenshot getSimpleScreenshot() {
         ScaleProviderFactory scaleProviderFactory = updateScalingParams();
-//        ensureElementVisible(this.targetElement);
-
-        logger.verbose("Screenshot requested...");
         BufferedImage screenshotImage = imageProvider.getImage();
         debugScreenshotsProvider.save(screenshotImage, "original");
 
         ScaleProvider scaleProvider = scaleProviderFactory.getScaleProvider(screenshotImage.getWidth());
         if (scaleProvider.getScaleRatio() != 1.0) {
-            logger.verbose("scaling...");
             screenshotImage = ImageUtils.scaleImage(screenshotImage, scaleProvider.getScaleRatio(), true);
             debugScreenshotsProvider.save(screenshotImage, "scaled");
         }
 
         CutProvider cutProvider = cutProviderHandler.get();
         if (!(cutProvider instanceof NullCutProvider)) {
-            logger.verbose("cutting...");
             screenshotImage = cutProvider.cut(screenshotImage);
             debugScreenshotsProvider.save(screenshotImage, "cut");
         }
 
-        logger.verbose("Creating screenshot object...");
         return new EyesAppiumScreenshot(logger, driver, screenshotImage);
     }
 
@@ -727,10 +704,7 @@ public class Eyes extends EyesBase {
         Point p = targetElement.getLocation();
         Dimension d = targetElement.getSize();
         Region region = new Region(p.getX(), p.getY(), d.getWidth(), d.getHeight(), CoordinatesType.CONTEXT_RELATIVE);
-        MatchResult result = checkWindowBase(region, name, checkSettings);
-        logger.verbose("Done! trying to scroll back to original position.");
-
-        return result;
+        return checkWindowBase(region, name, checkSettings);
     }
 
     public void checkRegion(Region region) {
@@ -739,14 +713,10 @@ public class Eyes extends EyesBase {
 
     public void checkRegion(final Region region, int matchTimeout, String tag) throws TestFailedException {
         if (getIsDisabled()) {
-            getLogger().log(String.format("checkRegion([%s], %d, '%s'): Ignored", region, matchTimeout, tag));
             return;
         }
 
         ArgumentGuard.notNull(region, "region");
-
-        getLogger().verbose(String.format("checkRegion([%s], %d, '%s')", region, matchTimeout, tag));
-
         check(Target.region(region).timeout(matchTimeout).withName(tag));
     }
 
@@ -764,13 +734,10 @@ public class Eyes extends EyesBase {
 
     public void checkRegion(WebElement element, int matchTimeout, String tag, boolean stitchContent) {
         if (getIsDisabled()) {
-            getLogger().log(String.format("checkRegion([%s], %d, '%s'): Ignored", element, matchTimeout, tag));
             return;
         }
 
         ArgumentGuard.notNull(element, "element");
-
-        getLogger().verbose(String.format("checkRegion([%s], %d, '%s')", element, matchTimeout, tag));
 
         check(Target.region(element).timeout(matchTimeout).withName(tag).fully(stitchContent));
     }
@@ -799,12 +766,10 @@ public class Eyes extends EyesBase {
         check(tag, Target.region(selector).timeout(matchTimeout).fully(stitchContent));
     }
 
-    protected EyesScreenshot getSubScreenshot(EyesScreenshot screenshot, Region region, ICheckSettingsInternal checkSettingsInternal) {
+    private EyesScreenshot getSubScreenshot(EyesScreenshot screenshot, Region region) {
         ArgumentGuard.notNull(region, "region");
         if ((EyesDriverUtils.isAndroid(driver) || EyesDriverUtils.isIOS(driver))
                 && region.getCoordinatesType() != CoordinatesType.CONTEXT_RELATIVE) {
-            logger.verbose(String.format("getSubScreenshot([%s])", region));
-
             BufferedImage image = screenshot.getImage();
             if (image.getWidth() < driver.getViewportRect().get("width")) {
                 image = ImageUtils.scaleImage(image, driver.getDevicePixelRatio(), true);
@@ -813,8 +778,6 @@ public class Eyes extends EyesBase {
                     1 / driver.getDevicePixelRatio(), true);
 
             EyesAppiumScreenshot result = new EyesAppiumScreenshot(logger, driver, subScreenshotImage);
-
-            logger.verbose("Done!");
             return result;
         } else {
             return screenshot.getSubScreenshot(region, false);
@@ -823,9 +786,9 @@ public class Eyes extends EyesBase {
 
     private void initVisualLocatorProvider() {
         if (EyesDriverUtils.isAndroid(driver)) {
-            visualLocatorsProvider = new AndroidVisualLocatorProvider(logger, driver, getServerConnector(), getDevicePixelRatio(), configuration.getAppName(), debugScreenshotsProvider);
+            visualLocatorsProvider = new AndroidVisualLocatorProvider(logger, getTestId(), driver, getServerConnector(), getDevicePixelRatio(), configuration.getAppName(), debugScreenshotsProvider);
         } else if (EyesDriverUtils.isIOS(driver)) {
-            visualLocatorsProvider = new IOSVisualLocatorProvider(logger, driver, getServerConnector(), getDevicePixelRatio(), configuration.getAppName(), debugScreenshotsProvider);
+            visualLocatorsProvider = new IOSVisualLocatorProvider(logger, getTestId(), driver, getServerConnector(), getDevicePixelRatio(), configuration.getAppName(), debugScreenshotsProvider);
         } else {
             throw new Error("Could not find driver type for getting visual locator provider");
         }
@@ -837,14 +800,11 @@ public class Eyes extends EyesBase {
     }
 
     private Region getElementRegion(WebElement element, ICheckSettings checkSettings) {
-        logger.verbose("Get element region...");
         Boolean statusBarExists = null;
         if (checkSettings instanceof AppiumCheckSettings) {
             statusBarExists = ((AppiumCheckSettings) checkSettings).getStatusBarExists();
         }
-        Region region = ((AppiumScrollPositionProvider) getPositionProvider()).getElementRegion(element, shouldStitchContent(), statusBarExists);
-        logger.verbose("Element region: " + region.toString());
-        return region;
+        return ((AppiumScrollPositionProvider) getPositionProvider()).getElementRegion(element, shouldStitchContent(), statusBarExists);
     }
 
     @Override
@@ -1008,11 +968,6 @@ public class Eyes extends EyesBase {
                     }
                 } catch (NoSuchElementException | StaleElementReferenceException ignored) {
                 }
-            }
-            if (version == null) {
-                logger.verbose("Appium Helper library is not used...");
-            } else {
-                logger.verbose("Appium Helper library version: " + version);
             }
         }
         return version;

@@ -11,6 +11,9 @@ import com.applitools.eyes.exceptions.TestFailedException;
 import com.applitools.eyes.fluent.GetSimpleRegion;
 import com.applitools.eyes.fluent.ICheckSettingsInternal;
 import com.applitools.eyes.fluent.SimpleRegionByRectangle;
+import com.applitools.eyes.logging.Stage;
+import com.applitools.eyes.logging.TraceLevel;
+import com.applitools.eyes.logging.Type;
 import com.applitools.eyes.positioning.PositionProvider;
 import com.applitools.eyes.scaling.FixedScaleProviderFactory;
 import com.applitools.eyes.scaling.NullScaleProvider;
@@ -30,6 +33,7 @@ import com.applitools.eyes.visualgrid.model.RenderingInfo;
 import com.applitools.eyes.visualgrid.model.VisualGridSelector;
 import com.applitools.eyes.visualgrid.services.CheckTask;
 import com.applitools.utils.*;
+import org.apache.commons.lang3.tuple.Pair;
 import org.apache.http.annotation.Obsolete;
 import org.openqa.selenium.*;
 import org.openqa.selenium.remote.RemoteWebDriver;
@@ -113,7 +117,7 @@ public class SeleniumEyes extends RunningTest implements ISeleniumEyes {
         doNotGetTitle = false;
         devicePixelRatio = UNKNOWN_DEVICE_PIXEL_RATIO;
         regionVisibilityStrategyHandler = new SimplePropertyHandler<>();
-        regionVisibilityStrategyHandler.set(new MoveToRegionVisibilityStrategy(logger));
+        regionVisibilityStrategyHandler.set(new MoveToRegionVisibilityStrategy());
     }
 
     @Override
@@ -216,9 +220,9 @@ public class SeleniumEyes extends RunningTest implements ISeleniumEyes {
      */
     public void setScrollToRegion(boolean shouldScroll) {
         if (shouldScroll) {
-            regionVisibilityStrategyHandler = new ReadOnlyPropertyHandler<RegionVisibilityStrategy>(logger, new MoveToRegionVisibilityStrategy(logger));
+            regionVisibilityStrategyHandler = new ReadOnlyPropertyHandler<RegionVisibilityStrategy>(new MoveToRegionVisibilityStrategy());
         } else {
-            regionVisibilityStrategyHandler = new ReadOnlyPropertyHandler<RegionVisibilityStrategy>(logger, new NopRegionVisibilityStrategy(logger));
+            regionVisibilityStrategyHandler = new ReadOnlyPropertyHandler<RegionVisibilityStrategy>(new NopRegionVisibilityStrategy(logger));
         }
     }
 
@@ -260,6 +264,10 @@ public class SeleniumEyes extends RunningTest implements ISeleniumEyes {
 
     @Override
     public WebDriver open(WebDriver driver, String appName, String testName, RectangleSize viewportSize) throws EyesException {
+        logger.log(TraceLevel.Info, Collections.singleton(getTestId()), Stage.OPEN, Type.CALLED,
+                Pair.of("appName", appName),
+                Pair.of("testName", testName),
+                Pair.of("viewportSize", viewportSize == null ? "default" : viewportSize));
         getConfigurationInstance().setAppName(appName).setTestName(testName);
         if (viewportSize != null && !viewportSize.isEmpty()) {
             getConfigurationInstance().setViewportSize(new RectangleSize(viewportSize));
@@ -278,7 +286,6 @@ public class SeleniumEyes extends RunningTest implements ISeleniumEyes {
         openLogger();
 
         if (getIsDisabled()) {
-            logger.verbose("Ignored");
             return driver;
         }
 
@@ -304,22 +311,19 @@ public class SeleniumEyes extends RunningTest implements ISeleniumEyes {
             openBase();
         }
 
-        //updateScalingParams();
-
         this.driver.setRotation(rotation);
         this.runner.addBatch(this.getConfigurationInstance().getBatch().getId(), this);
         return this.driver;
     }
 
     private void initDevicePixelRatio() {
-        logger.verbose("Trying to extract device pixel ratio...");
         try {
             devicePixelRatio = driver.getDevicePixelRatio();
         } catch (Exception ex) {
-            logger.verbose("Failed to extract device pixel ratio! Using default.");
+            GeneralUtils.logExceptionStackTrace(logger, Stage.GENERAL, ex);
             devicePixelRatio = DEFAULT_DEVICE_PIXEL_RATIO;
         }
-        logger.verbose("Device pixel ratio: " + devicePixelRatio);
+        logger.log(getTestId(), Stage.GENERAL, Pair.of("devicePixelRatio", devicePixelRatio));
     }
 
     private void initDriver(WebDriver driver) {
@@ -328,10 +332,7 @@ public class SeleniumEyes extends RunningTest implements ISeleniumEyes {
         } else if (driver instanceof EyesSeleniumDriver) {
             this.driver = (EyesSeleniumDriver) driver;
         } else {
-            String errMsg = "Driver is not a RemoteWebDriver (" +
-                    driver.getClass().getName() + ")";
-            logger.log(errMsg);
-            throw new EyesException(errMsg);
+            throw new EyesException("Driver is not a RemoteWebDriver (" + driver.getClass().getName() + ")");
         }
         if (EyesDriverUtils.isMobileDevice(driver)) {
             regionVisibilityStrategyHandler.set(new NopRegionVisibilityStrategy(logger));
@@ -356,13 +357,10 @@ public class SeleniumEyes extends RunningTest implements ISeleniumEyes {
     private PositionProvider createPositionProvider(WebElement scrollRootElement) {
         // Setting the correct position provider.
         StitchMode stitchMode = getConfigurationInstance().getStitchMode();
-        logger.verbose("initializing position provider. stitchMode: " + stitchMode);
-        switch (stitchMode) {
-            case CSS:
-                return new CssTranslatePositionProvider(logger, this.jsExecutor, scrollRootElement);
-            default:
-                return ScrollPositionProviderFactory.getScrollPositionProvider(userAgent, logger, this.jsExecutor, scrollRootElement);
+        if (stitchMode == StitchMode.CSS) {
+            return new CssTranslatePositionProvider(logger, this.jsExecutor, scrollRootElement);
         }
+        return ScrollPositionProviderFactory.getScrollPositionProvider(userAgent, logger, this.jsExecutor, scrollRootElement);
     }
 
 
@@ -372,7 +370,7 @@ public class SeleniumEyes extends RunningTest implements ISeleniumEyes {
      * Default match timeout is used.
      */
     public void checkWindow() {
-        checkWindow((String) null);
+        checkWindow(null);
     }
 
     /**
@@ -403,18 +401,15 @@ public class SeleniumEyes extends RunningTest implements ISeleniumEyes {
      */
     public void check(ICheckSettings... checkSettings) {
         if (getIsDisabled()) {
-            logger.log(String.format("check(ICheckSettings[%d]): Ignored", checkSettings.length));
             return;
         }
 
         Boolean forceFullPageScreenshot = getConfigurationInstance().getForceFullPageScreenshot();
-        boolean originalForceFPS = forceFullPageScreenshot == null ? false : forceFullPageScreenshot;
+        boolean originalForceFPS = forceFullPageScreenshot != null && forceFullPageScreenshot;
 
         if (checkSettings.length > 1) {
             getConfigurationInstance().setForceFullPageScreenshot(true);
         }
-
-        logger.verbose(getConfigurationInstance().toString());
 
         Dictionary<Integer, GetSimpleRegion> getRegions = new Hashtable<>();
         Dictionary<Integer, ICheckSettingsInternal> checkSettingsInternalDictionary = new Hashtable<>();
@@ -445,7 +440,6 @@ public class SeleniumEyes extends RunningTest implements ISeleniumEyes {
                     }
                 }
             }
-            //check(settings);
         }
 
         this.userDefinedSRE = EyesSeleniumUtils.getScrollRootElement(logger, driver, (IScrollRootElementContainer) checkSettings[0]);
@@ -474,7 +468,7 @@ public class SeleniumEyes extends RunningTest implements ISeleniumEyes {
             try {
                 activeElement = driver.executeScript("var activeElement = document.activeElement; activeElement && activeElement.blur(); return activeElement;");
             } catch (WebDriverException e) {
-                logger.verbose("WARNING: Cannot hide caret! " + e.getMessage());
+                GeneralUtils.logExceptionStackTrace(logger, Stage.CHECK, e, getTestId());
             }
         }
 
@@ -523,7 +517,7 @@ public class SeleniumEyes extends RunningTest implements ISeleniumEyes {
             try {
                 driver.executeScript("arguments[0].focus();", activeElement);
             } catch (WebDriverException e) {
-                logger.verbose("WARNING: Could not return focus to active element! " + e.getMessage());
+                GeneralUtils.logExceptionStackTrace(logger, Stage.CHECK, e, getTestId());
             }
         }
 
@@ -533,10 +527,7 @@ public class SeleniumEyes extends RunningTest implements ISeleniumEyes {
     private List<EyesScreenshot> getSubScreenshots(Region bBox, EyesWebDriverScreenshot screenshot, GetSimpleRegion getSimpleRegion) {
         List<EyesScreenshot> subScreenshots = new ArrayList<>();
         for (Region r : getSimpleRegion.getRegions(screenshot)) {
-            logger.verbose("original sub-region: " + r);
             r = r.offset(-bBox.getLeft(), -bBox.getTop());
-            //r = regionPositionCompensation.compensateRegionPosition(r, devicePixelRatio);
-            //logger.verbose("sub-region after compensation: " + r);
             EyesScreenshot subScreenshot = screenshot.getSubScreenshotForRegion(r, false);
             subScreenshots.add(subScreenshot);
         }
@@ -555,16 +546,13 @@ public class SeleniumEyes extends RunningTest implements ISeleniumEyes {
             Location location = subScreenshot.getLocationInScreenshot(Location.ZERO, CoordinatesType.SCREENSHOT_AS_IS);
             AppOutput appOutput = new AppOutput(name, subScreenshot, null, null, location);
             MatchWindowData data = prepareForMatch(new ArrayList<Trigger>(), appOutput, name, false,
-                    ims, this, null, source);
-            MatchResult matchResult = performMatch(data);
-
-            logger.verbose("matchResult.asExcepted: " + matchResult.getAsExpected());
+                    ims, null, source);
+            performMatch(data);
         }
     }
 
     private Region findBoundingBox(Dictionary<Integer, GetSimpleRegion> getRegions, ICheckSettings[] checkSettings) {
         RectangleSize rectSize = getViewportSize();
-        logger.verbose("rectSize: " + rectSize);
         EyesScreenshot screenshot = new EyesWebDriverScreenshot(logger, driver,
                 new BufferedImage(rectSize.getWidth(), rectSize.getHeight(), BufferedImage.TYPE_INT_RGB));
 
@@ -609,7 +597,6 @@ public class SeleniumEyes extends RunningTest implements ISeleniumEyes {
      */
     public void check(String name, ICheckSettings checkSettings) {
         if (getIsDisabled()) {
-            logger.log(String.format("check('%s', %s): Ignored", name, checkSettings));
             return;
         }
         ArgumentGuard.isValidState(isOpen, "Eyes not open");
@@ -643,7 +630,7 @@ public class SeleniumEyes extends RunningTest implements ISeleniumEyes {
             DomCapture domCapture = new DomCapture(this);
             fullWindowDom = domCapture.getPageDom(positionProvider);
         } catch (Exception e) {
-            GeneralUtils.logExceptionStackTrace(logger, e);
+            GeneralUtils.logExceptionStackTrace(logger, Stage.CHECK, Type.DOM_SCRIPT, e, getBaseAgentId());
         } finally {
             ((EyesTargetLocator) driver.switchTo()).frames(fc);
         }
@@ -653,15 +640,16 @@ public class SeleniumEyes extends RunningTest implements ISeleniumEyes {
     @Override
     protected void setEffectiveViewportSize(RectangleSize size) {
         this.effectiveViewport = new Region(Location.ZERO, size);
-        logger.verbose("setting effective viewport size to " + size);
     }
 
     public void check(ICheckSettings checkSettings) {
         if (getIsDisabled()) {
-            logger.log(String.format("check(%s): Ignored", checkSettings));
             return;
         }
 
+        logger.log(TraceLevel.Info, Collections.singleton(getTestId()), Stage.CHECK, Type.CALLED,
+                Pair.of("configuration", getConfiguration()),
+                Pair.of("checkSettings", checkSettings));
         try {
             ArgumentGuard.isValidState(isOpen, "Eyes not open");
             ArgumentGuard.notNull(checkSettings, "checkSettings");
@@ -672,7 +660,6 @@ public class SeleniumEyes extends RunningTest implements ISeleniumEyes {
             String source = null;
             if (!isMobileDevice) {
                 source = driver.getCurrentUrl();
-                logger.verbose("URL: " + source);
             }
 
             ICheckSettingsInternal checkSettingsInternal = (ICheckSettingsInternal) checkSettings;
@@ -685,24 +672,20 @@ public class SeleniumEyes extends RunningTest implements ISeleniumEyes {
             state.setStitchContent((fully != null && fully) || (forceFullPageScreenshot != null && forceFullPageScreenshot));
 
             // Ensure frame is not used as a region
-            ((SeleniumCheckSettings) checkSettings).sanitizeSettings(logger, driver, state.isStitchContent());
+            ((SeleniumCheckSettings) checkSettings).sanitizeSettings(driver, state.isStitchContent());
             seleniumCheckTarget.init(logger, driver);
 
             Region targetRegion = checkSettingsInternal.getTargetRegion();
 
-            logger.verbose("setting userDefinedSRE ...");
             this.userDefinedSRE = tryGetUserDefinedSREFromSREContainer(seleniumCheckTarget, driver);
             WebElement scrollRootElement = this.userDefinedSRE;
             if (scrollRootElement == null && !isMobileDevice) {
                 scrollRootElement = EyesSeleniumUtils.getDefaultRootElement(logger, driver);
             }
 
-            logger.verbose("userDefinedSRE set to " + ((this.userDefinedSRE != null) ? userDefinedSRE.toString() : "null"));
-            logger.verbose("scrollRootElement set to " + scrollRootElement);
-
             currentFramePositionProvider = null;
             super.positionProviderHandler.set(PositionProviderFactory.getPositionProvider(logger, getConfigurationInstance().getStitchMode(), jsExecutor, scrollRootElement, userAgent));
-            CaretVisibilityProvider caretVisibilityProvider = new CaretVisibilityProvider(logger, driver, getConfigurationInstance());
+            CaretVisibilityProvider caretVisibilityProvider = new CaretVisibilityProvider(driver, getConfigurationInstance());
 
             PageState pageState = new PageState(logger, driver, getConfigurationInstance().getStitchMode(), userAgent);
             pageState.preparePage(seleniumCheckTarget, getConfigurationInstance(), scrollRootElement);
@@ -758,9 +741,6 @@ public class SeleniumEyes extends RunningTest implements ISeleniumEyes {
             } else if (!isMobileDevice && seleniumCheckTarget.getFrameChain().size() > 0) {
                 if (state.isStitchContent()) {
                     checkFullFrame(checkSettingsInternal, state, source);
-                } else {
-                    logger.log("Target.Frame(frame).Fully(false)");
-                    logger.log("WARNING: This shouldn't have been called, as it is covered by `CheckElement_(...)`");
                 }
             } else {
                 if (state.isStitchContent()) {
@@ -774,13 +754,12 @@ public class SeleniumEyes extends RunningTest implements ISeleniumEyes {
 
             pageState.restorePageState();
         } catch (Exception ex) {
-            GeneralUtils.logExceptionStackTrace(logger, ex);
+            GeneralUtils.logExceptionStackTrace(logger, Stage.CHECK, ex, getTestId());
             throw ex;
         }
     }
 
     private void checkFullFrame(ICheckSettingsInternal checkSettingsInternal, CheckState state, String source) {
-        logger.verbose("Target.Frame(frame).Fully(true)");
         FrameChain currentFrameChain = driver.getFrameChain().clone();
         Location visualOffset = getFrameChainOffset(currentFrameChain);
         Frame currentFrame = currentFrameChain.peek();
@@ -794,11 +773,6 @@ public class SeleniumEyes extends RunningTest implements ISeleniumEyes {
     }
 
     private void checkFullRegion(ICheckSettingsInternal checkSettingsInternal, Region targetRegion, CheckState state, String source) {
-        if (((ISeleniumCheckTarget) checkSettingsInternal).getFrameChain().size() > 0) {
-            logger.verbose("Target.Frame(frame).Region(x,y,w,h).Fully(true)");
-        } else {
-            logger.verbose("Target.Region(x,y,w,h).Fully(true)");
-        }
         FrameChain currentFrameChain = driver.getFrameChain().clone();
         Frame currentFrame = currentFrameChain.peek();
         if (currentFrame != null) {
@@ -826,11 +800,6 @@ public class SeleniumEyes extends RunningTest implements ISeleniumEyes {
     private void checkElement(ICheckSettingsInternal checkSettingsInternal, WebElement targetElement,
                               Region targetRegion, CheckState state, String source) {
         List<FrameLocator> frameLocators = ((ISeleniumCheckTarget) checkSettingsInternal).getFrameChain();
-        if (frameLocators.size() > 0) {
-            logger.verbose("Target.Frame(frame).Region(element).Fully(false)");
-        } else {
-            logger.verbose("Target.Region(element).Fully(false)");
-        }
         FrameChain currentFrameChain = driver.getFrameChain().clone();
         Region bounds = EyesRemoteWebElement.getClientBounds(targetElement, driver, logger);
 
@@ -875,19 +844,13 @@ public class SeleniumEyes extends RunningTest implements ISeleniumEyes {
 
     private void checkFullElement(ICheckSettingsInternal checkSettingsInternal, WebElement targetElement,
                                   Region targetRegion, CheckState state, String source) {
-        if (((ISeleniumCheckTarget) checkSettingsInternal).getFrameChain().size() > 0) {
-            logger.verbose("Target.Frame(frame)...Region(element).Fully(true)");
-        } else {
-            logger.verbose("Target.Region(element).Fully(true)");
-        }
-
         // Hide scrollbars
         String originalOverflow = EyesDriverUtils.setOverflow(driver, "hidden", targetElement);
 
         // Get element's scroll size and bounds
         RectangleSize scrollSize = EyesRemoteWebElement.getScrollSize(targetElement, driver, logger);
         Region elementBounds = EyesRemoteWebElement.getClientBounds(targetElement, driver, logger);
-        Region elementInnerBounds = EyesRemoteWebElement.getClientBoundsWithoutBorders(targetElement, driver, logger);
+        Region elementInnerBounds = EyesRemoteWebElement.getClientBoundsWithoutBorders(targetElement, driver);
 
         boolean isScrollableElement = scrollSize.getHeight() > elementInnerBounds.getHeight() || scrollSize.getWidth() > elementInnerBounds.getWidth();
 
@@ -905,7 +868,7 @@ public class SeleniumEyes extends RunningTest implements ISeleniumEyes {
             if (getConfiguration().getStitchMode().equals(StitchMode.CSS)) {
                 bringRegionToViewCss(elementBounds, state.getEffectiveViewport().getLocation());
                 if (isScrollableElement) {
-                    elementBounds = EyesRemoteWebElement.getClientBoundsWithoutBorders(targetElement, driver, logger);
+                    elementBounds = EyesRemoteWebElement.getClientBoundsWithoutBorders(targetElement, driver);
                 } else {
                     elementBounds = EyesRemoteWebElement.getClientBounds(targetElement, driver, logger);
                 }
@@ -920,7 +883,6 @@ public class SeleniumEyes extends RunningTest implements ISeleniumEyes {
         fullElementBounds.setHeight(Math.max(fullElementBounds.getHeight(), scrollSize.getHeight()));
         FrameChain currentFrameChain = driver.getFrameChain().clone();
         Location screenshotOffset = getFrameChainOffset(currentFrameChain);
-        logger.verbose("screenshotOffset: " + screenshotOffset);
         fullElementBounds = fullElementBounds.offset(screenshotOffset);
 
         state.setFullRegion(fullElementBounds);
@@ -969,7 +931,6 @@ public class SeleniumEyes extends RunningTest implements ISeleniumEyes {
     }
 
     private void checkWindow(ICheckSettingsInternal checkSettingsInternal, CheckState state, WebElement scrollRootElement, String source) {
-        logger.verbose("Target.Window()");
         Location location = Location.ZERO;
         if (!EyesDriverUtils.isMobileDevice(driver)) {
             location = SeleniumScrollPositionProvider.getCurrentPosition(driver, scrollRootElement);
@@ -979,7 +940,6 @@ public class SeleniumEyes extends RunningTest implements ISeleniumEyes {
     }
 
     private void checkFullWindow(ICheckSettingsInternal checkSettingsInternal, CheckState state, WebElement scrollRootElement, String source) {
-        logger.verbose("Target.Window().Fully(true)");
         initPositionProvidersForCheckWindow(state, scrollRootElement);
         state.setOriginalLocation(Location.ZERO);
         checkWindowBase(null, checkSettingsInternal, source);
@@ -1078,7 +1038,6 @@ public class SeleniumEyes extends RunningTest implements ISeleniumEyes {
                 state.setStitchPositionProvider(new SeleniumScrollPositionProvider(logger, driver, scrollRootElement));
             }
         }
-        logger.verbose("isScrollableElement ?" + isScrollableElement);
     }
 
     public static WebElement tryGetUserDefinedSREFromSREContainer(IScrollRootElementContainer scrollRootElementContainer, EyesSeleniumDriver driver) {
@@ -1107,7 +1066,6 @@ public class SeleniumEyes extends RunningTest implements ISeleniumEyes {
     public static PositionProvider getPositionProviderForScrollRootElement(Logger logger, EyesSeleniumDriver driver, StitchMode stitchMode, UserAgent ua, WebElement scrollRootElement) {
         PositionProvider positionProvider = PositionProviderFactory.tryGetPositionProviderForElement(scrollRootElement);
         if (positionProvider == null) {
-            logger.verbose("creating a new position provider.");
             WebElement defaultSRE = EyesSeleniumUtils.getDefaultRootElement(logger, driver);
             if (scrollRootElement.equals(defaultSRE)) {
                 positionProvider = PositionProviderFactory.getPositionProvider(logger, stitchMode, driver, scrollRootElement, ua);
@@ -1115,14 +1073,13 @@ public class SeleniumEyes extends RunningTest implements ISeleniumEyes {
                 positionProvider = new ElementPositionProvider(logger, driver, scrollRootElement);
             }
         }
-        logger.verbose("position provider: " + positionProvider);
         return positionProvider;
     }
 
     private Region computeEffectiveViewport(FrameChain frameChain, RectangleSize initialSize) {
         Region viewport = new Region(Location.ZERO, initialSize);
         if (userDefinedSRE != null) {
-            Region sreInnerBounds = EyesRemoteWebElement.getClientBoundsWithoutBorders(userDefinedSRE, driver, logger);
+            Region sreInnerBounds = EyesRemoteWebElement.getClientBoundsWithoutBorders(userDefinedSRE, driver);
             viewport.intersect(sreInnerBounds);
         }
         Location offset = Location.ZERO;
@@ -1159,25 +1116,19 @@ public class SeleniumEyes extends RunningTest implements ISeleniumEyes {
         // Update the scaling params only if we haven't done so yet, and the user hasn't set anything else manually.
         if (scaleProviderHandler.get() instanceof NullScaleProvider) {
             ScaleProviderFactory factory;
-            logger.verbose("Trying to extract device pixel ratio...");
             try {
                 devicePixelRatio = driver.getDevicePixelRatio();
             } catch (Exception e) {
-                logger.verbose(
-                        "Failed to extract device pixel ratio! Using default.");
+                GeneralUtils.logExceptionStackTrace(logger, Stage.GENERAL, e, getTestId());
                 devicePixelRatio = DEFAULT_DEVICE_PIXEL_RATIO;
             }
 
-            logger.verbose(String.format("Device pixel ratio: %f", devicePixelRatio));
             if (!EyesDriverUtils.isMobileDevice(driver)) {
-                logger.verbose("Setting web scale provider...");
                 factory = getScaleProviderFactory();
             } else {
-                logger.verbose("Setting native app scale provider...");
                 factory = new FixedScaleProviderFactory(logger, 1 / devicePixelRatio, scaleProviderHandler);
             }
 
-            logger.verbose("Done!");
             return factory;
         }
         // If we already have a scale provider set, we'll just use it, and pass a mock as provider handler.
@@ -1258,14 +1209,10 @@ public class SeleniumEyes extends RunningTest implements ISeleniumEyes {
      */
     public void checkFrame(int frameIndex, int matchTimeout, String tag) {
         if (getIsDisabled()) {
-            logger.log(String.format("CheckFrame(%d, %d, '%s'): Ignored", frameIndex, matchTimeout, tag));
             return;
         }
 
         ArgumentGuard.greaterThanOrEqualToZero(frameIndex, "frameIndex");
-
-        logger.log(String.format("CheckFrame(%d, %d, '%s')", frameIndex, matchTimeout, tag));
-
         check(tag, Target.frame(frameIndex).timeout(matchTimeout).fully());
     }
 
@@ -1389,19 +1336,16 @@ public class SeleniumEyes extends RunningTest implements ISeleniumEyes {
      */
     public void addMouseTrigger(MouseAction action, Region control, Location cursor) {
         if (getIsDisabled()) {
-            logger.verbose(String.format("Ignoring %s (disabled)", action));
             return;
         }
 
         // Triggers are actually performed on the previous window.
         if (lastScreenshot == null) {
-            logger.verbose(String.format("Ignoring %s (no screenshot)", action));
             return;
         }
 
         if (!FrameChain.isSameFrameChain(driver.getFrameChain(),
                 ((EyesWebDriverScreenshot) lastScreenshot).getFrameChain())) {
-            logger.verbose(String.format("Ignoring %s (different frame)", action));
             return;
         }
 
@@ -1415,7 +1359,6 @@ public class SeleniumEyes extends RunningTest implements ISeleniumEyes {
      */
     public void addMouseTrigger(MouseAction action, WebElement element) {
         if (getIsDisabled()) {
-            logger.verbose(String.format("Ignoring %s (disabled)", action));
             return;
         }
 
@@ -1429,13 +1372,11 @@ public class SeleniumEyes extends RunningTest implements ISeleniumEyes {
 
         // Triggers are actually performed on the previous window.
         if (lastScreenshot == null) {
-            logger.verbose(String.format("Ignoring %s (no screenshot)", action));
             return;
         }
 
         if (!FrameChain.isSameFrameChain(driver.getFrameChain(),
                 ((EyesWebDriverScreenshot) lastScreenshot).getFrameChain())) {
-            logger.verbose(String.format("Ignoring %s (different frame)", action));
             return;
         }
 
@@ -1455,18 +1396,15 @@ public class SeleniumEyes extends RunningTest implements ISeleniumEyes {
      */
     public void addTextTrigger(Region control, String text) {
         if (getIsDisabled()) {
-            logger.verbose(String.format("Ignoring '%s' (disabled)", text));
             return;
         }
 
         if (lastScreenshot == null) {
-            logger.verbose(String.format("Ignoring '%s' (no screenshot)", text));
             return;
         }
 
         if (!FrameChain.isSameFrameChain(driver.getFrameChain(),
                 ((EyesWebDriverScreenshot) lastScreenshot).getFrameChain())) {
-            logger.verbose(String.format("Ignoring '%s' (different frame)", text));
             return;
         }
 
@@ -1480,7 +1418,6 @@ public class SeleniumEyes extends RunningTest implements ISeleniumEyes {
      */
     public void addTextTrigger(WebElement element, String text) {
         if (getIsDisabled()) {
-            logger.verbose(String.format("Ignoring '%s' (disabled)", text));
             return;
         }
 
@@ -1518,7 +1455,6 @@ public class SeleniumEyes extends RunningTest implements ISeleniumEyes {
     @Override
     public RectangleSize getViewportSize() {
         if (!isOpen && driver == null) {
-            logger.log("Called getViewportSize before calling open");
             return null;
         }
 
@@ -1563,7 +1499,7 @@ public class SeleniumEyes extends RunningTest implements ISeleniumEyes {
             } catch (EyesException e1) {
                 // Just in case the user catches this error
                 ((EyesTargetLocator) driver.switchTo()).frames(originalFrame);
-                GeneralUtils.logExceptionStackTrace(logger, e1);
+                GeneralUtils.logExceptionStackTrace(logger, Stage.OPEN, e1, getTestId());
                 throw new TestFailedException("Failed to set the viewport size", e1);
             }
             ((EyesTargetLocator) driver.switchTo()).frames(originalFrame);
@@ -1580,16 +1516,15 @@ public class SeleniumEyes extends RunningTest implements ISeleniumEyes {
         }
 
         ScaleProviderFactory scaleProviderFactory = updateScalingParams();
-
         EyesWebDriverScreenshot result;
         CheckState state = ((ISeleniumCheckTarget) checkSettingsInternal).getState();
+        logger.log(getTestId(), Stage.CHECK, Type.CAPTURE_SCREENSHOT, Pair.of("checkState", state));
         WebElement targetElement = state.getTargetElementInternal();
         boolean stitchContent = state.isStitchContent();
 
         Region effectiveViewport = state.getEffectiveViewport();
         Region fullRegion = state.getFullRegion();
         if (effectiveViewport.contains(fullRegion) && !fullRegion.isEmpty()) {
-            logger.verbose("effectiveViewport: " + effectiveViewport + " ; fullRegion: " + fullRegion);
             result = getViewportScreenshot(scaleProviderFactory);
             result = result.getSubScreenshot(fullRegion, true);
         } else if (targetElement != null || stitchContent) {
@@ -1617,7 +1552,6 @@ public class SeleniumEyes extends RunningTest implements ISeleniumEyes {
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-
         return getScaledAndCroppedScreenshot(scaleProviderFactory);
     }
 
@@ -1640,13 +1574,10 @@ public class SeleniumEyes extends RunningTest implements ISeleniumEyes {
         FullPageCaptureAlgorithm algo = createFullPageCaptureAlgorithm(scaleProviderFactory, renderingInfo);
 
         EyesWebDriverScreenshot result;
-        logger.verbose("Check frame/element requested");
-
         PositionProvider positionProvider = state.getStitchPositionProvider();
         PositionProvider originPositionProvider = state.getOriginPositionProvider();
 
         if (positionProvider == null) {
-            logger.verbose("positionProvider is null, updating it.");
             WebElement scrollRootElement = getCurrentFrameScrollRootElement();
             positionProvider = getPositionProviderForScrollRootElement(logger, driver, getConfigurationInstance().getStitchMode(), userAgent, scrollRootElement);
         }
@@ -1660,7 +1591,6 @@ public class SeleniumEyes extends RunningTest implements ISeleniumEyes {
         }
         BufferedImage entireFrameOrElement = algo.getStitchedRegion(state.getEffectiveViewport(), state.getFullRegion(), positionProvider, originPositionProvider, state.getStitchOffset());
 
-        logger.verbose("Building screenshot object...");
         Location frameLocationInScreenshot = new Location(-state.getFullRegion().getLeft(), -state.getFullRegion().getTop());
         result = new EyesWebDriverScreenshot(logger, driver, entireFrameOrElement,
                 new RectangleSize(entireFrameOrElement.getWidth(), entireFrameOrElement.getHeight()),
@@ -1701,14 +1631,14 @@ public class SeleniumEyes extends RunningTest implements ISeleniumEyes {
             try {
                 jsExecutor.executeScript(String.format("var e = arguments[0]; if (e != null) e.setAttribute('%s','%s');", key, value), element);
             } catch (Exception e) {
-                GeneralUtils.logExceptionStackTrace(logger, e);
+                GeneralUtils.logExceptionStackTrace(logger, Stage.CHECK, e, getTestId());
             }
         }
     }
 
     private FullPageCaptureAlgorithm createFullPageCaptureAlgorithm(ScaleProviderFactory scaleProviderFactory, RenderingInfo renderingInfo) {
         ISizeAdjuster sizeAdjuster = ImageProviderFactory.getImageSizeAdjuster(userAgent, jsExecutor);
-        return new FullPageCaptureAlgorithm(logger, regionPositionCompensation,
+        return new FullPageCaptureAlgorithm(logger, getTestId(), regionPositionCompensation,
                 getConfigurationInstance().getWaitBeforeScreenshots(), debugScreenshotsProvider, screenshotFactory,
                 scaleProviderFactory, cutProviderHandler.get(), getConfigurationInstance().getStitchOverlap(),
                 imageProvider, renderingInfo.getMaxImageHeight(), renderingInfo.getMaxImageArea(), sizeAdjuster);
@@ -1720,7 +1650,7 @@ public class SeleniumEyes extends RunningTest implements ISeleniumEyes {
             try {
                 return driver.getTitle();
             } catch (Exception ex) {
-                logger.verbose("failed (" + ex.getMessage() + ")");
+                GeneralUtils.logExceptionStackTrace(logger, Stage.GENERAL, ex, getTestId());
                 doNotGetTitle = true;
             }
         }
@@ -1749,18 +1679,12 @@ public class SeleniumEyes extends RunningTest implements ISeleniumEyes {
         RemoteWebDriver underlyingDriver = driver.getRemoteWebDriver();
         // If hostOs isn't set, we'll try and extract and OS ourselves.
         if (appEnv.getOs() == null) {
-            logger.log("No OS set, checking for mobile OS...");
             if (EyesDriverUtils.isMobileDevice(underlyingDriver)) {
                 String platformName = null;
-                logger.log("Mobile device detected! Checking device type..");
                 if (EyesDriverUtils.isAndroid(underlyingDriver)) {
-                    logger.log("Android detected.");
                     platformName = "Android";
                 } else if (EyesDriverUtils.isIOS(underlyingDriver)) {
-                    logger.log("iOS detected.");
                     platformName = "iOS";
-                } else {
-                    logger.log("Unknown device type.");
                 }
                 // We only set the OS if we identified the device type.
                 if (platformName != null) {
@@ -1775,19 +1699,14 @@ public class SeleniumEyes extends RunningTest implements ISeleniumEyes {
                             os += " " + majorVersion;
                         }
                     }
-
-                    logger.verbose("Setting OS: " + os);
                     appEnv.setOs(os);
                 }
 
                 if (appEnv.getDeviceInfo() == null) {
                     appEnv.setDeviceInfo(EyesDriverUtils.getMobileDeviceName(driver.getRemoteWebDriver()));
                 }
-            } else {
-                logger.log("No mobile OS detected.");
             }
         }
-        logger.log("Done!");
         return appEnv;
     }
 
@@ -1798,12 +1717,13 @@ public class SeleniumEyes extends RunningTest implements ISeleniumEyes {
 
     @Override
     public TestResults close(boolean throwEx) {
+        logger.log(getTestId(), Stage.CLOSE, Type.CALLED, Pair.of("throwEx", throwEx));
         TestResults results;
         try {
             results = stopSession(false);
             closeCompleted(results);
         } catch (Throwable e) {
-            GeneralUtils.logExceptionStackTrace(logger, e);
+            GeneralUtils.logExceptionStackTrace(logger, Stage.CLOSE, e, getTestId());
             closeFailed(e);
             throw e;
         }
@@ -1821,7 +1741,6 @@ public class SeleniumEyes extends RunningTest implements ISeleniumEyes {
     /**
      * The type Eyes selenium agent setup.
      */
-    @SuppressWarnings("UnusedDeclaration")
     class EyesSeleniumAgentSetup {
         /**
          * The type Web driver info.
@@ -1851,7 +1770,7 @@ public class SeleniumEyes extends RunningTest implements ISeleniumEyes {
             remoteWebDriver = driver.getRemoteWebDriver();
         }
 
-        private RemoteWebDriver remoteWebDriver;
+        private final RemoteWebDriver remoteWebDriver;
 
         /**
          * Gets selenium session id.

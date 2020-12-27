@@ -40,7 +40,7 @@ public class TestSessionStartInfo extends ReportingTestSuite {
         ims.setFloatingRegions(new FloatingMatchSettings[]{new FloatingMatchSettings(22, 32, 42, 52, 5, 10, 15, 20)});
 
         SessionStartInfo sessionStartInfo = new SessionStartInfo(
-                "agent", SessionType.SEQUENTIAL,
+                "id", "agent", SessionType.SEQUENTIAL,
                 "some app",
                 "1.0",
                 "some test",

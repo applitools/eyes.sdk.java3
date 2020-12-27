@@ -1,14 +1,13 @@
 package com.applitools.eyes.selenium.triggers;
 
 import com.applitools.eyes.Location;
-import com.applitools.eyes.Logger;
+import com.applitools.eyes.Region;
 import com.applitools.eyes.selenium.EyesDriverUtils;
 import com.applitools.eyes.selenium.wrappers.EyesSeleniumDriver;
 import com.applitools.eyes.triggers.MouseAction;
-import com.applitools.eyes.Region;
 import com.applitools.utils.ArgumentGuard;
-import org.openqa.selenium.interactions.Mouse;
 import org.openqa.selenium.interactions.Coordinates;
+import org.openqa.selenium.interactions.Mouse;
 
 /**
  * A wrapper class for Selenium's Mouse class. It adds saving of mouse events
@@ -16,17 +15,14 @@ import org.openqa.selenium.interactions.Coordinates;
  */
 public class EyesMouse implements Mouse {
 
-    private final Logger logger;
     private final EyesSeleniumDriver eyesDriver;
     private final Mouse mouse;
     private Location mouseLocation;
 
-    public EyesMouse(Logger logger, EyesSeleniumDriver eyesDriver, Mouse mouse) {
-        ArgumentGuard.notNull(logger, "logger");
+    public EyesMouse(EyesSeleniumDriver eyesDriver, Mouse mouse) {
         ArgumentGuard.notNull(eyesDriver, "eyesDriver");
         ArgumentGuard.notNull(mouse, "mouse");
 
-        this.logger = logger;
         this.eyesDriver = eyesDriver;
         this.mouse = mouse;
         this.mouseLocation = new Location(0, 0);
@@ -45,58 +41,35 @@ public class EyesMouse implements Mouse {
     }
 
     public void click(Coordinates where) {
-        Location location = EyesDriverUtils.getPageLocation(where);
-        logger.verbose("click(" + location + ")");
-
         moveIfNeeded(where);
         addMouseTrigger(MouseAction.Click);
-
-        logger.verbose("Location is " + mouseLocation);
         mouse.click(where);
     }
 
     public void doubleClick(Coordinates where) {
-        Location location = EyesDriverUtils.getPageLocation(where);
-        logger.verbose("doubleClick(" + location + ")");
-
         moveIfNeeded(where);
         addMouseTrigger(MouseAction.DoubleClick);
-
-        logger.verbose("Location is " + mouseLocation);
         mouse.doubleClick(where);
     }
 
     public void mouseDown(Coordinates where) {
-        Location location = EyesDriverUtils.getPageLocation(where);
-        logger.verbose("mouseDown(" + location + ")");
-
         moveIfNeeded(where);
         addMouseTrigger(MouseAction.Down);
-
-        logger.verbose("Location is " + mouseLocation);
         mouse.mouseDown(where);
     }
 
     public void mouseUp(Coordinates where) {
-        Location location = EyesDriverUtils.getPageLocation(where);
-        logger.verbose("mouseUp(" + location + ")");
-
         moveIfNeeded(where);
         addMouseTrigger(MouseAction.Up);
-
-        logger.verbose("Location is " + mouseLocation);
         mouse.mouseUp(where);
     }
 
     public void mouseMove(Coordinates where) {
         Location location = EyesDriverUtils.getPageLocation(where);
-        logger.verbose("mouseMove(" + location + ")");
-
         if (location != null) {
             int newX = Math.max(0, location.getX());
             int newY = Math.max(0, location.getY());
             mouseLocation = new Location(newX, newY);
-
             addMouseTrigger(MouseAction.Move);
         }
 
@@ -105,9 +78,6 @@ public class EyesMouse implements Mouse {
 
     public void mouseMove(Coordinates where, long xOffset, long yOffset) {
         Location location = EyesDriverUtils.getPageLocation(where);
-        logger.verbose("mouseMove(" + location + ", " + xOffset + ", "
-                + yOffset + ")");
-
         int newX, newY;
         if (location != null) {
             newX = (int)(location.getX() + xOffset);
@@ -133,13 +103,8 @@ public class EyesMouse implements Mouse {
     }
 
     public void contextClick(Coordinates where) {
-        Location location = EyesDriverUtils.getPageLocation(where);
-        logger.verbose("contextClick(" + location + ")");
-
         moveIfNeeded(where);
         addMouseTrigger(MouseAction.RightClick);
-
-        logger.verbose("Location is " + mouseLocation);
         mouse.contextClick(where);
     }
 

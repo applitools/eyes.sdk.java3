@@ -9,6 +9,7 @@ import com.applitools.eyes.debug.DebugScreenshotsProvider;
 import com.applitools.eyes.exceptions.TestFailedException;
 import com.applitools.eyes.locators.VisualLocatorSettings;
 import com.applitools.eyes.locators.VisualLocatorsProvider;
+import com.applitools.eyes.logging.Stage;
 import com.applitools.eyes.positioning.PositionProvider;
 import com.applitools.eyes.selenium.fluent.SeleniumCheckSettings;
 import com.applitools.eyes.selenium.fluent.Target;
@@ -22,12 +23,14 @@ import com.applitools.eyes.visualgrid.model.IDebugResourceWriter;
 import com.applitools.eyes.visualgrid.model.RenderingInfo;
 import com.applitools.eyes.visualgrid.services.VisualGridRunner;
 import com.applitools.utils.ArgumentGuard;
+import org.apache.commons.lang3.tuple.Pair;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.remote.RemoteWebDriver;
 
 import java.net.URI;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
@@ -473,7 +476,6 @@ public class Eyes implements IEyesBase {
      * @return the test results
      */
     public TestResults close(boolean shouldThrowException) {
-        getLogger().verbose("enter");
         return activeEyes.close(shouldThrowException);
     }
 
@@ -614,14 +616,10 @@ public class Eyes implements IEyesBase {
      */
     public void checkRegion(final Region region, int matchTimeout, String tag) throws TestFailedException {
         if (getIsDisabled()) {
-            getLogger().log(String.format("checkRegion([%s], %d, '%s'): Ignored", region, matchTimeout, tag));
             return;
         }
 
         ArgumentGuard.notNull(region, "region");
-
-        getLogger().verbose(String.format("checkRegion([%s], %d, '%s')", region, matchTimeout, tag));
-
         check(Target.region(region).timeout(matchTimeout).withName(tag));
     }
 
@@ -690,14 +688,10 @@ public class Eyes implements IEyesBase {
      */
     public void checkRegion(WebElement element, int matchTimeout, String tag, boolean stitchContent) {
         if (getIsDisabled()) {
-            getLogger().log(String.format("checkRegion([%s], %d, '%s'): Ignored", element, matchTimeout, tag));
             return;
         }
 
         ArgumentGuard.notNull(element, "element");
-
-        getLogger().verbose(String.format("checkRegion([%s], %d, '%s')", element, matchTimeout, tag));
-
         check(Target.region(element).timeout(matchTimeout).withName(tag).fully(stitchContent));
     }
 
@@ -1643,7 +1637,7 @@ public class Eyes implements IEyesBase {
      * @param message the massage to log
      */
     public void log(String message) {
-        activeEyes.getLogger().log(message);
+        activeEyes.getLogger().log(new HashSet<String>(), Stage.GENERAL, Pair.of("message", message));
     }
 
     /**
@@ -1840,7 +1834,6 @@ public class Eyes implements IEyesBase {
     }
 
     public void closeAsync() {
-        getLogger().verbose("enter");
         if (isVisualGridEyes) {
             visualGridEyes.closeAsync();
         } else {

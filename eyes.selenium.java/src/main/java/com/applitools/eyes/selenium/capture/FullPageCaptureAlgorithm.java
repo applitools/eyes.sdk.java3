@@ -5,6 +5,9 @@ import com.applitools.eyes.capture.EyesScreenshotFactory;
 import com.applitools.eyes.capture.ImageProvider;
 import com.applitools.eyes.debug.DebugScreenshotsProvider;
 import com.applitools.eyes.CutProvider;
+import com.applitools.eyes.logging.Stage;
+import com.applitools.eyes.logging.TraceLevel;
+import com.applitools.eyes.logging.Type;
 import com.applitools.eyes.positioning.PositionMemento;
 import com.applitools.eyes.positioning.PositionProvider;
 import com.applitools.eyes.selenium.positioning.NullRegionPositionCompensation;
@@ -12,14 +15,17 @@ import com.applitools.eyes.selenium.positioning.RegionPositionCompensation;
 import com.applitools.utils.ArgumentGuard;
 import com.applitools.utils.GeneralUtils;
 import com.applitools.utils.ImageUtils;
+import org.apache.commons.lang3.tuple.Pair;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
+import java.util.Collections;
 
 public class FullPageCaptureAlgorithm {
     private static final int MIN_SCREENSHOT_PART_SIZE = 10;
 
     private final Logger logger;
+    private final String testId;
     private final RegionPositionCompensation regionPositionCompensation;
     private final int waitBeforeScreenshots;
     private final DebugScreenshotsProvider debugScreenshotsProvider;
@@ -32,7 +38,7 @@ public class FullPageCaptureAlgorithm {
     private final int maxHeight;
     private final int maxArea;
 
-    public FullPageCaptureAlgorithm(Logger logger, RegionPositionCompensation regionPositionCompensation,
+    public FullPageCaptureAlgorithm(Logger logger, String testId, RegionPositionCompensation regionPositionCompensation,
                                     int waitBeforeScreenshots, DebugScreenshotsProvider debugScreenshotsProvider,
                                     EyesScreenshotFactory screenshotFactory,
                                     ScaleProviderFactory scaleProviderFactory, CutProvider cutProvider,
@@ -42,6 +48,7 @@ public class FullPageCaptureAlgorithm {
         ArgumentGuard.notNull(logger, "logger");
 
         this.logger = logger;
+        this.testId = testId;
         this.waitBeforeScreenshots = waitBeforeScreenshots;
         this.debugScreenshotsProvider = debugScreenshotsProvider;
         this.screenshotFactory = screenshotFactory;
@@ -79,21 +86,18 @@ public class FullPageCaptureAlgorithm {
         ArgumentGuard.notNull(region, "region");
         ArgumentGuard.notNull(positionProvider, "positionProvider");
 
-        logger.verbose(String.format("region: %s ; fullArea: %s ; positionProvider: %s",
-                region, fullarea, positionProvider.getClass().getName()));
+        logger.log(testId, Stage.CHECK, Type.CAPTURE_SCREENSHOT,
+                Pair.of("region", region),
+                Pair.of("fullArea", fullarea),
+                Pair.of("positionProvider", positionProvider.getClass().getName()));
 
         PositionMemento originalPosition = originProvider.getState();
-
         PositionMemento originalStitchedState = positionProvider.getState();
-        logger.verbose("region size: " + region);
-
         originProvider.setPosition(Location.ZERO);
 
         try {
             Thread.sleep(waitBeforeScreenshots);
-        } catch (InterruptedException e) {
-            GeneralUtils.logExceptionStackTrace(logger, e);
-        }
+        } catch (InterruptedException ignored) {}
 
         BufferedImage initialScreenshot = imageProvider.getImage();
         RectangleSize initialSize = new RectangleSize(initialScreenshot.getWidth(), initialScreenshot.getHeight());
@@ -112,6 +116,7 @@ public class FullPageCaptureAlgorithm {
         }
 
         Region regionInScreenshot = getRegionInScreenshot(region, initialScreenshot, pixelRatio);
+        logger.log(testId, Stage.CHECK, Type.CAPTURE_SCREENSHOT, Pair.of("regionInScreenshot", regionInScreenshot));
         BufferedImage croppedInitialScreenshot = cropScreenshot(initialScreenshot, regionInScreenshot);
         debugScreenshotsProvider.save(croppedInitialScreenshot, "cropped");
 
@@ -124,30 +129,31 @@ public class FullPageCaptureAlgorithm {
             RectangleSize entireSize;
             try {
                 entireSize = positionProvider.getEntireSize();
-                logger.verbose("Entire size of region context: " + entireSize);
             } catch (EyesException e) {
-                logger.log("WARNING: Failed to extract entire size of region context" + e.getMessage());
-                logger.log("Using image size instead: " + scaledInitialScreenshot.getWidth() + "x" + scaledInitialScreenshot.getHeight());
+                GeneralUtils.logExceptionStackTrace(logger, Stage.CHECK, Type.CAPTURE_SCREENSHOT, e, testId);
                 entireSize = new RectangleSize(scaledInitialScreenshot.getWidth(), scaledInitialScreenshot.getHeight());
             }
 
             // Notice that this might still happen even if we used
             // "getImagePart", since "entirePageSize" might be that of a frame.
             if (scaledInitialScreenshot.getWidth() >= entireSize.getWidth() && scaledInitialScreenshot.getHeight() >= entireSize.getHeight()) {
-                logger.log("WARNING: Seems the image is already a full page screenshot.");
+                logger.log(TraceLevel.Warn, Collections.singleton(testId), Stage.CHECK, Type.CAPTURE_SCREENSHOT,
+                        Pair.of("message", "Seems the image is already a full page screenshot"));
                 originProvider.restoreState(originalPosition);
                 return scaledInitialScreenshot;
             }
             fullarea = new Region(Location.ZERO, entireSize, CoordinatesType.SCREENSHOT_AS_IS);
+            logger.log(testId, Stage.CHECK, Type.CAPTURE_SCREENSHOT,
+                    Pair.of("entireSize", entireSize),
+                    Pair.of("fullArea", fullarea));
         }
 
         float currentFullWidth = fullarea.getWidth();
         fullarea = sizeAdjuster.adjustRegion(fullarea, initialSizeScaled);
+        logger.log(testId, Stage.CHECK, Type.CAPTURE_SCREENSHOT, Pair.of("adjustedFullArea", fullarea));
+
         float sizeRatio = currentFullWidth / fullarea.getWidth();
-        logger.verbose("adjusted fullarea: " + fullarea);
-
         Location scaledCropLocation = fullarea.getLocation();
-
         Location physicalCropLocation = new Location(
                 (int) Math.ceil(scaledCropLocation.getX() * pixelRatio),
                 (int) Math.ceil(scaledCropLocation.getY() * pixelRatio));
@@ -180,8 +186,6 @@ public class FullPageCaptureAlgorithm {
                 Math.max((int) scaledCropSize.getHeight(), MIN_SCREENSHOT_PART_SIZE)
         );
 
-        logger.verbose("Screenshot part size: " + screenshotPartSize);
-
         // Getting the list of viewport regions composing the page (we'll take screenshot for each one).
         Rectangle rectInScreenshot;
         if (regionInScreenshot.isSizeEmpty()) {
@@ -201,7 +205,7 @@ public class FullPageCaptureAlgorithm {
         }
 
         fullarea = coerceImageSize(fullarea);
-
+        logger.log(testId, Stage.CHECK, Type.CAPTURE_SCREENSHOT, Pair.of("finalFullArea", fullarea));
         SubregionForStitching[] screenshotParts = fullarea.getSubRegions(screenshotPartSize, stitchingOverlap, pixelRatio, rectInScreenshot, logger);
 
         BufferedImage stitchedImage = new BufferedImage(fullarea.getWidth(), fullarea.getHeight(), BufferedImage.TYPE_4BYTE_ABGR);
@@ -217,13 +221,11 @@ public class FullPageCaptureAlgorithm {
     private Region coerceImageSize(Region fullarea) {
         if (fullarea.getHeight() < maxHeight && fullarea.getArea() < maxArea)
         {
-            logger.verbose("full area fits server limits.");
             return fullarea;
         }
 
         if (maxArea == 0 || maxHeight == 0)
         {
-            logger.verbose("server limits unspecified.");
             return fullarea;
         }
 
@@ -231,17 +233,15 @@ public class FullPageCaptureAlgorithm {
         Region newRegion = new Region(fullarea.getLeft(), fullarea.getTop(), fullarea.getWidth(), trimmedHeight, fullarea.getCoordinatesType());
         if (newRegion.isSizeEmpty())
         {
-            logger.verbose("empty region after coerce. returning original.");
             return fullarea;
         }
-        logger.verbose("coerced region: " + newRegion);
         return newRegion;
 
     }
 
     private BufferedImage cropScreenshot(BufferedImage initialScreenshot, Region regionInScreenshot) {
         if (!regionInScreenshot.isSizeEmpty()) {
-            BufferedImage croppedInitialScreenshot = ImageUtils.cropImage(logger, initialScreenshot, regionInScreenshot);
+            BufferedImage croppedInitialScreenshot = ImageUtils.cropImage(initialScreenshot, regionInScreenshot);
             initialScreenshot = croppedInitialScreenshot;
             saveDebugScreenshotPart(croppedInitialScreenshot, regionInScreenshot, "cropped");
         }
@@ -253,11 +253,17 @@ public class FullPageCaptureAlgorithm {
                                   CutProvider scaledCutProvider, float sizeRatio) {
         //noinspection unused
         int index = 0;
-        logger.verbose(String.format("enter: originalStitchedState: %s ; scaleRatio: %s",
-                stitchOffset, scaleRatio));
+        logger.log(testId, Stage.CHECK, Type.CAPTURE_SCREENSHOT,
+                Pair.of("stitchOffset", stitchOffset),
+                Pair.of("scaleRatio", scaleRatio));
 
         for (SubregionForStitching partRegion : screenshotParts) {
-            logger.verbose("Part: " + partRegion);
+            logger.log(TraceLevel.Info, Collections.singleton(testId), Stage.CHECK, Type.CAPTURE_SCREENSHOT,
+                    Pair.of("scrollTo", new Location(partRegion.getScrollTo())),
+                    Pair.of("pastePhysicalLocation", new Location(partRegion.getPastePhysicalLocation())),
+                    Pair.of("physicalCropArea", new Region(partRegion.getLogicalCropArea())),
+                    Pair.of("logicalCropArea", new Region(partRegion.getPhysicalCropArea())));
+
             // Scroll to the part's top/left
             Point partAbsoluteLocationInCurrentFrame = partRegion.getScrollTo();
             partAbsoluteLocationInCurrentFrame.translate(stitchOffset.getWidth(), stitchOffset.getHeight());
@@ -273,16 +279,14 @@ public class FullPageCaptureAlgorithm {
             // Actually taking the screenshot.
             try {
                 Thread.sleep(waitBeforeScreenshots);
-            } catch (InterruptedException e) {
-                GeneralUtils.logExceptionStackTrace(logger, e);
-            }
+            } catch (InterruptedException ignored) {}
 
             BufferedImage partImage = imageProvider.getImage();
             BufferedImage cutPart = scaledCutProvider.cut(partImage);
             BufferedImage croppedPart;
             Rectangle r = partRegion.getPhysicalCropArea();
             if (!r.isEmpty()) {
-                croppedPart = ImageUtils.cropImage(logger, cutPart, new Region(r.x, r.y, r.width, r.height));
+                croppedPart = ImageUtils.cropImage(cutPart, new Region(r.x, r.y, r.width, r.height));
             } else {
                 croppedPart = cutPart;
             }
@@ -290,18 +294,12 @@ public class FullPageCaptureAlgorithm {
             Rectangle r2 = partRegion.getLogicalCropArea();
 
             BufferedImage scaledPartImage = ImageUtils.scaleImage(croppedPart, scaleRatio);
-            BufferedImage scaledCroppedPartImage = ImageUtils.cropImage(logger, scaledPartImage,  new Region(r2.x, r2.y, r2.width, r2.height));
+            BufferedImage scaledCroppedPartImage = ImageUtils.cropImage(scaledPartImage,  new Region(r2.x, r2.y, r2.width, r2.height));
 
             debugScreenshotsProvider.save(partImage, "partImage-" + originPosition.getX() + "_" + originPosition.getY());
-            //debugScreenshotsProvider.save(cutPart, "cutPart-" + originPosition.getX() + "_" + originPosition.getY());
-            //debugScreenshotsProvider.save(croppedPart, "croppedPart-" + originPosition.getX() + "_" + originPosition.getY());
-            //debugScreenshotsProvider.save(scaledPartImage, "scaledPartImage-" + originPosition.getX() + "_" + originPosition.getY());
             debugScreenshotsProvider.save(scaledCroppedPartImage, "scaledCroppedPartImage-" + partPastePosition.getX() + "_" + partPastePosition.getY());
-            logger.verbose("pasting part at " + partPastePosition);
-
+            logger.log(TraceLevel.Info, Collections.singleton(testId), Stage.CHECK, Type.CAPTURE_SCREENSHOT,Pair.of("partPastePosition", partPastePosition));
             stitchedImage.getRaster().setRect(partPastePosition.x, partPastePosition.y, scaledCroppedPartImage.getData());
-
-            //debugScreenshotsProvider.save(stitchedImage, "stitched" + index + "(" + targetPosition.toStringForFilename() + ")");
             index++;
         }
 
@@ -313,28 +311,21 @@ public class FullPageCaptureAlgorithm {
             return region;
         }
 
-        logger.verbose("Creating screenshot object...");
         // We need the screenshot to be able to convert the region to screenshot coordinates.
         EyesScreenshot screenshot = screenshotFactory.makeScreenshot(image);
-        logger.verbose("Getting region in screenshot...");
 
         // Region regionInScreenshot = screenshot.convertRegionLocation(regionProvider.getRegion(), regionProvider.getCoordinatesType(), CoordinatesType.SCREENSHOT_AS_IS);
         Region regionInScreenshot = screenshot.getIntersectedRegion(region, CoordinatesType.SCREENSHOT_AS_IS);
 
         RectangleSize scaledImageSize = new RectangleSize((int) Math.round(image.getWidth() / pixelRatio), (int) Math.round(image.getHeight() / pixelRatio));
         regionInScreenshot = sizeAdjuster.adjustRegion(regionInScreenshot, scaledImageSize);
-
-        logger.verbose("Region in screenshot: " + regionInScreenshot);
         regionInScreenshot = regionInScreenshot.scale(pixelRatio);
-        logger.verbose("Scaled region: " + regionInScreenshot);
-
         regionInScreenshot = regionPositionCompensation.compensateRegionPosition(regionInScreenshot, pixelRatio);
 
         // Handling a specific case where the region is actually larger than
         // the screenshot (e.g., when body width/height are set to 100%, and
         // an internal div is set to value which is larger than the viewport).
         regionInScreenshot.intersect(new Region(0, 0, image.getWidth(), image.getHeight()));
-        logger.verbose("Region after intersect: " + regionInScreenshot);
         return regionInScreenshot;
     }
 }

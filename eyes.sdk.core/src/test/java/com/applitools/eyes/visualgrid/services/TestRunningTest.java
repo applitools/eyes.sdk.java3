@@ -23,7 +23,7 @@ public class TestRunningTest extends ReportingTestSuite {
 
     @BeforeMethod
     public void beforeEach() {
-        runningTest = new VisualGridRunningTest(mock(RenderBrowserInfo.class), mock(Logger.class), new Configuration());
+        runningTest = new VisualGridRunningTest(mock(RenderBrowserInfo.class), new Logger(), new Configuration());
         runningTest.issueCheck(mock(ICheckSettings.class), mock(List.class), "");
         runningTest.issueCheck(mock(ICheckSettings.class), mock(List.class), "");
         runningTest.issueCheck(mock(ICheckSettings.class), mock(List.class), "");

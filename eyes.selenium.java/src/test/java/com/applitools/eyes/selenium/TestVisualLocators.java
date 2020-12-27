@@ -29,7 +29,6 @@ public class TestVisualLocators extends ReportingTestSuite {
     public void testVisualLocators(boolean useVisualGrid) {
         super.addSuiteArg("isVisualGrid", useVisualGrid);
         EyesRunner runner = useVisualGrid ? new VisualGridRunner(10) : new ClassicRunner();
-        runner.setLogHandler(new StdoutLogHandler());
         String suffix = useVisualGrid ? "_VG" : "";
         Eyes eyes = new Eyes(runner);
         eyes.setLogHandler(new StdoutLogHandler());

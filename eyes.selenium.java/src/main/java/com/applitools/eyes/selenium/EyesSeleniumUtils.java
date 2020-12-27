@@ -6,6 +6,9 @@ package com.applitools.eyes.selenium;
 import com.applitools.eyes.EyesException;
 import com.applitools.eyes.Logger;
 import com.applitools.eyes.UserAgent;
+import com.applitools.eyes.logging.Stage;
+import com.applitools.eyes.logging.TraceLevel;
+import com.applitools.eyes.logging.Type;
 import com.applitools.eyes.selenium.fluent.FrameLocator;
 import com.applitools.eyes.selenium.fluent.IScrollRootElementContainer;
 import com.applitools.eyes.selenium.frames.Frame;
@@ -15,6 +18,7 @@ import com.applitools.eyes.selenium.wrappers.EyesSeleniumDriver;
 import com.applitools.eyes.selenium.wrappers.EyesWebDriver;
 import com.applitools.utils.GeneralUtils;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.apache.commons.lang3.tuple.Pair;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 
@@ -53,7 +57,7 @@ public class EyesSeleniumUtils {
         try {
             scrollingElement = (WebElement) driver.executeScript("return document.scrollingElement");
         } catch (Throwable t) {
-            GeneralUtils.logExceptionStackTrace(logger, t);
+            GeneralUtils.logExceptionStackTrace(logger, Stage.GENERAL, t);
             scrollingElement = null;
         }
 
@@ -90,7 +94,7 @@ public class EyesSeleniumUtils {
             }
         }
 
-        logger.verbose(String.format("Chosen default root element is %s", chosenElement.getTagName()));
+        logger.log(new HashSet<String>(), Stage.GENERAL, Pair.of("defaultRootElement", chosenElement.getTagName()));
         return chosenElement;
     }
 
@@ -99,8 +103,7 @@ public class EyesSeleniumUtils {
             driver.findElement(By.tagName("body"));
             return true;
         } catch (Throwable t) {
-            // Supporting web pages without the body element
-            logger.log("Failed finding the body element");
+            GeneralUtils.logExceptionStackTrace(logger, Stage.GENERAL, t);
             return false;
         }
     }
@@ -127,7 +130,6 @@ public class EyesSeleniumUtils {
             return driver.findElement(scrollRootSelector);
         }
 
-        logger.log("Warning: Got an empty scroll root element container");
         return EyesSeleniumUtils.getDefaultRootElement(logger, driver);
     }
 
@@ -181,9 +183,8 @@ public class EyesSeleniumUtils {
         return scrollRootElement;
     }
 
-    public static String runDomScript(Logger logger, EyesWebDriver driver, UserAgent userAgent, String domScript,
+    public static String runDomScript(Logger logger, EyesWebDriver driver, UserAgent userAgent, Set<String> testIds, String domScript,
                                       Map<String, Object> domScriptArguments, String pollingScript) throws Exception {
-        logger.verbose("Starting dom extraction");
         if (domScriptArguments == null) {
             domScriptArguments = new HashMap<>();
         }
@@ -205,8 +206,8 @@ public class EyesSeleniumUtils {
             ScriptResponse scriptResponse = GeneralUtils.parseJsonToObject(resultAsString, ScriptResponse.class);
             ScriptResponse.Status status = scriptResponse.getStatus();
 
+            logger.log(TraceLevel.Info, testIds, Stage.CHECK, Type.DOM_SCRIPT, Pair.of("message", "Starting dom script"));
             while (status == ScriptResponse.Status.WIP && !isCheckTimerTimedOut.get()) {
-                logger.verbose("Dom script polling...");
                 resultAsString = (String) driver.executeScript(pollingScriptWrapped);
                 scriptResponse = GeneralUtils.parseJsonToObject(resultAsString, ScriptResponse.class);
                 status = scriptResponse.getStatus();
@@ -225,9 +226,9 @@ public class EyesSeleniumUtils {
                 return scriptResponse.getValue().toString();
             }
 
+            logger.log(TraceLevel.Info, testIds, Stage.CHECK, Type.DOM_SCRIPT, Pair.of("message", "Collecting chunks"));
             StringBuilder value = new StringBuilder();
             while (status == ScriptResponse.Status.SUCCESS_CHUNKED && !scriptResponse.isDone() && !isCheckTimerTimedOut.get()) {
-                logger.verbose("Dom script chunks polling...");
                 value.append(GeneralUtils.parseJsonToObject(scriptResponse.getValue().toString(), String.class));
                 resultAsString = (String) driver.executeScript(pollingScriptWrapped);
                 scriptResponse = GeneralUtils.parseJsonToObject(resultAsString, ScriptResponse.class);
@@ -247,7 +248,7 @@ public class EyesSeleniumUtils {
             return value.toString();
         } finally {
             timer.cancel();
-            logger.verbose("Finished dom extraction");
+            logger.log(TraceLevel.Info, testIds, Stage.CHECK, Type.DOM_SCRIPT, Pair.of("message", "Finished dom script"));
         }
     }
 }

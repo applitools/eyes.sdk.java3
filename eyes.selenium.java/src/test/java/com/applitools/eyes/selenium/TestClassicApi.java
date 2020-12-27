@@ -60,9 +60,7 @@ public class TestClassicApi extends TestSetup {
         getDriver().switchTo().defaultContent();
         getDriver().switchTo().frame(getDriver().findElement(By.name("frame1")));
         getEyes().checkFrame("frame1-1", "inner-frame");
-        getEyes().getLogger().log("Validating (1) ...");
         getEyes().checkWindow("window after check frame");
-        getEyes().getLogger().log("Validating (2) ...");
         WebElement innerFrameBody = getDriver().findElement(By.tagName("body"));
         ((IEyesJsExecutor) getDriver()).executeScript("arguments[0].style.background='red';", innerFrameBody);
         getEyes().checkWindow("window after change background color of inner frame");

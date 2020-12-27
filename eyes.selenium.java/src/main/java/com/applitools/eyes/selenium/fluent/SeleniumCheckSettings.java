@@ -11,31 +11,41 @@ import com.applitools.eyes.selenium.CheckState;
 import com.applitools.eyes.selenium.EyesSeleniumUtils;
 import com.applitools.eyes.selenium.wrappers.EyesSeleniumDriver;
 import com.applitools.eyes.selenium.wrappers.EyesWebDriver;
+import com.applitools.eyes.serializers.BySerializer;
+import com.applitools.eyes.serializers.WebElementSerializer;
 import com.applitools.eyes.visualgrid.model.VisualGridSelector;
 import com.applitools.utils.ArgumentGuard;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
 
 public class SeleniumCheckSettings extends CheckSettings implements ISeleniumCheckTarget, Cloneable {
-
     public static final String FULL_PAGE = "full-page";
     public static final String VIEWPORT = "viewport";
     public static final String REGION = "region";
     public static final String SELECTOR = "selector";
     public static final String FULL_SELECTOR = "full-selector";
+    @JsonSerialize(using = BySerializer.class)
     private By targetSelector;
+    @JsonSerialize(using = WebElementSerializer.class)
     private WebElement targetElement;
     private final List<FrameLocator> frameChain = new ArrayList<>();
+    @JsonSerialize(using = WebElementSerializer.class)
     private WebElement scrollRootElement;
+    @JsonSerialize(using = BySerializer.class)
     private By scrollRootSelector;
     private VisualGridSelector selector;
     private CheckState state;
 
     private boolean isDefaultLayoutBreakpointsSet = false;
-    private List<Integer> layoutBreakpoints = new ArrayList<>();
+    private final List<Integer> layoutBreakpoints = new ArrayList<>();
 
     public SeleniumCheckSettings() {
     }
@@ -572,13 +582,12 @@ public class SeleniumCheckSettings extends CheckSettings implements ISeleniumChe
         return layoutBreakpoints;
     }
 
-    public void sanitizeSettings(Logger logger, EyesSeleniumDriver driver, boolean isFully) {
-        if (frameChain.size() > 0 && targetElement == null && targetSelector == null && !isFully)
-        {
+    public void sanitizeSettings(EyesSeleniumDriver driver, boolean isFully) {
+        if (frameChain.size() > 0 && targetElement == null && targetSelector == null && !isFully) {
             FrameLocator lastFrame = frameChain.get(frameChain.size() - 1);
             frameChain.remove(frameChain.size() - 1);
             targetElement = EyesSeleniumUtils.findFrameByFrameCheckTarget(lastFrame, driver);
-            logger.log("Using Target.Frame() for the purpose of Target.Region()");
-        }  }
+        }
+    }
 }
 

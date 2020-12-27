@@ -64,12 +64,10 @@ public abstract class TestIEyesBase extends ReportingTestSuite {
             eyes = initEyes(webDriver, testedUrl);
             eyes.setSaveNewTests(false);
             logger = eyes.getLogger();
-            logger.log("running check for url " + testedUrl);
             ICheckSettings checkSettings = getCheckSettings();
             eyes.setMatchLevel(matchLevel);
             eyes.check(checkSettings.withName("Step1 - " + testedUrl));
             eyes.check(checkSettings.fully().withName("Step2 - " + testedUrl));
-            logger.verbose(String.format("calling eyes_.Close() (test: %s)", testedUrl));
             TestResults results = eyes.close(false);
             validateResults(eyes, results);
         } finally {

@@ -3,6 +3,7 @@ package com.applitools.eyes.selenium.rendering;
 import com.applitools.eyes.BatchInfo;
 import com.applitools.eyes.RectangleSize;
 import com.applitools.eyes.TestResults;
+import com.applitools.eyes.logging.Stage;
 import com.applitools.eyes.metadata.ActualAppOutput;
 import com.applitools.eyes.metadata.Image;
 import com.applitools.eyes.metadata.SessionResults;
@@ -41,7 +42,7 @@ public class TestIEyesSelenium extends TestIEyesBase{
         try {
             sessionResults = TestUtils.getSessionResults(eyes.getApiKey(), results);
         } catch (IOException e) {
-            GeneralUtils.logExceptionStackTrace(logger, e);
+            GeneralUtils.logExceptionStackTrace(logger, Stage.GENERAL, e);
         }
 
         ActualAppOutput[] actualAppOutputs = sessionResults.getActualAppOutput();

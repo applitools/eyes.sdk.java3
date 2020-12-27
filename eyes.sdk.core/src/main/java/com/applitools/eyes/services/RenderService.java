@@ -4,11 +4,13 @@ import com.applitools.connectivity.ServerConnector;
 import com.applitools.eyes.EyesException;
 import com.applitools.eyes.Logger;
 import com.applitools.eyes.TaskListener;
+import com.applitools.eyes.logging.Stage;
+import com.applitools.eyes.logging.Type;
+import com.applitools.eyes.logging.TraceLevel;
 import com.applitools.eyes.visualgrid.model.RenderRequest;
 import com.applitools.eyes.visualgrid.model.RenderStatus;
 import com.applitools.eyes.visualgrid.model.RenderStatusResults;
 import com.applitools.eyes.visualgrid.model.RunningRender;
-import com.applitools.utils.GeneralUtils;
 import org.apache.commons.lang3.tuple.Pair;
 
 import java.util.*;
@@ -25,7 +27,7 @@ public class RenderService extends EyesService<RenderRequest, RenderStatusResult
     private class TimeoutTask extends TimerTask {
         @Override
         public void run() {
-            logger.verbose("Rendering task is Timed out!");
+            logger.log(TraceLevel.Error, new HashSet<String>(), Stage.RENDER, Type.TIMEOUT);
             isTimeElapsed.set(true);
         }
     }
@@ -67,25 +69,28 @@ public class RenderService extends EyesService<RenderRequest, RenderStatusResult
             return;
         }
 
-        final RenderRequest[] asArray = new RenderRequest[inputQueue.size()];
+        List<RenderRequest> renderRequests = new ArrayList<>();
         final List<String> testIds = new ArrayList<>();
-        for (int i = 0; i < inputQueue.size(); i++) {
-            asArray[i] = inputQueue.get(i).getRight();
-            testIds.add(inputQueue.get(i).getLeft());
+        synchronized (inputQueue) {
+            for (Pair<String, RenderRequest> stringRenderRequestPair : inputQueue) {
+                renderRequests.add(stringRenderRequestPair.getRight());
+                testIds.add(stringRenderRequestPair.getLeft());
+            }
+            inputQueue.clear();
         }
-        inputQueue.clear();
 
         final TaskListener<List<RunningRender>> renderListener = new TaskListener<List<RunningRender>>() {
             @Override
             public void onComplete(List<RunningRender> runningRenders) {
-                if (runningRenders == null || runningRenders.size() != asArray.length) {
+                if (runningRenders == null || runningRenders.size() != testIds.size()) {
                     onFail();
                     return;
                 }
 
                 try {
-                    for (RunningRender runningRender : runningRenders) {
-                        logger.verbose(String.format("RunningRender: %s", runningRender));
+                    for (int i = 0; i < testIds.size(); i++) {
+                        RunningRender runningRender = runningRenders.get(i);
+                        logger.log(TraceLevel.Info, testIds.get(i), Stage.RENDER, Pair.of("runningRender", runningRender));
                         RenderStatus renderStatus = runningRender.getRenderStatus();
                         if (!renderStatus.equals(RenderStatus.RENDERED) && !renderStatus.equals(RenderStatus.RENDERING)) {
                             setRenderErrorToTasks(testIds, new EyesException(
@@ -109,14 +114,13 @@ public class RenderService extends EyesService<RenderRequest, RenderStatusResult
         };
 
         try {
-            serverConnector.render(renderListener, asArray);
+            serverConnector.render(renderListener, renderRequests);
         } catch (Throwable t) {
             setRenderErrorToTasks(testIds, t);
         }
     }
 
     private void pollRenderingStatus(final List<String> testIds, final List<String> renderIds) {
-        logger.verbose("renderIds : " + renderIds);
         final Timer timer = new Timer("VG_StopWatch", true);
         timer.schedule(new TimeoutTask(), RENDER_STATUS_POLLING_TIMEOUT);
         serverConnector.renderStatusById(new TaskListener<List<RenderStatusResults>>() {
@@ -133,15 +137,14 @@ public class RenderService extends EyesService<RenderRequest, RenderStatusResult
                         renderStatusResults = RenderStatusResults.createError(renderIds.get(i));
                     }
 
-                    logger.verbose(String.format("renderStatusResults: %s", renderStatusResults));
+                    logger.log(TraceLevel.Info, Collections.singleton(testIds.get(i)), Stage.RENDER, Type.RENDER_STATUS,
+                            Pair.of("renderStatusResults", renderStatusResults));
                     RenderStatus renderStatus = renderStatusResults.getStatus();
                     if (!renderStatus.equals(RenderStatus.RENDERED) && !renderStatus.equals(RenderStatus.ERROR)) {
                         continue;
                     }
 
-                    String renderId = renderIds.get(i);
                     String testId = testIds.get(i);
-                    logger.verbose(String.format("Setting render result. TestId: %s, RenderId: %s, Result: %s", testId, renderId, renderStatusResults));
                     String error = renderStatusResults.getError();
                     if (error != null) {
                         synchronized (errorQueue) {
@@ -167,12 +170,10 @@ public class RenderService extends EyesService<RenderRequest, RenderStatusResult
 
                 try {
                     Thread.sleep(1500);
-                } catch (InterruptedException e) {
-                    GeneralUtils.logExceptionStackTrace(logger, e);
-                }
+                } catch (InterruptedException ignored) {}
 
                 if (!isTimeElapsed.get()) {
-                    serverConnector.renderStatusById(this, renderIds.toArray(new String[0]));
+                    serverConnector.renderStatusById(this, testIds, renderIds);
                     return;
                 }
 
@@ -183,12 +184,10 @@ public class RenderService extends EyesService<RenderRequest, RenderStatusResult
             public void onFail() {
                 try {
                     Thread.sleep(500);
-                } catch (InterruptedException e) {
-                    GeneralUtils.logExceptionStackTrace(logger, e);
-                }
+                } catch (InterruptedException ignored) {}
 
                 if (!renderIds.isEmpty() && !isTimeElapsed.get()) {
-                    serverConnector.renderStatusById(this, renderIds.toArray(new String[0]));
+                    serverConnector.renderStatusById(this, testIds, renderIds);
                     return;
                 }
 
@@ -197,7 +196,6 @@ public class RenderService extends EyesService<RenderRequest, RenderStatusResult
                     return;
                 }
 
-                logger.verbose(String.format("renderIds that didn't complete in time: %s", Arrays.toString(renderIds.toArray())));
                 for (int i = 0; i < testIds.size(); i++) {
                     String renderId = renderIds.get(i);
                     String testId = testIds.get(i);
@@ -207,7 +205,7 @@ public class RenderService extends EyesService<RenderRequest, RenderStatusResult
                     }
                 }
             }
-        }, renderIds.toArray(new String[0]));
+        }, testIds, renderIds);
     }
 
     private void setRenderErrorToTasks(List<String> testIds, Throwable t) {

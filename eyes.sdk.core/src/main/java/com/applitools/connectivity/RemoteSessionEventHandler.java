@@ -55,22 +55,10 @@ public class RemoteSessionEventHandler extends RestClient {
     }
 
     private void sendMessage(HttpMethodCall method) {
-        StackTraceElement[] stackTraceElements = Thread.currentThread().getStackTrace();
-        String methodName = "";
-        if (stackTraceElements.length >= 3) {
-            methodName = stackTraceElements[2].getMethodName();
-        }
-
         Response response = null;
         try {
             response = method.call();
-            if (response.getStatusCode() != 200) {
-                logger.verbose("'" + methodName + "' notification handler returned an error: " + response.getStatusPhrase());
-            } else {
-                logger.verbose("'" + methodName + "' succeeded: " + response);
-            }
         } catch (RuntimeException e) {
-            logger.log("'" + methodName + "' Server request failed: " + e.getMessage());
             if (this.throwExceptions) {
                 throw e;
             }

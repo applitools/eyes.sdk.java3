@@ -3,6 +3,7 @@ package com.applitools.eyes;
 import com.applitools.ICheckSettings;
 import com.applitools.eyes.config.Configuration;
 import com.applitools.eyes.fluent.ICheckSettingsInternal;
+import com.applitools.eyes.logging.Stage;
 import com.applitools.eyes.selenium.ClassicRunner;
 import com.applitools.eyes.visualgrid.model.RenderBrowserInfo;
 import com.applitools.eyes.visualgrid.model.VisualGridSelector;
@@ -10,7 +11,6 @@ import com.applitools.eyes.visualgrid.services.CheckTask;
 import com.applitools.utils.GeneralUtils;
 
 import java.util.List;
-import java.util.UUID;
 
 public abstract class RunningTest extends EyesBase implements IBatchCloser {
     protected final RenderBrowserInfo browserInfo;
@@ -19,7 +19,6 @@ public abstract class RunningTest extends EyesBase implements IBatchCloser {
     private Boolean isAbortIssued = null;
     private boolean inOpenProcess = false;
     private boolean startedCloseProcess = false;
-    private final String testId = UUID.randomUUID().toString();
 
     protected RunningTest(ClassicRunner runner) {
         super(runner);
@@ -67,7 +66,6 @@ public abstract class RunningTest extends EyesBase implements IBatchCloser {
             return;
         }
 
-        logger.verbose(toString());
         isAbortIssued = false;
     }
 
@@ -76,7 +74,6 @@ public abstract class RunningTest extends EyesBase implements IBatchCloser {
             return;
         }
 
-        logger.verbose(toString());
         isAbortIssued = true;
         if (this.error == null) {
             this.error = error;
@@ -86,9 +83,9 @@ public abstract class RunningTest extends EyesBase implements IBatchCloser {
     public void closeCompleted(TestResults testResults) {
         if (!isTestAborted()) {
             try {
-                logSessionResultsAndThrowException(logger, true, testResults);
+                logSessionResultsAndThrowException(true, testResults);
             } catch (Throwable e) {
-                GeneralUtils.logExceptionStackTrace(logger, e);
+                GeneralUtils.logExceptionStackTrace(logger, Stage.CLOSE, e, getTestId());
                 error = e;
             }
         }
@@ -122,16 +119,10 @@ public abstract class RunningTest extends EyesBase implements IBatchCloser {
     }
 
     public void setTestInExceptionMode(Throwable e) {
-        GeneralUtils.logExceptionStackTrace(logger, e);
         if (isTestAborted()) {
             return;
         }
         issueAbort(e, true);
-        logger.verbose("releasing visualGridTaskList.");
-    }
-
-    public String getTestId() {
-        return testId;
     }
 
     protected RectangleSize getViewportSize() {
@@ -139,7 +130,6 @@ public abstract class RunningTest extends EyesBase implements IBatchCloser {
     }
 
     protected Configuration setViewportSize(RectangleSize size) {
-        logger.log("WARNING setViewportSize() was called in Visual-Grid context");
         return getConfigurationInstance();
     }
 
@@ -174,14 +164,14 @@ public abstract class RunningTest extends EyesBase implements IBatchCloser {
         }
 
         RunningTest that = (RunningTest) o;
-        return testId.equals(that.testId);
+        return getTestId().equals(that.getTestId());
     }
 
     @Override
     public String toString() {
         return "RunningTest{" +
                 "browserInfo=" + browserInfo +
-                ", testId='" + testId + '\'' +
+                ", testId='" + getTestId() + '\'' +
                 '}';
     }
 }

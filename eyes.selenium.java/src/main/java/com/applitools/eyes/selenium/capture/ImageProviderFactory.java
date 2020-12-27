@@ -16,7 +16,7 @@ public class ImageProviderFactory {
             if (ua.getBrowser().equals(BrowserNames.FIREFOX)) {
                 try {
                     if (Integer.parseInt(ua.getBrowserMajorVersion()) >= 48) {
-                        return new FirefoxScreenshotImageProvider(eyes, logger, tsInstance);
+                        return new FirefoxScreenshotImageProvider(eyes, tsInstance);
                     }
                 } catch (NumberFormatException e) {
                     return new TakesScreenshotImageProvider(logger, tsInstance);

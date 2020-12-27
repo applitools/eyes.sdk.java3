@@ -6,8 +6,11 @@ import com.applitools.connectivity.ServerConnector;
 import com.applitools.eyes.*;
 import com.applitools.eyes.config.Configuration;
 import com.applitools.eyes.fluent.ICheckSettingsInternal;
+import com.applitools.eyes.logging.Stage;
+import com.applitools.eyes.logging.TraceLevel;
 import com.applitools.eyes.visualgrid.model.*;
 import com.applitools.utils.ClassVersionGetter;
+import org.apache.commons.lang3.tuple.Pair;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -23,6 +26,7 @@ public class VisualGridRunningTest extends RunningTest {
 
     public VisualGridRunningTest(RenderBrowserInfo browserInfo, Logger logger, Configuration configuration) {
         super(browserInfo, logger);
+        logger.log(getTestId(), Stage.GENERAL, Pair.of("browserInfo", browserInfo));
         this.configuration = configuration;
     }
 
@@ -45,7 +49,6 @@ public class VisualGridRunningTest extends RunningTest {
     }
 
     private void removeAllCheckTasks() {
-        logger.verbose(String.format("Removing %s CHECK tasks from test", checkTasks.size()));
         checkTasks.clear();
     }
 
@@ -85,15 +88,11 @@ public class VisualGridRunningTest extends RunningTest {
         if (vgRegions != null) {
             for (VGRegion reg : vgRegions) {
                 if (reg.getError() != null) {
-                    logger.log(String.format("Warning: region error: %s", reg.getError()));
+                    logger.log(TraceLevel.Error, getTestId(), Stage.CHECK, Pair.of("regionError", reg.getError()));
                 } else {
                     regions.add(reg);
                 }
             }
-        }
-        if (imageLocation == null) {
-            logger.verbose("CHECKING IMAGE WITH NULL LOCATION - ");
-            logger.verbose(renderResult.toString());
         }
 
         ICheckSettingsInternal checkSettingsInternal = (ICheckSettingsInternal) checkTask.getCheckSettings();
@@ -101,17 +100,19 @@ public class VisualGridRunningTest extends RunningTest {
             checkTask.getCheckSettings().fully();
         }
 
+        logger.log(TraceLevel.Info, getTestId(), Stage.CHECK,
+                Pair.of("configuration", getConfiguration()),
+                Pair.of("checkSettings", checkSettingsInternal));
         ImageMatchSettings imageMatchSettings = MatchWindowTask.createImageMatchSettings(checkSettingsInternal, this);
         String tag = checkSettingsInternal.getName();
         AppOutput appOutput = new AppOutput(tag, null, domLocation, imageLocation, renderResult.getImagePositionInActiveFrame(), visualViewport);
         MatchWindowTask.collectRegions(imageMatchSettings, renderResult.getImagePositionInActiveFrame(), regions, checkTask.getRegionSelectors());
         MatchWindowTask.collectRegions(imageMatchSettings, checkSettingsInternal);
-        return prepareForMatch(new ArrayList<Trigger>(), appOutput, tag, false, imageMatchSettings, this, renderId, checkTask.getSource());
+        return prepareForMatch(new ArrayList<Trigger>(), appOutput, tag, false, imageMatchSettings, renderId, checkTask.getSource());
     }
 
     @Override
     public CheckTask issueCheck(ICheckSettings checkSettings, List<VisualGridSelector[]> regionSelectors, String source) {
-        logger.verbose(toString());
         CheckTask checkTask = new CheckTask(this, checkSettings, regionSelectors, source);
         checkTasks.add(checkTask);
         return checkTask;
@@ -119,7 +120,7 @@ public class VisualGridRunningTest extends RunningTest {
 
     @Override
     public void checkCompleted(CheckTask checkTask, MatchResult matchResult) {
-        validateResult(((ICheckSettingsInternal) checkTask.getCheckSettings()).getName(), matchResult);
+        validateResult(matchResult);
         checkTasks.remove(checkTask);
     }
 
@@ -160,6 +161,7 @@ public class VisualGridRunningTest extends RunningTest {
         RenderInfo renderInfo = new RenderInfo(browserInfo.getWidth(), browserInfo.getHeight(), null, null,
                 null, browserInfo.getEmulationInfo(), browserInfo.getIosDeviceInfo());
         RenderRequest renderRequest = new RenderRequest(renderInfo, browserInfo.getPlatform(), browserInfo.getBrowserType());
+        renderRequest.setTestId(getTestId());
         getServerConnector().getJobInfo(listener, new RenderRequest[]{renderRequest});
         JobInfo[] jobInfos = listener.get();
         if (jobInfos == null) {

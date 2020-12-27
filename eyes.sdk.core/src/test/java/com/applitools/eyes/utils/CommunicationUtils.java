@@ -7,7 +7,6 @@ import com.applitools.connectivity.api.Request;
 import com.applitools.connectivity.api.Response;
 import com.applitools.eyes.BatchInfo;
 import com.applitools.eyes.Logger;
-import com.applitools.eyes.StdoutLogHandler;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -71,8 +70,7 @@ public class CommunicationUtils {
             String data = response.getBodyString();
             response.close();
             if (response.getStatusCode() != HttpStatus.SC_OK) {
-                logger.log(String.format("Bad status code from getBatch: %d", response.getStatusCode()));
-                throw new IOException("Failed getting batch info from the server");
+                throw new IOException(String.format("Failed getting batch info from the server. Status code: %d", response.getStatusCode()));
             }
 
             ObjectMapper objectMapper = new ObjectMapper();

@@ -2,6 +2,10 @@ package com.applitools.eyes.selenium.fluent;
 
 import com.applitools.eyes.*;
 import com.applitools.eyes.fluent.GetSimpleRegion;
+import com.applitools.eyes.serializers.WebElementSerializer;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import org.openqa.selenium.Dimension;
 import org.openqa.selenium.Point;
 import org.openqa.selenium.WebElement;
@@ -12,6 +16,7 @@ import java.util.List;
 
 public class SimpleRegionByElement implements GetSimpleRegion, IGetSeleniumRegion {
 
+    @JsonSerialize(using = WebElementSerializer.class)
     protected final WebElement element;
 
     public SimpleRegionByElement(WebElement element) {
@@ -35,6 +40,11 @@ public class SimpleRegionByElement implements GetSimpleRegion, IGetSeleniumRegio
                 CoordinatesType.SCREENSHOT_AS_IS));
 
         return value;
+    }
+
+    @JsonProperty("element")
+    public WebElement getElement() {
+        return element;
     }
 
     @Override

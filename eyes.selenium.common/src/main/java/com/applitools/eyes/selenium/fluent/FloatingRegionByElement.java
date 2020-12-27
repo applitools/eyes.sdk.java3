@@ -5,7 +5,11 @@ import com.applitools.eyes.EyesScreenshot;
 import com.applitools.eyes.FloatingMatchSettings;
 import com.applitools.eyes.Location;
 import com.applitools.eyes.fluent.GetFloatingRegion;
+import com.applitools.eyes.serializers.WebElementSerializer;
 import com.applitools.eyes.visualgrid.model.IGetFloatingRegionOffsets;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import org.openqa.selenium.Dimension;
 import org.openqa.selenium.Point;
 import org.openqa.selenium.WebElement;
@@ -16,6 +20,7 @@ import java.util.List;
 
 public class FloatingRegionByElement implements GetFloatingRegion, IGetSeleniumRegion, IGetFloatingRegionOffsets {
 
+    @JsonSerialize(using = WebElementSerializer.class)
     protected final WebElement element;
     protected final int maxUpOffset;
     protected final int maxDownOffset;
@@ -51,6 +56,11 @@ public class FloatingRegionByElement implements GetFloatingRegion, IGetSeleniumR
                 size.getHeight(), maxUpOffset, maxDownOffset, maxLeftOffset, maxRightOffset));
 
         return value;
+    }
+
+    @JsonProperty("element")
+    public WebElement getElement() {
+        return element;
     }
 
     @Override

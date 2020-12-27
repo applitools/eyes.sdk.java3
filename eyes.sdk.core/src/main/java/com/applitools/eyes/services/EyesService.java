@@ -23,11 +23,7 @@ public abstract class EyesService<INPUT, OUTPUT> {
 
     public void setLogger(Logger logger) {
         serverConnector.setLogger(logger);
-        if (this.logger == null) {
-            this.logger = logger;
-        } else {
-            this.logger.setLogHandler(logger.getLogHandler());
-        }
+        this.logger = logger;
     }
 
     public void setServerConnector(ServerConnector serverConnector) {

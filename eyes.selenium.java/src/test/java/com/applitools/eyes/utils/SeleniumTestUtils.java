@@ -8,7 +8,6 @@ import com.applitools.eyes.selenium.Eyes;
 import java.io.File;
 
 import static com.applitools.eyes.utils.TestUtils.logsPath;
-import static com.applitools.eyes.utils.TestUtils.verboseLogs;
 
 public class SeleniumTestUtils {
     public static void setupLogging(Eyes eyes) {
@@ -24,7 +23,7 @@ public class SeleniumTestUtils {
             eyes.setDebugScreenshotsPrefix(methodName + "_");
             eyes.setSaveDebugScreenshots(true);
         } else {
-            logHandler = new StdoutLogHandler(verboseLogs);
+            logHandler = new StdoutLogHandler();
         }
         eyes.setLogHandler(logHandler);
     }

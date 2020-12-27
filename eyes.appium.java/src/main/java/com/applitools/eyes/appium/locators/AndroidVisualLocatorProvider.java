@@ -13,14 +13,13 @@ import java.util.Map;
 
 public class AndroidVisualLocatorProvider extends MobileVisualLocatorProvider {
 
-    public AndroidVisualLocatorProvider(Logger logger, EyesAppiumDriver driver, ServerConnector serverConnector,
+    public AndroidVisualLocatorProvider(Logger logger, String testId, EyesAppiumDriver driver, ServerConnector serverConnector,
                                  double devicePixelRatio, String appName, DebugScreenshotsProvider debugScreenshotsProvider) {
-        super(logger, driver, serverConnector, devicePixelRatio, appName, debugScreenshotsProvider);
+        super(logger, testId, driver, serverConnector, devicePixelRatio, appName, debugScreenshotsProvider);
     }
 
     @Override
     protected Map<String, List<Region>> adjustVisualLocators(Map<String, List<Region>> map) {
-        logger.verbose("Adjust visual locators size and coordinates according to device pixel ratio = " + devicePixelRatio);
         Map<String, List<Region>> result = new HashMap<>();
         for (String key : map.keySet()) {
             List<Region> regions = new ArrayList<>();

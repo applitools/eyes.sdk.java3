@@ -1,4 +1,5 @@
 {
+  "testId": "id",
   "renderId": null,
   "stitchingService": "https://some.stitchingserviceuri.com",
   "webhook": "https://some.uri.com",

@@ -4,12 +4,11 @@ import com.applitools.ICheckSettings;
 import com.applitools.eyes.*;
 import com.applitools.eyes.visualgrid.model.VisualGridOption;
 import com.applitools.eyes.visualgrid.model.VisualGridSelector;
+import com.fasterxml.jackson.annotation.JsonInclude;
 
 import java.util.*;
 
-/**
- * The Match settings object to use in the various Eyes.Check methods.
- */
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class CheckSettings implements ICheckSettings, ICheckSettingsInternal {
     // For Rendering Grid
     protected static final String BEFORE_CAPTURE_SCREENSHOT = "beforeCaptureScreenshot";

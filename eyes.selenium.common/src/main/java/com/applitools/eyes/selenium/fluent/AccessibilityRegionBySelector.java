@@ -3,6 +3,10 @@ package com.applitools.eyes.selenium.fluent;
 import com.applitools.eyes.*;
 import com.applitools.eyes.fluent.IGetAccessibilityRegionType;
 import com.applitools.eyes.selenium.wrappers.EyesWebDriver;
+import com.applitools.eyes.serializers.BySerializer;
+import com.applitools.eyes.serializers.WebElementSerializer;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Point;
 import org.openqa.selenium.WebElement;
@@ -12,9 +16,10 @@ import java.util.List;
 
 public class AccessibilityRegionBySelector implements GetAccessibilityRegion, IGetSeleniumRegion, IGetAccessibilityRegionType, ImplicitInitiation {
 
-    private Logger logger;
+    @JsonIgnore
     private EyesWebDriver driver;
     private final AccessibilityRegionType regionType;
+    @JsonSerialize(using = BySerializer.class)
     private final By selector;
 
     public AccessibilityRegionBySelector(By selector, AccessibilityRegionType regionType) {
@@ -24,7 +29,6 @@ public class AccessibilityRegionBySelector implements GetAccessibilityRegion, IG
 
     @Override
     public void init(Logger logger, EyesWebDriver driver) {
-        this.logger = logger;
         this.driver = driver;
     }
 

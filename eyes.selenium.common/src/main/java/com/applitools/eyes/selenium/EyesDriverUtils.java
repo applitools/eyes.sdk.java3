@@ -1,6 +1,7 @@
 package com.applitools.eyes.selenium;
 
 import com.applitools.eyes.*;
+import com.applitools.eyes.logging.Stage;
 import com.applitools.eyes.selenium.exceptions.EyesDriverOperationException;
 import com.applitools.eyes.selenium.wrappers.EyesWebDriver;
 import com.applitools.utils.ArgumentGuard;
@@ -168,7 +169,7 @@ public class EyesDriverUtils {
                 Object orientation = appiumDriver.getClass().getMethod("getOrientation").invoke(appiumDriver);
                 return orientation == ScreenOrientation.LANDSCAPE;
             } catch (Exception e) {
-                logger.log("WARNING: Couldn't get device orientation. Assuming Portrait.");
+                GeneralUtils.logExceptionStackTrace(logger, Stage.GENERAL, e);
                 return false;
             } finally {
                 if (originalContext != null) {
@@ -304,7 +305,6 @@ public class EyesDriverUtils {
     public static RectangleSize getEntireElementSize(Logger logger, IEyesJsExecutor executor, WebElement element) {
         RectangleSize result;
         try {
-            //noinspection unchecked
             Object retVal = executor.executeScript(JS_GET_ENTIRE_PAGE_SIZE, element);
             String[] wh = ((String) retVal).split(";");
 
@@ -315,7 +315,7 @@ public class EyesDriverUtils {
             float h = Float.parseFloat(wh[1]);
             result = new RectangleSize(Math.round(w), Math.round(h));
         } catch (WebDriverException e) {
-            GeneralUtils.logExceptionStackTrace(logger, e);
+            GeneralUtils.logExceptionStackTrace(logger, Stage.GENERAL, e);
             throw new EyesDriverOperationException("Failed to extract entire element size!");
         }
         return result;
@@ -340,25 +340,6 @@ public class EyesDriverUtils {
     }
 
     /**
-     * Gets viewport size.
-     * @param executor The executor to use.
-     * @param logger   logger
-     * @return The viewport size.
-     */
-    public static RectangleSize getViewportSize(JavascriptExecutor executor, Logger logger) {
-        Object scriptResult = executor.executeScript(JS_GET_VIEWPORT_SIZE);
-        logger.verbose("scriptResult result = " + scriptResult);
-        String[] wh = ((String) scriptResult).split(";");
-
-        if (wh.length != 2) {
-            throw new EyesException("Could not get viewport size!");
-        }
-        float w = Float.parseFloat(wh[0]);
-        float h = Float.parseFloat(wh[1]);
-        return new RectangleSize(Math.round(w), Math.round(h));
-    }
-
-    /**
      * Gets viewport size or display size.
      * @param logger The logger to use.
      * @param driver The web driver to use.
@@ -366,20 +347,15 @@ public class EyesDriverUtils {
      * if the viewport size cannot be retrieved.
      */
     public static RectangleSize getViewportSizeOrDisplaySize(Logger logger, WebDriver driver) {
-        logger.verbose("getViewportSizeOrDisplaySize()");
-
         if (!isMobileDevice(driver)) {
             try {
                 return getViewportSize((JavascriptExecutor) driver);
             } catch (Exception ex) {
-                logger.verbose(String.format(
-                        "Failed to extract viewport size using Javascript: %s",
-                        ex.getMessage()));
+                GeneralUtils.logExceptionStackTrace(logger, Stage.GENERAL, ex);
             }
         }
         // If we failed to extract the viewport size using JS, will use the
         // window size instead.
-        logger.verbose("Using window size as viewport size.");
         Dimension windowSize = driver.manage().window().getSize();
         int width = windowSize.getWidth();
         int height = windowSize.getHeight();
@@ -395,32 +371,27 @@ public class EyesDriverUtils {
         } catch (WebDriverException e) {
             // Not every WebDriver supports querying for orientation.
         }
-        logger.verbose(String.format("Done! Size %d x %d", width, height));
         return new RectangleSize(width, height);
     }
 
     /**
      * Sets browser size.
-     * @param logger       the logger
      * @param driver       the driver
      * @param requiredSize the required size
      * @return the browser size
      */
-    public static boolean setBrowserSize(Logger logger, WebDriver driver,
-                                         RectangleSize requiredSize) {
+    public static boolean setBrowserSize(WebDriver driver, RectangleSize requiredSize) {
         final int SLEEP = 1000;
         int retriesLeft = 3;
         Dimension dRequiredSize = new Dimension(requiredSize.getWidth(), requiredSize.getHeight());
         Dimension dCurrentSize;
         RectangleSize currentSize;
         do {
-            logger.verbose("Trying to set browser size to: " + requiredSize);
             driver.manage().window().setSize(dRequiredSize);
             GeneralUtils.sleep(SLEEP);
             dCurrentSize = driver.manage().window().getSize();
             currentSize = new RectangleSize(dCurrentSize.getWidth(),
                     dCurrentSize.getHeight());
-            logger.verbose("Current browser size: " + currentSize);
         } while (--retriesLeft > 0 && !currentSize.equals(requiredSize));
 
         return currentSize == requiredSize;
@@ -428,25 +399,23 @@ public class EyesDriverUtils {
 
     /**
      * Sets browser size by viewport size.
-     * @param logger               the logger
      * @param driver               the driver
      * @param actualViewportSize   the actual viewport size
      * @param requiredViewportSize the required viewport size
      * @return the browser size by viewport size
      */
     @SuppressWarnings("UnusedReturnValue")
-    public static boolean setBrowserSizeByViewportSize(Logger logger, WebDriver driver,
+    public static boolean setBrowserSizeByViewportSize(WebDriver driver,
                                                        RectangleSize actualViewportSize,
                                                        RectangleSize requiredViewportSize) {
         Dimension browserSize = driver.manage().window().getSize();
-        logger.verbose("Current browser size: " + browserSize);
         RectangleSize requiredBrowserSize = new RectangleSize(
                 browserSize.width +
                         (requiredViewportSize.getWidth() - actualViewportSize.getWidth()),
                 browserSize.height +
                         (requiredViewportSize.getHeight() - actualViewportSize.getHeight()));
 
-        return setBrowserSize(logger, driver, requiredBrowserSize);
+        return setBrowserSize(driver, requiredBrowserSize);
     }
 
     /**
@@ -461,21 +430,17 @@ public class EyesDriverUtils {
             return;
         }
 
-        logger.verbose("setViewportSize(" + size + ")");
-
         RectangleSize requiredSize = new RectangleSize(size.getWidth(), size.getHeight());
         RectangleSize actualViewportSize;
         try {
-            actualViewportSize = getViewportSize((JavascriptExecutor) driver, logger);
+            actualViewportSize = getViewportSize((JavascriptExecutor) driver);
         } catch (Exception e) {
-            GeneralUtils.logExceptionStackTrace(logger, e);
+            GeneralUtils.logExceptionStackTrace(logger, Stage.GENERAL, e);
             throw e;
         }
-        logger.verbose("Initial viewport size:" + actualViewportSize);
 
         // If the viewport size is already the required size
         if (actualViewportSize.equals(requiredSize)) {
-            logger.verbose("Required size already set.");
             return;
         }
 
@@ -484,10 +449,10 @@ public class EyesDriverUtils {
         try {
             driver.manage().window().setPosition(new Point(0, 0));
         } catch (WebDriverException e) {
-            logger.verbose("Warning: Failed to move the browser window to (0,0)");
+            GeneralUtils.logExceptionStackTrace(logger, Stage.GENERAL, e);
         }
 
-        setBrowserSizeByViewportSize(logger, driver, actualViewportSize, requiredSize);
+        setBrowserSizeByViewportSize(driver, actualViewportSize, requiredSize);
 
         actualViewportSize = getViewportSize((JavascriptExecutor) driver);
 
@@ -499,12 +464,9 @@ public class EyesDriverUtils {
         // (border size for maximized browser sometimes different than
         // non-maximized, so the original browser size calculation is
         // wrong).
-        logger.verbose("Trying workaround for maximization...");
-        setBrowserSizeByViewportSize(logger, driver, actualViewportSize, requiredSize);
+        setBrowserSizeByViewportSize(driver, actualViewportSize, requiredSize);
 
         actualViewportSize = getViewportSize((JavascriptExecutor) driver);
-        logger.verbose("Current viewport size: " + actualViewportSize);
-
         if (actualViewportSize.equals(requiredSize)) {
             return;
         }
@@ -523,11 +485,9 @@ public class EyesDriverUtils {
         int currHeightChange = 0;
         // We try the zoom workaround only if size difference is reasonable.
         if (Math.abs(widthDiff) <= MAX_DIFF && Math.abs(heightDiff) <= MAX_DIFF) {
-            logger.verbose("Trying workaround for zoom...");
             int retriesLeft = Math.abs((widthDiff == 0 ? 1 : widthDiff) * (heightDiff == 0 ? 1 : heightDiff)) * 2;
             RectangleSize lastRequiredBrowserSize = null;
             do {
-                logger.verbose("Retries left: " + retriesLeft);
                 // We specifically use "<=" (and not "<"), so to give an extra resize attempt
                 // in addition to reaching the diff, due to floating point issues.
                 if (Math.abs(currWidthChange) <= Math.abs(widthDiff) &&
@@ -542,17 +502,13 @@ public class EyesDriverUtils {
                 RectangleSize requiredBrowserSize = new RectangleSize(browserSize.getWidth() + currWidthChange,
                         browserSize.getHeight() + currHeightChange);
                 if (requiredBrowserSize.equals(lastRequiredBrowserSize)) {
-                    logger.verbose("Browser size is as required but viewport size does not match!");
-                    logger.verbose("Browser size: " + requiredBrowserSize + " , Viewport size: " + actualViewportSize);
-                    logger.verbose("Stopping viewport size attempts.");
                     break;
                 }
 
-                setBrowserSize(logger, driver, requiredBrowserSize);
+                setBrowserSize(driver, requiredBrowserSize);
                 lastRequiredBrowserSize = requiredBrowserSize;
 
                 actualViewportSize = getViewportSize((JavascriptExecutor) driver);
-                logger.verbose("Current viewport size: " + actualViewportSize);
 
                 if (actualViewportSize.equals(requiredSize)) {
                     return;
@@ -560,8 +516,6 @@ public class EyesDriverUtils {
             } while ((Math.abs(currWidthChange) <= Math.abs(widthDiff) ||
                     Math.abs(currHeightChange) <= Math.abs(heightDiff))
                     && (--retriesLeft > 0));
-
-            logger.verbose("Zoom workaround failed.");
         }
 
         throw new EyesException("Failed to set viewport size!");
@@ -714,7 +668,7 @@ public class EyesDriverUtils {
                 }
             }
         } catch (Exception ex) {
-            GeneralUtils.logExceptionStackTrace(logger, ex);
+            GeneralUtils.logExceptionStackTrace(logger, Stage.GENERAL, ex);
         }
 
         return region.getSize();

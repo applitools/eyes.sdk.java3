@@ -21,8 +21,6 @@ public class SeleniumScrollPositionProvider implements ScrollPositionProvider, I
         this.logger = logger;
         this.executor = executor;
         this.scrollRootElement = scrollRootElement;
-
-        logger.verbose("creating ScrollPositionProvider");
     }
 
     public static Location getCurrentPosition(IEyesJsExecutor executor, WebElement scrollRootElement) {
@@ -43,7 +41,6 @@ public class SeleniumScrollPositionProvider implements ScrollPositionProvider, I
      */
     @Override
     public Location setPosition(Location location) {
-        logger.verbose(String.format("setting position of %s to %s", scrollRootElement, location));
         Object position = executor.executeScript(String.format("arguments[0].scrollLeft=%d; arguments[0].scrollTop=%d; return (arguments[0].scrollLeft+';'+arguments[0].scrollTop);",
                 location.getX(), location.getY()),
                 scrollRootElement);
@@ -62,10 +59,7 @@ public class SeleniumScrollPositionProvider implements ScrollPositionProvider, I
      * to.
      */
     public RectangleSize getEntireSize() {
-        RectangleSize entireSize =
-                EyesDriverUtils.getEntireElementSize(logger, executor, scrollRootElement);
-        logger.verbose("ScrollPositionProvider - Entire size: " + entireSize);
-        return entireSize;
+        return EyesDriverUtils.getEntireElementSize(logger, executor, scrollRootElement);
     }
 
     public PositionMemento getState() {

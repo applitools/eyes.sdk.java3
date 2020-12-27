@@ -2,6 +2,7 @@ package com.applitools.eyes.services;
 
 import com.applitools.connectivity.ServerConnector;
 import com.applitools.eyes.*;
+import com.applitools.eyes.logging.Stage;
 import com.applitools.eyes.visualgrid.services.ServiceTaskListener;
 import org.apache.commons.lang3.tuple.Pair;
 
@@ -22,7 +23,7 @@ public class CloseService extends EyesService<SessionStopInfo, TestResults> {
         while (!inputQueue.isEmpty()) {
             final Pair<String, SessionStopInfo> nextInput = inputQueue.remove(0);
             inProgressTests.add(nextInput.getLeft());
-            operate(nextInput.getRight(), new ServiceTaskListener<TestResults>() {
+            operate(nextInput.getLeft(), nextInput.getRight(), new ServiceTaskListener<TestResults>() {
                 @Override
                 public void onComplete(TestResults output) {
                     inProgressTests.remove(nextInput.getLeft());
@@ -32,14 +33,13 @@ public class CloseService extends EyesService<SessionStopInfo, TestResults> {
                 @Override
                 public void onFail(Throwable t) {
                     inProgressTests.remove(nextInput.getLeft());
-                    logger.log(String.format("Failed completing task on input %s", nextInput));
                     errorQueue.add(Pair.of(nextInput.getLeft(), t));
                 }
             });
         }
     }
 
-    public void operate(final SessionStopInfo sessionStopInfo, final ServiceTaskListener<TestResults> listener) {
+    public void operate(final String testId, final SessionStopInfo sessionStopInfo, final ServiceTaskListener<TestResults> listener) {
         if (sessionStopInfo == null) {
             TestResults testResults = new TestResults();
             testResults.setStatus(TestResultsStatus.NotOpened);
@@ -50,10 +50,9 @@ public class CloseService extends EyesService<SessionStopInfo, TestResults> {
         TaskListener<TestResults> taskListener = new TaskListener<TestResults>() {
             @Override
             public void onComplete(TestResults testResults) {
-                logger.log("Session stopped successfully");
+                logger.log(testId, Stage.CLOSE, Pair.of("testResults", testResults));
                 testResults.setNew(sessionStopInfo.getRunningSession().getIsNew());
                 testResults.setUrl(sessionStopInfo.getRunningSession().getUrl());
-                logger.verbose(testResults.toString());
                 testResults.setServerConnector(serverConnector);
                 listener.onComplete(testResults);
             }
@@ -65,6 +64,7 @@ public class CloseService extends EyesService<SessionStopInfo, TestResults> {
         };
 
         try {
+            logger.log(testId, Stage.CLOSE, Pair.of("sessionStopInfo", sessionStopInfo));
             serverConnector.stopSession(taskListener, sessionStopInfo);
         } catch (Throwable t) {
             listener.onFail(t);

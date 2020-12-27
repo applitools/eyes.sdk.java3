@@ -4,14 +4,18 @@ import com.applitools.eyes.Location;
 import com.applitools.eyes.RectangleSize;
 import com.applitools.eyes.Region;
 import com.applitools.eyes.positioning.PositionProvider;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.openqa.selenium.WebElement;
 
 public class CheckState {
+    @JsonIgnore
     private WebElement targetElementInternal;
     private boolean stitchContent;
+    @JsonIgnore
     private PositionProvider stitchPositionProvider;
     private Region effectiveViewport = Region.EMPTY;
     private Region fullRegion = Region.EMPTY;
+    @JsonIgnore
     private PositionProvider originPositionProvider = new NullPositionProvider();
     private RectangleSize stitchOffset = RectangleSize.EMPTY;
     private Location originalLocation;

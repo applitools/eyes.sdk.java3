@@ -53,21 +53,16 @@ public class EyesWebDriverScreenshot extends EyesScreenshot {
         ArgumentGuard.notNull(driver, "driver");
         this.driver = driver;
 
-        logger.verbose("enter");
-
         this.screenshotType = updateScreenshotType(screenshotType, image);
 
         PositionProvider positionProvider;
         if (frameLocationInScreenshot == null && driver.getEyes().checkFrameOrElement) {
             WebElement frameScrollRoot = driver.getEyes().getCurrentFrameScrollRootElement();
             positionProvider = ScrollPositionProviderFactory.getScrollPositionProvider(driver.getUserAgent(), logger, driver, frameScrollRoot);
-            logger.verbose((String.format("position provider: using the current frame scroll root element's position provider: %s", positionProvider)));
         } else if (driver.getEyes().getCurrentFramePositionProvider() != null) {
             positionProvider = driver.getEyes().getCurrentFramePositionProvider();
-            logger.verbose(String.format("position provider: using CurrentFramePositionProvider: %s", positionProvider));
         } else {
             positionProvider = driver.getEyes().getPositionProvider();
-            logger.verbose(String.format("position provider: using PositionProvider: %s", positionProvider));
         }
 
         frameChain = driver.getFrameChain();
@@ -80,13 +75,9 @@ public class EyesWebDriverScreenshot extends EyesScreenshot {
 
         RectangleSize frameContentSize = getFrameContentSize();
         if (!frameContentSize.isEmpty()) {
-            logger.verbose("Calculating frame window...");
             frameWindow = new Region(this.frameLocationInScreenshot, frameContentSize);
-
             Region imageSizeAsRegion = new Region(0, 0, image.getWidth(), image.getHeight());
-            logger.verbose(String.format("frameWindow: %s ; imageSizeAsRegion: %s", frameWindow, imageSizeAsRegion));
             frameWindow.intersect(imageSizeAsRegion);
-            logger.verbose(String.format("updated frameWindow: %s", frameWindow));
         } else {
             frameWindow = new Region(0, 0, image.getWidth(), image.getHeight());
         }
@@ -94,8 +85,6 @@ public class EyesWebDriverScreenshot extends EyesScreenshot {
         if (frameWindow.getWidth() <= 0 || frameWindow.getHeight() <= 0) {
             throw new EyesException("Got empty frame window for screenshot!");
         }
-
-        logger.verbose("Done!");
     }
 
     private void updateCurrentScrollPosition(PositionProvider positionProvider) {
@@ -269,9 +258,6 @@ public class EyesWebDriverScreenshot extends EyesScreenshot {
 
     @Override
     public EyesWebDriverScreenshot getSubScreenshot(Region region, boolean throwIfClipped) {
-
-        logger.verbose(String.format("getSubScreenshot([%s], %b)", region, throwIfClipped));
-
         ArgumentGuard.notNull(region, "region");
 
         // We calculate intersection based on as-is coordinates.
@@ -294,14 +280,10 @@ public class EyesWebDriverScreenshot extends EyesScreenshot {
 
         result.updateFrameLocationInScreenshot(new Location(-region.getLeft(), -region.getTop()));
         result.setDomUrl(this.domUrl);
-        logger.verbose("Done!");
         return result;
     }
 
     public EyesWebDriverScreenshot getSubScreenshotForRegion(Region region, boolean throwIfClipped) {
-
-        logger.verbose(String.format("getSubScreenshot([%s], %b)", region, throwIfClipped));
-
         ArgumentGuard.notNull(region, "region");
 
         // We calculate intersection based on as-is coordinates.
@@ -319,12 +301,9 @@ public class EyesWebDriverScreenshot extends EyesScreenshot {
         BufferedImage subScreenshotImage =
                 ImageUtils.getImagePart(image, asIsSubScreenshotRegion);
 
-        EyesWebDriverScreenshot result = new EyesWebDriverScreenshot(logger, driver, subScreenshotImage,
+        return new EyesWebDriverScreenshot(logger, driver, subScreenshotImage,
                 new Region(region.getLocation(),
                         new RectangleSize(subScreenshotImage.getWidth(), subScreenshotImage.getHeight())));
-
-        logger.verbose("Done!");
-        return result;
     }
 
     @Override

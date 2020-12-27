@@ -14,7 +14,6 @@ public class EdgeBrowserScrollPositionProvider extends SeleniumScrollPositionPro
 
     @Override
     public Location setPosition(Location location) {
-        logger.verbose(String.format("setting position of %s to %s", scrollRootElement, location));
         Object position = executor.executeScript(String.format("window.scrollTo(%d,%d);" +
                         "return (window.scrollX+';'+window.scrollY);",
                 location.getX(), location.getY()),

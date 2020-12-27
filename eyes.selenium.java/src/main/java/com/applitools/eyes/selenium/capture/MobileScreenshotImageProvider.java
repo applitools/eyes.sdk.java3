@@ -29,7 +29,7 @@ public class MobileScreenshotImageProvider extends TakesScreenshotImageProvider 
         EyesSeleniumDriver driver = (EyesSeleniumDriver)eyes.getDriver();
         if (cachedViewportSize == null || !driver.getCurrentUrl().equals(cachedUrl)) {
             cachedUrl = driver.getCurrentUrl();
-            cachedViewportSize = EyesDriverUtils.getViewportSize(driver, logger);
+            cachedViewportSize = EyesDriverUtils.getViewportSize(driver);
         }
         return cachedViewportSize;
     }

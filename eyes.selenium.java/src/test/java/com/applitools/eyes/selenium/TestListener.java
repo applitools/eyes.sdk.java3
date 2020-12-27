@@ -1,6 +1,7 @@
 package com.applitools.eyes.selenium;
 
 import com.applitools.eyes.*;
+import com.applitools.eyes.logging.Stage;
 import com.applitools.eyes.metadata.ActualAppOutput;
 import com.applitools.eyes.metadata.ImageMatchSettings;
 import com.applitools.eyes.metadata.SessionResults;
@@ -52,7 +53,7 @@ public class TestListener implements ITestListener {
         Object instance = result.getInstance();
         if (instance instanceof TestSetup) {
             TestSetup testSetup = (TestSetup) instance;
-            GeneralUtils.logExceptionStackTrace(testSetup.getEyes().getLogger(), result.getThrowable());
+            GeneralUtils.logExceptionStackTrace(testSetup.getEyes().getLogger(), Stage.GENERAL, result.getThrowable());
             afterMethodFailure(testSetup);
         }
     }
@@ -93,17 +94,11 @@ public class TestListener implements ITestListener {
         try {
             if (eyes.isOpen()) {
 
-                TestResults results = null;
-                try {
-                    results = eyes.close();
-                } catch (Throwable e) {
-                    throw e;
-                }
+                TestResults results;
+                results = eyes.close();
                 if (eyes.getIsDisabled()) {
-                    eyes.getLogger().log("eyes is disabled.");
                     return true;
                 } else if (results == null) {
-                    eyes.getLogger().verbose("no results returned from eyes.close()");
                     return true;
                 }
 
@@ -190,7 +185,7 @@ public class TestListener implements ITestListener {
                     currentType = currentObject.getClass();
                 }
             } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
-                GeneralUtils.logExceptionStackTrace(testSetup.getEyes().getLogger(), e);
+                GeneralUtils.logExceptionStackTrace(testSetup.getEyes().getLogger(), Stage.GENERAL, e);
             }
 
                 Assert.assertEquals(currentObject, kvp.getValue(), String.format("Property comparison for test '%s' failed! Property %s expected %s but got %s",testSetup.getTestName(), kvp.getKey(), kvp.getValue(), currentObject));

@@ -22,7 +22,7 @@ public class FileDebugScreenshotsProvider extends DebugScreenshotsProvider {
     @Override
     public void save(BufferedImage image, String suffix) {
         String filename = getPath() + getPrefix() + getFormattedTimeStamp() + "_" + suffix + ".png";
-        ImageUtils.saveImage(logger, image, filename);
+        ImageUtils.saveImage(image, filename);
     }
 
     private String getFormattedTimeStamp(){

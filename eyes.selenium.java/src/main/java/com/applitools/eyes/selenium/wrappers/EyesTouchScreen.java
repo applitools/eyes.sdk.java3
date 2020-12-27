@@ -1,16 +1,12 @@
-/*
- * Applitools SDK for Selenium integration.
- */
 package com.applitools.eyes.selenium.wrappers;
 
 import com.applitools.eyes.Location;
-import com.applitools.eyes.Logger;
+import com.applitools.eyes.Region;
 import com.applitools.eyes.selenium.EyesDriverUtils;
 import com.applitools.eyes.triggers.MouseAction;
-import com.applitools.eyes.Region;
 import com.applitools.utils.ArgumentGuard;
-import org.openqa.selenium.interactions.TouchScreen;
 import org.openqa.selenium.interactions.Coordinates;
+import org.openqa.selenium.interactions.TouchScreen;
 
 
 /**
@@ -19,17 +15,13 @@ import org.openqa.selenium.interactions.Coordinates;
  */
 public class EyesTouchScreen implements TouchScreen {
 
-    private final Logger logger;
     private final EyesSeleniumDriver driver;
     private final TouchScreen touch;
 
-    public EyesTouchScreen(Logger logger, EyesSeleniumDriver driver,
-                           TouchScreen touch) {
-        ArgumentGuard.notNull(logger, "logger");
+    public EyesTouchScreen(EyesSeleniumDriver driver, TouchScreen touch) {
         ArgumentGuard.notNull(driver, "driver");
         ArgumentGuard.notNull(touch, "touch");
 
-        this.logger = logger;
         this.driver = driver;
         this.touch = touch;
     }
@@ -42,11 +34,7 @@ public class EyesTouchScreen implements TouchScreen {
         // This is not a mistake - Appium only supports getPageLocation (and
         // the result is relative to the viewPort)
         Location location = EyesDriverUtils.getPageLocation(where);
-        logger.verbose("tap(" + location + ")");
-
-        driver.getEyes().addMouseTrigger(MouseAction.Click, Region.EMPTY,
-                location);
-
+        driver.getEyes().addMouseTrigger(MouseAction.Click, Region.EMPTY, location);
         touch.singleTap(where);
     }
 
@@ -74,11 +62,7 @@ public class EyesTouchScreen implements TouchScreen {
         // This is not a mistake - Appium only supports getPageLocation (and
         // the result is relative to the viewPort)
         Location location = EyesDriverUtils.getPageLocation(where);
-        logger.verbose("tap(" + location + ")");
-
-        driver.getEyes().addMouseTrigger(MouseAction.DoubleClick,
-                Region.EMPTY, location);
-
+        driver.getEyes().addMouseTrigger(MouseAction.DoubleClick, Region.EMPTY, location);
         touch.doubleTap(where);
     }
 

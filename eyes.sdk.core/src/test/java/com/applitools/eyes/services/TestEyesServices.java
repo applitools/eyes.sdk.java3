@@ -3,7 +3,6 @@ package com.applitools.eyes.services;
 import com.applitools.connectivity.MockServerConnector;
 import com.applitools.connectivity.ServerConnector;
 import com.applitools.eyes.*;
-import com.applitools.eyes.services.*;
 import com.applitools.eyes.visualgrid.model.*;
 import com.applitools.eyes.visualgrid.services.ServiceTaskListener;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -205,7 +204,7 @@ public class TestEyesServices {
     public void testRenderServiceRenderFail() {
         ServerConnector serverConnector = new MockServerConnector() {
             @Override
-            public void render(final TaskListener<List<RunningRender>> listener, RenderRequest... renderRequests) {
+            public void render(final TaskListener<List<RunningRender>> listener, List<RenderRequest> renderRequests) {
                 listener.onFail();
             }
         };
@@ -221,7 +220,7 @@ public class TestEyesServices {
     public void testRenderServiceRenderException() {
         ServerConnector serverConnector = new MockServerConnector() {
             @Override
-            public void render(final TaskListener<List<RunningRender>> listener, RenderRequest... renderRequests) {
+            public void render(final TaskListener<List<RunningRender>> listener, List<RenderRequest> renderRequests) {
                 throw new EyesException("fail");
             }
         };
@@ -237,7 +236,7 @@ public class TestEyesServices {
     public void testRenderServiceRenderStatusFailed() {
         ServerConnector serverConnector = new MockServerConnector() {
             @Override
-            public void renderStatusById(final TaskListener<List<RenderStatusResults>> listener, String... renderIds) {
+            public void renderStatusById(final TaskListener<List<RenderStatusResults>> listener, List<String> testIds, List<String> renderIds) {
                 listener.onFail();
             }
         };
@@ -254,7 +253,7 @@ public class TestEyesServices {
     public void testRenderServiceRenderStatusException() {
         ServerConnector serverConnector = new MockServerConnector() {
             @Override
-            public void renderStatusById(final TaskListener<List<RenderStatusResults>> listener, String... renderIds) {
+            public void renderStatusById(final TaskListener<List<RenderStatusResults>> listener, List<String> testIds, List<String> renderIds) {
                 throw new EyesException("fail");
             }
         };
@@ -271,7 +270,7 @@ public class TestEyesServices {
         final AtomicReference<List<String>> checkedHashes = new AtomicReference<>();
         ServerConnector serverConnector = new MockServerConnector() {
             @Override
-            public void checkResourceStatus(final TaskListener<Boolean[]> listener, String renderId, HashObject... hashes) {
+            public void checkResourceStatus(final TaskListener<Boolean[]> listener, Set<String> testIds, String renderId, HashObject... hashes) {
                 List<String> hashesList = new ArrayList<>();
                 for (HashObject hash : hashes) {
                     hashesList.add(hash.getHash());

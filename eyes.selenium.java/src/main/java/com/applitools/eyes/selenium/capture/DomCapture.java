@@ -2,6 +2,8 @@ package com.applitools.eyes.selenium.capture;
 
 import com.applitools.connectivity.ServerConnector;
 import com.applitools.eyes.*;
+import com.applitools.eyes.logging.Stage;
+import com.applitools.eyes.logging.Type;
 import com.applitools.eyes.positioning.PositionMemento;
 import com.applitools.eyes.positioning.PositionProvider;
 import com.applitools.eyes.selenium.EyesSeleniumUtils;
@@ -13,6 +15,7 @@ import com.applitools.eyes.selenium.wrappers.EyesTargetLocator;
 import com.applitools.eyes.visualgrid.model.RGridResource;
 import com.applitools.utils.EfficientStringReplace;
 import com.applitools.utils.GeneralUtils;
+import org.apache.commons.lang3.tuple.Pair;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 
@@ -32,6 +35,7 @@ public class DomCapture {
     private final Phaser cssPhaser = new Phaser(); // Phaser for syncing all callbacks on a single Frame
 
     private static ServerConnector serverConnector = null;
+    private final String testId;
     private final EyesSeleniumDriver driver;
     private final Logger logger;
     private String cssStartToken;
@@ -46,6 +50,7 @@ public class DomCapture {
         logger = eyes.getLogger();
         driver = (EyesSeleniumDriver) eyes.getDriver();
         userAgent = eyes.getUserAgent();
+        testId = eyes.getTestId();
 
         try {
             CAPTURE_DOM = GeneralUtils.readToEnd(DomCapture.class.getResourceAsStream("/dom-capture/dist/captureDomAndPoll.js"));
@@ -74,7 +79,7 @@ public class DomCapture {
                 cssPhaser.awaitAdvanceInterruptibly(0, 5, TimeUnit.MINUTES);
             }
         } catch (InterruptedException | TimeoutException e) {
-            GeneralUtils.logExceptionStackTrace(logger, e);
+            GeneralUtils.logExceptionStackTrace(logger, Stage.CHECK, Type.DOM_SCRIPT, e, testId);
         }
 
         shouldWaitForPhaser = false;
@@ -88,7 +93,6 @@ public class DomCapture {
     }
 
     public String getFrameDom(String baseUrl, List<String> framesPath) {
-        logger.verbose("Trying to get DOM from driver");
         String domScript = userAgent.isInternetExplorer() ? CAPTURE_DOM_FOR_IE : CAPTURE_DOM;
         String pollingScript = userAgent.isInternetExplorer() ? POLL_RESULT_FOR_IE : POLL_RESULT;
 
@@ -97,7 +101,8 @@ public class DomCapture {
         List<String> data = new ArrayList<>();
         Separators separators;
         try {
-            String scriptResult = EyesSeleniumUtils.runDomScript(logger, driver, userAgent, domScript, null, pollingScript);
+            String scriptResult = EyesSeleniumUtils.runDomScript(logger, driver, userAgent, Collections.singleton(testId),
+                    domScript, null, pollingScript);
             scriptResult = GeneralUtils.parseJsonToObject(scriptResult, String.class);
             separators = parseScriptResult(scriptResult, missingCssList, missingFramesList, data);
         } catch (Exception e) {
@@ -113,7 +118,7 @@ public class DomCapture {
         try {
             framesData = recurseFrames(missingFramesList, framesPath);
         } catch (Exception e) {
-            GeneralUtils.logExceptionStackTrace(logger, e);
+            GeneralUtils.logExceptionStackTrace(logger, Stage.CHECK, Type.DOM_SCRIPT, e, testId);
         }
 
         return EfficientStringReplace.efficientStringReplace(separators.iframeStartToken, separators.iframeEndToken, data.get(0), framesData);
@@ -139,10 +144,11 @@ public class DomCapture {
                     blocks.get(blockIndex).add(str);
                 }
             } while (lineIndex < lines.length);
-            logger.verbose("missing css count: " + missingCssList.size());
-            logger.verbose("missing frames count: " + missingFramesList.size());
+            logger.log(testId, Stage.CHECK, Type.DOM_SCRIPT,
+                    Pair.of("missingCssCount", missingCssList.size()),
+                    Pair.of("missingFramesCount", missingFramesList.size()));
         } catch (IOException e) {
-            GeneralUtils.logExceptionStackTrace(logger, e);
+            GeneralUtils.logExceptionStackTrace(logger, Stage.CHECK, Type.DOM_SCRIPT, e, testId);
         }
         return separators;
     }
@@ -155,23 +161,19 @@ public class DomCapture {
 
             final URI uri = resolveUriString(baseUrl, cssUrl);
             if (uri == null) {
-                logger.verbose(String.format("Failed resolving url of css %s", cssUrl));
                 continue;
             }
             try {
                 cssPhaser.register();
-                logger.verbose(String.format("Downloading css url %s", uri));
                 shouldWaitForPhaser = true;
                 serverConnector.downloadResource(uri, userAgent.toString(), baseUrl, new TaskListener<RGridResource>() {
                     @Override
                     public void onComplete(RGridResource resource) {
                         try {
-                            logger.verbose(String.format("Css Download Completed. URL: %s", uri));
                             CssTreeNode node = new CssTreeNode(new String(resource.getContent()));
                             node.parse(logger);
                             List<String> importedUrls = node.getImportedUrls();
                             if (!importedUrls.isEmpty()) {
-                                logger.verbose(String.format("New urls parsed from %s: %s", uri.toString(), Arrays.toString(importedUrls.toArray())));
                                 fetchCssFiles(uri.toString(), importedUrls, node);
                             }
 
@@ -181,24 +183,19 @@ public class DomCapture {
                                 cssNodesToReplace.put(cssUrl, node);
                             }
                         } catch (Throwable e) {
-                            GeneralUtils.logExceptionStackTrace(logger, e);
+                            GeneralUtils.logExceptionStackTrace(logger, Stage.CHECK, Type.DOM_SCRIPT, e, testId);
                         } finally {
                             cssPhaser.arriveAndDeregister();
-                            logger.verbose("cssPhaser.arriveAndDeregister(); " + uri);
-                            logger.verbose("current missing - " + cssPhaser.getUnarrivedParties());
                         }
                     }
 
                     @Override
                     public void onFail() {
-                        logger.log("This flow can't be reached. Please verify.");
                         cssPhaser.arriveAndDeregister();
-                        logger.verbose("cssPhaser.arriveAndDeregister(); " + uri);
-                        logger.verbose("current missing - " + cssPhaser.getUnarrivedParties());
                     }
                 });
             } catch (Throwable e) {
-                GeneralUtils.logExceptionStackTrace(logger, e);
+                GeneralUtils.logExceptionStackTrace(logger, Stage.CHECK, Type.DOM_SCRIPT, e, testId);
             }
         }
     }
@@ -209,18 +206,14 @@ public class DomCapture {
 
         FrameChain fc = driver.getFrameChain().clone();
         for (String missingFrameLine : missingFramesList) {
-            logger.verbose("Switching to frame line :" + missingFrameLine);
             try {
                 String[] missingFrameXpaths = missingFrameLine.split(",");
                 for (String missingFrameXpath : missingFrameXpaths) {
-                    logger.verbose("switching to specific frame : " + missingFrameXpath);
                     WebElement frame = driver.findElement(By.xpath(missingFrameXpath));
-                    logger.verbose("Switched to frame(" + missingFrameXpath + ") with src(" + frame.getAttribute("src") + ")");
                     switchTo.frame(frame);
                 }
                 String locationAfterSwitch = (String) driver.executeScript("return document.location.href");
                 if (framesPath.contains(locationAfterSwitch)) {
-                    logger.verbose("Found a bidirectional dependency. not switching to frame");
                     framesData.put(missingFrameLine, "");
                     continue;
                 }
@@ -230,7 +223,7 @@ public class DomCapture {
                 String result = getFrameDom(locationAfterSwitch, newFramePath);
                 framesData.put(missingFrameLine, result);
             } catch (Exception e) {
-                GeneralUtils.logExceptionStackTrace(logger, e);
+                GeneralUtils.logExceptionStackTrace(logger, Stage.CHECK, Type.DOM_SCRIPT, e, testId);
                 framesData.put(missingFrameLine, "");
             } finally {
                 switchTo.frames(fc);
@@ -247,8 +240,7 @@ public class DomCapture {
         try {
             return new URI(baseUrl).resolve(uri);
         } catch (Exception e) {
-            logger.log("Error resolving uri:" + uri);
-            GeneralUtils.logExceptionStackTrace(logger, e);
+            GeneralUtils.logExceptionStackTrace(logger, Stage.CHECK, Type.DOM_SCRIPT, e, testId);
             return null;
         }
     }

@@ -26,4 +26,32 @@ public class LastScrollData {
             "fromIndex=%s, itemCount=%s}", scrollX, scrollY, maxScrollX, maxScrollY, toIndex,
             fromIndex, itemCount);
     }
+
+    public int getScrollX() {
+        return scrollX;
+    }
+
+    public int getScrollY() {
+        return scrollY;
+    }
+
+    public int getMaxScrollX() {
+        return maxScrollX;
+    }
+
+    public int getMaxScrollY() {
+        return maxScrollY;
+    }
+
+    public int getFromIndex() {
+        return fromIndex;
+    }
+
+    public int getToIndex() {
+        return toIndex;
+    }
+
+    public int getItemCount() {
+        return itemCount;
+    }
 }

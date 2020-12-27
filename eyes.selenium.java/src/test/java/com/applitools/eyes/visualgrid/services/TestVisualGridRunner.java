@@ -59,7 +59,7 @@ public class TestVisualGridRunner {
                 invocation.callRealMethod();
                 return null;
             }
-        }).when(serverConnector).render(ArgumentMatchers.<TaskListener<List<RunningRender>>>any(), ArgumentMatchers.<RenderRequest[]>any());
+        }).when(serverConnector).render(ArgumentMatchers.<TaskListener<List<RunningRender>>>any(), ArgumentMatchers.<List<RenderRequest>>any());
 
         Eyes eyes = new Eyes(runner);
         eyes.setLogHandler(new StdoutLogHandler());
@@ -246,7 +246,7 @@ public class TestVisualGridRunner {
 
         VisualGridRunner runner = new VisualGridRunner();
         MockServerConnector serverConnector = new MockServerConnector() {
-            public void render(final TaskListener<List<RunningRender>> listener, RenderRequest... renderRequests) {
+            public void render(final TaskListener<List<RunningRender>> listener, List<RenderRequest> renderRequests) {
                 if (runningRendersCount.getAndIncrement() >= VisualGridRunningTest.PARALLEL_STEPS_LIMIT) {
                     isOnlyOneRender.set(false);
                 }
@@ -254,7 +254,7 @@ public class TestVisualGridRunner {
                 try {
                     Thread.sleep(1000);
                 } catch (InterruptedException ignored) {}
-                if (renderRequests.length != 1) {
+                if (renderRequests.size() != 1) {
                     isOnlyOneRender.set(false);
                 }
                 super.render(new TaskListener<List<RunningRender>>() {

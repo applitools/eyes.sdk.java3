@@ -4,9 +4,11 @@
 package com.applitools.eyes.appium;
 
 import com.applitools.eyes.Logger;
+import com.applitools.eyes.logging.Stage;
 import com.applitools.eyes.selenium.EyesDriverUtils;
 import com.applitools.eyes.selenium.positioning.ImageRotation;
 import com.applitools.utils.ArgumentGuard;
+import com.applitools.utils.GeneralUtils;
 import com.applitools.utils.ImageUtils;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.appium.java_client.AppiumDriver;
@@ -110,7 +112,7 @@ public class EyesAppiumUtils {
             ScreenOrientation orientation = appiumDriver.getOrientation();
             return orientation == ScreenOrientation.LANDSCAPE;
         } catch (Exception e) {
-            logger.log("WARNING: Couldn't get device orientation. Assuming Portrait.");
+            GeneralUtils.logExceptionStackTrace(logger, Stage.GENERAL, e);
             return false;
         }
         finally {
@@ -124,7 +126,6 @@ public class EyesAppiumUtils {
         ArgumentGuard.notNull(logger, "logger");
         int degrees = 0;
         try {
-            logger.verbose("Trying to automatically normalize rotation...");
             if (EyesDriverUtils.isMobileDevice(driver) &&
                     isLandscapeOrientation(logger, driver)
                     && image.getHeight() > image.getWidth()) {
@@ -133,8 +134,7 @@ public class EyesAppiumUtils {
                 degrees = EyesDriverUtils.isAndroid(driver) ? 90 : -90;
             }
         } catch (Exception e) {
-            logger.verbose("Got exception: " + e.getMessage());
-            logger.verbose("Skipped automatic rotation handling.");
+            GeneralUtils.logExceptionStackTrace(logger, Stage.GENERAL, e);
         }
         return degrees;
     }

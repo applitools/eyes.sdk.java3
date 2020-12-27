@@ -22,12 +22,8 @@ public class FirefoxRegionPositionCompensation implements RegionPositionCompensa
 
     @Override
     public Region compensateRegionPosition(Region region, double pixelRatio) {
-        logger.verbose(userAgent.toString());
-        logger.verbose("pixel ratio: " + pixelRatio);
-
         if (userAgent.getOS().equalsIgnoreCase(OSNames.WINDOWS) &&
                 Integer.parseInt(userAgent.getOSMajorVersion()) <= 7) {
-            logger.verbose("compensating by " + pixelRatio + " pixels");
             return region.offset(0, (int) pixelRatio);
         }
 
@@ -37,7 +33,6 @@ public class FirefoxRegionPositionCompensation implements RegionPositionCompensa
 
         EyesSeleniumDriver eyesSeleniumDriver = (EyesSeleniumDriver) eyes.getDriver();
         FrameChain frameChain = eyesSeleniumDriver.getFrameChain();
-        logger.verbose("frameChain.size(): " + frameChain.size());
         if (frameChain.size() > 0) {
             return region;
         }

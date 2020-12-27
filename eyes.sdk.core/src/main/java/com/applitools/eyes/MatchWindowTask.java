@@ -4,11 +4,14 @@ import com.applitools.connectivity.ServerConnector;
 import com.applitools.eyes.capture.AppOutputProvider;
 import com.applitools.eyes.config.Configuration;
 import com.applitools.eyes.fluent.*;
+import com.applitools.eyes.logging.Stage;
+import com.applitools.eyes.logging.TraceLevel;
 import com.applitools.eyes.visualgrid.model.IGetFloatingRegionOffsets;
 import com.applitools.eyes.visualgrid.model.MutableRegion;
 import com.applitools.eyes.visualgrid.model.VisualGridSelector;
 import com.applitools.utils.ArgumentGuard;
 import com.applitools.utils.GeneralUtils;
+import org.apache.commons.lang3.tuple.Pair;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -55,12 +58,9 @@ public class MatchWindowTask {
 
     public static void collectRegions(EyesBase eyes, EyesScreenshot screenshot,
                                       ICheckSettingsInternal checkSettingsInternal, ImageMatchSettings imageMatchSettings) {
-        eyes.getLogger().verbose("enter");
         collectSimpleRegions(eyes, checkSettingsInternal, imageMatchSettings, screenshot);
         collectFloatingRegions(checkSettingsInternal, imageMatchSettings, screenshot);
         collectAccessibilityRegions(checkSettingsInternal, imageMatchSettings, screenshot);
-        logRegions(eyes.getLogger(), imageMatchSettings);
-        eyes.getLogger().verbose("exit");
     }
 
     public static void collectRegions(ImageMatchSettings imageMatchSettings, ICheckSettingsInternal checkSettingsInternal) {
@@ -236,14 +236,11 @@ public class MatchWindowTask {
                                    boolean shouldRunOnceOnTimeout,
                                    ICheckSettingsInternal checkSettingsInternal,
                                    String source) {
-
         ImageMatchSettings imageMatchSettings = createImageMatchSettings(checkSettingsInternal, this.eyes);
         int retryTimeout = checkSettingsInternal.getTimeout();
         if (retryTimeout < 0) {
             retryTimeout = defaultRetryTimeout;
         }
-
-        logger.verbose(String.format("retryTimeout = %d", retryTimeout));
 
         EyesScreenshot screenshot = takeScreenshot(userInputs, region, tag, shouldRunOnceOnTimeout,
                 checkSettingsInternal, imageMatchSettings, retryTimeout, source);
@@ -269,7 +266,7 @@ public class MatchWindowTask {
             try {
                 regions.addAll(regionProvider.getRegions(screenshot));
             } catch (OutOfBoundsException ex) {
-                eyes.getLogger().log("WARNING - region was out of bounds.");
+                GeneralUtils.logExceptionStackTrace(eyes.getLogger(), Stage.CHECK, ex, eyes.getTestId());
             }
         }
         return regions.toArray(new Region[0]);
@@ -282,15 +279,16 @@ public class MatchWindowTask {
      * @return Merged match settings.
      */
     public static ImageMatchSettings createImageMatchSettings(ICheckSettingsInternal checkSettingsInternal, EyesScreenshot screenshot, EyesBase eyesBase) {
-        eyesBase.getLogger().verbose("enter");
+        eyesBase.getLogger().log(TraceLevel.Info, eyesBase.getTestId(), Stage.CHECK,
+                Pair.of("configuration", eyesBase.getConfiguration()),
+                Pair.of("checkSettings", checkSettingsInternal));
         ImageMatchSettings imageMatchSettings = createImageMatchSettings(checkSettingsInternal, eyesBase);
         if (imageMatchSettings != null) {
             collectSimpleRegions(eyesBase, checkSettingsInternal, imageMatchSettings, screenshot);
             collectFloatingRegions(checkSettingsInternal, imageMatchSettings, screenshot);
             collectAccessibilityRegions(checkSettingsInternal, imageMatchSettings, screenshot);
-            logRegions(eyesBase.getLogger(), imageMatchSettings);
         }
-        eyesBase.getLogger().verbose("exit");
+
         return imageMatchSettings;
     }
 
@@ -322,27 +320,20 @@ public class MatchWindowTask {
                                           ICheckSettingsInternal checkSettingsInternal,
                                           ImageMatchSettings imageMatchSettings,
                                           int retryTimeout, String source) {
-        long elapsedTimeStart = System.currentTimeMillis();
         EyesScreenshot screenshot;
         lastScreenshotHash = null;
 
         // If the wait to load time is 0, or "run once" is true,
         // we perform a single check window.
         if (0 == retryTimeout || shouldMatchWindowRunOnceOnTimeout) {
-            logger.verbose("Taking screenshot without retry mechanism");
             if (shouldMatchWindowRunOnceOnTimeout) {
                 GeneralUtils.sleep(retryTimeout);
             }
             screenshot = tryTakeScreenshot(userInputs, region, tag, checkSettingsInternal, imageMatchSettings, source);
         } else {
-            logger.verbose("Taking screenshot with retry mechanism");
             screenshot = retryTakingScreenshot(userInputs, region, tag, checkSettingsInternal, imageMatchSettings,
                     retryTimeout, source);
         }
-
-        double elapsedTime = (System.currentTimeMillis() - elapsedTimeStart) / 1000;
-        logger.verbose(String.format("Completed in %.2f seconds", elapsedTime));
-        //matchResult.setScreenshot(screenshot);
         return screenshot;
     }
 
@@ -365,17 +356,14 @@ public class MatchWindowTask {
             screenshot = tryTakeScreenshot(userInputs, region, tag, checkSettingsInternal, imageMatchSettings, source);
 
             if (matchResult.getAsExpected()) {
-                logger.verbose("Good match result");
                 break;
             }
 
-            logger.verbose("Bad match result");
             retry = System.currentTimeMillis() - start;
         }
 
         // if we're here because we haven't found a match yet, try once more
         if (!matchResult.getAsExpected()) {
-            logger.verbose("Bad match result, trying again");
             screenshot = tryTakeScreenshot(userInputs, region, tag, checkSettingsInternal, imageMatchSettings, source);
         }
         return screenshot;
@@ -388,13 +376,12 @@ public class MatchWindowTask {
         EyesScreenshot screenshot = appOutput.getScreenshot();
         String currentScreenshotHash = GeneralUtils.getSha256hash(appOutput.getScreenshotBytes());
         if (currentScreenshotHash.equals(lastScreenshotHash)) {
-            logger.log("Got the same screenshot in retry. Not sending to the server.");
             return screenshot;
         }
 
         ImageMatchSettings matchSettings = createImageMatchSettings(checkSettingsInternal, screenshot, eyes);
         MatchWindowData data = eyes.prepareForMatch(Arrays.asList(userInputs), appOutput, tag, lastScreenshotHash != null,
-                matchSettings, eyes, null, source);
+                matchSettings, null, source);
         matchResult = eyes.performMatch(data);
         lastScreenshotHash = currentScreenshotHash;
         return screenshot;
@@ -419,25 +406,5 @@ public class MatchWindowTask {
         }
         imageMatchSettings.setAccessibility(accessibilityRegions.toArray(new AccessibilityRegionByRectangle[0]));
 
-    }
-
-    private static void logRegions(Logger logger, ImageMatchSettings ims) {
-        logTypedRegions(logger, "Ignore", ims.getIgnoreRegions());
-        logTypedRegions(logger, "Strict", ims.getStrictRegions());
-        logTypedRegions(logger, "Content", ims.getContentRegions());
-        logTypedRegions(logger, "Layout", ims.getLayoutRegions());
-        logTypedRegions(logger, "Floating", ims.getFloatingRegions());
-        logTypedRegions(logger, "Accessibility", ims.getAccessibility());
-    }
-
-    private static void logTypedRegions(Logger logger, String regionType, Object[] regions) {
-        if (regions == null || regions.length == 0) {
-            logger.verbose(regionType + " Regions list is null or empty");
-            return;
-        }
-        logger.verbose(regionType + " Regions:");
-        for (Object region : regions) {
-            logger.verbose("    " + region);
-        }
     }
 }

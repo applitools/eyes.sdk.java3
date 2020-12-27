@@ -32,7 +32,6 @@ public class InternetExplorerScreenshotImageProvider implements ImageProvider {
     }
 
     public BufferedImage getImage() {
-        logger.verbose("Getting current position...");
         Location loc;
         double scaleRatio = eyes.getDevicePixelRatio();
 
@@ -44,22 +43,18 @@ public class InternetExplorerScreenshotImageProvider implements ImageProvider {
         } else {
             loc = currentFrameChain.getDefaultContentScrollPosition();
         }
+
         Location scaledLoc = loc.scale(scaleRatio);
-
-        logger.verbose("Getting screenshot as base64...");
         String screenshot64 = tsInstance.getScreenshotAs(OutputType.BASE64);
-        logger.verbose("Done getting base64! Creating BufferedImage...");
         BufferedImage image = ImageUtils.imageFromBase64(screenshot64);
-
         RectangleSize originalViewportSize = eyes.getViewportSize();
         RectangleSize viewportSize = originalViewportSize.scale(scaleRatio);
 
         if (image.getHeight() > viewportSize.getHeight() || image.getWidth() > viewportSize.getWidth()) {
             //Damn IE driver returns full page screenshot even when not asked to!
-            logger.verbose("seems IE returned full page screenshot rather than only the viewport.");
             eyes.getDebugScreenshotsProvider().save(image, "IE");
             if (!eyes.getIsCutProviderExplicitlySet()) {
-                image = ImageUtils.cropImage(logger, image, new Region(scaledLoc, viewportSize));
+                image = ImageUtils.cropImage(image, new Region(scaledLoc, viewportSize));
             }
         }
         if (positionProvider != null) {

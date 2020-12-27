@@ -1,5 +1,7 @@
 package com.applitools.eyes;
 
+import java.awt.*;
+
 /**
  * A location in a two-dimensional plane.
  */
@@ -22,6 +24,11 @@ public final class Location implements Cloneable {
     public Location(int x, int y) {
         this.x = x;
         this.y = y;
+    }
+
+    public Location(Point point) {
+        this.x = point.x;
+        this.y = point.y;
     }
 
 

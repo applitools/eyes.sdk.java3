@@ -18,9 +18,6 @@ public class AccessibilityRegionByRectangle implements GetAccessibilityRegion {
     @JsonInclude
     private AccessibilityRegionType type;
 
-    @JsonIgnore
-    private Region region;
-
     public AccessibilityRegionByRectangle() {
     }
 
@@ -37,12 +34,12 @@ public class AccessibilityRegionByRectangle implements GetAccessibilityRegion {
         this.setRegion(region);
     }
 
+    @JsonIgnore
     public Region getRegion() {
         return new Region(left, top, width, height);
     }
 
     public void setRegion(Region region) {
-        this.region = region;
         this.left = region.getLeft();
         this.top = region.getTop();
         this.width = region.getWidth();

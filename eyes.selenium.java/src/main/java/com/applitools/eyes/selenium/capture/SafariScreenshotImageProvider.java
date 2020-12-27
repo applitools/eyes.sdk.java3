@@ -24,9 +24,7 @@ public class SafariScreenshotImageProvider extends MobileScreenshotImageProvider
 
     @Override
     public BufferedImage getImage() {
-        logger.verbose("Getting screenshot as base64...");
         String screenshot64 = tsInstance.getScreenshotAs(OutputType.BASE64);
-        logger.verbose("Done getting base64! Creating BufferedImage...");
         BufferedImage image = ImageUtils.imageFromBase64(screenshot64);
 
         eyes.getDebugScreenshotsProvider().save(image, "SAFARI");
@@ -38,9 +36,6 @@ public class SafariScreenshotImageProvider extends MobileScreenshotImageProvider
         double scaleRatio = eyes.getDevicePixelRatio();
         RectangleSize originalViewportSize = getViewportSize();
         RectangleSize viewportSize = originalViewportSize.scale(scaleRatio);
-
-        logger.verbose("logical viewport size: " + originalViewportSize);
-
         if (userAgent.getOS().equals(OSNames.IOS)) {
             image = cropIOSImage(image, originalViewportSize, logger);
         } else {
@@ -60,7 +55,7 @@ public class SafariScreenshotImageProvider extends MobileScreenshotImageProvider
 
                 loc = loc.scale(scaleRatio);
 
-                image = ImageUtils.cropImage(logger, image, new Region(loc, viewportSize));
+                image = ImageUtils.cropImage(image, new Region(loc, viewportSize));
             }
         }
 
@@ -78,9 +73,6 @@ public class SafariScreenshotImageProvider extends MobileScreenshotImageProvider
 
         int imageWidth = image.getWidth();
         int imageHeight = image.getHeight();
-
-        logger.verbose("physical device pixel size: " + imageWidth + "x" + imageHeight);
-
         RectangleSize imageSize = new RectangleSize(imageWidth, imageHeight);
         if (devicesRegions.containsKey(imageSize))
         {
@@ -93,25 +85,17 @@ public class SafariScreenshotImageProvider extends MobileScreenshotImageProvider
             {
                 Rectangle bestMatchingRect = resolutions[0];
                 float bestHeightDiff = Math.abs(bestMatchingRect.height - height);
-                logger.verbose("bestMatchingRect: " + bestMatchingRect + " ; bestHeightDiff: " + bestHeightDiff);
                 for (int i = 1; i < resolutions.length; ++i)
                 {
                     Rectangle rect = resolutions[i];
                     float heightDiff = Math.abs(rect.height - height);
-                    logger.verbose("rect: " + rect + " ; heightDiff: " + heightDiff + " ; bestHeightDiff: " + bestHeightDiff);
                     if (heightDiff < bestHeightDiff)
                     {
                         bestHeightDiff = heightDiff;
                         bestMatchingRect = rect;
-                        logger.verbose("updated bestHeightDiff to " + bestHeightDiff + " and bestMatchingRect to " + bestMatchingRect);
                     }
                 }
-                logger.verbose("closest crop rect found: " + bestMatchingRect);
                 image = ImageUtils.cropImage(logger, image, bestMatchingRect);
-            }
-            else
-            {
-                logger.verbose("no crop needed. must be using chrome emulator.");
             }
         }
 

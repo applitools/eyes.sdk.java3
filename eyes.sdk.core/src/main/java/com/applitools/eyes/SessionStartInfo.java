@@ -4,6 +4,7 @@
 package com.applitools.eyes;
 
 import com.applitools.utils.ArgumentGuard;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonRootName;
 
@@ -19,6 +20,8 @@ import java.util.List;
  */
 @JsonRootName(value = "startInfo")
 public class SessionStartInfo {
+    @JsonIgnore
+    private String testId;
     private String agentId;
     private SessionType sessionType;
     private String appIdOrName;
@@ -39,7 +42,7 @@ public class SessionStartInfo {
     private Integer timeout;
     private final int concurrencyVersion = 2;
 
-    public SessionStartInfo(String agentId, SessionType sessionType,
+    public SessionStartInfo(String testId, String agentId, SessionType sessionType,
                             String appIdOrName, String verId,
                             String scenarioIdOrName, BatchInfo batchInfo,
                             String baselineEnvName, String environmentName,
@@ -53,6 +56,7 @@ public class SessionStartInfo {
         ArgumentGuard.notNull(batchInfo, "batchInfo");
         ArgumentGuard.notNull(environment, "environment");
         ArgumentGuard.notNull(defaultMatchSettings, "defaultMatchSettings");
+        this.testId = testId;
         this.agentId = agentId;
         this.sessionType = sessionType;
         this.appIdOrName = appIdOrName;
@@ -168,5 +172,13 @@ public class SessionStartInfo {
                 ", timeout=" + timeout +
                 ", concurrencyVersion=" + concurrencyVersion +
                 '}';
+    }
+
+    public String getTestId() {
+        return testId;
+    }
+
+    public void setTestId(String testId) {
+        this.testId = testId;
     }
 }

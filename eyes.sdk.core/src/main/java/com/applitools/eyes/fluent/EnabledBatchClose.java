@@ -3,8 +3,12 @@ package com.applitools.eyes.fluent;
 import com.applitools.connectivity.ServerConnector;
 import com.applitools.eyes.Logger;
 import com.applitools.eyes.ProxySettings;
+import com.applitools.eyes.logging.Stage;
+import com.applitools.eyes.logging.Type;
 import com.applitools.utils.ArgumentGuard;
+import org.apache.commons.lang3.tuple.Pair;
 
+import java.util.HashSet;
 import java.util.List;
 
 public class EnabledBatchClose extends BatchClose {
@@ -50,7 +54,7 @@ public class EnabledBatchClose extends BatchClose {
     }
 
     public void close() {
-        logger.verbose(String.format("Closing %d batches", batchIds.size()));
+        logger.log(new HashSet<String>(), Stage.CLOSE, Type.CLOSE_BATCH, Pair.of("batchSize", batchIds.size()));
         for (String batchId : batchIds) {
             serverConnector.closeBatch(batchId, serverUrl);
         }

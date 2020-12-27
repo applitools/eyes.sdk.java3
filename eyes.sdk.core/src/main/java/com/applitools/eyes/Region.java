@@ -76,6 +76,10 @@ public class Region implements IRegion {
         this.coordinatesType = coordinatesType;
     }
 
+    public Region(Rectangle rectangle) {
+        this(rectangle.x, rectangle.y, rectangle.width, rectangle.height, CoordinatesType.SCREENSHOT_AS_IS);
+    }
+
     /**
      * Is empty boolean.
      * @return true if the region is empty, false otherwise.
@@ -727,8 +731,6 @@ public class Region implements IRegion {
                         new Rectangle(physicalCropArea),
                         new Rectangle(logicalCropArea)
                 );
-
-                logger.verbose("adding subregion - " + subregion);
 
                 subRegions.add(subregion);
 

@@ -50,8 +50,7 @@ public class PageState {
         if (!EyesDriverUtils.isMobileDevice(driver)) {
             saveCurrentFrameState(frameStates, driver, userDefinedSRE);
             tryHideScrollbarsInFrame(config, driver, userDefinedSRE);
-            int switchedToFrameCount = switchToTargetFrame(seleniumCheckTarget, config, frameStates, userDefinedSRE);
-            logger.verbose("switchedToFrameCount: " + switchedToFrameCount);
+            switchToTargetFrame(seleniumCheckTarget, config, frameStates, userDefinedSRE);
         }
     }
 
@@ -103,7 +102,7 @@ public class PageState {
         PositionProvider positionProvider = SeleniumEyes.getPositionProviderForScrollRootElement(logger, driver,
                 stitchMode, userAgent, currentFrameSRE);
 
-        Region frameRect = EyesRemoteWebElement.getClientBoundsWithoutBorders(frameElement, driver, logger);
+        Region frameRect = EyesRemoteWebElement.getClientBoundsWithoutBorders(frameElement, driver);
         if (stitchMode == StitchMode.SCROLL) {
             Location pageScrollPosition = positionProvider.getCurrentPosition();
             frameRect = frameRect.offset(pageScrollPosition.getX(), pageScrollPosition.getY());
@@ -121,7 +120,7 @@ public class PageState {
         frame.setScrollRootElement(rootElement);
         saveCurrentFrameState(frameStates, driver, rootElement);
         tryHideScrollbarsInFrame(config, driver, rootElement);
-        frame.setScrollRootElementInnerBounds(EyesRemoteWebElement.getClientBoundsWithoutBorders(rootElement, driver, logger));
+        frame.setScrollRootElementInnerBounds(EyesRemoteWebElement.getClientBoundsWithoutBorders(rootElement, driver));
     }
 
     private static void tryHideScrollbarsInFrame(Configuration config, EyesSeleniumDriver driver, WebElement rootElement) {

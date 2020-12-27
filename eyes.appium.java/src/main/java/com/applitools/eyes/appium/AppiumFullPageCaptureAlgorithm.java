@@ -4,6 +4,8 @@ import com.applitools.eyes.*;
 import com.applitools.eyes.capture.EyesScreenshotFactory;
 import com.applitools.eyes.capture.ImageProvider;
 import com.applitools.eyes.debug.DebugScreenshotsProvider;
+import com.applitools.eyes.logging.Stage;
+import com.applitools.eyes.logging.Type;
 import com.applitools.eyes.positioning.PositionMemento;
 import com.applitools.eyes.positioning.PositionProvider;
 import com.applitools.eyes.selenium.exceptions.EyesDriverOperationException;
@@ -13,6 +15,7 @@ import com.applitools.eyes.selenium.positioning.ScrollPositionProvider;
 import com.applitools.utils.ArgumentGuard;
 import com.applitools.utils.GeneralUtils;
 import com.applitools.utils.ImageUtils;
+import org.apache.commons.lang3.tuple.Pair;
 import org.openqa.selenium.WebElement;
 
 import java.awt.image.BufferedImage;
@@ -23,7 +26,7 @@ public class AppiumFullPageCaptureAlgorithm {
     protected static final int DEFAULT_STITCHING_ADJUSTMENT = 50;
 
     protected Logger logger;
-
+    protected final String testId;
     private final PositionProvider originProvider;
     protected final ImageProvider imageProvider;
     protected final DebugScreenshotsProvider debugScreenshotsProvider;
@@ -49,7 +52,7 @@ public class AppiumFullPageCaptureAlgorithm {
     private final WebElement cutElement;
     protected Integer stitchingAdjustment = DEFAULT_STITCHING_ADJUSTMENT;
 
-    public AppiumFullPageCaptureAlgorithm(Logger logger, PositionProvider originProvider,
+    public AppiumFullPageCaptureAlgorithm(Logger logger, String testId, PositionProvider originProvider,
                                           PositionProvider positionProvider,
                                           ScrollPositionProvider scrollProvider,
                                           ImageProvider imageProvider, DebugScreenshotsProvider debugScreenshotsProvider,
@@ -58,6 +61,7 @@ public class AppiumFullPageCaptureAlgorithm {
                                           Integer stitchingAdjustment) {
         ArgumentGuard.notNull(logger, "logger");
         this.logger = logger;
+        this.testId = testId;
         this.originProvider = originProvider;
         this.positionProvider = positionProvider;
         this.scrollProvider = scrollProvider;
@@ -80,7 +84,7 @@ public class AppiumFullPageCaptureAlgorithm {
         }
     }
 
-    public AppiumFullPageCaptureAlgorithm(Logger logger,
+    public AppiumFullPageCaptureAlgorithm(Logger logger, String testId,
                                           AppiumScrollPositionProvider scrollProvider,
                                           ImageProvider imageProvider, DebugScreenshotsProvider debugScreenshotsProvider,
                                           ScaleProviderFactory scaleProviderFactory, CutProvider cutProvider,
@@ -89,13 +93,12 @@ public class AppiumFullPageCaptureAlgorithm {
 
         // ensure that all the scroll/position providers used by the superclass are the same object;
         // getting the current position for appium is very expensive!
-        this(logger, scrollProvider, scrollProvider, scrollProvider, imageProvider,
+        this(logger, testId, scrollProvider, scrollProvider, scrollProvider, imageProvider,
                 debugScreenshotsProvider, scaleProviderFactory, cutProvider, screenshotFactory,
                 waitBeforeScreenshots, cutElement, stitchingAdjustment);
     }
 
     protected RectangleSize captureAndStitchCurrentPart(Region partRegion) {
-        logger.verbose("Taking screenshot for current scroll location");
         GeneralUtils.sleep(waitBeforeScreenshots);
         BufferedImage partImage = imageProvider.getImage();
         debugScreenshotsProvider.save(partImage,
@@ -112,9 +115,6 @@ public class AppiumFullPageCaptureAlgorithm {
     }
 
     protected void captureAndStitchTailParts(RectangleSize entireSize, RectangleSize initialPartSize) {
-
-        logger.verbose("Capturing all the tail parts for an Appium screen");
-
         RectangleSize lastSuccessfulPartSize = new RectangleSize(initialPartSize.getWidth(), initialPartSize.getHeight());
         PositionMemento originalStitchedState = scrollProvider.getState();
 
@@ -136,8 +136,6 @@ public class AppiumFullPageCaptureAlgorithm {
         Region regionToCrop;
         int oneScrollStep = downscaleSafe(scrollViewRegion.getHeight() - stitchingAdjustment);
         int maxScrollSteps = contentSize.getScrollContentHeight() / oneScrollStep;
-        logger.verbose("maxScrollSteps: " + maxScrollSteps);
-
         int startY = downscaleSafe(scrollViewRegion.getHeight() + scrollViewRegion.getTop()) - 1 - stitchingAdjustment/2;
         int endY = startY - oneScrollStep + 2 + stitchingAdjustment/2;
         for (int step = 1; step <= maxScrollSteps; step++) {
@@ -153,17 +151,13 @@ public class AppiumFullPageCaptureAlgorithm {
             // here we make sure to say that the region we have scrolled to in the main screenshot
             // is also offset by 1, to match the change we made to the scrollViewRegion
             // We should set left = 0 because we need to a region from the start of viewport
-            Region scrolledRegion = new Region(scrollViewRegion.getLeft(), scrollViewRegion.getTop() + 1, scrollViewRegion.getWidth(),
-                    scrollViewRegion.getHeight());
             currentPosition = new Location(currentPosition.getX(), currentPosition.getY() + 1 + stitchingAdjustment);
-            logger.verbose("The region to capture will be " + scrolledRegion);
 
             lastSuccessfulPartSize = captureAndStitchCurrentPart(regionToCrop);
         }
 
         int heightUnderScrollableView = initialPartSize.getHeight() - scaleSafe(oneScrollStep) - scrollViewRegion.getTop();
         if (heightUnderScrollableView > 0) { // check if there is views under the scrollable view
-            logger.verbose("There are extra space under the scrollable element. (height: " + heightUnderScrollableView + ")");
             regionToCrop = new Region(
                     0,
                     scrollViewRegion.getHeight() + scrollViewRegion.getTop() - stitchingAdjustment,
@@ -202,10 +196,8 @@ public class AppiumFullPageCaptureAlgorithm {
      * @param endY End Y coordinate of scroll action.
      */
     protected void moveToTopLeft(int startX, int startY, int endX, int endY) {
-        logger.verbose("Moving to the top left with coordinates");
         currentPosition = originProvider.getCurrentPosition();
         if (currentPosition.getX() <= 0 && currentPosition.getY() <= 0) {
-            logger.verbose("We are already at the top left, doing nothing");
             return;
         }
 
@@ -217,28 +209,17 @@ public class AppiumFullPageCaptureAlgorithm {
             startY = downscaleSafe(scrollViewRegion.getTop()) + 1;
             endY = startY + oneScrollStep - 2;
         }
-        logger.verbose("Start scroll point is (" + startX + ", " + startY + "), end scroll point is (" + endX + ", " + endY + ").");
 
         do {
             ((AppiumScrollPositionProvider) scrollProvider).scrollTo(startX, startY, endX, endY, false);
             GeneralUtils.sleep(waitBeforeScreenshots);
             currentPosition = originProvider.getCurrentPosition();
-            if (currentPosition.getX() <= 0 && currentPosition.getY() <= 0) {
-                break;
-            }
-        } while (true);
-
-        if (currentPosition.getY() > 0) {
-            originProvider.restoreState(originalPosition);
-            throw new EyesException("Couldn't set position to the top/left corner!");
-        }
+        } while (currentPosition.getX() > 0 || currentPosition.getY() > 0);
     }
 
     protected void moveToTopLeft() {
-        logger.verbose("Moving to the top left of the screen");
         currentPosition = originProvider.getCurrentPosition();
         if (currentPosition.getX() <= 0 && currentPosition.getY() <= 0) {
-            logger.verbose("We are already at the top left, doing nothing");
             return;
         }
 
@@ -262,7 +243,6 @@ public class AppiumFullPageCaptureAlgorithm {
 
     private BufferedImage getTopLeftScreenshot() {
         moveToTopLeft(0, 0, 0, 0);
-        logger.verbose("Getting top/left image...");
         BufferedImage image = imageProvider.getImage();
         debugScreenshotsProvider.save(image, "original");
 
@@ -270,12 +250,10 @@ public class AppiumFullPageCaptureAlgorithm {
         scaleProvider = scaleProviderFactory.getScaleProvider(image.getWidth());
         // Notice that we want to cut/crop an image before we scale it, we need to change
         pixelRatio = 1 / scaleProvider.getScaleRatio();
-        logger.verbose("Set pixel ratio for this run to " + pixelRatio);
 
         // FIXME - cropping should be overlaid, so a single cut provider will only handle a single part of the image.
         cutProvider = cutProvider.scale(pixelRatio);
         if (!(cutProvider instanceof NullCutProvider)) {
-            logger.verbose("We have a cut provider, so cutting top left screenshot");
             image = cutProvider.cut(image);
             debugScreenshotsProvider.save(image, "original-cut");
         }
@@ -285,17 +263,11 @@ public class AppiumFullPageCaptureAlgorithm {
 
     private BufferedImage cropToRegion(BufferedImage image, Region region,
                                        RegionPositionCompensation regionPositionCompensation) {
-        logger.verbose("Cropping image with dimensions [" + image.getWidth() + ", " + image.getHeight() + "] to region " + region);
-
         setRegionInScreenshot(image, region, regionPositionCompensation);
-
-        if (regionInScreenshot.isEmpty()) {
-            logger.verbose("Region in screenshot was empty, no need to crop");
-        } else {
+        if (!regionInScreenshot.isEmpty()) {
             image = ImageUtils.getImagePart(image, regionInScreenshot);
             saveDebugScreenshotPart(image, region, "cropped");
         }
-
 
         return image;
     }
@@ -305,10 +277,8 @@ public class AppiumFullPageCaptureAlgorithm {
         if (!checkingAnElement) {
             try {
                 entireSize = scrollProvider.getEntireSize();
-                logger.verbose("Entire size of region context: " + entireSize);
             } catch (EyesDriverOperationException e) {
-                logger.log("WARNING: Failed to extract entire size of region context" + e.getMessage());
-                logger.log("Using image size instead: " + image.getWidth() + "x" + image.getHeight());
+                GeneralUtils.logExceptionStackTrace(logger, Stage.CHECK, Type.CAPTURE_SCREENSHOT, e, testId);
                 entireSize = new RectangleSize(image.getWidth(), image.getHeight());
             }
         } else {
@@ -317,13 +287,10 @@ public class AppiumFullPageCaptureAlgorithm {
         return entireSize;
     }
 
-    protected void setRegionInScreenshot (BufferedImage image, Region region,
+    protected void setRegionInScreenshot(BufferedImage image, Region region,
                                           RegionPositionCompensation regionPositionCompensation) {
-
-        logger.verbose("Creating screenshot object...");
         // We need the screenshot to be able to convert the region to screenshot coordinates.
         EyesScreenshot screenshot = screenshotFactory.makeScreenshot(image);
-        logger.verbose("Getting region in screenshot...");
         regionInScreenshot = getRegionInScreenshot(region, image, pixelRatio, screenshot,
                 regionPositionCompensation);
 
@@ -339,7 +306,6 @@ public class AppiumFullPageCaptureAlgorithm {
 
         // FIXME - cropping should be overlaid (see previous comment re cropping)
         if (!(cutProvider instanceof NullCutProvider)) {
-            logger.verbose("cutting...");
             partImage = cutProvider.cut(partImage);
             debugScreenshotsProvider.save(partImage,
                     "original-scrolled-cut-" + currentPosition
@@ -347,7 +313,6 @@ public class AppiumFullPageCaptureAlgorithm {
         }
 
         if (!regionInScreenshot.isEmpty()) {
-            logger.verbose("cropping...");
             partImage = ImageUtils.getImagePart(partImage, regionInScreenshot);
             saveDebugScreenshotPart(partImage, partRegion,
                     "original-scrolled-"
@@ -360,59 +325,28 @@ public class AppiumFullPageCaptureAlgorithm {
     protected void cleanupStitch(PositionMemento originalStitchedState,
                                  Location lastSuccessfulLocation,
                                  RectangleSize lastSuccessfulPartSize, RectangleSize entireSize) {
-
-        logger.verbose("Stitching done!");
         positionProvider.restoreState(originalStitchedState);
         originProvider.restoreState(originalPosition);
 
         // If the actual image size is smaller than the extracted size, we crop the image.
         int actualImageWidth = lastSuccessfulLocation.getX() + lastSuccessfulPartSize.getWidth();
         int actualImageHeight = lastSuccessfulLocation.getY() + lastSuccessfulPartSize.getHeight();
-        logger.verbose("Extracted entire size: " + entireSize);
-        logger.verbose("Actual stitched size: " + actualImageWidth + "x" + actualImageHeight);
 
         if (actualImageWidth < stitchedImage.getWidth() || actualImageHeight < stitchedImage
                 .getHeight()) {
-            logger.verbose("Trimming unnecessary margins..");
             stitchedImage = ImageUtils.getImagePart(stitchedImage,
                     new Region(0, 0,
                             Math.min(actualImageWidth, stitchedImage.getWidth()),
                             Math.min(actualImageHeight, stitchedImage.getHeight())));
-            logger.verbose("Done!");
         }
 
         debugScreenshotsProvider.save(stitchedImage, "stitched");
     }
 
-    private void captureAndStitchPart(Region partRegion) {
-        logger.verbose(String.format("Taking screenshot for %s", partRegion));
-        // Set the position to the part's top/left. May need to downscale since partRegion is in
-        // upscaled dimensions
-        positionProvider.setPosition(downscaleSafe(partRegion.getLocation()));
-        // Giving it time to stabilize.
-        GeneralUtils.sleep(waitBeforeScreenshots);
-        // Screen size may cause the scroll to only reach part of the way. Make sure we get the
-        // current position in scaled coordinates if necessary
-        currentPosition = scaleSafe(positionProvider.getCurrentPosition());
-        logger.verbose(String.format("Set position to %s", currentPosition));
-
-        // Actually taking the screenshot.
-        logger.verbose("Getting image...");
-        BufferedImage partImage = imageProvider.getImage();
-        debugScreenshotsProvider.save(partImage,
-                "original-scrolled-" + currentPosition.toStringForFilename());
-
-        partImage = cropPartToRegion(partImage, partRegion);
-        stitchPartIntoContainer(partImage);
-    }
-
     protected void stitchPartIntoContainer(BufferedImage partImage) {
-        // Stitching the current part.
-        logger.verbose("Stitching part into the image container...");
         // We should stitch images from the start of X coordinate
         stitchedImage.getRaster()
                 .setRect(0, currentPosition.getY(), partImage.getData());
-        logger.verbose("Done!");
     }
 
 
@@ -425,21 +359,19 @@ public class AppiumFullPageCaptureAlgorithm {
      * @return An image which represents the stitched region.
      */
     public BufferedImage getStitchedRegion(Region region, RegionPositionCompensation regionPositionCompensation) {
-        logger.verbose("getStitchedRegion()");
-
         ArgumentGuard.notNull(region, "region");
-
-        logger.verbose(String.format(
-                "getStitchedRegion: originProvider: %s ; positionProvider: %s ; cutProvider: %s",
-                originProvider.getClass(), positionProvider.getClass(), cutProvider.getClass()));
-
-        logger.verbose(String.format("Region to check: %s", region));
 
         // Saving the original position (in case we were already in the outermost frame).
         originalPosition = originProvider.getState();
 
         // first, scroll to the origin and get the top left screenshot
         BufferedImage image = getTopLeftScreenshot();
+        logger.log(testId, Stage.CHECK, Type.CAPTURE_SCREENSHOT,
+                Pair.of("region", region),
+                Pair.of("pixelRatio", pixelRatio),
+                Pair.of("originProvider", originalPosition.getClass().getName()),
+                Pair.of("positionProvider", positionProvider.getClass().getName()),
+                Pair.of("cutProvider", cutProvider.getClass().getName()));
 
         // now crop the screenshot based on the provided region
         image = cropToRegion(image, region, regionPositionCompensation);
@@ -448,37 +380,31 @@ public class AppiumFullPageCaptureAlgorithm {
 
         boolean checkingAnElement = !region.isEmpty();
         RectangleSize entireSize = scaleSafe(getEntireSize(image, checkingAnElement));
-        logger.verbose("Scaled entire size is " + entireSize);
+        logger.log(testId, Stage.CHECK, Type.CAPTURE_SCREENSHOT, Pair.of("entireSize", entireSize));
 
         // If the image is already the same as or bigger than the entire size, we're done!
         // Notice that this might still happen even if we used
         // "getImagePart", since "entirePageSize" might be that of a frame.
         if (image.getWidth() >= entireSize.getWidth() && image.getHeight() >= entireSize
                 .getHeight()) {
-            logger.verbose("Image was already bigger than entire size, so returning straightaway");
             originProvider.restoreState(originalPosition);
 
             return ImageUtils.scaleImage(image, scaleProvider.getScaleRatio(), true);
         }
 
         // Otherwise, make a big image to stitch smaller parts into
-        logger.verbose("Creating stitchedImage container. Size: " + entireSize);
         //Notice stitchedImage uses the same type of image as the screenshots.
         // Use initial image width for stitched image to prevent wrong image part size
         // if scrollable view has some padding or margins
         stitchedImage = new BufferedImage(
                 image.getWidth(), entireSize.getHeight(), image.getType());
-        logger.verbose("Done!");
 
         // First of all we want to stitch the screenshot we already captured at (0, 0)
-        logger.verbose("Adding initial screenshot..");
         Raster initialPart = image.getData();
         RectangleSize initialPartSize = new RectangleSize(initialPart.getWidth(),
                 initialPart.getHeight());
-        logger.verbose(String.format("Initial part:(0,0)[%d x %d]",
-                initialPart.getWidth(), initialPart.getHeight()));
+        logger.log(testId, Stage.CHECK, Type.CAPTURE_SCREENSHOT, Pair.of("initialPart", initialPartSize));
         stitchedImage.getRaster().setRect(0, 0, initialPart);
-        logger.verbose("Done!");
 
         /* TODO need to determine if there is anything in the initial part which should be cut
            off and reapplied at the bottom of the stitched image. Can do this by checking whether
@@ -487,10 +413,7 @@ public class AppiumFullPageCaptureAlgorithm {
         captureAndStitchTailParts(entireSize, initialPartSize);
 
         // Finally, scale the image appropriately
-        if (pixelRatio == 1.0) {
-            logger.verbose("Pixel ratio was 1, no need to scale stitched image");
-        } else {
-            logger.verbose("Pixel ratio was " + pixelRatio + "; scaling stitched image");
+        if (pixelRatio != 1.0) {
             stitchedImage = ImageUtils.scaleImage(stitchedImage, scaleProvider.getScaleRatio(), true);
             debugScreenshotsProvider.save(stitchedImage, "scaled");
         }
@@ -502,11 +425,7 @@ public class AppiumFullPageCaptureAlgorithm {
                                          EyesScreenshot screenshot, RegionPositionCompensation regionPositionCompensation) {
         // Region regionInScreenshot = screenshot.convertRegionLocation(regionProvider.getRegion(), regionProvider.getCoordinatesType(), CoordinatesType.SCREENSHOT_AS_IS);
         region.setLocation(new Location(0, region.getLocation().getY()));
-        Region regionInScreenshot = screenshot
-                .getIntersectedRegion(region, CoordinatesType.SCREENSHOT_AS_IS);
-
-        logger.verbose("Done! Region in screenshot: " + regionInScreenshot);
-
+        Region regionInScreenshot = screenshot.getIntersectedRegion(region, CoordinatesType.SCREENSHOT_AS_IS);
         if (regionPositionCompensation == null) {
             regionPositionCompensation = new NullRegionPositionCompensation();
         }
@@ -519,7 +438,7 @@ public class AppiumFullPageCaptureAlgorithm {
         // the screenshot (e.g., when body width/height are set to 100%, and
         // an internal div is set to value which is larger than the viewport).
         regionInScreenshot.intersect(new Region(0, 0, image.getWidth(), image.getHeight()));
-        logger.verbose("Region after intersect: " + regionInScreenshot);
+        logger.log(testId, Stage.CHECK, Type.CAPTURE_SCREENSHOT, Pair.of("regionInScreenshot", regionInScreenshot));
         return regionInScreenshot;
     }
 

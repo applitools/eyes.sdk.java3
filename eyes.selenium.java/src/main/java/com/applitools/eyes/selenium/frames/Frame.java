@@ -58,10 +58,6 @@ public final class Frame {
         ArgumentGuard.notNull(originalLocation, "originalLocation");
         ArgumentGuard.notNull(jsExecutor, "jsExecutor");
 
-        logger.verbose(String.format(
-                "Frame(logger, reference, %s, %s, %s, %s)",
-                location, outerSize, innerSize, originalLocation));
-
         this.logger = logger;
         this.reference = reference;
         this.location = location;
@@ -104,13 +100,11 @@ public final class Frame {
 
     public void hideScrollbars(WebDriver driver) {
         WebElement scrollRootElement = getScrollRootElement(driver);
-        logger.verbose("hiding scrollbars of element: " + scrollRootElement);
         originalOverflow = (String) jsExecutor.executeScript("var origOF = arguments[0].style.overflow; arguments[0].style.overflow='hidden'; return origOF;", scrollRootElement);
     }
 
     public void returnToOriginalOverflow(WebDriver driver) {
         WebElement scrollRootElement = getScrollRootElement(driver);
-        logger.verbose("returning overflow of element to its original value: " + scrollRootElement);
         jsExecutor.executeScript("arguments[0].style.overflow='" + originalOverflow + "';", scrollRootElement);
     }
 
@@ -123,7 +117,6 @@ public final class Frame {
     private WebElement getScrollRootElement(WebDriver driver) {
         WebElement scrollRootElement = getScrollRootElement();
         if (scrollRootElement == null) {
-            logger.verbose("no scroll root element. selecting default.");
             scrollRootElement = EyesSeleniumUtils.getDefaultRootElement(logger, (EyesSeleniumDriver) driver);
         }
 

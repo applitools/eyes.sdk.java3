@@ -1,11 +1,13 @@
 package com.applitools.eyes.selenium;
 
 import com.applitools.eyes.*;
+import com.applitools.eyes.logging.Stage;
 import com.applitools.eyes.utils.ReportingTestSuite;
 import com.applitools.eyes.utils.SeleniumTestUtils;
 import com.applitools.eyes.utils.SeleniumUtils;
 import com.applitools.eyes.utils.TestUtils;
 import com.applitools.eyes.visualgrid.services.VisualGridRunner;
+import org.apache.commons.lang3.tuple.Pair;
 import org.openqa.selenium.Capabilities;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.remote.RemoteWebDriver;
@@ -200,8 +202,6 @@ public abstract class TestSetup extends ReportingTestSuite implements ITest {
 
         SeleniumTestUtils.setupLogging(eyes, testName + "_" + options.getPlatform());
 
-        eyes.getLogger().log("navigating to URL: " + testedPageUrl);
-
         beforeOpen(eyes);
 
         WebDriver driver;
@@ -211,9 +211,12 @@ public abstract class TestSetup extends ReportingTestSuite implements ITest {
             webDriver.quit();
             throw e;
         }
-        //string userProfile = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
+
         driver.get(testedPageUrl);
-        eyes.getLogger().log(testName + ": " + TestDataProvider.batchInfo.getName());
+        eyes.getLogger().log(new HashSet<String>(), Stage.GENERAL,
+                Pair.of("testName", testName),
+                Pair.of("batchName", TestDataProvider.batchInfo.getName()));
+
         if (useVisualGrid) {
             try {
                 Thread.sleep(2000);

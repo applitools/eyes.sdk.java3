@@ -1,14 +1,23 @@
 package com.applitools.eyes.selenium.fluent;
 
+import com.applitools.eyes.serializers.BySerializer;
+import com.applitools.eyes.serializers.WebElementSerializer;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class FrameLocator implements ISeleniumFrameCheckTarget {
+    @JsonSerialize(using = BySerializer.class)
     private By frameSelector;
     private String frameNameOrId;
     private Integer frameIndex;
+    @JsonSerialize(using = WebElementSerializer.class)
     private WebElement frameReference;
+    @JsonSerialize(using = BySerializer.class)
     private By scrollRootSelector;
+    @JsonSerialize(using = WebElementSerializer.class)
     private WebElement scrollRootElement;
 
     @Override

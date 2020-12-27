@@ -1,6 +1,5 @@
 package com.applitools.eyes.appium.capture;
 
-import com.applitools.eyes.Logger;
 import com.applitools.eyes.appium.EyesAppiumDriver;
 import com.applitools.eyes.appium.EyesAppiumUtils;
 import com.applitools.eyes.capture.ImageProvider;
@@ -13,20 +12,15 @@ import java.util.Map;
 
 public class AndroidViewportScreenshotImageProvider implements ImageProvider {
 
-    private final Logger logger;
     private final EyesAppiumDriver driver;
 
-    public AndroidViewportScreenshotImageProvider(Logger logger, EyesWebDriver driver) {
-        this.logger = logger;
+    public AndroidViewportScreenshotImageProvider(EyesWebDriver driver) {
         this.driver = (EyesAppiumDriver) driver;
     }
 
     @Override
     public BufferedImage getImage() {
-        logger.verbose("Getting screenshot as base64...");
         BufferedImage screenshot = ImageUtils.imageFromBytes(driver.getScreenshotAs(OutputType.BYTES));
-        logger.verbose("Done getting base64! Creating BufferedImage...");
-
         Map<String, Integer> systemBarHeights = EyesAppiumUtils.getSystemBarsHeights(driver);
         screenshot = cropTop(screenshot, systemBarHeights.get(EyesAppiumUtils.STATUS_BAR));
         screenshot = cropBottom(screenshot, systemBarHeights.get(EyesAppiumUtils.NAVIGATION_BAR));

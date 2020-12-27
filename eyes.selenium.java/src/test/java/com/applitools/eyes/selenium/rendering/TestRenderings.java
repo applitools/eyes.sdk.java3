@@ -22,7 +22,6 @@ import com.applitools.eyes.utils.TestUtils;
 import com.applitools.eyes.visualgrid.model.*;
 import com.applitools.eyes.visualgrid.services.CheckTask;
 import com.applitools.eyes.visualgrid.services.VisualGridRunner;
-import com.applitools.utils.GeneralUtils;
 import org.mockito.ArgumentMatchers;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
@@ -104,9 +103,7 @@ public class TestRenderings extends ReportingTestSuite {
         driver.get(url);
         try {
             Thread.sleep(500);
-        } catch (InterruptedException e) {
-            GeneralUtils.logExceptionStackTrace(eyes.getLogger(), e);
-        }
+        } catch (InterruptedException ignored) {}
         eyes.check(testName, Target.window().fully());
         driver.quit();
         eyes.close(false);
@@ -165,7 +162,7 @@ public class TestRenderings extends ReportingTestSuite {
     @Test
     public void testRenderFail() {
         ServerConnector serverConnector = spy(ServerConnector.class);
-        doThrow(new IllegalStateException()).when(serverConnector).render(ArgumentMatchers.<TaskListener<List<RunningRender>>>any(), any(RenderRequest.class));
+        doThrow(new IllegalStateException()).when(serverConnector).render(ArgumentMatchers.<TaskListener<List<RunningRender>>>any(), ArgumentMatchers.<List<RenderRequest>>any());
 
         EyesRunner runner = new VisualGridRunner(10);
         Eyes eyes = new Eyes(runner);
@@ -270,7 +267,7 @@ public class TestRenderings extends ReportingTestSuite {
         // Mocking server connector to add fake missing resources to the render request
         final ServerConnector serverConnector = new ServerConnector() {
             @Override
-            public void checkResourceStatus(final TaskListener<Boolean[]> listener, String renderId, HashObject... hashes) {
+            public void checkResourceStatus(final TaskListener<Boolean[]> listener, Set<String> testIds, String renderId, HashObject... hashes) {
                 Boolean[] result = new Boolean[hashes.length];
                 for (int i = 0; i < hashes.length; i++) {
                     result[i] = !hashes[i].getHash().equals("e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855");
@@ -279,9 +276,9 @@ public class TestRenderings extends ReportingTestSuite {
             }
 
             @Override
-            public Future<?> renderPutResource(String renderId, RGridResource resource, TaskListener<Void> listener) {
+            public Future<?> renderPutResource(Set<String> testIds, String renderId, RGridResource resource, TaskListener<Void> listener) {
                 missingResources.put(resource.getUrl(), resource);
-                return super.renderPutResource(renderId, resource, listener);
+                return super.renderPutResource(testIds, renderId, resource, listener);
             }
         };
         VisualGridRunner runner = spy(new VisualGridRunner(10));
@@ -366,7 +363,8 @@ public class TestRenderings extends ReportingTestSuite {
     @Test
     public void testRenderStatusNull() {
         MockServerConnector mockServerConnector = new MockServerConnector() {
-            public void renderStatusById(final TaskListener<List<RenderStatusResults>> listener, String... renderIds) {
+            @Override
+            public void renderStatusById(final TaskListener<List<RenderStatusResults>> listener, List<String> testIds, List<String> renderIds) {
                 listener.onComplete(new ArrayList<RenderStatusResults>() {{add(null);}});
             }
         };
@@ -408,7 +406,7 @@ public class TestRenderings extends ReportingTestSuite {
         VisualGridEyes eyes = new VisualGridEyes(new VisualGridRunner(10), configurationProvider);
         driver = eyes.open(driver, "test", "test", new RectangleSize(800, 800));
         EyesTargetLocator switchTo = ((EyesTargetLocator) driver.switchTo());
-        FrameData frameData = eyes.captureDomSnapshot(switchTo);
+        FrameData frameData = eyes.captureDomSnapshot(new HashSet<String>(), switchTo);
         driver.quit();
         Assert.assertEquals(frameData.getFrames().size(), 1);
 

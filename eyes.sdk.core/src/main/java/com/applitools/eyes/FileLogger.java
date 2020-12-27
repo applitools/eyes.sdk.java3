@@ -3,14 +3,16 @@
  */
 package com.applitools.eyes;
 
+import com.applitools.eyes.logging.ClientEvent;
+import com.applitools.eyes.logging.TraceLevel;
 import com.applitools.utils.ArgumentGuard;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
+import java.util.Objects;
 
 /**
  * Writes log messages to a file.
@@ -20,31 +22,28 @@ public class FileLogger extends LogHandler {
     private final boolean append;
     private BufferedWriter fileWriter;
 
-    private final SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
-
-    /**
-     * Creates a new FileHandler instance.
-     * @param filename  The file in which to save the logs.
-     * @param append    Whether to append the logs if the current file exists,
-     *                  or to overwrite the existing file.
-     * @param isVerbose Whether to handle or ignore verbose log messages.
-     */
     public FileLogger(String filename, boolean append, boolean isVerbose) {
-        super(isVerbose);
+        super(isVerbose ? TraceLevel.Debug : TraceLevel.Notice);
         ArgumentGuard.notNullOrEmpty(filename, "filename");
         this.filename = filename;
         this.append = append;
         fileWriter = null;
     }
 
-    /**
-     * See {@link #FileLogger(String, boolean, boolean)}.
-     * {@code filename} defaults to {@code eyes.log}, append defaults to
-     * {@code true}.
-     * @param isVerbose Whether to handle or ignore verbose log messages.
-     */
+    public FileLogger(String filename, boolean append, TraceLevel level) {
+        super(level);
+        ArgumentGuard.notNullOrEmpty(filename, "filename");
+        this.filename = filename;
+        this.append = append;
+        fileWriter = null;
+    }
+
     public FileLogger(boolean isVerbose) {
-        this("eyes.log", true, isVerbose);
+        this(isVerbose ? TraceLevel.Debug : TraceLevel.Notice);
+    }
+
+    public FileLogger(TraceLevel level) {
+        this("eyes.log", true, level);
     }
 
     /**
@@ -75,16 +74,16 @@ public class FileLogger extends LogHandler {
     }
 
     @Override
-    public synchronized void onMessage(String message) {
+    public void onMessageInner(ClientEvent clientEvent) {
         if (fileWriter != null) {
-            synchronized (fileWriter) {
-                try {
-                    fileWriter.write(getFormattedTimeStamp() + " Eyes: " + message);
+            try {
+                synchronized (fileWriter) {
+                    fileWriter.write(new ObjectMapper().writeValueAsString(clientEvent));
                     fileWriter.newLine();
                     fileWriter.flush();
-                } catch (Exception e) {
-                    e.printStackTrace();
                 }
+            } catch (Exception e) {
+                e.printStackTrace();
             }
         }
     }
@@ -107,8 +106,17 @@ public class FileLogger extends LogHandler {
         return fileWriter != null;
     }
 
-    private String getFormattedTimeStamp() {
-        return dateFormat.format(Calendar.getInstance().getTime());
+    @Override
+    public boolean equals(Object other) {
+        if (other instanceof FileLogger) {
+            return ((FileLogger) other).filename.equals(filename);
+        }
+
+        return false;
     }
 
+    @Override
+    public int hashCode() {
+        return Objects.hash(filename);
+    }
 }

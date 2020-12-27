@@ -3,14 +3,18 @@ package com.applitools.eyes.appium;
 import com.applitools.eyes.Location;
 import com.applitools.eyes.Logger;
 import com.applitools.eyes.Region;
+import com.applitools.eyes.logging.Stage;
+import com.applitools.eyes.logging.TraceLevel;
 import com.applitools.eyes.positioning.PositionMemento;
 import com.applitools.eyes.selenium.EyesDriverUtils;
+import com.applitools.utils.GeneralUtils;
 import com.applitools.utils.ImageUtils;
 import io.appium.java_client.MobileBy;
 import io.appium.java_client.TouchAction;
 import io.appium.java_client.remote.MobileCapabilityType;
 import io.appium.java_client.touch.WaitOptions;
 import io.appium.java_client.touch.offset.PointOption;
+import org.apache.commons.lang3.tuple.Pair;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.OutputType;
 import org.openqa.selenium.Rectangle;
@@ -18,7 +22,6 @@ import org.openqa.selenium.WebElement;
 
 import javax.annotation.Nullable;
 import java.awt.image.BufferedImage;
-import java.io.IOException;
 import java.time.Duration;
 import java.util.HashMap;
 import java.util.List;
@@ -40,10 +43,7 @@ public class IOSScrollPositionProvider extends AppiumScrollPositionProvider {
      * @param location The position to scroll to.
      */
     public Location setPosition(Location location) {
-        logger.log("Warning: Appium cannot reliably scroll based on location; pass an element instead if you can. Doing nothing");
         Location curPos = getCurrentPosition();
-        logger.verbose("Wanting to scroll to " + location);
-        logger.verbose("Current scroll position is " + getCurrentPosition());
         Location lastPos;
 
 
@@ -64,17 +64,13 @@ public class IOSScrollPositionProvider extends AppiumScrollPositionProvider {
 
         // first handle any vertical scrolling
         if (!directionY.isEmpty()) {
-            logger.verbose("Scrolling to Y component");
             args.put("direction", directionY);
             while ((directionY.equals(SCROLL_DIRECTION_DOWN) && curPos.getY() < location.getY()) ||
                 (directionY.equals(SCROLL_DIRECTION_UP) && curPos.getY() > location.getY())) {
-                logger.verbose("Scrolling " + directionY);
                 driver.executeScript("mobile: scroll", args);
                 lastPos = curPos;
                 curPos = getCurrentPosition();
-                logger.verbose("Scrolled to " + curPos);
                 if (curPos.getY() == lastPos.getY()) {
-                    logger.verbose("Ended up at the same place as last scroll, stopping");
                     break;
                 }
             }
@@ -82,16 +78,13 @@ public class IOSScrollPositionProvider extends AppiumScrollPositionProvider {
 
         // then handle any horizontal scrolling
         if (!directionX.isEmpty()) {
-            logger.verbose("Scrolling to X component");
             args.put("direction", directionX);
             while ((directionX.equals(SCROLL_DIRECTION_RIGHT) && curPos.getX() < location.getX()) ||
                 (directionX.equals(SCROLL_DIRECTION_LEFT) && curPos.getX() > location.getX())) {
-                logger.verbose("Scrolling " + directionY);
                 driver.executeScript("mobile: scroll", args);
                 lastPos = curPos;
                 curPos = getCurrentPosition();
                 if (curPos.getX() == lastPos.getX()) {
-                    logger.verbose("Ended up at the same place as last scroll, stopping");
                     break;
                 }
             }
@@ -108,7 +101,6 @@ public class IOSScrollPositionProvider extends AppiumScrollPositionProvider {
     }
 
     public void restoreState(PositionMemento state) {
-        logger.log("Warning: AppiumScrollPositionProvider cannot reliably restore position state; doing nothing");
     }
 
 
@@ -122,8 +114,6 @@ public class IOSScrollPositionProvider extends AppiumScrollPositionProvider {
             //double scrollviewHeight = ((getScrollableViewRegion().getHeight() - verticalScrollGap) * pixelRatio);
             double scrollviewHeight = getScrollableViewRegion().getHeight() - (cutElement != null ? cutElement.getSize().getHeight() : 0);
             distanceRatio = scrollviewHeight / viewportHeight;
-            logger.verbose("Distance ratio for scroll down based on viewportHeight of " + viewportHeight +
-                " and scrollview height of " + scrollviewHeight + " is " + Double.toString(distanceRatio));
         }
 
         return distanceRatio;
@@ -136,8 +126,9 @@ public class IOSScrollPositionProvider extends AppiumScrollPositionProvider {
 
     @Override
     public void scrollTo(int startX, int startY, int endX, int endY, boolean shouldCancel) {
-        logger.verbose("Trying to scroll from startX: " + startX + " | startY: " + startY + " | endX: " + endX + " | endY: " + endY);
-
+        logger.log(TraceLevel.Debug, null, Stage.CHECK,
+                Pair.of("from", new Location(startX, startY)),
+                Pair.of("to", new Location(startX, startY)));
         TouchAction scrollAction = new TouchAction(driver);
         scrollAction.press(new PointOption().withCoordinates(startX, startY)).waitAction(new WaitOptions().withDuration(Duration.ofMillis(3000)));;
         scrollAction.moveTo(new PointOption().withCoordinates(startX, endY));
@@ -154,8 +145,7 @@ public class IOSScrollPositionProvider extends AppiumScrollPositionProvider {
         Region region = new Region((int) (element.getLocation().getX() * devicePixelRatio),
                 (int) (element.getLocation().getY() * devicePixelRatio),
                 (int) (element.getSize().getWidth() * devicePixelRatio),
-                (int) (element.getSize().getHeight() * devicePixelRatio));;
-        logger.verbose("Element is instance of " + element.getAttribute("type"));
+                (int) (element.getSize().getHeight() * devicePixelRatio));
         if (shouldStitchContent) {
             ContentSize contentSize = EyesAppiumUtils.getContentSize(driver, element);
             /*
@@ -216,11 +206,10 @@ public class IOSScrollPositionProvider extends AppiumScrollPositionProvider {
     protected ContentSize getCachedContentSize() {
         try {
             WebElement activeScroll = getFirstScrollableView();
-            logger.verbose("Scrollable element is type of " + activeScroll.getAttribute("type"));
             contentSize = EyesAppiumUtils.getContentSize(driver, activeScroll);
             contentSize.scrollableOffset = getEntireScrollableHeight(activeScroll, contentSize);
         } catch (NoSuchElementException e) {
-            logger.log("WARNING: No active scroll element, so no content size to retrieve");
+            GeneralUtils.logExceptionStackTrace(logger, Stage.CHECK, e);
             contentSize = null;
 
             /*
@@ -230,9 +219,8 @@ public class IOSScrollPositionProvider extends AppiumScrollPositionProvider {
             String base64 = driver.getScreenshotAs(OutputType.BASE64);
             BufferedImage image = ImageUtils.imageFromBase64(base64);
 
-            logger.verbose(driver.getPageSource());
+            logger.log(TraceLevel.Debug, null, Stage.CHECK, Pair.of("pageSource", driver.getPageSource()));
         }
-        logger.verbose("Retrieved contentSize, it is: " + contentSize);
         return contentSize;
     }
 
@@ -240,13 +228,10 @@ public class IOSScrollPositionProvider extends AppiumScrollPositionProvider {
     protected WebElement getCachedFirstVisibleChild () {
         WebElement activeScroll = getFirstScrollableView();
         if (firstVisibleChild == null) {
-            logger.verbose("Could not find first visible child in cache, getting (this could take a while)");
             firstVisibleChild = getFirstChild(activeScroll);
         } else {
             Rectangle firstVisibleChildRect = firstVisibleChild.getRect();
             if (firstVisibleChildRect.getWidth() == 0 && firstVisibleChildRect.getHeight() == 0) {
-                logger.verbose("Cached visible child is invalid for some reason(e.g. user opened another screen and current firstVisibleChild is useless" +
-                        " and it is not already in the view hierarchy). It should be updated. Getting (this could take a while)");
                 firstVisibleChild = getFirstChild(activeScroll);
             }
         }
@@ -287,7 +272,7 @@ public class IOSScrollPositionProvider extends AppiumScrollPositionProvider {
                 platformVersion = Double.valueOf(platformVersionString);
             }
         } catch (NumberFormatException e) {
-            logger.verbose("Could not extract platform version from capabilities.");
+            GeneralUtils.logExceptionStackTrace(logger, Stage.CHECK, e);
         }
         // Since iOS 13 we can not get correct status bar height
         if (platformVersion != null && platformVersion.compareTo(Double.valueOf("13.0")) >= 0) {
@@ -344,8 +329,6 @@ public class IOSScrollPositionProvider extends AppiumScrollPositionProvider {
                 if (!list.isEmpty()) {
                     WebElement lastElement = list.get(list.size()-1);
                     scrollableOffset = lastElement.getLocation().getY() + lastElement.getSize().getHeight();
-                } else {
-                    logger.verbose("XCUIElementTypeTable does not have child...");
                 }
                 break;
             case "XCUIElementTypeScrollView":
@@ -353,8 +336,6 @@ public class IOSScrollPositionProvider extends AppiumScrollPositionProvider {
                 if (!list.isEmpty()) {
                     WebElement firstElement = list.get(0);
                     scrollableOffset = firstElement.getLocation().getY() + firstElement.getSize().getHeight();
-                } else {
-                    logger.verbose("XCUIElementTypeScrollView does not have child...");
                 }
                 break;
         }

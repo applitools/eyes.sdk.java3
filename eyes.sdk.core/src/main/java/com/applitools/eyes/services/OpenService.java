@@ -2,10 +2,15 @@ package com.applitools.eyes.services;
 
 import com.applitools.connectivity.ServerConnector;
 import com.applitools.eyes.*;
+import com.applitools.eyes.logging.Stage;
+import com.applitools.eyes.logging.TraceLevel;
+import com.applitools.eyes.logging.Type;
 import com.applitools.eyes.visualgrid.services.ServiceTaskListener;
 import org.apache.commons.lang3.tuple.Pair;
 
-import java.util.*;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class OpenService extends EyesService<SessionStartInfo, RunningSession> {
@@ -26,11 +31,11 @@ public class OpenService extends EyesService<SessionStartInfo, RunningSession> {
     public void run() {
         while (!inputQueue.isEmpty() && !isServerConcurrencyLimitReached && this.eyesConcurrency > currentTestAmount.get()) {
             currentTestAmount.incrementAndGet();
-            logger.log(String.format("A new test was added. Current amount of tests: %d", currentTestAmount.get()));
+            logger.log(TraceLevel.Info, new HashSet<String>(), Stage.OPEN, null, Pair.of("testAmount", currentTestAmount.get()));
 
             final Pair<String, SessionStartInfo> nextInput = inputQueue.remove(0);
             inProgressTests.add(nextInput.getLeft());
-            operate(nextInput.getRight(), new ServiceTaskListener<RunningSession>() {
+            operate(nextInput.getLeft(), nextInput.getRight(), new ServiceTaskListener<RunningSession>() {
                 @Override
                 public void onComplete(RunningSession output) {
                     inProgressTests.remove(nextInput.getLeft());
@@ -40,30 +45,26 @@ public class OpenService extends EyesService<SessionStartInfo, RunningSession> {
                 @Override
                 public void onFail(Throwable t) {
                     inProgressTests.remove(nextInput.getLeft());
-                    logger.log(String.format("Failed completing task on input %s", nextInput));
                     errorQueue.add(Pair.of(nextInput.getLeft(), t));
                 }
             });
         }
     }
 
-    public void operate(final SessionStartInfo sessionStartInfo, final ServiceTaskListener<RunningSession> listener) {
+    public void operate(final String testId, final SessionStartInfo sessionStartInfo, final ServiceTaskListener<RunningSession> listener) {
         final AtomicInteger timePassed = new AtomicInteger(0);
         final AtomicInteger sleepDuration = new AtomicInteger(2 * 1000);
-        logger.log(String.format("Calling start session with agentSessionId %s", sessionStartInfo.getAgentSessionId()));
         TaskListener<RunningSession> taskListener = new TaskListener<RunningSession>() {
             @Override
             public void onComplete(RunningSession runningSession) {
+                logger.log(testId, Stage.OPEN, Pair.of("runningSession", runningSession));
                 if (runningSession.isConcurrencyFull()) {
                     isServerConcurrencyLimitReached = true;
-                    logger.verbose("Failed starting test, concurrency is fully used. Trying again.");
                     onFail();
                     return;
                 }
 
                 isServerConcurrencyLimitReached = false;
-                logger.verbose("Server session ID is " + runningSession.getId());
-                logger.setSessionId(runningSession.getSessionId());
                 listener.onComplete(runningSession);
             }
 
@@ -84,7 +85,7 @@ public class OpenService extends EyesService<SessionStartInfo, RunningSession> {
                         sleepDuration.set(5 * 1000);
                     }
 
-                    logger.verbose("Trying startSession again");
+                    logger.log(testId, Stage.OPEN, Type.RETRY);
                     serverConnector.startSession(this, sessionStartInfo);
                 } catch (Throwable e) {
                     listener.onFail(e);
@@ -93,6 +94,7 @@ public class OpenService extends EyesService<SessionStartInfo, RunningSession> {
         };
 
         try {
+            logger.log(testId, Stage.OPEN, Pair.of("sessionStartInfo", sessionStartInfo));
             serverConnector.startSession(taskListener, sessionStartInfo);
         } catch (Throwable t) {
             listener.onFail(t);
@@ -101,6 +103,6 @@ public class OpenService extends EyesService<SessionStartInfo, RunningSession> {
 
     public void decrementConcurrency() {
         int currentAmount = this.currentTestAmount.decrementAndGet();
-        logger.log(String.format("A test was ended. Current running tests: %d", currentAmount));
+        logger.log(TraceLevel.Info, new HashSet<String>(), Stage.CLOSE, null, Pair.of("testAmount", currentAmount));
     }
 }

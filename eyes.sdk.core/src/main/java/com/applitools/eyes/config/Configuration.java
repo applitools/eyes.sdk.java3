@@ -6,10 +6,13 @@ import com.applitools.eyes.selenium.StitchMode;
 import com.applitools.eyes.visualgrid.model.*;
 import com.applitools.utils.ArgumentGuard;
 import com.applitools.utils.GeneralUtils;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonInclude;
 
 import java.net.URI;
 import java.util.*;
 
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class Configuration implements IConfiguration {
     private static final int DEFAULT_MATCH_TIMEOUT = 2000; // Milliseconds;
     private static final int DEFAULT_WAIT_BEFORE_SCREENSHOTS = 100;
@@ -55,6 +58,7 @@ public class Configuration implements IConfiguration {
     private boolean hideCaret = true;
     private boolean isVisualGrid = false;
     private boolean disableBrowserFetching = false;
+    @JsonIgnore
     private IDebugResourceWriter debugResourceWriter = new NullDebugResourceWriter();
 
     //Rendering Configuration

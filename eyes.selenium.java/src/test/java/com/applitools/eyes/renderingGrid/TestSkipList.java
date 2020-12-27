@@ -25,7 +25,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.spy;
 
@@ -43,12 +42,12 @@ public class TestSkipList extends ReportingTestSuite {
         doAnswer(new Answer<Void>() {
             @Override
             public Void answer(InvocationOnMock invocation) throws Throwable {
-                RenderRequest renderRequest = invocation.getArgument(1);
-                resourceMaps.add(renderRequest.getResources().keySet());
+                List<RenderRequest> renderRequest = invocation.getArgument(1);
+                resourceMaps.add(renderRequest.get(0).getResources().keySet());
                 invocation.callRealMethod();
                 return null;
             }
-        }).when(serverConnector).render(ArgumentMatchers.<TaskListener<List<RunningRender>>>any(), any(RenderRequest.class));
+        }).when(serverConnector).render(ArgumentMatchers.<TaskListener<List<RunningRender>>>any(), ArgumentMatchers.<List<RenderRequest>>any());
 
         VisualGridRunner runner = new VisualGridRunner(30);
         Eyes eyes = new Eyes(runner);

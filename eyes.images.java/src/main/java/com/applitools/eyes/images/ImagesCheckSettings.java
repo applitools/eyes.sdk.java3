@@ -1,12 +1,14 @@
 package com.applitools.eyes.images;
 
 import com.applitools.eyes.fluent.CheckSettings;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import java.awt.image.BufferedImage;
 
 public class ImagesCheckSettings extends CheckSettings implements IImagesCheckTarget {
 
-    private BufferedImage image;
+    @JsonIgnore
+    private final BufferedImage image;
 
     public ImagesCheckSettings(BufferedImage image){
 

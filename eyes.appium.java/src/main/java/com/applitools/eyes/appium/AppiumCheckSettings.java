@@ -11,6 +11,9 @@ import com.applitools.eyes.fluent.GetRegion;
 import com.applitools.eyes.selenium.wrappers.EyesWebDriver;
 import com.applitools.eyes.selenium.fluent.AccessibilityRegionBySelector;
 import com.applitools.eyes.selenium.fluent.ImplicitInitiation;
+import com.applitools.eyes.serializers.BySerializer;
+import com.applitools.eyes.serializers.WebElementSerializer;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 
@@ -19,13 +22,18 @@ import java.util.List;
 
 public class AppiumCheckSettings extends CheckSettings implements ImplicitInitiation {
 
+    @JsonSerialize(using = BySerializer.class)
     private By targetSelector;
+    @JsonSerialize(using = WebElementSerializer.class)
     private WebElement targetElement;
+    @JsonSerialize(using = BySerializer.class)
     private By cutElementSelector;
     private ElementType cutElementType;
     private Boolean statusBarExists;
     private String scrollRootElementId;
+    @JsonSerialize(using = BySerializer.class)
     private By scrollRootElementSelector;
+    @JsonSerialize(using = WebElementSerializer.class)
     private WebElement scrollRootElement;
 
     protected AppiumCheckSettings() {

@@ -1,7 +1,8 @@
 ## [vNext]
 ### Added
-- New JS layout feature and `setLayoutBreakpoints' API. [Trello 2387](https://trello.com/c/8caokJ19)
+- New JS layout feature and `setLayoutBreakpoints' API. [Trello 2387](https://trello.com/c/8caokJ19) [Trello 2258](https://trello.com/c/3Ty3HRCG)
 ### Updated
+- Updated logger structure. [Trello 2395](https://trello.com/c/NuhnOCD6)
 - Updated `isMobileDevice()` method to make `isBrowser()` accessible. [Trello 2307](https://trello.com/c/8VCtSmfN)
 - Now sending screenshot location in match window data and setting correct scrolled element for dom capture. [Trello 2379](https://trello.com/c/Wn9Fp4XN)
 - A massive update to eyes runners and services. [Trello 2092](https://trello.com/c/gulak9SJ)

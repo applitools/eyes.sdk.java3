@@ -14,18 +14,15 @@ public class MockServerConnector extends ServerConnector {
 
     @Override
     public void closeBatch(String batchId) {
-        logger.log(String.format("closing batch: %s", batchId));
     }
 
     @Override
     public void deleteSession(final TaskListener<Void> listener, TestResults testResults) {
-        logger.log(String.format("deleting session: %s", testResults.getId()));
         listener.onComplete(null);
     }
 
     @Override
     public void stopSession(final TaskListener<TestResults> listener, SessionStopInfo sessionStopInfo) {
-        logger.log("ending session");
         TestResults testResults = new TestResults();
         testResults.setStatus(TestResultsStatus.Passed);
         listener.onComplete(testResults);
@@ -42,11 +39,11 @@ public class MockServerConnector extends ServerConnector {
     }
 
     @Override
-    public void render(final TaskListener<List<RunningRender>> listener, RenderRequest... renderRequests) {
-        this.renderRequests.addAll(Arrays.asList(renderRequests));
+    public void render(final TaskListener<List<RunningRender>> listener, List<RenderRequest> renderRequests) {
+        this.renderRequests.addAll(renderRequests);
 
         List<RunningRender> runningRenders = new ArrayList<>();
-        for (int i = 0; i < renderRequests.length; i++) {
+        for (int i = 0; i < renderRequests.size(); i++) {
             final RunningRender runningRender = new RunningRender();
             runningRender.setRenderId(UUID.randomUUID().toString());
             runningRender.setRenderStatus(RenderStatus.RENDERED);
@@ -57,7 +54,7 @@ public class MockServerConnector extends ServerConnector {
     }
 
     @Override
-    public void renderStatusById(final TaskListener<List<RenderStatusResults>> listener, String... renderIds) {
+    public void renderStatusById(final TaskListener<List<RenderStatusResults>> listener, List<String> testIds, List<String> renderIds) {
         List<RenderStatusResults> results = new ArrayList<>();
         for (String renderId : renderIds) {
             RenderStatusResults renderStatusResults = new RenderStatusResults();
@@ -79,8 +76,6 @@ public class MockServerConnector extends ServerConnector {
 
     @Override
     public void startSession(final TaskListener<RunningSession> listener, SessionStartInfo sessionStartInfo) {
-        logger.log(String.format("starting session: %s", sessionStartInfo));
-
         final RunningSession newSession = new RunningSession();
         newSession.setIsNew(false);
         newSession.setSessionId(UUID.randomUUID().toString());
@@ -88,7 +83,7 @@ public class MockServerConnector extends ServerConnector {
     }
 
     @Override
-    public void checkResourceStatus(final TaskListener<Boolean[]> listener, String renderId, HashObject... hashes) {
+    public void checkResourceStatus(final TaskListener<Boolean[]> listener, Set<String> testIds, String renderId, HashObject... hashes) {
         Boolean[] result = new Boolean[hashes.length];
         for (int i = 0; i < hashes.length; i++) {
             result[i] = false;
@@ -97,7 +92,7 @@ public class MockServerConnector extends ServerConnector {
     }
 
     @Override
-    public Future<?> renderPutResource(final String renderID, final RGridResource resource,
+    public Future<?> renderPutResource(final Set<String> testIds, final String renderID, final RGridResource resource,
                                        final TaskListener<Void> listener) {
         listener.onComplete(null);
         return null;

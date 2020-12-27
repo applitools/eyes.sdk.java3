@@ -7,16 +7,16 @@ import com.applitools.eyes.debug.DebugScreenshotsProvider;
 
 public class AndroidFullPageCaptureAlgorithm extends AppiumFullPageCaptureAlgorithm {
 
-    private String scrollableElementId;
+    private final String scrollableElementId;
 
-    public AndroidFullPageCaptureAlgorithm(Logger logger,
+    public AndroidFullPageCaptureAlgorithm(Logger logger, String testId,
                                            AppiumScrollPositionProvider scrollProvider,
                                            ImageProvider imageProvider, DebugScreenshotsProvider debugScreenshotsProvider,
                                            ScaleProviderFactory scaleProviderFactory, CutProvider cutProvider,
                                            EyesScreenshotFactory screenshotFactory, int waitBeforeScreenshots,
                                            Integer stitchingAdjustment, String scrollableElementId) {
 
-        super(logger, scrollProvider, imageProvider, debugScreenshotsProvider,
+        super(logger, testId, scrollProvider, imageProvider, debugScreenshotsProvider,
             scaleProviderFactory, cutProvider, screenshotFactory, waitBeforeScreenshots, null, stitchingAdjustment);
 
         // Android returns pixel coordinates which are already scaled according to the pixel ratio
@@ -43,10 +43,6 @@ public class AndroidFullPageCaptureAlgorithm extends AppiumFullPageCaptureAlgori
         // We need to set position margin to avoid shadow at the top of view
         int oneScrollStep = scrollViewRegion.getHeight() - stitchingAdjustment;
         int maxScrollSteps = contentSize.getScrollContentHeight() / oneScrollStep;
-        logger.verbose("Entire scrollable height: " + contentSize.getScrollContentHeight());
-        logger.verbose("One scroll step: " + oneScrollStep);
-        logger.verbose("Max scroll steps: " + ((double) contentSize.getScrollContentHeight() / oneScrollStep));
-
         for (int step = 1; step <= maxScrollSteps; step++) {
             regionToCrop = new Region(0,
                     scrollViewRegion.getTop() + stitchingAdjustment,
@@ -60,7 +56,6 @@ public class AndroidFullPageCaptureAlgorithm extends AppiumFullPageCaptureAlgori
             int endY = scrollViewRegion.getTop() + (step != maxScrollSteps ? stitchingAdjustment/2 : 0);
             boolean isScrolledWithHelperLibrary = false;
             if (scrollableElementId != null) { // it means that we want to scroll on a specific element
-                logger.verbose("Scrollable element id: " + scrollableElementId);
                 isScrolledWithHelperLibrary = ((AndroidScrollPositionProvider) scrollProvider).tryScrollWithHelperLibrary(scrollableElementId, (startY - endY), step, maxScrollSteps);
                 if (step == maxScrollSteps && isScrolledWithHelperLibrary) {
                     // We should make additional scroll on parent in case of scrollable element inside ScrollView
@@ -68,7 +63,6 @@ public class AndroidFullPageCaptureAlgorithm extends AppiumFullPageCaptureAlgori
                 }
             }
             if (!isScrolledWithHelperLibrary) {
-                logger.verbose("Scroll root element or helper library is not provided... Using standard scrolling...");
                 // We should use release() touch action for the last scroll action
                 // For some applications scrolling is not executed for the last part with cancel() action
                 ((AppiumScrollPositionProvider) scrollProvider).scrollTo(xPos,

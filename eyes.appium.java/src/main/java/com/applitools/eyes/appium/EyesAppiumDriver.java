@@ -3,11 +3,15 @@ package com.applitools.eyes.appium;
 import com.applitools.eyes.EyesException;
 import com.applitools.eyes.Logger;
 import com.applitools.eyes.RectangleSize;
+import com.applitools.eyes.logging.Stage;
+import com.applitools.eyes.logging.TraceLevel;
 import com.applitools.eyes.selenium.EyesDriverUtils;
 import com.applitools.eyes.selenium.wrappers.EyesWebDriver;
 import com.applitools.eyes.selenium.positioning.ImageRotation;
+import com.applitools.utils.GeneralUtils;
 import com.applitools.utils.ImageUtils;
 import io.appium.java_client.AppiumDriver;
+import org.apache.commons.lang3.tuple.Pair;
 import org.openqa.selenium.*;
 import org.openqa.selenium.remote.RemoteWebElement;
 
@@ -51,18 +55,12 @@ public class EyesAppiumDriver extends EyesWebDriver {
 
     private Map<String, Object> getCachedSessionDetails () {
         if(sessionDetails == null) {
-            logger.verbose("Retrieving session details and caching the result...");
             sessionDetails = getRemoteWebDriver().getSessionDetails();
-            logger.verbose("Session details: " + sessionDetails.toString());
         }
         return sessionDetails;
     }
 
     public HashMap<String, Integer> getViewportRect() {
-        Object viewportRectObject = getCachedSessionDetails().get("viewportRect");
-        logger.verbose("Viewport Rect Type: " + viewportRectObject.getClass());
-        logger.verbose("Viewport Rect Value: " + viewportRectObject.toString());
-
         Map<String, Long> rectMap = (Map<String, Long>) getCachedSessionDetails().get("viewportRect");
         int width = rectMap.get("width").intValue();
         int height = ensureViewportHeight(rectMap.get("height").intValue());
@@ -85,8 +83,8 @@ public class EyesAppiumDriver extends EyesWebDriver {
                     }
                 }
                 return height;
-            } catch (Exception ignored) {
-                logger.log("WARNING: There was an error while getting system bars height. Using original viewport size");
+            } catch (Exception e) {
+                GeneralUtils.logExceptionStackTrace(logger, Stage.GENERAL, e);
             }
         }
 
@@ -240,18 +238,14 @@ public class EyesAppiumDriver extends EyesWebDriver {
      * @return The viewport size of the default content (outer most frame).
      */
     public RectangleSize getDefaultContentViewportSize(boolean forceQuery) {
-        logger.verbose("getDefaultContentViewportSize(forceQuery: " + forceQuery + ")");
-
         if (defaultContentViewportSize != null && !forceQuery) {
-            logger.verbose("Using cached viewport size: " + defaultContentViewportSize);
             return defaultContentViewportSize;
         }
 
         HashMap<String, Integer> rect = getViewportRect();
         double dpr = getDevicePixelRatio();
         defaultContentViewportSize = (new RectangleSize(rect.get("width"), rect.get("height"))).scale(1/dpr);
-        logger.verbose("Done! Viewport size: " + defaultContentViewportSize);
-
+        logger.log(TraceLevel.Info, null, Stage.GENERAL, Pair.of("defaultContentViewportSize", defaultContentViewportSize));
         return defaultContentViewportSize;
     }
 

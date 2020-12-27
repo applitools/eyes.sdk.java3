@@ -5,6 +5,7 @@ import com.applitools.eyes.appium.EyesAppiumDriver;
 import com.applitools.eyes.appium.EyesAppiumElement;
 import com.applitools.eyes.selenium.wrappers.EyesWebDriver;
 import com.applitools.eyes.selenium.fluent.ImplicitInitiation;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.openqa.selenium.Dimension;
 import org.openqa.selenium.Point;
 import org.openqa.selenium.WebElement;
@@ -14,6 +15,7 @@ import java.util.List;
 
 public class AccessibilityRegionByElement extends com.applitools.eyes.selenium.fluent.AccessibilityRegionByElement implements ImplicitInitiation {
 
+    @JsonIgnore
     private EyesAppiumDriver driver;
 
     public AccessibilityRegionByElement(WebElement element, AccessibilityRegionType regionType) {

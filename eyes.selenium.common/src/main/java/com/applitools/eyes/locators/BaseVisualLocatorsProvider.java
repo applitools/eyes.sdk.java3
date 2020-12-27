@@ -1,30 +1,30 @@
 package com.applitools.eyes.locators;
 
 import com.applitools.connectivity.ServerConnector;
-import com.applitools.eyes.EyesException;
-import com.applitools.eyes.Logger;
-import com.applitools.eyes.Region;
-import com.applitools.eyes.SyncTaskListener;
+import com.applitools.eyes.*;
 import com.applitools.eyes.debug.DebugScreenshotsProvider;
+import com.applitools.eyes.logging.Stage;
 import com.applitools.utils.ArgumentGuard;
 import com.applitools.utils.ImageUtils;
+import org.apache.commons.lang3.tuple.Pair;
 
 import java.awt.image.BufferedImage;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
 public abstract class BaseVisualLocatorsProvider implements VisualLocatorsProvider {
 
     protected Logger logger;
+    protected final String testId;
     private final ServerConnector serverConnector;
     protected double devicePixelRatio;
     protected String appName;
     protected DebugScreenshotsProvider debugScreenshotsProvider;
 
-    public BaseVisualLocatorsProvider(Logger logger, ServerConnector serverConnector,
+    public BaseVisualLocatorsProvider(Logger logger, String testId, ServerConnector serverConnector,
                                       double devicePixelRatio, String appName, DebugScreenshotsProvider debugScreenshotsProvider) {
         this.logger = logger;
+        this.testId = testId;
         this.serverConnector = serverConnector;
         this.devicePixelRatio = devicePixelRatio;
         this.appName = appName;
@@ -35,17 +35,14 @@ public abstract class BaseVisualLocatorsProvider implements VisualLocatorsProvid
     public Map<String, List<Region>> getLocators(VisualLocatorSettings visualLocatorSettings) {
         ArgumentGuard.notNull(visualLocatorSettings, "visualLocatorSettings");
 
-        logger.verbose("Get locators with given names: " + Arrays.toString(visualLocatorSettings.getNames().toArray()));
 
-        logger.verbose("Requested viewport screenshot for visual locators...");
         BufferedImage viewPortScreenshot = getViewPortScreenshot();
-        logger.verbose(String.format("Image size after scaling: %dx%d", viewPortScreenshot.getWidth(), viewPortScreenshot.getHeight()));
+        logger.log(testId, Stage.LOCATE,
+                Pair.of("locatorNames", visualLocatorSettings.getNames()),
+                Pair.of("devicePixelRatio", devicePixelRatio),
+                Pair.of("scaledImageSize", new RectangleSize(viewPortScreenshot.getWidth(), viewPortScreenshot.getHeight())));
         debugScreenshotsProvider.save(viewPortScreenshot, "visual_locators_final");
-
-        logger.verbose("Convert screenshot from BufferedImage to base64...");
         byte[] image = ImageUtils.encodeAsPng(viewPortScreenshot);
-
-        logger.verbose("Post visual locators screenshot...");
         SyncTaskListener<String> listener = new SyncTaskListener<>(logger, "getLocators");
         serverConnector.uploadImage(listener, image);
         String viewportScreenshotUrl = listener.get();
@@ -53,10 +50,10 @@ public abstract class BaseVisualLocatorsProvider implements VisualLocatorsProvid
             throw new EyesException("Failed posting viewport image");
         }
 
-        logger.verbose("Screenshot URL: " + viewportScreenshotUrl);
-
         VisualLocatorsData data = new VisualLocatorsData(appName, viewportScreenshotUrl, visualLocatorSettings.isFirstOnly(), visualLocatorSettings.getNames());
-        logger.verbose("Post visual locators: " + data.toString());
+        logger.log(testId, Stage.LOCATE,
+                Pair.of("screenshotUrl", viewportScreenshotUrl),
+                Pair.of("visualLocatorsData", data));
 
         SyncTaskListener<Map<String, List<Region>>> postListener = new SyncTaskListener<>(logger, "getLocators");
         serverConnector.postLocators(postListener, data);
@@ -65,6 +62,8 @@ public abstract class BaseVisualLocatorsProvider implements VisualLocatorsProvid
             throw new EyesException("Failed posting locators");
         }
 
+        logger.log(testId, Stage.LOCATE,
+                Pair.of("result", result));
         return result;
     }
 

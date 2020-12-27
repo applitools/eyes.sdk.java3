@@ -17,7 +17,7 @@ public class CssTranslatePositionProvider implements PositionProvider, ISelenium
     protected final IEyesJsExecutor executor;
     private final WebElement scrollRootElement;
 
-    private final String JSSetTransform =
+    private final static String JSSetTransform =
             "var originalTransform = arguments[0].style.transform;" +
                     "arguments[0].style.transform = '%s';" +
                     "return originalTransform;";
@@ -32,18 +32,14 @@ public class CssTranslatePositionProvider implements PositionProvider, ISelenium
         this.logger = logger;
         this.executor = executor;
         this.scrollRootElement = scrollRootElement;
-
-        logger.verbose("creating CssTranslatePositionProvider");
     }
 
     public Location getCurrentPosition() {
-        logger.verbose("position to return: " + lastSetPosition);
         return lastSetPosition;
     }
 
     public Location setPosition(Location location) {
         ArgumentGuard.notNull(location, "location");
-        logger.verbose("CssTranslatePositionProvider - Setting position to: " + location);
         Location negatedLocation = new Location(-location.getX(), -location.getY());
         Location negatedLocation2 = new Location(10, -location.getY());
         //EyesSeleniumUtils.translateTo(executor, location);
@@ -55,16 +51,12 @@ public class CssTranslatePositionProvider implements PositionProvider, ISelenium
                 String.format("arguments[0].style.transform='translate(%dpx,%dpx)';",
                         negatedLocation.getX(), negatedLocation.getY()),
                 this.scrollRootElement);
-        logger.verbose("Done!");
         lastSetPosition = location;
         return lastSetPosition;
     }
 
     public RectangleSize getEntireSize() {
-        RectangleSize entireSize =
-                EyesDriverUtils.getEntireElementSize(logger, executor, scrollRootElement);
-        logger.verbose("CssTranslatePositionProvider - Entire size: " + entireSize);
-        return entireSize;
+        return EyesDriverUtils.getEntireElementSize(logger, executor, scrollRootElement);
     }
 
     public PositionMemento getState() {

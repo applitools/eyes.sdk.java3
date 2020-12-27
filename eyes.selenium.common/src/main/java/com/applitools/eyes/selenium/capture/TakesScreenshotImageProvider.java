@@ -23,9 +23,7 @@ public class TakesScreenshotImageProvider implements ImageProvider {
 
     @Override
     public BufferedImage getImage() {
-        logger.verbose("Getting screenshot as base64...");
         String screenshot64 = tsInstance.getScreenshotAs(OutputType.BASE64);
-        logger.verbose("Done getting base64! Creating BufferedImage...");
         return ImageUtils.imageFromBase64(screenshot64);
     }
 }

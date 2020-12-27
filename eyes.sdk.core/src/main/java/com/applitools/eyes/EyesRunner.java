@@ -1,13 +1,16 @@
 package com.applitools.eyes;
 
 import com.applitools.connectivity.ServerConnector;
+import com.applitools.eyes.logging.Stage;
+import com.applitools.eyes.logging.Type;
 import com.applitools.utils.GeneralUtils;
+import org.apache.commons.lang3.tuple.Pair;
 
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
-import java.util.UUID;
 
 public abstract class EyesRunner {
     protected ServerConnector serverConnector = new ServerConnector();
@@ -15,7 +18,7 @@ public abstract class EyesRunner {
 
     private boolean dontCloseBatches = false;
 
-    protected Logger logger = new IdPrintingLogger("n/a");
+    protected Logger logger = new Logger();
 
     private final Map<String, IBatchCloser> batchesServerConnectorsMap = new HashMap<>();
 
@@ -26,9 +29,8 @@ public abstract class EyesRunner {
     }
 
     public TestResultsSummary getAllTestResults(boolean shouldThrowException) {
-        logger.verbose("enter");
+        logger.log(new HashSet<String>(), Stage.CLOSE, Type.CALLED);
         if (allTestResults != null) {
-            logger.log("WARNING: getAllTestResults called more than once");
             return allTestResults;
         }
 
@@ -50,11 +52,10 @@ public abstract class EyesRunner {
 
         boolean dontCloseBatchesStr = GeneralUtils.getDontCloseBatches();
         if (dontCloseBatchesStr) {
-            logger.log("APPLITOOLS_DONT_CLOSE_BATCHES environment variable set to true. Skipping batch close.");
             return;
         }
 
-        logger.verbose(String.format("Deleting %d batches", batchesServerConnectorsMap.size()));
+        logger.log(new HashSet<String>(), Stage.CLOSE, Type.CLOSE_BATCH, Pair.of("batchSize", batchesServerConnectorsMap.size()));
         for (String batch : batchesServerConnectorsMap.keySet()) {
             IBatchCloser connector = batchesServerConnectorsMap.get(batch);
             connector.closeBatch(batch);
@@ -82,32 +83,13 @@ public abstract class EyesRunner {
         }
     }
 
-    protected static class IdPrintingLogger extends Logger {
-        protected final String runnerId = UUID.randomUUID().toString();
-        protected final String suiteName;
-
-        public IdPrintingLogger(String suiteName) {
-            this.suiteName = suiteName;
-        }
-
-        @Override
-        protected int getMethodsBack() {
-            return 4;
-        }
-
-        @Override
-        public String getPrefix() {
-            return super.getPrefix() + suiteName + " (runnerId: " + runnerId + ") ";
-        }
-    }
-
     public void setServerUrl(String serverUrl) {
         if (serverUrl != null) {
             if (serverConnector.getServerUrl().equals(GeneralUtils.getServerUrl())) {
                 try {
                     serverConnector.setServerUrl(new URI(serverUrl));
                 } catch (URISyntaxException e) {
-                    GeneralUtils.logExceptionStackTrace(logger, e);
+                    GeneralUtils.logExceptionStackTrace(logger, Stage.GENERAL, e);
                 }
             } else if (!serverConnector.getServerUrl().toString().equals(serverUrl)) {
                 throw new EyesException(String.format("Server url was already set to %s", serverConnector.getServerUrl()));

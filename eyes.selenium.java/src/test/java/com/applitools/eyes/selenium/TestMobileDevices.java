@@ -48,15 +48,11 @@ public class TestMobileDevices extends ReportingTestSuite implements ITest {
         String testName = getTestName(deviceName, platformVersion, deviceOrientation, page);
 
         SeleniumTestUtils.setupLogging(eyes, testName);
-
-        eyes.getLogger().log(testName);
         WebDriver driver = initEyesSimulation(deviceName, platformVersion, deviceOrientation, testName + " " + eyes.getFullAgentId(), platformName, browserName);
 
         if (driver != null) {
             driver.manage().timeouts().implicitlyWait(30, TimeUnit.SECONDS);
             runTest(true, eyes, testName, driver, page);
-        } else {
-            eyes.getLogger().log("Error: failed to create webdriver.");
         }
     }
 

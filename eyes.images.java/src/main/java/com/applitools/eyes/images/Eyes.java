@@ -11,14 +11,19 @@ import com.applitools.eyes.events.ValidationResult;
 import com.applitools.eyes.exceptions.TestFailedException;
 import com.applitools.eyes.fluent.CheckSettings;
 import com.applitools.eyes.fluent.ICheckSettingsInternal;
+import com.applitools.eyes.logging.Stage;
+import com.applitools.eyes.logging.TraceLevel;
+import com.applitools.eyes.logging.Type;
 import com.applitools.eyes.positioning.RegionProvider;
 import com.applitools.eyes.selenium.ClassicRunner;
 import com.applitools.eyes.triggers.MouseAction;
 import com.applitools.utils.ArgumentGuard;
 import com.applitools.utils.ClassVersionGetter;
 import com.applitools.utils.ImageUtils;
+import org.apache.commons.lang3.tuple.Pair;
 
 import java.awt.image.BufferedImage;
+import java.util.Collections;
 
 public class Eyes extends EyesBase implements IConfiguration {
 
@@ -131,13 +136,9 @@ public class Eyes extends EyesBase implements IConfiguration {
     public boolean checkImage(BufferedImage image, String tag,
                               boolean ignoreMismatch) {
         if (getIsDisabled()) {
-            logger.verbose(String.format("CheckImage(Image, '%s', %b): Ignored", tag, ignoreMismatch));
             return false;
         }
         ArgumentGuard.notNull(image, "image cannot be null!");
-
-        logger.verbose(String.format("CheckImage(Image, '%s', %b)", tag, ignoreMismatch));
-
         return checkImage_(RegionProvider.NULL_INSTANCE, image, tag, new CheckSettings(USE_DEFAULT_TIMEOUT));
     }
 
@@ -216,15 +217,10 @@ public class Eyes extends EyesBase implements IConfiguration {
      */
     public boolean checkRegion(BufferedImage image, final Region region, String tag, boolean ignoreMismatch) {
         if (getIsDisabled()) {
-            logger.verbose(String.format(
-                    "CheckRegion(Image, [%s], '%s', %b): Ignored",
-                    region, tag, ignoreMismatch));
             return false;
         }
         ArgumentGuard.notNull(image, "image cannot be null!");
         ArgumentGuard.notNull(region, "region cannot be null!");
-
-        logger.verbose(String.format("CheckRegion(Image, [%s], '%s', %b)", region, tag, ignoreMismatch));
         return checkImage_(new RegionProvider() {
             public Region getRegion() {
                 return region;
@@ -352,7 +348,9 @@ public class Eyes extends EyesBase implements IConfiguration {
                                 BufferedImage image,
                                 String tag,
                                 ICheckSettings checkSettings) {
-
+        logger.log(TraceLevel.Info, Collections.singleton(getTestId()), Stage.CHECK, Type.CALLED,
+                Pair.of("configuration", getConfiguration()),
+                Pair.of("checkSettings", checkSettings));
         if (config.getViewportSize() == null || config.getViewportSize().isEmpty()) {
             setViewportSize(new RectangleSize(image.getWidth(), image.getHeight()));
         }
@@ -366,7 +364,6 @@ public class Eyes extends EyesBase implements IConfiguration {
 
         CutProvider cutProvider = cutProviderHandler.get();
         if (!(cutProvider instanceof NullCutProvider)) {
-            logger.verbose("cutting...");
             image = cutProvider.cut(image);
             debugScreenshotsProvider.save(image, "cut");
         }
@@ -496,11 +493,9 @@ public class Eyes extends EyesBase implements IConfiguration {
     public Configuration setMatchTimeout(int ms) {
         final int MIN_MATCH_TIMEOUT = 500;
         if (getIsDisabled()) {
-            logger.verbose("Ignored");
             return config;
         }
 
-        logger.verbose("Setting match timeout to: " + ms);
         if ((ms != 0) && (MIN_MATCH_TIMEOUT > ms)) {
             throw new IllegalArgumentException("Match timeout must be set in milliseconds, and must be > " +
                     MIN_MATCH_TIMEOUT);
@@ -558,11 +553,8 @@ public class Eyes extends EyesBase implements IConfiguration {
      */
     public Configuration setBatch(BatchInfo batch) {
         if (getIsDisabled()) {
-            logger.verbose("Ignored");
             return config;
         }
-
-        logger.verbose("setBatch(" + batch + ")");
 
         this.config.setBatch(batch);
         return config;
@@ -686,9 +678,6 @@ public class Eyes extends EyesBase implements IConfiguration {
      * @param hostOS The host OS running the AUT.
      */
     public Configuration setHostOS(String hostOS) {
-
-        logger.log("Host OS: " + hostOS);
-
         if (hostOS == null || hostOS.isEmpty()) {
             this.config.setHostOS(null);
         } else {
@@ -708,9 +697,6 @@ public class Eyes extends EyesBase implements IConfiguration {
      * @param hostApp The application running the AUT (e.g., Chrome).
      */
     public Configuration setHostApp(String hostApp) {
-
-        logger.log("Host App: " + hostApp);
-
         if (hostApp == null || hostApp.isEmpty()) {
             this.config.setHostApp(null);
         } else {
@@ -749,9 +735,6 @@ public class Eyes extends EyesBase implements IConfiguration {
      * @param baselineEnvName The name of the baseline's environment.
      */
     public Configuration setBaselineEnvName(String baselineEnvName) {
-
-        logger.log("Baseline environment name: " + baselineEnvName);
-
         if (baselineEnvName == null || baselineEnvName.isEmpty()) {
             this.config.setBaselineEnvName(null);
         } else {
@@ -782,9 +765,6 @@ public class Eyes extends EyesBase implements IConfiguration {
      * @param envName The name of the environment of the baseline.
      */
     public void setEnvName(String envName) {
-
-        logger.log("Environment name: " + envName);
-
         if (envName == null || envName.isEmpty()) {
             this.config.setEnvironmentName(null);
         } else {
@@ -810,13 +790,8 @@ public class Eyes extends EyesBase implements IConfiguration {
     @Deprecated
     public void setAppEnvironment(String hostOS, String hostApp) {
         if (getIsDisabled()) {
-            logger.verbose("Ignored");
             return;
         }
-
-        logger.log("Warning: SetAppEnvironment is deprecated! Please use 'setHostOS' and 'setHostApp'");
-
-        logger.verbose("setAppEnvironment(" + hostOS + ", " + hostApp + ")");
         setHostOS(hostOS);
         setHostApp(hostApp);
     }

@@ -11,6 +11,7 @@ import com.applitools.utils.GeneralUtils;
 import org.apache.http.HttpStatus;
 
 import java.util.Calendar;
+import java.util.Objects;
 import java.util.TimeZone;
 
 public class NetworkLogHandler extends LogHandler {
@@ -21,7 +22,7 @@ public class NetworkLogHandler extends LogHandler {
     final LogSessionsClientEvents clientEvents;
 
     protected NetworkLogHandler(ServerConnector serverConnector) {
-        super(true);
+        super(TraceLevel.Notice);
         ArgumentGuard.notNull(serverConnector, "serverConnector");
         this.serverConnector = serverConnector;
         this.clientEvents = new LogSessionsClientEvents();
@@ -31,19 +32,14 @@ public class NetworkLogHandler extends LogHandler {
     public void open() {}
 
     @Override
-    public void onMessage(TraceLevel level, String message) {
+    public void onMessageInner(ClientEvent event) {
         synchronized (clientEvents) {
-            String currentTime = GeneralUtils.toISO8601DateTime(Calendar.getInstance(TimeZone.getTimeZone("UTC")));
-            ClientEvent event = new ClientEvent(currentTime, message, level);
             clientEvents.addEvent(event);
             if (clientEvents.size() >= MAX_EVENTS_SIZE) {
                 sendLogs();
             }
         }
     }
-
-    @Override
-    public void onMessage(String message) {}
 
     @Override
     public void close() {
@@ -84,8 +80,21 @@ public class NetworkLogHandler extends LogHandler {
     }
 
     public static void sendSingleLog(ServerConnector serverConnector, TraceLevel level, String message) {
+        String currentTime = GeneralUtils.toISO8601DateTime(Calendar.getInstance(TimeZone.getTimeZone("UTC")));
+        ClientEvent event = new ClientEvent(currentTime, message, level);
         NetworkLogHandler logHandler = new NetworkLogHandler(serverConnector);
-        logHandler.onMessage(level, message);
+        logHandler.onMessage(event);
         logHandler.close();
+    }
+
+    @Override
+    public boolean equals(Object other) {
+        return other instanceof NetworkLogHandler &&
+                ((NetworkLogHandler) other).serverConnector.getServerUrl().equals(serverConnector.getServerUrl());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(serverConnector.getServerUrl());
     }
 }

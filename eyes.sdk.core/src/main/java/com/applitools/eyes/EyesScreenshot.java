@@ -114,10 +114,7 @@ public abstract class EyesScreenshot {
         ArgumentGuard.notNull(to, "to");
 
         Location originalLocation = region.getLocation();
-        logger.verbose("original location: " + originalLocation);
         Location updatedLocation = convertLocation(originalLocation, from, to);
-        logger.verbose("updated location: " + updatedLocation);
-
         return new Region(updatedLocation, region.getSize());
     }
 

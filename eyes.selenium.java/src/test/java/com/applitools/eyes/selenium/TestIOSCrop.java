@@ -73,12 +73,8 @@ public class TestIOSCrop extends ReportingTestSuite {
 
         Logger logger = new Logger();
         logger.setLogHandler(TestUtils.initLogger(testName));
-
-        logger.log("looking for resource: '/IOSImages/Input/" + sanitizedTestName + ".png'");
         InputStream inputStream = TestIOSCrop.class.getResourceAsStream("/IOSImages/Input/" + sanitizedTestName + ".png");
         BufferedImage input = ImageUtils.imageFromStream(inputStream);
-
-        logger.log("looking for resource: '/IOSImages/Expected/" + sanitizedTestName + ".png'");
         InputStream expectedStream = TestIOSCrop.class.getResourceAsStream("/IOSImages/Expected/" + sanitizedTestName + ".png");
         BufferedImage expected = ImageUtils.imageFromStream(expectedStream);
 
@@ -86,9 +82,9 @@ public class TestIOSCrop extends ReportingTestSuite {
             BufferedImage output = SafariScreenshotImageProvider.cropIOSImage(input, new RectangleSize(vpWidth, vpHeight), logger);
             if (!TestUtils.runOnCI) {
                 String inputPath = TestUtils.logsPath + File.separator + "java" + File.separator + "IOSCrop" + File.separator + sanitizedTestName + "_input.png";
-                ImageUtils.saveImage(logger, input, inputPath);
+                ImageUtils.saveImage(input, inputPath);
                 String outputPath = TestUtils.logsPath + File.separator + "java" + File.separator + "IOSCrop" + File.separator + sanitizedTestName + "_output.png";
-                ImageUtils.saveImage(logger, output, outputPath);
+                ImageUtils.saveImage(output, outputPath);
             }
             Assert.assertEquals(output.getWidth(), expected.getWidth(), "Width");
             Assert.assertEquals(output.getHeight(), expected.getHeight(), "Height");

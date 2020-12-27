@@ -4,6 +4,7 @@ import com.applitools.connectivity.api.AsyncRequest;
 import com.applitools.connectivity.api.AsyncRequestCallback;
 import com.applitools.connectivity.api.Response;
 import com.applitools.eyes.TaskListener;
+import com.applitools.eyes.logging.Stage;
 import com.applitools.utils.GeneralUtils;
 import org.apache.http.HttpStatus;
 
@@ -42,7 +43,6 @@ public class UploadCallback implements AsyncRequestCallback {
         response.close();
 
         if (statusCode == HttpStatus.SC_OK || statusCode == HttpStatus.SC_CREATED) {
-            serverConnector.logger.verbose(String.format("upload completed. url: %s", targetUrl));
             listener.onComplete(targetUrl);
             return;
         }
@@ -64,7 +64,6 @@ public class UploadCallback implements AsyncRequestCallback {
             sleepDuration = 10 * 1000;
         }
 
-        serverConnector.logger.log(String.format("Failed uploading image, retrying. %s", errorMessage));
         try {
             Thread.sleep(sleepDuration);
         } catch (InterruptedException e) {
@@ -78,7 +77,7 @@ public class UploadCallback implements AsyncRequestCallback {
 
     @Override
     public void onFail(Throwable throwable) {
-        GeneralUtils.logExceptionStackTrace(serverConnector.logger, throwable);
+        GeneralUtils.logExceptionStackTrace(serverConnector.logger, Stage.GENERAL, throwable);
         listener.onFail();
     }
 

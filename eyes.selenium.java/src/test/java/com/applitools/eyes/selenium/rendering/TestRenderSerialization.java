@@ -45,7 +45,7 @@ public class TestRenderSerialization {
         Map<String, RGridResource> resources = new HashMap<>();
         String platform = "android";
         BrowserType browserName = BrowserType.IE_10;
-        RenderRequest request = new RenderRequest(webHook.toString(), url.toString(), dom, resources, renderInfo, platform,
+        RenderRequest request = new RenderRequest("id", webHook.toString(), url.toString(), dom, resources, renderInfo, platform,
                 browserName, null, selectorsToFindRegionsFor, true, "rendererId", "", stitchingServiceUrl.toString(), options);
 
         ObjectMapper mapper = new ObjectMapper();
@@ -67,7 +67,7 @@ public class TestRenderSerialization {
             }
 
             @Override
-            public void renderStatusById(final TaskListener<List<RenderStatusResults>> listener, String... renderIds) {
+            public void renderStatusById(final TaskListener<List<RenderStatusResults>> listener, List<String> testIds, List<String> renderIds) {
                 super.renderStatusById(new TaskListener<List<RenderStatusResults>>() {
                     @Override
                     public void onComplete(List<RenderStatusResults> results) {
@@ -83,7 +83,7 @@ public class TestRenderSerialization {
                     public void onFail() {
                         listener.onFail();
                     }
-                }, renderIds);
+                }, testIds, renderIds);
             }
         };
 

@@ -36,7 +36,7 @@ public class FixedCutProvider implements CutProvider {
         Region targetRegion = new Region(left, header,
                 image.getWidth() - left - right,
                 image.getHeight() - header - footer);
-        return ImageUtils.cropImage(logger, image, targetRegion);
+        return ImageUtils.cropImage(image, targetRegion);
     }
 
     public CutProvider scale(double scaleRatio) {
