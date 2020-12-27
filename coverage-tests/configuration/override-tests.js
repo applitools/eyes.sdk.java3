@@ -81,5 +81,8 @@ module.exports = {
     'should send dom and location when check region by selector with custom scroll root with vg': {skipEmit: true},
     'should send dom and location when check region by selector fully with custom scroll root': {skipEmit: true},
     'should send dom and location when check region by selector fully with custom scroll root with vg': {skipEmit: true},
-    'should send dom of version 10': {skipEmit: true}
+    'should send dom of version 10': {skipEmit: true},
+    'appium android check window': {skip: true}, //wrong ignore region ticket 2396
+    'appium android check region with ignore region': {skip: true}, //wrong ignore region region ticket 2396
+    'appium iOS check region with ignore region': {skip: true}, //wrong ignore region region ticket 2396
  }
