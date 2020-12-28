@@ -1,3 +1,7 @@
+##[vNext]
+### Updated
+- Updated `isMobileDevice()` method to make `isBrowser()` accessible. [Trello 2307](https://trello.com/c/8VCtSmfN)
+
 ## [3.189.0] - 2020-12-17
 ### Fixed
 - DOM Capture won't be stuck in an infinite recursion because of bidirectional frame dependency anymore. [Trello 2292](https://trello.com/c/HmNKvpk4)

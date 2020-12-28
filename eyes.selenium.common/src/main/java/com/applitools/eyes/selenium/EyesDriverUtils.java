@@ -8,9 +8,7 @@ import com.applitools.utils.GeneralUtils;
 import org.openqa.selenium.*;
 import org.openqa.selenium.interactions.Coordinates;
 
-import java.lang.reflect.Field;
-import java.lang.reflect.InvocationHandler;
-import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.*;
 import java.lang.reflect.Proxy;
 import java.util.HashMap;
 import java.util.Map;
@@ -125,9 +123,17 @@ public class EyesDriverUtils {
     public static boolean isMobileDevice(WebDriver driver) {
         driver = getUnderlyingDriver(driver);
         try {
-            return reflectionInstanceof(driver, "AppiumDriver") &&
-                    driver.getClass().getMethod("isBrowser").invoke(driver).equals(false);
-        } catch (IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
+            if (reflectionInstanceof(driver, "AppiumDriver")) {
+                Method isBrowser;
+                try {
+                    isBrowser = driver.getClass().getDeclaredMethod("isBrowser");
+                    isBrowser.setAccessible(true);
+                } catch (NoSuchMethodException ignored) {
+                    isBrowser = driver.getClass().getMethod("isBrowser");
+                }
+                return isBrowser.invoke(driver).equals(false);
+            }
+        } catch (Exception e) {
             e.printStackTrace();
         }
         return false;
