@@ -1,6 +1,8 @@
 ##[vNext]
 ### Updated
 - Updated `isMobileDevice()` method to make `isBrowser()` accessible. [Trello 2307](https://trello.com/c/8VCtSmfN)
+### Fixed 
+- Initialize content size from element bounds if IOException is thrown. [Trello 2250](https://trello.com/c/mVAzVx0X)
 
 ## [3.189.0] - 2020-12-17
 ### Fixed
