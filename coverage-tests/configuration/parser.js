@@ -22,8 +22,12 @@ function checkSettings(cs, native) {
     if (cs.ignoreDisplacements !== undefined) options += `.ignoreDisplacements(${cs.ignoreDisplacements})`
     if (cs.sendDom !== undefined) options += `.sendDom(${serialize(cs.sendDom)})`
     if (cs.matchLevel) options += `.matchLevel(MatchLevel.${cs.matchLevel.toUpperCase()})`
-    if (cs.isFully) options += '.fully()'
     if (cs.name) options += `.withName(${cs.name})`
+    if (cs.isFully === true) {
+        options += '.fully()'
+    } else if (cs.isFully === false) {
+        options += '.fully(false)'
+    }
     return java + element + options
 
     // check settings
