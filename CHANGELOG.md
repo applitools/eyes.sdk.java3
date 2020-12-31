@@ -2,6 +2,7 @@
 ### Updated
 - Updated `isMobileDevice()` method to make `isBrowser()` accessible. [Trello 2307](https://trello.com/c/8VCtSmfN)
 - Now sending screenshot location in match window data and setting correct scrolled element for dom capture. [Trello 2379](https://trello.com/c/Wn9Fp4XN)
+- A massive update to eyes runners and services. [Trello 2092](https://trello.com/c/gulak9SJ)
 ### Fixed 
 - Initialize content size from element bounds if IOException is thrown. [Trello 2250](https://trello.com/c/mVAzVx0X)
 
