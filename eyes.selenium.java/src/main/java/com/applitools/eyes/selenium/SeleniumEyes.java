@@ -1852,4 +1852,8 @@ public class SeleniumEyes extends RunningTest implements ISeleniumEyes {
     public CutProvider getCutProvider() {
         return cutProviderHandler.get();
     }
+
+    public ImageProvider getImageProvider() {
+        return imageProvider;
+    }
 }

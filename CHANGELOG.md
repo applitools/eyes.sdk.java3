@@ -1,3 +1,10 @@
+## [vNext]
+### Updated
+- Dom snapshot 4.4.3. [Trello 2405](https://trello.com/c/wBy9nGQi)
+- Added debug screenshot before calling dom snapshot in js layout.
+### Fixed
+- Setting server configuration now works properly in UFG tests. [Trello 2404](https://trello.com/c/4AuvRh4U)
+
 ## [3.190.1] - 2021-01-01
 ### Fixed
 - reverted rename of "getIsOpen". 

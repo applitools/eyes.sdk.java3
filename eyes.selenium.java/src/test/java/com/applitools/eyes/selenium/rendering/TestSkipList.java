@@ -1,4 +1,4 @@
-package com.applitools.eyes.renderingGrid;
+package com.applitools.eyes.selenium.rendering;
 
 import com.applitools.connectivity.ServerConnector;
 import com.applitools.eyes.RectangleSize;

@@ -478,9 +478,18 @@
     </test>
     <test name="TestSkipList">
         <classes>
-            <class name="com.applitools.eyes.renderingGrid.TestSkipList">
+            <class name="com.applitools.eyes.selenium.rendering.TestSkipList">
                 <methods>
                     <include name="testSkipList"/>
+                </methods>
+            </class>
+        </classes>
+    </test>
+    <test name="TestVisualGridEyes">
+        <classes>
+            <class name="com.applitools.eyes.selenium.rendering.TestVisualGridEyes">
+                <methods>
+                    <include name="testSetConfiguration"/>
                 </methods>
             </class>
         </classes>

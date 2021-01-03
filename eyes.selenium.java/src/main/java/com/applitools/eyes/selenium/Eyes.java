@@ -81,7 +81,7 @@ public class Eyes implements IEyesBase {
         }
     }
 
-    private void initLocatorProvider(WebDriver webDriver) {
+    private void afterOpen(WebDriver webDriver) {
         if (!(webDriver instanceof EyesSeleniumDriver)) {
             webDriver = new EyesSeleniumDriver(getLogger(), seleniumEyes, (RemoteWebDriver) webDriver);
         }
@@ -91,6 +91,10 @@ public class Eyes implements IEyesBase {
                 (EyesSeleniumDriver) webDriver,
                 getLogger(),
                 getDebugScreenshotsProvider());
+
+        if (isVisualGridEyes) {
+            visualGridEyes.setImageProvider(seleniumEyes.getImageProvider());
+        }
     }
 
     /**
@@ -105,7 +109,7 @@ public class Eyes implements IEyesBase {
         }
 
         webDriver = activeEyes.open(webDriver);
-        initLocatorProvider(webDriver);
+        afterOpen(webDriver);
         return webDriver;
     }
 
@@ -123,7 +127,7 @@ public class Eyes implements IEyesBase {
         }
 
         driver = activeEyes.open(driver, appName, testName, null);
-        initLocatorProvider(driver);
+        afterOpen(driver);
         return driver;
     }
 
@@ -143,7 +147,7 @@ public class Eyes implements IEyesBase {
         }
 
         driver = activeEyes.open(driver, appName, testName, viewportSize);
-        initLocatorProvider(driver);
+        afterOpen(driver);
         return driver;
     }
 
@@ -517,6 +521,9 @@ public class Eyes implements IEyesBase {
      */
     public void setSaveDebugScreenshots(boolean saveDebugScreenshots) {
         this.seleniumEyes.setSaveDebugScreenshots(saveDebugScreenshots);
+        if (isVisualGridEyes) {
+            visualGridEyes.setSaveDebugScreenshots(saveDebugScreenshots);
+        }
     }
 
     /**
@@ -533,6 +540,9 @@ public class Eyes implements IEyesBase {
      */
     public void setDebugScreenshotsPath(String pathToSave) {
         this.seleniumEyes.setDebugScreenshotsPath(pathToSave);
+        if (isVisualGridEyes) {
+            visualGridEyes.setDebugScreenshotsPath(pathToSave);
+        }
     }
 
     /**
@@ -549,6 +559,9 @@ public class Eyes implements IEyesBase {
      */
     public void setDebugScreenshotsPrefix(String prefix) {
         this.seleniumEyes.setDebugScreenshotsPrefix(prefix);
+        if (isVisualGridEyes) {
+            visualGridEyes.setDebugScreenshotsPrefix(prefix);
+        }
     }
 
     /**

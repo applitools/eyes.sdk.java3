@@ -451,6 +451,12 @@ public class ServerConnector extends UfgConnector {
 
     public void closeBatchAsync(final TaskListener<Void> listener, final String batchId, final String url) {
         ArgumentGuard.notNull(batchId, "batchId");
+        if (getApiKey() == null) {
+            logger.log(TraceLevel.Error, null, Stage.CLOSE, Type.CLOSE_BATCH, Pair.of("apiKey", "null"));
+            listener.onFail();
+            return;
+        }
+
         final String path = String.format(CLOSE_BATCH, batchId);
         initClient();
         AsyncRequest request = makeEyesRequest(new HttpRequestBuilder() {

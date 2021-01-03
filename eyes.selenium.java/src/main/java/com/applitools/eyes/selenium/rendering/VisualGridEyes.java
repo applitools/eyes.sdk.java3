@@ -4,8 +4,12 @@ import com.applitools.ICheckSettings;
 import com.applitools.ICheckSettingsInternal;
 import com.applitools.connectivity.ServerConnector;
 import com.applitools.eyes.*;
+import com.applitools.eyes.capture.ImageProvider;
 import com.applitools.eyes.config.Configuration;
 import com.applitools.eyes.config.ConfigurationProvider;
+import com.applitools.eyes.debug.DebugScreenshotsProvider;
+import com.applitools.eyes.debug.FileDebugScreenshotsProvider;
+import com.applitools.eyes.debug.NullDebugScreenshotProvider;
 import com.applitools.eyes.fluent.CheckSettings;
 import com.applitools.eyes.fluent.GetFloatingRegion;
 import com.applitools.eyes.fluent.GetSimpleRegion;
@@ -20,8 +24,8 @@ import com.applitools.eyes.selenium.wrappers.EyesSeleniumDriver;
 import com.applitools.eyes.selenium.wrappers.EyesTargetLocator;
 import com.applitools.eyes.visualgrid.model.*;
 import com.applitools.eyes.visualgrid.services.CheckTask;
-import com.applitools.eyes.visualgrid.services.VisualGridRunningTest;
 import com.applitools.eyes.visualgrid.services.VisualGridRunner;
+import com.applitools.eyes.visualgrid.services.VisualGridRunningTest;
 import com.applitools.utils.ArgumentGuard;
 import com.applitools.utils.ClassVersionGetter;
 import com.applitools.utils.GeneralUtils;
@@ -32,6 +36,7 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.remote.RemoteWebDriver;
 
+import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -39,11 +44,9 @@ import java.util.*;
 
 public class VisualGridEyes implements ISeleniumEyes {
     private final Logger logger;
-    private String apiKey = null;
-    private String serverUrl = null;
 
     private final VisualGridRunner runner;
-    private final Map<String, RunningTest> testList = new HashMap<>();
+    final Map<String, RunningTest> testList = new HashMap<>();
     private boolean isOpen = false;
 
     private final String PROCESS_PAGE;
@@ -57,6 +60,9 @@ public class VisualGridEyes implements ISeleniumEyes {
     private UserAgent userAgent = null;
     private RectangleSize viewportSize;
     private final List<PropertyData> properties = new ArrayList<>();
+
+    private ImageProvider imageProvider;
+    private DebugScreenshotsProvider debugScreenshotsProvider = new NullDebugScreenshotProvider();
 
     private static final String GET_ELEMENT_XPATH_JS =
             "var el = arguments[0];" +
@@ -121,6 +127,29 @@ public class VisualGridEyes implements ISeleniumEyes {
         setServerUrl(serverUrl);
     }
 
+    public void setImageProvider(ImageProvider imageProvider) {
+        this.imageProvider = imageProvider;
+    }
+
+    public void setSaveDebugScreenshots(boolean saveDebugScreenshots) {
+        DebugScreenshotsProvider prev = debugScreenshotsProvider;
+        if (saveDebugScreenshots) {
+            debugScreenshotsProvider = new FileDebugScreenshotsProvider(logger);
+        } else {
+            debugScreenshotsProvider = new NullDebugScreenshotProvider();
+        }
+        debugScreenshotsProvider.setPrefix(prev.getPrefix());
+        debugScreenshotsProvider.setPath(prev.getPath());
+    }
+
+    public void setDebugScreenshotsPath(String pathToSave) {
+        debugScreenshotsProvider.setPath(pathToSave);
+    }
+
+    public void setDebugScreenshotsPrefix(String prefix) {
+        debugScreenshotsProvider.setPrefix(prefix);
+    }
+
     @Override
     public WebDriver open(WebDriver driver, String appName, String testName, RectangleSize viewportSize) throws EyesException {
         logger.log(TraceLevel.Info, new HashSet<String>(), Stage.OPEN, Type.CALLED,
@@ -181,11 +210,22 @@ public class VisualGridEyes implements ISeleniumEyes {
         List<VisualGridRunningTest> newTests = new ArrayList<>();
         for (RenderBrowserInfo browserInfo : browserInfoList) {
             VisualGridRunningTest test = new VisualGridRunningTest(getConfiguration(), browserInfo, this.properties, logger);
+            test.setServerConnector(runner.getServerConnector());
+            test.setApiKey(getApiKey());
+            test.setServerUrl(getServerUrl());
+            test.setProxy(getProxy());
             this.testList.put(test.getTestId(), test);
             newTests.add(test);
         }
 
-        runner.open(this, newTests);
+        try {
+            runner.open(this, newTests);
+        } catch (Throwable t) {
+            for (RunningTest runningTest : testList.values()) {
+                runningTest.openFailed(t);
+            }
+            throw t;
+        }
         return this.webDriver != null ? this.webDriver : webDriver;
     }
 
@@ -296,15 +336,11 @@ public class VisualGridEyes implements ISeleniumEyes {
     }
 
     public String getApiKey() {
-        if (apiKey == null) {
-            apiKey = runner.getApiKey();
-        }
-
-        return apiKey;
+        return getConfiguration().getApiKey() == null ? runner.getApiKey() : getConfiguration().getApiKey();
     }
 
     public void setApiKey(String apiKey) {
-        this.apiKey = apiKey;
+        getConfiguration().setApiKey(apiKey);
     }
 
     public void setIsDisabled(Boolean disabled) {
@@ -316,10 +352,7 @@ public class VisualGridEyes implements ISeleniumEyes {
     }
 
     public URI getServerUrl() {
-        if (serverUrl == null) {
-            serverUrl = runner.getServerUrl();
-        }
-
+        String serverUrl = getConfiguration().getServerUrl() == null ? runner.getServerUrl() : getConfiguration().getServerUrl().toString();
         try {
             return new URI(serverUrl);
         } catch (URISyntaxException e) {
@@ -329,15 +362,11 @@ public class VisualGridEyes implements ISeleniumEyes {
     }
 
     public void setServerUrl(String serverUrl) {
-        this.serverUrl = serverUrl;
+        getConfiguration().setServerUrl(serverUrl);
     }
 
     public AbstractProxySettings getProxy() {
-        if (getConfiguration().getProxy() == null) {
-            return runner.getProxy();
-        }
-
-        return getConfiguration().getProxy();
+        return getConfiguration().getProxy() == null ? runner.getProxy() : getConfiguration().getProxy();
     }
 
     @Override
@@ -501,9 +530,19 @@ public class VisualGridEyes implements ISeleniumEyes {
         if (width != 0) {
             try {
                 EyesDriverUtils.setViewportSize(logger, webDriver, new RectangleSize(width, viewportSize.getHeight()));
+                Thread.sleep(300);
             } catch (Throwable t) {
                 GeneralUtils.logExceptionStackTrace(logger, Stage.CHECK, Type.DOM_SCRIPT, t, testIds.toArray(new String[0]));
             }
+        }
+
+        if (width != 0) {
+            RectangleSize viewportSize = EyesDriverUtils.getViewportSize(webDriver);
+            logger.log(TraceLevel.Info, testIds, Stage.CHECK, Type.DOM_SCRIPT,
+                    Pair.of("requiredWidth", width),
+                    Pair.of("viewportSize", viewportSize));
+            BufferedImage bufferedImage = imageProvider.getImage();
+            debugScreenshotsProvider.save(bufferedImage, String.format("snapshot_%s", viewportSize.toString()));
         }
 
         FrameData scriptResult = captureDomSnapshot(testIds, switchTo);

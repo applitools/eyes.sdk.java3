@@ -1,6 +1,8 @@
 package com.applitools.connectivity;
 
+import com.applitools.connectivity.api.AsyncRequestCallback;
 import com.applitools.eyes.*;
+import com.applitools.eyes.logging.LogSessionsClientEvents;
 import com.applitools.eyes.visualgrid.model.*;
 
 import java.net.URI;
@@ -125,5 +127,9 @@ public class MockServerConnector extends ServerConnector {
     @Override
     public void closeBatch(String batchId, String url) {
 
+    }
+
+    public void sendLogs(AsyncRequestCallback callback, LogSessionsClientEvents clientEvents) {
+        callback.onComplete(new MockedResponse(logger, 200, "ok", new byte[0]));
     }
 }
