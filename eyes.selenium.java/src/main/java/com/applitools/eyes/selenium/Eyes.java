@@ -175,7 +175,7 @@ public class Eyes implements IEyesBase {
      */
     public void setProxy(AbstractProxySettings proxySettings) {
         configuration.setProxy(proxySettings);
-        seleniumEyes.setProxy(proxySettings);
+        activeEyes.proxy(proxySettings);
     }
 
     /**

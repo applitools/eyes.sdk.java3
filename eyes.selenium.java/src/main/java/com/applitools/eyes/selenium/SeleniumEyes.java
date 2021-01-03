@@ -129,6 +129,10 @@ public class SeleniumEyes extends RunningTest implements ISeleniumEyes {
         setApiKey(apiKey);
     }
 
+    public void proxy(AbstractProxySettings proxySettings) {
+        setProxy(proxySettings);
+    }
+
     @Override
     public boolean isEyesClosed() {
         return isCompleted();

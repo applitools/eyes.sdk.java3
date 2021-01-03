@@ -365,6 +365,11 @@ public class VisualGridEyes implements ISeleniumEyes {
         getConfiguration().setServerUrl(serverUrl);
     }
 
+    @Override
+    public void proxy(AbstractProxySettings abstractProxySettings) {
+        getConfiguration().setProxy(abstractProxySettings);
+    }
+
     public AbstractProxySettings getProxy() {
         return getConfiguration().getProxy() == null ? runner.getProxy() : getConfiguration().getProxy();
     }

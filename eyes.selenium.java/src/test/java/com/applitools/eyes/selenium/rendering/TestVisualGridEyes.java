@@ -54,6 +54,7 @@ public class TestVisualGridEyes {
         eyes.setServerConnector(new MockServerConnector());
         eyes.setApiKey(expectedApiKey);
         eyes.setServerUrl(expectedServerUrl);
+        eyes.proxy(expectedProxy);
         eyes.open(driver, "app", "test", new RectangleSize(800, 800));
         Assert.assertEquals(runner.getApiKey(), expectedApiKey);
         Assert.assertEquals(eyes.getApiKey(), expectedApiKey);
@@ -61,6 +62,9 @@ public class TestVisualGridEyes {
         Assert.assertEquals(runner.getServerUrl(), expectedServerUrl);
         Assert.assertEquals(eyes.getServerUrl().toString(), expectedServerUrl);
         Assert.assertEquals(eyes.testList.values().iterator().next().getServerUrl().toString(), expectedServerUrl);
+        Assert.assertEquals(runner.getProxy(), expectedProxy);
+        Assert.assertEquals(eyes.getProxy(), expectedProxy);
+        Assert.assertEquals(eyes.testList.values().iterator().next().getProxy(), expectedProxy);
 
         final Configuration configuration2 = new Configuration();
         ConfigurationProvider configurationProvider2 = new ConfigurationProvider() {

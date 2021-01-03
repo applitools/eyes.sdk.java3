@@ -21,6 +21,8 @@ public interface IEyes extends IEyesBase {
 
     void apiKey(String apiKey);
 
+    void proxy(AbstractProxySettings proxySettings);
+
     boolean isEyesClosed();
 
     Logger getLogger();
