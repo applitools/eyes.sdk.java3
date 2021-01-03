@@ -85,7 +85,8 @@ public abstract class EyesRunner {
 
     public void setServerUrl(String serverUrl) {
         if (serverUrl != null) {
-            if (serverConnector.getServerUrl().equals(GeneralUtils.getServerUrl())) {
+            URI defaultServerUrl = GeneralUtils.getServerUrl();
+            if (serverConnector.getServerUrl().equals(defaultServerUrl) && !serverUrl.equals(defaultServerUrl.toString())) {
                 try {
                     serverConnector.setServerUrl(new URI(serverUrl));
                 } catch (URISyntaxException e) {
