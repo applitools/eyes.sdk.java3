@@ -119,6 +119,11 @@ public class AndroidScrollPositionProvider extends AppiumScrollPositionProvider 
         }
     }
 
+    @Override
+    public void forceScrollToTop() {
+        scroll(false);
+    }
+
     public void restoreState(PositionMemento state) {
         setPosition(new Location(state.getX(), state.getY()));
     }

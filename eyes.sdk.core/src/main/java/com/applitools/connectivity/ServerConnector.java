@@ -341,7 +341,7 @@ public class ServerConnector extends UfgConnector {
 
                 @Override
                 public void onFail() {
-                    listener.onFail();
+                    listener.onComplete(null);
                 }
             }, new TypeReference<RenderStatusResults[]>() {});
             sendAsyncRequest(request, HttpMethod.POST, callback, json, MediaType.APPLICATION_JSON);

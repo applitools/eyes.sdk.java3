@@ -5,32 +5,23 @@ import com.applitools.eyes.EyesException;
 import com.applitools.eyes.Logger;
 import com.applitools.eyes.TaskListener;
 import com.applitools.eyes.logging.Stage;
-import com.applitools.eyes.logging.Type;
 import com.applitools.eyes.logging.TraceLevel;
+import com.applitools.eyes.logging.Type;
 import com.applitools.eyes.visualgrid.model.RenderRequest;
 import com.applitools.eyes.visualgrid.model.RenderStatus;
 import com.applitools.eyes.visualgrid.model.RenderStatusResults;
 import com.applitools.eyes.visualgrid.model.RunningRender;
 import org.apache.commons.lang3.tuple.Pair;
 
-import java.util.*;
-import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 public class RenderService extends EyesService<RenderRequest, RenderStatusResults> {
     int RENDER_STATUS_POLLING_TIMEOUT = 60 * 60 * 1000;
 
-    private final AtomicBoolean isTimeElapsed = new AtomicBoolean(false);
-
     // Queue for tests that are in a render process
     private final List<Pair<String, String>> renderingQueue = Collections.synchronizedList(new ArrayList<Pair<String, String>>());
-
-    private class TimeoutTask extends TimerTask {
-        @Override
-        public void run() {
-            logger.log(TraceLevel.Error, new HashSet<String>(), Stage.RENDER, Type.TIMEOUT);
-            isTimeElapsed.set(true);
-        }
-    }
 
     public RenderService(Logger logger, ServerConnector serverConnector) {
         super(logger, serverConnector);
@@ -58,7 +49,7 @@ public class RenderService extends EyesService<RenderRequest, RenderStatusResult
         }
 
         try {
-            pollRenderingStatus(testIds, renderIds);
+            sendRenderingStatus(testIds, renderIds);
         } catch (Throwable t) {
             setRenderErrorToTasks(testIds, t);
         }
@@ -120,9 +111,7 @@ public class RenderService extends EyesService<RenderRequest, RenderStatusResult
         }
     }
 
-    private void pollRenderingStatus(final List<String> testIds, final List<String> renderIds) {
-        final Timer timer = new Timer("VG_StopWatch", true);
-        timer.schedule(new TimeoutTask(), RENDER_STATUS_POLLING_TIMEOUT);
+    private void sendRenderingStatus(final List<String> testIds, final List<String> renderIds) {
         serverConnector.renderStatusById(new TaskListener<List<RenderStatusResults>>() {
             @Override
             public void onComplete(List<RenderStatusResults> renderStatusResultsList) {
@@ -164,7 +153,6 @@ public class RenderService extends EyesService<RenderRequest, RenderStatusResult
                 }
 
                 if (renderIds.isEmpty()) {
-                    timer.cancel();
                     return;
                 }
 
@@ -172,34 +160,17 @@ public class RenderService extends EyesService<RenderRequest, RenderStatusResult
                     Thread.sleep(1500);
                 } catch (InterruptedException ignored) {}
 
-                if (!isTimeElapsed.get()) {
-                    serverConnector.renderStatusById(this, testIds, renderIds);
-                    return;
+                for (int i = 0; i < testIds.size(); i++) {
+                    renderingQueue.add(Pair.of(testIds.get(i), renderIds.get(i)));
                 }
-
-                onFail();
             }
 
             @Override
             public void onFail() {
-                try {
-                    Thread.sleep(500);
-                } catch (InterruptedException ignored) {}
-
-                if (!renderIds.isEmpty() && !isTimeElapsed.get()) {
-                    serverConnector.renderStatusById(this, testIds, renderIds);
-                    return;
-                }
-
-                timer.cancel();
-                if (renderIds.isEmpty()) {
-                    return;
-                }
-
                 for (int i = 0; i < testIds.size(); i++) {
                     String renderId = renderIds.get(i);
                     String testId = testIds.get(i);
-                    Throwable t = new EyesException(String.format("Render timeout. TestId: %s, RenderId: %s", testId, renderId));
+                    Throwable t = new EyesException(String.format("Render status failed. TestId: %s, RenderId: %s", testId, renderId));
                     synchronized (errorQueue) {
                         errorQueue.add(Pair.of(testId, t));
                     }

@@ -11,7 +11,6 @@ import com.applitools.eyes.selenium.fluent.Target;
 import com.applitools.eyes.selenium.rendering.VisualGridEyes;
 import com.applitools.eyes.utils.SeleniumUtils;
 import com.applitools.eyes.visualgrid.model.*;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import org.mockito.ArgumentMatchers;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
@@ -178,68 +177,6 @@ public class TestVisualGridRunner {
     }
 
     @Test
-    public void testConcurrencyAmount() {
-        VisualGridRunner runner = new VisualGridRunner();
-        Assert.assertEquals(runner.testConcurrency.actualConcurrency, VisualGridRunner.DEFAULT_CONCURRENCY);
-        Assert.assertEquals(runner.testConcurrency.userConcurrency, VisualGridRunner.DEFAULT_CONCURRENCY);
-        Assert.assertTrue(runner.testConcurrency.isDefault);
-        Assert.assertFalse(runner.testConcurrency.isLegacy);
-
-        runner = new VisualGridRunner("");
-        Assert.assertEquals(runner.testConcurrency.actualConcurrency, VisualGridRunner.DEFAULT_CONCURRENCY);
-        Assert.assertEquals(runner.testConcurrency.userConcurrency, VisualGridRunner.DEFAULT_CONCURRENCY);
-        Assert.assertTrue(runner.testConcurrency.isDefault);
-        Assert.assertFalse(runner.testConcurrency.isLegacy);
-
-        runner = new VisualGridRunner(10);
-        Assert.assertEquals(runner.testConcurrency.actualConcurrency, 50);
-        Assert.assertEquals(runner.testConcurrency.userConcurrency, 10);
-        Assert.assertFalse(runner.testConcurrency.isDefault);
-        Assert.assertTrue(runner.testConcurrency.isLegacy);
-
-        runner = new VisualGridRunner(5, "");
-        Assert.assertEquals(runner.testConcurrency.actualConcurrency, 25);
-        Assert.assertEquals(runner.testConcurrency.userConcurrency, 5);
-        Assert.assertFalse(runner.testConcurrency.isDefault);
-        Assert.assertTrue(runner.testConcurrency.isLegacy);
-
-        runner = new VisualGridRunner(new RunnerOptions().testConcurrency(5));
-        Assert.assertEquals(runner.testConcurrency.actualConcurrency, 5);
-        Assert.assertEquals(runner.testConcurrency.userConcurrency, 5);
-        Assert.assertFalse(runner.testConcurrency.isDefault);
-        Assert.assertFalse(runner.testConcurrency.isLegacy);
-
-        runner = new VisualGridRunner(new RunnerOptions().testConcurrency(5).testConcurrency(7));
-        Assert.assertEquals(runner.testConcurrency.actualConcurrency, 7);
-        Assert.assertEquals(runner.testConcurrency.userConcurrency, 7);
-        Assert.assertFalse(runner.testConcurrency.isDefault);
-        Assert.assertFalse(runner.testConcurrency.isLegacy);
-
-        runner = new VisualGridRunner(new RunnerOptions().testConcurrency(10), "");
-        Assert.assertEquals(runner.testConcurrency.actualConcurrency, 10);
-        Assert.assertEquals(runner.testConcurrency.userConcurrency, 10);
-        Assert.assertFalse(runner.testConcurrency.isDefault);
-        Assert.assertFalse(runner.testConcurrency.isLegacy);
-    }
-
-    @Test
-    public void testConcurrencyLogMessage() throws JsonProcessingException {
-        VisualGridRunner runner = new VisualGridRunner();
-        Assert.assertEquals(runner.getConcurrencyLog(),
-                String.format("{\"type\":\"runnerStarted\",\"defaultConcurrency\":%d}", VisualGridRunner.DEFAULT_CONCURRENCY));
-
-        runner = new VisualGridRunner(10);
-        Assert.assertEquals(runner.getConcurrencyLog(),
-                String.format("{\"type\":\"runnerStarted\",\"concurrency\":%d}", 10));
-
-        runner = new VisualGridRunner(new RunnerOptions().testConcurrency(10));
-        Assert.assertEquals(runner.getConcurrencyLog(),
-                String.format("{\"type\":\"runnerStarted\",\"testConcurrency\":%d}", 10));
-
-        Assert.assertNull(runner.getConcurrencyLog());
-    }
-
-    @Test
     public void testParallelStepsLimitOfTest() {
         final AtomicBoolean isOnlyOneRender = new AtomicBoolean(true);
         final AtomicInteger runningRendersCount = new AtomicInteger(0);
@@ -304,31 +241,31 @@ public class TestVisualGridRunner {
 
         VisualGridRunner visualGridRunner = new VisualGridRunner(new RunnerOptions());
         Assert.assertNull(visualGridRunner.getProxy());
-        Assert.assertNull(visualGridRunner.eyesServiceRunner.getAutProxy());
+        Assert.assertNull(visualGridRunner.serviceRunner.getAutProxy());
 
         visualGridRunner = new VisualGridRunner(new RunnerOptions().proxy(p1));
         Assert.assertEquals(visualGridRunner.getProxy(), p1);
-        Assert.assertEquals(visualGridRunner.eyesServiceRunner.getAutProxy(), p1);
+        Assert.assertEquals(visualGridRunner.serviceRunner.getAutProxy(), p1);
 
         visualGridRunner = new VisualGridRunner(new RunnerOptions().autProxy(p1));
         Assert.assertNull(visualGridRunner.getProxy());
-        Assert.assertEquals(visualGridRunner.eyesServiceRunner.getAutProxy(), p1);
+        Assert.assertEquals(visualGridRunner.serviceRunner.getAutProxy(), p1);
 
         visualGridRunner = new VisualGridRunner(new RunnerOptions().proxy(p1).autProxy(p2));
         Assert.assertEquals(visualGridRunner.getProxy(), p1);
-        Assert.assertEquals(visualGridRunner.eyesServiceRunner.getAutProxy(), p2);
+        Assert.assertEquals(visualGridRunner.serviceRunner.getAutProxy(), p2);
 
         visualGridRunner = new VisualGridRunner(new RunnerOptions().autProxy(p2).proxy(p1));
         Assert.assertEquals(visualGridRunner.getProxy(), p1);
-        Assert.assertEquals(visualGridRunner.eyesServiceRunner.getAutProxy(), p2);
+        Assert.assertEquals(visualGridRunner.serviceRunner.getAutProxy(), p2);
 
         visualGridRunner = new VisualGridRunner(new RunnerOptions().proxy(p1).autProxy(null));
         Assert.assertEquals(visualGridRunner.getProxy(), p1);
-        Assert.assertNull(visualGridRunner.eyesServiceRunner.getAutProxy());
+        Assert.assertNull(visualGridRunner.serviceRunner.getAutProxy());
 
         visualGridRunner = new VisualGridRunner(new RunnerOptions().proxy(null).autProxy(p1));
         Assert.assertNull(visualGridRunner.getProxy());
-        Assert.assertEquals(visualGridRunner.eyesServiceRunner.getAutProxy(), p1);
+        Assert.assertEquals(visualGridRunner.serviceRunner.getAutProxy(), p1);
 
         visualGridRunner = new VisualGridRunner(new RunnerOptions());
         Eyes eyes = new Eyes(visualGridRunner);
@@ -336,7 +273,7 @@ public class TestVisualGridRunner {
         eyes.setProxy(p1);
         eyes.open(driver, "app", "test");
         Assert.assertEquals(visualGridRunner.getProxy(), p1);
-        Assert.assertEquals(visualGridRunner.eyesServiceRunner.getAutProxy(), p1);
+        Assert.assertEquals(visualGridRunner.serviceRunner.getAutProxy(), p1);
 
         visualGridRunner = new VisualGridRunner(new RunnerOptions().autProxy(p2));
         eyes = new Eyes(visualGridRunner);
@@ -344,7 +281,7 @@ public class TestVisualGridRunner {
         eyes.setProxy(p1);
         eyes.open(driver, "app", "test");
         Assert.assertEquals(visualGridRunner.getProxy(), p1);
-        Assert.assertEquals(visualGridRunner.eyesServiceRunner.getAutProxy(), p2);
+        Assert.assertEquals(visualGridRunner.serviceRunner.getAutProxy(), p2);
 
         visualGridRunner = new VisualGridRunner(new RunnerOptions().autProxy(null));
         eyes = new Eyes(visualGridRunner);
@@ -352,6 +289,6 @@ public class TestVisualGridRunner {
         eyes.setProxy(p1);
         eyes.open(driver, "app", "test");
         Assert.assertEquals(visualGridRunner.getProxy(), p1);
-        Assert.assertNull(visualGridRunner.eyesServiceRunner.getAutProxy());
+        Assert.assertNull(visualGridRunner.serviceRunner.getAutProxy());
     }
 }

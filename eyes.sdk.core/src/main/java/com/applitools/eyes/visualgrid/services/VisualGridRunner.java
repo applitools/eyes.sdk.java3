@@ -2,65 +2,29 @@ package com.applitools.eyes.visualgrid.services;
 
 import com.applitools.connectivity.ServerConnector;
 import com.applitools.eyes.*;
-import com.applitools.eyes.logging.Stage;
-import com.applitools.eyes.logging.TraceLevel;
-import com.applitools.eyes.services.EyesServiceRunner;
+import com.applitools.eyes.services.VisualGridServiceRunner;
 import com.applitools.eyes.visualgrid.model.FrameData;
 import com.applitools.eyes.visualgrid.model.IDebugResourceWriter;
 import com.applitools.eyes.visualgrid.model.RGridResource;
 import com.applitools.eyes.visualgrid.model.RenderingInfo;
-import com.applitools.utils.ArgumentGuard;
-import com.applitools.utils.GeneralUtils;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ObjectNode;
-import org.apache.commons.lang3.tuple.Pair;
 
 import java.util.*;
 
 public class VisualGridRunner extends EyesRunner {
-    static class TestConcurrency {
-        final int userConcurrency;
-        final int actualConcurrency;
-        final boolean isLegacy;
-        boolean isDefault = false;
-
-        TestConcurrency() {
-            isDefault = true;
-            isLegacy = false;
-            userConcurrency = DEFAULT_CONCURRENCY;
-            actualConcurrency = DEFAULT_CONCURRENCY;
-        }
-
-        TestConcurrency(int userConcurrency, boolean isLegacy) {
-            this.userConcurrency = userConcurrency;
-            this.actualConcurrency = isLegacy ? userConcurrency * CONCURRENCY_FACTOR : userConcurrency;
-            this.isLegacy = isLegacy;
-        }
-    }
-
-    private static final int CONCURRENCY_FACTOR = 5;
-    static final int DEFAULT_CONCURRENCY = 5;
-
-    EyesServiceRunner eyesServiceRunner;
-    final TestConcurrency testConcurrency;
-    private boolean wasConcurrencyLogSent = false;
+    VisualGridServiceRunner serviceRunner;
     final Set<IEyes> allEyes = Collections.synchronizedSet(new HashSet<IEyes>());
     private final Map<String, RGridResource> resourcesCacheMap = Collections.synchronizedMap(new HashMap<String, RGridResource>());
 
     private RenderingInfo renderingInfo;
     private IDebugResourceWriter debugResourceWriter;
-    private boolean isDisabled;
-
-    private String suiteName;
 
     public VisualGridRunner() {
         this(Thread.currentThread().getStackTrace()[2].getClassName());
     }
 
     public VisualGridRunner(String suiteName) {
-        this.testConcurrency = new TestConcurrency();
-        init(suiteName);
+        super(suiteName);
+        init();
     }
 
     public VisualGridRunner(int testConcurrency) {
@@ -68,8 +32,8 @@ public class VisualGridRunner extends EyesRunner {
     }
 
     public VisualGridRunner(int testConcurrency, String suiteName) {
-        this.testConcurrency = new TestConcurrency(testConcurrency, true);
-        init(suiteName);
+        super(testConcurrency, suiteName);
+        init();
     }
 
     public VisualGridRunner(RunnerOptions runnerOptions) {
@@ -77,34 +41,29 @@ public class VisualGridRunner extends EyesRunner {
     }
 
     public VisualGridRunner(RunnerOptions runnerOptions, String suiteName) {
-        ArgumentGuard.notNull(runnerOptions, "runnerOptions");
-        int testConcurrency = runnerOptions.getTestConcurrency() == null ? DEFAULT_CONCURRENCY : runnerOptions.getTestConcurrency();
-        this.testConcurrency = new TestConcurrency(testConcurrency, false);
-        setApiKey(runnerOptions.getApiKey());
-        setServerUrl(runnerOptions.getServerUrl());
-        init(suiteName);
+        super(runnerOptions, suiteName);
+        init();
         if (runnerOptions.isAutProxySet()) {
-            eyesServiceRunner.setAutProxy(runnerOptions.getAutProxy());
+            serviceRunner.setAutProxy(runnerOptions.getAutProxy());
         } else {
             if (runnerOptions.getProxy() != null) {
-                eyesServiceRunner.setAutProxy(runnerOptions.getProxy());
+                serviceRunner.setAutProxy(runnerOptions.getProxy());
             }
         }
         setProxy(runnerOptions.getProxy());
     }
 
-    private void init(String suiteName) {
-        this.suiteName = suiteName;
-        eyesServiceRunner = new EyesServiceRunner(logger, serverConnector, allEyes, testConcurrency.actualConcurrency, debugResourceWriter, resourcesCacheMap);
-        eyesServiceRunner.start();
+    private void init() {
+        serviceRunner = new VisualGridServiceRunner(logger, serverConnector, allEyes, testConcurrency.actualConcurrency, debugResourceWriter, resourcesCacheMap);
+        serviceRunner.start();
     }
 
-    public void open(IEyes eyes, List<VisualGridRunningTest> newTests) {
+    public void open(IEyes eyes, List<RunningTest> newTests) {
         if (renderingInfo == null) {
             renderingInfo = serverConnector.getRenderInfo();
         }
 
-        eyesServiceRunner.setRenderingInfo(renderingInfo);
+        serviceRunner.setRenderingInfo(renderingInfo);
         if (allEyes.isEmpty()) {
             this.setLogger(eyes.getLogger());
         }
@@ -112,21 +71,13 @@ public class VisualGridRunner extends EyesRunner {
             allEyes.add(eyes);
         }
 
-        try {
-            String logMessage = getConcurrencyLog();
-            if (logMessage != null) {
-                NetworkLogHandler.sendSingleLog(serverConnector, TraceLevel.Notice, logMessage);
-            }
-        } catch (JsonProcessingException e) {
-            GeneralUtils.logExceptionStackTrace(logger, Stage.OPEN, e);
-        }
-
+        sendConcurrencyLog();
         this.addBatch(eyes.getBatchId(), eyes.getBatchCloser());
-        eyesServiceRunner.openTests(newTests);
+        serviceRunner.openTests(newTests);
     }
 
     public synchronized void check(FrameData domData, List<CheckTask> checkTasks) {
-        eyesServiceRunner.addResourceCollectionTask(domData, checkTasks);
+        serviceRunner.addResourceCollectionTask(domData, checkTasks);
         logMemoryUsage();
     }
 
@@ -156,7 +107,7 @@ public class VisualGridRunner extends EyesRunner {
             throw new EyesException("Execution crashed", getError());
         }
 
-        eyesServiceRunner.stopServices();
+        serviceRunner.stopServices();
 
         Throwable exception = null;
         List<TestResultContainer> allResults = new ArrayList<>();
@@ -180,12 +131,12 @@ public class VisualGridRunner extends EyesRunner {
     }
 
     public Throwable getError() {
-        return eyesServiceRunner.getError();
+        return serviceRunner.getError();
     }
 
     public void setDebugResourceWriter(IDebugResourceWriter debugResourceWriter) {
         this.debugResourceWriter = debugResourceWriter;
-        eyesServiceRunner.setDebugResourceWriter(debugResourceWriter);
+        serviceRunner.setDebugResourceWriter(debugResourceWriter);
     }
 
     public IDebugResourceWriter getDebugResourceWriter() {
@@ -193,61 +144,24 @@ public class VisualGridRunner extends EyesRunner {
     }
 
     public void setLogger(Logger logger) {
-        eyesServiceRunner.setLogger(logger);
+        serviceRunner.setLogger(logger);
         this.logger = logger;
     }
 
     @Override
     public void setServerConnector(ServerConnector serverConnector) {
         super.setServerConnector(serverConnector);
-        eyesServiceRunner.setServerConnector(serverConnector);
+        serviceRunner.setServerConnector(serverConnector);
     }
 
     public void setProxy(AbstractProxySettings proxySettings) {
         super.setProxy(proxySettings);
         if (proxySettings != null) {
-            eyesServiceRunner.setAutProxy(proxySettings);
+            serviceRunner.setAutProxy(proxySettings);
         }
-    }
-
-    public String getConcurrencyLog() throws JsonProcessingException {
-        if (wasConcurrencyLogSent) {
-            return null;
-        }
-
-        wasConcurrencyLogSent = true;
-        String key = testConcurrency.isDefault ? "defaultConcurrency" : testConcurrency.isLegacy ? "concurrency" : "testConcurrency";
-        ObjectMapper objectMapper = new ObjectMapper();
-        ObjectNode objectNode = objectMapper.createObjectNode();
-        objectNode.put("type", "runnerStarted");
-        objectNode.put(key, testConcurrency.userConcurrency);
-        return objectMapper.writeValueAsString(objectNode);
     }
 
     public Map<String, RGridResource> getResourcesCacheMap() {
         return resourcesCacheMap;
-    }
-
-    public void setIsDisabled(boolean isDisabled) {
-        this.isDisabled = isDisabled;
-    }
-
-    public boolean getIsDisabled() {
-        return this.isDisabled;
-    }
-
-    public String getSuiteName() {
-        return suiteName;
-    }
-
-    public void setSuiteName(String suiteName) {
-        this.suiteName = suiteName;
-    }
-
-    public void logMemoryUsage() {
-        logger.log(TraceLevel.Debug, Collections.<String>emptySet(), Stage.GENERAL, null,
-                Pair.of("totalMemory", Runtime.getRuntime().totalMemory()),
-                Pair.of("freeMemory", Runtime.getRuntime().freeMemory()),
-                Pair.of("maxMemory", Runtime.getRuntime().maxMemory()));
     }
 }
