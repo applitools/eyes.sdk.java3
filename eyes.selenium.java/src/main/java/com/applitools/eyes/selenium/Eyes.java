@@ -43,7 +43,6 @@ public class Eyes implements IEyesBase {
     private VisualGridEyes visualGridEyes = null;
     private SeleniumEyes seleniumEyes;
     private ISeleniumEyes activeEyes;
-    private EyesRunner runner = null;
     private Configuration configuration = new Configuration();
     private ImageRotation rotation;
     VisualLocatorsProvider visualLocatorsProvider;
@@ -68,13 +67,13 @@ public class Eyes implements IEyesBase {
      */
     public Eyes(EyesRunner runner) {
         this();
-        this.runner = runner == null ? new ClassicRunner() : runner;
-        if (this.runner instanceof VisualGridRunner) {
-            visualGridEyes = new VisualGridEyes((VisualGridRunner) this.runner, configurationProvider);
+        runner = runner == null ? new ClassicRunner() : runner;
+        if (runner instanceof VisualGridRunner) {
+            visualGridEyes = new VisualGridEyes((VisualGridRunner) runner, configurationProvider);
             activeEyes = visualGridEyes;
             isVisualGridEyes = true;
         } else {
-            seleniumEyes = new SeleniumEyes(configurationProvider, (ClassicRunner) runner);
+            seleniumEyes = new SeleniumEyes(configurationProvider, runner);
             activeEyes = seleniumEyes;
         }
     }
@@ -1835,11 +1834,7 @@ public class Eyes implements IEyesBase {
     }
 
     public void closeAsync() {
-        if (isVisualGridEyes) {
-            visualGridEyes.closeAsync();
-        } else {
-            seleniumEyes.close(false);
-        }
+        activeEyes.closeAsync();
     }
 
     public Map<String, List<Region>> locate(VisualLocatorSettings visualLocatorSettings) {

@@ -15,6 +15,8 @@ public class AndroidRecyclerViewFullpageTest extends AndroidTestSetup {
 
         driver.findElementById("btn_recycler_view").click();
 
+        try { Thread.sleep(1000); } catch (InterruptedException ignored) {}
+
         eyes.open(driver, getApplicationName(), "Test RecyclerView");
 
         eyes.check(Target.window().withName("Viewport"));

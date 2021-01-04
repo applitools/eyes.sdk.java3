@@ -229,4 +229,6 @@ public abstract class AppiumScrollPositionProvider implements ScrollPositionProv
         this.scrollRootElement = scrollRootElement;
         this.cachedScrollableView = scrollRootElement;
     }
+
+    public abstract void forceScrollToTop();
 }

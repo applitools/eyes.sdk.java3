@@ -4,6 +4,7 @@
 package com.applitools.eyes.exceptions;
 
 import com.applitools.eyes.TestResults;
+import com.applitools.eyes.TestResultsSummary;
 
 /**
  * Indicates that a test did not pass (i.e., test either failed or is a new test).
@@ -24,6 +25,9 @@ public class TestFailedException extends AssertionError {
         this.testResults = testResults;
     }
 
+    public TestFailedException(TestResultsSummary testResultsSummary, Throwable cause) {
+        super(String.format("Test suite failed: %s", testResultsSummary), cause);
+    }
 
     /**
      * Creates a new TestFailedException instance.
