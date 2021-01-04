@@ -9,6 +9,7 @@ import com.applitools.eyes.logging.TraceLevel;
 import com.applitools.eyes.visualgrid.model.IGetFloatingRegionOffsets;
 import com.applitools.eyes.visualgrid.model.MutableRegion;
 import com.applitools.eyes.visualgrid.model.VisualGridSelector;
+import com.applitools.eyes.visualgrid.services.CheckTask;
 import com.applitools.utils.ArgumentGuard;
 import com.applitools.utils.GeneralUtils;
 import org.apache.commons.lang3.tuple.Pair;
@@ -27,7 +28,6 @@ public class MatchWindowTask {
 
     protected Logger logger;
     protected ServerConnector serverConnector;
-    protected RunningSession runningSession;
     protected AppOutputProvider appOutputProvider;
     protected MatchResult matchResult;
     protected EyesBase eyes;
@@ -35,22 +35,18 @@ public class MatchWindowTask {
     /**
      * @param logger            A logger instance.
      * @param serverConnector   Our gateway to the agent
-     * @param runningSession    The running session in which we should match the window
      * @param retryTimeout      The default total time to retry matching (ms).
      * @param eyes              An EyesBase object.
      * @param appOutputProvider A callback for getting the application output when performing match.
      */
-    public MatchWindowTask(Logger logger, ServerConnector serverConnector,
-                           RunningSession runningSession, int retryTimeout,
+    public MatchWindowTask(Logger logger, ServerConnector serverConnector, int retryTimeout,
                            EyesBase eyes, AppOutputProvider appOutputProvider) {
         ArgumentGuard.notNull(serverConnector, "serverConnector");
-        ArgumentGuard.notNull(runningSession, "runningSession");
         ArgumentGuard.greaterThanOrEqualToZero(retryTimeout, "retryTimeout");
         ArgumentGuard.notNull(appOutputProvider, "appOutputProvider");
 
         this.logger = logger;
         this.serverConnector = serverConnector;
-        this.runningSession = runningSession;
         this.defaultRetryTimeout = retryTimeout;
         this.eyes = eyes;
         this.appOutputProvider = appOutputProvider;
@@ -281,9 +277,7 @@ public class MatchWindowTask {
                 Pair.of("checkSettings", checkSettingsInternal));
         ImageMatchSettings imageMatchSettings = createImageMatchSettings(checkSettingsInternal, eyesBase);
         if (imageMatchSettings != null) {
-            collectSimpleRegions(eyesBase, checkSettingsInternal, imageMatchSettings, screenshot);
-            collectFloatingRegions(checkSettingsInternal, imageMatchSettings, screenshot);
-            collectAccessibilityRegions(checkSettingsInternal, imageMatchSettings, screenshot);
+            collectRegions(eyesBase, screenshot, checkSettingsInternal, imageMatchSettings);
         }
 
         return imageMatchSettings;
@@ -322,7 +316,7 @@ public class MatchWindowTask {
 
         // If the wait to load time is 0, or "run once" is true,
         // we perform a single check window.
-        if (0 == retryTimeout || shouldMatchWindowRunOnceOnTimeout) {
+        if (0 == retryTimeout || shouldMatchWindowRunOnceOnTimeout || eyes.isAsync) {
             if (shouldMatchWindowRunOnceOnTimeout) {
                 GeneralUtils.sleep(retryTimeout);
             }
@@ -376,9 +370,20 @@ public class MatchWindowTask {
             return screenshot;
         }
 
-        ImageMatchSettings matchSettings = createImageMatchSettings(checkSettingsInternal, screenshot, eyes);
+        eyes.getLogger().log(TraceLevel.Info, eyes.getTestId(), Stage.CHECK,
+                Pair.of("configuration", eyes.getConfiguration()),
+                Pair.of("checkSettings", checkSettingsInternal));
+        if (eyes.isAsync) {
+            RunningTest runningTest = (RunningTest) eyes;
+            CheckTask checkTask = runningTest.issueCheck((CheckSettings) checkSettingsInternal, null, source);
+            checkTask.setAppOutput(appOutput);
+            checkTask.setImageMatchSettings(imageMatchSettings);
+            eyes.performMatchAsync(checkTask);
+            return null;
+        }
+
         MatchWindowData data = eyes.prepareForMatch(checkSettingsInternal, Arrays.asList(userInputs), appOutput, tag, lastScreenshotHash != null,
-                matchSettings, null, source);
+                imageMatchSettings, null, source);
         matchResult = eyes.performMatch(data);
         lastScreenshotHash = currentScreenshotHash;
         return screenshot;

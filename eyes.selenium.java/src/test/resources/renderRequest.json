@@ -4,7 +4,7 @@
   "stitchingService": "https://some.stitchingserviceuri.com",
   "webhook": "https://some.uri.com",
   "url": "https://another.url.co.il",
-  "dom": {
+  "snapshot": {
     "hashFormat": "sha256",
     "hash": "25e89e9adf2d1ff0603a7d4f135110851794e47641ac3f6d9224cebced6bcac2"
   },
@@ -35,10 +35,11 @@
     "key": "value"
   },
   "renderer": "rendererId",
-  "platform": {
-    "name": "android"
-  },
   "browser": {
     "name": "ie10"
+  },
+  "platform": {
+    "name": "android",
+    "type": "web"
   }
 }

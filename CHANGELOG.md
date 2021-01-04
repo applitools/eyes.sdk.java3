@@ -16,6 +16,18 @@
 - Fixed an edge case when there are infinite attempts of downloading a resource. [Trello 2563](https://trello.com/c/nKYEYiQ6)
 - Not adjusting the size for mobile devices if the width ratio is low. [Trello 2558](https://trello.com/c/5MXTjDMs)
 
+## [3.201.0-beta]
+### Fixed
+- UFG Native Mobile takes full page screenshots by default.
+
+## [3.201.0-beta]
+### Added
+- Added API for `addMobileDevices`.
+
+## [3.200.0-beta]
+### Added
+- UFG for IOS Native tests.
+
 ## [3.201.0]
 ### Added
 - Supporting iPad Air 4 safari tests. [Trello 2558](https://trello.com/c/5MXTjDMs)
