@@ -60,6 +60,10 @@
 ### Updated
 - Use original height of scrollable element to calculate scroll steps. [Trello 2633](https://trello.com/c/dQqN02TN)
 
+## [3.207.3-beta] - 2021-08-12
+### Added
+- Supporting ufg tests for android native apps.
+
 ## [3.207.3] - 2021-08-03
 ### Updated
 - Updated scroll mechanism with helper library for Android. [Trello 2633](https://trello.com/c/dQqN02TN)
@@ -130,6 +134,22 @@
 ### Fixed
 - Fixed an edge case when there are infinite attempts of downloading a resource. [Trello 2563](https://trello.com/c/nKYEYiQ6)
 - Not adjusting the size for mobile devices if the width ratio is low. [Trello 2558](https://trello.com/c/5MXTjDMs)
+
+## [3.202.0-beta] 2021-07-14
+### Updated
+- Updated appium trigger for ios.
+
+## [3.201.1-beta]
+### Fixed
+- UFG Native Mobile takes full page screenshots by default.
+
+## [3.201.0-beta]
+### Added
+- Added API for `addMobileDevices`.
+
+## [3.200.0-beta]
+### Added
+- UFG for IOS Native tests.
 
 ## [3.201.0]
 ### Added

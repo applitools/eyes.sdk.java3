@@ -1,7 +1,6 @@
 package com.applitools.eyes.visualgrid.services;
 
 
-import com.applitools.ICheckSettings;
 import com.applitools.connectivity.ServerConnector;
 import com.applitools.eyes.*;
 import com.applitools.eyes.capture.ScreenshotProvider;
@@ -22,20 +21,22 @@ public class VisualGridRunningTest extends RunningTest {
     static final int PARALLEL_STEPS_LIMIT = 1;
 
     private final Configuration configuration;
-    final List<CheckTask> checkTasks = new ArrayList<>();
     private JobInfo jobInfo;
 
-    VisualGridRunningTest(Logger logger, String eyesId, RenderBrowserInfo browserInfo, Configuration configuration) {
+    private final boolean isWeb;
+
+    VisualGridRunningTest(Logger logger, boolean isWeb, String eyesId, RenderBrowserInfo browserInfo, Configuration configuration) {
         super(browserInfo, logger);
         setTestId(String.format("%s/%s", eyesId, getTestId()));
         logger.log(getTestId(), Stage.GENERAL, Pair.of("browserInfo", browserInfo));
         this.configuration = configuration;
+        this.isWeb = isWeb;
     }
 
-    public VisualGridRunningTest(Logger logger, String eyesId, Configuration configuration, RenderBrowserInfo browserInfo,
+    public VisualGridRunningTest(Logger logger, boolean isWeb, String eyesId, Configuration configuration, RenderBrowserInfo browserInfo,
                                  List<PropertyData> properties, ServerConnector serverConnector, String agentRunId) {
-        this(logger, eyesId, browserInfo, configuration);
-        this.agentRunId = agentRunId;
+        this(logger, isWeb, eyesId, browserInfo, configuration);
+            this.agentRunId = agentRunId;
         this.setServerConnector(serverConnector);
         if (properties != null) {
             for (PropertyData property : properties) {
@@ -44,16 +45,8 @@ public class VisualGridRunningTest extends RunningTest {
         }
     }
 
-    private void removeAllCheckTasks() {
-        checkTasks.clear();
-    }
-
-    boolean isCheckTaskReadyForRender(CheckTask checkTask) {
-        if (!getIsOpen()) {
-            return false;
-        }
-
-        if (!checkTasks.contains(checkTask)) {
+    public boolean isCheckTaskReady(CheckTask checkTask) {
+        if (!super.isCheckTaskReady(checkTask) || !getIsOpen()) {
             return false;
         }
 
@@ -74,11 +67,7 @@ public class VisualGridRunningTest extends RunningTest {
     @Override
     public MatchWindowData prepareForMatch(CheckTask checkTask) {
         RenderStatusResults renderResult = checkTask.getRenderStatusResults();
-        String imageLocation = renderResult.getImageLocation();
-        String domLocation = renderResult.getDomLocation();
         String renderId = renderResult.getRenderId();
-        RectangleSize visualViewport = renderResult.getVisualViewport();
-
         List<VGRegion> vgRegions = renderResult.getSelectorRegions();
         List<IRegion> regions = new ArrayList<>();
         if (vgRegions != null) {
@@ -100,44 +89,17 @@ public class VisualGridRunningTest extends RunningTest {
                 Pair.of("configuration", getConfiguration()),
                 Pair.of("checkSettings", checkSettingsInternal));
         ImageMatchSettings imageMatchSettings = MatchWindowTask.createImageMatchSettings(checkSettingsInternal, this);
-        String tag = checkSettingsInternal.getName();
-        AppOutput appOutput = new AppOutput(tag, null, domLocation, imageLocation, renderResult.getImagePositionInActiveFrame(), visualViewport);
-        MatchWindowTask.collectRegions(imageMatchSettings, renderResult.getImagePositionInActiveFrame(), regions, checkTask.getRegionSelectors());
-        MatchWindowTask.collectRegions(imageMatchSettings, checkSettingsInternal);
-        return prepareForMatch(checkSettingsInternal, new ArrayList<Trigger>(), appOutput, tag, false, imageMatchSettings, renderId, checkTask.getSource());
-    }
-
-    @Override
-    public CheckTask issueCheck(ICheckSettings checkSettings, List<VisualGridSelector[]> regionSelectors, String source) {
-        CheckTask checkTask = new CheckTask(this, checkSettings, regionSelectors, source);
-        checkTasks.add(checkTask);
-        return checkTask;
-    }
-
-    @Override
-    public void checkCompleted(CheckTask checkTask, MatchResult matchResult) {
-        validateResult(matchResult);
-        checkTasks.remove(checkTask);
-    }
-
-    @Override
-    public void issueAbort(Throwable error, boolean forceAbort) {
-        super.issueAbort(error, forceAbort);
-        if (isTestAborted()) {
-            removeAllCheckTasks();
+        if (isWeb) {
+            MatchWindowTask.collectRegions(imageMatchSettings, renderResult.getImagePositionInActiveFrame(), regions, checkTask.getRegionSelectors());
+            MatchWindowTask.collectRegions(imageMatchSettings, checkSettingsInternal);
         }
-    }
-
-    /**
-     * @return true if the only task left is CLOSE task
-     */
-    public boolean isTestReadyToClose() {
-        return super.isTestReadyToClose() && checkTasks.isEmpty();
+        return prepareForMatch(checkSettingsInternal, new ArrayList<Trigger>(), checkTask.getAppOutput(), checkSettingsInternal.getName(), false, imageMatchSettings, renderId, checkTask.getSource());
     }
 
     @Override
     protected String getBaseAgentId() {
-        return "eyes.selenium.visualgrid.java/" + ClassVersionGetter.CURRENT_VERSION;
+        String moduleName = isWeb ? "selenium" : "appium";
+        return String.format("eyes.%s.visualgrid.java/%s", moduleName, ClassVersionGetter.CURRENT_VERSION);
     }
 
     @Override
@@ -163,8 +125,9 @@ public class VisualGridRunningTest extends RunningTest {
 
         SyncTaskListener<JobInfo[]> listener = new SyncTaskListener<>(logger, String.format("getJobInfo %s", browserInfo));
         RenderInfo renderInfo = new RenderInfo(browserInfo.getWidth(), browserInfo.getHeight(), null, null,
-                null, browserInfo.getEmulationInfo(), browserInfo.getIosDeviceInfo());
-        RenderRequest renderRequest = new RenderRequest(renderInfo, browserInfo.getPlatform(), browserInfo.getBrowserType());
+                null, browserInfo.getEmulationInfo(), browserInfo.getIosDeviceInfo(), browserInfo.getAndroidDeviceInfo());
+        String platformType = isWeb ? "web" : "native";
+        RenderRequest renderRequest = new RenderRequest(renderInfo, browserInfo.getPlatform(), platformType, isWeb ? browserInfo.getBrowserType() : null);
         renderRequest.setTestId(getTestId());
         getServerConnector().getJobInfo(listener, new RenderRequest[]{renderRequest});
         JobInfo[] jobInfos = listener.get();

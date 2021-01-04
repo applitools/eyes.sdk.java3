@@ -226,4 +226,6 @@ public abstract class AppiumScrollPositionProvider implements ScrollPositionProv
     public void setScrollRootElement(WebElement scrollRootElement) {
         this.scrollRootElement = scrollRootElement;
     }
+
+    public abstract void forceScrollToTop();
 }

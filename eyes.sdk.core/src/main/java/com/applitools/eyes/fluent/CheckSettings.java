@@ -13,6 +13,12 @@ import java.util.*;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class CheckSettings implements ICheckSettings, ICheckSettingsInternal {
+    public static final String FULL_PAGE = "full-page";
+    public static final String VIEWPORT = "viewport";
+    public static final String REGION = "region";
+    public static final String SELECTOR = "selector";
+    public static final String FULL_SELECTOR = "full-selector";
+
     // For Rendering Grid
     protected static final String BEFORE_CAPTURE_SCREENSHOT = "beforeCaptureScreenshot";
 

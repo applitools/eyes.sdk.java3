@@ -27,8 +27,17 @@ public class OpenService extends EyesService<SessionStartInfo, RunningSession> {
     }
 
     @Override
+    public void logServiceStatus() {
+        logger.log(Collections.<String>emptySet(), Stage.GENERAL,
+                Pair.of("input_size", inputQueue.size()),
+                Pair.of("output_size", outputQueue.size()),
+                Pair.of("error_size", errorQueue.size()),
+                Pair.of("in_progress", inProgressTests.size()));
+    }
+
+    @Override
     public void run() {
-        while (!inputQueue.isEmpty() && !isServerConcurrencyLimitReached && this.eyesConcurrency > currentTestAmount.get()) {
+        while (!inputQueue.isEmpty() && !isConcurrencyLimitReached()) {
             currentTestAmount.incrementAndGet();
             logger.log(TraceLevel.Info, new HashSet<String>(), Stage.OPEN, null, Pair.of("testAmount", currentTestAmount.get()));
 
@@ -103,5 +112,9 @@ public class OpenService extends EyesService<SessionStartInfo, RunningSession> {
     public void decrementConcurrency() {
         int currentAmount = this.currentTestAmount.decrementAndGet();
         logger.log(TraceLevel.Info, new HashSet<String>(), Stage.CLOSE, null, Pair.of("testAmount", currentAmount));
+    }
+
+    public boolean isConcurrencyLimitReached() {
+        return isServerConcurrencyLimitReached || currentTestAmount.get() >= this.eyesConcurrency;
     }
 }
