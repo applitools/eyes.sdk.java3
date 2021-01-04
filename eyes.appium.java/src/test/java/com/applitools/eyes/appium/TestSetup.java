@@ -2,6 +2,7 @@ package com.applitools.eyes.appium;
 
 import com.applitools.eyes.LogHandler;
 import com.applitools.eyes.ProxySettings;
+import com.applitools.eyes.selenium.AsyncClassicRunner;
 import com.applitools.eyes.utils.ReportingTestSuite;
 import com.applitools.eyes.StdoutLogHandler;
 import com.applitools.eyes.utils.TestUtils;
@@ -35,7 +36,7 @@ public abstract class TestSetup extends ReportingTestSuite implements ITest {
         capabilities = new DesiredCapabilities();
         setCapabilities();
 
-        eyes = new Eyes();
+        eyes = new Eyes(new AsyncClassicRunner());
         eyes.setApiKey(System.getenv("APPLITOOLS_API_KEY"));
 
         LogHandler logHandler = new StdoutLogHandler(TestUtils.verboseLogs);

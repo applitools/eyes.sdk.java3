@@ -2,6 +2,7 @@ package com.applitools.eyes.visualgrid.services;
 
 import com.applitools.ICheckSettings;
 import com.applitools.eyes.Logger;
+import com.applitools.eyes.RunningTest;
 import com.applitools.eyes.config.Configuration;
 import com.applitools.eyes.utils.ReportingTestSuite;
 import com.applitools.eyes.visualgrid.model.RenderBrowserInfo;
@@ -15,7 +16,7 @@ import static org.mockito.Mockito.mock;
 
 public class TestRunningTest extends ReportingTestSuite {
 
-    VisualGridRunningTest runningTest;
+    RunningTest runningTest;
 
     public TestRunningTest() {
         super.setGroupName("core");
@@ -35,7 +36,7 @@ public class TestRunningTest extends ReportingTestSuite {
         runningTest.issueClose();
         runningTest.issueAbort(new Exception(""), false);
 
-        Assert.assertEquals(runningTest.checkTasks.size(), 3);
+        Assert.assertEquals(runningTest.getNumberOfStepsLeft(), 3);
         Assert.assertTrue(runningTest.isCloseTaskIssued());
         Assert.assertFalse(runningTest.isTestAborted());
     }
@@ -45,7 +46,7 @@ public class TestRunningTest extends ReportingTestSuite {
         runningTest.issueClose();
         runningTest.issueAbort(new Exception(""), true);
 
-        Assert.assertEquals(runningTest.checkTasks.size(), 0);
+        Assert.assertEquals(runningTest.getNumberOfStepsLeft(), 0);
         Assert.assertTrue(runningTest.isCloseTaskIssued());
         Assert.assertTrue(runningTest.isTestAborted());
     }
@@ -54,7 +55,7 @@ public class TestRunningTest extends ReportingTestSuite {
     public void testAbortWhenCloseNotCalled() {
         runningTest.issueAbort(new Exception(""), false);
 
-        Assert.assertEquals(runningTest.checkTasks.size(), 0);
+        Assert.assertEquals(runningTest.getNumberOfStepsLeft(), 0);
         Assert.assertTrue(runningTest.isCloseTaskIssued());
         Assert.assertTrue(runningTest.isTestAborted());
     }
@@ -63,7 +64,7 @@ public class TestRunningTest extends ReportingTestSuite {
     public void testForceAbortWhenCloseNotCalled() {
         runningTest.issueAbort(new Exception(""), true);
 
-        Assert.assertEquals(runningTest.checkTasks.size(), 0);
+        Assert.assertEquals(runningTest.getNumberOfStepsLeft(), 0);
         Assert.assertTrue(runningTest.isCloseTaskIssued());
         Assert.assertTrue(runningTest.isTestAborted());
     }

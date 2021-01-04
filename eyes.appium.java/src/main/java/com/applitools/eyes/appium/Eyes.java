@@ -27,6 +27,7 @@ import com.applitools.eyes.scaling.FixedScaleProviderFactory;
 import com.applitools.eyes.scaling.NullScaleProvider;
 import com.applitools.eyes.selenium.ClassicRunner;
 import com.applitools.eyes.selenium.EyesDriverUtils;
+import com.applitools.eyes.selenium.IClassicRunner;
 import com.applitools.eyes.selenium.StitchMode;
 import com.applitools.eyes.selenium.fluent.SimpleRegionByElement;
 import com.applitools.eyes.selenium.positioning.ImageRotation;
@@ -35,6 +36,7 @@ import com.applitools.eyes.selenium.positioning.RegionPositionCompensation;
 import com.applitools.eyes.selenium.regionVisibility.MoveToRegionVisibilityStrategy;
 import com.applitools.eyes.selenium.regionVisibility.NopRegionVisibilityStrategy;
 import com.applitools.eyes.selenium.regionVisibility.RegionVisibilityStrategy;
+import com.applitools.eyes.visualgrid.services.CheckTask;
 import com.applitools.utils.*;
 import io.appium.java_client.AppiumDriver;
 import io.appium.java_client.MobileBy;
@@ -47,7 +49,7 @@ import java.awt.image.BufferedImage;
 import java.net.URI;
 import java.util.*;
 
-public class Eyes extends EyesBase {
+public class Eyes extends RunningTest {
     private static final int USE_DEFAULT_MATCH_TIMEOUT = -1;
     private static final int DEFAULT_STITCH_OVERLAP = 50;
     private static final int IOS_STITCH_OVERLAP = 0;
@@ -70,7 +72,11 @@ public class Eyes extends EyesBase {
     private WebElement scrollRootElement = null;
 
     public Eyes() {
-        super(new ClassicRunner());
+        this(new ClassicRunner());
+    }
+
+    public Eyes(IClassicRunner runner) {
+        super(runner);
         regionVisibilityStrategyHandler = new SimplePropertyHandler<>();
         regionVisibilityStrategyHandler.set(new MoveToRegionVisibilityStrategy());
         configuration.setStitchOverlap(DEFAULT_STITCH_OVERLAP);
@@ -431,12 +437,18 @@ public class Eyes extends EyesBase {
         String name = checkSettingsInternal.getName();
         for (EyesScreenshot subScreenshot : subScreenshots) {
             debugScreenshotsProvider.save(subScreenshot.getImage(), String.format("subscreenshot_%s", name));
-
-            ImageMatchSettings ims = MatchWindowTask.createImageMatchSettings(checkSettingsInternal, subScreenshot, this);
             Location location = subScreenshot.getLocationInScreenshot(Location.ZERO, CoordinatesType.SCREENSHOT_AS_IS);
             AppOutput appOutput = new AppOutput(name, subScreenshot, null, null, location);
-            MatchWindowData data = prepareForMatch(checkSettingsInternal, new ArrayList<Trigger>(), appOutput, name, false,
-                    ims, null, getAppName());
+            if (isAsync) {
+                CheckTask checkTask = issueCheck((ICheckSettings) checkSettingsInternal, null, getAppName());
+                checkTask.setAppOutput(appOutput);
+                performMatchAsync(checkTask);
+                continue;
+            }
+
+            ImageMatchSettings ims = MatchWindowTask.createImageMatchSettings(checkSettingsInternal, subScreenshot, this);
+            MatchWindowData data = prepareForMatch(checkSettingsInternal, new ArrayList<Trigger>(), appOutput, name,
+                    false, ims, null, getAppName());
             performMatch(data);
         }
     }
@@ -502,21 +514,6 @@ public class Eyes extends EyesBase {
     }
 
     @Override
-    public TestResults close(boolean throwEx) {
-        logger.log(getTestId(), Stage.CLOSE, Type.CALLED, Pair.of("throwEx", throwEx));
-        TestResults results = null;
-        try {
-            results = super.close(throwEx);
-        } catch (Throwable e) {
-            GeneralUtils.logExceptionStackTrace(logger, Stage.GENERAL, e, getTestId());
-            if (throwEx) {
-                throw e;
-            }
-        }
-        return results;
-    }
-
-    @Override
     protected void getAppOutputForOcr(BaseOcrRegion ocrRegion) {
         OcrRegion appiumOcrRegion = (OcrRegion) ocrRegion;
         AppiumCheckSettings checkSettings = null;
@@ -571,6 +568,10 @@ public class Eyes extends EyesBase {
     @Override
     protected EyesScreenshot getScreenshot(Region targetRegion, ICheckSettingsInternal checkSettingsInternal) {
         EyesScreenshot result;
+
+        // Extra pause to wait for application actions will be finished.
+        // Moving from one screen to another for example or wait untill scrollbars becomes unvisible
+        try { Thread.sleep(1000); } catch (InterruptedException ignored) {}
 
         if (getForceFullPageScreenshot() || stitchContent) {
             result = getFullPageScreenshot();

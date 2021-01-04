@@ -33,7 +33,6 @@ import com.applitools.eyes.selenium.wrappers.EyesSeleniumDriver;
 import com.applitools.eyes.selenium.wrappers.EyesTargetLocator;
 import com.applitools.eyes.triggers.MouseAction;
 import com.applitools.eyes.visualgrid.model.RenderingInfo;
-import com.applitools.eyes.visualgrid.model.VisualGridSelector;
 import com.applitools.eyes.visualgrid.services.CheckTask;
 import com.applitools.utils.*;
 import org.apache.commons.lang3.tuple.Pair;
@@ -113,7 +112,7 @@ public class SeleniumEyes extends RunningTest implements ISeleniumEyes {
      * Creates a new SeleniumEyes instance that interacts with the SeleniumEyes cloud
      * service.
      */
-    public SeleniumEyes(ConfigurationProvider configurationProvider, ClassicRunner runner) {
+    public SeleniumEyes(ConfigurationProvider configurationProvider, IClassicRunner runner) {
         super(runner);
         this.configurationProvider = configurationProvider;
         checkFrameOrElement = false;
@@ -149,27 +148,6 @@ public class SeleniumEyes extends RunningTest implements ISeleniumEyes {
     @Override
     public String getBatchId() {
         return getConfiguration().getBatch().getId();
-    }
-
-    @Override
-    public Map<String, RunningTest> getAllRunningTests() {
-        Map<String, RunningTest> map = new HashMap<>();
-        map.put(getTestId(), this);
-        return map;
-    }
-
-    @Override
-    public List<TestResultContainer> getAllTestResults() {
-        if (!isCompleted()) {
-            return null;
-        }
-
-        return Collections.singletonList(testResultContainer);
-    }
-
-    @Override
-    public boolean isCompleted() {
-        return testResultContainer != null;
     }
 
     public void serverUrl(String serverUrl) {
@@ -557,14 +535,19 @@ public class SeleniumEyes extends RunningTest implements ISeleniumEyes {
         String name = checkSettingsInternal.getName();
         String source = EyesDriverUtils.isMobileDevice(driver) ? null : driver.getCurrentUrl();
         for (EyesScreenshot subScreenshot : subScreenshots) {
-
             debugScreenshotsProvider.save(subScreenshot.getImage(), String.format("subscreenshot_%s", name));
-
-            ImageMatchSettings ims = MatchWindowTask.createImageMatchSettings(checkSettingsInternal, subScreenshot, this);
             Location location = subScreenshot.getLocationInScreenshot(Location.ZERO, CoordinatesType.SCREENSHOT_AS_IS);
             AppOutput appOutput = new AppOutput(name, subScreenshot, null, null, location);
-            MatchWindowData data = prepareForMatch(checkSettingsInternal, new ArrayList<Trigger>(), appOutput, name, false,
-                    ims, null, source);
+            if (isAsync) {
+                CheckTask checkTask = issueCheck((ICheckSettings) checkSettingsInternal, null, source);
+                checkTask.setAppOutput(appOutput);
+                performMatchAsync(checkTask);
+                continue;
+            }
+
+            ImageMatchSettings ims = MatchWindowTask.createImageMatchSettings(checkSettingsInternal, subScreenshot, this);
+            MatchWindowData data = prepareForMatch(checkSettingsInternal, new ArrayList<Trigger>(), appOutput, name,
+                    false, ims, null, source);
             performMatch(data);
         }
     }
@@ -622,7 +605,7 @@ public class SeleniumEyes extends RunningTest implements ISeleniumEyes {
         if (getIsDisabled()) {
             return;
         }
-        ArgumentGuard.isValidState(isOpen, "Eyes not open");
+        ArgumentGuard.isValidState(isOpen || inOpenProcess, "Eyes not open");
         ArgumentGuard.notNull(checkSettings, "checkSettings");
         if (name != null) {
             checkSettings = checkSettings.withName(name);
@@ -674,7 +657,7 @@ public class SeleniumEyes extends RunningTest implements ISeleniumEyes {
                 Pair.of("configuration", getConfiguration()),
                 Pair.of("checkSettings", checkSettings));
         try {
-            ArgumentGuard.isValidState(isOpen, "Eyes not open");
+            ArgumentGuard.isValidState(isOpen || inOpenProcess, "Eyes not open");
             ArgumentGuard.notNull(checkSettings, "checkSettings");
             ArgumentGuard.notOfType(checkSettings, ISeleniumCheckTarget.class, "checkSettings");
             boolean isMobileDevice = EyesDriverUtils.isMobileDevice(driver);
@@ -1458,21 +1441,6 @@ public class SeleniumEyes extends RunningTest implements ISeleniumEyes {
         addTextTrigger(elementRegion, text);
     }
 
-    @Override
-    public MatchWindowData prepareForMatch(CheckTask checkTask) {
-        return null;
-    }
-
-    @Override
-    public CheckTask issueCheck(ICheckSettings checkSettings, List<VisualGridSelector[]> regionSelectors, String source) {
-        return null;
-    }
-
-    @Override
-    public void checkCompleted(CheckTask checkTask, MatchResult matchResult) {
-
-    }
-
     /**
      * Use this method only if you made a previous call to {@link #open
      * (WebDriver, String, String)} or one of its variants.
@@ -1743,29 +1711,6 @@ public class SeleniumEyes extends RunningTest implements ISeleniumEyes {
     }
 
     @Override
-    public TestResults close(boolean throwEx) {
-        logger.log(getTestId(), Stage.CLOSE, Type.CALLED, Pair.of("throwEx", throwEx));
-        TestResults results;
-        try {
-            results = stopSession(false);
-            closeCompleted(results);
-        } catch (Throwable e) {
-            GeneralUtils.logExceptionStackTrace(logger, Stage.CLOSE, e, getTestId());
-            closeFailed(e);
-            throw e;
-        }
-
-        if (error != null && throwEx) {
-            throw new Error(error);
-        }
-
-        if (runner != null) {
-            this.runner.aggregateResult(testResultContainer);
-        }
-        return results;
-    }
-
-    @Override
     protected void getAppOutputForOcr(BaseOcrRegion ocrRegion) {
         OcrRegion seleniumOcrRegion = (OcrRegion) ocrRegion;
         SeleniumCheckSettings checkSettings = null;
@@ -1799,7 +1744,6 @@ public class SeleniumEyes extends RunningTest implements ISeleniumEyes {
         return new SeleniumScreenshotProvider(this, driver, logger, getDebugScreenshotsProvider());
     }
 
-    @Override
     public Boolean isSendDom() {
         return !EyesDriverUtils.isMobileDevice(driver) && super.isSendDom();
     }
