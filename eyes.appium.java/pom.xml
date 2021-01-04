@@ -14,7 +14,6 @@
         <groupId>com.applitools</groupId>
         <version>3.210.6</version>
     </parent>
-
     <dependencies>
         <dependency>
             <groupId>com.applitools</groupId>
