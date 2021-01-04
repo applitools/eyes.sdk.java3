@@ -147,6 +147,18 @@ public class TestEyesServices {
         when(matchWindowFailed.getAppOutput()).thenReturn(appOutput3);
         when(matchWindowException.getAppOutput()).thenReturn(appOutput3);
 
+        RunningSession runningSession = mock(RunningSession.class);
+        when(matchWindowSuccess.getTestId()).thenReturn("id");
+        when(matchWindowSuccess.getRunningSession()).thenReturn(runningSession);
+        when(matchWindowFailed.getTestId()).thenReturn("id");
+        when(matchWindowFailed.getRunningSession()).thenReturn(runningSession);
+        when(matchWindowException.getTestId()).thenReturn("id");
+        when(matchWindowException.getRunningSession()).thenReturn(runningSession);
+        when(matchWindowUploadFailed.getTestId()).thenReturn("id");
+        when(matchWindowUploadFailed.getRunningSession()).thenReturn(runningSession);
+        when(matchWindowUploadException.getTestId()).thenReturn("id");
+        when(matchWindowUploadException.getRunningSession()).thenReturn(runningSession);
+
         CheckService checkService = new CheckService(new Logger(), serverConnector);
         checkService.addInput("1", matchWindowSuccess);
         checkService.addInput("2", matchWindowFailed);

@@ -6,6 +6,7 @@ import com.applitools.eyes.utils.ReportingTestSuite;
 import com.applitools.eyes.utils.SeleniumTestUtils;
 import com.applitools.eyes.utils.SeleniumUtils;
 import com.applitools.eyes.utils.TestUtils;
+import com.applitools.eyes.visualgrid.services.RunnerOptions;
 import com.applitools.eyes.visualgrid.services.VisualGridRunner;
 import org.apache.commons.lang3.tuple.Pair;
 import org.openqa.selenium.Capabilities;
@@ -30,7 +31,7 @@ public abstract class TestSetup extends ReportingTestSuite implements ITest {
     private boolean useVisualGrid = false;
     StitchMode stitchMode = StitchMode.SCROLL;
 
-    private EyesRunner runner = new ClassicRunner();
+    private EyesRunner runner = new AsyncClassicRunner();
     private Capabilities options;
     private String testName;
 
@@ -123,7 +124,9 @@ public abstract class TestSetup extends ReportingTestSuite implements ITest {
             TestDataProvider.batchInfo.setId(batchId);
         }
 
-        this.runner = this.useVisualGrid ? new VisualGridRunner(10, testSuitName) : new ClassicRunner();
+        this.runner = this.useVisualGrid ?
+                new VisualGridRunner(10, testSuitName) :
+                new AsyncClassicRunner(new RunnerOptions().testConcurrency(50));
     }
 
     public SpecificTestContextRequirements getTestData() {

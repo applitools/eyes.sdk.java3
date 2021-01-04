@@ -7,20 +7,41 @@ import com.applitools.eyes.logging.Type;
 import com.applitools.eyes.services.CheckService;
 import com.applitools.eyes.services.CloseService;
 import com.applitools.eyes.services.OpenService;
+import com.applitools.eyes.visualgrid.services.RunnerOptions;
 import com.applitools.eyes.visualgrid.services.ServiceTaskListener;
 import com.applitools.utils.GeneralUtils;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class ClassicRunner extends EyesRunner {
-    private final OpenService openService;
-    private final CheckService checkService;
-    private final CloseService closeService;
+public class ClassicRunner extends EyesRunner implements IClassicRunner {
+    private OpenService openService;
+    private CheckService checkService;
+    private CloseService closeService;
     private final List<TestResultContainer> allTestResult = new ArrayList<>();
 
     public ClassicRunner() {
-        openService = new OpenService(logger, serverConnector, 1);
+        this(Thread.currentThread().getStackTrace()[2].getClassName());
+    }
+
+    public ClassicRunner(String suiteName) {
+        this(new RunnerOptions().testConcurrency(Integer.MAX_VALUE), suiteName);
+        testConcurrency.isDefault = true;
+        init();
+    }
+
+    public ClassicRunner(RunnerOptions runnerOptions) {
+        this(runnerOptions, Thread.currentThread().getStackTrace()[2].getClassName());
+    }
+
+    public ClassicRunner(RunnerOptions runnerOptions, String suiteName) {
+        super(runnerOptions, suiteName);
+        init();
+        setProxy(runnerOptions.getProxy());
+    }
+
+    public void init() {
+        openService = new OpenService(logger, serverConnector, testConcurrency.actualConcurrency);
         checkService = new CheckService(logger, serverConnector);
         closeService = new CloseService(logger, serverConnector);
     }
@@ -42,17 +63,20 @@ public class ClassicRunner extends EyesRunner {
         this.allTestResult.add(testResult);
     }
 
-    @Override
-    public void setServerConnector(ServerConnector serverConnector) {
-        super.setServerConnector(serverConnector);
-        openService.setServerConnector(serverConnector);
-        checkService.setServerConnector(serverConnector);
-        closeService.setServerConnector(serverConnector);
-    }
+    public RunningSession open(final EyesBase runningTest) {
+        sendConcurrencyLog();
+        SessionStartInfo sessionStartInfo = runningTest.prepareForOpen();
+        if (sessionStartInfo == null) {
+            return null;
+        }
 
-    public RunningSession open(final String testId, SessionStartInfo sessionStartInfo) {
+        while (openService.isConcurrencyLimitReached()) {
+            try {
+                Thread.sleep(500);
+            } catch (InterruptedException ignored) {}
+        }
         final SyncTaskListener<RunningSession> listener = new SyncTaskListener<>(logger, String.format("openBase %s", sessionStartInfo));
-        openService.operate(testId, sessionStartInfo, new ServiceTaskListener<RunningSession>() {
+        openService.operate(runningTest.getTestId(), sessionStartInfo, new ServiceTaskListener<RunningSession>() {
             @Override
             public void onComplete(RunningSession taskResponse) {
                 listener.onComplete(taskResponse);
@@ -60,16 +84,21 @@ public class ClassicRunner extends EyesRunner {
 
             @Override
             public void onFail(Throwable t) {
-                GeneralUtils.logExceptionStackTrace(logger, Stage.OPEN, t, testId);
+                GeneralUtils.logExceptionStackTrace(logger, Stage.OPEN, t, runningTest.getTestId());
                 listener.onFail();
             }
         });
-        return listener.get();
+        RunningSession runningSession = listener.get();
+        if (runningSession == null) {
+            throw new EyesException("Failed starting session with the server");
+        }
+
+        return runningSession;
     }
 
-    public MatchResult check(final String testId, MatchWindowData matchWindowData) {
+    public MatchResult check(final MatchWindowData matchWindowData) {
         final SyncTaskListener<Boolean> listener = new SyncTaskListener<>(logger, String.format("uploadImage %s", matchWindowData.getRunningSession()));
-        checkService.tryUploadImage(testId, matchWindowData, new ServiceTaskListener<Void>() {
+        checkService.tryUploadImage(matchWindowData, new ServiceTaskListener<Void>() {
             @Override
             public void onComplete(Void taskResponse) {
                 listener.onComplete(true);
@@ -77,7 +106,7 @@ public class ClassicRunner extends EyesRunner {
 
             @Override
             public void onFail(Throwable t) {
-                GeneralUtils.logExceptionStackTrace(logger, Stage.CHECK, Type.UPLOAD_COMPLETE, t, testId);
+                GeneralUtils.logExceptionStackTrace(logger, Stage.CHECK, Type.UPLOAD_COMPLETE, t, matchWindowData.getTestId());
                 listener.onFail();
             }
         });
@@ -88,7 +117,7 @@ public class ClassicRunner extends EyesRunner {
         }
 
         final SyncTaskListener<MatchResult> matchListener = new SyncTaskListener<>(logger, String.format("performMatch %s", matchWindowData.getRunningSession()));
-        checkService.matchWindow(testId, matchWindowData, new ServiceTaskListener<MatchResult>() {
+        checkService.matchWindow(matchWindowData, new ServiceTaskListener<MatchResult>() {
             @Override
             public void onComplete(MatchResult taskResponse) {
                 matchListener.onComplete(taskResponse);
@@ -96,7 +125,7 @@ public class ClassicRunner extends EyesRunner {
 
             @Override
             public void onFail(Throwable t) {
-                GeneralUtils.logExceptionStackTrace(logger, Stage.CHECK, Type.MATCH_COMPLETE, t, testId);
+                GeneralUtils.logExceptionStackTrace(logger, Stage.CHECK, Type.MATCH_COMPLETE, t, matchWindowData.getTestId());
                 matchListener.onFail();
             }
         });
@@ -108,15 +137,24 @@ public class ClassicRunner extends EyesRunner {
         closeService.operate(testId, sessionStopInfo, new ServiceTaskListener<TestResults>() {
             @Override
             public void onComplete(TestResults taskResponse) {
+                openService.decrementConcurrency();
                 listener.onComplete(taskResponse);
             }
 
             @Override
             public void onFail(Throwable t) {
+                openService.decrementConcurrency();
                 GeneralUtils.logExceptionStackTrace(logger, Stage.CLOSE, t, testId);
                 listener.onFail();
             }
         });
         return listener.get();
+    }
+
+    @Override
+    public void setServerConnector(ServerConnector serverConnector) {
+        openService.setServerConnector(serverConnector);
+        checkService.setServerConnector(serverConnector);
+        closeService.setServerConnector(serverConnector);
     }
 }

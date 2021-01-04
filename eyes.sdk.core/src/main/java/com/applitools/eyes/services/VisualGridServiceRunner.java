@@ -7,14 +7,13 @@ import com.applitools.eyes.logging.Stage;
 import com.applitools.eyes.visualgrid.model.*;
 import com.applitools.eyes.visualgrid.services.CheckTask;
 import com.applitools.eyes.visualgrid.services.IEyes;
-import com.applitools.eyes.visualgrid.services.VisualGridRunningTest;
 import com.applitools.utils.GeneralUtils;
 import org.apache.commons.lang3.tuple.Pair;
 
 import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-public class EyesServiceRunner extends Thread {
+public class VisualGridServiceRunner extends Thread {
     private static final String FULLPAGE = "full-page";
     private static final String VIEWPORT = "viewport";
 
@@ -35,8 +34,8 @@ public class EyesServiceRunner extends Thread {
     private final ResourceCollectionService resourceCollectionService;
     private final RenderService renderService;
 
-    public EyesServiceRunner(Logger logger, ServerConnector serverConnector, Set<IEyes> allEyes, int testConcurrency,
-                             IDebugResourceWriter debugResourceWriter, Map<String, RGridResource> resourcesCacheMap) {
+    public VisualGridServiceRunner(Logger logger, ServerConnector serverConnector, Set<IEyes> allEyes, int testConcurrency,
+                                   IDebugResourceWriter debugResourceWriter, Map<String, RGridResource> resourcesCacheMap) {
         this.logger = logger;
         this.allEyes = allEyes;
 
@@ -82,8 +81,8 @@ public class EyesServiceRunner extends Thread {
         renderService.setServerConnector(serverConnector);
     }
 
-    public void openTests(Collection<VisualGridRunningTest> runningTests) {
-        for (VisualGridRunningTest runningTest : runningTests) {
+    public void openTests(Collection<RunningTest> runningTests) {
+        for (RunningTest runningTest : runningTests) {
             openService.addInput(runningTest.getTestId(), runningTest.prepareForOpen());
         }
     }
@@ -233,7 +232,7 @@ public class EyesServiceRunner extends Thread {
                 continue;
             }
 
-            if (checkTask.isReadyForRender()) {
+            if (checkTask.isReady()) {
                 renderService.addInput(checkTask.getStepId(), renderRequest);
                 renderRequestsToRemove.add(renderRequest);
             }
@@ -249,7 +248,7 @@ public class EyesServiceRunner extends Thread {
                 continue;
             }
 
-            checkTask.setRenderStatusResults(pair.getRight());
+            checkTask.setAppOutput(pair.getRight());
         }
 
         for (Pair<String, Throwable> pair : renderService.getFailedTasks()) {
@@ -299,7 +298,7 @@ public class EyesServiceRunner extends Thread {
                     checkTask.getRenderer(), checkTask.getStepId(), this.renderingInfo.getStitchingServiceUrl(), checkSettingsInternal.getVisualGridOptions());
 
             waitingCheckTasks.put(checkTask.getStepId(), checkTask);
-            if (checkTask.isReadyForRender()) {
+            if (checkTask.isReady()) {
                 renderService.addInput(checkTask.getStepId(), request);
             } else {
                 waitingRenderRequests.add(request);

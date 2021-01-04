@@ -209,9 +209,9 @@ public class VisualGridEyes implements ISeleniumEyes {
 
         runner.setLogger(logger);
 
-        List<VisualGridRunningTest> newTests = new ArrayList<>();
+        List<RunningTest> newTests = new ArrayList<>();
         ServerConnector serverConnector = runner.getServerConnector();
-        String agentRunId = String.format("%s_%s", getConfiguration().getTestName(), UUID.randomUUID().toString());
+        String agentRunId = String.format("%s_%s", getConfiguration().getTestName(), UUID.randomUUID());
         for (RenderBrowserInfo browserInfo : browserInfoList) {
             if (browserInfo.getEmulationInfo() != null) {
                 Map<String, DeviceSize> deviceSizes = serverConnector.getDevicesSizes(ServerConnector.EMULATED_DEVICES_PATH);
@@ -221,7 +221,8 @@ public class VisualGridEyes implements ISeleniumEyes {
                 Map<String, DeviceSize> deviceSizes = serverConnector.getDevicesSizes(ServerConnector.IOS_DEVICES_PATH);
                 browserInfo.setIosDeviceSize(deviceSizes.get(browserInfo.getIosDeviceInfo().getDeviceName()));
             }
-            VisualGridRunningTest test = new VisualGridRunningTest(logger, eyesId, getConfiguration(), browserInfo, this.properties, serverConnector, agentRunId);
+
+            RunningTest test = new VisualGridRunningTest(logger, eyesId, getConfiguration(), browserInfo, this.properties, serverConnector, agentRunId);
             this.testList.put(test.getTestId(), test);
             newTests.add(test);
         }
