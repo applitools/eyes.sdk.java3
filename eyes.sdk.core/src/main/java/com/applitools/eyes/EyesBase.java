@@ -30,6 +30,7 @@ import com.applitools.eyes.triggers.MouseTrigger;
 import com.applitools.eyes.triggers.TextTrigger;
 import com.applitools.eyes.visualgrid.model.DeviceSize;
 import com.applitools.eyes.visualgrid.model.RenderingInfo;
+import com.applitools.eyes.visualgrid.services.CheckTask;
 import com.applitools.utils.*;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -53,7 +54,8 @@ public abstract class EyesBase implements IEyesBase {
 
     private String testId = UUID.randomUUID().toString();
     protected String agentRunId = null;
-    protected ClassicRunner runner;
+    protected final EyesRunner runner;
+    protected final boolean isAsync;
     protected ServerConnector serverConnector;
     protected RunningSession runningSession;
     protected SessionStartInfo sessionStartInfo;
@@ -72,7 +74,7 @@ public abstract class EyesBase implements IEyesBase {
     protected boolean isOpen;
 
     private final Queue<Trigger> userInputs;
-    private final List<PropertyData> properties = new ArrayList<>();
+    protected final List<PropertyData> properties = new ArrayList<>();
 
     private boolean isViewportSizeSet;
 
@@ -83,8 +85,9 @@ public abstract class EyesBase implements IEyesBase {
         this(null);
     }
 
-    public EyesBase(ClassicRunner runner) {
+    public EyesBase(EyesRunner runner) {
         this.runner = runner != null ? runner : new ClassicRunner();
+        this.isAsync = runner instanceof AsyncClassicRunner;
         logger = new Logger();
         initProviders();
 
@@ -147,8 +150,8 @@ public abstract class EyesBase implements IEyesBase {
     public ServerConnector getServerConnector() {
         if (serverConnector != null && serverConnector.getAgentId() == null) {
             serverConnector.setAgentId(getFullAgentId());
-            runner.setServerConnector(serverConnector);
             logger.setAgentId(serverConnector.getAgentId());
+            runner.setAgentId(serverConnector.getAgentId());
         }
 
         return serverConnector;
@@ -165,7 +168,6 @@ public abstract class EyesBase implements IEyesBase {
             throw new EyesException("server connector not set.");
         }
         getServerConnector().setApiKey(apiKey);
-        runner.setApiKey(apiKey);
         return this.getConfigurationInstance();
     }
 
@@ -204,7 +206,6 @@ public abstract class EyesBase implements IEyesBase {
         } else {
             getServerConnector().setServerUrl(serverUrl);
         }
-        runner.setServerUrl(getServerConnector().getServerUrl().toString());
         return this.getConfigurationInstance();
     }
 
@@ -229,7 +230,6 @@ public abstract class EyesBase implements IEyesBase {
         }
 
         getServerConnector().setProxy(abstractProxySettings);
-        runner.setProxy(abstractProxySettings);
         return getConfigurationInstance();
     }
 
@@ -320,7 +320,6 @@ public abstract class EyesBase implements IEyesBase {
     public void setLogHandler(LogHandler logHandler) {
         logger.setLogHandler(logHandler);
         serverConnector.setLogger(logger);
-        runner.setLogHandler(logHandler);
     }
 
     /**
@@ -519,7 +518,7 @@ public abstract class EyesBase implements IEyesBase {
             return testResults;
         }
 
-        TestResults testResults = runner.close(getTestId(), sessionStopInfo);
+        TestResults testResults = ((ClassicRunner) runner).close(getTestId(), sessionStopInfo);
         runningSession = null;
         if (testResults == null) {
             throw new EyesException("Failed stopping session");
@@ -705,12 +704,18 @@ public abstract class EyesBase implements IEyesBase {
                 replaceLast, false, false, false, false,
                 imageMatchSettings, source, checkSettingsInternal.getVariationGroupId(), renderId);
 
-        return new MatchWindowData(runningSession, userInputs.toArray(new Trigger[0]), appOutput, tag,
+        return new MatchWindowData(getTestId(), runningSession, userInputs.toArray(new Trigger[0]), appOutput, tag,
                 false, options, agentSetupStr, renderId);
     }
 
+    public void performMatchAsync(CheckTask checkTask) {
+        AsyncClassicRunner asyncClassicRunner = (AsyncClassicRunner) runner;
+        asyncClassicRunner.check(checkTask);
+    }
+
     public MatchResult performMatch(MatchWindowData data) {
-        MatchResult result = runner.check(getTestId(), data);
+        ClassicRunner classicRunner = (ClassicRunner) runner;
+        MatchResult result = classicRunner.check(data);
         if (result == null) {
             throw new EyesException("Failed performing match with the server");
         }
@@ -776,7 +781,6 @@ public abstract class EyesBase implements IEyesBase {
             tag = "";
         }
 
-        ArgumentGuard.isValidState(getIsOpen(), "Eyes not open");
         if (checkSettingsInternal.getOcrRegion() != null) {
             AppOutput appOutput = getAppOutputWithScreenshot(region, checkSettingsInternal);
             checkSettingsInternal.getOcrRegion().setAppOutput(appOutput);
@@ -785,9 +789,12 @@ public abstract class EyesBase implements IEyesBase {
             return result;
         }
 
+        ArgumentGuard.isValidState(sessionStartInfo != null, "Eyes not open");
         result = matchWindowTask.matchWindow(getUserInputs(), region, tag, shouldMatchWindowRunOnceOnTimeout,
                 checkSettingsInternal, source);
-        validateResult(result);
+        if (!isAsync) {
+            validateResult(result);
+        }
         return result;
     }
 
@@ -855,6 +862,7 @@ public abstract class EyesBase implements IEyesBase {
         validateApiKey();
         validateSessionOpen();
 
+        testResultContainer = null;
         this.isViewportSizeSet = false;
         RectangleSize viewportSize = getViewportSizeForOpen();
         if (viewportSize == null) {
@@ -882,41 +890,47 @@ public abstract class EyesBase implements IEyesBase {
                 configGetter.getParentBranchName(), configGetter.getBaselineBranchName(), configGetter.getSaveDiffs(),
                 properties, agentSessionId, agentRunId, configGetter.getAbortIdleTestTimeout());
 
+        matchWindowTask = new MatchWindowTask(
+                logger,
+                getServerConnector(),
+                getConfigurationInstance().getMatchTimeout(),
+                EyesBase.this,
+                // A callback which will call getAppOutput
+                new AppOutputProvider() {
+                    @Override
+                    public AppOutput getAppOutput(Region region,
+                                                  ICheckSettingsInternal checkSettingsInternal) {
+                        return getAppOutputWithScreenshot(region, checkSettingsInternal);
+                    }
+                }
+        );
+
         logger.log(TraceLevel.Info, getTestId(), Stage.OPEN, Pair.of("configuration", getConfiguration()));
         return sessionStartInfo;
     }
 
     protected void openBase() throws EyesException {
-        SessionStartInfo startInfo = prepareForOpen();
-        if (startInfo == null) {
+        runner.setApiKey(getApiKey());
+        runner.setServerUrl(getServerUrl().toString());
+        runner.setProxy(getProxy());
+        if (isAsync) {
+            AsyncClassicRunner asyncClassicRunner = (AsyncClassicRunner) runner;
+            asyncClassicRunner.open((RunningTest) this);
             return;
         }
 
-        RunningSession runningSession = runner.open(getTestId(), startInfo);
+        ClassicRunner classicRunner = (ClassicRunner) runner;
+        RunningSession runningSession = classicRunner.open(this);
         if (runningSession == null) {
-            throw new EyesException("Failed starting session with the server");
+            return;
         }
+
         openCompleted(runningSession);
     }
 
     public void openCompleted(RunningSession result) {
         runningSession = result;
         shouldMatchWindowRunOnceOnTimeout = runningSession.getIsNew();
-        matchWindowTask = new MatchWindowTask(
-                logger,
-                getServerConnector(),
-                runningSession,
-                getConfigurationInstance().getMatchTimeout(),
-                EyesBase.this,
-                // A callback which will call getAppOutput
-                new AppOutputProvider() {
-                    @Override
-                    public AppOutput getAppOutput(Region region, ICheckSettingsInternal checkSettingsInternal) {
-                        return getAppOutputWithScreenshot(region, checkSettingsInternal);
-                    }
-                }
-        );
-
         validationId = -1;
         isOpen = true;
     }
@@ -1222,11 +1236,21 @@ public abstract class EyesBase implements IEyesBase {
     }
 
     public void closeAsync() {
-        close(false);
+        if (isAsync) {
+            RunningTest runningTest = (RunningTest) this;
+            runningTest.issueClose();
+        } else {
+            close(false);
+        }
     }
 
     public void abortAsync() {
-        abort();
+        if (isAsync) {
+            RunningTest runningTest = (RunningTest) this;
+            runningTest.issueAbort(new EyesException("eyes.close wasn't called. Aborted the test"), false);
+        } else {
+            abort();
+        }
     }
 
     public boolean isCompleted() {

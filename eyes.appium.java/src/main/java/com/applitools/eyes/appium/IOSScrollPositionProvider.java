@@ -97,6 +97,13 @@ public class IOSScrollPositionProvider extends AppiumScrollPositionProvider {
         driver.executeScript("mobile: scroll", params);
     }
 
+    @Override
+    public void forceScrollToTop() {
+        HashMap<String, String> args = new HashMap<>();
+        args.put("direction", SCROLL_DIRECTION_UP);
+        driver.executeScript("mobile: scroll", args);
+    }
+
     public void restoreState(PositionMemento state) {
     }
 

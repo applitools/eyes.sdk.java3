@@ -29,11 +29,6 @@ import java.util.List;
 import java.util.Map;
 
 public class SeleniumCheckSettings extends CheckSettings implements ISeleniumCheckTarget, Cloneable {
-    public static final String FULL_PAGE = "full-page";
-    public static final String VIEWPORT = "viewport";
-    public static final String REGION = "region";
-    public static final String SELECTOR = "selector";
-    public static final String FULL_SELECTOR = "full-selector";
     @JsonSerialize(using = BySerializer.class)
     private By targetSelector;
     @JsonSerialize(using = WebElementSerializer.class)
@@ -518,6 +513,9 @@ public class SeleniumCheckSettings extends CheckSettings implements ISeleniumChe
         this.sendDom = isSendDom;
     }
 
+    /**
+     * internal
+     */
     @JsonProperty("sizeMode")
     public String getSizeMode() {
         ICheckSettingsInternal checkSettingsInternal = this;

@@ -13,6 +13,7 @@ import com.applitools.eyes.selenium.positioning.ImageRotation;
 import com.applitools.utils.GeneralUtils;
 import com.applitools.utils.ImageUtils;
 import io.appium.java_client.AppiumDriver;
+import io.appium.java_client.MobileSelector;
 import org.apache.commons.lang3.tuple.Pair;
 import org.openqa.selenium.*;
 import org.openqa.selenium.remote.RemoteWebElement;
@@ -261,6 +262,14 @@ public class EyesAppiumDriver extends EyesWebDriver {
 
     public List<WebElement> findElementsByXPath(String path) {
         return findElements(By.xpath(path));
+    }
+
+    public WebElement findElementByAccessibilityId(String name) {
+        return driver.findElementByAccessibilityId(name);
+    }
+
+    public List<WebElement> findElementsByAccessibilityId(String name) {
+        return driver.findElementsByAccessibilityId(name);
     }
 
     public Capabilities getCapabilities() {

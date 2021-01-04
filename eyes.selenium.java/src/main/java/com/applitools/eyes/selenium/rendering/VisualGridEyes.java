@@ -12,6 +12,7 @@ import com.applitools.eyes.debug.FileDebugScreenshotsProvider;
 import com.applitools.eyes.debug.NullDebugScreenshotProvider;
 import com.applitools.eyes.dom.DomScriptUtils;
 import com.applitools.eyes.dom.ScriptExecutor;
+import com.applitools.eyes.exceptions.TestFailedException;
 import com.applitools.eyes.fluent.CheckSettings;
 import com.applitools.eyes.fluent.GetFloatingRegion;
 import com.applitools.eyes.fluent.GetSimpleRegion;
@@ -198,9 +199,9 @@ public class VisualGridEyes implements ISeleniumEyes {
 
         runner.setLogger(logger);
 
-        List<VisualGridRunningTest> newTests = new ArrayList<>();
+        List<RunningTest> newTests = new ArrayList<>();
         ServerConnector serverConnector = runner.getServerConnector();
-        String agentRunId = String.format("%s_%s", getConfiguration().getTestName(), UUID.randomUUID().toString());
+        String agentRunId = String.format("%s_%s", getConfiguration().getTestName(), UUID.randomUUID());
         for (RenderBrowserInfo browserInfo : browserInfoList) {
             if (browserInfo.getEmulationInfo() != null) {
                 Map<String, DeviceSize> deviceSizes = serverConnector.getDevicesSizes(ServerConnector.EMULATED_DEVICES_PATH);
@@ -210,7 +211,8 @@ public class VisualGridEyes implements ISeleniumEyes {
                 Map<String, DeviceSize> deviceSizes = serverConnector.getDevicesSizes(ServerConnector.IOS_DEVICES_PATH);
                 browserInfo.setIosDeviceSize(deviceSizes.get(browserInfo.getIosDeviceInfo().getDeviceName()));
             }
-            VisualGridRunningTest test = new VisualGridRunningTest(logger, eyesId, getConfiguration(), browserInfo, this.properties, serverConnector, agentRunId);
+
+            RunningTest test = new VisualGridRunningTest(logger, true, eyesId, getConfiguration(), browserInfo, this.properties, serverConnector, agentRunId);
             this.testList.put(test.getTestId(), test);
             newTests.add(test);
         }
@@ -324,9 +326,10 @@ public class VisualGridEyes implements ISeleniumEyes {
             }
         }
 
+        TestResultsSummary testResultsSummary = new TestResultsSummary(allResults);
         if (errorResult != null) {
             if (throwException) {
-                throw new Error(errorResult.getException());
+                throw new TestFailedException(testResultsSummary, errorResult.getException());
             }
             return errorResult.getTestResults();
         }
@@ -368,7 +371,6 @@ public class VisualGridEyes implements ISeleniumEyes {
         getConfiguration().setServerUrl(serverUrl);
     }
 
-    @Override
     public void proxy(AbstractProxySettings abstractProxySettings) {
         getConfiguration().setProxy(abstractProxySettings);
     }
@@ -377,7 +379,6 @@ public class VisualGridEyes implements ISeleniumEyes {
         return getConfiguration().getProxy() == null ? runner.getProxy() : getConfiguration().getProxy();
     }
 
-    @Override
     public boolean isEyesClosed() {
         boolean isVGEyesClosed = true;
         synchronized (testList) {

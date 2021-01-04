@@ -9,7 +9,6 @@ import com.applitools.eyes.selenium.fluent.Target;
 import com.applitools.eyes.utils.SeleniumUtils;
 import com.applitools.eyes.visualgrid.model.*;
 import com.applitools.eyes.visualgrid.services.VisualGridRunner;
-import com.applitools.utils.ClassVersionGetter;
 import com.applitools.utils.GeneralUtils;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -30,7 +29,7 @@ public class TestRenderSerialization {
         String target = "full-page";
         Region region = new Region(40, 50, 60, 70);
         EmulationBaseInfo emulationInfo = new ChromeEmulationInfo(DeviceName.Galaxy_S5, ScreenOrientation.PORTRAIT);
-        RenderInfo renderInfo = new RenderInfo(width, height, target, region, null, emulationInfo, null);
+        RenderInfo renderInfo = new RenderInfo(width, height, target, region, null, emulationInfo, null, null);
 
         String xpath = "//html/body/some/path/to/some/element[@with:attribute]";
         Object category = "cat";
@@ -44,8 +43,8 @@ public class TestRenderSerialization {
         Map<String, RGridResource> resources = new HashMap<>();
         String platform = "android";
         BrowserType browserName = BrowserType.IE_10;
-        RenderRequest request = new RenderRequest("id", webHook.toString(), url.toString(), dom, resources, renderInfo, platform,
-                browserName, null, selectorsToFindRegionsFor, true, "rendererId", "", stitchingServiceUrl.toString(), options, ClassVersionGetter.CURRENT_VERSION);
+        RenderRequest request = new RenderRequest("id", webHook.toString(), url.toString(), dom, resources, renderInfo, platform, "web",
+                browserName, null, selectorsToFindRegionsFor, true, "rendererId", "", stitchingServiceUrl.toString(), options, "");
 
         ObjectMapper mapper = new ObjectMapper();
         ObjectNode actual = (ObjectNode) mapper.readTree(mapper.writeValueAsString(request));
