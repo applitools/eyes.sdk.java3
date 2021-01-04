@@ -4,6 +4,9 @@ import com.applitools.eyes.*;
 import com.applitools.eyes.capture.EyesScreenshotFactory;
 import com.applitools.eyes.capture.ImageProvider;
 import com.applitools.eyes.debug.DebugScreenshotsProvider;
+import com.applitools.eyes.logging.Stage;
+import com.applitools.eyes.logging.TraceLevel;
+import org.apache.commons.lang3.tuple.Pair;
 
 public class AndroidFullPageCaptureAlgorithm extends AppiumFullPageCaptureAlgorithm {
 
@@ -43,6 +46,9 @@ public class AndroidFullPageCaptureAlgorithm extends AppiumFullPageCaptureAlgori
         // We need to set position margin to avoid shadow at the top of view
         int oneScrollStep = scrollViewRegion.getHeight() - stitchingAdjustment;
         int maxScrollSteps = contentSize.getScrollContentHeight() / oneScrollStep;
+        logger.log(TraceLevel.Debug, null, Stage.CHECK,
+                Pair.of("entireScrollableHeight", contentSize.getScrollContentHeight()),
+                Pair.of("oneScrollStep", oneScrollStep));
         for (int step = 1; step <= maxScrollSteps; step++) {
             regionToCrop = new Region(0,
                     scrollViewRegion.getTop() + stitchingAdjustment,
@@ -56,6 +62,8 @@ public class AndroidFullPageCaptureAlgorithm extends AppiumFullPageCaptureAlgori
             int endY = scrollViewRegion.getTop() + (step != maxScrollSteps ? stitchingAdjustment/2 : 0);
             boolean isScrolledWithHelperLibrary = false;
             if (scrollableElementId != null) { // it means that we want to scroll on a specific element
+                logger.log(TraceLevel.Debug, null, Stage.CHECK,
+                        Pair.of("scrollRootElementId", scrollableElementId));
                 isScrolledWithHelperLibrary = ((AndroidScrollPositionProvider) scrollProvider).tryScrollWithHelperLibrary(scrollableElementId, (startY - endY), step, maxScrollSteps);
                 if (step == maxScrollSteps && isScrolledWithHelperLibrary) {
                     // We should make additional scroll on parent in case of scrollable element inside ScrollView

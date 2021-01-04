@@ -146,6 +146,8 @@ public class IOSScrollPositionProvider extends AppiumScrollPositionProvider {
                 (int) (element.getLocation().getY() * devicePixelRatio),
                 (int) (element.getSize().getWidth() * devicePixelRatio),
                 (int) (element.getSize().getHeight() * devicePixelRatio));
+        logger.log(TraceLevel.Debug, null, Stage.CHECK,
+                Pair.of("elementClass", element.getAttribute("type")));
         if (shouldStitchContent) {
             ContentSize contentSize = EyesAppiumUtils.getContentSize(driver, element);
             /*

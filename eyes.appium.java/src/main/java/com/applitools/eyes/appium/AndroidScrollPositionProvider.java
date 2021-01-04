@@ -221,6 +221,8 @@ public class AndroidScrollPositionProvider extends AppiumScrollPositionProvider 
                 element.getSize().getWidth(),
                 element.getSize().getHeight());
         if (shouldStitchContent) {
+            logger.log(TraceLevel.Debug, null, Stage.CHECK,
+                    Pair.of("elementClass", element.getAttribute("className")));
             double devicePixelRatio = eyesDriver.getDevicePixelRatio();
             ContentSize contentSize = EyesAppiumUtils.getContentSize(driver, element);
             region = new Region(contentSize.left,
@@ -324,6 +326,8 @@ public class AndroidScrollPositionProvider extends AppiumScrollPositionProvider 
             } else {
                 activeScroll = getFirstScrollableView();
             }
+            logger.log(TraceLevel.Debug, null, Stage.CHECK,
+                    Pair.of("elementClass", activeScroll.getAttribute("className")));
             String className = activeScroll.getAttribute("className");
 
             if (className.equals("android.support.v7.widget.RecyclerView") ||
@@ -338,12 +342,13 @@ public class AndroidScrollPositionProvider extends AppiumScrollPositionProvider 
                     } catch (NumberFormatException e) {
                         GeneralUtils.logExceptionStackTrace(logger, Stage.CHECK, e);
                     }
-                } catch (NoSuchElementException | StaleElementReferenceException ignored) {
+                } catch (NoSuchElementException | StaleElementReferenceException e) {
                     if (contentSize.scrollableOffset > 0) {
                         scrollableHeight = contentSize.scrollableOffset;
                     } else {
                         scrollableHeight = contentSize.height;
                     }
+                    GeneralUtils.logExceptionStackTrace(logger, Stage.CHECK, e);
                 }
             }
         } catch (NoSuchElementException e) {
@@ -404,6 +409,8 @@ public class AndroidScrollPositionProvider extends AppiumScrollPositionProvider 
                 scrollableContentSize = hiddenElement.getText();
             }
         }
+        logger.log(TraceLevel.Debug, null, Stage.CHECK,
+                Pair.of("scrollableHeightFromHelper", scrollableContentSize));
         return scrollableContentSize;
     }
 }
