@@ -2,17 +2,51 @@ package com.applitools.eyes;
 
 import com.applitools.connectivity.ServerConnector;
 import com.applitools.eyes.logging.Stage;
+import com.applitools.eyes.logging.TraceLevel;
 import com.applitools.eyes.logging.Type;
+import com.applitools.eyes.visualgrid.services.RunnerOptions;
 import com.applitools.utils.GeneralUtils;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.apache.commons.lang3.tuple.Pair;
 
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 
 public abstract class EyesRunner {
+    private static final int CONCURRENCY_FACTOR = 5;
+    static final int DEFAULT_CONCURRENCY = 5;
+
+    protected static class TestConcurrency {
+        public final int userConcurrency;
+        public final int actualConcurrency;
+        public final boolean isLegacy;
+        public boolean isDefault = false;
+
+        TestConcurrency() {
+            isDefault = true;
+            isLegacy = false;
+            userConcurrency = DEFAULT_CONCURRENCY;
+            actualConcurrency = DEFAULT_CONCURRENCY;
+        }
+
+        TestConcurrency(int userConcurrency, boolean isLegacy) {
+            this.userConcurrency = userConcurrency;
+            this.actualConcurrency = isLegacy ? userConcurrency * CONCURRENCY_FACTOR : userConcurrency;
+            this.isLegacy = isLegacy;
+        }
+    }
+
+    protected final TestConcurrency testConcurrency;
+    protected boolean wasConcurrencyLogSent = false;
+    private String suiteName;
+    private boolean isDisabled;
+
     protected ServerConnector serverConnector = new ServerConnector();
     private TestResultsSummary allTestResults = null;
 
@@ -21,6 +55,24 @@ public abstract class EyesRunner {
     protected Logger logger = new Logger();
 
     private final Map<String, IBatchCloser> batchesServerConnectorsMap = new HashMap<>();
+
+    public EyesRunner(String suiteName) {
+        this.testConcurrency = new TestConcurrency();
+        this.suiteName = suiteName;
+    }
+
+    public EyesRunner(int testConcurrency, String suiteName) {
+        this.testConcurrency = new TestConcurrency(testConcurrency, true);
+        this.suiteName = suiteName;
+    }
+
+    public EyesRunner(RunnerOptions runnerOptions, String suiteName) {
+        int testConcurrency = runnerOptions.getTestConcurrency() == null ? DEFAULT_CONCURRENCY : runnerOptions.getTestConcurrency();
+        this.testConcurrency = new TestConcurrency(testConcurrency, false);
+        setApiKey(runnerOptions.getApiKey());
+        setServerUrl(runnerOptions.getServerUrl());
+        this.suiteName = suiteName;
+    }
 
     public abstract TestResultsSummary getAllTestResultsImpl(boolean shouldThrowException);
 
@@ -144,7 +196,55 @@ public abstract class EyesRunner {
         }
     }
 
+    protected void sendConcurrencyLog() {
+        try {
+            String logMessage = getConcurrencyLog();
+            if (logMessage != null) {
+                NetworkLogHandler.sendSingleLog(serverConnector, TraceLevel.Notice, logMessage);
+            }
+        } catch (JsonProcessingException e) {
+            GeneralUtils.logExceptionStackTrace(logger, Stage.OPEN, e);
+        }
+    }
+
+    protected String getConcurrencyLog() throws JsonProcessingException {
+        if (wasConcurrencyLogSent) {
+            return null;
+        }
+
+        wasConcurrencyLogSent = true;
+        String key = testConcurrency.isDefault ? "defaultConcurrency" : testConcurrency.isLegacy ? "concurrency" : "testConcurrency";
+        ObjectMapper objectMapper = new ObjectMapper();
+        ObjectNode objectNode = objectMapper.createObjectNode();
+        objectNode.put("type", "runnerStarted");
+        objectNode.put(key, testConcurrency.userConcurrency);
+        return objectMapper.writeValueAsString(objectNode);
+    }
+
     public String getAgentId() {
         return serverConnector.getAgentId();
+    }
+
+    public String getSuiteName() {
+        return suiteName;
+    }
+
+    public void setSuiteName(String suiteName) {
+        this.suiteName = suiteName;
+    }
+
+    public void setIsDisabled(boolean isDisabled) {
+        this.isDisabled = isDisabled;
+    }
+
+    public boolean getIsDisabled() {
+        return this.isDisabled;
+    }
+
+    public void logMemoryUsage() {
+        logger.log(TraceLevel.Debug, Collections.<String>emptySet(), Stage.GENERAL, null,
+                Pair.of("totalMemory", Runtime.getRuntime().totalMemory()),
+                Pair.of("freeMemory", Runtime.getRuntime().freeMemory()),
+                Pair.of("maxMemory", Runtime.getRuntime().maxMemory()));
     }
 }
