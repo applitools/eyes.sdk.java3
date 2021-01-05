@@ -9,7 +9,6 @@ import com.applitools.eyes.selenium.wrappers.EyesSeleniumDriver;
 import com.applitools.eyes.visualgrid.model.DeviceSize;
 import com.applitools.eyes.visualgrid.model.IosDeviceInfo;
 import com.applitools.eyes.visualgrid.model.IosDeviceName;
-import com.applitools.eyes.visualgrid.model.RenderingInfo;
 import com.applitools.eyes.visualgrid.services.RunnerOptions;
 import com.applitools.eyes.visualgrid.services.VisualGridRunner;
 import com.applitools.utils.GeneralUtils;
@@ -19,7 +18,6 @@ import org.openqa.selenium.remote.SessionId;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
-import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicReference;
 
