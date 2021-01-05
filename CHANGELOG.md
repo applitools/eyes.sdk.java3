@@ -1,3 +1,7 @@
+## [vNext]
+### Fixed
+- A bug in setting server configuration in UFG tests. [Trello 2404](https://trello.com/c/4AuvRh4U)
+
 ## [3.190.2]
 ### Updated
 - Dom snapshot 4.4.3. [Trello 2405](https://trello.com/c/wBy9nGQi)

@@ -108,8 +108,7 @@ public class MockServerConnector extends ServerConnector {
     }
 
     @Override
-    public Map<String, DeviceSize> getDevicesSizes(String path)
-    {
+    public Map<String, DeviceSize> getDevicesSizes(String path) {
         return new HashMap<>();
     }
 

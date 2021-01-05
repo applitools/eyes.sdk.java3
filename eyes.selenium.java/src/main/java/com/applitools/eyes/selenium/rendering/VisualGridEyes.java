@@ -209,8 +209,7 @@ public class VisualGridEyes implements ISeleniumEyes {
 
         List<VisualGridRunningTest> newTests = new ArrayList<>();
         for (RenderBrowserInfo browserInfo : browserInfoList) {
-            VisualGridRunningTest test = new VisualGridRunningTest(getConfiguration(), browserInfo, this.properties, logger);
-            test.setServerConnector(runner.getServerConnector());
+            VisualGridRunningTest test = new VisualGridRunningTest(getConfiguration(), browserInfo, this.properties, logger, runner.getServerConnector());
             this.testList.put(test.getTestId(), test);
             newTests.add(test);
         }

@@ -31,8 +31,9 @@ public class VisualGridRunningTest extends RunningTest {
     }
 
     public VisualGridRunningTest(Configuration configuration, RenderBrowserInfo browserInfo,
-                                 List<PropertyData> properties, Logger logger) {
+                                 List<PropertyData> properties, Logger logger, ServerConnector serverConnector) {
         this(browserInfo, logger, configuration);
+        this.setServerConnector(serverConnector);
         if (browserInfo.getEmulationInfo() != null) {
             Map<String, DeviceSize> deviceSizes = getDevicesSizes(ServerConnector.EMULATED_DEVICES_PATH);
             browserInfo.setEmulationDeviceSize(deviceSizes.get(browserInfo.getEmulationInfo().getDeviceName()));
