@@ -233,8 +233,10 @@ public class AndroidScrollPositionProvider extends AppiumScrollPositionProvider 
                     element.getAttribute("className").equals("android.widget.ListView") ||
                     element.getAttribute("className").equals("android.widget.GridView")) {
                 try {
-                    MobileElement hiddenElement = ((AndroidDriver<AndroidElement>) driver).findElement(MobileBy.AndroidUIAutomator("new UiSelector().description(\"EyesAppiumHelper\")"));
+                    MobileElement hiddenElement = ((AndroidDriver<AndroidElement>) driver).findElement(MobileBy.AndroidUIAutomator("new UiSelector().description(\"EyesAppiumHelperEDT\")"));
                     if (hiddenElement != null) {
+                        String elementId = element.getAttribute("resourceId").split("/")[1];
+                        hiddenElement.setValue("offset;"+elementId+";0;0;0");
                         hiddenElement.click();
 
                         String scrollableContentSize = hiddenElement.getText();
@@ -337,8 +339,10 @@ public class AndroidScrollPositionProvider extends AppiumScrollPositionProvider 
                     className.equals("android.widget.ListView") ||
                     className.equals("android.widget.GridView")) {
                 try {
-                    MobileElement hiddenElement = ((AndroidDriver<AndroidElement>) driver).findElement(MobileBy.AndroidUIAutomator("new UiSelector().description(\"EyesAppiumHelper\")"));
+                    MobileElement hiddenElement = ((AndroidDriver<AndroidElement>) driver).findElement(MobileBy.AndroidUIAutomator("new UiSelector().description(\"EyesAppiumHelperEDT\")"));
                     if (hiddenElement != null) {
+                        String elementId = activeScroll.getAttribute("resourceId").split("/")[1];
+                        hiddenElement.setValue("offset;"+elementId+";0;0;0");
                         hiddenElement.click();
 
                         String scrollableContentSize = hiddenElement.getText();

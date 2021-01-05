@@ -1,3 +1,7 @@
+## [vNext]
+### Updated
+- Scrollable offset calculation with updated Helper Library. [Trello 1673](https://trello.com/c/CYbkzXia)
+
 ## [3.190.3]
 ### Fixed
 - A bug in setting server configuration in UFG tests. [Trello 2404](https://trello.com/c/4AuvRh4U)
