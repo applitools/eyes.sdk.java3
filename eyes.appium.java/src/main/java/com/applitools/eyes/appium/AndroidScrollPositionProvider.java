@@ -389,7 +389,7 @@ public class AndroidScrollPositionProvider extends AppiumScrollPositionProvider 
 
     private String getScrollableContentSize(String resourceId) {
         String scrollableContentSize = "";
-        String[] version = EyesAppiumUtils.getHelperLibraryVersion(eyesDriver).split("\\.");
+        String[] version = EyesAppiumUtils.getHelperLibraryVersion(eyesDriver, logger).split("\\.");
         MobileElement hiddenElement;
         if (version.length == 3 &&
                 Integer.parseInt(version[0]) >= 1 &&

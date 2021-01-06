@@ -5,6 +5,7 @@ package com.applitools.eyes.appium;
 
 import com.applitools.eyes.Logger;
 import com.applitools.eyes.logging.Stage;
+import com.applitools.eyes.logging.TraceLevel;
 import com.applitools.eyes.selenium.EyesDriverUtils;
 import com.applitools.eyes.selenium.positioning.ImageRotation;
 import com.applitools.utils.ArgumentGuard;
@@ -14,6 +15,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import io.appium.java_client.AppiumDriver;
 import io.appium.java_client.MobileBy;
 import io.appium.java_client.android.AndroidDriver;
+import org.apache.commons.lang3.tuple.Pair;
 import org.openqa.selenium.*;
 import org.openqa.selenium.remote.RemoteWebElement;
 
@@ -226,7 +228,7 @@ public class EyesAppiumUtils {
         systemBarHeights.put(NAVIGATION_BAR, navigationBarHeight);
     }
 
-    public static String getHelperLibraryVersion(EyesAppiumDriver driver) {
+    public static String getHelperLibraryVersion(EyesAppiumDriver driver, Logger logger) {
         String version = "";
         if (driver.getRemoteWebDriver() instanceof AndroidDriver) {
             try {
@@ -246,6 +248,8 @@ public class EyesAppiumUtils {
                 }
             }
         }
+        logger.log(TraceLevel.Debug, null, Stage.CHECK,
+                Pair.of("helperLibraryVersion", version));
         return version;
     }
 }

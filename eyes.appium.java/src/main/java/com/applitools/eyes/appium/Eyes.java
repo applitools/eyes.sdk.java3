@@ -1045,7 +1045,7 @@ public class Eyes extends EyesBase {
         }
 
         public String getHelperLibraryVersion() {
-            return EyesAppiumUtils.getHelperLibraryVersion(driver);
+            return EyesAppiumUtils.getHelperLibraryVersion(driver, logger);
         }
     }
 }
