@@ -950,29 +950,6 @@ public class Eyes extends EyesBase {
         return scrollRootElementId;
     }
 
-    private String getHelperLibraryVersion() {
-        String version = "";
-        if (driver.getRemoteWebDriver() instanceof AndroidDriver) {
-            try {
-                WebElement hiddenElement = driver.getRemoteWebDriver().findElement(MobileBy.AndroidUIAutomator("new UiSelector().description(\"EyesAppiumHelper_Version\")"));
-                if (hiddenElement != null) {
-                    version = hiddenElement.getText();
-                }
-            } catch (NoSuchElementException | StaleElementReferenceException ignored) {
-            }
-            if (version == null) {
-                try {
-                    WebElement hiddenElement = driver.getRemoteWebDriver().findElement(MobileBy.AndroidUIAutomator("new UiSelector().description(\"EyesAppiumHelper\")"));
-                    if (hiddenElement != null) {
-                        version = "1.0.0";
-                    }
-                } catch (NoSuchElementException | StaleElementReferenceException ignored) {
-                }
-            }
-        }
-        return version;
-    }
-
     class EyesAppiumAgentSetup {
         class WebDriverInfo {
             /**
@@ -1068,7 +1045,7 @@ public class Eyes extends EyesBase {
         }
 
         public String getHelperLibraryVersion() {
-            return Eyes.this.getHelperLibraryVersion();
+            return EyesAppiumUtils.getHelperLibraryVersion(driver);
         }
     }
 }

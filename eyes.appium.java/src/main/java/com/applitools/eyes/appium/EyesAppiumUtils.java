@@ -12,6 +12,7 @@ import com.applitools.utils.GeneralUtils;
 import com.applitools.utils.ImageUtils;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.appium.java_client.AppiumDriver;
+import io.appium.java_client.MobileBy;
 import io.appium.java_client.android.AndroidDriver;
 import org.openqa.selenium.*;
 import org.openqa.selenium.remote.RemoteWebElement;
@@ -216,5 +217,28 @@ public class EyesAppiumUtils {
         int navigationBarHeight = driver.getDeviceHeight() - driver.getViewportRect().get("height") - statusBarHeight;
         systemBarHeights.put(STATUS_BAR, statusBarHeight);
         systemBarHeights.put(NAVIGATION_BAR, navigationBarHeight);
+    }
+
+    public static String getHelperLibraryVersion(EyesAppiumDriver driver) {
+        String version = "";
+        if (driver.getRemoteWebDriver() instanceof AndroidDriver) {
+            try {
+                WebElement hiddenElement = driver.getRemoteWebDriver().findElement(MobileBy.AndroidUIAutomator("new UiSelector().description(\"EyesAppiumHelper_Version\")"));
+                if (hiddenElement != null) {
+                    version = hiddenElement.getText();
+                }
+            } catch (NoSuchElementException | StaleElementReferenceException ignored) {
+            }
+            if (version == null) {
+                try {
+                    WebElement hiddenElement = driver.getRemoteWebDriver().findElement(MobileBy.AndroidUIAutomator("new UiSelector().description(\"EyesAppiumHelper\")"));
+                    if (hiddenElement != null) {
+                        version = "1.0.0";
+                    }
+                } catch (NoSuchElementException | StaleElementReferenceException ignored) {
+                }
+            }
+        }
+        return version;
     }
 }

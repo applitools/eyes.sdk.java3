@@ -233,22 +233,15 @@ public class AndroidScrollPositionProvider extends AppiumScrollPositionProvider 
                     element.getAttribute("className").equals("android.widget.ListView") ||
                     element.getAttribute("className").equals("android.widget.GridView")) {
                 try {
-                    MobileElement hiddenElement = ((AndroidDriver<AndroidElement>) driver).findElement(MobileBy.AndroidUIAutomator("new UiSelector().description(\"EyesAppiumHelperEDT\")"));
-                    if (hiddenElement != null) {
-                        String elementId = element.getAttribute("resourceId").split("/")[1];
-                        hiddenElement.setValue("offset;"+elementId+";0;0;0");
-                        hiddenElement.click();
-
-                        String scrollableContentSize = hiddenElement.getText();
-                        try {
-                            int scrollableHeight = Integer.valueOf(scrollableContentSize);
-                            region = new Region((int) (element.getLocation().getX() * devicePixelRatio),
-                                    (int) (element.getLocation().getY() * devicePixelRatio),
-                                    (int) (element.getSize().getWidth() * devicePixelRatio),
-                                    scrollableHeight);
-                        } catch (NumberFormatException e) {
-                            GeneralUtils.logExceptionStackTrace(logger, Stage.CHECK, e);
-                        }
+                    String scrollableContentSize = getScrollableContentSize(element.getAttribute("resourceId"));
+                    try {
+                        int scrollableHeight = Integer.parseInt(scrollableContentSize);
+                        region = new Region((int) (element.getLocation().getX() * devicePixelRatio),
+                                (int) (element.getLocation().getY() * devicePixelRatio),
+                                (int) (element.getSize().getWidth() * devicePixelRatio),
+                                scrollableHeight);
+                    } catch (NumberFormatException e) {
+                        GeneralUtils.logExceptionStackTrace(logger, Stage.CHECK, e);
                     }
                 } catch (NoSuchElementException | StaleElementReferenceException e) {
                     GeneralUtils.logExceptionStackTrace(logger, Stage.CHECK, e);
@@ -339,18 +332,11 @@ public class AndroidScrollPositionProvider extends AppiumScrollPositionProvider 
                     className.equals("android.widget.ListView") ||
                     className.equals("android.widget.GridView")) {
                 try {
-                    MobileElement hiddenElement = ((AndroidDriver<AndroidElement>) driver).findElement(MobileBy.AndroidUIAutomator("new UiSelector().description(\"EyesAppiumHelperEDT\")"));
-                    if (hiddenElement != null) {
-                        String elementId = activeScroll.getAttribute("resourceId").split("/")[1];
-                        hiddenElement.setValue("offset;"+elementId+";0;0;0");
-                        hiddenElement.click();
-
-                        String scrollableContentSize = hiddenElement.getText();
-                        try {
-                            scrollableHeight = Integer.valueOf(scrollableContentSize);
-                        } catch (NumberFormatException e) {
-                            GeneralUtils.logExceptionStackTrace(logger, Stage.CHECK, e);
-                        }
+                    String scrollableContentSize = getScrollableContentSize(activeScroll.getAttribute("resourceId"));
+                    try {
+                        scrollableHeight = Integer.parseInt(scrollableContentSize);
+                    } catch (NumberFormatException e) {
+                        GeneralUtils.logExceptionStackTrace(logger, Stage.CHECK, e);
                     }
                 } catch (NoSuchElementException | StaleElementReferenceException ignored) {
                     if (contentSize.scrollableOffset > 0) {
@@ -394,5 +380,30 @@ public class AndroidScrollPositionProvider extends AppiumScrollPositionProvider 
             }
         }
         return scrollableView;
+    }
+
+    private String getScrollableContentSize(String resourceId) {
+        String scrollableContentSize = "";
+        String[] version = EyesAppiumUtils.getHelperLibraryVersion(eyesDriver).split("\\.");
+        MobileElement hiddenElement;
+        if (version.length == 3 &&
+                Integer.parseInt(version[0]) >= 1 &&
+                Integer.parseInt(version[1]) >= 3 &&
+                Integer.parseInt(version[2]) >= 1) {
+            hiddenElement = ((AndroidDriver<AndroidElement>) driver).findElement(MobileBy.AndroidUIAutomator("new UiSelector().description(\"EyesAppiumHelperEDT\")"));
+            if (hiddenElement != null) {
+                String elementId = resourceId.split("/")[1];
+                hiddenElement.setValue("offset;"+elementId+";0;0;0");
+                hiddenElement.click();
+                scrollableContentSize = hiddenElement.getText();
+            }
+        } else {
+            hiddenElement = ((AndroidDriver<AndroidElement>) driver).findElement(MobileBy.AndroidUIAutomator("new UiSelector().description(\"EyesAppiumHelper\")"));
+            if (hiddenElement != null) {
+                hiddenElement.click();
+                scrollableContentSize = hiddenElement.getText();
+            }
+        }
+        return scrollableContentSize;
     }
 }
