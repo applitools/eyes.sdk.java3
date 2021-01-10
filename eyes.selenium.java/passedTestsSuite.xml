@@ -6,7 +6,7 @@
         <listener class-name="com.applitools.eyes.utils.ReportingListener"/>
     </listeners>
     <test name="TestClassicApi">
-        <parameter name="dont_run" value="TestCheckInnerFrame+VG,TestCheckFrame+VG, TestCheckWindowFully+VG, TestDoubleCheckWindow+VG, TestCheckWindow+VG, TestCheckRegionInFrame+VG"/>
+        <parameter name="dont_run" value="TestCheckInnerFrame+VG,TestCheckFrame+VG,TestCheckRegionInFrame+VG"/>
         <classes>
             <class name="com.applitools.eyes.selenium.TestClassicApi">
                 <methods>
@@ -110,7 +110,7 @@
 
     <test name="TestFluentApi">
         <parameter name="dont_run"
-                   value="TestCheckFullWindowWithMultipleIgnoreRegionsBySelector_Fluent+VG, TestCheckWindow_Fluent+VG, TestCheckWindowWithFloatingByRegion_Fluent+VG, TestCheckWindowWithFloatingBySelector_Fluent+VG, TestCheckWindowWithIgnoreBySelector_Centered_Fluent+VG, TestCheckWindowWithIgnoreBySelector_Fluent+VG, TestCheckWindowWithIgnoreBySelector_Stretched_Fluent+VG, TestCheckWindowWithIgnoreRegion_Fluent+VG, TestIgnoreDisplacements+VG, TestCheckMany+VG, TestScrollbarsHiddenAndReturned_Fluent+VG"/>
+                   value="TestCheckMany+VG"/>
         <classes>
             <class name="com.applitools.eyes.selenium.TestFluentApi">
                 <methods>
@@ -172,7 +172,6 @@
         </classes>
     </test>
     <test name="TestScrollRootElementInCenter_Test">
-        <parameter name="dont_run" value="TestCheckScrollRootElement+VG"/>
         <classes>
             <class name="com.applitools.eyes.selenium.TestScrollRootElementInCenter"/>
         </classes>
@@ -369,8 +368,6 @@
         </classes>
     </test>
     <test name="TestDefaultRootElement" parallel="methods">
-        <parameter name="dont_run"
-                   value="TestCheckElementFullyOnBottomAfterScroll+VG"/>
         <classes>
             <class name="com.applitools.eyes.selenium.TestDefaultRootElement">
                 <methods>
