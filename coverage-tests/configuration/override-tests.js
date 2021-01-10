@@ -18,8 +18,10 @@ module.exports = {
     'check window fully on android chrome emulator on mobile page with horizontal scroll': {skip: true}, // have diffs
     'check window fully with fixed scroll root element': {skip: true}, // Have differences
     'check window fully and frame in frame fully with vg': {skip: true}, // Unable to locate element: {"method":"css selector","selector":"[name="frame1"]"}
+    'check window after manual scroll with vg': {skip: true}, // diffs
     'check window after manual scroll on safari 11': {skip: true}, //diffs
     'check window after manual scroll on safari 12': {skip: true}, // diffs
+    'check window on page with sticky header with vg': {skip: true}, // diffs
     'check window fully with html scrollRootElement after scroll with css stitching': {skip: true}, // diffs
     'check window fully with html scrollRootElement after scroll with scroll stitching': {skip: true}, // diffs
     // region
@@ -70,5 +72,6 @@ module.exports = {
     'should send dom and location when check region by selector with custom scroll root': {skipEmit: true},
     'should send dom and location when check region by selector with custom scroll root with vg': {skipEmit: true},
     'should send dom and location when check region by selector fully with custom scroll root': {skipEmit: true},
-    'should send dom and location when check region by selector fully with custom scroll root with vg': {skipEmit: true}
+    'should send dom and location when check region by selector fully with custom scroll root with vg': {skipEmit: true},
+    'should send dom of version 11': {skipEmit: true}
 }
