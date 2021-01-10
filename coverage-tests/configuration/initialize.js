@@ -247,7 +247,7 @@ module.exports = function (tracker, test) {
       })
     },
     locate(visualLocator) {
-      return addCommand(java`eyes.locate(new VisualLocatorSettings().names(Arrays.asList(${visualLocator.locatorNames.join(', ')})));`)
+      return addCommand(java`eyes.locate(new VisualLocatorSettings().names(Arrays.asList(${visualLocator.locatorNames.join(', ')})));`).type('Map<String, List<Region>>')
     }
   }
 

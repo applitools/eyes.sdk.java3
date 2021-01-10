@@ -497,7 +497,9 @@ public abstract class EyesBase implements IEyesBase {
 
     protected TestResults stopSession(boolean isAborted) {
         if (isDisabled) {
-            return new TestResults();
+            TestResults testResults = new TestResults();
+            testResults.setStatus(TestResultsStatus.Disabled);
+            return testResults;
         }
 
         SessionStopInfo sessionStopInfo = prepareStopSession(isAborted);

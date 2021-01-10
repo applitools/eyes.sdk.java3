@@ -8,28 +8,16 @@ module.exports = {
     'should handle check of stale element in frame if selector is preserved': {skipEmit: true}, // Not implemented yet
     // General
     'should hide and restore scrollbars with vg': {skip: true}, // java.lang.IllegalArgumentException: checkTasks == 0
-    'should not check if disabled': {skip: true}, // throws com.applitools.eyes.EyesException: Status is null in the test results
-    'should send accessibility regions by selector with vg': {skip: true}, // diffs
-    'should send dom on edge legacy': {skip: true}, // java.lang.IllegalArgumentException: width < 0 , in Eyes.open
     'should send floating region by coordinates in frame with vg': {skip: true}, // stale element reference
-    'should send floating region by coordinates with vg': {skip: true}, // diffs
-    'should send floating region by selector with vg': {skip: true}, // diffs
-    'should send ignore region by coordinates with vg': {skip: true}, // diffs
-    'should send ignore region by selector with vg': {skip: true}, // diffs
     'should send ignore region by the same selector as target region with scroll stitching': {skip: true}, // Region has different position [(0, 0) 304x184, SCREENSHOT_AS_IS] but found [(0, 284) 304x184, SCREENSHOT_AS_IS]
-    'should send ignore regions by selector with vg': {skip: true}, // diffs
+    'should send dom on edge legacy': {skip: true}, // java.lang.IllegalArgumentException: width < 0 , in Eyes.open
     'should set viewport size on edge legacy': {skip: true}, // java.lang.IllegalArgumentException: width < 0
-    'should send ignore displacements with vg': {skip: true}, // diffs
     // window
     'check window fully on android chrome emulator on desktop page': {skip: true}, // have diffs
     'check window fully on android chrome emulator on mobile page': {skip: true}, // have diffs
     'check window fully on android chrome emulator on mobile page with horizontal scroll': {skip: true}, // have diffs
     'check window fully with fixed scroll root element': {skip: true}, // Have differences
-    'check window two times with vg classic': {skip: true}, // Diffs, baseline saved for fully() while check is without ( all good for classic)
-    'check window with vg classic': {skip: true}, // baseline saved for fully() while check is without
-    'check window with vg': {skip: true}, // baseline saved for fully() while check is without
     'check window fully and frame in frame fully with vg': {skip: true}, // Unable to locate element: {"method":"css selector","selector":"[name="frame1"]"}
-    'check window fully with vg': {skip: true}, // diffs
     'check window after manual scroll on safari 11': {skip: true}, //diffs
     'check window after manual scroll on safari 12': {skip: true}, // diffs
     'check window fully with html scrollRootElement after scroll with css stitching': {skip: true}, // diffs

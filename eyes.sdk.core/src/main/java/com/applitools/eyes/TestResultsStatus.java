@@ -4,5 +4,6 @@ public enum TestResultsStatus {
     Passed,
     Unresolved,
     Failed,
-    NotOpened
+    NotOpened,
+    Disabled
 }
