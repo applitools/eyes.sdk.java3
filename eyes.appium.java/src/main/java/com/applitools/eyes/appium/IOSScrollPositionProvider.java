@@ -126,7 +126,7 @@ public class IOSScrollPositionProvider extends AppiumScrollPositionProvider {
 
     @Override
     public void scrollTo(int startX, int startY, int endX, int endY, boolean shouldCancel) {
-        logger.log(TraceLevel.Debug, null, Stage.CHECK,
+        logger.log(TraceLevel.Debug, eyesDriver.getTestId(), Stage.CHECK,
                 Pair.of("from", new Location(startX, startY)),
                 Pair.of("to", new Location(startX, startY)));
         TouchAction scrollAction = new TouchAction(driver);
@@ -146,7 +146,7 @@ public class IOSScrollPositionProvider extends AppiumScrollPositionProvider {
                 (int) (element.getLocation().getY() * devicePixelRatio),
                 (int) (element.getSize().getWidth() * devicePixelRatio),
                 (int) (element.getSize().getHeight() * devicePixelRatio));
-        logger.log(TraceLevel.Debug, null, Stage.CHECK,
+        logger.log(TraceLevel.Debug, eyesDriver.getTestId(), Stage.CHECK,
                 Pair.of("elementClass", element.getAttribute("type")));
         if (shouldStitchContent) {
             ContentSize contentSize = EyesAppiumUtils.getContentSize(driver, element);
@@ -221,7 +221,7 @@ public class IOSScrollPositionProvider extends AppiumScrollPositionProvider {
             String base64 = driver.getScreenshotAs(OutputType.BASE64);
             BufferedImage image = ImageUtils.imageFromBase64(base64);
 
-            logger.log(TraceLevel.Debug, null, Stage.CHECK, Pair.of("pageSource", driver.getPageSource()));
+            logger.log(TraceLevel.Debug, eyesDriver.getTestId(), Stage.CHECK, Pair.of("pageSource", driver.getPageSource()));
         }
         return contentSize;
     }

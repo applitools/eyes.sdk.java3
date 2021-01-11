@@ -46,7 +46,7 @@ public class AndroidFullPageCaptureAlgorithm extends AppiumFullPageCaptureAlgori
         // We need to set position margin to avoid shadow at the top of view
         int oneScrollStep = scrollViewRegion.getHeight() - stitchingAdjustment;
         int maxScrollSteps = contentSize.getScrollContentHeight() / oneScrollStep;
-        logger.log(TraceLevel.Debug, null, Stage.CHECK,
+        logger.log(TraceLevel.Debug, testId, Stage.CHECK,
                 Pair.of("entireScrollableHeight", contentSize.getScrollContentHeight()),
                 Pair.of("oneScrollStep", oneScrollStep));
         for (int step = 1; step <= maxScrollSteps; step++) {
@@ -62,7 +62,7 @@ public class AndroidFullPageCaptureAlgorithm extends AppiumFullPageCaptureAlgori
             int endY = scrollViewRegion.getTop() + (step != maxScrollSteps ? stitchingAdjustment/2 : 0);
             boolean isScrolledWithHelperLibrary = false;
             if (scrollableElementId != null) { // it means that we want to scroll on a specific element
-                logger.log(TraceLevel.Debug, null, Stage.CHECK,
+                logger.log(TraceLevel.Debug, testId, Stage.CHECK,
                         Pair.of("scrollRootElementId", scrollableElementId));
                 isScrolledWithHelperLibrary = ((AndroidScrollPositionProvider) scrollProvider).tryScrollWithHelperLibrary(scrollableElementId, (startY - endY), step, maxScrollSteps);
                 if (step == maxScrollSteps && isScrolledWithHelperLibrary) {

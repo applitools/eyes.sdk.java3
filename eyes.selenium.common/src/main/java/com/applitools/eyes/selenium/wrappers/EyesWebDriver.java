@@ -43,4 +43,8 @@ public abstract class EyesWebDriver implements WebDriver, JavascriptExecutor, Ta
     }
 
     protected abstract double getDevicePixelRatioInner();
+
+    public String getTestId() {
+        return eyesBase.getTestId();
+    }
 }

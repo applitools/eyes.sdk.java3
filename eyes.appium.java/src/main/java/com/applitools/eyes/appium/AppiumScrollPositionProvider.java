@@ -66,7 +66,7 @@ public abstract class AppiumScrollPositionProvider implements ScrollPositionProv
         try {
             WebElement activeScroll = getFirstScrollableView();
             contentSize = EyesAppiumUtils.getContentSize(driver, activeScroll);
-            logger.log(TraceLevel.Debug, null, Stage.CHECK, Pair.of("contentSize", contentSize));
+            logger.log(TraceLevel.Debug, eyesDriver.getTestId(), Stage.CHECK, Pair.of("contentSize", contentSize));
         } catch (NoSuchElementException e) {
             GeneralUtils.logExceptionStackTrace(logger, Stage.CHECK, e);
         }
@@ -90,7 +90,7 @@ public abstract class AppiumScrollPositionProvider implements ScrollPositionProv
             isVerticalScrollGapSet = true;
         }
         Location loc = new Location(scrollLoc.x, scrollLoc.y + verticalScrollGap);
-        logger.log(TraceLevel.Debug, null, Stage.CHECK,
+        logger.log(TraceLevel.Debug, eyesDriver.getTestId(), Stage.CHECK,
                 Pair.of("location", loc),
                 Pair.of("verticalScrollGap", verticalScrollGap));
         return loc;
@@ -109,7 +109,7 @@ public abstract class AppiumScrollPositionProvider implements ScrollPositionProv
             reg = new Region(0, 0, 0, 0);
         }
 
-        logger.log(TraceLevel.Debug, null, Stage.CHECK,
+        logger.log(TraceLevel.Debug, eyesDriver.getTestId(), Stage.CHECK,
                 Pair.of("region", reg),
                 Pair.of("verticalScrollGap", verticalScrollGap));
         return reg;
@@ -141,7 +141,7 @@ public abstract class AppiumScrollPositionProvider implements ScrollPositionProv
             // the position of the scrollview is basically the offset of the first visible child
             pos = new Location(loc.getX() - childLoc.getX(), loc.getY() - childLoc.getY());
         }
-        logger.log(TraceLevel.Debug, null, Stage.CHECK, Pair.of("currentPosition", pos));
+        logger.log(TraceLevel.Debug, eyesDriver.getTestId(), Stage.CHECK, Pair.of("currentPosition", pos));
         return pos;
     }
 
@@ -155,7 +155,7 @@ public abstract class AppiumScrollPositionProvider implements ScrollPositionProv
             // the position of the scrollview is basically the offset of the first visible child
             pos = new Location(loc.getX() - childLoc.getX(), (loc.getY() - getStatusBarHeight()) - childLoc.getY());
         }
-        logger.log(TraceLevel.Debug, null, Stage.CHECK, Pair.of("currentPosition", pos));
+        logger.log(TraceLevel.Debug, eyesDriver.getTestId(), Stage.CHECK, Pair.of("currentPosition", pos));
         return pos;
     }
 

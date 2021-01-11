@@ -248,7 +248,7 @@ public class EyesAppiumUtils {
                 }
             }
         }
-        logger.log(TraceLevel.Debug, null, Stage.CHECK,
+        logger.log(TraceLevel.Debug, driver.getTitle(), Stage.CHECK,
                 Pair.of("helperLibraryVersion", version));
         return version;
     }
