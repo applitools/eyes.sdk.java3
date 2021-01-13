@@ -1,6 +1,7 @@
 package com.applitools.eyes.appium;
 
 import com.applitools.ICheckSettings;
+import com.applitools.connectivity.ServerConnector;
 import com.applitools.eyes.*;
 import com.applitools.eyes.appium.capture.ImageProviderFactory;
 import com.applitools.eyes.appium.capture.MobileScreenshotProvider;
@@ -27,7 +28,6 @@ import com.applitools.eyes.scaling.FixedScaleProviderFactory;
 import com.applitools.eyes.scaling.NullScaleProvider;
 import com.applitools.eyes.selenium.ClassicRunner;
 import com.applitools.eyes.selenium.EyesDriverUtils;
-import com.applitools.eyes.selenium.IClassicRunner;
 import com.applitools.eyes.selenium.StitchMode;
 import com.applitools.eyes.selenium.fluent.SimpleRegionByElement;
 import com.applitools.eyes.selenium.positioning.ImageRotation;
@@ -36,10 +36,16 @@ import com.applitools.eyes.selenium.positioning.RegionPositionCompensation;
 import com.applitools.eyes.selenium.regionVisibility.MoveToRegionVisibilityStrategy;
 import com.applitools.eyes.selenium.regionVisibility.NopRegionVisibilityStrategy;
 import com.applitools.eyes.selenium.regionVisibility.RegionVisibilityStrategy;
+import com.applitools.eyes.visualgrid.model.DeviceSize;
+import com.applitools.eyes.visualgrid.model.RenderBrowserInfo;
 import com.applitools.eyes.visualgrid.services.CheckTask;
+import com.applitools.eyes.visualgrid.services.IEyes;
+import com.applitools.eyes.visualgrid.services.VisualGridRunner;
+import com.applitools.eyes.visualgrid.services.VisualGridRunningTest;
 import com.applitools.utils.*;
 import io.appium.java_client.AppiumDriver;
 import io.appium.java_client.MobileBy;
+import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.lang3.tuple.Pair;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.*;
@@ -49,7 +55,7 @@ import java.awt.image.BufferedImage;
 import java.net.URI;
 import java.util.*;
 
-public class Eyes extends RunningTest {
+public class Eyes extends RunningTest implements IEyes {
     private static final int USE_DEFAULT_MATCH_TIMEOUT = -1;
     private static final int DEFAULT_STITCH_OVERLAP = 50;
     private static final int IOS_STITCH_OVERLAP = 0;
@@ -57,6 +63,7 @@ public class Eyes extends RunningTest {
     public static final double UNKNOWN_DEVICE_PIXEL_RATIO = 0;
     public static final double DEFAULT_DEVICE_PIXEL_RATIO = 1;
 
+    private final boolean isVisualGrid;
     private Configuration configuration = new Configuration();
     private EyesAppiumDriver driver;
     private VisualLocatorsProvider visualLocatorsProvider;
@@ -71,12 +78,15 @@ public class Eyes extends RunningTest {
     private PropertyHandler<RegionVisibilityStrategy> regionVisibilityStrategyHandler;
     private WebElement scrollRootElement = null;
 
+    final Map<String, RunningTest> visualGridTestList = new HashMap<>();
+
     public Eyes() {
         this(new ClassicRunner());
     }
 
-    public Eyes(IClassicRunner runner) {
+    public Eyes(EyesRunner runner) {
         super(runner);
+        isVisualGrid = runner instanceof VisualGridRunner;
         regionVisibilityStrategyHandler = new SimplePropertyHandler<>();
         regionVisibilityStrategyHandler.set(new MoveToRegionVisibilityStrategy());
         configuration.setStitchOverlap(DEFAULT_STITCH_OVERLAP);
@@ -153,6 +163,11 @@ public class Eyes extends RunningTest {
         tryUpdateDevicePixelRatio();
 
         ensureViewportSize();
+        if (isVisualGrid) {
+            openVisualGrid();
+            return this.driver;
+        }
+
         openBase();
 
         initImageProvider();
@@ -193,7 +208,17 @@ public class Eyes extends RunningTest {
         this.check(checkSettings);
     }
 
-    protected void ensureViewportSize() {
+    @Override
+    public IBatchCloser getBatchCloser() {
+        return this;
+    }
+
+    @Override
+    public String getBatchId() {
+        return getConfiguration().getBatch().getId();
+    }
+
+    private void ensureViewportSize() {
         this.configuration.setViewportSize(driver.getDefaultContentViewportSize());
     }
 
@@ -370,6 +395,13 @@ public class Eyes extends RunningTest {
             return;
         }
 
+        if (isVisualGrid) {
+            for (ICheckSettings checkSetting : checkSettings) {
+                this.check(checkSetting);
+            }
+            return;
+        }
+
         boolean originalForceFPS = getConfigurationInstance().getForceFullPageScreenshot() != null && getConfigurationInstance().getForceFullPageScreenshot();
 
         if (checkSettings.length > 1) {
@@ -458,6 +490,11 @@ public class Eyes extends RunningTest {
                 Pair.of("configuration", getConfiguration()),
                 Pair.of("checkSettings", checkSettings));
 
+        if (isVisualGrid) {
+            checkVisualGrid(checkSettings);
+            return;
+        }
+
         if (checkSettings instanceof AppiumCheckSettings) {
             updateCutElement((AppiumCheckSettings) checkSettings);
             this.scrollRootElement = getScrollRootElement((AppiumCheckSettings) checkSettings);
@@ -537,6 +574,206 @@ public class Eyes extends RunningTest {
     @Override
     protected ScreenshotProvider getScreenshotProvider() {
         return new MobileScreenshotProvider(driver, getDevicePixelRatio());
+    }
+
+    public void openVisualGrid() {
+        runner.setApiKey(getApiKey());
+        runner.setServerUrl(getServerUrl().toString());
+        runner.setProxy(getProxy());
+
+        if (isOpen) {
+            return;
+        }
+
+        isOpen = true;
+        if (this.getConfiguration().getBrowsersInfo().isEmpty()) {
+            throw new EyesException("Device wasn't set in the configuration");
+        }
+
+        if (runner.getAgentId() == null ) {
+            runner.setAgentId(getFullAgentId());
+        }
+
+        VisualGridRunner visualGridRunner = (VisualGridRunner) runner;
+        visualGridRunner.setLogger(logger);
+
+        List<RenderBrowserInfo> deviceInfoList = getConfiguration().getBrowsersInfo();
+        List<RunningTest> newTests = new ArrayList<>();
+        ServerConnector serverConnector = runner.getServerConnector();
+        for (RenderBrowserInfo deviceInfo : deviceInfoList) {
+            if (deviceInfo.getIosDeviceInfo() == null) {
+                throw new EyesException("All browser infos must be ios device info");
+            }
+            Map<String, DeviceSize> deviceSizes = serverConnector.getDevicesSizes(ServerConnector.IOS_DEVICES_PATH);
+            deviceInfo.setIosDeviceSize(deviceSizes.get(deviceInfo.getIosDeviceInfo().getDeviceName()));
+
+            String agentRunId = String.format("%s_%s", getConfiguration().getTestName(), UUID.randomUUID());
+            RunningTest test = new VisualGridRunningTest(logger, false, getTestId(), getConfiguration(), deviceInfo, this.properties, serverConnector, agentRunId);
+            this.visualGridTestList.put(test.getTestId(), test);
+            newTests.add(test);
+        }
+
+        try {
+            visualGridRunner.open(this, newTests);
+        } catch (Throwable t) {
+            for (RunningTest runningTest : visualGridTestList.values()) {
+                runningTest.openFailed(t);
+            }
+            throw t;
+        }
+    }
+
+    private void checkVisualGrid(ICheckSettings checkSettings) {
+        Set<String> testIds = new HashSet<>();
+        for (RunningTest runningTest : visualGridTestList.values()) {
+            testIds.add(runningTest.getTestId());
+        }
+        try {
+            driver.findElementByName("UFG_TriggerArea").click();
+            String base64 = driver.findElementByName("UFG_Label").getAttribute("value");
+            byte[] resources = Base64.decodeBase64(base64);
+            List<CheckTask> checkTasks = new ArrayList<>();
+            for (RunningTest runningTest : visualGridTestList.values()) {
+                if (runningTest.isCloseTaskIssued()) {
+                    continue;
+                }
+
+                checkTasks.add(runningTest.issueCheck(checkSettings, null, null));
+            }
+
+            if (checkTasks.isEmpty()) {
+                logger.log(TraceLevel.Warn, testIds, Stage.CHECK, null, Pair.of("message", "No check tasks created. Tests were probably aborted"));
+                return;
+            }
+            VisualGridRunner visualGridRunner = (VisualGridRunner) runner;
+            visualGridRunner.check(resources,"x-applitools-vhs/ios", checkTasks);
+        } catch (Throwable e) {
+            Error error = new Error(e);
+            for (RunningTest runningTest : visualGridTestList.values()) {
+                runningTest.setTestInExceptionMode(error);
+            }
+        } finally {
+            try {
+                driver.findElementByAccessibilityId("UFG_ClearArea").click();
+            } catch (Throwable e) {
+                GeneralUtils.logExceptionStackTrace(logger, Stage.CHECK, e, testIds.toArray(new String[0]));
+            }
+        }
+    }
+
+    @Override
+    public TestResults close(boolean throwEx) {
+        if (isVisualGrid) {
+            closeAsync();
+            return waitForEyesToFinish(throwEx);
+        }
+
+        return super.close(throwEx);
+    }
+
+    @Override
+    public TestResults abortIfNotClosed() {
+        if (isVisualGrid) {
+            abortAsync();
+            return waitForEyesToFinish(false);
+        }
+
+        return super.abortIfNotClosed();
+    }
+
+    public TestResults waitForEyesToFinish(boolean throwException) {
+        if (!isVisualGrid) {
+            return super.waitForEyesToFinish(throwException);
+        }
+
+        while (!isCompleted()) {
+            try {
+                Thread.sleep(500);
+            } catch (InterruptedException ignored) {}
+        }
+
+        List<TestResultContainer> allResults = getAllTestResults();
+        TestResultContainer errorResult = null;
+        TestResults firstResult = null;
+        for (TestResultContainer result : allResults) {
+            if (firstResult == null) {
+                firstResult = result.getTestResults();
+            }
+            if (result.getException() != null) {
+                errorResult = result;
+                break;
+            }
+        }
+
+        if (errorResult != null) {
+            if (throwException) {
+                throw new Error(errorResult.getException());
+            }
+            return errorResult.getTestResults();
+        }
+
+        return firstResult;
+    }
+
+    @Override
+    public void closeAsync() {
+        logger.log(getTestId(), Stage.CLOSE, Type.CALLED);
+        if (isVisualGrid) {
+            isOpen = false;
+            for (RunningTest runningTest : visualGridTestList.values()) {
+                runningTest.issueClose();
+            }
+        } else {
+            super.closeAsync();
+        }
+    }
+
+    @Override
+    public void abortAsync() {
+        logger.log(getTestId(), Stage.CLOSE, Type.CALLED);
+        if (isVisualGrid) {
+            for (RunningTest runningTest : visualGridTestList.values()) {
+                runningTest.issueAbort(new EyesException("eyes.close wasn't called. Aborted the test"), false);
+            }
+        } else {
+            super.abortAsync();
+        }
+    }
+
+    @Override
+    public Map<String, RunningTest> getAllRunningTests() {
+        return visualGridTestList;
+    }
+
+    @Override
+    public List<TestResultContainer> getAllTestResults() {
+        if (!isVisualGrid) {
+            return super.getAllTestResults();
+        }
+
+        VisualGridRunner visualGridRunner = (VisualGridRunner) runner;
+        List<TestResultContainer> allResults = new ArrayList<>();
+        for (RunningTest runningTest : visualGridTestList.values()) {
+            if (!runningTest.isCompleted()) {
+                if (visualGridRunner.getError() != null) {
+                    throw new EyesException("Execution crashed", visualGridRunner.getError());
+                }
+                return null;
+            }
+
+            allResults.add(runningTest.getTestResultContainer());
+        }
+
+        return allResults;
+    }
+
+    @Override
+    public boolean isCompleted() {
+        if (!isVisualGrid) {
+            return super.isCompleted();
+        }
+
+        return getAllTestResults() != null;
     }
 
     /**

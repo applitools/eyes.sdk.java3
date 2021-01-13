@@ -221,7 +221,7 @@ public class VisualGridEyes implements ISeleniumEyes {
                 browserInfo.setIosDeviceSize(deviceSizes.get(browserInfo.getIosDeviceInfo().getDeviceName()));
             }
 
-            RunningTest test = new VisualGridRunningTest(logger, eyesId, getConfiguration(), browserInfo, this.properties, serverConnector, agentRunId);
+            RunningTest test = new VisualGridRunningTest(logger, true, eyesId, getConfiguration(), browserInfo, this.properties, serverConnector, agentRunId);
             this.testList.put(test.getTestId(), test);
             newTests.add(test);
         }
@@ -379,7 +379,6 @@ public class VisualGridEyes implements ISeleniumEyes {
         getConfiguration().setServerUrl(serverUrl);
     }
 
-    @Override
     public void proxy(AbstractProxySettings abstractProxySettings) {
         getConfiguration().setProxy(abstractProxySettings);
     }
@@ -388,7 +387,6 @@ public class VisualGridEyes implements ISeleniumEyes {
         return getConfiguration().getProxy() == null ? runner.getProxy() : getConfiguration().getProxy();
     }
 
-    @Override
     public boolean isEyesClosed() {
         boolean isVGEyesClosed = true;
         synchronized (testList) {

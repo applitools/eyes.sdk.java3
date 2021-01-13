@@ -3,6 +3,7 @@ package com.applitools.eyes.services;
 import com.applitools.ICheckSettingsInternal;
 import com.applitools.connectivity.ServerConnector;
 import com.applitools.eyes.*;
+import com.applitools.eyes.fluent.CheckSettings;
 import com.applitools.eyes.logging.Stage;
 import com.applitools.eyes.visualgrid.model.*;
 import com.applitools.eyes.visualgrid.services.CheckTask;
@@ -14,9 +15,6 @@ import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 public class VisualGridServiceRunner extends Thread {
-    private static final String FULLPAGE = "full-page";
-    private static final String VIEWPORT = "viewport";
-
     private final AtomicBoolean isRunning = new AtomicBoolean(true);
     private Throwable error = null;
 
@@ -25,6 +23,7 @@ public class VisualGridServiceRunner extends Thread {
 
     private final Set<IEyes> allEyes;
     private final Map<String, Pair<FrameData, List<CheckTask>>> resourceCollectionTasksMapping = new HashMap<>();
+    private final Map<String, List<CheckTask>> nativeResourceCollectionTasksMapping = new HashMap<>();
     private final List<RenderRequest> waitingRenderRequests = new ArrayList<>();
     private final Map<String, CheckTask> waitingCheckTasks = new HashMap<>();
 
@@ -32,6 +31,7 @@ public class VisualGridServiceRunner extends Thread {
     private final CheckService checkService;
     private final CloseService closeService;
     private final ResourceCollectionService resourceCollectionService;
+    private final PutResourceService putResourceService;
     private final RenderService renderService;
 
     public VisualGridServiceRunner(Logger logger, ServerConnector serverConnector, Set<IEyes> allEyes, int testConcurrency,
@@ -43,6 +43,7 @@ public class VisualGridServiceRunner extends Thread {
         checkService = new CheckService(logger, serverConnector);
         closeService = new CloseService(logger, serverConnector);
         resourceCollectionService = new ResourceCollectionService(logger, serverConnector, debugResourceWriter, resourcesCacheMap);
+        putResourceService = new PutResourceService(logger, serverConnector);
         renderService = new RenderService(logger, serverConnector);
     }
 
@@ -69,6 +70,7 @@ public class VisualGridServiceRunner extends Thread {
         checkService.setLogger(logger);
         closeService.setLogger(logger);
         resourceCollectionService.setLogger(logger);
+        putResourceService.setLogger(logger);
         renderService.setLogger(logger);
         this.logger = logger;
     }
@@ -78,6 +80,7 @@ public class VisualGridServiceRunner extends Thread {
         checkService.setServerConnector(serverConnector);
         closeService.setServerConnector(serverConnector);
         resourceCollectionService.setServerConnector(serverConnector);
+        putResourceService.setServerConnector(serverConnector);
         renderService.setServerConnector(serverConnector);
     }
 
@@ -98,12 +101,26 @@ public class VisualGridServiceRunner extends Thread {
         resourceCollectionTasksMapping.put(resourceCollectionTaskId, Pair.of(domData, checkTasks));
     }
 
+    public void addNativeMobileResources(byte[] resources, String contentType, List<CheckTask> checkTasks) {
+        String resourceCollectionTaskId = UUID.randomUUID().toString();
+        RGridResource resource = new RGridResource(null, contentType, resources);
+        RGridDom dom = new RGridDom(resource);
+        Set<String> testIds = new HashSet<>();
+        for (CheckTask checkTask : checkTasks) {
+            testIds.add(checkTask.getTestId());
+        }
+        dom.setTestIds(testIds);
+        nativeResourceCollectionTasksMapping.put(resourceCollectionTaskId, checkTasks);
+        putResourceService.addInput(resourceCollectionTaskId, dom);
+    }
+
     @Override
     public void run() {
         try {
             while (isRunning.get()) {
                 openServiceIteration();
                 resourceCollectionServiceIteration();
+                putResourcesServiceIteration();
                 renderServiceIteration();
                 checkServiceIteration();
                 closeServiceIteration();
@@ -196,10 +213,8 @@ public class VisualGridServiceRunner extends Thread {
             return;
         }
 
-        for (Pair<String, Map<String, RGridResource>> pair : resourceCollectionService.getSucceededTasks()) {
-            Pair<FrameData, List<CheckTask>> checkTasks = resourceCollectionTasksMapping.get(pair.getLeft());
-            queueRenderRequests(checkTasks.getLeft(), pair.getRight(), checkTasks.getRight());
-            resourceCollectionTasksMapping.remove(pair.getLeft());
+        for (Pair<String, RGridDom> pair : resourceCollectionService.getSucceededTasks()) {
+            putResourceService.addInput(pair.getLeft(), pair.getRight());
         }
 
         for (Pair<String, Throwable> pair : resourceCollectionService.getFailedTasks()) {
@@ -209,6 +224,42 @@ public class VisualGridServiceRunner extends Thread {
             }
 
             resourceCollectionTasksMapping.remove(pair.getLeft());
+        }
+
+        System.gc();
+    }
+
+    private void putResourcesServiceIteration() {
+        putResourceService.run();
+        if (putResourceService.outputQueue.isEmpty() && putResourceService.errorQueue.isEmpty()) {
+            return;
+        }
+
+        for (Pair<String, RGridDom> pair : putResourceService.getSucceededTasks()) {
+            if (resourceCollectionTasksMapping.containsKey(pair.getLeft())) {
+                Pair<FrameData, List<CheckTask>> checkTasks = resourceCollectionTasksMapping.get(pair.getLeft());
+                queueRenderRequests(checkTasks.getLeft(), pair.getRight(), checkTasks.getRight());
+                resourceCollectionTasksMapping.remove(pair.getLeft());
+            } else {
+                List<CheckTask> checkTasks = nativeResourceCollectionTasksMapping.get(pair.getLeft());
+                queueRenderRequests(pair.getRight(), checkTasks);
+                nativeResourceCollectionTasksMapping.remove(pair.getLeft());
+            }
+        }
+
+        for (Pair<String, Throwable> pair : putResourceService.getFailedTasks()) {
+            List<CheckTask> tasksToFail;
+            if (resourceCollectionTasksMapping.containsKey(pair.getLeft())) {
+                tasksToFail = resourceCollectionTasksMapping.get(pair.getLeft()).getRight();
+                resourceCollectionTasksMapping.remove(pair.getLeft());
+            } else {
+                tasksToFail = nativeResourceCollectionTasksMapping.get(pair.getLeft());
+                nativeResourceCollectionTasksMapping.remove(pair.getLeft());
+            }
+
+            for (CheckTask checkTask : tasksToFail) {
+                checkTask.onFail(pair.getRight());
+            }
         }
 
         System.gc();
@@ -264,8 +315,7 @@ public class VisualGridServiceRunner extends Thread {
         throw new IllegalStateException(String.format("Didn't find test id %s", testId));
     }
 
-    private void queueRenderRequests(FrameData result, Map<String, RGridResource> resourceMapping, List<CheckTask> checkTasks) {
-        RGridDom dom = new RGridDom(result.getCdt(), resourceMapping, result.getUrl());
+    private void queueRenderRequests(FrameData result, RGridDom dom, List<CheckTask> checkTasks) {
         ICheckSettingsInternal checkSettingsInternal = (ICheckSettingsInternal) checkTasks.get(0).getCheckSettings();
         List<VisualGridSelector> regionSelectorsList = new ArrayList<>();
         for (VisualGridSelector[] regionSelector : checkTasks.get(0).getRegionSelectors()) {
@@ -279,8 +329,8 @@ public class VisualGridServiceRunner extends Thread {
 
             RenderBrowserInfo browserInfo = checkTask.getBrowserInfo();
             String sizeMode = checkSettingsInternal.getSizeMode();
-            if (sizeMode.equalsIgnoreCase(VIEWPORT) && checkSettingsInternal.isStitchContent()) {
-                sizeMode = FULLPAGE;
+            if (sizeMode.equalsIgnoreCase(CheckSettings.VIEWPORT) && checkSettingsInternal.isStitchContent()) {
+                sizeMode = CheckSettings.FULL_PAGE;
             }
 
             RenderInfo renderInfo = new RenderInfo(browserInfo.getWidth(), browserInfo.getHeight(),
@@ -288,9 +338,33 @@ public class VisualGridServiceRunner extends Thread {
                     browserInfo.getEmulationInfo(), browserInfo.getIosDeviceInfo());
 
             RenderRequest request = new RenderRequest(checkTask.getTestId(), this.renderingInfo.getResultsUrl(), result.getUrl(), dom,
-                    resourceMapping, renderInfo, browserInfo.getPlatform(), browserInfo.getBrowserType(),
+                    dom.getResources(), renderInfo, browserInfo.getPlatform(), "web", browserInfo.getBrowserType(),
                     checkSettingsInternal.getScriptHooks(), regionSelectorsList, checkSettingsInternal.isSendDom(),
-                    checkTask.getRenderer(), checkTask.getStepId(), this.renderingInfo.getStitchingServiceUrl(), checkSettingsInternal.getVisualGridOptions());
+                    checkTask.getRenderer(), checkTask.getStepId(), this.renderingInfo.getStitchingServiceUrl(), checkTask.getAgentId(), checkSettingsInternal.getVisualGridOptions());
+
+            waitingCheckTasks.put(checkTask.getStepId(), checkTask);
+            if (checkTask.isReady()) {
+                renderService.addInput(checkTask.getStepId(), request);
+            } else {
+                waitingRenderRequests.add(request);
+            }
+        }
+    }
+
+    private void queueRenderRequests(RGridDom dom, List<CheckTask> checkTasks) {
+        for (CheckTask checkTask : checkTasks) {
+            if (!checkTask.isTestActive()) {
+                continue;
+            }
+
+            ICheckSettingsInternal checkSettingsInternal = (ICheckSettingsInternal) checkTasks.get(0).getCheckSettings();
+            RenderBrowserInfo deviceInfo = checkTask.getBrowserInfo();
+            RenderInfo renderInfo = new RenderInfo(deviceInfo.getWidth(), deviceInfo.getHeight(), checkSettingsInternal.getSizeMode(),
+                    null, null, null, deviceInfo.getIosDeviceInfo());
+
+            RenderRequest request = new RenderRequest(checkTask.getTestId(), this.renderingInfo.getResultsUrl(), dom,
+                    renderInfo, deviceInfo.getPlatform(), "native", checkSettingsInternal.getScriptHooks(), checkTask.getRenderer(),
+                    checkTask.getStepId(), this.renderingInfo.getStitchingServiceUrl(), checkTask.getAgentId(), checkSettingsInternal.getVisualGridOptions());
 
             waitingCheckTasks.put(checkTask.getStepId(), checkTask);
             if (checkTask.isReady()) {

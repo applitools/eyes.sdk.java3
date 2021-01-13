@@ -72,7 +72,7 @@ public class Eyes implements IEyesBase {
             activeEyes = visualGridEyes;
             isVisualGridEyes = true;
         } else {
-            seleniumEyes = new SeleniumEyes(configurationProvider, (IClassicRunner) runner);
+            seleniumEyes = new SeleniumEyes(configurationProvider, runner);
             activeEyes = seleniumEyes;
         }
     }

@@ -81,6 +81,10 @@ public class VisualGridRunner extends EyesRunner {
         logMemoryUsage();
     }
 
+    public synchronized void check(byte[] mobileResources, String contentType, List<CheckTask> checkTasks) {
+        serviceRunner.addNativeMobileResources(mobileResources, contentType, checkTasks);
+    }
+
     public TestResultsSummary getAllTestResultsImpl(boolean throwException) {
         synchronized (allEyes) {
             for (IEyes eyes : allEyes) {
