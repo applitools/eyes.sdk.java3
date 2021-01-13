@@ -1,6 +1,7 @@
 ## [vNext]
 ### Updated
 - Fill system bars with default method if we encountered exceptions from Appium Client. [Trello 2339](https://trello.com/c/AjbgFdZe)
+- Logs in appium tests to have a test it. [Trello 2407](https://trello.com/c/TnOWFgya)
 
 ## [3.190.5]
 ### Updated
