@@ -1,3 +1,7 @@
+## [vNext]
+### Updated
+- Fill system bars with default method if we encountered exceptions from Appium Client. [Trello 2339](https://trello.com/c/AjbgFdZe)
+
 ## [3.190.5]
 ### Updated
 - Updated logs in visual grid tests to have a test id.

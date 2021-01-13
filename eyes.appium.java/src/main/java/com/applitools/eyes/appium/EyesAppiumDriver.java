@@ -72,6 +72,11 @@ public class EyesAppiumDriver extends EyesWebDriver {
         return intRectMap;
     }
 
+    public int getViewportHeight() {
+        Map<String, Long> rectMap = (Map<String, Long>) getCachedSessionDetails().get("viewportRect");
+        return rectMap.get("height").intValue();
+    }
+
     private int ensureViewportHeight(int viewportHeight) {
         if (EyesDriverUtils.isAndroid(driver)) {
             try {

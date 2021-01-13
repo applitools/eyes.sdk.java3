@@ -171,10 +171,17 @@ public class EyesAppiumUtils {
         systemBarHeights.put(STATUS_BAR, null);
         systemBarHeights.put(NAVIGATION_BAR, null);
 
-        if (EyesDriverUtils.isAndroid(driver)) {
-            fillSystemBarsHeightsMap((AndroidDriver) driver.getRemoteWebDriver(), systemBarHeights);
-        } else {
-            fillSystemBarsHeightsMap(driver, systemBarHeights);
+        try {
+            if (EyesDriverUtils.isAndroid(driver)) {
+                fillSystemBarsHeightsMap((AndroidDriver) driver.getRemoteWebDriver(), systemBarHeights);
+            } else {
+                fillSystemBarsHeightsMap(driver, systemBarHeights);
+            }
+        } catch (Exception ignored) {
+            int statusBarHeight = driver.getStatusBarHeight();
+            int navigationBarHeight = driver.getDeviceHeight() - driver.getViewportHeight() - statusBarHeight;
+            systemBarHeights.put(STATUS_BAR, statusBarHeight);
+            systemBarHeights.put(NAVIGATION_BAR, navigationBarHeight);
         }
 
         return systemBarHeights;
