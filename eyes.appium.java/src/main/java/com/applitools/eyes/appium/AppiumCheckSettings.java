@@ -8,11 +8,13 @@ import com.applitools.eyes.appium.fluent.FloatingRegionByElement;
 import com.applitools.eyes.appium.fluent.SimpleRegionByElement;
 import com.applitools.eyes.fluent.CheckSettings;
 import com.applitools.eyes.fluent.GetRegion;
+import com.applitools.eyes.fluent.ICheckSettingsInternal;
 import com.applitools.eyes.selenium.wrappers.EyesWebDriver;
 import com.applitools.eyes.selenium.fluent.AccessibilityRegionBySelector;
 import com.applitools.eyes.selenium.fluent.ImplicitInitiation;
 import com.applitools.eyes.serializers.BySerializer;
 import com.applitools.eyes.serializers.WebElementSerializer;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
@@ -255,5 +257,16 @@ public class AppiumCheckSettings extends CheckSettings implements ImplicitInitia
 
     public WebElement getScrollRootElement() {
         return this.scrollRootElement;
+    }
+
+    @JsonProperty("sizeMode")
+    public String getSizeMode() {
+        ICheckSettingsInternal checkSettingsInternal = this;
+        Boolean stitchContent = checkSettingsInternal.getStitchContent();
+        if (stitchContent == null) {
+            stitchContent = false;
+        }
+
+        return stitchContent ? FULL_PAGE : VIEWPORT;
     }
 }

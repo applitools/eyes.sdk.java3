@@ -53,6 +53,10 @@ public class CheckTask {
         return null;
     }
 
+    public String getAgentId() {
+        return runningTest.getFullAgentId();
+    }
+
     public RenderStatusResults getRenderStatusResults() {
         return renderStatusResults;
     }

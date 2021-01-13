@@ -6,7 +6,6 @@ import com.applitools.eyes.fluent.ICheckSettingsInternal;
 import com.applitools.eyes.logging.Stage;
 import com.applitools.eyes.logging.Type;
 import com.applitools.eyes.selenium.ClassicRunner;
-import com.applitools.eyes.selenium.IClassicRunner;
 import com.applitools.eyes.visualgrid.model.RenderBrowserInfo;
 import com.applitools.eyes.visualgrid.model.VisualGridSelector;
 import com.applitools.eyes.visualgrid.services.CheckTask;
@@ -25,7 +24,7 @@ public abstract class RunningTest extends EyesBase implements IBatchCloser {
 
     protected final List<CheckTask> checkTasks = new ArrayList<>();
 
-    protected RunningTest(IClassicRunner runner) {
+    protected RunningTest(EyesRunner runner) {
         super(runner);
         browserInfo = null;
     }

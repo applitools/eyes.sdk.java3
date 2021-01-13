@@ -112,7 +112,7 @@ public class SeleniumEyes extends RunningTest implements ISeleniumEyes {
      * Creates a new SeleniumEyes instance that interacts with the SeleniumEyes cloud
      * service.
      */
-    public SeleniumEyes(ConfigurationProvider configurationProvider, IClassicRunner runner) {
+    public SeleniumEyes(ConfigurationProvider configurationProvider, EyesRunner runner) {
         super(runner);
         this.configurationProvider = configurationProvider;
         checkFrameOrElement = false;
@@ -133,11 +133,6 @@ public class SeleniumEyes extends RunningTest implements ISeleniumEyes {
 
     public void proxy(AbstractProxySettings proxySettings) {
         setProxy(proxySettings);
-    }
-
-    @Override
-    public boolean isEyesClosed() {
-        return isCompleted();
     }
 
     @Override
