@@ -4,6 +4,7 @@
 - Logs in appium tests to have a test it. [Trello 2407](https://trello.com/c/TnOWFgya)
 ### Fixed
 - Removed the limitation of resource parsing threads in dom analyzer. [Trello 2423](https://trello.com/c/BiQsgzLg) [Trello 2421](https://trello.com/c/U5ZdFrho)
+- Cors iframes now contains `applitools-iframe` query param in their url. [Trello 2276](https://trello.com/c/qn5glrAD)
 
 ## [3.190.5]
 ### Updated

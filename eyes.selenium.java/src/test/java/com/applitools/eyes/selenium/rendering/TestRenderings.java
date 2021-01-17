@@ -34,6 +34,7 @@ import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
 import javax.ws.rs.HttpMethod;
+import java.net.URI;
 import java.net.UnknownHostException;
 import java.util.*;
 import java.util.concurrent.Future;
@@ -419,6 +420,9 @@ public class TestRenderings extends ReportingTestSuite {
         AttributeData applitoolsSrc = attributeData.get(attributeData.size() - 1);
         Assert.assertEquals(applitoolsSrc.name, "data-applitools-src");
         Assert.assertEquals(applitoolsSrc.value, innerFrame.getFrames().get(0).getUrl());
+
+        URI uri = new URI(innerFrame.getUrl());
+        Assert.assertTrue(uri.getQuery().contains("applitools-iframe"));
     }
 
     @Test

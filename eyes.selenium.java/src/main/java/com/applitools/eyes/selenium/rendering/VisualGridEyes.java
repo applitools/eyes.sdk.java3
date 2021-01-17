@@ -31,6 +31,7 @@ import com.applitools.utils.ClassVersionGetter;
 import com.applitools.utils.GeneralUtils;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.lang3.tuple.Pair;
+import org.apache.http.client.utils.URIBuilder;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
@@ -617,6 +618,15 @@ public class VisualGridEyes implements ISeleniumEyes {
                 WebElement frame = webDriver.findElement(By.cssSelector(crossFrame.getSelector()));
                 switchTo.frame(frame);
                 FrameData result = captureDomSnapshot(testIds, switchTo);
+                try {
+                    String url = GeneralUtils.sanitizeURL(result.getUrl());
+                    URIBuilder builder = new URIBuilder(url);
+                    builder.addParameter("applitools-iframe", UUID.randomUUID().toString());
+                    result.setUrl(builder.toString());
+                } catch (Throwable t) {
+                    GeneralUtils.logExceptionStackTrace(logger, Stage.CHECK, Type.DOM_SCRIPT, t, testIds.toArray(new String[0]));
+                }
+
                 frameData.addFrame(result);
                 frameData.getCdt().get(crossFrame.getIndex()).attributes.add(new AttributeData("data-applitools-src", result.getUrl()));
             } catch (Throwable t) {
