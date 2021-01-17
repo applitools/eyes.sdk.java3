@@ -41,23 +41,28 @@ public class ResourceCollectionService extends EyesService<FrameData, Map<String
         while (!inputQueue.isEmpty()) {
             final Pair<String, FrameData> nextInput = inputQueue.remove(0);
             final FrameData frameData = nextInput.getRight();
-            DomAnalyzer domAnalyzer = new DomAnalyzer(logger, serverConnector, debugResourceWriter, frameData, resourcesCacheMap, new TaskListener<Map<String, RGridResource>>() {
-                @Override
-                public void onComplete(final Map<String, RGridResource> resourceMap) {
-                    RGridDom dom = new RGridDom(frameData.getCdt(), resourceMap, frameData.getUrl());
-                    dom.setTestIds(frameData.getTestIds());
-                    waitingForUploadQueue.add(Pair.of(nextInput.getLeft(), Pair.of(dom, resourceMap)));
-                    tasksInDomAnalyzingProcess.remove(nextInput.getLeft());
-                }
 
-                @Override
-                public void onFail() {
-                    errorQueue.add(Pair.<String, Throwable>of(nextInput.getLeft(), new EyesException("Dom analyzer failed")));
-                    tasksInDomAnalyzingProcess.remove(nextInput.getLeft());
-                }
-            });
+            try {
+                DomAnalyzer domAnalyzer = new DomAnalyzer(logger, serverConnector, debugResourceWriter, frameData,
+                        resourcesCacheMap, new TaskListener<Map<String, RGridResource>>() {
+                    @Override
+                    public void onComplete(final Map<String, RGridResource> resourceMap) {
+                        RGridDom dom = new RGridDom(frameData.getCdt(), resourceMap, frameData.getUrl());
+                        dom.setTestIds(frameData.getTestIds());
+                        waitingForUploadQueue.add(Pair.of(nextInput.getLeft(), Pair.of(dom, resourceMap)));
+                        tasksInDomAnalyzingProcess.remove(nextInput.getLeft());
+                    }
 
-            tasksInDomAnalyzingProcess.put(nextInput.getLeft(), domAnalyzer);
+                    @Override
+                    public void onFail() {
+                        errorQueue.add(Pair.<String, Throwable>of(nextInput.getLeft(), new EyesException("Dom analyzer failed")));
+                        tasksInDomAnalyzingProcess.remove(nextInput.getLeft());
+                    }
+                });
+                tasksInDomAnalyzingProcess.put(nextInput.getLeft(), domAnalyzer);
+            } catch (Throwable t) {
+                errorQueue.add(Pair.of(nextInput.getLeft(), t));
+            }
         }
 
         List<DomAnalyzer> domAnalyzers;

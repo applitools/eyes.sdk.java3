@@ -2,6 +2,8 @@
 ### Updated
 - Fill system bars with default method if we encountered exceptions from Appium Client. [Trello 2339](https://trello.com/c/AjbgFdZe)
 - Logs in appium tests to have a test it. [Trello 2407](https://trello.com/c/TnOWFgya)
+### Fixed
+- Removed the limitation of resource parsing threads in dom analyzer. [Trello 2423](https://trello.com/c/BiQsgzLg)
 
 ## [3.190.5]
 ### Updated
