@@ -278,7 +278,7 @@ public class FullPageCaptureAlgorithm {
             int dy = scrollPosition.getY() - originPosition.getY();
 
             Point partPastePosition = partRegion.getPastePhysicalLocation();
-            partPastePosition.translate(dx, dy);
+            partPastePosition.translate(-dx, -dy);
             logger.log(TraceLevel.Info, Collections.singleton(testId), Stage.CHECK, Type.CAPTURE_SCREENSHOT,
                     Pair.of("scrollPosition", scrollPosition),
                     Pair.of("originPosition", originPosition),
@@ -294,7 +294,7 @@ public class FullPageCaptureAlgorithm {
             BufferedImage croppedPart;
             Rectangle r = partRegion.getPhysicalCropArea();
             if (!r.isEmpty()) {
-                croppedPart = ImageUtils.cropImage(cutPart, new Region(r.x, r.y, r.width, r.height));
+                croppedPart = ImageUtils.cropImage(cutPart, new Region(r.x, r.y, r.width + dx, r.height + dy));
             } else {
                 croppedPart = cutPart;
             }
@@ -302,7 +302,7 @@ public class FullPageCaptureAlgorithm {
             Rectangle r2 = partRegion.getLogicalCropArea();
 
             BufferedImage scaledPartImage = ImageUtils.scaleImage(croppedPart, scaleRatio);
-            BufferedImage scaledCroppedPartImage = ImageUtils.cropImage(scaledPartImage,  new Region(r2.x, r2.y, r2.width, r2.height));
+            BufferedImage scaledCroppedPartImage = ImageUtils.cropImage(scaledPartImage,  new Region(r2.x, r2.y, r2.width + dx, r2.height + dy));
 
             debugScreenshotsProvider.save(partImage, "partImage-" + originPosition.getX() + "_" + originPosition.getY());
             debugScreenshotsProvider.save(scaledCroppedPartImage, "scaledCroppedPartImage-" + partPastePosition.getX() + "_" + partPastePosition.getY());

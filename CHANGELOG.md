@@ -1,3 +1,7 @@
+## [vNext]
+### Fixed
+- Fixed a bug in the selenium full page algorithm. [Trello 2223](https://trello.com/c/bHwlpmuX) [Trello 2416](https://trello.com/c/4NDa6Vxl)
+
 ## [3.191.0]
 ### Updated
 - Dom Snapshot 4.4.8. [Trello 1835](https://trello.com/c/OyWRWqJm)
