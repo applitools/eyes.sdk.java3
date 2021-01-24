@@ -331,7 +331,7 @@ public class TestEyesServices {
         frameData.setResourceUrls(urls);
         frameData.setBlobs(new ArrayList<BlobData>());
         frameData.setFrames(new ArrayList<FrameData>());
-        frameData.setCdt(new ArrayList<CdtData>());
+        frameData.setCdt(new ArrayList<Map<String, Object>>());
         frameData.setSrcAttr("");
         frameData.setUserAgent(mock(UserAgent.class));
 

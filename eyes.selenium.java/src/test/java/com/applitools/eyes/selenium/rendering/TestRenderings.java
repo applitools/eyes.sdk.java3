@@ -416,7 +416,7 @@ public class TestRenderings extends ReportingTestSuite {
         Assert.assertEquals(innerFrame.getFrames().size(), 1);
 
         int cdtIndex = innerFrame.getCrossFrames().get(0).getIndex();
-        List<AttributeData> attributeData = innerFrame.getCdt().get(cdtIndex).attributes;
+        List<AttributeData> attributeData = (List<AttributeData>) innerFrame.getCdt().get(cdtIndex).get("attributes");
         AttributeData applitoolsSrc = attributeData.get(attributeData.size() - 1);
         Assert.assertEquals(applitoolsSrc.name, "data-applitools-src");
         Assert.assertEquals(applitoolsSrc.value, innerFrame.getFrames().get(0).getUrl());

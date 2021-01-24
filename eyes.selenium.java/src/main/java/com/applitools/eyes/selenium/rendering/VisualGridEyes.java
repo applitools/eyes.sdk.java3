@@ -628,7 +628,8 @@ public class VisualGridEyes implements ISeleniumEyes {
                 }
 
                 frameData.addFrame(result);
-                frameData.getCdt().get(crossFrame.getIndex()).attributes.add(new AttributeData("data-applitools-src", result.getUrl()));
+                List<AttributeData> attributeData = (List<AttributeData>) frameData.getCdt().get(crossFrame.getIndex()).get("attributes");
+                attributeData.add(new AttributeData("data-applitools-src", result.getUrl()));
             } catch (Throwable t) {
                 GeneralUtils.logExceptionStackTrace(logger, Stage.CHECK, Type.DOM_SCRIPT, t, testIds.toArray(new String[0]));
             } finally {
