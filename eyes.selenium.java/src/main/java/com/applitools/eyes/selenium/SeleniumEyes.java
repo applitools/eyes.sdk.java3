@@ -440,7 +440,9 @@ public class SeleniumEyes extends RunningTest implements ISeleniumEyes {
                     }
 
                     if (targetElement != null) {
-                        getRegions.put(i, new SimpleRegionByElement(targetElement));
+                        SimpleRegionByElement simpleRegionByElement = new SimpleRegionByElement(targetElement);
+                        simpleRegionByElement.init(logger, driver);
+                        getRegions.put(i, simpleRegionByElement);
                     }
                 }
             }
