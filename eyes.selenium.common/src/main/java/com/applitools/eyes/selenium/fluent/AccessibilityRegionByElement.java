@@ -8,6 +8,7 @@ import com.applitools.eyes.serializers.WebElementSerializer;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import org.openqa.selenium.Dimension;
 import org.openqa.selenium.Rectangle;
 import org.openqa.selenium.WebElement;
 
@@ -35,8 +36,9 @@ public class AccessibilityRegionByElement implements GetAccessibilityRegion, IGe
     @Override
     public List<AccessibilityRegionByRectangle> getRegions(EyesScreenshot screenshot) {
         Rectangle rectangle = EyesDriverUtils.getVisibleElementRect(element, driver);
+        Dimension size = element.getSize();
         Location pTag = screenshot.convertLocation(new Location(rectangle.x, rectangle.y), CoordinatesType.CONTEXT_RELATIVE, CoordinatesType.SCREENSHOT_AS_IS);
-        return Collections.singletonList(new AccessibilityRegionByRectangle(new Region(pTag, new RectangleSize(rectangle.width, rectangle.height)), regionType));
+        return Collections.singletonList(new AccessibilityRegionByRectangle(new Region(pTag, new RectangleSize(size.width, size.height)), regionType));
     }
 
 

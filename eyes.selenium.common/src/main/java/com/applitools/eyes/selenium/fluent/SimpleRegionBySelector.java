@@ -34,13 +34,14 @@ public class SimpleRegionBySelector implements GetSimpleRegion, IGetSeleniumRegi
         List<Region> values = new ArrayList<>(elements.size());
         for (WebElement element : elements) {
             Rectangle rectangle = EyesDriverUtils.getVisibleElementRect(element, driver);
+            Dimension size = element.getSize();
             Location adjustedLocation = new Location(rectangle.x, rectangle.y);
             if (screenshot != null) {
                 // Element's coordinates are context relative, so we need to convert them first.
                 adjustedLocation = screenshot.convertLocation(adjustedLocation,
                         CoordinatesType.CONTEXT_RELATIVE, CoordinatesType.SCREENSHOT_AS_IS);
             }
-            values.add(new Region(adjustedLocation, new RectangleSize(rectangle.width, rectangle.height),
+            values.add(new Region(adjustedLocation, new RectangleSize(size.width, size.height),
                     CoordinatesType.SCREENSHOT_AS_IS));
         }
         return values;

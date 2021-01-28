@@ -8,6 +8,7 @@ import com.applitools.eyes.serializers.WebElementSerializer;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import org.openqa.selenium.Dimension;
 import org.openqa.selenium.Rectangle;
 import org.openqa.selenium.WebElement;
 
@@ -34,6 +35,7 @@ public class SimpleRegionByElement implements GetSimpleRegion, IGetSeleniumRegio
     @Override
     public List<Region> getRegions(EyesScreenshot screenshot) {
         Rectangle rectangle = EyesDriverUtils.getVisibleElementRect(element, driver);
+        Dimension size = element.getSize();
         Location adjustedLocation = new Location(rectangle.x, rectangle.y);
         if (screenshot != null) {
             // Element's coordinates are context relative, so we need to convert them first.
@@ -42,7 +44,7 @@ public class SimpleRegionByElement implements GetSimpleRegion, IGetSeleniumRegio
         }
 
         List<Region> value = new ArrayList<>();
-        value.add(new Region(adjustedLocation, new RectangleSize(rectangle.width, rectangle.height),
+        value.add(new Region(adjustedLocation, new RectangleSize(size.width, size.height),
                 CoordinatesType.SCREENSHOT_AS_IS));
 
         return value;

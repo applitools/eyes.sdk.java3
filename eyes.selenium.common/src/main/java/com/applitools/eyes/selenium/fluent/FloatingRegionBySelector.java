@@ -9,6 +9,7 @@ import com.applitools.eyes.visualgrid.model.IGetFloatingRegionOffsets;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import org.openqa.selenium.By;
+import org.openqa.selenium.Dimension;
 import org.openqa.selenium.Rectangle;
 import org.openqa.selenium.WebElement;
 
@@ -47,6 +48,7 @@ public class FloatingRegionBySelector implements GetFloatingRegion , IGetSeleniu
         for (WebElement element : elements) {
             Rectangle rectangle = EyesDriverUtils.getVisibleElementRect(element, driver);
             Location location = new Location(rectangle.x, rectangle.y);
+            Dimension size = element.getSize();
 
             Location adjustedLocation;
             if (screenshot != null) {
@@ -56,8 +58,8 @@ public class FloatingRegionBySelector implements GetFloatingRegion , IGetSeleniu
                 adjustedLocation = location;
             }
 
-            values.add(new FloatingMatchSettings(adjustedLocation.getX(), adjustedLocation.getY(), rectangle.width,
-                    rectangle.height, maxUpOffset, maxDownOffset, maxLeftOffset, maxRightOffset));
+            values.add(new FloatingMatchSettings(adjustedLocation.getX(), adjustedLocation.getY(), size.width,
+                    size.height, maxUpOffset, maxDownOffset, maxLeftOffset, maxRightOffset));
         }
 
         return values;
