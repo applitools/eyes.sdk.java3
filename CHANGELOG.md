@@ -1,3 +1,7 @@
+## [3.191.4]
+### Fixed
+- Coded regions location is now correct when checking a region. [Trello 2436](https://trello.com/c/spt3lwDk)
+
 ## [3.191.3]
 ### Update
 - Cdt data is now represented by a map to allow new properties. [Trello 2428](https://trello.com/c/9UgxPO5f)

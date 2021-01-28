@@ -2,13 +2,13 @@ package com.applitools.eyes.selenium.fluent;
 
 import com.applitools.eyes.*;
 import com.applitools.eyes.fluent.IGetAccessibilityRegionType;
+import com.applitools.eyes.selenium.EyesDriverUtils;
 import com.applitools.eyes.selenium.wrappers.EyesWebDriver;
 import com.applitools.eyes.serializers.BySerializer;
-import com.applitools.eyes.serializers.WebElementSerializer;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import org.openqa.selenium.By;
-import org.openqa.selenium.Point;
+import org.openqa.selenium.Rectangle;
 import org.openqa.selenium.WebElement;
 
 import java.util.ArrayList;
@@ -37,9 +37,9 @@ public class AccessibilityRegionBySelector implements GetAccessibilityRegion, IG
         List<WebElement> elements = driver.findElements(selector);
         List<AccessibilityRegionByRectangle> retVal = new ArrayList<>();
         for (WebElement element : elements) {
-            Point p = element.getLocation();
-            Location pTag = screenshot.convertLocation(new Location(p.x, p.y), CoordinatesType.CONTEXT_RELATIVE, CoordinatesType.SCREENSHOT_AS_IS);
-            retVal.add(new AccessibilityRegionByRectangle(new Region(pTag, new RectangleSize(element.getSize().width, element.getSize().height)), regionType));
+            Rectangle rectangle = EyesDriverUtils.getVisibleElementRect(element, driver);
+            Location pTag = screenshot.convertLocation(new Location(rectangle.x, rectangle.y), CoordinatesType.CONTEXT_RELATIVE, CoordinatesType.SCREENSHOT_AS_IS);
+            retVal.add(new AccessibilityRegionByRectangle(new Region(pTag, new RectangleSize(rectangle.width, rectangle.height)), regionType));
         }
         return retVal;
     }

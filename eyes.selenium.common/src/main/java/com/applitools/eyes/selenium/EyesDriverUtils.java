@@ -9,6 +9,7 @@ import com.applitools.utils.GeneralUtils;
 import org.openqa.selenium.*;
 import org.openqa.selenium.interactions.Coordinates;
 
+import java.io.IOException;
 import java.lang.reflect.*;
 import java.lang.reflect.Proxy;
 import java.util.HashMap;
@@ -70,6 +71,16 @@ public class EyesDriverUtils {
             "var width = Math.max(arguments[0].clientWidth, arguments[0].scrollWidth);" +
                     "var height = Math.max(arguments[0].clientHeight, arguments[0].scrollHeight);" +
                     "return width+';'+height;";
+
+    private static String JS_GET_VISIBLE_ELEMENT_RECT;
+
+    static {
+        try {
+            JS_GET_VISIBLE_ELEMENT_RECT = GeneralUtils.readToEnd(EyesDriverUtils.class.getResourceAsStream("/getVisibleRect.js"));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
 
     /**
      * Extracts the location relative to the entire page from the coordinates
@@ -720,5 +731,19 @@ public class EyesDriverUtils {
             objectClass = objectClass.getSuperclass();
         }
         return false;
+    }
+
+    public static Rectangle getVisibleElementRect(WebElement webElement, EyesWebDriver driver) {
+        if (isMobileDevice(driver)) {
+            return new Rectangle(webElement.getLocation(), webElement.getSize());
+        }
+
+        String result = (String) driver.executeScript(JS_GET_VISIBLE_ELEMENT_RECT, webElement);
+        String[] data = result.split(";");
+        return new Rectangle(
+                Math.round(Float.parseFloat(data[0])),
+                Math.round(Float.parseFloat(data[1])),
+                Math.round(Float.parseFloat(data[3])),
+                Math.round(Float.parseFloat(data[2])));
     }
 }
