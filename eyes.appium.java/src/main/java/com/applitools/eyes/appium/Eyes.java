@@ -542,6 +542,10 @@ public class Eyes extends EyesBase {
     protected EyesScreenshot getScreenshot(Region targetRegion, ICheckSettingsInternal checkSettingsInternal) {
         EyesScreenshot result;
 
+        // Extra pause to wait for application actions will be finished.
+        // Moving from one screen to another for example or wait until scrollbars becomes invisible
+        try { Thread.sleep(1000); } catch (InterruptedException ignored) {}
+
         if (getForceFullPageScreenshot() || stitchContent) {
             result = getFullPageScreenshot();
         } else {

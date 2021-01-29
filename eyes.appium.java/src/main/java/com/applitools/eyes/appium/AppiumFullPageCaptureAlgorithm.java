@@ -220,6 +220,10 @@ public class AppiumFullPageCaptureAlgorithm {
     protected void moveToTopLeft() {
         currentPosition = originProvider.getCurrentPosition();
         if (currentPosition.getX() <= 0 && currentPosition.getY() <= 0) {
+            // Just to make sure that we are on the top of the screen we need scroll up for a one step.
+            // Because position can not be 'top' after Appium calculating last scrollable data.
+            ((AppiumScrollPositionProvider) originProvider).forceScrollToTop();
+            try { Thread.sleep(1000); } catch (InterruptedException ignored) {}
             return;
         }
 
@@ -363,6 +367,10 @@ public class AppiumFullPageCaptureAlgorithm {
 
         // Saving the original position (in case we were already in the outermost frame).
         originalPosition = originProvider.getState();
+
+        // Extra pause to wait for application actions will be finished.
+        // Moving from one screen to another for example
+        try { Thread.sleep(1000); } catch (InterruptedException ignored) {}
 
         // first, scroll to the origin and get the top left screenshot
         BufferedImage image = getTopLeftScreenshot();

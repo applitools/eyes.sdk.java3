@@ -23,7 +23,7 @@ public class AndroidAccessibilityTest extends AndroidTestSetup {
         eyes.setMatchTimeout(1000);
         eyes.setSaveDebugScreenshots(false);
 
-        Configuration configuration = new Configuration();
+        Configuration configuration = eyes.getConfiguration();
         configuration.setAppName(getApplicationName());
         configuration.setTestName("Test accessibility");
         configuration.setAccessibilityValidation(new AccessibilitySettings(AccessibilityLevel.AA, AccessibilityGuidelinesVersion.WCAG_2_0));

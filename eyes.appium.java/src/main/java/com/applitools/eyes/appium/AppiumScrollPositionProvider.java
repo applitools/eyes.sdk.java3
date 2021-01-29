@@ -204,4 +204,6 @@ public abstract class AppiumScrollPositionProvider implements ScrollPositionProv
     protected WebElement getFirstScrollableView() {
         return EyesAppiumUtils.getFirstScrollableView(driver);
     }
+
+    public abstract void forceScrollToTop();
 }
