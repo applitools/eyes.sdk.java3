@@ -1,3 +1,7 @@
+## [vNext]
+### Update
+- Cleanup cached data after check() execution. [Trello 1673](https://trello.com/c/CYbkzXia)
+
 ## [3.191.4]
 ### Fixed
 - Coded regions location is now correct when checking a region. [Trello 2436](https://trello.com/c/spt3lwDk)

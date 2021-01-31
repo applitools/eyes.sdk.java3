@@ -495,6 +495,7 @@ public class Eyes extends EyesBase {
 
         ValidationResult validationResult = new ValidationResult();
         validationResult.setAsExpected(result.getAsExpected());
+        ((AppiumScrollPositionProvider) getPositionProvider()).cleanupCachedData();
     }
 
     @Override

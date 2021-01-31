@@ -204,4 +204,9 @@ public abstract class AppiumScrollPositionProvider implements ScrollPositionProv
     protected WebElement getFirstScrollableView() {
         return EyesAppiumUtils.getFirstScrollableView(driver);
     }
+
+    public void cleanupCachedData() {
+        this.contentSize = null;
+        this.firstVisibleChild = null;
+    }
 }
