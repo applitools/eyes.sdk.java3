@@ -1,6 +1,7 @@
 package com.applitools.eyes.appium;
 
 import com.applitools.eyes.*;
+import com.applitools.eyes.capture.ScreenshotProvider;
 import com.applitools.eyes.config.Configuration;
 import com.applitools.eyes.fluent.ICheckSettingsInternal;
 import org.testng.Assert;
@@ -15,6 +16,11 @@ public class TestEyes extends EyesBase {
 
     @Override
     protected String getBaseAgentId() {
+        return null;
+    }
+
+    @Override
+    protected ScreenshotProvider getScreenshotProvider() {
         return null;
     }
 

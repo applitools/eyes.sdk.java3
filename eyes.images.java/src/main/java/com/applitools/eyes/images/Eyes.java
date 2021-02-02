@@ -5,6 +5,7 @@ package com.applitools.eyes.images;
 
 import com.applitools.ICheckSettings;
 import com.applitools.eyes.*;
+import com.applitools.eyes.capture.ScreenshotProvider;
 import com.applitools.eyes.config.Configuration;
 import com.applitools.eyes.config.IConfiguration;
 import com.applitools.eyes.events.ValidationResult;
@@ -42,6 +43,16 @@ public class Eyes extends EyesBase implements IConfiguration {
      */
     public String getBaseAgentId() {
         return "eyes.images.java/" + ClassVersionGetter.CURRENT_VERSION;
+    }
+
+    @Override
+    protected ScreenshotProvider getScreenshotProvider() {
+        return new ScreenshotProvider() {
+            @Override
+            public BufferedImage getViewPortScreenshot() {
+                return screenshot.getImage();
+            }
+        };
     }
 
     public String tryCaptureDom() {
@@ -319,6 +330,10 @@ public class Eyes extends EyesBase implements IConfiguration {
      */
     public void setInferredEnvironment(String inferred) {
         this.inferred = inferred;
+    }
+
+    public void setScreenshot(BufferedImage image) {
+        screenshot = new EyesImagesScreenshot(logger, image);
     }
 
     /**

@@ -1,33 +1,34 @@
-package com.applitools.eyes.selenium.locators;
+package com.applitools.eyes.selenium.capture;
 
 import com.applitools.eyes.Logger;
 import com.applitools.eyes.RectangleSize;
 import com.applitools.eyes.UserAgent;
 import com.applitools.eyes.capture.ImageProvider;
+import com.applitools.eyes.capture.ScreenshotProvider;
 import com.applitools.eyes.debug.DebugScreenshotsProvider;
-import com.applitools.eyes.locators.BaseVisualLocatorsProvider;
 import com.applitools.eyes.logging.Stage;
 import com.applitools.eyes.selenium.SeleniumEyes;
-import com.applitools.eyes.selenium.capture.ImageProviderFactory;
 import com.applitools.eyes.selenium.wrappers.EyesSeleniumDriver;
 import com.applitools.utils.ImageUtils;
 import org.apache.commons.lang3.tuple.Pair;
 
 import java.awt.image.BufferedImage;
 
-public class SeleniumVisualLocatorsProvider extends BaseVisualLocatorsProvider {
-
-    private final EyesSeleniumDriver driver;
+public class SeleniumScreenshotProvider implements ScreenshotProvider {
     private final SeleniumEyes eyes;
+    private final EyesSeleniumDriver driver;
+    private final Logger logger;
+    private final DebugScreenshotsProvider debugScreenshotsProvider;
 
-    public SeleniumVisualLocatorsProvider(SeleniumEyes eyes, EyesSeleniumDriver driver, Logger logger, DebugScreenshotsProvider debugScreenshotsProvider) {
-        super(logger, eyes.getTestId(), eyes.getServerConnector(), eyes.getDevicePixelRatio(), eyes.getConfiguration().getAppName(), debugScreenshotsProvider);
-        this.driver = driver;
+    public SeleniumScreenshotProvider(SeleniumEyes eyes, EyesSeleniumDriver driver, Logger logger, DebugScreenshotsProvider debugScreenshotsProvider) {
         this.eyes = eyes;
+        this.driver = driver;
+        this.logger = logger;
+        this.debugScreenshotsProvider = debugScreenshotsProvider;
     }
 
     @Override
-    protected BufferedImage getViewPortScreenshot() {
+    public BufferedImage getViewPortScreenshot() {
         String uaString = driver.getUserAgent();
         UserAgent userAgent = null;
         if (uaString != null) {
@@ -36,20 +37,20 @@ public class SeleniumVisualLocatorsProvider extends BaseVisualLocatorsProvider {
         UserAgent.parseUserAgentString(uaString, true);
         ImageProvider provider = ImageProviderFactory.getImageProvider(userAgent, eyes, logger, driver);
         BufferedImage image = provider.getImage();
-        logger.log(testId, Stage.LOCATE, Pair.of("imageSize", new RectangleSize(image.getWidth(), image.getHeight())));
-        debugScreenshotsProvider.save(image, "visual_locators_initial");
+        logger.log(eyes.getTestId(), Stage.LOCATE, Pair.of("imageSize", new RectangleSize(image.getWidth(), image.getHeight())));
+        debugScreenshotsProvider.save(image, "initial");
         if (eyes.getIsCutProviderExplicitlySet()) {
             image = eyes.getCutProvider().cut(image);
-            logger.log(testId, Stage.LOCATE, Pair.of("croppedImageSize", new RectangleSize(image.getWidth(), image.getHeight())));
-            debugScreenshotsProvider.save(image, "visual_locators_cut");
+            logger.log(eyes.getTestId(), Stage.LOCATE, Pair.of("croppedImageSize", new RectangleSize(image.getWidth(), image.getHeight())));
+            debugScreenshotsProvider.save(image, "cut");
         }
 
-        double scaleRatio = 1 / devicePixelRatio;
+        double scaleRatio = 1 / eyes.getDevicePixelRatio();
         if (eyes.getIsScaleProviderExplicitlySet()) {
             scaleRatio = eyes.getScaleProvider().getScaleRatio();
         }
 
-        logger.log(testId, Stage.LOCATE, Pair.of("scaleRatio", scaleRatio));
+        logger.log(eyes.getTestId(), Stage.LOCATE, Pair.of("scaleRatio", scaleRatio));
         return ImageUtils.scaleImage(image, scaleRatio);
     }
 }

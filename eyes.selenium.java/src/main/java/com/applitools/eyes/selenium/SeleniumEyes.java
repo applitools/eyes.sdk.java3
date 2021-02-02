@@ -4,6 +4,7 @@ import com.applitools.ICheckSettings;
 import com.applitools.eyes.*;
 import com.applitools.eyes.capture.EyesScreenshotFactory;
 import com.applitools.eyes.capture.ImageProvider;
+import com.applitools.eyes.capture.ScreenshotProvider;
 import com.applitools.eyes.config.Configuration;
 import com.applitools.eyes.config.ConfigurationProvider;
 import com.applitools.eyes.debug.DebugScreenshotsProvider;
@@ -1743,6 +1744,11 @@ public class SeleniumEyes extends RunningTest implements ISeleniumEyes {
             this.runner.aggregateResult(testResultContainer);
         }
         return results;
+    }
+
+    @Override
+    protected ScreenshotProvider getScreenshotProvider() {
+        return new SeleniumScreenshotProvider(this, driver, logger, getDebugScreenshotsProvider());
     }
 
     @Override

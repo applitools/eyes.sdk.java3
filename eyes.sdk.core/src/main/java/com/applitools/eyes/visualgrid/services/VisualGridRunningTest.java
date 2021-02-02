@@ -4,6 +4,7 @@ package com.applitools.eyes.visualgrid.services;
 import com.applitools.ICheckSettings;
 import com.applitools.connectivity.ServerConnector;
 import com.applitools.eyes.*;
+import com.applitools.eyes.capture.ScreenshotProvider;
 import com.applitools.eyes.config.Configuration;
 import com.applitools.eyes.fluent.ICheckSettingsInternal;
 import com.applitools.eyes.logging.Stage;
@@ -135,6 +136,11 @@ public class VisualGridRunningTest extends RunningTest {
     @Override
     protected String getBaseAgentId() {
         return "eyes.selenium.visualgrid.java/" + ClassVersionGetter.CURRENT_VERSION;
+    }
+
+    @Override
+    protected ScreenshotProvider getScreenshotProvider() {
+        return null;
     }
 
     public String tryCaptureDom() {

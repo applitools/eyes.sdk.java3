@@ -7,14 +7,12 @@ import com.applitools.eyes.config.Configuration;
 import com.applitools.eyes.config.ConfigurationProvider;
 import com.applitools.eyes.debug.DebugScreenshotsProvider;
 import com.applitools.eyes.exceptions.TestFailedException;
-import com.applitools.eyes.locators.VisualLocatorSettings;
-import com.applitools.eyes.locators.VisualLocatorsProvider;
+import com.applitools.eyes.locators.*;
 import com.applitools.eyes.logging.Stage;
 import com.applitools.eyes.positioning.PositionProvider;
 import com.applitools.eyes.selenium.fluent.SeleniumCheckSettings;
 import com.applitools.eyes.selenium.fluent.Target;
 import com.applitools.eyes.selenium.frames.FrameChain;
-import com.applitools.eyes.selenium.locators.SeleniumVisualLocatorsProvider;
 import com.applitools.eyes.selenium.positioning.ImageRotation;
 import com.applitools.eyes.selenium.rendering.VisualGridEyes;
 import com.applitools.eyes.selenium.wrappers.EyesSeleniumDriver;
@@ -27,7 +25,6 @@ import org.apache.commons.lang3.tuple.Pair;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
-import org.openqa.selenium.remote.RemoteWebDriver;
 
 import java.net.URI;
 import java.util.HashSet;
@@ -81,17 +78,15 @@ public class Eyes implements IEyesBase {
         }
     }
 
-    private void afterOpen(WebDriver webDriver) {
-        if (!(webDriver instanceof EyesSeleniumDriver)) {
-            webDriver = new EyesSeleniumDriver(getLogger(), seleniumEyes, (RemoteWebDriver) webDriver);
-        }
-
-        visualLocatorsProvider = new SeleniumVisualLocatorsProvider(
-                seleniumEyes,
-                (EyesSeleniumDriver) webDriver,
+    private void afterOpen() {
+        visualLocatorsProvider = new BaseVisualLocatorsProvider(
                 getLogger(),
+                seleniumEyes.getTestId(),
+                seleniumEyes.getServerConnector(),
+                seleniumEyes.getScreenshotProvider(),
+                seleniumEyes.getDevicePixelRatio(),
+                seleniumEyes.getConfiguration().getAppName(),
                 getDebugScreenshotsProvider());
-
         if (isVisualGridEyes) {
             visualGridEyes.setImageProvider(seleniumEyes.getImageProvider());
         }
@@ -109,7 +104,7 @@ public class Eyes implements IEyesBase {
         }
 
         webDriver = activeEyes.open(webDriver);
-        afterOpen(webDriver);
+        afterOpen();
         return webDriver;
     }
 
@@ -127,7 +122,7 @@ public class Eyes implements IEyesBase {
         }
 
         driver = activeEyes.open(driver, appName, testName, null);
-        afterOpen(driver);
+        afterOpen();
         return driver;
     }
 
@@ -147,7 +142,7 @@ public class Eyes implements IEyesBase {
         }
 
         driver = activeEyes.open(driver, appName, testName, viewportSize);
-        afterOpen(driver);
+        afterOpen();
         return driver;
     }
 
@@ -1849,5 +1844,9 @@ public class Eyes implements IEyesBase {
     public Map<String, List<Region>> locate(VisualLocatorSettings visualLocatorSettings) {
         ArgumentGuard.notNull(visualLocatorSettings, "visualLocatorSettings");
         return visualLocatorsProvider.getLocators(visualLocatorSettings);
+    }
+
+    public Map<String, List<TextRegion>> extractTextRegions(TextRegionSettings textRegionSettings) {
+        return seleniumEyes.extractTextRegions(textRegionSettings);
     }
 }

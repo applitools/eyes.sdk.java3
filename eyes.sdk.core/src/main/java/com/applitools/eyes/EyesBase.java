@@ -3,6 +3,7 @@ package com.applitools.eyes;
 import com.applitools.ICheckSettings;
 import com.applitools.connectivity.ServerConnector;
 import com.applitools.eyes.capture.AppOutputProvider;
+import com.applitools.eyes.capture.ScreenshotProvider;
 import com.applitools.eyes.config.Configuration;
 import com.applitools.eyes.debug.DebugScreenshotsProvider;
 import com.applitools.eyes.debug.FileDebugScreenshotsProvider;
@@ -16,6 +17,8 @@ import com.applitools.eyes.fluent.ICheckSettingsInternal;
 import com.applitools.eyes.logging.Stage;
 import com.applitools.eyes.logging.TraceLevel;
 import com.applitools.eyes.logging.Type;
+import com.applitools.eyes.locators.TextRegion;
+import com.applitools.eyes.locators.TextRegionSettings;
 import com.applitools.eyes.positioning.InvalidPositionProvider;
 import com.applitools.eyes.positioning.PositionProvider;
 import com.applitools.eyes.scaling.FixedScaleProvider;
@@ -31,6 +34,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.lang3.tuple.Pair;
 
+import java.awt.image.BufferedImage;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.*;
@@ -581,6 +585,37 @@ public abstract class EyesBase implements IEyesBase {
             positionProviderHandler.set(new InvalidPositionProvider());
         }
     }
+
+    public Map<String, List<TextRegion>> extractTextRegions(TextRegionSettings textRegionSettings) {
+        ArgumentGuard.notNull(textRegionSettings, "textRegionSettings");
+        BufferedImage viewPortScreenshot = getScreenshotProvider().getViewPortScreenshot();
+        logger.log(getTestId(), Stage.LOCATE,
+                Pair.of("textRegionSettings", textRegionSettings),
+                Pair.of("scaledImageSize", new RectangleSize(viewPortScreenshot.getWidth(), viewPortScreenshot.getHeight())));
+        debugScreenshotsProvider.save(viewPortScreenshot, "text_regions_final");
+        byte[] image = ImageUtils.encodeAsPng(viewPortScreenshot);
+        SyncTaskListener<String> listener = new SyncTaskListener<>(logger, "getTextRegions");
+        serverConnector.uploadImage(listener, image);
+        String viewportScreenshotUrl = listener.get();
+        if (viewportScreenshotUrl == null) {
+            throw new EyesException("Failed posting viewport image");
+        }
+
+        logger.log(getTestId(), Stage.LOCATE, Pair.of("screenshotUrl", viewportScreenshotUrl));
+        textRegionSettings.setAppOutput(new AppOutput(getTitle(), null, null, viewportScreenshotUrl, null));
+        SyncTaskListener<Map<String, List<TextRegion>>> postListener = new SyncTaskListener<>(logger, "getTextRegions");
+        serverConnector.postTextRegions(postListener, textRegionSettings);
+        Map<String, List<TextRegion>> result = postListener.get();
+        if (result == null) {
+            throw new EyesException("Failed posting text regions");
+        }
+
+        logger.log(testId, Stage.LOCATE,
+                Pair.of("result", result));
+        return result;
+    }
+
+    protected abstract ScreenshotProvider getScreenshotProvider();
 
     /**
      * Creates the match model

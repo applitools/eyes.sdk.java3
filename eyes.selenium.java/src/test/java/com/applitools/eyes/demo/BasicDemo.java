@@ -3,15 +3,22 @@ package com.applitools.eyes.demo;
 import com.applitools.eyes.*;
 import com.applitools.eyes.selenium.ClassicRunner;
 import com.applitools.eyes.selenium.Eyes;
+import com.applitools.eyes.selenium.fluent.Target;
 import com.applitools.eyes.utils.ReportingTestSuite;
 import com.applitools.eyes.utils.SeleniumUtils;
 import com.applitools.eyes.utils.TestUtils;
 import com.applitools.eyes.visualgrid.services.VisualGridRunner;
 import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.chrome.ChromeDriver;
+import org.openqa.selenium.remote.DesiredCapabilities;
+import org.openqa.selenium.remote.RemoteWebDriver;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
+
+import java.net.MalformedURLException;
+import java.net.URL;
 
 public class BasicDemo extends ReportingTestSuite {
     private static BatchInfo batch;
@@ -38,28 +45,33 @@ public class BasicDemo extends ReportingTestSuite {
 
     @BeforeMethod
     public void beforeEach() {
-        driver = SeleniumUtils.createChromeDriver();
     }
 
-    @Test(dataProvider = "booleanDP")
-    public void basicDemo(boolean useVisualGrid) {
-        super.addSuiteArg("isVisualGrid", useVisualGrid);
-        EyesRunner runner = useVisualGrid ? new VisualGridRunner(10) : new ClassicRunner();
-        String suffix = useVisualGrid ? "_VG" : "";
-        Eyes eyes = new Eyes(runner);
-        eyes.setLogHandler(logger);
-        eyes.setBatch(batch);
-        //eyes.setProxy(new ProxySettings("http://localhost:8888"));
+    @Test
+    public void basicDemo() throws MalformedURLException, InterruptedException {
+        DesiredCapabilities caps = DesiredCapabilities.firefox();
+        caps.setCapability("platform", "Mac OS X 10.15");
+        caps.setCapability("version", "78.0");
+        caps.setCapability("screenResolution", "1400x1050");
+        caps.setCapability("name", "Charter");
+        String username = System.getenv("SAUCE_USERNAME");
+        String accessKey = System.getenv("SAUCE_ACCESS_KEY");
+        String domain = "@ondemand.saucelabs.com:443/wd/hub";
+        String url = "https://" + username + ":" + accessKey + domain;
+        driver = new ChromeDriver();
+        driver.get("https://www.nintendo.com/switch/");
+        Thread.sleep(1000);
+
+        Eyes eyes = new Eyes();
+        eyes.setLogHandler(new StdoutLogHandler(true));
+        eyes.setProxy(new ProxySettings("http://localhost:8888"));
         try {
-            eyes.open(driver, "Demo App", "BasicDemo" + suffix, new RectangleSize(800, 800));
-            driver.get("https://applitools.github.io/demo/TestPages/FramesTestPage/");
-            eyes.checkWindow();
-            eyes.closeAsync();
+            eyes.open(driver, "test", "test", new RectangleSize(1200, 600));
+            eyes.check(Target.window().fully());
+            eyes.close();
         } finally {
-            eyes.abortAsync();
             driver.quit();
-            TestResultsSummary allTestResults = runner.getAllTestResults();
-            System.out.println(allTestResults);
+            eyes.abortIfNotClosed();
         }
     }
 }

@@ -3,10 +3,12 @@ package com.applitools.eyes.appium;
 import com.applitools.ICheckSettings;
 import com.applitools.eyes.*;
 import com.applitools.eyes.appium.capture.ImageProviderFactory;
+import com.applitools.eyes.appium.capture.MobileScreenshotProvider;
 import com.applitools.eyes.appium.locators.AndroidVisualLocatorProvider;
 import com.applitools.eyes.appium.locators.IOSVisualLocatorProvider;
 import com.applitools.eyes.capture.EyesScreenshotFactory;
 import com.applitools.eyes.capture.ImageProvider;
+import com.applitools.eyes.capture.ScreenshotProvider;
 import com.applitools.eyes.config.Configuration;
 import com.applitools.eyes.events.ValidationInfo;
 import com.applitools.eyes.events.ValidationResult;
@@ -33,8 +35,6 @@ import com.applitools.eyes.selenium.regionVisibility.NopRegionVisibilityStrategy
 import com.applitools.eyes.selenium.regionVisibility.RegionVisibilityStrategy;
 import com.applitools.utils.*;
 import io.appium.java_client.AppiumDriver;
-import io.appium.java_client.MobileBy;
-import io.appium.java_client.android.AndroidDriver;
 import org.apache.commons.lang3.tuple.Pair;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.*;
@@ -511,6 +511,11 @@ public class Eyes extends EyesBase {
             }
         }
         return results;
+    }
+
+    @Override
+    protected ScreenshotProvider getScreenshotProvider() {
+        return new MobileScreenshotProvider(driver, getDevicePixelRatio());
     }
 
     /**

@@ -2,6 +2,7 @@ package com.applitools.eyes.locators;
 
 import com.applitools.connectivity.ServerConnector;
 import com.applitools.eyes.*;
+import com.applitools.eyes.capture.ScreenshotProvider;
 import com.applitools.eyes.debug.DebugScreenshotsProvider;
 import com.applitools.eyes.logging.Stage;
 import com.applitools.utils.ArgumentGuard;
@@ -12,20 +13,22 @@ import java.awt.image.BufferedImage;
 import java.util.List;
 import java.util.Map;
 
-public abstract class BaseVisualLocatorsProvider implements VisualLocatorsProvider {
+public class BaseVisualLocatorsProvider implements VisualLocatorsProvider {
 
     protected Logger logger;
     protected final String testId;
     private final ServerConnector serverConnector;
+    private final ScreenshotProvider screenshotProvider;
     protected double devicePixelRatio;
     protected String appName;
     protected DebugScreenshotsProvider debugScreenshotsProvider;
 
-    public BaseVisualLocatorsProvider(Logger logger, String testId, ServerConnector serverConnector,
+    public BaseVisualLocatorsProvider(Logger logger, String testId, ServerConnector serverConnector, ScreenshotProvider screenshotProvider,
                                       double devicePixelRatio, String appName, DebugScreenshotsProvider debugScreenshotsProvider) {
         this.logger = logger;
         this.testId = testId;
         this.serverConnector = serverConnector;
+        this.screenshotProvider = screenshotProvider;
         this.devicePixelRatio = devicePixelRatio;
         this.appName = appName;
         this.debugScreenshotsProvider = debugScreenshotsProvider;
@@ -34,9 +37,7 @@ public abstract class BaseVisualLocatorsProvider implements VisualLocatorsProvid
     @Override
     public Map<String, List<Region>> getLocators(VisualLocatorSettings visualLocatorSettings) {
         ArgumentGuard.notNull(visualLocatorSettings, "visualLocatorSettings");
-
-
-        BufferedImage viewPortScreenshot = getViewPortScreenshot();
+        BufferedImage viewPortScreenshot = screenshotProvider.getViewPortScreenshot();
         logger.log(testId, Stage.LOCATE,
                 Pair.of("locatorNames", visualLocatorSettings.getNames()),
                 Pair.of("devicePixelRatio", devicePixelRatio),
@@ -66,6 +67,4 @@ public abstract class BaseVisualLocatorsProvider implements VisualLocatorsProvid
                 Pair.of("result", result));
         return result;
     }
-
-    protected abstract BufferedImage getViewPortScreenshot();
 }
