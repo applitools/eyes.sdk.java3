@@ -81,7 +81,7 @@
     </test>
     <test name="TestSendDom">
         <classes>
-            <class name="com.applitools.eyes.selenium.TestSendDom">
+            <class name="com.applitools.eyes.selenium.capture.TestSendDom">
                 <methods>
                     <include name="TestSendDOM_Selector"/>
                     <include name="TestNotSendDOM"/>
@@ -90,6 +90,7 @@
                     <include name="TestSendDOM_FullWindow"/>
                     <include name="TestCssFetching"/>
                     <include name="TestBidirectionalFrameDependency"/>
+                    <include name="TestCssEscaping"/>
                 </methods>
             </class>
         </classes>

@@ -1,4 +1,4 @@
-package com.applitools.eyes.selenium;
+package com.applitools.eyes.selenium.capture;
 
 import com.applitools.connectivity.MockServerConnector;
 import com.applitools.connectivity.ServerConnector;
@@ -7,7 +7,7 @@ import com.applitools.eyes.config.Configuration;
 import com.applitools.eyes.config.ConfigurationProvider;
 import com.applitools.eyes.metadata.ActualAppOutput;
 import com.applitools.eyes.metadata.SessionResults;
-import com.applitools.eyes.selenium.capture.DomCapture;
+import com.applitools.eyes.selenium.*;
 import com.applitools.eyes.selenium.fluent.Target;
 import com.applitools.eyes.selenium.frames.FrameChain;
 import com.applitools.eyes.selenium.wrappers.EyesSeleniumDriver;
@@ -94,6 +94,11 @@ public final class TestSendDom extends ReportingTestSuite {
             this.domJson = super.tryCaptureDom();
             return this.domJson;
         }
+
+        @Override
+        public Configuration getConfiguration() {
+            return this.getConfigurationInstance();
+        }
     }
 
     // This is used for rhe
@@ -117,7 +122,7 @@ public final class TestSendDom extends ReportingTestSuite {
         webDriver.get("https://applitools.github.io/demo/TestPages/FramesTestPage/");
         DomInterceptingEyes eyes = new DomInterceptingEyes();
         eyes.setBatch(TestDataProvider.batchInfo);
-        eyes.getConfigurationInstance().setAppName("Test Send DOM").setTestName("Full Window").setViewportSize(new RectangleSize(1024, 768));
+        eyes.getConfiguration().setAppName("Test Send DOM").setTestName("Full Window").setViewportSize(new RectangleSize(1024, 768));
         eyes.setLogHandler(new StdoutLogHandler());
         try {
             eyes.open(webDriver);
@@ -278,6 +283,34 @@ public final class TestSendDom extends ReportingTestSuite {
         Assert.assertEquals(result.get("url2"), "content");
         verify(domCapture, never()).getFrameDom(eq("url1"), ArgumentMatchers.<String>anyList());
         verify(domCapture, times(1)).getFrameDom("url2", Arrays.asList("url3", "url1", "url4", "url2"));
+    }
+
+    @Test
+    public void TestCssEscaping() {
+        EyesSeleniumDriver driver = mock(EyesSeleniumDriver.class);
+        when(driver.getFrameChain()).thenReturn(new FrameChain(new Logger()));
+        when(driver.switchTo()).thenReturn(mock(EyesTargetLocator.class));
+        when(driver.executeScript("return document.location.href")).thenReturn("url");
+
+        ServerConnector serverConnector = new MockServerConnector();
+        SeleniumEyes eyes = mock(SeleniumEyes.class);
+
+        when(eyes.getServerConnector()).thenReturn(serverConnector);
+        when(eyes.getLogger()).thenReturn(new Logger());
+        when(eyes.getUserAgent()).thenReturn(UserAgent.parseUserAgentString("Mozilla/5.0 (Windows NT 6.1; WOW64; rv:54.0) Gecko/20100101 Firefox/54.0"));
+        when(eyes.getDriver()).thenReturn(driver);
+
+
+        DomCapture domCapture = spy(new DomCapture(eyes));
+        domCapture.cssStartToken = "#####";
+        domCapture.cssEndToken = domCapture.cssStartToken;
+        doReturn("{\"css\":\"#####a.css#####\"}").when(domCapture).getFrameDom(anyString(), ArgumentMatchers.<String>anyList());
+
+        CssTreeNode cssTreeNode = mock(CssTreeNode.class);
+        when(cssTreeNode.toString()).thenReturn("{font-family: \"David\"}");
+        domCapture.cssNodesToReplace.put("a.css", cssTreeNode);
+        String dom = domCapture.getPageDom(new NullPositionProvider());
+        Assert.assertEquals(dom, "{\"css\":\"{font-family: \\\"David\\\"}\"}");
     }
 
     private static boolean getHasDom(IEyesBase eyes, TestResults results) throws IOException {

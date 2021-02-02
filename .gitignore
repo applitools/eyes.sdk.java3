@@ -31,6 +31,7 @@ venv
 
 # sdk-coverage-tests
 **/test/java/coverage/generic/
+coverage-tests/configuration/local.js
 coverage-test-report.xml
 coverage-tests-metadata.json
 package-lock.json

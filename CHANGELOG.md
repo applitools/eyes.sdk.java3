@@ -1,6 +1,8 @@
 ## [vNext]
 ### Update
 - Cleanup cached data after check() execution. [Trello 1673](https://trello.com/c/CYbkzXia)
+### Fixed
+- Didn't add escaping to css files when collecting dom for RCA. [Trello 2444](https://trello.com/c/yIez6VxK)
 
 ## [3.191.4]
 ### Fixed

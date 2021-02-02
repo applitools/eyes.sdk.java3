@@ -15,6 +15,8 @@ import com.applitools.eyes.selenium.wrappers.EyesTargetLocator;
 import com.applitools.eyes.visualgrid.model.RGridResource;
 import com.applitools.utils.EfficientStringReplace;
 import com.applitools.utils.GeneralUtils;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.lang3.tuple.Pair;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
@@ -38,9 +40,9 @@ public class DomCapture {
     private final String testId;
     private final EyesSeleniumDriver driver;
     private final Logger logger;
-    private String cssStartToken;
-    private String cssEndToken;
-    private final Map<String, CssTreeNode> cssNodesToReplace = Collections.synchronizedMap(new HashMap<String, CssTreeNode>());
+    String cssStartToken;
+    String cssEndToken;
+    final Map<String, CssTreeNode> cssNodesToReplace = Collections.synchronizedMap(new HashMap<String, CssTreeNode>());
     private boolean shouldWaitForPhaser = false;
 
     private final UserAgent userAgent;
@@ -85,7 +87,15 @@ public class DomCapture {
         shouldWaitForPhaser = false;
         Map<String, String> cssStringsToReplace = new HashMap<>();
         for (String url : cssNodesToReplace.keySet()) {
-            cssStringsToReplace.put(url, cssNodesToReplace.get(url).toString());
+            try {
+                String escapedCss = new ObjectMapper().writeValueAsString(cssNodesToReplace.get(url).toString());
+                if (escapedCss.startsWith("\"") && escapedCss.endsWith("\"")) {
+                    escapedCss = escapedCss.substring(1, escapedCss.length() - 1); // remove quotes
+                }
+                cssStringsToReplace.put(url, escapedCss);
+            } catch (JsonProcessingException e) {
+                GeneralUtils.logExceptionStackTrace(logger, Stage.CHECK, Type.DOM_SCRIPT, e);
+            }
         }
         String domJson = EfficientStringReplace.efficientStringReplace(cssStartToken, cssEndToken, dom, cssStringsToReplace);
         positionProvider.restoreState(originalPosition);
