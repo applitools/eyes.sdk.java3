@@ -602,7 +602,12 @@ public abstract class EyesBase implements IEyesBase {
         }
 
         logger.log(getTestId(), Stage.LOCATE, Pair.of("screenshotUrl", viewportScreenshotUrl));
-        textRegionSettings.setAppOutput(new AppOutput(getTitle(), null, null, viewportScreenshotUrl, null));
+
+        String domUrl = null;
+        if (shouldCaptureDom(null)) {
+            domUrl = tryCaptureAndPostDom();
+        }
+        textRegionSettings.setAppOutput(new AppOutput(getTitle(), null, domUrl, viewportScreenshotUrl, null));
         SyncTaskListener<Map<String, List<TextRegion>>> postListener = new SyncTaskListener<>(logger, "getTextRegions");
         serverConnector.postTextRegions(postListener, textRegionSettings);
         Map<String, List<TextRegion>> result = postListener.get();
@@ -724,22 +729,20 @@ public abstract class EyesBase implements IEyesBase {
 
     protected abstract String tryCaptureDom();
 
-    protected String tryCaptureAndPostDom(ICheckSettingsInternal checkSettingsInternal) {
+    protected String tryCaptureAndPostDom() {
         String domUrl = null;
-        if (shouldCaptureDom(checkSettingsInternal.isSendDom())) {
-            try {
-                String domJson = tryCaptureDom();
-                domUrl = tryPostDomCapture(domJson);
-                logger.log(getTestId(), Stage.CHECK, Type.DOM_SCRIPT, Pair.of("domUrl", domUrl));
-            } catch (Exception ex) {
-                GeneralUtils.logExceptionStackTrace(logger, Stage.CHECK, Type.DOM_SCRIPT, ex, getTestId());
-            }
+        try {
+            String domJson = tryCaptureDom();
+            domUrl = tryPostDomCapture(domJson);
+            logger.log(getTestId(), Stage.CHECK, Type.DOM_SCRIPT, Pair.of("domUrl", domUrl));
+        } catch (Exception ex) {
+            GeneralUtils.logExceptionStackTrace(logger, Stage.CHECK, Type.DOM_SCRIPT, ex, getTestId());
         }
 
         return domUrl;
     }
 
-    private boolean shouldCaptureDom(Boolean sendDomFromCheckSettings) {
+    protected boolean shouldCaptureDom(Boolean sendDomFromCheckSettings) {
         boolean sendDomFromConfig = getConfigurationInstance().isSendDom() == null || getConfigurationInstance().isSendDom();
         return (sendDomFromCheckSettings != null && sendDomFromCheckSettings) || (sendDomFromCheckSettings == null && sendDomFromConfig);
     }

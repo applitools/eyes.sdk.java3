@@ -1546,8 +1546,8 @@ public class SeleniumEyes extends RunningTest implements ISeleniumEyes {
             debugScreenshotsProvider.save(result.getImage(), "SUB_SCREENSHOT");
         }
 
-        if (!EyesDriverUtils.isMobileDevice(driver)) {
-            result.setDomUrl(tryCaptureAndPostDom(checkSettingsInternal));
+        if (!EyesDriverUtils.isMobileDevice(driver) && shouldCaptureDom(checkSettingsInternal.isSendDom())) {
+            result.setDomUrl(tryCaptureAndPostDom());
         }
 
         result.setOriginalLocation(state.getOriginalLocation());
