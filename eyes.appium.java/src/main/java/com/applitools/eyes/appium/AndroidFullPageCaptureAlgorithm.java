@@ -32,8 +32,9 @@ public class AndroidFullPageCaptureAlgorithm extends AppiumFullPageCaptureAlgori
     protected void captureAndStitchTailParts(RectangleSize entireSize, RectangleSize initialPartSize) {
         // scrollViewRegion is the (upscaled) region of the scrollview on the screen
         Region scrollViewRegion = scaleSafe(((AppiumScrollPositionProvider) scrollProvider).getScrollableViewRegion());
-        // we modify the region by one pixel to make sure we don't accidentally get a pixel of the header above it
-        Location newLoc = new Location(scrollViewRegion.getLeft(), scrollViewRegion.getTop() - scaleSafe(((AppiumScrollPositionProvider) scrollProvider).getStatusBarHeight()));
+
+        Location originalViewLocation = new Location(scrollViewRegion.getLeft(), scrollViewRegion.getTop());
+        Location newLoc = new Location(originalViewLocation.getX(), originalViewLocation.getY() - scaleSafe(((AppiumScrollPositionProvider) scrollProvider).getStatusBarHeight()));
         RectangleSize newSize = new RectangleSize(initialPartSize.getWidth(), scrollViewRegion.getHeight());
         scrollViewRegion.setLocation(newLoc);
         scrollViewRegion.setSize(newSize);
@@ -58,8 +59,9 @@ public class AndroidFullPageCaptureAlgorithm extends AppiumFullPageCaptureAlgori
             currentPosition = new Location(0,
                     scrollViewRegion.getTop() + ((scrollViewRegion.getHeight()) * (step)) - (stitchingAdjustment*step - stitchingAdjustment));
 
-            int startY = scrollViewRegion.getHeight() + scrollViewRegion.getTop() - 1 - (step != maxScrollSteps ? stitchingAdjustment/2 : 0);
-            int endY = scrollViewRegion.getTop() + (step != maxScrollSteps ? stitchingAdjustment/2 : 0);
+            // We should use original view location for scroll positions due to better calculation positions on the screen
+            int startY = scrollViewRegion.getHeight() + originalViewLocation.getY() - 1 - (step != maxScrollSteps ? stitchingAdjustment/2 : 0);
+            int endY = originalViewLocation.getY() + (step != maxScrollSteps ? stitchingAdjustment/2 : 0);
             boolean isScrolledWithHelperLibrary = false;
             if (scrollableElementId != null) { // it means that we want to scroll on a specific element
                 logger.log(TraceLevel.Debug, testId, Stage.CHECK,
