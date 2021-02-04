@@ -86,10 +86,12 @@ public class TestSetup extends GlobalSetup {
         return sessionResults;
     }
 
-    public void setBatch(HashMap<String, String>[] properties) {
+    public void setBatch(String name, HashMap<String, String>[] properties) {
+        BatchInfo batch = new BatchInfo(name);
         for (Map<String, String> property : properties) {
             batch.addProperty(property.get("name"), property.get("value"));
         }
+        eyes.setBatch(batch);
     }
 
     public JsonNode getDom(TestResults results, String domId) {
