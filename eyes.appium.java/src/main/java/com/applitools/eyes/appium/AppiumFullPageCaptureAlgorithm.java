@@ -41,6 +41,7 @@ public class AppiumFullPageCaptureAlgorithm {
     private double pixelRatio;
     private BufferedImage stitchedImage;
     protected Location currentPosition;
+    protected WebElement scrollRootElement;
 
     // need to keep track of whether location and dimension coordinates returned by the driver
     // are already scaled to the pixel ratio, or are in "logical" pixels
@@ -89,13 +90,15 @@ public class AppiumFullPageCaptureAlgorithm {
                                           ImageProvider imageProvider, DebugScreenshotsProvider debugScreenshotsProvider,
                                           ScaleProviderFactory scaleProviderFactory, CutProvider cutProvider,
                                           EyesScreenshotFactory screenshotFactory, int waitBeforeScreenshots, WebElement cutElement,
-                                          Integer stitchingAdjustment) {
+                                          Integer stitchingAdjustment, WebElement scrollRootElement) {
 
         // ensure that all the scroll/position providers used by the superclass are the same object;
         // getting the current position for appium is very expensive!
         this(logger, testId, scrollProvider, scrollProvider, scrollProvider, imageProvider,
                 debugScreenshotsProvider, scaleProviderFactory, cutProvider, screenshotFactory,
                 waitBeforeScreenshots, cutElement, stitchingAdjustment);
+        this.scrollRootElement = scrollRootElement;
+        scrollProvider.setScrollRootElement(scrollRootElement);
     }
 
     protected RectangleSize captureAndStitchCurrentPart(Region partRegion) {
@@ -171,7 +174,8 @@ public class AppiumFullPageCaptureAlgorithm {
 
         cleanupStitch(originalStitchedState, currentPosition, lastSuccessfulPartSize, entireSize);
 
-        moveToTopLeft(xPos, endY + statusBarHeight + stitchingAdjustment, xPos, startY + statusBarHeight);
+        // 50 - extra offset to avoid overlay elements.
+        moveToTopLeft(xPos, endY + statusBarHeight + 50 + stitchingAdjustment, xPos, startY + statusBarHeight);
     }
 
 

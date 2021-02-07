@@ -27,7 +27,6 @@ public class AndroidScrollPositionProvider extends AppiumScrollPositionProvider 
     private Location curScrollPos;
     private Location scrollableViewLoc;
     private RectangleSize entireSize = null;
-    private String scrollRootElement = null;
 
     public AndroidScrollPositionProvider(Logger logger, EyesAppiumDriver driver) {
         super(logger, driver);
@@ -320,10 +319,8 @@ public class AndroidScrollPositionProvider extends AppiumScrollPositionProvider 
         int scrollableHeight = 0;
 
         try {
-            WebElement activeScroll;
-            if (scrollRootElement != null) {
-                activeScroll = driver.findElement(MobileBy.id(scrollRootElement));
-            } else {
+            WebElement activeScroll = scrollRootElement;
+            if (activeScroll == null) {
                 activeScroll = getFirstScrollableView();
             }
             logger.log(TraceLevel.Debug, eyesDriver.getTestId(), Stage.CHECK,
@@ -365,10 +362,6 @@ public class AndroidScrollPositionProvider extends AppiumScrollPositionProvider 
                 Pair.of("verticalScrollGap", verticalScrollGap),
                 Pair.of("scrollContentHeight", scrollContentHeight));
         return entireSize;
-    }
-
-    public void setScrollRootElement(String scrollRootElement) {
-        this.scrollRootElement = scrollRootElement;
     }
 
     @Override

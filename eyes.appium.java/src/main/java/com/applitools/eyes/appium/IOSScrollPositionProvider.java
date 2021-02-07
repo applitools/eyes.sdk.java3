@@ -15,10 +15,7 @@ import io.appium.java_client.remote.MobileCapabilityType;
 import io.appium.java_client.touch.WaitOptions;
 import io.appium.java_client.touch.offset.PointOption;
 import org.apache.commons.lang3.tuple.Pair;
-import org.openqa.selenium.NoSuchElementException;
-import org.openqa.selenium.OutputType;
-import org.openqa.selenium.Rectangle;
-import org.openqa.selenium.WebElement;
+import org.openqa.selenium.*;
 
 import javax.annotation.Nullable;
 import java.awt.image.BufferedImage;
@@ -206,6 +203,10 @@ public class IOSScrollPositionProvider extends AppiumScrollPositionProvider {
     @Nullable
     @Override
     protected ContentSize getCachedContentSize() {
+        if (contentSize != null) {
+            return contentSize;
+        }
+
         try {
             WebElement activeScroll = getFirstScrollableView();
             contentSize = EyesAppiumUtils.getContentSize(driver, activeScroll);
@@ -215,8 +216,8 @@ public class IOSScrollPositionProvider extends AppiumScrollPositionProvider {
             contentSize = null;
 
             /*
-            * To get more information about view hierarchy we printed page source to the logs
-            * and saving debug screenshot for current screen
+             * To get more information about view hierarchy we printed page source to the logs
+             * and saving debug screenshot for current screen
              */
             String base64 = driver.getScreenshotAs(OutputType.BASE64);
             BufferedImage image = ImageUtils.imageFromBase64(base64);

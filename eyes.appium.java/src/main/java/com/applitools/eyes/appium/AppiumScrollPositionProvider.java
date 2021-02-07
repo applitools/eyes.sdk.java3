@@ -23,6 +23,7 @@ public abstract class AppiumScrollPositionProvider implements ScrollPositionProv
     protected double distanceRatio;
     protected int verticalScrollGap;
     protected WebElement cutElement = null;
+    protected WebElement scrollRootElement = null;
 
     protected ContentSize contentSize;
 
@@ -202,11 +203,18 @@ public abstract class AppiumScrollPositionProvider implements ScrollPositionProv
     public abstract Region getElementRegion(WebElement element, boolean shouldStitchContent, Boolean statusBarExists);
 
     protected WebElement getFirstScrollableView() {
+        if (scrollRootElement != null) {
+            return scrollRootElement;
+        }
         return EyesAppiumUtils.getFirstScrollableView(driver);
     }
 
     public void cleanupCachedData() {
         this.contentSize = null;
         this.firstVisibleChild = null;
+    }
+
+    public void setScrollRootElement(WebElement scrollRootElement) {
+        this.scrollRootElement = scrollRootElement;
     }
 }

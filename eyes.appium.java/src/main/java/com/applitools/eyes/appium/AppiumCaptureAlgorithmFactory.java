@@ -23,14 +23,14 @@ public class AppiumCaptureAlgorithmFactory {
     private final int waitBeforeScreenshot;
     private final WebElement cutElement;
     private final Integer stitchingAdjustment;
-    private final String scrollableElementId;
+    private final WebElement scrollableElement;
 
     public AppiumCaptureAlgorithmFactory(EyesAppiumDriver driver, Logger logger, String testId,
                                          AppiumScrollPositionProvider scrollProvider,
                                          ImageProvider imageProvider, DebugScreenshotsProvider debugScreenshotsProvider,
                                          ScaleProviderFactory scaleProviderFactory, CutProvider cutProvider,
                                          EyesScreenshotFactory screenshotFactory, int waitBeforeScreenshots, WebElement cutElement,
-                                         Integer stitchingAdjustment, String scrollableElementId) {
+                                         Integer stitchingAdjustment, WebElement scrollableElement) {
         this.driver = driver;
         this.logger = logger;
         this.testId = testId;
@@ -43,18 +43,18 @@ public class AppiumCaptureAlgorithmFactory {
         this.waitBeforeScreenshot = waitBeforeScreenshots;
         this.cutElement = cutElement;
         this.stitchingAdjustment = stitchingAdjustment;
-        this.scrollableElementId = scrollableElementId;
+        this.scrollableElement = scrollableElement;
     }
 
     public AppiumFullPageCaptureAlgorithm getAlgorithm() {
         if (EyesDriverUtils.isAndroid(driver.getRemoteWebDriver())) {
             return new AndroidFullPageCaptureAlgorithm(logger, testId, scrollProvider, imageProvider,
                     debugScreenshotsProvider, scaleProviderFactory, cutProvider, screenshotFactory,
-                    waitBeforeScreenshot, stitchingAdjustment, scrollableElementId);
+                    waitBeforeScreenshot, stitchingAdjustment, scrollableElement);
         } else if (EyesDriverUtils.isIOS(driver.getRemoteWebDriver())) {
             return new AppiumFullPageCaptureAlgorithm(logger, testId, scrollProvider, imageProvider,
                     debugScreenshotsProvider, scaleProviderFactory, cutProvider, screenshotFactory,
-                    waitBeforeScreenshot, cutElement, stitchingAdjustment);
+                    waitBeforeScreenshot, cutElement, stitchingAdjustment, scrollableElement);
         }
         throw new Error("Could not find driver type for getting capture algorithm");
     }

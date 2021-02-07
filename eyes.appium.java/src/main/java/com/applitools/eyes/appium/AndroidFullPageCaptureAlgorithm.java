@@ -7,25 +7,27 @@ import com.applitools.eyes.debug.DebugScreenshotsProvider;
 import com.applitools.eyes.logging.Stage;
 import com.applitools.eyes.logging.TraceLevel;
 import org.apache.commons.lang3.tuple.Pair;
+import org.openqa.selenium.WebElement;
 
 public class AndroidFullPageCaptureAlgorithm extends AppiumFullPageCaptureAlgorithm {
 
-    private final String scrollableElementId;
+    private String scrollableElementId = null;
 
     public AndroidFullPageCaptureAlgorithm(Logger logger, String testId,
                                            AppiumScrollPositionProvider scrollProvider,
                                            ImageProvider imageProvider, DebugScreenshotsProvider debugScreenshotsProvider,
                                            ScaleProviderFactory scaleProviderFactory, CutProvider cutProvider,
                                            EyesScreenshotFactory screenshotFactory, int waitBeforeScreenshots,
-                                           Integer stitchingAdjustment, String scrollableElementId) {
+                                           Integer stitchingAdjustment, WebElement scrollRootElement) {
 
         super(logger, testId, scrollProvider, imageProvider, debugScreenshotsProvider,
-            scaleProviderFactory, cutProvider, screenshotFactory, waitBeforeScreenshots, null, stitchingAdjustment);
+            scaleProviderFactory, cutProvider, screenshotFactory, waitBeforeScreenshots, null, stitchingAdjustment, scrollRootElement);
 
         // Android returns pixel coordinates which are already scaled according to the pixel ratio
         this.coordinatesAreScaled = true;
-        this.scrollableElementId = scrollableElementId;
-        ((AndroidScrollPositionProvider) scrollProvider).setScrollRootElement(scrollableElementId);
+        if (scrollRootElement != null) {
+            this.scrollableElementId = scrollRootElement.getAttribute("resourceId").split("/")[1];
+        }
     }
 
     @Override
