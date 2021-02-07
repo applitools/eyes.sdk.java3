@@ -16,6 +16,8 @@ import com.applitools.eyes.exceptions.TestFailedException;
 import com.applitools.eyes.fluent.GetSimpleRegion;
 import com.applitools.eyes.fluent.ICheckSettingsInternal;
 import com.applitools.eyes.fluent.SimpleRegionByRectangle;
+import com.applitools.eyes.locators.BaseOcrRegion;
+import com.applitools.eyes.locators.OcrRegion;
 import com.applitools.eyes.locators.VisualLocatorSettings;
 import com.applitools.eyes.locators.VisualLocatorsProvider;
 import com.applitools.eyes.logging.Stage;
@@ -184,7 +186,7 @@ public class Eyes extends EyesBase {
         this.check(checkSettings);
     }
 
-    private void ensureViewportSize() {
+    protected void ensureViewportSize() {
         this.configuration.setViewportSize(driver.getDefaultContentViewportSize());
     }
 
@@ -511,6 +513,27 @@ public class Eyes extends EyesBase {
             }
         }
         return results;
+    }
+
+    @Override
+    protected void getAppOutputForOcr(BaseOcrRegion ocrRegion) {
+        OcrRegion appiumOcrRegion = (OcrRegion) ocrRegion;
+        AppiumCheckSettings checkSettings = null;
+        if (appiumOcrRegion.getRegion() != null) {
+            checkSettings = Target.region(appiumOcrRegion.getRegion());
+        }
+        if (appiumOcrRegion.getElement() != null) {
+            checkSettings = Target.region(appiumOcrRegion.getElement()).fully();
+        }
+        if (appiumOcrRegion.getSelector() != null) {
+            checkSettings = Target.region(appiumOcrRegion.getSelector()).fully();
+        }
+
+        if (checkSettings == null) {
+            throw new IllegalStateException("Got uninitialized ocr region");
+        }
+
+        check(checkSettings.ocrRegion(ocrRegion));
     }
 
     @Override

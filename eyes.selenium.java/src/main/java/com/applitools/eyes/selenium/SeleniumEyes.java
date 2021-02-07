@@ -12,6 +12,8 @@ import com.applitools.eyes.exceptions.TestFailedException;
 import com.applitools.eyes.fluent.GetSimpleRegion;
 import com.applitools.eyes.fluent.ICheckSettingsInternal;
 import com.applitools.eyes.fluent.SimpleRegionByRectangle;
+import com.applitools.eyes.locators.BaseOcrRegion;
+import com.applitools.eyes.locators.OcrRegion;
 import com.applitools.eyes.logging.Stage;
 import com.applitools.eyes.logging.TraceLevel;
 import com.applitools.eyes.logging.Type;
@@ -314,6 +316,8 @@ public class SeleniumEyes extends RunningTest implements ISeleniumEyes {
 
         if (!getConfigurationInstance().isVisualGrid()) {
             openBase();
+        } else {
+            isOpen = true;
         }
 
         this.driver.setRotation(rotation);
@@ -661,8 +665,11 @@ public class SeleniumEyes extends RunningTest implements ISeleniumEyes {
             ArgumentGuard.isValidState(isOpen, "Eyes not open");
             ArgumentGuard.notNull(checkSettings, "checkSettings");
             ArgumentGuard.notOfType(checkSettings, ISeleniumCheckTarget.class, "checkSettings");
-
             boolean isMobileDevice = EyesDriverUtils.isMobileDevice(driver);
+            if (!isMobileDevice) {
+                ensureViewportSize();
+            }
+
 
             String source = null;
             if (!isMobileDevice) {
@@ -1744,6 +1751,35 @@ public class SeleniumEyes extends RunningTest implements ISeleniumEyes {
             this.runner.aggregateResult(testResultContainer);
         }
         return results;
+    }
+
+    @Override
+    protected void getAppOutputForOcr(BaseOcrRegion ocrRegion) {
+        OcrRegion seleniumOcrRegion = (OcrRegion) ocrRegion;
+        SeleniumCheckSettings checkSettings = null;
+        if (seleniumOcrRegion.getRegion() != null) {
+            checkSettings = Target.region(seleniumOcrRegion.getRegion());
+        }
+        if (seleniumOcrRegion.getElement() != null) {
+            ocrRegion.hint(EyesRemoteWebElement.getInnerText(logger, driver, seleniumOcrRegion.getElement()));
+            checkSettings = Target.region(seleniumOcrRegion.getElement()).fully();
+        }
+        if (seleniumOcrRegion.getSelector() != null) {
+            try {
+                WebElement element = driver.findElement(seleniumOcrRegion.getSelector());
+                ocrRegion.hint(EyesRemoteWebElement.getInnerText(logger, driver, element));
+            } catch (Throwable t) {
+                GeneralUtils.logExceptionStackTrace(logger, Stage.LOCATE, t);
+            }
+
+            checkSettings = Target.region(seleniumOcrRegion.getSelector()).fully();
+        }
+
+        if (checkSettings == null) {
+            throw new IllegalStateException("Got uninitialized ocr region");
+        }
+
+        check(checkSettings.ocrRegion(ocrRegion));
     }
 
     @Override

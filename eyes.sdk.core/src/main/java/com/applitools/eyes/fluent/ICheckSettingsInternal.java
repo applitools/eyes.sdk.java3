@@ -2,6 +2,7 @@ package com.applitools.eyes.fluent;
 
 import com.applitools.ICheckSettings;
 import com.applitools.eyes.GetAccessibilityRegion;
+import com.applitools.eyes.locators.BaseOcrRegion;
 import com.applitools.eyes.visualgrid.model.VisualGridSelector;
 
 public interface ICheckSettingsInternal extends com.applitools.ICheckSettingsInternal {
@@ -36,4 +37,6 @@ public interface ICheckSettingsInternal extends com.applitools.ICheckSettingsInt
     Boolean isIgnoreDisplacements();
 
     GetAccessibilityRegion[] getAccessibilityRegions();
+
+    BaseOcrRegion getOcrRegion();
 }

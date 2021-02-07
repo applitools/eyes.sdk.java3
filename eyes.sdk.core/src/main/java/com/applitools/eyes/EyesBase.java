@@ -14,6 +14,7 @@ import com.applitools.eyes.exceptions.NewTestException;
 import com.applitools.eyes.exceptions.TestFailedException;
 import com.applitools.eyes.fluent.CheckSettings;
 import com.applitools.eyes.fluent.ICheckSettingsInternal;
+import com.applitools.eyes.locators.BaseOcrRegion;
 import com.applitools.eyes.logging.Stage;
 import com.applitools.eyes.logging.TraceLevel;
 import com.applitools.eyes.logging.Type;
@@ -586,6 +587,48 @@ public abstract class EyesBase implements IEyesBase {
         }
     }
 
+    public List<String> extractText(BaseOcrRegion... ocrRegions) {
+        ArgumentGuard.notNull(ocrRegions, "ocrRegions");
+        ArgumentGuard.notContainsNull(ocrRegions, "ocrRegions");
+
+        List<String> result = new ArrayList<>();
+        for (BaseOcrRegion ocrRegion : ocrRegions) {
+            logger.log(getTestId(), Stage.LOCATE, Pair.of("ocrRegion", ocrRegion));
+            getAppOutputForOcr(ocrRegion);
+            if (ocrRegion.getAppOutput() == null) {
+                return Collections.emptyList();
+            }
+
+            SyncTaskListener<String> listener = new SyncTaskListener<>(logger, "getTextRegions");
+            serverConnector.uploadImage(listener, ocrRegion.getAppOutput().getScreenshotBytes());
+            String screenshotUrl = listener.get();
+            if (screenshotUrl == null) {
+                throw new EyesException("Failed posting image");
+            }
+
+            logger.log(getTestId(), Stage.LOCATE, Pair.of("screenshotUrl", screenshotUrl));
+            ocrRegion.getAppOutput().setScreenshotUrl(screenshotUrl);
+
+            SyncTaskListener<List<String>> postListener = new SyncTaskListener<>(logger, "getText");
+            serverConnector.postOcrRegions(postListener, ocrRegion);
+            List<String> serverResult = postListener.get();
+            if (serverResult == null) {
+                throw new EyesException("Failed posting ocr region");
+            }
+
+            logger.log(testId, Stage.LOCATE, Pair.of("result", result));
+            if (serverResult.isEmpty()) {
+                result.add(null);
+            } else {
+                result.add(serverResult.get(0));
+            }
+        }
+
+        return result;
+    }
+
+    protected abstract void getAppOutputForOcr(BaseOcrRegion ocrRegion);
+
     public Map<String, List<TextRegion>> extractTextRegions(TextRegionSettings textRegionSettings) {
         ArgumentGuard.notNull(textRegionSettings, "textRegionSettings");
         BufferedImage viewPortScreenshot = getScreenshotProvider().getViewPortScreenshot();
@@ -615,8 +658,7 @@ public abstract class EyesBase implements IEyesBase {
             throw new EyesException("Failed posting text regions");
         }
 
-        logger.log(testId, Stage.LOCATE,
-                Pair.of("result", result));
+        logger.log(testId, Stage.LOCATE, Pair.of("result", result));
         return result;
     }
 
@@ -722,7 +764,16 @@ public abstract class EyesBase implements IEyesBase {
         }
 
         ArgumentGuard.isValidState(getIsOpen(), "Eyes not open");
-        result = matchWindow(region, tag, checkSettingsInternal, source);
+        if (checkSettingsInternal.getOcrRegion() != null) {
+            AppOutput appOutput = getAppOutputWithScreenshot(region, checkSettingsInternal, null);
+            checkSettingsInternal.getOcrRegion().setAppOutput(appOutput);
+            result = new MatchResult();
+            result.setAsExpected(true);
+            return result;
+        }
+
+        result = matchWindowTask.matchWindow(getUserInputs(), region, tag, shouldMatchWindowRunOnceOnTimeout,
+                checkSettingsInternal, source);
         validateResult(result);
         return result;
     }
@@ -752,17 +803,6 @@ public abstract class EyesBase implements IEyesBase {
         validationInfo.setValidationId("" + (++validationId));
         validationInfo.setTag(tag);
         return validationInfo;
-    }
-
-    private MatchResult matchWindow(Region region, String tag,
-                                    ICheckSettingsInternal checkSettingsInternal, String source) {
-        MatchResult result;
-
-        result = matchWindowTask.matchWindow(
-                getUserInputs(), region, tag, shouldMatchWindowRunOnceOnTimeout,
-                checkSettingsInternal, source);
-
-        return result;
     }
 
     private String tryPostDomCapture(String domJson) {
@@ -1073,7 +1113,7 @@ public abstract class EyesBase implements IEyesBase {
         return null;
     }
 
-    private void ensureViewportSize() {
+    protected void ensureViewportSize() {
         if (isViewportSizeSet) {
             return;
         }
@@ -1111,7 +1151,9 @@ public abstract class EyesBase implements IEyesBase {
             domUrl = screenshot.domUrl;
         }
 
-        MatchWindowTask.collectRegions(this, screenshot, checkSettingsInternal, imageMatchSettings);
+        if (imageMatchSettings != null) {
+            MatchWindowTask.collectRegions(this, screenshot, checkSettingsInternal, imageMatchSettings);
+        }
         String title = getTitle();
         Location location = region == null ? null : region.getLocation();
         if (screenshot != null && screenshot.getOriginalLocation() != null) {

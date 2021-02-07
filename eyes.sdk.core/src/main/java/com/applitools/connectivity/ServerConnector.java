@@ -5,6 +5,7 @@ import com.applitools.connectivity.api.AsyncRequestCallback;
 import com.applitools.connectivity.api.HttpClient;
 import com.applitools.connectivity.api.Response;
 import com.applitools.eyes.*;
+import com.applitools.eyes.locators.BaseOcrRegion;
 import com.applitools.eyes.locators.TextRegion;
 import com.applitools.eyes.locators.TextRegionSettings;
 import com.applitools.eyes.locators.VisualLocatorsData;
@@ -438,6 +439,29 @@ public class ServerConnector extends UfgConnector {
         List<Integer> validStatusCodes = new ArrayList<>();
         validStatusCodes.add(HttpStatus.SC_OK);
         ResponseParsingCallback<Map<String, List<Region>>> callback = new ResponseParsingCallback<>(this, validStatusCodes, listener, new TypeReference<Map<String, List<Region>>>() {});
+        sendLongRequest(request, HttpMethod.POST, callback, postData, MediaType.APPLICATION_JSON);
+    }
+
+    public void postOcrRegions(TaskListener<List<String>> listener, BaseOcrRegion ocrRegion) {
+        String postData;
+        try {
+            postData = jsonMapper.writeValueAsString(ocrRegion);
+        } catch (IOException e) {
+            throw new EyesException("Failed serializing object to string", e);
+        }
+
+        AsyncRequest request = makeEyesRequest(new HttpRequestBuilder() {
+            @Override
+            public AsyncRequest build() {
+                return restClient.target(serverUrl).path(("/api/sessions/running/images/text"))
+                        .queryParam("apiKey", getApiKey())
+                        .asyncRequest(MediaType.APPLICATION_JSON);
+            }
+        });
+
+        List<Integer> validStatusCodes = new ArrayList<>();
+        validStatusCodes.add(HttpStatus.SC_OK);
+        ResponseParsingCallback<List<String>> callback = new ResponseParsingCallback<>(this, validStatusCodes, listener, new TypeReference<List<String>>() {});
         sendLongRequest(request, HttpMethod.POST, callback, postData, MediaType.APPLICATION_JSON);
     }
 

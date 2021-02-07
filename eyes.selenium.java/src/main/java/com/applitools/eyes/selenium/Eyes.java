@@ -1849,4 +1849,8 @@ public class Eyes implements IEyesBase {
     public Map<String, List<TextRegion>> extractTextRegions(TextRegionSettings textRegionSettings) {
         return seleniumEyes.extractTextRegions(textRegionSettings);
     }
+
+    public List<String> extractText(BaseOcrRegion... ocrRegions) {
+        return seleniumEyes.extractText(ocrRegions);
+    }
 }

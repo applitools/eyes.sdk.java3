@@ -395,6 +395,15 @@ public class EyesRemoteWebElement extends RemoteWebElement {
         return webElement.getText();
     }
 
+    public static String getInnerText(Logger logger, EyesSeleniumDriver driver, WebElement element) {
+        try {
+            return (String) driver.executeScript("return arguments[0].innerText", element);
+        } catch (Throwable t) {
+            GeneralUtils.logExceptionStackTrace(logger, Stage.GENERAL, t);
+            return null;
+        }
+    }
+
     @Override
     public String getCssValue(String propertyName) {
         return webElement.getCssValue(propertyName);

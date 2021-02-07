@@ -1,5 +1,7 @@
 package com.applitools.eyes.locators;
 
+import java.util.Objects;
+
 public class TextRegion {
     private int x;
     private int y;
@@ -55,5 +57,18 @@ public class TextRegion {
 
     public void setText(String text) {
         this.text = text;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        TextRegion region = (TextRegion) o;
+        return x == region.x && y == region.y && width == region.width && height == region.height && Objects.equals(text, region.text);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(x, y, width, height, text);
     }
 }

@@ -12,6 +12,7 @@ import com.applitools.eyes.events.ValidationResult;
 import com.applitools.eyes.exceptions.TestFailedException;
 import com.applitools.eyes.fluent.CheckSettings;
 import com.applitools.eyes.fluent.ICheckSettingsInternal;
+import com.applitools.eyes.locators.BaseOcrRegion;
 import com.applitools.eyes.logging.Stage;
 import com.applitools.eyes.logging.TraceLevel;
 import com.applitools.eyes.logging.Type;
@@ -822,5 +823,14 @@ public class Eyes extends EyesBase implements IConfiguration {
 
     public void setConfiguration(Configuration config) {
         this.config = new Configuration(config);
+    }
+
+    @Override
+    protected void getAppOutputForOcr(BaseOcrRegion ocrRegion) {
+        if (screenshot == null) {
+            return;
+        }
+        ImagesCheckSettings imagesCheckSettings = (ImagesCheckSettings) Target.image(screenshot.getImage());
+        checkImage_(RegionProvider.NULL_INSTANCE, screenshot.getImage(), "", imagesCheckSettings.ocrRegion(ocrRegion));
     }
 }

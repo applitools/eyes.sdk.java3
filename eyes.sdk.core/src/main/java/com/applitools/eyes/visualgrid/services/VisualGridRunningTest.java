@@ -7,6 +7,7 @@ import com.applitools.eyes.*;
 import com.applitools.eyes.capture.ScreenshotProvider;
 import com.applitools.eyes.config.Configuration;
 import com.applitools.eyes.fluent.ICheckSettingsInternal;
+import com.applitools.eyes.locators.BaseOcrRegion;
 import com.applitools.eyes.logging.Stage;
 import com.applitools.eyes.logging.TraceLevel;
 import com.applitools.eyes.visualgrid.model.*;
@@ -137,6 +138,9 @@ public class VisualGridRunningTest extends RunningTest {
     protected String getBaseAgentId() {
         return "eyes.selenium.visualgrid.java/" + ClassVersionGetter.CURRENT_VERSION;
     }
+
+    @Override
+    protected void getAppOutputForOcr(BaseOcrRegion ocrRegion) {}
 
     @Override
     protected ScreenshotProvider getScreenshotProvider() {

@@ -231,11 +231,8 @@ public class MatchWindowTask {
      * @param checkSettingsInternal  The settings to use.
      * @return Returns the results of the match
      */
-    public MatchResult matchWindow(Trigger[] userInputs,
-                                   Region region, String tag,
-                                   boolean shouldRunOnceOnTimeout,
-                                   ICheckSettingsInternal checkSettingsInternal,
-                                   String source) {
+    public MatchResult matchWindow(Trigger[] userInputs, Region region, String tag, boolean shouldRunOnceOnTimeout,
+                                   ICheckSettingsInternal checkSettingsInternal, String source) {
         ImageMatchSettings imageMatchSettings = createImageMatchSettings(checkSettingsInternal, this.eyes);
         int retryTimeout = checkSettingsInternal.getTimeout();
         if (retryTimeout < 0) {

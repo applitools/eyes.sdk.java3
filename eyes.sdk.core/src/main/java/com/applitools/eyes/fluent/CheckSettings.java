@@ -2,6 +2,7 @@ package com.applitools.eyes.fluent;
 
 import com.applitools.ICheckSettings;
 import com.applitools.eyes.*;
+import com.applitools.eyes.locators.BaseOcrRegion;
 import com.applitools.eyes.visualgrid.model.VisualGridOption;
 import com.applitools.eyes.visualgrid.model.VisualGridSelector;
 import com.fasterxml.jackson.annotation.JsonInclude;
@@ -31,6 +32,7 @@ public class CheckSettings implements ICheckSettings, ICheckSettingsInternal {
     protected Map<String, String> scriptHooks = new HashMap<>();
     protected Boolean ignoreDisplacements;
     private List<VisualGridOption> visualGridOptions = new ArrayList<>();
+    private BaseOcrRegion ocrRegion = null;
 
     protected CheckSettings() { }
 
@@ -457,6 +459,7 @@ public class CheckSettings implements ICheckSettings, ICheckSettingsInternal {
         clone.accessibilityRegions = this.accessibilityRegions;
         clone.useDom = (this.useDom);
         clone.visualGridOptions = this.visualGridOptions;
+        clone.ocrRegion = this.ocrRegion;
     }
 
     public void setStitchContent(boolean stitchContent) {
@@ -537,6 +540,17 @@ public class CheckSettings implements ICheckSettings, ICheckSettingsInternal {
     @Override
     public GetAccessibilityRegion[] getAccessibilityRegions() {
         return this.accessibilityRegions.toArray(new GetAccessibilityRegion[0]);
+    }
+
+    public ICheckSettings ocrRegion(BaseOcrRegion ocrRegion) {
+        CheckSettings clone = clone();
+        clone.ocrRegion = ocrRegion;
+        return clone;
+    }
+
+    @Override
+    public BaseOcrRegion getOcrRegion() {
+        return ocrRegion;
     }
 
     @Override
