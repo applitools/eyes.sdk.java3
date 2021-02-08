@@ -30,7 +30,7 @@ public abstract class BaseOcrRegion {
         return this;
     }
 
-    private BaseOcrRegion language(String language) {
+    public BaseOcrRegion language(String language) {
         this.language = language;
         return this;
     }
