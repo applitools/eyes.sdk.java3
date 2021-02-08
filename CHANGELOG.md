@@ -1,3 +1,7 @@
+## [vNext]
+### Added
+- Supporting OCR Feature. [Trello 2440](https://trello.com/c/FLGKnqIS)
+
 ## [3.192.0]
 ### Update
 - Cleanup cached data after check() execution. [Trello 1673](https://trello.com/c/CYbkzXia)

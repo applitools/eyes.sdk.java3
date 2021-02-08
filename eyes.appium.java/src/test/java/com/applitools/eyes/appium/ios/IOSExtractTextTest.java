@@ -18,7 +18,7 @@ public class IOSExtractTextTest extends IOSTestSetup {
     public void testIOSExtractText() {
         driver.manage().timeouts().implicitlyWait(5, TimeUnit.SECONDS);
 
-        eyes.open(driver, getApplicationName(), "Check element test");
+        eyes.open(driver, getApplicationName(), "Extract text test");
 
         WebElement showScrollView = driver.findElement(MobileBy.AccessibilityId("Scroll view"));
         List<String> textResult = eyes.extractText(new OcrRegion(showScrollView));

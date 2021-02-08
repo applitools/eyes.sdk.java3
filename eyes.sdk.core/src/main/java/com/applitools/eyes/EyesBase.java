@@ -1124,6 +1124,7 @@ public abstract class EyesBase implements IEyesBase {
                 viewportSize = getViewportSize();
                 setEffectiveViewportSize(viewportSize);
                 getConfigurationInstance().setViewportSize(viewportSize);
+                isViewportSizeSet = true;
             } catch (NullPointerException e) {
                 isViewportSizeSet = false;
             }
