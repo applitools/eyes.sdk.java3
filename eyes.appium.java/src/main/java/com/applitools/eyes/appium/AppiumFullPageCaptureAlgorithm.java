@@ -128,7 +128,9 @@ public class AppiumFullPageCaptureAlgorithm {
         // we modify the region by one pixel to make sure we don't accidentally get a pixel of the header above it
         Location newLoc = new Location(scrollViewRegion.getLeft(), scrollViewRegion.getTop() - scaleSafe(statusBarHeight) + 1);
         RectangleSize newSize = new RectangleSize(initialPartSize.getWidth(), scrollViewRegion.getHeight() - 1);
-        scrollViewRegion.setLocation(newLoc);
+        if (scrollRootElement == null) {
+            scrollViewRegion.setLocation(newLoc);
+        }
         scrollViewRegion.setSize(newSize);
 
         ((AppiumScrollPositionProvider) scrollProvider).setCutElement(cutElement);
@@ -154,7 +156,8 @@ public class AppiumFullPageCaptureAlgorithm {
             // here we make sure to say that the region we have scrolled to in the main screenshot
             // is also offset by 1, to match the change we made to the scrollViewRegion
             // We should set left = 0 because we need to a region from the start of viewport
-            currentPosition = new Location(currentPosition.getX(), currentPosition.getY() + 1 + stitchingAdjustment);
+            currentPosition = new Location(currentPosition.getX(), currentPosition.getY() + 1 + stitchingAdjustment
+                    + (scrollRootElement == null ? 0 : scaleSafe(statusBarHeight)));
 
             lastSuccessfulPartSize = captureAndStitchCurrentPart(regionToCrop);
         }
