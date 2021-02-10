@@ -322,7 +322,15 @@ public class MatchWindowTask {
 
         // If the wait to load time is 0, or "run once" is true,
         // we perform a single check window.
-        screenshot = tryTakeScreenshot(userInputs, region, tag, checkSettingsInternal, imageMatchSettings, source);
+        if (0 == retryTimeout || shouldMatchWindowRunOnceOnTimeout) {
+            if (shouldMatchWindowRunOnceOnTimeout) {
+                GeneralUtils.sleep(retryTimeout);
+            }
+            screenshot = tryTakeScreenshot(userInputs, region, tag, checkSettingsInternal, imageMatchSettings, source);
+        } else {
+            screenshot = retryTakingScreenshot(userInputs, region, tag, checkSettingsInternal, imageMatchSettings,
+                    retryTimeout, source);
+        }
         return screenshot;
     }
 
