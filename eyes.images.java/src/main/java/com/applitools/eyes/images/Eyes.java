@@ -48,12 +48,7 @@ public class Eyes extends EyesBase implements IConfiguration {
 
     @Override
     protected ScreenshotProvider getScreenshotProvider() {
-        return new ScreenshotProvider() {
-            @Override
-            public BufferedImage getViewPortScreenshot() {
-                return screenshot.getImage();
-            }
-        };
+        return null;
     }
 
     public String tryCaptureDom() {
@@ -331,10 +326,6 @@ public class Eyes extends EyesBase implements IConfiguration {
      */
     public void setInferredEnvironment(String inferred) {
         this.inferred = inferred;
-    }
-
-    public void setScreenshot(BufferedImage image) {
-        screenshot = new EyesImagesScreenshot(logger, image);
     }
 
     /**
@@ -827,10 +818,8 @@ public class Eyes extends EyesBase implements IConfiguration {
 
     @Override
     protected void getAppOutputForOcr(BaseOcrRegion ocrRegion) {
-        if (screenshot == null) {
-            return;
-        }
-        ImagesCheckSettings imagesCheckSettings = (ImagesCheckSettings) Target.image(screenshot.getImage());
-        checkImage_(RegionProvider.NULL_INSTANCE, screenshot.getImage(), "", imagesCheckSettings.ocrRegion(ocrRegion));
+        BufferedImage image = ((OcrRegion) ocrRegion).getImage();
+        ImagesCheckSettings imagesCheckSettings = (ImagesCheckSettings) Target.image(image);
+        checkImage_(RegionProvider.NULL_INSTANCE, image, "", imagesCheckSettings.ocrRegion(ocrRegion));
     }
 }

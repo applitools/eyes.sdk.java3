@@ -593,7 +593,7 @@ public abstract class EyesBase implements IEyesBase {
 
         List<String> result = new ArrayList<>();
         for (BaseOcrRegion ocrRegion : ocrRegions) {
-            logger.log(getTestId(), Stage.LOCATE, Pair.of("ocrRegion", ocrRegion));
+            logger.log(getTestId(), Stage.OCR, Pair.of("ocrRegion", ocrRegion));
             getAppOutputForOcr(ocrRegion);
             if (ocrRegion.getAppOutput() == null) {
                 return Collections.emptyList();
@@ -606,7 +606,7 @@ public abstract class EyesBase implements IEyesBase {
                 throw new EyesException("Failed posting image");
             }
 
-            logger.log(getTestId(), Stage.LOCATE, Pair.of("screenshotUrl", screenshotUrl));
+            logger.log(getTestId(), Stage.OCR, Pair.of("screenshotUrl", screenshotUrl));
             ocrRegion.getAppOutput().setScreenshotUrl(screenshotUrl);
 
             SyncTaskListener<List<String>> postListener = new SyncTaskListener<>(logger, "getText");
@@ -616,7 +616,7 @@ public abstract class EyesBase implements IEyesBase {
                 throw new EyesException("Failed posting ocr region");
             }
 
-            logger.log(testId, Stage.LOCATE, Pair.of("result", result));
+            logger.log(testId, Stage.OCR, Pair.of("result", result));
             if (serverResult.isEmpty()) {
                 result.add(null);
             } else {
@@ -631,8 +631,17 @@ public abstract class EyesBase implements IEyesBase {
 
     public Map<String, List<TextRegion>> extractTextRegions(TextRegionSettings textRegionSettings) {
         ArgumentGuard.notNull(textRegionSettings, "textRegionSettings");
-        BufferedImage viewPortScreenshot = getScreenshotProvider().getViewPortScreenshot();
-        logger.log(getTestId(), Stage.LOCATE,
+        ScreenshotProvider screenshotProvider = getScreenshotProvider();
+        BufferedImage viewPortScreenshot;
+        if (textRegionSettings.getImage() != null) {
+            viewPortScreenshot = textRegionSettings.getImage();
+        } else if (screenshotProvider != null) {
+            viewPortScreenshot = screenshotProvider.getViewPortScreenshot(Stage.OCR);
+        } else {
+            throw new IllegalArgumentException("No image for the text region settings");
+        }
+
+        logger.log(getTestId(), Stage.OCR,
                 Pair.of("textRegionSettings", textRegionSettings),
                 Pair.of("scaledImageSize", new RectangleSize(viewPortScreenshot.getWidth(), viewPortScreenshot.getHeight())));
         debugScreenshotsProvider.save(viewPortScreenshot, "text_regions_final");
@@ -644,7 +653,7 @@ public abstract class EyesBase implements IEyesBase {
             throw new EyesException("Failed posting viewport image");
         }
 
-        logger.log(getTestId(), Stage.LOCATE, Pair.of("screenshotUrl", viewportScreenshotUrl));
+        logger.log(getTestId(), Stage.OCR, Pair.of("screenshotUrl", viewportScreenshotUrl));
 
         String domUrl = null;
         if (shouldCaptureDom(null)) {
@@ -658,7 +667,7 @@ public abstract class EyesBase implements IEyesBase {
             throw new EyesException("Failed posting text regions");
         }
 
-        logger.log(testId, Stage.LOCATE, Pair.of("result", result));
+        logger.log(testId, Stage.OCR, Pair.of("result", result));
         return result;
     }
 
@@ -1113,7 +1122,7 @@ public abstract class EyesBase implements IEyesBase {
         return null;
     }
 
-    protected void ensureViewportSize() {
+    private void ensureViewportSize() {
         if (isViewportSizeSet) {
             return;
         }
@@ -1124,7 +1133,6 @@ public abstract class EyesBase implements IEyesBase {
                 viewportSize = getViewportSize();
                 setEffectiveViewportSize(viewportSize);
                 getConfigurationInstance().setViewportSize(viewportSize);
-                isViewportSizeSet = true;
             } catch (NullPointerException e) {
                 isViewportSizeSet = false;
             }

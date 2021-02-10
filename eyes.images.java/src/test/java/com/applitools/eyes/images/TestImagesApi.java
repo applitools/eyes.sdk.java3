@@ -11,6 +11,7 @@ import org.testng.annotations.BeforeClass;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
+import java.awt.image.BufferedImage;
 import java.lang.reflect.Method;
 import java.util.List;
 import java.util.Map;
@@ -77,12 +78,12 @@ public class TestImagesApi extends ReportingTestSuite {
 
     @Test
     public void TestExtractText() {
-        eyes.setScreenshot(ImageUtils.imageFromFile("resources/extractText.png"));
-        List<String> result = eyes.extractText(new OcrRegion());
+        BufferedImage image = ImageUtils.imageFromFile("resources/extractText.png");
+        List<String> result = eyes.extractText(new OcrRegion(image));
         Assert.assertEquals(result.size(), 1);
         Assert.assertEquals(result.get(0), "This is the navigation bar");
 
-        Map<String, List<TextRegion>> textRegions = eyes.extractTextRegions(new TextRegionSettings(".+"));
+        Map<String, List<TextRegion>> textRegions = eyes.extractTextRegions(new TextRegionSettings(".+").image(image));
         Assert.assertEquals(textRegions.size(), 1);
         List<TextRegion> regions = textRegions.get(".+");
         Assert.assertEquals(regions.size(), 1);

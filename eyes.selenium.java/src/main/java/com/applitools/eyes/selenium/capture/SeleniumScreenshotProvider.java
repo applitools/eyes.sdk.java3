@@ -28,7 +28,7 @@ public class SeleniumScreenshotProvider implements ScreenshotProvider {
     }
 
     @Override
-    public BufferedImage getViewPortScreenshot() {
+    public BufferedImage getViewPortScreenshot(Stage stage) {
         String uaString = driver.getUserAgent();
         UserAgent userAgent = null;
         if (uaString != null) {
@@ -37,11 +37,11 @@ public class SeleniumScreenshotProvider implements ScreenshotProvider {
         UserAgent.parseUserAgentString(uaString, true);
         ImageProvider provider = ImageProviderFactory.getImageProvider(userAgent, eyes, logger, driver);
         BufferedImage image = provider.getImage();
-        logger.log(eyes.getTestId(), Stage.LOCATE, Pair.of("imageSize", new RectangleSize(image.getWidth(), image.getHeight())));
+        logger.log(eyes.getTestId(), stage, Pair.of("imageSize", new RectangleSize(image.getWidth(), image.getHeight())));
         debugScreenshotsProvider.save(image, "initial");
         if (eyes.getIsCutProviderExplicitlySet()) {
             image = eyes.getCutProvider().cut(image);
-            logger.log(eyes.getTestId(), Stage.LOCATE, Pair.of("croppedImageSize", new RectangleSize(image.getWidth(), image.getHeight())));
+            logger.log(eyes.getTestId(), stage, Pair.of("croppedImageSize", new RectangleSize(image.getWidth(), image.getHeight())));
             debugScreenshotsProvider.save(image, "cut");
         }
 
@@ -50,7 +50,7 @@ public class SeleniumScreenshotProvider implements ScreenshotProvider {
             scaleRatio = eyes.getScaleProvider().getScaleRatio();
         }
 
-        logger.log(eyes.getTestId(), Stage.LOCATE, Pair.of("scaleRatio", scaleRatio));
+        logger.log(eyes.getTestId(), stage, Pair.of("scaleRatio", scaleRatio));
         return ImageUtils.scaleImage(image, scaleRatio);
     }
 }

@@ -666,11 +666,6 @@ public class SeleniumEyes extends RunningTest implements ISeleniumEyes {
             ArgumentGuard.notNull(checkSettings, "checkSettings");
             ArgumentGuard.notOfType(checkSettings, ISeleniumCheckTarget.class, "checkSettings");
             boolean isMobileDevice = EyesDriverUtils.isMobileDevice(driver);
-            if (!isMobileDevice) {
-                ensureViewportSize();
-            }
-
-
             String source = null;
             if (!isMobileDevice) {
                 source = driver.getCurrentUrl();
@@ -705,6 +700,11 @@ public class SeleniumEyes extends RunningTest implements ISeleniumEyes {
             pageState.preparePage(seleniumCheckTarget, getConfigurationInstance(), scrollRootElement);
 
             FrameChain frameChainAfterSwitchToTarget = driver.getFrameChain().clone();
+
+            if (this.effectiveViewport == null) {
+                RectangleSize viewportSize = getViewportSize();
+                setEffectiveViewportSize(viewportSize);
+            }
 
             RectangleSize viewportSize = this.effectiveViewport.getSize();
             Region effectiveViewport = computeEffectiveViewport(frameChainAfterSwitchToTarget, viewportSize);
@@ -1769,14 +1769,14 @@ public class SeleniumEyes extends RunningTest implements ISeleniumEyes {
                 WebElement element = driver.findElement(seleniumOcrRegion.getSelector());
                 ocrRegion.hint(EyesRemoteWebElement.getInnerText(logger, driver, element));
             } catch (Throwable t) {
-                GeneralUtils.logExceptionStackTrace(logger, Stage.LOCATE, t);
+                GeneralUtils.logExceptionStackTrace(logger, Stage.OCR, t);
             }
 
             checkSettings = Target.region(seleniumOcrRegion.getSelector()).fully();
         }
 
         if (checkSettings == null) {
-            throw new IllegalStateException("Got uninitialized ocr region");
+            throw new IllegalArgumentException("Got uninitialized ocr region");
         }
 
         check(checkSettings.ocrRegion(ocrRegion));

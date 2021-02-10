@@ -2,6 +2,7 @@ package com.applitools.eyes.appium.capture;
 
 import com.applitools.eyes.appium.EyesAppiumDriver;
 import com.applitools.eyes.capture.ScreenshotProvider;
+import com.applitools.eyes.logging.Stage;
 import com.applitools.utils.ImageUtils;
 import org.openqa.selenium.OutputType;
 
@@ -18,7 +19,7 @@ public class MobileScreenshotProvider implements ScreenshotProvider {
     }
 
     @Override
-    public BufferedImage getViewPortScreenshot() {
+    public BufferedImage getViewPortScreenshot(Stage stage) {
         String base64Image = driver.getScreenshotAs(OutputType.BASE64);
         BufferedImage image = ImageUtils.imageFromBase64(base64Image);
         return ImageUtils.scaleImage(image, 1 / devicePixelRatio, true);

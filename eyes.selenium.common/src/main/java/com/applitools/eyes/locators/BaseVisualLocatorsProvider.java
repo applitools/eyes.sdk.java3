@@ -37,7 +37,7 @@ public class BaseVisualLocatorsProvider implements VisualLocatorsProvider {
     @Override
     public Map<String, List<Region>> getLocators(VisualLocatorSettings visualLocatorSettings) {
         ArgumentGuard.notNull(visualLocatorSettings, "visualLocatorSettings");
-        BufferedImage viewPortScreenshot = screenshotProvider.getViewPortScreenshot();
+        BufferedImage viewPortScreenshot = screenshotProvider.getViewPortScreenshot(Stage.LOCATE);
         logger.log(testId, Stage.LOCATE,
                 Pair.of("locatorNames", visualLocatorSettings.getNames()),
                 Pair.of("devicePixelRatio", devicePixelRatio),
