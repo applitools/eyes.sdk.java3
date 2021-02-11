@@ -1,6 +1,7 @@
 package com.applitools.eyes.locators;
 
 import com.applitools.eyes.AppOutput;
+import com.applitools.eyes.Region;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -17,6 +18,7 @@ public abstract class BaseOcrRegion {
     private String hint = null;
     private Float minMatch;
     private String language;
+    private Region region = null;
 
     public BaseOcrRegion hint(String hint) {
         if (hint == null || !hint.isEmpty()) {
@@ -32,6 +34,11 @@ public abstract class BaseOcrRegion {
 
     public BaseOcrRegion language(String language) {
         this.language = language;
+        return this;
+    }
+
+    public BaseOcrRegion region(Region region) {
+        this.region = region;
         return this;
     }
 
@@ -51,6 +58,10 @@ public abstract class BaseOcrRegion {
         return appOutput;
     }
 
+    public Region getRegion() {
+        return region;
+    }
+
     public void setAppOutput(AppOutput appOutput) {
         this.appOutput = appOutput;
     }
@@ -61,12 +72,17 @@ public abstract class BaseOcrRegion {
             return null;
         }
 
+        Region regionToSend = this.region != null ? region : new Region(
+                0,
+                0,
+                appOutput.getScreenshot().getImage().getWidth(),
+                appOutput.getScreenshot().getImage().getHeight());
         List<Map<String, Object>> regions = new ArrayList<>();
         Map<String, Object> props = new HashMap<>();
-        props.put("left", 0);
-        props.put("top", 0);
-        props.put("width", appOutput.getScreenshot().getImage().getWidth());
-        props.put("height", appOutput.getScreenshot().getImage().getHeight());
+        props.put("left", regionToSend.getLeft());
+        props.put("top", regionToSend.getTop());
+        props.put("width", regionToSend.getWidth());
+        props.put("height", regionToSend.getHeight());
         if (hint != null) {
             props.put("expected", hint);
         }
