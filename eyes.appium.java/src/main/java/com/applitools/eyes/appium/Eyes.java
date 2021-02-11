@@ -37,6 +37,7 @@ import com.applitools.eyes.selenium.regionVisibility.NopRegionVisibilityStrategy
 import com.applitools.eyes.selenium.regionVisibility.RegionVisibilityStrategy;
 import com.applitools.utils.*;
 import io.appium.java_client.AppiumDriver;
+import io.appium.java_client.MobileBy;
 import org.apache.commons.lang3.tuple.Pair;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.*;
