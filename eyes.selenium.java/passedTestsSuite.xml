@@ -74,7 +74,6 @@
             <class name="com.applitools.eyes.selenium.TestAcme">
                 <methods>
                     <include name="TestAcmeLogin"/>
-                    <include name="TestCodedRegions"/>
                 </methods>
             </class>
         </classes>

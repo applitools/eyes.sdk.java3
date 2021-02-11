@@ -182,7 +182,7 @@ public class TestRenderings extends ReportingTestSuite {
         eyes.setConfiguration(config);
 
         WebDriver driver = SeleniumUtils.createChromeDriver();
-        driver.get("https://demo.applitools.com");
+        driver.get("https://applitools.github.io/demo/TestPages/FramesTestPage/");
         try {
             eyes.open(driver);
             eyes.check(Target.window());

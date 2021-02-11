@@ -599,6 +599,8 @@ public abstract class EyesBase implements IEyesBase {
                 return Collections.emptyList();
             }
 
+            debugScreenshotsProvider.save(ocrRegion.getAppOutput().getScreenshot().getImage(), "ocr_regions");
+
             SyncTaskListener<String> listener = new SyncTaskListener<>(logger, "getTextRegions");
             serverConnector.uploadImage(listener, ocrRegion.getAppOutput().getScreenshotBytes());
             String screenshotUrl = listener.get();
