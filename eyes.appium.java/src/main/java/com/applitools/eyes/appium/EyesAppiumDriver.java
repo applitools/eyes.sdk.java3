@@ -2,7 +2,9 @@ package com.applitools.eyes.appium;
 
 import com.applitools.eyes.EyesException;
 import com.applitools.eyes.Logger;
+import com.applitools.eyes.MobileDeviceInfo;
 import com.applitools.eyes.RectangleSize;
+import com.applitools.eyes.config.Feature;
 import com.applitools.eyes.logging.Stage;
 import com.applitools.eyes.logging.TraceLevel;
 import com.applitools.eyes.selenium.EyesDriverUtils;
@@ -63,8 +65,12 @@ public class EyesAppiumDriver extends EyesWebDriver {
     public HashMap<String, Integer> getViewportRect() {
         Map<String, Long> rectMap = (Map<String, Long>) getCachedSessionDetails().get("viewportRect");
         int width = rectMap.get("width").intValue();
-        int height = ensureViewportHeight(rectMap.get("height").intValue());
-
+        int height = rectMap.get("height").intValue();
+        if (getEyesBase().getConfiguration().isFeatureActivated(Feature.USE_PREDEFINED_DEVICE_INFO)) {
+            height = getDeviceViewportHeight();
+        } else {
+            height = ensureViewportHeight(height);
+        }
         HashMap<String, Integer> intRectMap = new HashMap<>();
         intRectMap.put("width", width);
         intRectMap.put("height", height);
@@ -116,15 +122,6 @@ public class EyesAppiumDriver extends EyesWebDriver {
         return systemBarsHeights;
     }
 
-    public int getStatusBarHeight() {
-        Object statusBarHeight = getCachedSessionDetails().get("statBarHeight");
-        if (statusBarHeight instanceof Double) {
-            return ((Double) statusBarHeight).intValue();
-        } else {
-            return ((Long) statusBarHeight).intValue();
-        }
-    }
-
     @Override
     protected double getDevicePixelRatioInner() {
         Object pixelRatio = getCachedSessionDetails().get("pixelRatio");
@@ -132,6 +129,44 @@ public class EyesAppiumDriver extends EyesWebDriver {
             return (Double) pixelRatio;
         } else {
             return ((Long) pixelRatio).doubleValue();
+        }
+    }
+
+    public int getDeviceViewportHeight() {
+        if (getEyesBase().getConfiguration().isFeatureActivated(Feature.USE_PREDEFINED_DEVICE_INFO)) {
+            Map<String, MobileDeviceInfo> mobileDevicesInfo = getEyesBase().getMobileDeviceInfo();
+            String deviceName = getEyesBase().getConfiguration().getDeviceInfo();
+            deviceName = deviceName == null ? EyesDriverUtils.getMobileDeviceName(this) : deviceName;
+            for (MobileDeviceInfo mobileDeviceInfo : mobileDevicesInfo.values()) {
+                for (String name : mobileDeviceInfo.getAliases()) {
+                    if (deviceName.equalsIgnoreCase(name)) {
+                        return mobileDeviceInfo.getViewportRect().getHeight();
+                    }
+                }
+            }
+        }
+        Map<String, Long> rectMap = (Map<String, Long>) getCachedSessionDetails().get("viewportRect");
+        return ensureViewportHeight(rectMap.get("height").intValue());
+    }
+
+    public int getStatusBarHeight() {
+        if (getEyesBase().getConfiguration().isFeatureActivated(Feature.USE_PREDEFINED_DEVICE_INFO)) {
+            Map<String, MobileDeviceInfo> mobileDevicesInfo = getEyesBase().getMobileDeviceInfo();
+            String deviceName = getEyesBase().getConfiguration().getDeviceInfo();
+            deviceName = deviceName == null ? EyesDriverUtils.getMobileDeviceName(this) : deviceName;
+            for (MobileDeviceInfo mobileDeviceInfo : mobileDevicesInfo.values()) {
+                for (String name : mobileDeviceInfo.getAliases()) {
+                    if (deviceName.equalsIgnoreCase(name)) {
+                        return mobileDeviceInfo.getViewportRect().getTop();
+                    }
+                }
+            }
+        }
+        Object statusBarHeight = getCachedSessionDetails().get("statBarHeight");
+        if (statusBarHeight instanceof Double) {
+            return ((Double) statusBarHeight).intValue();
+        } else {
+            return ((Long) statusBarHeight).intValue();
         }
     }
 

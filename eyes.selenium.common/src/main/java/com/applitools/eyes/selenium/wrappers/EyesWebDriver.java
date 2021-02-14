@@ -25,6 +25,10 @@ public abstract class EyesWebDriver implements WebDriver, JavascriptExecutor, Ta
     public abstract WebElement findElement(By by);
     public abstract List<WebElement> findElements(By by);
 
+    protected EyesBase getEyesBase() {
+        return eyesBase;
+    }
+
     public double getDevicePixelRatio() {
         if (eyesBase.getConfiguration().isFeatureActivated(Feature.USE_PREDEFINED_DEVICE_INFO)) {
             Map<String, MobileDeviceInfo> mobileDevicesInfo = eyesBase.getMobileDeviceInfo();
