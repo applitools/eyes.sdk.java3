@@ -1,3 +1,7 @@
+## [vNext]
+### Added
+- Users can now use a separated proxy for networks requests which aren't sent to Applitools servers. [Trello 2449](https://trello.com/c/xVScV0PP) 
+
 ## [3.193.1]
 ### Added
 -  The `USE_PREDEFINED_DEVICE_INFO` feature now use viewport height and status bar height from server. [Trello 2307](https://trello.com/c/8VCtSmfN)

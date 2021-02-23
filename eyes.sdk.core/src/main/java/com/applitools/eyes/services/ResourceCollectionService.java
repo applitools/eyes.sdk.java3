@@ -1,10 +1,8 @@
 package com.applitools.eyes.services;
 
 import com.applitools.connectivity.ServerConnector;
-import com.applitools.eyes.EyesException;
-import com.applitools.eyes.Logger;
-import com.applitools.eyes.SyncTaskListener;
-import com.applitools.eyes.TaskListener;
+import com.applitools.connectivity.UfgConnector;
+import com.applitools.eyes.*;
 import com.applitools.eyes.logging.Stage;
 import com.applitools.eyes.logging.TraceLevel;
 import com.applitools.eyes.logging.Type;
@@ -25,15 +23,32 @@ public class ResourceCollectionService extends EyesService<FrameData, Map<String
     protected final List<Pair<String, Pair<RGridDom, Map<String, RGridResource>>>> waitingForUploadQueue =
             Collections.synchronizedList(new ArrayList<Pair<String, Pair<RGridDom, Map<String, RGridResource>>>>());
 
+    private final UfgConnector resourcesConnector;
+    private boolean isAutProxySet = false;
+
     public ResourceCollectionService(Logger logger, ServerConnector serverConnector, IDebugResourceWriter debugResourceWriter,
                                      Map<String, RGridResource> resourcesCacheMap) {
         super(logger, serverConnector);
         this.debugResourceWriter = debugResourceWriter != null ? debugResourceWriter : new NullDebugResourceWriter();
         this.resourcesCacheMap = resourcesCacheMap;
+        this.resourcesConnector = new UfgConnector();
     }
 
     public void setDebugResourceWriter(IDebugResourceWriter debugResourceWriter) {
         this.debugResourceWriter = debugResourceWriter != null ? debugResourceWriter : new NullDebugResourceWriter();
+    }
+
+    public void setAutProxy(AbstractProxySettings proxySettings) {
+        if (!isAutProxySet) {
+            isAutProxySet = true;
+            if (proxySettings != null) {
+                resourcesConnector.setProxy(proxySettings);
+            }
+        }
+    }
+
+    public AbstractProxySettings getAutProxy() {
+        return resourcesConnector.getProxy();
     }
 
     @Override
@@ -43,7 +58,7 @@ public class ResourceCollectionService extends EyesService<FrameData, Map<String
             final FrameData frameData = nextInput.getRight();
 
             try {
-                DomAnalyzer domAnalyzer = new DomAnalyzer(logger, serverConnector, debugResourceWriter, frameData,
+                DomAnalyzer domAnalyzer = new DomAnalyzer(logger, resourcesConnector, debugResourceWriter, frameData,
                         resourcesCacheMap, new TaskListener<Map<String, RGridResource>>() {
                     @Override
                     public void onComplete(final Map<String, RGridResource> resourceMap) {

@@ -469,6 +469,7 @@
                     <include name="testConcurrencyAmount"/>
                     <include name="testConcurrencyLogMessage"/>
                     <include name="testParallelStepsLimitOfTest"/>
+                    <include name="testRunnerProxy"/>
                 </methods>
             </class>
         </classes>

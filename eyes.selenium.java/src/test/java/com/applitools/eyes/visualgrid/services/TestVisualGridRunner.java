@@ -16,6 +16,7 @@ import org.mockito.ArgumentMatchers;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.remote.RemoteWebDriver;
 import org.testng.Assert;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
@@ -292,5 +293,66 @@ public class TestVisualGridRunner {
         }
 
         Assert.assertTrue(isOnlyOneRender.get());
+    }
+
+    @Test
+    public void testRunnerProxy() {
+        RemoteWebDriver driver = mock(RemoteWebDriver.class);
+        when(driver.executeScript(ArgumentMatchers.<String>any())).thenReturn("800;800");
+
+        AbstractProxySettings p1 = new ProxySettings("1");
+        AbstractProxySettings p2 = new ProxySettings("2");
+
+        VisualGridRunner visualGridRunner = new VisualGridRunner(new RunnerOptions());
+        Assert.assertNull(visualGridRunner.getProxy());
+        Assert.assertNull(visualGridRunner.eyesServiceRunner.getAutProxy());
+
+        visualGridRunner = new VisualGridRunner(new RunnerOptions().proxy(p1));
+        Assert.assertEquals(visualGridRunner.getProxy(), p1);
+        Assert.assertEquals(visualGridRunner.eyesServiceRunner.getAutProxy(), p1);
+
+        visualGridRunner = new VisualGridRunner(new RunnerOptions().autProxy(p1));
+        Assert.assertNull(visualGridRunner.getProxy());
+        Assert.assertEquals(visualGridRunner.eyesServiceRunner.getAutProxy(), p1);
+
+        visualGridRunner = new VisualGridRunner(new RunnerOptions().proxy(p1).autProxy(p2));
+        Assert.assertEquals(visualGridRunner.getProxy(), p1);
+        Assert.assertEquals(visualGridRunner.eyesServiceRunner.getAutProxy(), p2);
+
+        visualGridRunner = new VisualGridRunner(new RunnerOptions().autProxy(p2).proxy(p1));
+        Assert.assertEquals(visualGridRunner.getProxy(), p1);
+        Assert.assertEquals(visualGridRunner.eyesServiceRunner.getAutProxy(), p2);
+
+        visualGridRunner = new VisualGridRunner(new RunnerOptions().proxy(p1).autProxy(null));
+        Assert.assertEquals(visualGridRunner.getProxy(), p1);
+        Assert.assertNull(visualGridRunner.eyesServiceRunner.getAutProxy());
+
+        visualGridRunner = new VisualGridRunner(new RunnerOptions().proxy(null).autProxy(p1));
+        Assert.assertNull(visualGridRunner.getProxy());
+        Assert.assertEquals(visualGridRunner.eyesServiceRunner.getAutProxy(), p1);
+
+        visualGridRunner = new VisualGridRunner(new RunnerOptions());
+        Eyes eyes = new Eyes(visualGridRunner);
+        eyes.setServerConnector(new MockServerConnector());
+        eyes.setProxy(p1);
+        eyes.open(driver, "app", "test");
+        Assert.assertEquals(visualGridRunner.getProxy(), p1);
+        Assert.assertEquals(visualGridRunner.eyesServiceRunner.getAutProxy(), p1);
+
+        visualGridRunner = new VisualGridRunner(new RunnerOptions().autProxy(p2));
+        eyes = new Eyes(visualGridRunner);
+        eyes.setServerConnector(new MockServerConnector());
+        eyes.setProxy(p1);
+        eyes.open(driver, "app", "test");
+        Assert.assertEquals(visualGridRunner.getProxy(), p1);
+        Assert.assertEquals(visualGridRunner.eyesServiceRunner.getAutProxy(), p2);
+
+        visualGridRunner = new VisualGridRunner(new RunnerOptions().autProxy(null));
+        eyes = new Eyes(visualGridRunner);
+        eyes.setServerConnector(new MockServerConnector());
+        eyes.setProxy(p1);
+        eyes.open(driver, "app", "test");
+        Assert.assertEquals(visualGridRunner.getProxy(), p1);
+        Assert.assertNull(visualGridRunner.eyesServiceRunner.getAutProxy());
     }
 }

@@ -9,6 +9,7 @@ import com.applitools.eyes.visualgrid.model.FrameData;
 import com.applitools.eyes.visualgrid.model.IDebugResourceWriter;
 import com.applitools.eyes.visualgrid.model.RGridResource;
 import com.applitools.eyes.visualgrid.model.RenderingInfo;
+import com.applitools.utils.ArgumentGuard;
 import com.applitools.utils.GeneralUtils;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -40,7 +41,7 @@ public class VisualGridRunner extends EyesRunner {
     private static final int CONCURRENCY_FACTOR = 5;
     static final int DEFAULT_CONCURRENCY = 5;
 
-    private EyesServiceRunner eyesServiceRunner;
+    EyesServiceRunner eyesServiceRunner;
     final TestConcurrency testConcurrency;
     private boolean wasConcurrencyLogSent = false;
     final Set<IEyes> allEyes = Collections.synchronizedSet(new HashSet<IEyes>());
@@ -75,12 +76,20 @@ public class VisualGridRunner extends EyesRunner {
     }
 
     public VisualGridRunner(RunnerOptions runnerOptions, String suiteName) {
+        ArgumentGuard.notNull(runnerOptions, "runnerOptions");
         int testConcurrency = runnerOptions.getTestConcurrency() == null ? DEFAULT_CONCURRENCY : runnerOptions.getTestConcurrency();
         this.testConcurrency = new TestConcurrency(testConcurrency, false);
         setApiKey(runnerOptions.getApiKey());
         setServerUrl(runnerOptions.getServerUrl());
-        setProxy(runnerOptions.getProxy());
         init(suiteName);
+        if (runnerOptions.isAutProxySet()) {
+            eyesServiceRunner.setAutProxy(runnerOptions.getAutProxy());
+        } else {
+            if (runnerOptions.getProxy() != null) {
+                eyesServiceRunner.setAutProxy(runnerOptions.getProxy());
+            }
+        }
+        setProxy(runnerOptions.getProxy());
     }
 
     private void init(String suiteName) {
@@ -183,6 +192,13 @@ public class VisualGridRunner extends EyesRunner {
     public void setServerConnector(ServerConnector serverConnector) {
         super.setServerConnector(serverConnector);
         eyesServiceRunner.setServerConnector(serverConnector);
+    }
+
+    public void setProxy(AbstractProxySettings proxySettings) {
+        super.setProxy(proxySettings);
+        if (proxySettings != null) {
+            eyesServiceRunner.setAutProxy(proxySettings);
+        }
     }
 
     public String getConcurrencyLog() throws JsonProcessingException {
