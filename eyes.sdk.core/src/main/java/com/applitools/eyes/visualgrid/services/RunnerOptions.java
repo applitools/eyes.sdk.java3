@@ -48,6 +48,11 @@ public class RunnerOptions {
         return proxy;
     }
 
+    /**
+     * Setting a separated proxy for requests made to non-eyes domains.
+     * If the AUT proxy is set, it cannot be changed again for those specific requests by any means.
+     * If AUT proxy is set to null, there will be no proxy for those specific requests.
+     */
     public RunnerOptions autProxy(AbstractProxySettings autProxy) {
         isAutProxySet = true;
         this.autProxy = autProxy;
