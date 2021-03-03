@@ -55,10 +55,10 @@ public class DomCapture {
         testId = eyes.getTestId();
 
         try {
-            CAPTURE_DOM = GeneralUtils.readToEnd(DomCapture.class.getResourceAsStream("/dom-capture/dist/captureDomAndPoll.js"));
-            CAPTURE_DOM_FOR_IE = GeneralUtils.readToEnd(DomCapture.class.getResourceAsStream("/dom-capture/dist/captureDomAndPollForIE.js"));
-            POLL_RESULT = GeneralUtils.readToEnd(VisualGridEyes.class.getResourceAsStream("/dom-capture/dist/pollResult.js"));
-            POLL_RESULT_FOR_IE = GeneralUtils.readToEnd(VisualGridEyes.class.getResourceAsStream("/dom-capture/dist/pollResultForIE.js"));
+            CAPTURE_DOM = GeneralUtils.readInputStreamAsString(DomCapture.class.getResourceAsStream("/dom-capture/dist/captureDomAndPoll.js"));
+            CAPTURE_DOM_FOR_IE = GeneralUtils.readInputStreamAsString(DomCapture.class.getResourceAsStream("/dom-capture/dist/captureDomAndPollForIE.js"));
+            POLL_RESULT = GeneralUtils.readInputStreamAsString(VisualGridEyes.class.getResourceAsStream("/dom-capture/dist/pollResult.js"));
+            POLL_RESULT_FOR_IE = GeneralUtils.readInputStreamAsString(VisualGridEyes.class.getResourceAsStream("/dom-capture/dist/pollResultForIE.js"));
         } catch (IOException e) {
             throw new EyesException("Failed getting resources for dom scripts", e);
         }

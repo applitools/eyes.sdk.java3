@@ -20,8 +20,6 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.*;
 
-import static org.mockito.Mockito.*;
-
 public class TestRenderSerialization {
 
     @Test
@@ -51,7 +49,7 @@ public class TestRenderSerialization {
         ObjectMapper mapper = new ObjectMapper();
         ObjectNode actual = (ObjectNode) mapper.readTree(mapper.writeValueAsString(request));
         actual.remove("agentId");
-        ObjectNode expected = (ObjectNode) mapper.readTree(GeneralUtils.readToEnd(TestDomCapture.class.getResourceAsStream("/renderRequest.json")));
+        ObjectNode expected = (ObjectNode) mapper.readTree(GeneralUtils.readInputStreamAsString(TestDomCapture.class.getResourceAsStream("/renderRequest.json")));
         Assert.assertEquals(actual, expected);
     }
 

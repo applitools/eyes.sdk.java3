@@ -92,10 +92,10 @@ public class VisualGridEyes implements ISeleniumEyes {
         this.logger = renderingGridManager.getLogger();
 
         try {
-            PROCESS_PAGE = GeneralUtils.readToEnd(VisualGridEyes.class.getResourceAsStream("/dom-snapshot/dist/processPagePoll.js"));
-            PROCESS_PAGE_FOR_IE = GeneralUtils.readToEnd(VisualGridEyes.class.getResourceAsStream("/dom-snapshot/dist/processPagePollForIE.js"));
-            POLL_RESULT = GeneralUtils.readToEnd(VisualGridEyes.class.getResourceAsStream("/dom-snapshot/dist/pollResult.js"));
-            POLL_RESULT_FOR_IE = GeneralUtils.readToEnd(VisualGridEyes.class.getResourceAsStream("/dom-snapshot/dist/pollResultForIE.js"));
+            PROCESS_PAGE = GeneralUtils.readInputStreamAsString(VisualGridEyes.class.getResourceAsStream("/dom-snapshot/dist/processPagePoll.js"));
+            PROCESS_PAGE_FOR_IE = GeneralUtils.readInputStreamAsString(VisualGridEyes.class.getResourceAsStream("/dom-snapshot/dist/processPagePollForIE.js"));
+            POLL_RESULT = GeneralUtils.readInputStreamAsString(VisualGridEyes.class.getResourceAsStream("/dom-snapshot/dist/pollResult.js"));
+            POLL_RESULT_FOR_IE = GeneralUtils.readInputStreamAsString(VisualGridEyes.class.getResourceAsStream("/dom-snapshot/dist/pollResultForIE.js"));
         } catch (IOException e) {
             throw new EyesException("Failed getting resources for dom scripts", e);
         }

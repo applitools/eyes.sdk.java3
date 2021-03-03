@@ -73,7 +73,7 @@ public class TestRenderingTask extends ReportingTestSuite {
 
         // Get a json of uris simulating the real resource uris structure
         File file = new File(Objects.requireNonNull(getClass().getClassLoader().getResource("resource_urls.json")).getFile());
-        String jsonString = GeneralUtils.readToEnd(new FileInputStream(file));
+        String jsonString = GeneralUtils.readInputStreamAsString(new FileInputStream(file));
         ObjectMapper jsonMapper = new ObjectMapper();
         final Map<String, Map> urls = jsonMapper.readValue(jsonString, Map.class);
 

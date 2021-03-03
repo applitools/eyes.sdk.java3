@@ -76,7 +76,7 @@ public class EyesDriverUtils {
 
     static {
         try {
-            JS_GET_VISIBLE_ELEMENT_RECT = GeneralUtils.readToEnd(EyesDriverUtils.class.getResourceAsStream("/getVisibleRect.js"));
+            JS_GET_VISIBLE_ELEMENT_RECT = GeneralUtils.readInputStreamAsString(EyesDriverUtils.class.getResourceAsStream("/getVisibleRect.js"));
         } catch (IOException e) {
             e.printStackTrace();
         }

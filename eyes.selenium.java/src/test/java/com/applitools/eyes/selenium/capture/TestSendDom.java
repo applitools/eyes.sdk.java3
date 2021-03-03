@@ -134,7 +134,7 @@ public final class TestSendDom extends ReportingTestSuite {
             Assert.assertTrue(hasDom);
             ObjectMapper mapper = new ObjectMapper();
             try {
-                String expectedDomJson = GeneralUtils.readToEnd(TestSendDom.class.getResourceAsStream("/expected_dom1.json"));
+                String expectedDomJson = GeneralUtils.readInputStreamAsString(TestSendDom.class.getResourceAsStream("/expected_dom1.json"));
                 JsonNode actual = mapper.readTree(actualDomJsonString);
                 JsonNode expected = mapper.readTree(expectedDomJson);
                 if (actual == null) {
@@ -225,7 +225,7 @@ public final class TestSendDom extends ReportingTestSuite {
 
             ObjectMapper objectMapper = new ObjectMapper();
             JsonNode actual = objectMapper.readTree(dom);
-            String expectedDomJson = GeneralUtils.readToEnd(TestSendDom.class.getResourceAsStream("/dom_cors_css.json"));
+            String expectedDomJson = GeneralUtils.readInputStreamAsString(TestSendDom.class.getResourceAsStream("/dom_cors_css.json"));
             JsonNode expected = objectMapper.readTree(expectedDomJson);
             Assert.assertTrue(actual.equals(new DiffPrintingNotARealComparator(), expected));
         } finally {

@@ -16,7 +16,6 @@ import org.testng.annotations.Test;
 import java.io.IOException;
 import java.util.Calendar;
 import java.util.TimeZone;
-import java.util.UUID;
 
 public class TestSessionStartInfo extends ReportingTestSuite {
 
@@ -60,7 +59,7 @@ public class TestSessionStartInfo extends ReportingTestSuite {
         mapper.configure(SerializationFeature.INDENT_OUTPUT, true);
         try {
             String targetJsonObj = mapper.writeValueAsString(sessionStartInfo);
-            String sourceJsonAsString = GeneralUtils.readToEnd(TestDomCapture.class.getResourceAsStream("/sessionStartInfo.json"));
+            String sourceJsonAsString = GeneralUtils.readInputStreamAsString(TestDomCapture.class.getResourceAsStream("/sessionStartInfo.json"));
             Assert.assertEquals(targetJsonObj, sourceJsonAsString, "JSON strings are different.");
         } catch (IOException e) {
             e.printStackTrace();
@@ -96,7 +95,7 @@ public class TestSessionStartInfo extends ReportingTestSuite {
         try {
             String json = mapper.writeValueAsString(imageMatchSettings);
             String expectedJsonName = "/sessionStartInfo_FluentApiSerialization_" + useDom + "_" + enablePatterns + "_" + ignoreDisplacements + ".json";
-            String expectedJson = GeneralUtils.readToEnd(TestDomCapture.class.getResourceAsStream(expectedJsonName));
+            String expectedJson = GeneralUtils.readInputStreamAsString(TestDomCapture.class.getResourceAsStream(expectedJsonName));
             Assert.assertEquals(json, expectedJson);
         } catch (IOException e) {
             e.printStackTrace();
@@ -120,7 +119,7 @@ public class TestSessionStartInfo extends ReportingTestSuite {
         try {
             String json = mapper.writeValueAsString(imageMatchSettings);
             String expectedJsonName = "/sessionStartInfo_FluentApiSerialization_NonDefaultIMS_" + useDom + "_" + enablePatterns + "_" + ignoreDisplacements + ".json";
-            String expectedJson = GeneralUtils.readToEnd(TestDomCapture.class.getResourceAsStream(expectedJsonName));
+            String expectedJson = GeneralUtils.readInputStreamAsString(TestDomCapture.class.getResourceAsStream(expectedJsonName));
             Assert.assertEquals(json, expectedJson);
         } catch (IOException e) {
             e.printStackTrace();
@@ -147,7 +146,7 @@ public class TestSessionStartInfo extends ReportingTestSuite {
         try {
             String json = mapper.writeValueAsString(imageMatchSettings);
             String expectedJsonName = "/sessionStartInfo_FluentApiSerialization_NonDefaultIMS_" + useDom + "_" + enablePatterns + "_" + ignoreDisplacements + ".json";
-            String expectedJson = GeneralUtils.readToEnd(TestDomCapture.class.getResourceAsStream(expectedJsonName));
+            String expectedJson = GeneralUtils.readInputStreamAsString(TestDomCapture.class.getResourceAsStream(expectedJsonName));
             Assert.assertEquals(json, expectedJson);
         } catch (IOException e) {
             e.printStackTrace();
@@ -175,7 +174,7 @@ public class TestSessionStartInfo extends ReportingTestSuite {
         try {
             String json = mapper.writeValueAsString(imageMatchSettings);
             String expectedJsonName = "/sessionStartInfo_FluentApiSerialization_" + useDom + "_" + enablePatterns + "_" + ignoreDisplacements + ".json";
-            String expectedJson = GeneralUtils.readToEnd(TestDomCapture.class.getResourceAsStream(expectedJsonName));
+            String expectedJson = GeneralUtils.readInputStreamAsString(TestDomCapture.class.getResourceAsStream(expectedJsonName));
             Assert.assertEquals(json, expectedJson);
         } catch (IOException e) {
             e.printStackTrace();

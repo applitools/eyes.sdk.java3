@@ -1,3 +1,13 @@
+## [vNext]
+### Added
+- Resource collection optimizations.
+- Logs for dom analyzer.
+### Updated
+- Increased limitation for resources to 25 MB. [Trello 2472](https://trello.com/c/9ebh5Hzk)
+- Dom Snapshot 4.4.11. [Trello 2484](https://trello.com/c/EtLUMf46)
+### Fixed
+- Encoding for URLs containing `|` sign.
+
 ## [3.194.0]
 ### Added
 - Users can now use a separated proxy for networks requests which aren't sent to Applitools servers. [Trello 2449](https://trello.com/c/xVScV0PP) 
