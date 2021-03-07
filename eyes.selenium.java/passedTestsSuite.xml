@@ -232,6 +232,8 @@
             <class name="com.applitools.eyes.api.TestAbort">
                 <methods>
                     <include name="TestAbortIfNotClosed" />
+                    <include name="TestAbortAsyncIfNotClosed" />
+                    <include name="TestAbortIfNotClosedAndNotAborted" />
                 </methods>
             </class>
         </classes>

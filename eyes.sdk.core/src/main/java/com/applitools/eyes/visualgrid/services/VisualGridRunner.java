@@ -129,6 +129,10 @@ public class VisualGridRunner extends EyesRunner {
     }
 
     public TestResultsSummary getAllTestResultsImpl(boolean throwException) {
+        for (IEyes eyes : allEyes) {
+            eyes.abortAsync();
+        }
+
         boolean isRunning = true;
         while (isRunning && getError() == null) {
             isRunning = false;

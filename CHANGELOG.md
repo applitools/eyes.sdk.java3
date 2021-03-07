@@ -1,3 +1,7 @@
+## [vNext]
+### Updated
+- `getAllTestResults` will now abort UFG test that the user didn't close. [Trello 2493](https://trello.com/c/YS3vLGxd)
+
 ## [3.195.0]
 ### Added
 - Resource collection optimizations.

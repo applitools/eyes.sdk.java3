@@ -2,6 +2,7 @@ package com.applitools.eyes.api;
 
 import com.applitools.eyes.EyesRunner;
 import com.applitools.eyes.RectangleSize;
+import com.applitools.eyes.StdoutLogHandler;
 import com.applitools.eyes.config.Configuration;
 import com.applitools.eyes.selenium.BrowserType;
 import com.applitools.eyes.selenium.ClassicRunner;
@@ -12,13 +13,9 @@ import com.applitools.eyes.utils.ReportingTestSuite;
 import com.applitools.eyes.utils.SeleniumUtils;
 import com.applitools.eyes.visualgrid.services.VisualGridRunner;
 import org.openqa.selenium.WebDriver;
-import org.testng.annotations.AfterClass;
-import org.testng.annotations.BeforeClass;
-import org.testng.annotations.Factory;
-import org.testng.annotations.Test;
+import org.testng.annotations.*;
 
 public class TestAbort extends ReportingTestSuite {
-
     private WebDriver driver;
     private Eyes eyes;
     private EyesRunner runner;
@@ -31,13 +28,14 @@ public class TestAbort extends ReportingTestSuite {
         this.useVisualGrid = useVisualGrid;
     }
 
-    @BeforeClass
+    @BeforeMethod
     public void SetUp() {
         driver = SeleniumUtils.createChromeDriver();
         driver.get("data:text/html,<p>Test</p>");
         runner = useVisualGrid ? new VisualGridRunner(10) : new ClassicRunner();
         eyes = new Eyes(runner);
         eyes.setBatch(TestDataProvider.batchInfo);
+        eyes.setLogHandler(new StdoutLogHandler());
         String testName = useVisualGrid ? "Test Abort_VG" : "Test Abort";
 
         Configuration config = eyes.getConfiguration();
@@ -47,20 +45,30 @@ public class TestAbort extends ReportingTestSuite {
         eyes.open(driver, testName, testName, new RectangleSize(1200, 800));
     }
 
-    @AfterClass
+    @AfterMethod
     public void TearDown() {
         driver.quit();
         runner.getAllTestResults(false);
     }
 
     @Test
-    public void TestAbortIfNotClosed() {
+    public void TestAbortIfNotClosed() throws InterruptedException {
         eyes.check(useVisualGrid ? "VG" : "SEL", Target.window());
-        try {
-            Thread.sleep(15000);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
+        Thread.sleep(5000);
         eyes.abortIfNotClosed();
+    }
+
+    @Test
+    public void TestAbortAsyncIfNotClosed() throws InterruptedException {
+        eyes.check(useVisualGrid ? "VG" : "SEL", Target.window());
+        Thread.sleep(5000);
+        eyes.closeAsync();
+        eyes.abortAsync();
+    }
+
+    @Test
+    public void TestAbortIfNotClosedAndNotAborted() throws InterruptedException {
+        eyes.check(useVisualGrid ? "VG" : "SEL", Target.window());
+        Thread.sleep(5000);
     }
 }
