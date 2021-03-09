@@ -7,9 +7,9 @@ import com.applitools.eyes.TestResults;
  */
 public class DiffsFoundException extends TestFailedException {
     public DiffsFoundException(TestResults testResults, String scenarioIdOrName, String appIdOrName){
-        super(String.format("Test '%s' of '%s' detected differences! See details at: %s",
-                        scenarioIdOrName,
-                        appIdOrName,
-                        testResults.getUrl()));
+        super(testResults, String.format("Test '%s' of '%s' detected differences! See details at: %s",
+                scenarioIdOrName,
+                appIdOrName,
+                testResults.getUrl()));
     }
 }

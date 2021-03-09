@@ -9,20 +9,28 @@ import com.applitools.eyes.TestResults;
  * Indicates that a test did not pass (i.e., test either failed or is a new test).
  */
 public class TestFailedException extends AssertionError {
+    private TestResults testResults = null;
 
     public TestFailedException(TestResults testResults, String scenarioIdOrName, String appIdOrName) {
         super(String.format("'%s' of '%s'. See details at %s",
                 scenarioIdOrName,
                 appIdOrName,
                 testResults.getUrl()));
+        this.testResults = testResults;
     }
+
+    public TestFailedException(TestResults testResults, String message) {
+        super(message);
+        this.testResults = testResults;
+    }
+
 
     /**
      * Creates a new TestFailedException instance.
      * @param message A description string.
      */
     public TestFailedException(String message) {
-        super(message);
+        this(null, message);
     }
 
     /**
@@ -34,4 +42,14 @@ public class TestFailedException extends AssertionError {
     public TestFailedException(String message, Throwable cause) {
         super(message, cause);
     }
+
+    /**
+     * @return The failed test results, or {@code null} if the test has not
+     * yet ended (e.g., when thrown due to
+     * {@link com.applitools.eyes.FailureReports#IMMEDIATE} settings).
+     */
+    public TestResults getTestResults() {
+        return testResults;
+    }
+
 }

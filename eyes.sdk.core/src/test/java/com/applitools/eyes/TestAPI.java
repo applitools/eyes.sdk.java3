@@ -1,5 +1,6 @@
 package com.applitools.eyes;
 
+import com.applitools.eyes.exceptions.TestFailedException;
 import com.applitools.eyes.selenium.BrowserType;
 import com.applitools.eyes.utils.ReportingTestSuite;
 import org.testng.Assert;
@@ -60,5 +61,15 @@ public class TestAPI extends ReportingTestSuite {
         browsers.remove(BrowserType.EDGE_CHROMIUM_ONE_VERSION_BACK);
 
         Assert.assertEquals(0, browsers.size(), "Not all browser types names has been verified. Remaining browser types: " + StringUtils.join(browsers, ", "));
+    }
+
+    @Test
+    public void testFailedException() {
+        TestResults testResults = new TestResults();
+        testResults.setStatus(TestResultsStatus.Failed);
+        TestFailedException testFailedException = new TestFailedException(testResults, "message");
+        Assert.assertEquals(testFailedException.getTestResults(), testResults);
+        testFailedException = new TestFailedException("message");
+        Assert.assertNull(testFailedException.getTestResults());
     }
 }
