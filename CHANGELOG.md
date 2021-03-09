@@ -1,3 +1,7 @@
+## [vNext]
+### Fixed
+- `TestFailedException` now has the method `getTestResults` again. [Trello 2496](https://trello.com/c/4xleXQvp)
+
 ## [3.195.1]
 ### Updated
 - `getAllTestResults` will now abort UFG test that the user didn't close. [Trello 2493](https://trello.com/c/YS3vLGxd)
