@@ -43,7 +43,6 @@ public class IOSScrollPositionProvider extends AppiumScrollPositionProvider {
         Location curPos = getCurrentPosition();
         Location lastPos;
 
-
         HashMap<String, String> args = new HashMap<>();
         String directionY = ""; // empty means we don't have to do any scrolling
         String directionX = "";
@@ -57,7 +56,6 @@ public class IOSScrollPositionProvider extends AppiumScrollPositionProvider {
         } else if (curPos.getX() > location.getX()) {
             directionX = SCROLL_DIRECTION_LEFT;
         }
-
 
         // first handle any vertical scrolling
         if (!directionY.isEmpty()) {
@@ -100,7 +98,6 @@ public class IOSScrollPositionProvider extends AppiumScrollPositionProvider {
     public void restoreState(PositionMemento state) {
     }
 
-
     private double getScrollDistanceRatio() {
         if (distanceRatio == 0.0) {
             int viewportHeight = eyesDriver.getDefaultContentViewportSize(false).getHeight() + eyesDriver.getStatusBarHeight();
@@ -133,7 +130,7 @@ public class IOSScrollPositionProvider extends AppiumScrollPositionProvider {
 
         driver.performTouchAction(scrollAction);
 
-        try { Thread.sleep(750); } catch (InterruptedException ignored) {}
+        try { Thread.sleep(1000); } catch (InterruptedException ignored) {}
     }
 
     @Override
