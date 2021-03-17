@@ -16,7 +16,7 @@ import org.testng.annotations.Test;
 public class BasicDemo extends ReportingTestSuite {
     private static BatchInfo batch;
     private WebDriver driver;
-    private final LogHandler logger = new StdoutLogHandler();
+    private final LogHandler logger = new StdoutLogHandler(true);
 
     public BasicDemo(){
         super.setGroupName("selenium");
@@ -49,7 +49,7 @@ public class BasicDemo extends ReportingTestSuite {
         Eyes eyes = new Eyes(runner);
         eyes.setLogHandler(logger);
         eyes.setBatch(batch);
-        //eyes.setProxy(new ProxySettings("http://localhost:8888"));
+        eyes.setProxy(new ProxySettings("http://localhost:8888"));
         try {
             eyes.open(driver, "Demo App", "BasicDemo" + suffix, new RectangleSize(800, 800));
             driver.get("https://applitools.github.io/demo/TestPages/FramesTestPage/");

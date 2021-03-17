@@ -159,17 +159,19 @@ public class EyesServiceRunner extends Thread {
         // Check if tests are ready to be closed
         synchronized (allEyes) {
             for (IEyes eyes : allEyes) {
-                for (RunningTest runningTest : eyes.getAllRunningTests().values()) {
-                    if (runningTest.isTestReadyToClose()) {
-                        if (!runningTest.getIsOpen()) {
-                            // If the test isn't open and is ready to close, it means the open failed
-                            openService.decrementConcurrency();
-                            runningTest.closeFailed(new EyesException("Eyes never opened"));
-                            continue;
-                        }
+                synchronized (eyes.getAllRunningTests()) {
+                    for (RunningTest runningTest : eyes.getAllRunningTests().values()) {
+                        if (runningTest.isTestReadyToClose()) {
+                            if (!runningTest.getIsOpen()) {
+                                // If the test isn't open and is ready to close, it means the open failed
+                                openService.decrementConcurrency();
+                                runningTest.closeFailed(new EyesException("Eyes never opened"));
+                                continue;
+                            }
 
-                        SessionStopInfo sessionStopInfo = runningTest.prepareStopSession(runningTest.isTestAborted());
-                        closeService.addInput(runningTest.getTestId(), sessionStopInfo);
+                            SessionStopInfo sessionStopInfo = runningTest.prepareStopSession(runningTest.isTestAborted());
+                            closeService.addInput(runningTest.getTestId(), sessionStopInfo);
+                        }
                     }
                 }
             }
@@ -191,9 +193,14 @@ public class EyesServiceRunner extends Thread {
 
     private void resourceCollectionServiceIteration() {
         resourceCollectionService.run();
+        if (resourceCollectionService.outputQueue.isEmpty() && resourceCollectionService.errorQueue.isEmpty()) {
+            return;
+        }
+
         for (Pair<String, Map<String, RGridResource>> pair : resourceCollectionService.getSucceededTasks()) {
             Pair<FrameData, List<CheckTask>> checkTasks = resourceCollectionTasksMapping.get(pair.getLeft());
             queueRenderRequests(checkTasks.getLeft(), pair.getRight(), checkTasks.getRight());
+            resourceCollectionTasksMapping.remove(pair.getLeft());
         }
 
         for (Pair<String, Throwable> pair : resourceCollectionService.getFailedTasks()) {
@@ -204,6 +211,8 @@ public class EyesServiceRunner extends Thread {
 
             resourceCollectionTasksMapping.remove(pair.getLeft());
         }
+
+        System.gc();
     }
 
     private void renderServiceIteration() {

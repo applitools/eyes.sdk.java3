@@ -29,7 +29,6 @@ import com.applitools.eyes.visualgrid.services.VisualGridRunningTest;
 import com.applitools.utils.ArgumentGuard;
 import com.applitools.utils.ClassVersionGetter;
 import com.applitools.utils.GeneralUtils;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.http.client.utils.URIBuilder;
 import org.openqa.selenium.By;
@@ -48,7 +47,7 @@ public class VisualGridEyes implements ISeleniumEyes {
     private final String eyesId = UUID.randomUUID().toString();
 
     private final VisualGridRunner runner;
-    final Map<String, RunningTest> testList = new HashMap<>();
+    final Map<String, RunningTest> testList = Collections.synchronizedMap(new HashMap<String, RunningTest>());
     private boolean isOpen = false;
 
     private final String PROCESS_PAGE;
@@ -228,8 +227,10 @@ public class VisualGridEyes implements ISeleniumEyes {
         try {
             runner.open(this, newTests);
         } catch (Throwable t) {
-            for (RunningTest runningTest : testList.values()) {
-                runningTest.openFailed(t);
+            synchronized (testList) {
+                for (RunningTest runningTest : testList.values()) {
+                    runningTest.openFailed(t);
+                }
             }
             throw t;
         }
@@ -296,15 +297,19 @@ public class VisualGridEyes implements ISeleniumEyes {
 
         logger.log(eyesId, Stage.CLOSE, Type.CALLED);
         isOpen = false;
-        for (RunningTest runningTest : testList.values()) {
-            runningTest.issueClose();
+        synchronized (testList) {
+            for (RunningTest runningTest : testList.values()) {
+                runningTest.issueClose();
+            }
         }
     }
 
     public void abortAsync() {
         logger.log(eyesId, Stage.CLOSE, Type.CALLED);
-        for (RunningTest runningTest : testList.values()) {
-            runningTest.issueAbort(new EyesException(String.format("Didn't close test %s. Aborted the test", getConfiguration().getTestName())), false);
+        synchronized (testList) {
+            for (RunningTest runningTest : testList.values()) {
+                runningTest.issueAbort(new EyesException(String.format("Didn't close test %s. Aborted the test", getConfiguration().getTestName())), false);
+            }
         }
     }
 
@@ -384,8 +389,10 @@ public class VisualGridEyes implements ISeleniumEyes {
     @Override
     public boolean isEyesClosed() {
         boolean isVGEyesClosed = true;
-        for (RunningTest runningTest : testList.values()) {
-            isVGEyesClosed = isVGEyesClosed && runningTest.isCompleted();
+        synchronized (testList) {
+            for (RunningTest runningTest : testList.values()) {
+                isVGEyesClosed = isVGEyesClosed && runningTest.isCompleted();
+            }
         }
         return isVGEyesClosed;
     }
@@ -450,8 +457,10 @@ public class VisualGridEyes implements ISeleniumEyes {
             }
         } catch (Throwable e) {
             Error error = new Error(e);
-            for (RunningTest runningTest : testList.values()) {
-                runningTest.setTestInExceptionMode(error);
+            synchronized (testList) {
+                for (RunningTest runningTest : testList.values()) {
+                    runningTest.setTestInExceptionMode(error);
+                }
             }
         } finally {
             switchTo.frames(originalFC);
@@ -493,51 +502,55 @@ public class VisualGridEyes implements ISeleniumEyes {
         }
 
         Set<String> testIds = new HashSet<>();
-        for (RunningTest runningTest : testList.values()) {
-            testIds.add(runningTest.getTestId());
-        }
-
-        Map<Integer, List<RunningTest>> requiredWidths = new HashMap<>();
-        if (isDefaultLayoutBreakpointsSet || !layoutBreakpoint.isEmpty()) {
+        synchronized (testList) {
             for (RunningTest runningTest : testList.values()) {
-                int width = runningTest.getBrowserInfo().getDeviceSize().getWidth();
-                if (width <= 0) {
-                    width = viewportSize.getWidth();
-                }
+                testIds.add(runningTest.getTestId());
+            }
 
-                if (!layoutBreakpoint.isEmpty()) {
-                    for (int i = layoutBreakpoint.size() - 1; i >= 0; i--) {
-                        if (width >= layoutBreakpoint.get(i)) {
-                            width = layoutBreakpoint.get(i);
-                            break;
+            Map<Integer, List<RunningTest>> requiredWidths = new HashMap<>();
+            if (isDefaultLayoutBreakpointsSet || !layoutBreakpoint.isEmpty()) {
+                for (RunningTest runningTest : testList.values()) {
+                    int width = runningTest.getBrowserInfo().getDeviceSize().getWidth();
+                    if (width <= 0) {
+                        width = viewportSize.getWidth();
+                    }
+
+                    if (!layoutBreakpoint.isEmpty()) {
+                        for (int i = layoutBreakpoint.size() - 1; i >= 0; i--) {
+                            if (width >= layoutBreakpoint.get(i)) {
+                                width = layoutBreakpoint.get(i);
+                                break;
+                            }
+                        }
+
+                        if (width < layoutBreakpoint.get(0)) {
+                            width = layoutBreakpoint.get(0) - 1;
+                            logger.log(TraceLevel.Warn, testIds, Stage.CHECK, Type.DOM_SCRIPT,
+                                    Pair.of("message",String.format("Device width is smaller than the smallest breakpoint %d", layoutBreakpoint.get(0))));
                         }
                     }
 
-                    if (width < layoutBreakpoint.get(0)) {
-                        width = layoutBreakpoint.get(0) - 1;
-                        logger.log(TraceLevel.Warn, testIds, Stage.CHECK, Type.DOM_SCRIPT, Pair.of("message",String.format("Device width is smaller than the smallest breakpoint %d", layoutBreakpoint.get(0))));
+                    if (requiredWidths.containsKey(width)) {
+                        requiredWidths.get(width).add(runningTest);
+                    } else {
+                        List<RunningTest> list = new ArrayList<>();
+                        list.add(runningTest);
+                        requiredWidths.put(width, list);
                     }
                 }
-
-                if (requiredWidths.containsKey(width)) {
-                    requiredWidths.get(width).add(runningTest);
-                } else {
-                    List<RunningTest> list = new ArrayList<>();
-                    list.add(runningTest);
-                    requiredWidths.put(width, list);
-                }
             }
+            return requiredWidths;
         }
-
-        return requiredWidths;
     }
 
     private void captureDomForResourceCollection(int width, Collection<RunningTest> tests, EyesTargetLocator switchTo,
                                                  ICheckSettingsInternal checkSettingsInternal,
                                                  List<VisualGridSelector[]> regionsXPaths,String source) throws Exception {
         Set<String> testIds = new HashSet<>();
-        for (RunningTest runningTest : tests) {
-            testIds.add(runningTest.getTestId());
+        synchronized (testList) {
+            for (RunningTest runningTest : tests) {
+                testIds.add(runningTest.getTestId());
+            }
         }
         if (width != 0) {
             try {
@@ -569,12 +582,14 @@ public class VisualGridEyes implements ISeleniumEyes {
                 Pair.of("resourceUrls", scriptResult.getResourceUrls()));
 
         List<CheckTask> checkTasks = new ArrayList<>();
-        for (RunningTest runningTest : tests) {
-            if (runningTest.isCloseTaskIssued()) {
-                continue;
-            }
+        synchronized (testList) {
+            for (RunningTest runningTest : tests) {
+                if (runningTest.isCloseTaskIssued()) {
+                    continue;
+                }
 
-            checkTasks.add(runningTest.issueCheck((ICheckSettings) checkSettingsInternal, regionsXPaths, source));
+                checkTasks.add(runningTest.issueCheck((ICheckSettings) checkSettingsInternal, regionsXPaths, source));
+            }
         }
 
         if (checkTasks.isEmpty()) {
@@ -589,16 +604,9 @@ public class VisualGridEyes implements ISeleniumEyes {
     FrameData captureDomSnapshot(Set<String> testIds, EyesTargetLocator switchTo) throws Exception {
         String domScript = userAgent.isInternetExplorer() ? PROCESS_PAGE_FOR_IE : PROCESS_PAGE;
         String pollingScript = userAgent.isInternetExplorer() ? POLL_RESULT_FOR_IE : POLL_RESULT;
-
-        final String skipList;
-        synchronized (runner.getResourcesCacheMap()) {
-            skipList = new ObjectMapper().writeValueAsString(new HashSet<>(runner.getResourcesCacheMap().keySet()));
-        }
-
         Map<String, Object> arguments = new HashMap<String, Object>() {{
             put("serializeResources", true);
             put("dontFetchResources", getConfiguration().isDisableBrowserFetching());
-            //put("skipResources", skipList);
         }};
 
         String result = EyesSeleniumUtils.runDomScript(logger, webDriver, userAgent, testIds, domScript, arguments, pollingScript);
@@ -907,15 +915,17 @@ public class VisualGridEyes implements ISeleniumEyes {
      */
     public List<TestResultContainer> getAllTestResults() {
         List<TestResultContainer> allResults = new ArrayList<>();
-        for (RunningTest runningTest : testList.values()) {
-            if (!runningTest.isCompleted()) {
-                if (runner.getError() != null) {
-                    throw new EyesException("Execution crashed", runner.getError());
+        synchronized (testList) {
+            for (RunningTest runningTest : testList.values()) {
+                if (!runningTest.isCompleted()) {
+                    if (runner.getError() != null) {
+                        throw new EyesException("Execution crashed", runner.getError());
+                    }
+                    return null;
                 }
-                return null;
-            }
 
-            allResults.add(runningTest.getTestResultContainer());
+                allResults.add(runningTest.getTestResultContainer());
+            }
         }
 
         return allResults;

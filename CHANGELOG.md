@@ -1,3 +1,7 @@
+## [3.196.0]
+### Fixed
+- Fixed some memory issues and made optimizations to save memory usage.
+
 ## [3.195.3]
 ### Updated
 - Supporting safari screenshots in iPhone 12 Pro when running with BrowserStack. [Trello 2499](https://trello.com/c/HzCsXHsc)

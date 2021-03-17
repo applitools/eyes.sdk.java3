@@ -14,6 +14,7 @@ import com.applitools.utils.GeneralUtils;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import org.apache.commons.lang3.tuple.Pair;
 
 import java.util.*;
 
@@ -126,12 +127,15 @@ public class VisualGridRunner extends EyesRunner {
 
     public synchronized void check(FrameData domData, List<CheckTask> checkTasks) {
         eyesServiceRunner.addResourceCollectionTask(domData, checkTasks);
+        logMemoryUsage();
     }
 
     public TestResultsSummary getAllTestResultsImpl(boolean throwException) {
-        for (IEyes eyes : allEyes) {
-            // Aborting all tests that the user didn't close
-            eyes.abortAsync();
+        synchronized (allEyes) {
+            for (IEyes eyes : allEyes) {
+                // Aborting all tests that the user didn't close
+                eyes.abortAsync();
+            }
         }
 
         boolean isRunning = true;
@@ -238,5 +242,12 @@ public class VisualGridRunner extends EyesRunner {
 
     public void setSuiteName(String suiteName) {
         this.suiteName = suiteName;
+    }
+
+    public void logMemoryUsage() {
+        logger.log(TraceLevel.Debug, Collections.<String>emptySet(), Stage.GENERAL, null,
+                Pair.of("totalMemory", Runtime.getRuntime().totalMemory()),
+                Pair.of("freeMemory", Runtime.getRuntime().freeMemory()),
+                Pair.of("maxMemory", Runtime.getRuntime().maxMemory()));
     }
 }
