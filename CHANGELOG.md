@@ -1,3 +1,7 @@
+## [vNext]
+### Added
+- A new api for padding coded regions. [Trello 2507](https://trello.com/c/LhysNDqu)
+
 ## [3.196.0]
 ### Fixed
 - Fixed some memory issues and made optimizations to save memory usage.
