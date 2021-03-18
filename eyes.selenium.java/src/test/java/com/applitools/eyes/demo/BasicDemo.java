@@ -1,12 +1,15 @@
 package com.applitools.eyes.demo;
 
 import com.applitools.eyes.*;
+import com.applitools.eyes.selenium.Borders;
 import com.applitools.eyes.selenium.ClassicRunner;
 import com.applitools.eyes.selenium.Eyes;
+import com.applitools.eyes.selenium.fluent.Target;
 import com.applitools.eyes.utils.ReportingTestSuite;
 import com.applitools.eyes.utils.SeleniumUtils;
 import com.applitools.eyes.utils.TestUtils;
 import com.applitools.eyes.visualgrid.services.VisualGridRunner;
+import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.BeforeMethod;
@@ -24,7 +27,7 @@ public class BasicDemo extends ReportingTestSuite {
 
     @DataProvider(name = "booleanDP")
     public Object[] dp() {
-        return new Object[]{Boolean.TRUE, Boolean.FALSE};
+        return new Object[]{Boolean.FALSE};
     }
 
     @BeforeClass
@@ -53,7 +56,7 @@ public class BasicDemo extends ReportingTestSuite {
         try {
             eyes.open(driver, "Demo App", "BasicDemo" + suffix, new RectangleSize(800, 800));
             driver.get("https://applitools.github.io/demo/TestPages/FramesTestPage/");
-            eyes.checkWindow();
+            eyes.check(Target.window().fully().ignore(By.id("overflowing-div"), 10, -10, 20, 50));
             eyes.closeAsync();
         } finally {
             eyes.abortAsync();
