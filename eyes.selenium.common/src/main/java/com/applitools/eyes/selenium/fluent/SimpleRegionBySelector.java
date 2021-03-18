@@ -18,9 +18,16 @@ public class SimpleRegionBySelector implements GetSimpleRegion, IGetSeleniumRegi
     private EyesWebDriver driver;
     @JsonSerialize(using = BySerializer.class)
     private final By selector;
+    @JsonIgnore
+    private final Rectangle padding;
 
     public SimpleRegionBySelector(By selector) {
+        this(selector, new Rectangle(0, 0, 0, 0));
+    }
+
+    public SimpleRegionBySelector(By selector, Rectangle padding) {
         this.selector = selector;
+        this.padding = padding;
     }
 
     @Override
@@ -41,8 +48,10 @@ public class SimpleRegionBySelector implements GetSimpleRegion, IGetSeleniumRegi
                 adjustedLocation = screenshot.convertLocation(adjustedLocation,
                         CoordinatesType.CONTEXT_RELATIVE, CoordinatesType.SCREENSHOT_AS_IS);
             }
-            values.add(new Region(adjustedLocation, new RectangleSize(size.width, size.height),
-                    CoordinatesType.SCREENSHOT_AS_IS));
+            Region region = new Region(adjustedLocation, new RectangleSize(size.width, size.height),
+                    CoordinatesType.SCREENSHOT_AS_IS);
+            region = region.addPadding(padding.x, padding.y, padding.width, padding.height);
+            values.add(region);
         }
         return values;
     }

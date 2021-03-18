@@ -205,6 +205,14 @@ public class Region implements IRegion {
         return new Region(getLocation().scale(scaleRatio), getSize().scale(scaleRatio), getCoordinatesType());
     }
 
+    public Region addPadding(int left, int top, int right, int bottom) {
+        return new Region(
+                getLeft() - left,
+                getTop() - top,
+                getWidth() + left + right,
+                getHeight() + top + bottom);
+    }
+
     /**
      * Gets size.
      * @return The size of the region.

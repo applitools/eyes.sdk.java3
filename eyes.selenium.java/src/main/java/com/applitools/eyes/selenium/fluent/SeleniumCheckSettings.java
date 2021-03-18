@@ -19,6 +19,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import org.openqa.selenium.By;
+import org.openqa.selenium.Rectangle;
 import org.openqa.selenium.WebElement;
 
 import java.util.ArrayList;
@@ -206,6 +207,18 @@ public class SeleniumCheckSettings extends CheckSettings implements ISeleniumChe
         return clone;
     }
 
+    public SeleniumCheckSettings ignore(By selector, int leftPadding, int topPadding, int rightPadding, int bottomPadding) {
+        SeleniumCheckSettings clone = this.clone();
+        clone.ignore_(new SimpleRegionBySelector(selector, new Rectangle(leftPadding, topPadding, bottomPadding, rightPadding)));
+        return clone;
+    }
+
+    public SeleniumCheckSettings ignore(WebElement element, int leftPadding, int topPadding, int rightPadding, int bottomPadding) {
+        SeleniumCheckSettings clone = this.clone();
+        clone.ignore_(new SimpleRegionByElement(element, new Rectangle(leftPadding, topPadding, bottomPadding, rightPadding)));
+        return clone;
+    }
+
     public SeleniumCheckSettings layout(By regionSelector, By... regionSelectors) {
         SeleniumCheckSettings clone = this.clone();
         clone.layout_(new SimpleRegionBySelector(regionSelector));
@@ -243,6 +256,18 @@ public class SeleniumCheckSettings extends CheckSettings implements ISeleniumChe
             clone.layout_(new SimpleRegionByElement(e));
         }
 
+        return clone;
+    }
+
+    public SeleniumCheckSettings layout(By selector, int leftPadding, int topPadding, int rightPadding, int bottomPadding) {
+        SeleniumCheckSettings clone = this.clone();
+        clone.layout_(new SimpleRegionBySelector(selector, new Rectangle(leftPadding, topPadding, bottomPadding, rightPadding)));
+        return clone;
+    }
+
+    public SeleniumCheckSettings layout(WebElement element, int leftPadding, int topPadding, int rightPadding, int bottomPadding) {
+        SeleniumCheckSettings clone = this.clone();
+        clone.layout_(new SimpleRegionByElement(element, new Rectangle(leftPadding, topPadding, bottomPadding, rightPadding)));
         return clone;
     }
 
@@ -286,6 +311,18 @@ public class SeleniumCheckSettings extends CheckSettings implements ISeleniumChe
         return clone;
     }
 
+    public SeleniumCheckSettings strict(By selector, int leftPadding, int topPadding, int rightPadding, int bottomPadding) {
+        SeleniumCheckSettings clone = this.clone();
+        clone.strict_(new SimpleRegionBySelector(selector, new Rectangle(leftPadding, topPadding, bottomPadding, rightPadding)));
+        return clone;
+    }
+
+    public SeleniumCheckSettings strict(WebElement element, int leftPadding, int topPadding, int rightPadding, int bottomPadding) {
+        SeleniumCheckSettings clone = this.clone();
+        clone.strict_(new SimpleRegionByElement(element, new Rectangle(leftPadding, topPadding, bottomPadding, rightPadding)));
+        return clone;
+    }
+
     public SeleniumCheckSettings content(By regionSelector, By... regionSelectors) {
         SeleniumCheckSettings clone = this.clone();
         clone.content_(new SimpleRegionBySelector(regionSelector));
@@ -323,6 +360,18 @@ public class SeleniumCheckSettings extends CheckSettings implements ISeleniumChe
             clone.content_(new SimpleRegionByElement(e));
         }
 
+        return clone;
+    }
+
+    public SeleniumCheckSettings content(By selector, int leftPadding, int topPadding, int rightPadding, int bottomPadding) {
+        SeleniumCheckSettings clone = this.clone();
+        clone.content_(new SimpleRegionBySelector(selector, new Rectangle(leftPadding, topPadding, bottomPadding, rightPadding)));
+        return clone;
+    }
+
+    public SeleniumCheckSettings content(WebElement element, int leftPadding, int topPadding, int rightPadding, int bottomPadding) {
+        SeleniumCheckSettings clone = this.clone();
+        clone.content_(new SimpleRegionByElement(element, new Rectangle(leftPadding, topPadding, bottomPadding, rightPadding)));
         return clone;
     }
 

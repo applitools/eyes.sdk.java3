@@ -22,9 +22,16 @@ public class SimpleRegionByElement implements GetSimpleRegion, IGetSeleniumRegio
     private EyesWebDriver driver;
     @JsonSerialize(using = WebElementSerializer.class)
     protected final WebElement element;
+    @JsonIgnore
+    protected final Rectangle padding;
 
     public SimpleRegionByElement(WebElement element) {
+        this(element, new Rectangle(0, 0, 0, 0));
+    }
+
+    public SimpleRegionByElement(WebElement element, Rectangle padding) {
         this.element = element;
+        this.padding = padding;
     }
 
     @Override
@@ -44,8 +51,10 @@ public class SimpleRegionByElement implements GetSimpleRegion, IGetSeleniumRegio
         }
 
         List<Region> value = new ArrayList<>();
-        value.add(new Region(adjustedLocation, new RectangleSize(size.width, size.height),
-                CoordinatesType.SCREENSHOT_AS_IS));
+        Region region = new Region(adjustedLocation, new RectangleSize(size.width, size.height),
+                CoordinatesType.SCREENSHOT_AS_IS);
+        region = region.addPadding(padding.x, padding.y, padding.width, padding.height);
+        value.add(region);
 
         return value;
     }
