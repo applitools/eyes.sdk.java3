@@ -28,24 +28,33 @@ public class FloatingMatchSettings {
 
 
     @Override
-    public int hashCode()
-    {
+    public int hashCode() {
         return left*30000 + top*2000 + width*500 + height;
     }
 
     @Override
-    public boolean equals(Object other)
-    {
+    public boolean equals(Object other) {
         if (other == null) { return  false;}
         if (!(other instanceof FloatingMatchSettings)) {return  false;}
         FloatingMatchSettings otherFMS = (FloatingMatchSettings)other;
 
-        boolean result =
-                otherFMS.width == width &&
-                otherFMS.height == height &&
-                otherFMS.left == left &&
-                otherFMS.top == top;
+        return otherFMS.width == width &&
+        otherFMS.height == height &&
+        otherFMS.left == left &&
+        otherFMS.top == top;
+    }
 
-        return result;
+    @Override
+    public String toString() {
+        return "FloatingMatchSettings{" +
+                "top=" + top +
+                ", left=" + left +
+                ", width=" + width +
+                ", height=" + height +
+                ", maxUpOffset=" + maxUpOffset +
+                ", maxDownOffset=" + maxDownOffset +
+                ", maxLeftOffset=" + maxLeftOffset +
+                ", maxRightOffset=" + maxRightOffset +
+                '}';
     }
 }

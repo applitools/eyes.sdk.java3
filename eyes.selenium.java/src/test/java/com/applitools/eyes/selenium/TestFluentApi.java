@@ -47,9 +47,11 @@ public class TestFluentApi extends TestSetup {
     @Test
     public void TestCheckWindowWithIgnoreBySelector_Fluent() {
         getEyes().check("Fluent - Window with ignore region by selector", Target.window()
-                .ignore(By.id("overflowing-div")));
+                .ignore(By.id("overflowing-div"))
+                .ignore(By.id("overflowing-div"), 10, -10, 20, 50));
 
-        setExpectedIgnoreRegions(new Region(8, 81, 304, 184));
+        setExpectedIgnoreRegions(new Region(8, 81, 304, 184),
+                new Region(-2, 91, 334, 224));
     }
 
     @Test
@@ -57,7 +59,7 @@ public class TestFluentApi extends TestSetup {
         getEyes().check("Fluent - Window with ignore region by selector centered", Target.window()
                 .ignore(By.id("centered")));
 
-        setExpectedIgnoreRegions(new Region(122, 928, 456, 306));
+        setExpectedIgnoreRegions(new Region(122, 933, 456, 306));
     }
 
     @Test
@@ -65,7 +67,7 @@ public class TestFluentApi extends TestSetup {
         getEyes().check("Fluent - Window with ignore region by selector stretched", Target.window()
                 .ignore(By.id("stretched")));
 
-        setExpectedIgnoreRegions(new Region(8, 1270, 690, 206));
+        setExpectedIgnoreRegions(new Region(8, 1277, 690, 206));
     }
 
     @Test
@@ -73,7 +75,7 @@ public class TestFluentApi extends TestSetup {
         getEyes().check("Fluent - Window with floating region by selector", Target.window()
                 .floating(By.id("overflowing-div"), 3, 3, 20, 30));
 
-        setExpectedFloatingRegions(new FloatingMatchSettings(8, 80, 304, 184, 3, 3, 20, 30));
+        setExpectedFloatingRegions(new FloatingMatchSettings(8, 81, 304, 184, 3, 3, 20, 30));
     }
 
     @Test
@@ -115,9 +117,9 @@ public class TestFluentApi extends TestSetup {
     public void TestCheckFullWindowWithMultipleIgnoreRegionsBySelector_Fluent() {
         getEyes().check("Fluent - Region by element", Target.window().fully().ignore(By.cssSelector(".ignore")));
         setExpectedIgnoreRegions(
-                new Region(122, 928, 456, 306),
-                new Region(8, 1270, 690, 206),
-                new Region(10, 284, 800, 500)
+                new Region(8, 1277, 690, 206),
+                new Region(122, 933, 456, 306),
+                new Region(10, 286, 800, 500)
         );
     }
 
