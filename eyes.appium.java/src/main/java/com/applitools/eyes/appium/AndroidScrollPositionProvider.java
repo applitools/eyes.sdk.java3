@@ -25,7 +25,6 @@ import java.util.List;
 public class AndroidScrollPositionProvider extends AppiumScrollPositionProvider {
 
     private Location curScrollPos;
-    private Location scrollableViewLoc;
     private RectangleSize entireSize = null;
 
     public AndroidScrollPositionProvider(Logger logger, EyesAppiumDriver driver) {
@@ -34,7 +33,7 @@ public class AndroidScrollPositionProvider extends AppiumScrollPositionProvider 
 
     @Override
     public Location getScrollableViewLocation() {
-        if (scrollableViewLoc == null) {
+        if (cachedScrollableViewLocation == null) {
             WebElement activeScroll;
             try {
                 activeScroll = getFirstScrollableView();
@@ -43,10 +42,10 @@ public class AndroidScrollPositionProvider extends AppiumScrollPositionProvider 
                 return new Location(0, 0);
             }
             Point scrollLoc = activeScroll.getLocation();
-            scrollableViewLoc = new Location(scrollLoc.x, scrollLoc.y);
+            cachedScrollableViewLocation = new Location(scrollLoc.x, scrollLoc.y);
         }
-        logger.log(TraceLevel.Debug, eyesDriver.getTestId(), Stage.CHECK, Pair.of("location", scrollableViewLoc));
-        return scrollableViewLoc;
+        logger.log(TraceLevel.Debug, eyesDriver.getTestId(), Stage.CHECK, Pair.of("location", cachedScrollableViewLocation));
+        return cachedScrollableViewLocation;
     }
 
     private void checkCurrentScrollPosition() {
@@ -366,18 +365,22 @@ public class AndroidScrollPositionProvider extends AppiumScrollPositionProvider 
 
     @Override
     protected WebElement getFirstScrollableView() {
-        WebElement scrollableView = EyesAppiumUtils.getFirstScrollableView(driver);
-        if (scrollableView.getAttribute("className").equals("android.widget.HorizontalScrollView")) {
+        if(cachedScrollableView != null) {
+            return cachedScrollableView;
+        }
+        cachedScrollableView = EyesAppiumUtils.getFirstScrollableView(driver);
+        if (cachedScrollableView.getAttribute("className").equals("android.widget.HorizontalScrollView")) {
             List<MobileElement> list = driver.findElements(By.xpath(EyesAppiumUtils.SCROLLVIEW_XPATH));
             for (WebElement element : list) {
                 if (element.getAttribute("className").equals("android.widget.HorizontalScrollView")) {
                     continue;
                 }
-                List<MobileElement> child = scrollableView.findElements(By.xpath(EyesAppiumUtils.SCROLLVIEW_XPATH));
-                return child.isEmpty() ? element : child.get(0);
+                List<MobileElement> child = cachedScrollableView.findElements(By.xpath(EyesAppiumUtils.SCROLLVIEW_XPATH));
+                cachedScrollableView = child.isEmpty() ? element : child.get(0);
+                return cachedScrollableView;
             }
         }
-        return scrollableView;
+        return cachedScrollableView;
     }
 
     private String getScrollableContentSize(String resourceId) {
