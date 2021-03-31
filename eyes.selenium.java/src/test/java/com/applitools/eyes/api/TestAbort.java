@@ -19,11 +19,11 @@ public class TestAbort extends ReportingTestSuite {
     private EyesRunner runner;
     private final boolean useVisualGrid;
 
-    @Factory(dataProvider = "booleanDP", dataProviderClass = TestDataProvider.class)
-    public TestAbort(boolean useVisualGrid) {
+    //@Factory(dataProvider = "booleanDP", dataProviderClass = TestDataProvider.class)
+    public TestAbort() {
         super.setGroupName("selenium");
-        super.addSuiteArg("isVisualGrid", useVisualGrid);
-        this.useVisualGrid = useVisualGrid;
+        super.addSuiteArg("isVisualGrid", false);
+        this.useVisualGrid = false;
     }
 
     @BeforeClass
@@ -70,7 +70,6 @@ public class TestAbort extends ReportingTestSuite {
         Eyes eyes = setUp();
         eyes.check(useVisualGrid ? "VG" : "SEL", Target.window());
         Thread.sleep(5000);
-        eyes.closeAsync();
         eyes.abortAsync();
         tearDown(eyes);
     }

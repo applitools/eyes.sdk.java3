@@ -1224,6 +1224,10 @@ public abstract class EyesBase implements IEyesBase {
         return new Configuration(getConfigurationInstance());
     }
 
+    public void closeAsync() {
+        close(false);
+    }
+
     public void abortAsync() {
         abort();
     }
