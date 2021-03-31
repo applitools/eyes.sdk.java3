@@ -49,6 +49,25 @@ public class AndroidScrollPositionProvider extends AppiumScrollPositionProvider 
         return scrollableViewLoc;
     }
 
+    public Region getScrollableViewRegion() {
+        WebElement activeScroll;
+        Region reg;
+        try {
+            activeScroll = getFirstScrollableView();
+            Location scrollLoc = getScrollableViewLocation();
+            Dimension scrollDim = activeScroll.getSize();
+            reg = new Region(scrollLoc.getX(), scrollLoc.getY(), scrollDim.width, scrollDim.height - verticalScrollGap);
+        } catch (NoSuchElementException e) {
+            GeneralUtils.logExceptionStackTrace(logger, Stage.CHECK, e);
+            reg = new Region(0, 0, 0, 0);
+        }
+
+        logger.log(TraceLevel.Debug, eyesDriver.getTestId(), Stage.CHECK,
+                Pair.of("region", reg),
+                Pair.of("verticalScrollGap", verticalScrollGap));
+        return reg;
+    }
+
     private void checkCurrentScrollPosition() {
         if (curScrollPos == null) {
             ContentSize contentSize = getCachedContentSize();
@@ -405,5 +424,13 @@ public class AndroidScrollPositionProvider extends AppiumScrollPositionProvider 
         logger.log(TraceLevel.Debug, eyesDriver.getTestId(), Stage.CHECK,
                 Pair.of("scrollableHeightFromHelper", scrollableContentSize));
         return scrollableContentSize;
+    }
+
+    @Override
+    public void cleanupCachedData() {
+        super.cleanupCachedData();
+        curScrollPos = null;
+        entireSize = null;
+        scrollableViewLoc = null;
     }
 }
