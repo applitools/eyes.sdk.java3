@@ -19,11 +19,11 @@ public class TestAbort extends ReportingTestSuite {
     private EyesRunner runner;
     private final boolean useVisualGrid;
 
-    //@Factory(dataProvider = "booleanDP", dataProviderClass = TestDataProvider.class)
-    public TestAbort() {
+    @Factory(dataProvider = "booleanDP", dataProviderClass = TestDataProvider.class)
+    public TestAbort(boolean useVisualGrid) {
         super.setGroupName("selenium");
-        super.addSuiteArg("isVisualGrid", false);
-        this.useVisualGrid = false;
+        super.addSuiteArg("isVisualGrid", useVisualGrid);
+        this.useVisualGrid = useVisualGrid;
     }
 
     @BeforeClass
