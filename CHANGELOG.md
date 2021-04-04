@@ -1,3 +1,7 @@
+##[vNext]
+### Added
+- Supporting agentRunId and variantId. [Trello 2527](https://trello.com/c/6SyxJXVZ)
+
 ## [3.198.0]
 ### Updated
 - Closing test instead of aborting them when getAllTestsResults called without closing eyes by the user. [Trello 2493](https://trello.com/c/YS3vLGxd)

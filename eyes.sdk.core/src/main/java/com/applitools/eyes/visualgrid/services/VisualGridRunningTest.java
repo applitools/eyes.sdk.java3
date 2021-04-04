@@ -25,7 +25,7 @@ public class VisualGridRunningTest extends RunningTest {
     final List<CheckTask> checkTasks = new ArrayList<>();
     private JobInfo jobInfo;
 
-    public VisualGridRunningTest(Logger logger, String eyesId, RenderBrowserInfo browserInfo, Configuration configuration) {
+    VisualGridRunningTest(Logger logger, String eyesId, RenderBrowserInfo browserInfo, Configuration configuration) {
         super(browserInfo, logger);
         setTestId(String.format("%s/%s", eyesId, getTestId()));
         logger.log(getTestId(), Stage.GENERAL, Pair.of("browserInfo", browserInfo));
@@ -33,8 +33,9 @@ public class VisualGridRunningTest extends RunningTest {
     }
 
     public VisualGridRunningTest(Logger logger, String eyesId, Configuration configuration, RenderBrowserInfo browserInfo,
-                                 List<PropertyData> properties, ServerConnector serverConnector) {
+                                 List<PropertyData> properties, ServerConnector serverConnector, String agentRunId) {
         this(logger, eyesId, browserInfo, configuration);
+        this.agentRunId = agentRunId;
         this.setServerConnector(serverConnector);
         if (properties != null) {
             for (PropertyData property : properties) {

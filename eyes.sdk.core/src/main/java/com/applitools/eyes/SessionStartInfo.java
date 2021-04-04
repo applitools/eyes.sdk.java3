@@ -39,17 +39,16 @@ public class SessionStartInfo {
     private List<PropertyData> properties;
     private String agentSessionId;
     @JsonInclude(JsonInclude.Include.NON_NULL)
+    private String agentRunId;
+    @JsonInclude(JsonInclude.Include.NON_NULL)
     private Integer timeout;
     private final int concurrencyVersion = 2;
 
-    public SessionStartInfo(String testId, String agentId, SessionType sessionType,
-                            String appIdOrName, String verId,
-                            String scenarioIdOrName, BatchInfo batchInfo,
-                            String baselineEnvName, String environmentName,
-                            Object environment,
-                            ImageMatchSettings defaultMatchSettings,
-                            String branchName, String parentBranchName, String baselineBranchName,
-                            Boolean saveDiffs, List<PropertyData> properties, String agentSessionId, Integer timeout) {
+    public SessionStartInfo(String testId, String agentId, SessionType sessionType, String appIdOrName, String verId,
+                            String scenarioIdOrName, BatchInfo batchInfo, String baselineEnvName, String environmentName,
+                            Object environment, ImageMatchSettings defaultMatchSettings, String branchName,
+                            String parentBranchName, String baselineBranchName, Boolean saveDiffs,
+                            List<PropertyData> properties, String agentSessionId, String agentRunId, Integer timeout) {
         ArgumentGuard.notNullOrEmpty(agentId, "agentId");
         ArgumentGuard.notNullOrEmpty(appIdOrName, "appIdOrName");
         ArgumentGuard.notNullOrEmpty(scenarioIdOrName, "scenarioIdOrName");
@@ -73,6 +72,7 @@ public class SessionStartInfo {
         this.saveDiffs = saveDiffs;
         this.properties = properties;
         this.agentSessionId = agentSessionId;
+        this.agentRunId = agentRunId;
         this.timeout = timeout;
     }
 
@@ -150,6 +150,18 @@ public class SessionStartInfo {
         return timeout;
     }
 
+    public String getTestId() {
+        return testId;
+    }
+
+    public void setTestId(String testId) {
+        this.testId = testId;
+    }
+
+    public String getAgentRunId() {
+        return agentRunId;
+    }
+
     @Override
     public String toString() {
         return "SessionStartInfo{" +
@@ -169,16 +181,9 @@ public class SessionStartInfo {
                 ", defaultMatchSettings=" + defaultMatchSettings +
                 ", properties=" + properties +
                 ", agentSessionId='" + agentSessionId + '\'' +
+                ", agentRunId='" + agentRunId + '\'' +
                 ", timeout=" + timeout +
                 ", concurrencyVersion=" + concurrencyVersion +
                 '}';
-    }
-
-    public String getTestId() {
-        return testId;
-    }
-
-    public void setTestId(String testId) {
-        this.testId = testId;
     }
 }

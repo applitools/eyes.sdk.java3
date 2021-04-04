@@ -21,7 +21,8 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
     "userInputs",
     "windowTitle",
     "tag",
-    "isPrimary"
+    "isPrimary",
+    "knownVariantId"
 })
 public class ActualAppOutput {
 
@@ -50,6 +51,8 @@ public class ActualAppOutput {
     private String tag;
     @JsonProperty("isPrimary")
     private Boolean isPrimary;
+    @JsonProperty("knownVariantId")
+    private String knownVariantId;
 
     @JsonProperty("image")
     public Image getImage() {
@@ -161,4 +164,11 @@ public class ActualAppOutput {
         this.isPrimary = isPrimary;
     }
 
+    public String getKnownVariantId() {
+        return knownVariantId;
+    }
+
+    public void setKnownVariantId(String knownVariantId) {
+        this.knownVariantId = knownVariantId;
+    }
 }

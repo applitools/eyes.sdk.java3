@@ -300,6 +300,7 @@ public class TestSerialization extends ReportingTestSuite {
         BatchInfo bi = new BatchInfo("batch name", calendar);
         bi.setId("37a587aa-17d0-4e86-bf0e-566656a84dda");
         String agentSessionId = UUID.randomUUID().toString();
+        String agentRunId = UUID.randomUUID().toString();
 
         SessionStartInfo ssi = new SessionStartInfo("id", "some agent", SessionType.SEQUENTIAL,
                 "my app", "1.0.0", "some scenario",
@@ -313,11 +314,12 @@ public class TestSerialization extends ReportingTestSuite {
                 false,
                 properties,
                 agentSessionId,
+                agentRunId,
                 1800);
 
         String actualSerialization = jsonMapper.writeValueAsString(ssi);
 
-        String expectedSerialization = String.format("{\"agentId\":\"some agent\",\"sessionType\":\"SEQUENTIAL\",\"appIdOrName\":\"my app\",\"verId\":\"1.0.0\",\"scenarioIdOrName\":\"some scenario\",\"batchInfo\":{\"id\":\"37a587aa-17d0-4e86-bf0e-566656a84dda\",\"batchSequenceName\":null,\"name\":\"batch name\",\"startedAt\":\"2017-07-02T05:22:21Z\",\"notifyOnCompletion\":false,\"isCompleted\":false,\"properties\":[]},\"baselineEnvName\":\"some baseline name\",\"environmentName\":\"env name\",\"environment\":{\"inferred\":null,\"os\":null,\"hostingApp\":null,\"displaySize\":null,\"deviceInfo\":null,\"osInfo\":null,\"hostingAppInfo\":null},\"branchName\":\"some branch name\",\"parentBranchName\":\"some parent branch name\",\"baselineBranchName\":\"some baseline branch name\",\"saveDiffs\":false,\"defaultMatchSettings\":{\"matchLevel\":\"STRICT\",\"exact\":null,\"ignoreCaret\":false,\"useDom\":false,\"enablePatterns\":false,\"ignoreDisplacements\":false,\"accessibility\":[],\"accessibilitySettings\":null,\"Ignore\":null,\"Layout\":null,\"Strict\":null,\"Content\":null,\"Floating\":null},\"properties\":[{\"name\":\"property name\",\"value\":\"property value\"},{\"name\":null,\"value\":null}],\"agentSessionId\":\"%s\",\"timeout\":1800,\"concurrencyVersion\":2}", agentSessionId);
+        String expectedSerialization = String.format("{\"agentId\":\"some agent\",\"sessionType\":\"SEQUENTIAL\",\"appIdOrName\":\"my app\",\"verId\":\"1.0.0\",\"scenarioIdOrName\":\"some scenario\",\"batchInfo\":{\"id\":\"37a587aa-17d0-4e86-bf0e-566656a84dda\",\"batchSequenceName\":null,\"name\":\"batch name\",\"startedAt\":\"2017-07-02T05:22:21Z\",\"notifyOnCompletion\":false,\"isCompleted\":false,\"properties\":[]},\"baselineEnvName\":\"some baseline name\",\"environmentName\":\"env name\",\"environment\":{\"inferred\":null,\"os\":null,\"hostingApp\":null,\"displaySize\":null,\"deviceInfo\":null,\"osInfo\":null,\"hostingAppInfo\":null},\"branchName\":\"some branch name\",\"parentBranchName\":\"some parent branch name\",\"baselineBranchName\":\"some baseline branch name\",\"saveDiffs\":false,\"defaultMatchSettings\":{\"matchLevel\":\"STRICT\",\"exact\":null,\"ignoreCaret\":false,\"useDom\":false,\"enablePatterns\":false,\"ignoreDisplacements\":false,\"accessibility\":[],\"accessibilitySettings\":null,\"Ignore\":null,\"Layout\":null,\"Strict\":null,\"Content\":null,\"Floating\":null},\"properties\":[{\"name\":\"property name\",\"value\":\"property value\"},{\"name\":null,\"value\":null}],\"agentSessionId\":\"%s\",\"agentRunId\":\"%s\",\"timeout\":1800,\"concurrencyVersion\":2}", agentSessionId, agentRunId);
 
         Assert.assertEquals(actualSerialization,
                 expectedSerialization, "SessionStartInfo serialization does not match!");

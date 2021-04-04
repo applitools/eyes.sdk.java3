@@ -52,6 +52,7 @@ public abstract class EyesBase implements IEyesBase {
     private MatchWindowTask matchWindowTask;
 
     private String testId = UUID.randomUUID().toString();
+    protected String agentRunId = null;
     protected ClassicRunner runner;
     protected ServerConnector serverConnector;
     protected RunningSession runningSession;
@@ -700,8 +701,9 @@ public abstract class EyesBase implements IEyesBase {
             GeneralUtils.logExceptionStackTrace(logger, Stage.CHECK, e, getTestId());
         }
 
-        MatchWindowData.Options options = new MatchWindowData.Options(tag, userInputs.toArray(new Trigger[0]), replaceLast,
-                false, false, false, false, imageMatchSettings, source, renderId);
+        MatchWindowData.Options options = new MatchWindowData.Options(tag, userInputs.toArray(new Trigger[0]),
+                replaceLast, false, false, false, false,
+                imageMatchSettings, source, checkSettingsInternal.getVariantId(), renderId);
 
         return new MatchWindowData(runningSession, userInputs.toArray(new Trigger[0]), appOutput, tag,
                 false, options, agentSetupStr, renderId);
@@ -878,7 +880,7 @@ public abstract class EyesBase implements IEyesBase {
                 null, getTestName(), configGetter.getBatch(), getBaselineEnvName(), configGetter.getEnvironmentName(),
                 appEnv, configGetter.getDefaultMatchSettings(), configGetter.getBranchName(),
                 configGetter.getParentBranchName(), configGetter.getBaselineBranchName(), configGetter.getSaveDiffs(),
-                properties, agentSessionId, configGetter.getAbortIdleTestTimeout());
+                properties, agentSessionId, agentRunId, configGetter.getAbortIdleTestTimeout());
 
         logger.log(TraceLevel.Info, getTestId(), Stage.OPEN, Pair.of("configuration", getConfiguration()));
         return sessionStartInfo;

@@ -39,4 +39,6 @@ public interface ICheckSettingsInternal extends com.applitools.ICheckSettingsInt
     GetAccessibilityRegion[] getAccessibilityRegions();
 
     BaseOcrRegion getOcrRegion();
+
+    String getVariantId();
 }

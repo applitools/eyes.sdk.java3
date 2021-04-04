@@ -25,6 +25,7 @@ public class MatchWindowData {
         private final boolean forceMatch;
         private final ImageMatchSettings imageMatchSettings;
         private final String source;
+        private final String variantId;
         private final String renderId;
 
         /**
@@ -50,7 +51,7 @@ public class MatchWindowData {
                        boolean ignoreMismatch, boolean ignoreMatch,
                        boolean forceMismatch, boolean forceMatch,
                        ImageMatchSettings imageMatchSettings,
-                       String source, String renderId) {
+                       String source, String variantId, String renderId) {
             ArgumentGuard.notNull(userInputs, "userInputs");
 
             this.name = name;
@@ -62,6 +63,7 @@ public class MatchWindowData {
             this.forceMatch = forceMatch;
             this.imageMatchSettings = imageMatchSettings;
             this.source = source;
+            this.variantId = variantId;
             this.renderId = renderId;
         }
 
@@ -105,6 +107,9 @@ public class MatchWindowData {
             return renderId;
         }
 
+        public String getVariantId() {
+            return variantId;
+        }
     }
 
     // TODO Remove redundancy: userInputs and ignoreMismatch should only be inside Options. (requires server version update).

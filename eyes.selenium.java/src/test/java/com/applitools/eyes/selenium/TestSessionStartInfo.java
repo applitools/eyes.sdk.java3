@@ -53,6 +53,7 @@ public class TestSessionStartInfo extends ReportingTestSuite {
                 null,
                 null,
                 null,
+                null,
                 null);
 
         ObjectMapper mapper = new ObjectMapper();

@@ -18,7 +18,8 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
     "matchLevel",
     "defaultMatchSettings",
     "agentId",
-    "properties"
+    "properties",
+    "agentRunId"
 })
 public class StartInfo {
 
@@ -46,6 +47,8 @@ public class StartInfo {
     private String agentId;
     @JsonProperty("properties")
     private Object[] properties = null;
+    @JsonProperty("agentRunId")
+    private String agentRunId = null;
 
     @JsonProperty("sessionType")
     public String getSessionType() {
@@ -167,4 +170,13 @@ public class StartInfo {
         this.properties = properties;
     }
 
+    @JsonProperty("agentRunId")
+    public String getAgentRunId() {
+        return agentRunId;
+    }
+
+    @JsonProperty("agentRunId")
+    public void setAgentRunId(String agentRunId) {
+        this.agentRunId = agentRunId;
+    }
 }
