@@ -40,5 +40,5 @@ public interface ICheckSettingsInternal extends com.applitools.ICheckSettingsInt
 
     BaseOcrRegion getOcrRegion();
 
-    String getVariantId();
+    String getVariationGroupId();
 }

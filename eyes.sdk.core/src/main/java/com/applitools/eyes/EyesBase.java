@@ -703,7 +703,7 @@ public abstract class EyesBase implements IEyesBase {
 
         MatchWindowData.Options options = new MatchWindowData.Options(tag, userInputs.toArray(new Trigger[0]),
                 replaceLast, false, false, false, false,
-                imageMatchSettings, source, checkSettingsInternal.getVariantId(), renderId);
+                imageMatchSettings, source, checkSettingsInternal.getVariationGroupId(), renderId);
 
         return new MatchWindowData(runningSession, userInputs.toArray(new Trigger[0]), appOutput, tag,
                 false, options, agentSetupStr, renderId);
