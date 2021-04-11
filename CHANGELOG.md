@@ -1,4 +1,8 @@
-##[3.199.0]
+## [vNext]
+### Fixed
+- Now sanitizing resource url before parsing it in every place. [Trello 2533](https://trello.com/c/cQhhBquE)
+
+## [3.199.0]
 ### Added
 - Supporting agentRunId and variantId. [Trello 2527](https://trello.com/c/6SyxJXVZ)
 

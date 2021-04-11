@@ -43,7 +43,7 @@ public class TestResourceParsing extends ReportingTestSuite {
     public void testParseCss() throws IOException {
         String cssContent = GeneralUtils.readInputStreamAsString(getClass().getResourceAsStream("/css_file_with_urls.css"));
         RGridResource resource = new RGridResource( "https://test.com", "text/css", cssContent.getBytes());
-        Set<URI> newResources = resource.parse(new Logger(), "");
+        Set<URI> newResources = resource.parse(new Logger(), "https://test.com/home/#a#b");
         Assert.assertEquals(newResources.size(), 4);
     }
 
