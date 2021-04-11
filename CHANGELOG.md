@@ -1,4 +1,6 @@
 ## [vNext]
+### Updated
+- Supporting safari screenshots in iPad Air 4. [Trello 2530](https://trello.com/c/0XhQ7MPi)
 ### Fixed
 - Now sanitizing resource url before parsing it in every place. [Trello 2533](https://trello.com/c/cQhhBquE)
 

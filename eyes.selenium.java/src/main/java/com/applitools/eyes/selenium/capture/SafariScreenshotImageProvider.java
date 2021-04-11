@@ -6,6 +6,7 @@ import com.applitools.eyes.selenium.SeleniumEyes;
 import com.applitools.eyes.selenium.frames.FrameChain;
 import com.applitools.eyes.selenium.positioning.ScrollPositionProviderFactory;
 import com.applitools.eyes.selenium.wrappers.EyesSeleniumDriver;
+import com.applitools.eyes.visualgrid.model.IosDeviceName;
 import com.applitools.utils.ImageUtils;
 import org.openqa.selenium.*;
 
@@ -36,7 +37,10 @@ public class SafariScreenshotImageProvider extends MobileScreenshotImageProvider
         double scaleRatio = eyes.getDevicePixelRatio();
         RectangleSize originalViewportSize = getViewportSize();
         RectangleSize viewportSize = originalViewportSize.scale(scaleRatio);
-        if (userAgent.getOS().equals(OSNames.IOS)) {
+        Capabilities capabilities = ((EyesSeleniumDriver) eyes.getDriver()).getCapabilities();
+        String deviceName = (String) capabilities.getCapability("deviceName");
+        deviceName = deviceName != null ? deviceName : "";
+        if (userAgent.getOS().equals(OSNames.IOS) || deviceName.contains("iPad")) {
             image = cropIOSImage(image, originalViewportSize, logger);
         } else {
             Boolean forceFullPageScreenshot = eyes.getConfiguration().getForceFullPageScreenshot();
@@ -133,6 +137,8 @@ public class SafariScreenshotImageProvider extends MobileScreenshotImageProvider
         devicesRegions.put(new RectangleSize(2224, 1668), new Rectangle[]{new Rectangle(0, 140, 2224, 1528)});
 
         devicesRegions.put(new RectangleSize(1170, 2532), new Rectangle[]{new Rectangle(0, 293, 1170, 1993)});
+
+        devicesRegions.put(new RectangleSize(1640, 2360), new Rectangle[]{new Rectangle(0, 149, 1640, 2211)});
     }
 
 }
