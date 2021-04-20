@@ -10,6 +10,7 @@ import com.applitools.eyes.config.ConfigurationProvider;
 import com.applitools.eyes.debug.DebugScreenshotsProvider;
 import com.applitools.eyes.debug.FileDebugScreenshotsProvider;
 import com.applitools.eyes.debug.NullDebugScreenshotProvider;
+import com.applitools.eyes.exceptions.TestFailedException;
 import com.applitools.eyes.fluent.CheckSettings;
 import com.applitools.eyes.fluent.GetFloatingRegion;
 import com.applitools.eyes.fluent.GetSimpleRegion;
@@ -222,7 +223,7 @@ public class VisualGridEyes implements ISeleniumEyes {
                 browserInfo.setIosDeviceSize(deviceSizes.get(browserInfo.getIosDeviceInfo().getDeviceName()));
             }
 
-            RunningTest test = new VisualGridRunningTest(logger, eyesId, getConfiguration(), browserInfo, this.properties, serverConnector, agentRunId);
+            RunningTest test = new VisualGridRunningTest(logger, true, eyesId, getConfiguration(), browserInfo, this.properties, serverConnector, agentRunId);
             this.testList.put(test.getTestId(), test);
             newTests.add(test);
         }
@@ -336,9 +337,10 @@ public class VisualGridEyes implements ISeleniumEyes {
             }
         }
 
+        TestResultsSummary testResultsSummary = new TestResultsSummary(allResults);
         if (errorResult != null) {
             if (throwException) {
-                throw new Error(errorResult.getException());
+                throw new TestFailedException(testResultsSummary, errorResult.getException());
             }
             return errorResult.getTestResults();
         }
@@ -380,7 +382,6 @@ public class VisualGridEyes implements ISeleniumEyes {
         getConfiguration().setServerUrl(serverUrl);
     }
 
-    @Override
     public void proxy(AbstractProxySettings abstractProxySettings) {
         getConfiguration().setProxy(abstractProxySettings);
     }
@@ -389,7 +390,6 @@ public class VisualGridEyes implements ISeleniumEyes {
         return getConfiguration().getProxy() == null ? runner.getProxy() : getConfiguration().getProxy();
     }
 
-    @Override
     public boolean isEyesClosed() {
         boolean isVGEyesClosed = true;
         synchronized (testList) {

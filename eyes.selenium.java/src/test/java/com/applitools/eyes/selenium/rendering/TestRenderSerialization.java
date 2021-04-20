@@ -43,8 +43,8 @@ public class TestRenderSerialization {
         Map<String, RGridResource> resources = new HashMap<>();
         String platform = "android";
         BrowserType browserName = BrowserType.IE_10;
-        RenderRequest request = new RenderRequest("id", webHook.toString(), url.toString(), dom, resources, renderInfo, platform,
-                browserName, null, selectorsToFindRegionsFor, true, "rendererId", "", stitchingServiceUrl.toString(), options);
+        RenderRequest request = new RenderRequest("id", webHook.toString(), url.toString(), dom, resources, renderInfo, platform, "web",
+                browserName, null, selectorsToFindRegionsFor, true, "rendererId", "", stitchingServiceUrl.toString(), "", options);
 
         ObjectMapper mapper = new ObjectMapper();
         ObjectNode actual = (ObjectNode) mapper.readTree(mapper.writeValueAsString(request));

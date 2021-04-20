@@ -1,3 +1,15 @@
+## [3.201.0-beta]
+### Fixed
+- UFG Native Mobile takes full page screenshots by default.
+
+## [3.201.0-beta]
+### Added
+- Added API for `addMobileDevices`.
+
+## [3.200.0-beta]
+### Added
+- UFG for IOS Native tests.
+
 ## [3.201.0]
 ### Added
 - Supporting iPad Air 4 safari tests. [Trello 2558](https://trello.com/c/5MXTjDMs)

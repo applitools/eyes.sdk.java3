@@ -14,7 +14,7 @@ import com.applitools.utils.GeneralUtils;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ClassicRunner extends EyesRunner implements IClassicRunner {
+public class ClassicRunner extends EyesRunner {
     private OpenService openService;
     private CheckService checkService;
     private CloseService closeService;

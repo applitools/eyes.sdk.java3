@@ -24,9 +24,7 @@ import com.applitools.eyes.positioning.InvalidPositionProvider;
 import com.applitools.eyes.positioning.PositionProvider;
 import com.applitools.eyes.scaling.FixedScaleProvider;
 import com.applitools.eyes.scaling.NullScaleProvider;
-import com.applitools.eyes.selenium.AsyncClassicRunner;
 import com.applitools.eyes.selenium.ClassicRunner;
-import com.applitools.eyes.selenium.IClassicRunner;
 import com.applitools.eyes.triggers.MouseAction;
 import com.applitools.eyes.triggers.MouseTrigger;
 import com.applitools.eyes.triggers.TextTrigger;
@@ -56,7 +54,7 @@ public abstract class EyesBase implements IEyesBase {
 
     private String testId = UUID.randomUUID().toString();
     protected String agentRunId = null;
-    protected final IClassicRunner runner;
+    protected final EyesRunner runner;
     protected final boolean isAsync;
     protected ServerConnector serverConnector;
     protected RunningSession runningSession;
@@ -76,7 +74,7 @@ public abstract class EyesBase implements IEyesBase {
     protected boolean isOpen;
 
     private final Queue<Trigger> userInputs;
-    private final List<PropertyData> properties = new ArrayList<>();
+    protected final List<PropertyData> properties = new ArrayList<>();
 
     private boolean isViewportSizeSet;
 
@@ -87,7 +85,7 @@ public abstract class EyesBase implements IEyesBase {
         this(null);
     }
 
-    public EyesBase(IClassicRunner runner) {
+    public EyesBase(EyesRunner runner) {
         this.runner = runner != null ? runner : new ClassicRunner();
         this.isAsync = runner instanceof AsyncClassicRunner;
         logger = new Logger();

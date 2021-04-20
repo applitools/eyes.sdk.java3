@@ -5,9 +5,7 @@ import com.applitools.eyes.config.Configuration;
 import com.applitools.eyes.fluent.ICheckSettingsInternal;
 import com.applitools.eyes.logging.Stage;
 import com.applitools.eyes.logging.Type;
-import com.applitools.eyes.selenium.AsyncClassicRunner;
 import com.applitools.eyes.selenium.ClassicRunner;
-import com.applitools.eyes.selenium.IClassicRunner;
 import com.applitools.eyes.visualgrid.model.RenderBrowserInfo;
 import com.applitools.eyes.visualgrid.model.VisualGridSelector;
 import com.applitools.eyes.visualgrid.services.CheckTask;
@@ -26,7 +24,7 @@ public abstract class RunningTest extends EyesBase implements IBatchCloser {
 
     protected final List<CheckTask> checkTasks = new ArrayList<>();
 
-    protected RunningTest(IClassicRunner runner) {
+    protected RunningTest(EyesRunner runner) {
         super(runner);
         browserInfo = null;
     }
@@ -214,6 +212,10 @@ public abstract class RunningTest extends EyesBase implements IBatchCloser {
             return;
         }
         issueAbort(e, true);
+    }
+
+    public boolean isNextCheckTask(CheckTask checkTask) {
+        return !checkTasks.isEmpty() && checkTasks.get(0).equals(checkTask);
     }
 
     protected RectangleSize getViewportSize() {

@@ -56,6 +56,10 @@ public class CheckTask {
         return null;
     }
 
+    public String getAgentId() {
+        return runningTest.getFullAgentId();
+    }
+
     public RenderStatusResults getRenderStatusResults() {
         return renderStatusResults;
     }
@@ -96,7 +100,7 @@ public class CheckTask {
     }
 
     public boolean isReadyForMatch() {
-        return isRenderFinished() && !isMatchStarted && !runningTest.checkTasks.isEmpty() && runningTest.checkTasks.get(0).equals(this);
+        return isRenderFinished() && !isMatchStarted && runningTest.isNextCheckTask(this);
     }
 
     public MatchWindowData startMatch() {

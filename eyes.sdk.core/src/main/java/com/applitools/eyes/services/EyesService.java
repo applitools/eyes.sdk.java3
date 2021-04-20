@@ -4,11 +4,11 @@ import com.applitools.connectivity.ServerConnector;
 import com.applitools.eyes.Logger;
 import org.apache.commons.lang3.tuple.Pair;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
 public abstract class EyesService<INPUT, OUTPUT> {
+    private static final int TIME_BETWEEN_STATUS_REPORT = 5 * 60 * 1000;
+
     protected Logger logger;
     protected ServerConnector serverConnector;
 
@@ -19,6 +19,13 @@ public abstract class EyesService<INPUT, OUTPUT> {
     public EyesService(Logger logger, ServerConnector serverConnector) {
         this.logger = logger;
         this.serverConnector = serverConnector;
+        Timer timer = new Timer("Service Status Report", true);
+        timer.schedule(new TimerTask() {
+            @Override
+            public void run() {
+                logServiceStatus();
+            }
+        }, TIME_BETWEEN_STATUS_REPORT, TIME_BETWEEN_STATUS_REPORT);
     }
 
     public void setLogger(Logger logger) {
@@ -29,6 +36,8 @@ public abstract class EyesService<INPUT, OUTPUT> {
     public void setServerConnector(ServerConnector serverConnector) {
         this.serverConnector = serverConnector;
     }
+
+    public abstract void logServiceStatus();
 
     public abstract void run();
 

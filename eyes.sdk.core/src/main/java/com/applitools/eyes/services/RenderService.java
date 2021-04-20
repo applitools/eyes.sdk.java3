@@ -28,6 +28,15 @@ public class RenderService extends EyesService<RenderRequest, RenderStatusResult
     }
 
     @Override
+    public void logServiceStatus() {
+        logger.log(Collections.<String>emptySet(), Stage.GENERAL,
+                Pair.of("input_size", inputQueue.size()),
+                Pair.of("output_size", outputQueue.size()),
+                Pair.of("error_size", errorQueue.size()),
+                Pair.of("in_render_process", renderingQueue.size()));
+    }
+
+    @Override
     public void run() {
         sendAllRenderRequests();
 

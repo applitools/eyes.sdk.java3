@@ -1,7 +1,6 @@
 package com.applitools.eyes.visualgrid.model;
 
 import com.applitools.eyes.selenium.BrowserType;
-import com.applitools.utils.ClassVersionGetter;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -33,7 +32,7 @@ public class RenderRequest {
     private String url;
 
     @JsonInclude(JsonInclude.Include.NON_NULL)
-    private RGridDom dom;
+    private RGridDom snapshot;
 
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private Map<String, RGridResource> resources;
@@ -42,7 +41,10 @@ public class RenderRequest {
     private RenderInfo renderInfo;
 
     @JsonIgnore
-    private String platform;
+    private String platformName;
+
+    @JsonIgnore
+    private final String platformType;
 
     @JsonIgnore
     private BrowserType browserName;
@@ -62,24 +64,45 @@ public class RenderRequest {
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private String renderer;
 
-    public RenderRequest(String testId, String webHook, String url, RGridDom dom, Map<String, RGridResource> resources, RenderInfo renderInfo,
-                         String platform, BrowserType browserName, Object scriptHooks, List<VisualGridSelector> selectorsToFindRegionsFor,
-                         boolean sendDom, String renderer, String stepId, String stitchingService, List<VisualGridOption> visualGridOptions) {
+    public RenderRequest(String testId, String webHook, String url, RGridDom snapshot, Map<String, RGridResource> resources, RenderInfo renderInfo,
+                         String platformName, String platformType, BrowserType browserName, Object scriptHooks, List<VisualGridSelector> selectorsToFindRegionsFor,
+                         boolean sendDom, String renderer, String stepId, String stitchingService, String agentId, List<VisualGridOption> visualGridOptions) {
         this.testId = testId;
         this.webhook = webHook;
         this.url = url;
-        this.dom = dom;
+        this.snapshot = snapshot;
         this.resources = resources;
         this.renderInfo = renderInfo;
         this.renderer = renderer;
         this.stepId = stepId;
-        this.platform = platform;
+        this.platformName = platformName;
+        this.platformType = platformType;
         this.browserName = browserName;
         this.scriptHooks = scriptHooks;
         this.selectorsToFindRegionsFor = selectorsToFindRegionsFor;
         this.sendDom = sendDom;
         this.stitchingService = stitchingService;
-        this.agentId = "eyes.selenium.visualgrid.java/" + ClassVersionGetter.CURRENT_VERSION;
+        this.agentId = agentId;
+        this.options = new HashMap<>();
+        for (VisualGridOption option : visualGridOptions) {
+            this.options.put(option.getKey(), option.getValue());
+        }
+    }
+
+    public RenderRequest(String testId, String webHook, RGridDom snapshot, RenderInfo renderInfo, String platformName,
+                         String platformType, Object scriptHooks, String renderer, String stepId, String stitchingService,
+                         String agentId, List<VisualGridOption> visualGridOptions) {
+        this.testId = testId;
+        this.webhook = webHook;
+        this.snapshot = snapshot;
+        this.renderInfo = renderInfo;
+        this.platformName = platformName;
+        this.platformType = platformType;
+        this.scriptHooks = scriptHooks;
+        this.renderer = renderer;
+        this.stepId = stepId;
+        this.stitchingService = stitchingService;
+        this.agentId = agentId;
         this.options = new HashMap<>();
         for (VisualGridOption option : visualGridOptions) {
             this.options.put(option.getKey(), option.getValue());
@@ -89,9 +112,10 @@ public class RenderRequest {
     /**
      * A smaller constructor for creating a request for job-info
      */
-    public RenderRequest(RenderInfo renderInfo, String platform, BrowserType browserName) {
+    public RenderRequest(RenderInfo renderInfo, String platformName, String platformType, BrowserType browserName) {
         this.renderInfo = renderInfo;
-        this.platform = platform;
+        this.platformName = platformName;
+        this.platformType = platformType;
         this.browserName = browserName;
     }
 
@@ -103,12 +127,12 @@ public class RenderRequest {
         this.url = url;
     }
 
-    public RGridDom getDom() {
-        return dom;
+    public RGridDom getSnapshot() {
+        return snapshot;
     }
 
-    public void setDom(RGridDom dom) {
-        this.dom = dom;
+    public void setSnapshot(RGridDom snapshot) {
+        this.snapshot = snapshot;
     }
 
     public Map<String, RGridResource> getResources() {
@@ -127,8 +151,8 @@ public class RenderRequest {
         this.renderInfo = renderInfo;
     }
 
-    public void setPlatform(String platform) {
-        this.platform = platform;
+    public void setPlatformName(String platformName) {
+        this.platformName = platformName;
     }
 
     public void setBrowserName(BrowserType browserName) {
@@ -166,6 +190,9 @@ public class RenderRequest {
     @JsonProperty("browser")
     @JsonInclude(JsonInclude.Include.NON_NULL)
     public Map<String, Object> getBrowser() {
+        if (browserName == null) {
+            return null;
+        }
         Map<String, Object> map = new HashMap<>();
         map.put("name", this.browserName);
         return map;
@@ -175,7 +202,8 @@ public class RenderRequest {
     @JsonInclude(JsonInclude.Include.NON_NULL)
     public Map<String, Object> getPlatform() {
         Map<String, Object> map = new HashMap<>();
-        map.put("name", this.platform);
+        map.put("name", this.platformName);
+        map.put("type", this.platformType);
         return map;
     }
 
@@ -220,10 +248,10 @@ public class RenderRequest {
                 ", agentId='" + agentId + '\'' +
                 ", webhook='" + webhook + '\'' +
                 ", url='" + url + '\'' +
-                ", dom=" + dom +
+                ", snapshot=" + snapshot +
                 ", resources=" + resources +
                 ", renderInfo=" + renderInfo +
-                ", platform='" + platform + '\'' +
+                ", platform='" + platformName + '\'' +
                 ", browserName='" + browserName + '\'' +
                 ", scriptHooks=" + scriptHooks +
                 ", selectorsToFindRegionsFor=" + selectorsToFindRegionsFor +
