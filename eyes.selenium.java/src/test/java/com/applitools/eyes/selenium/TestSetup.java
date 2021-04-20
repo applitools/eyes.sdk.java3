@@ -31,7 +31,7 @@ public abstract class TestSetup extends ReportingTestSuite implements ITest {
     private boolean useVisualGrid = false;
     StitchMode stitchMode = StitchMode.SCROLL;
 
-    private EyesRunner runner = new AsyncClassicRunner();
+    private EyesRunner runner = new ClassicRunner();
     private Capabilities options;
     private String testName;
 
@@ -126,7 +126,7 @@ public abstract class TestSetup extends ReportingTestSuite implements ITest {
 
         this.runner = this.useVisualGrid ?
                 new VisualGridRunner(10, testSuitName) :
-                new AsyncClassicRunner(new RunnerOptions().testConcurrency(50));
+                new ClassicRunner(new RunnerOptions().testConcurrency(50));
     }
 
     public SpecificTestContextRequirements getTestData() {

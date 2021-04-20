@@ -1,13 +1,15 @@
-package com.applitools.eyes.selenium;
+package com.applitools.eyes;
 
 import com.applitools.connectivity.ServerConnector;
 import com.applitools.eyes.*;
+import com.applitools.eyes.selenium.ClassicServiceRunner;
+import com.applitools.eyes.selenium.IClassicRunner;
 import com.applitools.eyes.visualgrid.services.CheckTask;
 import com.applitools.eyes.visualgrid.services.RunnerOptions;
 
 import java.util.*;
 
-public class AsyncClassicRunner extends EyesRunner implements IClassicRunner {
+class AsyncClassicRunner extends EyesRunner implements IClassicRunner {
 
     private ClassicServiceRunner serviceRunner;
     protected final Map<String, RunningTest> runningTests = Collections.synchronizedMap(new HashMap<String, RunningTest>());

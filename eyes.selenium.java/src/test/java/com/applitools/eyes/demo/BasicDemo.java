@@ -1,7 +1,6 @@
 package com.applitools.eyes.demo;
 
 import com.applitools.eyes.*;
-import com.applitools.eyes.selenium.AsyncClassicRunner;
 import com.applitools.eyes.selenium.ClassicRunner;
 import com.applitools.eyes.selenium.Eyes;
 import com.applitools.eyes.utils.ReportingTestSuite;
@@ -25,7 +24,7 @@ public class BasicDemo extends ReportingTestSuite {
 
     @DataProvider(name = "runnerDP")
     public Object[] dp() {
-        return new Object[]{"classic", "async", "vg"};
+        return new Object[]{"classic", "vg"};
     }
 
     @BeforeClass
@@ -51,7 +50,8 @@ public class BasicDemo extends ReportingTestSuite {
                 runner = new ClassicRunner();
                 break;
             case "async":
-                runner = new AsyncClassicRunner();
+                runner = new ClassicRunner();
+                //runner = new AsyncClassicRunner();
                 break;
             case "vg":
                 runner = new VisualGridRunner(10);
