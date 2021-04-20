@@ -24,7 +24,6 @@ import com.applitools.eyes.positioning.InvalidPositionProvider;
 import com.applitools.eyes.positioning.PositionProvider;
 import com.applitools.eyes.scaling.FixedScaleProvider;
 import com.applitools.eyes.scaling.NullScaleProvider;
-import com.applitools.eyes.selenium.AsyncClassicRunner;
 import com.applitools.eyes.selenium.ClassicRunner;
 import com.applitools.eyes.selenium.IClassicRunner;
 import com.applitools.eyes.triggers.MouseAction;
