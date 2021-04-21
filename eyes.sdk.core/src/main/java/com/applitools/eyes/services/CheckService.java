@@ -25,6 +25,17 @@ public class CheckService extends EyesService<MatchWindowData, MatchResult> {
     }
 
     @Override
+    public void logServiceStatus() {
+        logger.log(Collections.<String>emptySet(), Stage.GENERAL,
+                Pair.of("input_size", inputQueue.size()),
+                Pair.of("output_size", outputQueue.size()),
+                Pair.of("error_size", errorQueue.size()),
+                Pair.of("tasks_in_upload_process", inUploadProcess.size()),
+                Pair.of("tasks_waiting_for_match_window", matchWindowQueue.size()),
+                Pair.of("tasks_in_match_window_process", inMatchWindowProcess.size()));
+    }
+
+    @Override
     public void run() {
         while (!inputQueue.isEmpty()) {
             final Pair<String, MatchWindowData> nextInput = inputQueue.remove(0);

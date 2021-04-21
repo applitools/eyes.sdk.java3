@@ -6,6 +6,7 @@ import com.applitools.eyes.AbstractProxySettings;
 import com.applitools.eyes.EyesException;
 import com.applitools.eyes.Logger;
 import com.applitools.eyes.TaskListener;
+import com.applitools.eyes.logging.Stage;
 import com.applitools.eyes.visualgrid.model.*;
 import org.apache.commons.lang3.tuple.Pair;
 
@@ -43,6 +44,15 @@ public class ResourceCollectionService extends EyesService<FrameData, RGridDom> 
 
     public AbstractProxySettings getAutProxy() {
         return resourcesConnector.getProxy();
+    }
+
+    @Override
+    public void logServiceStatus() {
+        logger.log(Collections.<String>emptySet(), Stage.GENERAL,
+                Pair.of("input_size", inputQueue.size()),
+                Pair.of("output_size", outputQueue.size()),
+                Pair.of("error_size", errorQueue.size()),
+                Pair.of("in_dom_analyzing_process", tasksInDomAnalyzingProcess.size()));
     }
 
     @Override

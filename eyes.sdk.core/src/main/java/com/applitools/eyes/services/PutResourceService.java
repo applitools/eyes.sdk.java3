@@ -21,8 +21,19 @@ public class PutResourceService extends EyesService<RGridDom, RGridDom> {
 
     final Map<String, SyncTaskListener<Void>> uploadedResourcesCache = Collections.synchronizedMap(new HashMap<String, SyncTaskListener<Void>>());
 
+    private final Set<String> inProgressTasks = Collections.synchronizedSet(new HashSet<String>());
+
     public PutResourceService(Logger logger, ServerConnector serverConnector) {
         super(logger, serverConnector);
+    }
+
+    @Override
+    public void logServiceStatus() {
+        logger.log(Collections.<String>emptySet(), Stage.GENERAL,
+                Pair.of("input_size", inputQueue.size()),
+                Pair.of("output_size", outputQueue.size()),
+                Pair.of("error_size", errorQueue.size()),
+                Pair.of("in_progress", inProgressTasks.size()));
     }
 
     @Override
@@ -40,16 +51,19 @@ public class PutResourceService extends EyesService<RGridDom, RGridDom> {
                         return;
                     }
 
+                    inProgressTasks.remove(nextInput.getLeft());
                     outputQueue.add(Pair.of(nextInput.getLeft(), dom));
                 }
 
                 @Override
                 public void onFail(Throwable t) {
+                    inProgressTasks.remove(nextInput.getLeft());
                     errorQueue.add(Pair.of(nextInput.getLeft(), t));
                 }
             };
 
             try {
+                inProgressTasks.add(nextInput.getLeft());
                 checkResourcesStatus(dom, checkResourceListener);
             } catch (Throwable t) {
                 checkResourceListener.onFail(t);
