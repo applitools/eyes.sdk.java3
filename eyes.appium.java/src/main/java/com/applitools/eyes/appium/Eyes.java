@@ -36,7 +36,6 @@ import com.applitools.eyes.selenium.positioning.RegionPositionCompensation;
 import com.applitools.eyes.selenium.regionVisibility.MoveToRegionVisibilityStrategy;
 import com.applitools.eyes.selenium.regionVisibility.NopRegionVisibilityStrategy;
 import com.applitools.eyes.selenium.regionVisibility.RegionVisibilityStrategy;
-import com.applitools.eyes.visualgrid.model.DeviceSize;
 import com.applitools.eyes.visualgrid.model.RenderBrowserInfo;
 import com.applitools.eyes.visualgrid.services.CheckTask;
 import com.applitools.eyes.visualgrid.services.IEyes;
@@ -604,8 +603,6 @@ public class Eyes extends RunningTest implements IEyes {
             if (deviceInfo.getIosDeviceInfo() == null) {
                 throw new EyesException("All browser infos must be ios device info");
             }
-            Map<String, DeviceSize> deviceSizes = serverConnector.getDevicesSizes(ServerConnector.IOS_DEVICES_PATH);
-            deviceInfo.setIosDeviceSize(deviceSizes.get(deviceInfo.getIosDeviceInfo().getDeviceName()));
 
             String agentRunId = String.format("%s_%s", getConfiguration().getTestName(), UUID.randomUUID());
             RunningTest test = new VisualGridRunningTest(logger, false, getTestId(), getConfiguration(), deviceInfo, this.properties, serverConnector, agentRunId);
@@ -704,10 +701,10 @@ public class Eyes extends RunningTest implements IEyes {
                 break;
             }
         }
-
+        TestResultsSummary testResultsSummary = new TestResultsSummary(allResults);
         if (errorResult != null) {
             if (throwException) {
-                throw new Error(errorResult.getException());
+                throw new TestFailedException(testResultsSummary, errorResult.getException());
             }
             return errorResult.getTestResults();
         }

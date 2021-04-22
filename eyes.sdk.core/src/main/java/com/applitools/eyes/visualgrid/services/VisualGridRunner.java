@@ -2,6 +2,7 @@ package com.applitools.eyes.visualgrid.services;
 
 import com.applitools.connectivity.ServerConnector;
 import com.applitools.eyes.*;
+import com.applitools.eyes.exceptions.TestFailedException;
 import com.applitools.eyes.services.VisualGridServiceRunner;
 import com.applitools.eyes.visualgrid.model.FrameData;
 import com.applitools.eyes.visualgrid.model.IDebugResourceWriter;
@@ -83,6 +84,7 @@ public class VisualGridRunner extends EyesRunner {
 
     public synchronized void check(byte[] mobileResources, String contentType, List<CheckTask> checkTasks) {
         serviceRunner.addNativeMobileResources(mobileResources, contentType, checkTasks);
+        logMemoryUsage();
     }
 
     public TestResultsSummary getAllTestResultsImpl(boolean throwException) {
@@ -128,10 +130,11 @@ public class VisualGridRunner extends EyesRunner {
             }
         }
 
+        TestResultsSummary testResultsSummary = new TestResultsSummary(allResults);
         if (throwException && exception != null) {
-            throw new Error(exception);
+            throw new TestFailedException(testResultsSummary, exception);
         }
-        return new TestResultsSummary(allResults);
+        return testResultsSummary;
     }
 
     public Throwable getError() {
