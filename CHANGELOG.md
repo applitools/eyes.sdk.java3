@@ -1,3 +1,7 @@
+## [3.200.0-beta]
+### Added
+- UFG for IOS Native tests.
+
 ## [3.199.1]
 ### Updated
 - Supporting safari screenshots in iPad Air 4. [Trello 2530](https://trello.com/c/0XhQ7MPi)
