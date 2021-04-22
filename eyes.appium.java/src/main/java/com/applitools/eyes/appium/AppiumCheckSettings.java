@@ -259,6 +259,9 @@ public class AppiumCheckSettings extends CheckSettings implements ImplicitInitia
         return this.scrollRootElement;
     }
 
+    /**
+     * internal
+     */
     @JsonProperty("sizeMode")
     public String getSizeMode() {
         ICheckSettingsInternal checkSettingsInternal = this;

@@ -10,6 +10,7 @@ import com.applitools.eyes.config.ConfigurationProvider;
 import com.applitools.eyes.debug.DebugScreenshotsProvider;
 import com.applitools.eyes.debug.FileDebugScreenshotsProvider;
 import com.applitools.eyes.debug.NullDebugScreenshotProvider;
+import com.applitools.eyes.exceptions.TestFailedException;
 import com.applitools.eyes.fluent.CheckSettings;
 import com.applitools.eyes.fluent.GetFloatingRegion;
 import com.applitools.eyes.fluent.GetSimpleRegion;
@@ -335,9 +336,10 @@ public class VisualGridEyes implements ISeleniumEyes {
             }
         }
 
+        TestResultsSummary testResultsSummary = new TestResultsSummary(allResults);
         if (errorResult != null) {
             if (throwException) {
-                throw new Error(errorResult.getException());
+                throw new TestFailedException(testResultsSummary, errorResult.getException());
             }
             return errorResult.getTestResults();
         }

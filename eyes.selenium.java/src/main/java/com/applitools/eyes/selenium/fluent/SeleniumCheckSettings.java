@@ -511,6 +511,9 @@ public class SeleniumCheckSettings extends CheckSettings implements ISeleniumChe
         this.sendDom = isSendDom;
     }
 
+    /**
+     * internal
+     */
     @JsonProperty("sizeMode")
     public String getSizeMode() {
         ICheckSettingsInternal checkSettingsInternal = this;
