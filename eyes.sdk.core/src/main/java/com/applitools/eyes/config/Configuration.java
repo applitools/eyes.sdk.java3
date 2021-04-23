@@ -632,6 +632,19 @@ public class Configuration implements IConfiguration {
         return addBrowser(iosDeviceInfo);
     }
 
+    public Configuration addMobileDevices(IosDeviceInfo iosDeviceInfo, IosDeviceInfo... iosDeviceInfos) {
+        addMobileDevice(iosDeviceInfo);
+        if (iosDeviceInfos == null) {
+            return this;
+        }
+
+        for (IosDeviceInfo info : iosDeviceInfos) {
+            addMobileDevice(info);
+        }
+
+        return this;
+    }
+
     public Configuration addBrowser(int width, int height, BrowserType browserType, String baselineEnvName) {
         RenderBrowserInfo browserInfo = new RenderBrowserInfo(width, height, browserType, baselineEnvName);
         addBrowser(browserInfo);

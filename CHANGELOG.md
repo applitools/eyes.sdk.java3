@@ -1,3 +1,7 @@
+## [3.201.0-beta]
+### Added
+- Added API for `addMobileDevices`.
+
 ## [3.200.0-beta]
 ### Added
 - UFG for IOS Native tests.
