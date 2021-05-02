@@ -136,7 +136,7 @@ public class TestRenderingTask extends ReportingTestSuite {
                                     throw new IllegalStateException(e);
                                 }
 
-                                TaskListener<RGridResource> listener = invocationOnMock.getArgument(3);
+                                TaskListener<RGridResource> listener = invocationOnMock.getArgument(4);
                                 listener.onComplete(resource);
                             }
                         }
