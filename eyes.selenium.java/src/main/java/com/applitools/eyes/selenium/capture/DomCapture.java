@@ -1,5 +1,6 @@
 package com.applitools.eyes.selenium.capture;
 
+import com.applitools.connectivity.Cookie;
 import com.applitools.connectivity.ServerConnector;
 import com.applitools.eyes.*;
 import com.applitools.eyes.logging.Stage;
@@ -176,7 +177,7 @@ public class DomCapture {
             try {
                 cssPhaser.register();
                 shouldWaitForPhaser = true;
-                serverConnector.downloadResource(uri, userAgent.toString(), baseUrl, new TaskListener<RGridResource>() {
+                serverConnector.downloadResource(uri, userAgent.toString(), baseUrl, Collections.<Cookie>emptySet(), new TaskListener<RGridResource>() {
                     @Override
                     public void onComplete(RGridResource resource) {
                         try {

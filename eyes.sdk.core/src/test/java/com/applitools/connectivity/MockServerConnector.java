@@ -101,7 +101,7 @@ public class MockServerConnector extends ServerConnector {
     }
 
     @Override
-    public Future<?> downloadResource(final URI url, final String userAgent, final String refererUrl,
+    public Future<?> downloadResource(final URI url, final String userAgent, final String refererUrl, Set<Cookie> cookies,
                                       final TaskListener<RGridResource> listener) {
         listener.onComplete(RGridResource.createEmpty(url.toString()));
         return null;

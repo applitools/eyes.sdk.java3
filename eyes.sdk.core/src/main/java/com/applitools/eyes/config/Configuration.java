@@ -57,7 +57,8 @@ public class Configuration implements IConfiguration {
     private boolean hideScrollbars = true;
     private boolean hideCaret = true;
     private boolean isVisualGrid = false;
-    private boolean disableBrowserFetching = false;
+    private boolean disableBrowserFetching = true;
+    private boolean useCookies = true;
     @JsonIgnore
     private IDebugResourceWriter debugResourceWriter = new NullDebugResourceWriter();
 
@@ -124,6 +125,7 @@ public class Configuration implements IConfiguration {
         this.features = new HashSet<>(other.getFeatures());
         this.visualGridOptions = other.getVisualGridOptions();
         this.disableBrowserFetching = other.isDisableBrowserFetching();
+        this.useCookies = other.isUseCookies();
         this.debugResourceWriter = other.getDebugResourceWriter();
         this.isDefaultLayoutBreakpointsSet = other.isDefaultLayoutBreakpointsSet();
         this.layoutBreakpoints = other.getLayoutBreakpoints();
@@ -775,6 +777,15 @@ public class Configuration implements IConfiguration {
 
     public Configuration setDisableBrowserFetching(boolean disableBrowserFetching) {
         this.disableBrowserFetching = disableBrowserFetching;
+        return this;
+    }
+
+    public boolean isUseCookies() {
+        return useCookies;
+    }
+
+    public Configuration setUseCookies(boolean useCookies) {
+        this.useCookies = useCookies;
         return this;
     }
 

@@ -20,10 +20,7 @@ import org.testng.annotations.Test;
 
 import javax.ws.rs.HttpMethod;
 import java.net.URI;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.Future;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicLong;
@@ -215,7 +212,7 @@ public class TestServerConnector extends ReportingTestSuite {
         when(restClient.target(url.toString())).thenReturn(target);
         when(target.asyncRequest(anyString())).thenReturn(mockedAsyncRequest);
 
-        connector.downloadResource(url, userAgent, referer, emptyListener);
+        connector.downloadResource(url, userAgent, referer, Collections.<Cookie>emptySet(), emptyListener);
         Map<String, String> expectedHeaders = new HashMap<>();
         expectedHeaders.put("User-Agent", userAgent);
         expectedHeaders.put("Referer", referer);
@@ -228,7 +225,7 @@ public class TestServerConnector extends ReportingTestSuite {
         when(restClient.target(filteredUrl.toString())).thenReturn(target);
         when(target.asyncRequest(anyString())).thenReturn(mockedAsyncRequest);
 
-        connector.downloadResource(filteredUrl, userAgent, referer, emptyListener);
+        connector.downloadResource(filteredUrl, userAgent, referer, Collections.<Cookie>emptySet(), emptyListener);
         expectedHeaders = new HashMap<>();
         expectedHeaders.put("Referer", referer);
         Assert.assertEquals(mockedAsyncRequest.headers, expectedHeaders);

@@ -1,5 +1,6 @@
 package com.applitools.eyes.visualgrid.model;
 
+import com.applitools.connectivity.Cookie;
 import com.applitools.connectivity.MockServerConnector;
 import com.applitools.connectivity.ServerConnector;
 import com.applitools.eyes.*;
@@ -105,7 +106,7 @@ public class TestRenderingTask extends ReportingTestSuite {
         domAnalyzer.cachedResources.put("12", cachedResource);
 
         // When RenderingTask tries to get a new resource, this task will be submitted to the ExecutorService
-        when(serverConnector.downloadResource(ArgumentMatchers.<URI>any(), anyString(), anyString(), ArgumentMatchers.<TaskListener<RGridResource>>any()))
+        when(serverConnector.downloadResource(ArgumentMatchers.<URI>any(), anyString(), anyString(), ArgumentMatchers.<Set<Cookie>>any(), ArgumentMatchers.<TaskListener<RGridResource>>any()))
                 .thenAnswer(new Answer<Future<?>>() {
             @Override
             public Future<?> answer(final InvocationOnMock invocationOnMock) throws Throwable {

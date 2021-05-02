@@ -32,6 +32,7 @@ import com.applitools.utils.GeneralUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.http.client.utils.URIBuilder;
 import org.openqa.selenium.By;
+import org.openqa.selenium.Cookie;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.remote.RemoteWebDriver;
@@ -633,6 +634,21 @@ public class VisualGridEyes implements ISeleniumEyes {
 
     private void analyzeFrameData(Set<String> testIds, FrameData frameData, EyesTargetLocator switchTo) {
         FrameChain frameChain = webDriver.getFrameChain().clone();
+
+        Set<com.applitools.connectivity.Cookie> sdkCookies = new HashSet<>();
+        if (getConfiguration().isUseCookies()) {
+            Set<Cookie> cookies = webDriver.manage().getCookies();
+            if (cookies != null) {
+                for (Cookie cookie : cookies) {
+                    com.applitools.connectivity.Cookie sdkCookie = new com.applitools.connectivity.Cookie(
+                            cookie.getName(), cookie.getValue(), cookie.getPath(), cookie.getDomain(), cookie.isSecure(), cookie.isHttpOnly(), cookie.getExpiry());
+                    sdkCookies.add(sdkCookie);
+                }
+            }
+
+        }
+
+        frameData.setCookies(sdkCookies);
         for (FrameData.CrossFrame crossFrame : frameData.getCrossFrames()) {
             if (crossFrame.getSelector() == null) {
                 continue;
