@@ -770,7 +770,11 @@ public class SeleniumEyes extends RunningTest implements ISeleniumEyes {
                 }
             } else {
                 if (state.isStitchContent()) {
-                    checkFullWindow(checkSettingsInternal, state, scrollRootElement, source);
+                    if (userDefinedSRE != null && !isMobileDevice) {
+                        checkFullElement(checkSettingsInternal, userDefinedSRE, null, state, source);
+                    } else {
+                        checkFullWindow(checkSettingsInternal, state, scrollRootElement, source);
+                    }
                 } else {
                     checkWindow(checkSettingsInternal, state, scrollRootElement, source);
                 }

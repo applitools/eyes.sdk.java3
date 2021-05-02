@@ -3,6 +3,8 @@
 - Now sending cookies when trying to download resources and disable browser fetching by default. [Trello 2517](https://trello.com/c/QeKRfMgv)
 ### Updated
 - If the SDK gets 403 when trying to download resource, it will try again without the referer header. [Trello 2415](https://trello.com/c/fI3Meo5c)
+### Fixed
+- Coded region are now collected properly for check window with SRE which is not in the window size. [Trello 2553](https://trello.com/c/seY4xZ3r)
 
 ## [3.199.1]
 ### Updated

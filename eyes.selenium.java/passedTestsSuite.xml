@@ -162,8 +162,14 @@
         </classes>
     </test>
     <test name="TestScrollRootElementInCenter_Test">
+        <parameter name="dont_run"
+                   value="TestCheckScrollRootElement+VG"/>
         <classes>
-            <class name="com.applitools.eyes.selenium.TestScrollRootElementInCenter"/>
+            <class name="com.applitools.eyes.selenium.TestScrollRootElementInCenter">
+                <methods>
+                    <include name="TestCheckScrollRootElement" />
+                </methods>
+            </class>
         </classes>
     </test>
     <test name="TestDuplicates" parallel="methods">

@@ -1,5 +1,6 @@
 package com.applitools.eyes.selenium;
 
+import com.applitools.eyes.Region;
 import com.applitools.eyes.selenium.fluent.Target;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Capabilities;
@@ -19,9 +20,10 @@ public final class TestScrollRootElementInCenter extends TestSetup {
     @Test
     public void TestCheckScrollRootElement() {
         getEyes().check("Scrollable area",
-                Target.region(By.cssSelector("article"))
-                        .scrollRootElement(By.cssSelector("div.wrapper"))
-                        .fully());
+                Target.window().scrollRootElement(By.cssSelector("div.wrapper"))
+                        .fully().layout(By.cssSelector("body > section > main > div > article > h1")));
+
+        setExpectedLayoutRegions(new Region(29, 52, 448, 24));
     }
 }
 
