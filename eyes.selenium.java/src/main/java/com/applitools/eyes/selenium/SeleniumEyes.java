@@ -877,6 +877,10 @@ public class SeleniumEyes extends RunningTest implements ISeleniumEyes {
         // Hide scrollbars
         String originalOverflow = EyesDriverUtils.setOverflow(driver, "hidden", targetElement);
 
+        ScrollPositionProvider scrollingElementProvider = new SeleniumScrollPositionProvider(logger, driver, getCurrentFrameScrollRootElement());
+        Location originalLocation = scrollingElementProvider.getCurrentPosition();
+        scrollingElementProvider.setPosition(Location.ZERO);
+
         // Get element's scroll size and bounds
         RectangleSize scrollSize = EyesRemoteWebElement.getScrollSize(targetElement, driver, logger);
         Region elementBounds = EyesRemoteWebElement.getClientBounds(targetElement, driver, logger);
@@ -947,6 +951,7 @@ public class SeleniumEyes extends RunningTest implements ISeleniumEyes {
         Region crop = computeCropRectangle(fullElementBounds, targetRegion);
         checkWindowBase(crop, checkSettingsInternal, source);
 
+        scrollingElementProvider.setPosition(originalLocation);
         EyesDriverUtils.setOverflow(driver, originalOverflow, targetElement);
     }
 
