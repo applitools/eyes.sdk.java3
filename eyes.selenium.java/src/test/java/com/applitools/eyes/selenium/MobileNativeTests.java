@@ -78,7 +78,7 @@ public class MobileNativeTests extends ReportingTestSuite {
         capabilities.setCapability("deviceName", "Samsung Galaxy S8 WQHD GoogleAPI Emulator");
         capabilities.setCapability("automationName", "uiautomator2");
 
-        capabilities.setCapability("app", "https://applitools.bintray.com/Examples/app-debug.apk");
+        capabilities.setCapability("app", "https://applitools.jfrog.io/artifactory/Examples/app-debug.apk");
 
         capabilities.setCapability("appPackage", "com.applitoolstest");
         capabilities.setCapability("appActivity", "com.applitoolstest.ScrollActivity");
@@ -137,7 +137,7 @@ public class MobileNativeTests extends ReportingTestSuite {
         caps.setCapability("deviceOrientation", "portrait");
         caps.setCapability("platformVersion", "13.0");
         caps.setCapability("platformName", "iOS");
-        caps.setCapability("app", "https://applitools.bintray.com/Examples/HelloWorldiOS_1_0.zip");
+        caps.setCapability("app", "https://applitools.jfrog.io/artifactory/Examples/HelloWorldiOS_1_0.zip");
 
         Eyes eyes = initEyes(caps);
         Configuration configuration = eyes.getConfiguration();

@@ -27,7 +27,7 @@ public class AndroidXRecyclerViewTest extends AndroidTestSetup {
 
     @Override
     protected void setAppCapability() {
-        // To run locally use https://applitools.bintray.com/Examples/androidx/1.0.0/app_androidx.apk
+        // To run locally use https://applitools.jfrog.io/artifactory/Examples/androidx/1.0.0/app_androidx.apk
         capabilities.setCapability("app", "app_androidx");
     }
 

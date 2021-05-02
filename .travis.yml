@@ -53,17 +53,17 @@ jobs:
       script:
         - echo $APPLITOOLS_REPORT_ID
         - sed -i 's/androidTestSuite.xml/devTestSuite.xml/g' $TRAVIS_BUILD_DIR/eyes.appium.java/pom.xml;
-        - sh upload_app.sh "https://applitools.bintray.com/Examples/android/1.3/app-debug.apk" "app_android"
-        - sh upload_app.sh "https://applitools.bintray.com/Examples/androidx/1.2.0/app_androidx.apk" "app_androidx"
-        - sh upload_app.sh "https://applitools.bintray.com/Examples/IOSTestApp/1.3/ipa/IOSTestApp.ipa" "app_ios"
+        - sh upload_app.sh "https://applitools.jfrog.io/artifactory/Examples/android/1.3/app-debug.apk" "app_android"
+        - sh upload_app.sh "https://applitools.jfrog.io/artifactory/Examples/androidx/1.2.0/app_androidx.apk" "app_androidx"
+        - sh upload_app.sh "https://applitools.jfrog.io/artifactory/Examples/IOSTestApp/1.3/ipa/IOSTestApp.ipa" "app_ios"
         - chmod +x ./runTests.sh
         - ./runTests.sh "eyes.appium.java"
     - name: Appium Android
       if: type != cron
       script:
         - echo $APPLITOOLS_REPORT_ID
-        - sh upload_app.sh "https://applitools.bintray.com/Examples/android/1.3/app-debug.apk" "app_android"
-        - sh upload_app.sh "https://applitools.bintray.com/Examples/androidx/1.1.0/app_androidx.apk" "app_androidx"
+        - sh upload_app.sh "https://applitools.jfrog.io/artifactory/Examples/android/1.3/app-debug.apk" "app_android"
+        - sh upload_app.sh "https://applitools.jfrog.io/artifactory/Examples/androidx/1.1.0/app_androidx.apk" "app_androidx"
         - chmod +x ./runTests.sh
         - ./runTests.sh "eyes.appium.java"
     - name: Selenium
@@ -115,7 +115,7 @@ jobs:
       if: type != cron
       script:
         - echo $APPLITOOLS_REPORT_ID
-        - sh upload_app.sh "https://applitools.bintray.com/Examples/IOSTestApp/1.3/ipa/IOSTestApp.ipa" "app_ios"
+        - sh upload_app.sh "https://applitools.jfrog.io/artifactory/Examples/IOSTestApp/1.3/ipa/IOSTestApp.ipa" "app_ios"
         - sed -i 's/androidTestSuite.xml/iosTestSuite.xml/g' $TRAVIS_BUILD_DIR/eyes.appium.java/pom.xml;
         - chmod +x ./runTests.sh
         - ./runTests.sh "eyes.appium.java"
