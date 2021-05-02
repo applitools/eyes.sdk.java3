@@ -1,3 +1,9 @@
+## [vNext]
+### Added
+- Now sending cookies when trying to download resources and disable browser fetching by default. [Trello 2517](https://trello.com/c/QeKRfMgv)
+### Updated
+- If the SDK gets 403 when trying to download resource, it will try again without the referer header. [Trello 2415](https://trello.com/c/fI3Meo5c)
+
 ## [3.199.1]
 ### Updated
 - Supporting safari screenshots in iPad Air 4. [Trello 2530](https://trello.com/c/0XhQ7MPi)
