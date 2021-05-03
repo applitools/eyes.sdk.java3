@@ -17,4 +17,5 @@ runTest() {
 
 runTest "jboss"
 runTest "jersey1x"
+runTest "net"
 echo "Connectivity tests passed"

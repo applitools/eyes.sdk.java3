@@ -1,5 +1,6 @@
 package com.applitools.eyes.selenium;
 
+import com.applitools.eyes.Borders;
 import com.applitools.eyes.Region;
 
 public class BoundsAndBorders {

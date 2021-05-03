@@ -5,7 +5,6 @@ import com.applitools.eyes.*;
 import com.applitools.eyes.logging.Stage;
 import com.applitools.eyes.logging.TraceLevel;
 import com.applitools.eyes.logging.Type;
-import com.applitools.eyes.visualgrid.services.ServiceTaskListener;
 import org.apache.commons.lang3.tuple.Pair;
 
 import java.util.Collections;
@@ -86,7 +85,7 @@ public class OpenService extends EyesService<SessionStartInfo, RunningSession> {
                     }
 
                     logger.log(testId, Stage.OPEN, Type.RETRY);
-                    serverConnector.startSession(this, sessionStartInfo);
+                    ((ServerConnector) serverConnector).startSession(this, sessionStartInfo);
                 } catch (Throwable e) {
                     listener.onFail(e);
                 }
@@ -95,7 +94,7 @@ public class OpenService extends EyesService<SessionStartInfo, RunningSession> {
 
         try {
             logger.log(testId, Stage.OPEN, Pair.of("sessionStartInfo", sessionStartInfo));
-            serverConnector.startSession(taskListener, sessionStartInfo);
+            ((ServerConnector) serverConnector).startSession(taskListener, sessionStartInfo);
         } catch (Throwable t) {
             listener.onFail(t);
         }

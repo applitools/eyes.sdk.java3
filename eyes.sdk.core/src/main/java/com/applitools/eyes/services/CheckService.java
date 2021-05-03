@@ -5,7 +5,6 @@ import com.applitools.eyes.*;
 import com.applitools.eyes.logging.Stage;
 import com.applitools.eyes.logging.TraceLevel;
 import com.applitools.eyes.logging.Type;
-import com.applitools.eyes.visualgrid.services.ServiceTaskListener;
 import org.apache.commons.lang3.tuple.Pair;
 
 import java.util.*;
@@ -95,7 +94,7 @@ public class CheckService extends EyesService<MatchWindowData, MatchResult> {
 
         try {
             logger.log(TraceLevel.Info, Collections.singleton(testId), Stage.CHECK, Type.UPLOAD_START, Pair.of("matchWindowData", matchWindowQueue));
-            serverConnector.uploadImage(uploadListener, appOutput.getScreenshotBytes());
+            ((ServerConnector) serverConnector).uploadImage(uploadListener, appOutput.getScreenshotBytes());
         } catch (Throwable t) {
             taskListener.onFail(t);
         }
@@ -104,7 +103,7 @@ public class CheckService extends EyesService<MatchWindowData, MatchResult> {
     public void matchWindow(final String testId, MatchWindowData data, final ServiceTaskListener<MatchResult> listener) {
         try {
             logger.log(TraceLevel.Info, Collections.singleton(testId), Stage.CHECK, Type.MATCH_START, Pair.of("matchWindowData", data));
-            serverConnector.matchWindow(new TaskListener<MatchResult>() {
+            ((ServerConnector) serverConnector).matchWindow(new TaskListener<MatchResult>() {
                 @Override
                 public void onComplete(MatchResult taskResponse) {
                     logger.log(testId, Stage.CHECK, Type.MATCH_COMPLETE, Pair.of("matchResult", taskResponse));

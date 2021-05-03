@@ -8,6 +8,7 @@ import com.applitools.eyes.visualgrid.model.*;
 import com.applitools.eyes.visualgrid.services.CheckTask;
 import com.applitools.eyes.visualgrid.services.IEyes;
 import com.applitools.eyes.visualgrid.services.VisualGridRunningTest;
+import com.applitools.utils.ClassVersionGetter;
 import com.applitools.utils.GeneralUtils;
 import org.apache.commons.lang3.tuple.Pair;
 
@@ -296,7 +297,8 @@ public class EyesServiceRunner extends Thread {
             RenderRequest request = new RenderRequest(checkTask.getTestId(), this.renderingInfo.getResultsUrl(), result.getUrl(), dom,
                     resourceMapping, renderInfo, browserInfo.getPlatform(), browserInfo.getBrowserType(),
                     checkSettingsInternal.getScriptHooks(), regionSelectorsList, checkSettingsInternal.isSendDom(),
-                    checkTask.getRenderer(), checkTask.getStepId(), this.renderingInfo.getStitchingServiceUrl(), checkSettingsInternal.getVisualGridOptions());
+                    checkTask.getRenderer(), checkTask.getStepId(), this.renderingInfo.getStitchingServiceUrl(),
+                    checkSettingsInternal.getVisualGridOptions(), "eyes.selenium.visualgrid.java/" + ClassVersionGetter.CURRENT_VERSION);
 
             waitingCheckTasks.put(checkTask.getStepId(), checkTask);
             if (checkTask.isReadyForRender()) {

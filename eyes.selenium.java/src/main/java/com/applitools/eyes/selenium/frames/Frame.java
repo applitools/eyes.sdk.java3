@@ -6,7 +6,7 @@ package com.applitools.eyes.selenium.frames;
 import com.applitools.eyes.*;
 import com.applitools.eyes.positioning.PositionMemento;
 import com.applitools.eyes.positioning.PositionProvider;
-import com.applitools.eyes.selenium.Borders;
+import com.applitools.eyes.Borders;
 import com.applitools.eyes.selenium.EyesSeleniumUtils;
 import com.applitools.eyes.selenium.positioning.ScrollPositionMemento;
 import com.applitools.eyes.selenium.positioning.ScrollPositionProviderFactory;

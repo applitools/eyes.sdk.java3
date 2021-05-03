@@ -3,7 +3,6 @@ package com.applitools.eyes.services;
 import com.applitools.connectivity.ServerConnector;
 import com.applitools.eyes.*;
 import com.applitools.eyes.logging.Stage;
-import com.applitools.eyes.visualgrid.services.ServiceTaskListener;
 import org.apache.commons.lang3.tuple.Pair;
 
 import java.util.Collections;
@@ -53,7 +52,7 @@ public class CloseService extends EyesService<SessionStopInfo, TestResults> {
                 logger.log(testId, Stage.CLOSE, Pair.of("testResults", testResults));
                 testResults.setNew(sessionStopInfo.getRunningSession().getIsNew());
                 testResults.setUrl(sessionStopInfo.getRunningSession().getUrl());
-                testResults.setServerConnector(serverConnector);
+                testResults.setServerConnector((ServerConnector) serverConnector);
                 listener.onComplete(testResults);
             }
 
@@ -65,7 +64,7 @@ public class CloseService extends EyesService<SessionStopInfo, TestResults> {
 
         try {
             logger.log(testId, Stage.CLOSE, Pair.of("sessionStopInfo", sessionStopInfo));
-            serverConnector.stopSession(taskListener, sessionStopInfo);
+            ((ServerConnector) serverConnector).stopSession(taskListener, sessionStopInfo);
         } catch (Throwable t) {
             listener.onFail(t);
         }

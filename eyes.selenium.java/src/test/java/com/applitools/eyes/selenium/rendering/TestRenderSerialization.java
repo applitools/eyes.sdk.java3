@@ -9,6 +9,7 @@ import com.applitools.eyes.selenium.fluent.Target;
 import com.applitools.eyes.utils.SeleniumUtils;
 import com.applitools.eyes.visualgrid.model.*;
 import com.applitools.eyes.visualgrid.services.VisualGridRunner;
+import com.applitools.utils.ClassVersionGetter;
 import com.applitools.utils.GeneralUtils;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -44,7 +45,7 @@ public class TestRenderSerialization {
         String platform = "android";
         BrowserType browserName = BrowserType.IE_10;
         RenderRequest request = new RenderRequest("id", webHook.toString(), url.toString(), dom, resources, renderInfo, platform,
-                browserName, null, selectorsToFindRegionsFor, true, "rendererId", "", stitchingServiceUrl.toString(), options);
+                browserName, null, selectorsToFindRegionsFor, true, "rendererId", "", stitchingServiceUrl.toString(), options, ClassVersionGetter.CURRENT_VERSION);
 
         ObjectMapper mapper = new ObjectMapper();
         ObjectNode actual = (ObjectNode) mapper.readTree(mapper.writeValueAsString(request));

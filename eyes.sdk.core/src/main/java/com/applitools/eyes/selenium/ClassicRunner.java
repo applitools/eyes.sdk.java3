@@ -7,7 +7,7 @@ import com.applitools.eyes.logging.Type;
 import com.applitools.eyes.services.CheckService;
 import com.applitools.eyes.services.CloseService;
 import com.applitools.eyes.services.OpenService;
-import com.applitools.eyes.visualgrid.services.ServiceTaskListener;
+import com.applitools.eyes.services.ServiceTaskListener;
 import com.applitools.utils.GeneralUtils;
 
 import java.util.ArrayList;

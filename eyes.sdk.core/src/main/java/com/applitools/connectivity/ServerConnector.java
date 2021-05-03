@@ -13,14 +13,11 @@ import com.applitools.eyes.logging.LogSessionsClientEvents;
 import com.applitools.eyes.logging.Stage;
 import com.applitools.eyes.logging.TraceLevel;
 import com.applitools.eyes.logging.Type;
-import com.applitools.eyes.visualgrid.model.*;
+import com.applitools.eyes.visualgrid.model.RenderingInfo;
 import com.applitools.utils.ArgumentGuard;
 import com.applitools.utils.GeneralUtils;
-import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.MapperFeature;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.http.HttpStatus;
@@ -34,10 +31,6 @@ import java.util.*;
 public class ServerConnector extends UfgConnector {
 
     static final String CLOSE_BATCH = "api/sessions/batches/%s/close/bypointerid";
-    static final String RENDER_STATUS = "/render-status";
-    static final String RENDER = "/render";
-    static final String RESOURCE_STATUS = "/query/resources-exist";
-    static final String RENDERER_INFO = "/job-info";
     static final String MOBILE_DEVICES_PATH = "/app/info/mobile/devices";
     public static final String API_PATH = "/api/sessions/running";
     private static final String LOG_PATH = "/api/sessions/log";
@@ -269,134 +262,6 @@ public class ServerConnector extends UfgConnector {
         validStatusCodes.add(HttpStatus.SC_OK);
         ResponseParsingCallback<MatchResult> callback = new ResponseParsingCallback<>(this, validStatusCodes, listener, new TypeReference<MatchResult>() {});
         sendLongRequest(request, HttpMethod.POST, callback, jsonData, MediaType.APPLICATION_JSON);
-    }
-
-    public void render(final TaskListener<List<RunningRender>> listener, List<RenderRequest> renderRequests) {
-        ArgumentGuard.notNull(renderRequests, "renderRequests");
-        for (RenderRequest renderRequest : renderRequests) {
-            logger.log(TraceLevel.Info, renderRequest.getTestId(), Stage.RENDER, Pair.of("renderRequest", renderRequest));
-        }
-        AsyncRequest request = restClient.target(getRenderInfo().getServiceUrl()).path(RENDER).asyncRequest(MediaType.APPLICATION_JSON);
-        request.header("X-Auth-Token", getRenderInfo().getAccessToken());
-        List<Integer> validStatusCodes = new ArrayList<>();
-        validStatusCodes.add(HttpStatus.SC_OK);
-
-        try {
-            ObjectMapper objectMapper = new ObjectMapper();
-            objectMapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
-            objectMapper.configure(MapperFeature.SORT_PROPERTIES_ALPHABETICALLY, true);
-            String json = objectMapper.writeValueAsString(renderRequests);
-            ResponseParsingCallback<RunningRender[]> callback = new ResponseParsingCallback<>(this, validStatusCodes, new TaskListener<RunningRender[]>() {
-                @Override
-                public void onComplete(RunningRender[] runningRenders) {
-                    listener.onComplete(runningRenders == null ? null : new ArrayList<>(Arrays.asList(runningRenders)));
-                }
-
-                @Override
-                public void onFail() {
-                    listener.onFail();
-                }
-            }, new TypeReference<RunningRender[]>() {});
-            sendAsyncRequest(request, HttpMethod.POST, callback, json, MediaType.APPLICATION_JSON);
-        } catch (JsonProcessingException e) {
-            throw new EyesException("Render failed", e);
-        }
-    }
-
-    public void renderStatusById(final TaskListener<List<RenderStatusResults>> listener, List<String> testIds, List<String> renderIds) {
-        try {
-            ArgumentGuard.notNull(testIds, "testIds");
-            ArgumentGuard.notNull(renderIds, "renderIds");
-
-            for (int i = 0; i < testIds.size(); i++) {
-                logger.log(TraceLevel.Info, Collections.singleton(testIds.get(i)), Stage.RENDER, Type.RENDER_STATUS, Pair.of("renderId", renderIds.get(i)));
-            }
-
-            AsyncRequest request = makeEyesRequest(new HttpRequestBuilder() {
-                @Override
-                public AsyncRequest build() {
-                    return restClient.target(getRenderInfo().getServiceUrl()).path((RENDER_STATUS)).asyncRequest(MediaType.TEXT_PLAIN);
-                }
-            });
-
-            request.header("X-Auth-Token", getRenderInfo().getAccessToken());
-            List<Integer> validStatusCodes = new ArrayList<>();
-            validStatusCodes.add(HttpStatus.SC_OK);
-
-            ObjectMapper objectMapper = new ObjectMapper();
-            objectMapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
-            objectMapper.configure(MapperFeature.SORT_PROPERTIES_ALPHABETICALLY, true);
-            String json = objectMapper.writeValueAsString(renderIds);
-
-            ResponseParsingCallback<RenderStatusResults[]> callback = new ResponseParsingCallback<>(this, validStatusCodes, new TaskListener<RenderStatusResults[]>() {
-                @Override
-                public void onComplete(RenderStatusResults[] renderStatusResults) {
-                    if (renderStatusResults == null) {
-                        listener.onComplete(null);
-                        return;
-                    }
-
-                    listener.onComplete(new ArrayList<>(Arrays.asList(renderStatusResults)));
-                }
-
-                @Override
-                public void onFail() {
-                    listener.onFail();
-                }
-            }, new TypeReference<RenderStatusResults[]>() {});
-            sendAsyncRequest(request, HttpMethod.POST, callback, json, MediaType.APPLICATION_JSON);
-        } catch (Exception e) {
-            GeneralUtils.logExceptionStackTrace(logger, Stage.RENDER, Type.RENDER_STATUS, e, testIds.toArray(new String[0]));
-            listener.onComplete(null);
-        }
-    }
-
-    public void checkResourceStatus(final TaskListener<Boolean[]> listener, Set<String> testIds, String renderId, HashObject... hashes) {
-        try {
-            ArgumentGuard.notNull(hashes, "hashes");
-            logger.log(TraceLevel.Info, testIds, Stage.RESOURCE_COLLECTION, Type.CHECK_RESOURCE, Pair.of("hashes", hashes));
-            renderId = renderId == null ? "NONE" : renderId;
-            AsyncRequest request = restClient.target(getRenderInfo().getServiceUrl()).queryParam("rg_render-id", renderId)
-                    .path(RESOURCE_STATUS).asyncRequest(MediaType.APPLICATION_JSON);
-            request.header("X-Auth-Token", getRenderInfo().getAccessToken());
-            List<Integer> validStatusCodes = new ArrayList<>();
-            validStatusCodes.add(HttpStatus.SC_OK);
-
-            ObjectMapper objectMapper = new ObjectMapper();
-            objectMapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
-            objectMapper.configure(MapperFeature.SORT_PROPERTIES_ALPHABETICALLY, true);
-            String json = objectMapper.writeValueAsString(hashes);
-            ResponseParsingCallback<Boolean[]> callback = new ResponseParsingCallback<>(this, validStatusCodes, listener, new TypeReference<Boolean[]>() {});
-            sendAsyncRequest(request, HttpMethod.POST, callback, json, MediaType.APPLICATION_JSON);
-        } catch (Throwable e) {
-            GeneralUtils.logExceptionStackTrace(logger, Stage.RESOURCE_COLLECTION, Type.CHECK_RESOURCE, e, testIds.toArray(new String[0]));
-            listener.onComplete(null);
-        }
-    }
-
-    public void getJobInfo(TaskListener<JobInfo[]> listener, RenderRequest[] browserInfos) {
-        try {
-            AsyncRequest request = restClient.target(getRenderInfo().getServiceUrl())
-                    .path(RENDERER_INFO).asyncRequest(MediaType.APPLICATION_JSON);
-            request.header("X-Auth-Token", getRenderInfo().getAccessToken());
-            ObjectMapper objectMapper = new ObjectMapper();
-            objectMapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
-            objectMapper.configure(MapperFeature.SORT_PROPERTIES_ALPHABETICALLY, true);
-            String json = objectMapper.writeValueAsString(browserInfos);
-
-            List<Integer> validStatusCodes = new ArrayList<>();
-            validStatusCodes.add(HttpStatus.SC_OK);
-
-            ResponseParsingCallback<JobInfo[]> callback = new ResponseParsingCallback<>(this, validStatusCodes, listener, new TypeReference<JobInfo[]>() {});
-            sendAsyncRequest(request, HttpMethod.POST, callback, json, MediaType.APPLICATION_JSON);
-        } catch (Throwable t) {
-            Set<String> testIds = new HashSet<>();
-            for (RenderRequest renderRequest : browserInfos) {
-                testIds.add(renderRequest.getTestId());
-            }
-            GeneralUtils.logExceptionStackTrace(logger, Stage.OPEN, Type.JOB_INFO, t, testIds.toArray(new String[0]));
-            listener.onFail();
-        }
     }
 
     public void uploadData(final TaskListener<String> listener, final byte[] bytes, final String contentType, final String mediaType) {
