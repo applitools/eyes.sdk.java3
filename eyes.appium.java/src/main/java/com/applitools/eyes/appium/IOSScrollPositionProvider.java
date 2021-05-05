@@ -133,7 +133,7 @@ public class IOSScrollPositionProvider extends AppiumScrollPositionProvider {
 
         driver.performTouchAction(scrollAction);
 
-        try { Thread.sleep(750); } catch (InterruptedException ignored) {}
+        try { Thread.sleep(1000); } catch (InterruptedException ignored) {}
     }
 
     @Override

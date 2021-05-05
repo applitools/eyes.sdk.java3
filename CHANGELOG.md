@@ -1,3 +1,7 @@
+## [vNext]
+### Updated
+- Added more cached parameters into Scroll providers. [Trello 1854](https://trello.com/c/Sdzfuue2)
+
 ## [3.200.0]
 ### Added
 - Now sending cookies when trying to download resources and disable browser fetching by default. [Trello 2517](https://trello.com/c/QeKRfMgv)
