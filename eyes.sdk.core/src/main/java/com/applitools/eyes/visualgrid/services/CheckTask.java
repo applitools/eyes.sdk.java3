@@ -2,6 +2,7 @@ package com.applitools.eyes.visualgrid.services;
 
 import com.applitools.ICheckSettings;
 import com.applitools.eyes.MatchResult;
+import com.applitools.eyes.MatchWindowData;
 import com.applitools.eyes.visualgrid.model.RenderBrowserInfo;
 import com.applitools.eyes.visualgrid.model.RenderStatusResults;
 import com.applitools.eyes.visualgrid.model.VisualGridSelector;
@@ -15,6 +16,7 @@ public class CheckTask {
     private final ICheckSettings checkSettings;
     private final List<VisualGridSelector[]> regionSelectors;
     private final String source;
+    private boolean isMatchStarted = false;
 
     private RenderStatusResults renderStatusResults;
 
@@ -59,6 +61,19 @@ public class CheckTask {
 
     public boolean isReadyForRender() {
         return runningTest.getIsOpen() && runningTest.isCheckTaskReadyForRender(this);
+    }
+
+    public boolean isReadyForMatch() {
+        return isRenderFinished() && !isMatchStarted && !runningTest.checkTasks.isEmpty() && runningTest.checkTasks.get(0).equals(this);
+    }
+
+    public MatchWindowData startMatch() {
+        isMatchStarted = true;
+        return runningTest.prepareForMatch(this);
+    }
+
+    public boolean isMatchStarted() {
+        return isMatchStarted;
     }
 
     public String getTestId() {

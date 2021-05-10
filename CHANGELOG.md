@@ -1,6 +1,8 @@
 ## [vNext]
 ### Updated
 - Added more cached parameters into Scroll providers. [Trello 1854](https://trello.com/c/Sdzfuue2)
+### Fixed
+- Ufg test steps are now executed in the right order. [Trello 2563](https://trello.com/c/nKYEYiQ6)
 
 ## [3.200.0]
 ### Added

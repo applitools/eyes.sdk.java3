@@ -295,6 +295,64 @@ public class TestVisualGridRunner {
     }
 
     @Test
+    public void testMatchWindowByStepsOrder() {
+        final AtomicBoolean isOnlyOneMatchWindow = new AtomicBoolean(true);
+        final AtomicInteger runningMatchWindowCount = new AtomicInteger(0);
+
+        VisualGridRunner runner = new VisualGridRunner();
+        MockServerConnector serverConnector = new MockServerConnector() {
+            public void matchWindow(final TaskListener<MatchResult> listener, MatchWindowData data) {
+                if (runningMatchWindowCount.getAndIncrement() >= 1) {
+                    isOnlyOneMatchWindow.set(false);
+                }
+
+                super.matchWindow(new TaskListener<MatchResult>() {
+                    @Override
+                    public void onComplete(final MatchResult taskResponse) {
+                        Thread thread = new Thread(new Runnable() {
+                            @Override
+                            public void run() {
+                                try {
+                                    Thread.sleep(1000);
+                                } catch (InterruptedException ignored) {}
+                                runningMatchWindowCount.decrementAndGet();
+                                listener.onComplete(taskResponse);
+                            }
+                        });
+                        thread.start();
+                    }
+
+                    @Override
+                    public void onFail() {
+                        runningMatchWindowCount.decrementAndGet();
+                        listener.onFail();
+                    }
+                }, data);
+            }
+        };
+
+        Eyes eyes = new Eyes(runner);
+        eyes.setLogHandler(new StdoutLogHandler());
+        eyes.setServerConnector(serverConnector);
+        configuration.addBrowser(new IosDeviceInfo(IosDeviceName.iPhone_7));
+        WebDriver driver = SeleniumUtils.createChromeDriver();
+        try {
+            eyes.open(driver, "Eyes SDK", "UFG Server Concurrency", new RectangleSize(800, 800));
+            driver.get("http://applitools.github.io/demo");
+            for (int i = 0; i < 10; i++) {
+                eyes.check(Target.window().fully());
+            }
+            eyes.closeAsync();
+        } finally {
+            eyes.abortAsync();
+            driver.quit();
+            runner.getAllTestResults();
+        }
+
+        Assert.assertTrue(isOnlyOneMatchWindow.get());
+    }
+
+    @Test
     public void testRunnerProxy() {
         RemoteWebDriver driver = mock(RemoteWebDriver.class);
         when(driver.executeScript(ArgumentMatchers.<String>any())).thenReturn("800;800");
