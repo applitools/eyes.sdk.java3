@@ -139,6 +139,13 @@ public class EyesServiceRunner extends Thread {
     }
 
     private void checkServiceIteration() {
+        for (CheckTask checkTask : waitingCheckTasks.values()) {
+            if (checkTask.isTestActive() && checkTask.isReadyForMatch()) {
+                MatchWindowData matchWindowData = checkTask.startMatch();
+                checkService.addInput(checkTask.getStepId(), matchWindowData);
+            }
+        }
+
         checkService.run();
         for (Pair<String, MatchResult> pair : checkService.getSucceededTasks()) {
             CheckTask checkTask = waitingCheckTasks.remove(pair.getLeft());
@@ -243,8 +250,6 @@ public class EyesServiceRunner extends Thread {
             }
 
             checkTask.setRenderStatusResults(pair.getRight());
-            MatchWindowData matchWindowData = findTestById(checkTask.getTestId()).prepareForMatch(checkTask);
-            checkService.addInput(checkTask.getStepId(), matchWindowData);
         }
 
         for (Pair<String, Throwable> pair : renderService.getFailedTasks()) {
