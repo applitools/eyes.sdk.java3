@@ -1,6 +1,9 @@
 ## [vNext]
+### Added
+- Supporting iPad Air 4 safari tests. [Trello 2558](https://trello.com/c/5MXTjDMs)
 ### Updated
 - Added more cached parameters into Scroll providers. [Trello 1854](https://trello.com/c/Sdzfuue2)
+- Resource download timeout is now 30 seconds. [Trello 2572](https://trello.com/c/DU5S66r9)
 ### Fixed
 - Ufg test steps are now executed in the right order. [Trello 2563](https://trello.com/c/nKYEYiQ6)
 

@@ -14,6 +14,8 @@ import org.apache.commons.lang3.tuple.Pair;
 import java.util.*;
 
 public class ResourceCollectionService extends EyesService<FrameData, Map<String, RGridResource>> {
+    private static final int RESOURCE_TIMEOUT = 30 * 1000;
+
     final Map<String, RGridResource> resourcesCacheMap;
     private IDebugResourceWriter debugResourceWriter;
 
@@ -31,7 +33,8 @@ public class ResourceCollectionService extends EyesService<FrameData, Map<String
         super(logger, serverConnector);
         this.debugResourceWriter = debugResourceWriter != null ? debugResourceWriter : new NullDebugResourceWriter();
         this.resourcesCacheMap = resourcesCacheMap;
-        this.resourcesConnector = new UfgConnector();
+        this.resourcesConnector = new UfgConnector(logger);
+        resourcesConnector.setTimeout(RESOURCE_TIMEOUT);
     }
 
     public void setDebugResourceWriter(IDebugResourceWriter debugResourceWriter) {

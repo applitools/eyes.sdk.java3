@@ -7,7 +7,11 @@ import com.applitools.eyes.UserAgent;
 import com.applitools.eyes.capture.ImageProvider;
 import com.applitools.eyes.selenium.SeleniumEyes;
 import com.applitools.eyes.selenium.SeleniumJavaScriptExecutor;
+import com.applitools.eyes.selenium.wrappers.EyesSeleniumDriver;
+import com.applitools.eyes.selenium.wrappers.EyesWebDriver;
+import org.openqa.selenium.Capabilities;
 import org.openqa.selenium.TakesScreenshot;
+import org.openqa.selenium.WebDriver;
 
 public class ImageProviderFactory {
 
@@ -32,9 +36,11 @@ public class ImageProviderFactory {
         return new TakesScreenshotImageProvider(logger, tsInstance);
     }
 
-    public static ISizeAdjuster getImageSizeAdjuster(UserAgent ua, SeleniumJavaScriptExecutor jsExecutor) {
-
-        if (ua != null && (ua.getOS().equals(OSNames.ANDROID) || ua.getOS().equals(OSNames.IOS))) {
+    public static ISizeAdjuster getImageSizeAdjuster(UserAgent ua, EyesWebDriver driver, SeleniumJavaScriptExecutor jsExecutor) {
+        Capabilities capabilities = driver.getCapabilities();
+        String deviceName = (String) capabilities.getCapability("deviceName");
+        deviceName = deviceName != null ? deviceName : "";
+        if (ua != null && (ua.getOS().equals(OSNames.ANDROID) || ua.getOS().equals(OSNames.IOS) || deviceName.contains("iPad"))) {
             return new MobileDeviceSizeAdjuster(jsExecutor);
         }
         return NullSizeAdjuster.getInstance();
