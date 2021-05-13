@@ -1673,7 +1673,7 @@ public class SeleniumEyes extends RunningTest implements ISeleniumEyes {
     }
 
     private FullPageCaptureAlgorithm createFullPageCaptureAlgorithm(ScaleProviderFactory scaleProviderFactory, RenderingInfo renderingInfo) {
-        ISizeAdjuster sizeAdjuster = ImageProviderFactory.getImageSizeAdjuster(userAgent, jsExecutor);
+        ISizeAdjuster sizeAdjuster = ImageProviderFactory.getImageSizeAdjuster(userAgent, driver, jsExecutor);
         return new FullPageCaptureAlgorithm(logger, getTestId(), regionPositionCompensation,
                 getConfigurationInstance().getWaitBeforeScreenshots(), debugScreenshotsProvider, screenshotFactory,
                 scaleProviderFactory, cutProviderHandler.get(), getConfigurationInstance().getStitchOverlap(),
