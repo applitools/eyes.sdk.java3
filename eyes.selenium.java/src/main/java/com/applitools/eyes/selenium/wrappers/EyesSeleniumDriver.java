@@ -431,4 +431,12 @@ public class EyesSeleniumDriver extends EyesWebDriver implements HasInputDevices
 
         return userAgent;
     }
+
+    public long getInnerWidth() {
+        if (!EyesDriverUtils.isMobileDevice(driver)) {
+            return (long) this.driver.executeScript("return window.innerWidth");
+        } else {
+            return 0;
+        }
+    }
 }

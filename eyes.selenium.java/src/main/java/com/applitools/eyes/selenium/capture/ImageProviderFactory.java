@@ -36,12 +36,12 @@ public class ImageProviderFactory {
         return new TakesScreenshotImageProvider(logger, tsInstance);
     }
 
-    public static ISizeAdjuster getImageSizeAdjuster(UserAgent ua, EyesWebDriver driver, SeleniumJavaScriptExecutor jsExecutor) {
+    public static ISizeAdjuster getImageSizeAdjuster(UserAgent ua, EyesSeleniumDriver driver, SeleniumJavaScriptExecutor jsExecutor) {
         Capabilities capabilities = driver.getCapabilities();
         String deviceName = (String) capabilities.getCapability("deviceName");
         deviceName = deviceName != null ? deviceName : "";
         if (ua != null && (ua.getOS().equals(OSNames.ANDROID) || ua.getOS().equals(OSNames.IOS) || deviceName.contains("iPad"))) {
-            return new MobileDeviceSizeAdjuster(jsExecutor);
+            return new MobileDeviceSizeAdjuster(jsExecutor, driver.getInnerWidth());
         }
         return NullSizeAdjuster.getInstance();
     }
