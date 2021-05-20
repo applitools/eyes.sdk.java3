@@ -1,4 +1,4 @@
-## [vNext]
+## [3.201.1]
 ### Fixed
 - Fixed an edge case when there are infinite attempts of downloading a resource. [Trello 2563](https://trello.com/c/nKYEYiQ6)
 - Not adjusting the size for mobile devices if the width ratio is low. [Trello 2558](https://trello.com/c/5MXTjDMs)
