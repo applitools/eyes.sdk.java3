@@ -12,6 +12,8 @@ public class MobileDeviceSizeAdjuster implements ISizeAdjuster {
                     "var viewport = (meta == null) ? '' : meta.getAttribute('content');" +
                     "return viewport;";
 
+    private static final float THRESHOLD_RATIO_FOR_ADJUSTING = 0.02f;
+
     private final ViewportMetaTag viewportMetaTag;
     private final long innerWidth;
 
@@ -28,6 +30,10 @@ public class MobileDeviceSizeAdjuster implements ISizeAdjuster {
         }
 
         float widthRatio = (float) inputRegion.getWidth() / deviceLogicalViewportSize.getWidth();
+        if (Math.abs(widthRatio - 1) < THRESHOLD_RATIO_FOR_ADJUSTING) {
+            return inputRegion;
+        }
+
         return new Region(inputRegion.getLeft(), inputRegion.getTop(), deviceLogicalViewportSize.getWidth(), Math.round(inputRegion.getHeight() / widthRatio));
     }
 }
