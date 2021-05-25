@@ -1,3 +1,7 @@
+## [vNext]
+### Updated
+- Increased wait action time when do scroll on iOS. [Trello 2543](https://trello.com/c/gT47BTwz) 
+
 ## [3.201.1]
 ### Fixed
 - Fixed an edge case when there are infinite attempts of downloading a resource. [Trello 2563](https://trello.com/c/nKYEYiQ6)
