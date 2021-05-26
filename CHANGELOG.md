@@ -1,4 +1,6 @@
-## [vNext]
+## [3.202.0] - 2021-05-26
+### Added
+- New connectivity package for android.
 ### Updated
 - Increased wait action time when do scroll on iOS. [Trello 2543](https://trello.com/c/gT47BTwz) 
 
