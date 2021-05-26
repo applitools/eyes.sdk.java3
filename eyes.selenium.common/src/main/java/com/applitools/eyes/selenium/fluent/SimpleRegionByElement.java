@@ -2,7 +2,7 @@ package com.applitools.eyes.selenium.fluent;
 
 import com.applitools.eyes.*;
 import com.applitools.eyes.fluent.GetSimpleRegion;
-import com.applitools.eyes.selenium.Borders;
+import com.applitools.eyes.Borders;
 import com.applitools.eyes.selenium.EyesDriverUtils;
 import com.applitools.eyes.selenium.wrappers.EyesWebDriver;
 import com.applitools.eyes.serializers.WebElementSerializer;

@@ -4,7 +4,6 @@ import com.applitools.connectivity.MockServerConnector;
 import com.applitools.connectivity.ServerConnector;
 import com.applitools.eyes.*;
 import com.applitools.eyes.visualgrid.model.*;
-import com.applitools.eyes.visualgrid.services.ServiceTaskListener;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import org.apache.commons.lang3.tuple.Pair;
 import org.testng.Assert;

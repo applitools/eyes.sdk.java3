@@ -3,14 +3,14 @@ package com.applitools.eyes.selenium.capture;
 import com.applitools.connectivity.Cookie;
 import com.applitools.connectivity.ServerConnector;
 import com.applitools.eyes.*;
+import com.applitools.eyes.dom.DomScriptUtils;
+import com.applitools.eyes.dom.ScriptExecutor;
 import com.applitools.eyes.logging.Stage;
 import com.applitools.eyes.logging.Type;
 import com.applitools.eyes.positioning.PositionMemento;
 import com.applitools.eyes.positioning.PositionProvider;
-import com.applitools.eyes.selenium.EyesSeleniumUtils;
 import com.applitools.eyes.selenium.SeleniumEyes;
 import com.applitools.eyes.selenium.frames.FrameChain;
-import com.applitools.eyes.selenium.rendering.VisualGridEyes;
 import com.applitools.eyes.selenium.wrappers.EyesSeleniumDriver;
 import com.applitools.eyes.selenium.wrappers.EyesTargetLocator;
 import com.applitools.eyes.visualgrid.model.RGridResource;
@@ -30,11 +30,6 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
 public class DomCapture {
-    private final String CAPTURE_DOM;
-    private final String CAPTURE_DOM_FOR_IE;
-    private final String POLL_RESULT;
-    private final String POLL_RESULT_FOR_IE;
-
     private final Phaser cssPhaser = new Phaser(); // Phaser for syncing all callbacks on a single Frame
 
     private static ServerConnector serverConnector = null;
@@ -54,67 +49,63 @@ public class DomCapture {
         driver = (EyesSeleniumDriver) eyes.getDriver();
         userAgent = eyes.getUserAgent();
         testId = eyes.getTestId();
-
-        try {
-            CAPTURE_DOM = GeneralUtils.readInputStreamAsString(DomCapture.class.getResourceAsStream("/dom-capture/dist/captureDomAndPoll.js"));
-            CAPTURE_DOM_FOR_IE = GeneralUtils.readInputStreamAsString(DomCapture.class.getResourceAsStream("/dom-capture/dist/captureDomAndPollForIE.js"));
-            POLL_RESULT = GeneralUtils.readInputStreamAsString(VisualGridEyes.class.getResourceAsStream("/dom-capture/dist/pollResult.js"));
-            POLL_RESULT_FOR_IE = GeneralUtils.readInputStreamAsString(VisualGridEyes.class.getResourceAsStream("/dom-capture/dist/pollResultForIE.js"));
-        } catch (IOException e) {
-            throw new EyesException("Failed getting resources for dom scripts", e);
-        }
     }
 
     public String getPageDom(PositionProvider positionProvider) {
         PositionMemento originalPosition = positionProvider.getState();
         positionProvider.setPosition(Location.ZERO);
-        FrameChain originalFC = driver.getFrameChain().clone();
-        EyesTargetLocator switchTo = (EyesTargetLocator) driver.switchTo();
-        switchTo.defaultContent();
-        String baseUrl = (String) driver.executeScript("return document.location.href");
-        String dom = getFrameDom(baseUrl, Collections.singletonList(baseUrl));
-        if (originalFC != null) {
-            switchTo.frames(originalFC);
-        }
-
         try {
-            if (shouldWaitForPhaser) {
-                cssPhaser.awaitAdvanceInterruptibly(0, 5, TimeUnit.MINUTES);
+            FrameChain originalFC = driver.getFrameChain().clone();
+            EyesTargetLocator switchTo = (EyesTargetLocator) driver.switchTo();
+            switchTo.defaultContent();
+            String baseUrl = (String) driver.executeScript("return document.location.href");
+            String dom = getFrameDom(baseUrl, Collections.singletonList(baseUrl));
+            if (originalFC != null) {
+                switchTo.frames(originalFC);
             }
-        } catch (InterruptedException | TimeoutException e) {
-            GeneralUtils.logExceptionStackTrace(logger, Stage.CHECK, Type.DOM_SCRIPT, e, testId);
-        }
 
-        shouldWaitForPhaser = false;
-        Map<String, String> cssStringsToReplace = new HashMap<>();
-        for (String url : cssNodesToReplace.keySet()) {
             try {
-                String escapedCss = new ObjectMapper().writeValueAsString(cssNodesToReplace.get(url).toString());
-                if (escapedCss.startsWith("\"") && escapedCss.endsWith("\"")) {
-                    escapedCss = escapedCss.substring(1, escapedCss.length() - 1); // remove quotes
+                if (shouldWaitForPhaser) {
+                    cssPhaser.awaitAdvanceInterruptibly(0, 5, TimeUnit.MINUTES);
                 }
-                cssStringsToReplace.put(url, escapedCss);
-            } catch (JsonProcessingException e) {
-                GeneralUtils.logExceptionStackTrace(logger, Stage.CHECK, Type.DOM_SCRIPT, e);
+            } catch (InterruptedException | TimeoutException e) {
+                GeneralUtils.logExceptionStackTrace(logger, Stage.CHECK, Type.DOM_SCRIPT, e, testId);
             }
+
+            shouldWaitForPhaser = false;
+            Map<String, String> cssStringsToReplace = new HashMap<>();
+            for (String url : cssNodesToReplace.keySet()) {
+                try {
+                    String escapedCss = new ObjectMapper().writeValueAsString(cssNodesToReplace.get(url).toString());
+                    if (escapedCss.startsWith("\"") && escapedCss.endsWith("\"")) {
+                        escapedCss = escapedCss.substring(1, escapedCss.length() - 1); // remove quotes
+                    }
+                    cssStringsToReplace.put(url, escapedCss);
+                } catch (JsonProcessingException e) {
+                    GeneralUtils.logExceptionStackTrace(logger, Stage.CHECK, Type.DOM_SCRIPT, e);
+                }
+            }
+
+            return EfficientStringReplace.efficientStringReplace(cssStartToken, cssEndToken, dom, cssStringsToReplace);
+        } finally {
+            positionProvider.restoreState(originalPosition);
         }
-        String domJson = EfficientStringReplace.efficientStringReplace(cssStartToken, cssEndToken, dom, cssStringsToReplace);
-        positionProvider.restoreState(originalPosition);
-        return domJson;
     }
 
     public String getFrameDom(String baseUrl, List<String> framesPath) {
-        String domScript = userAgent.isInternetExplorer() ? CAPTURE_DOM_FOR_IE : CAPTURE_DOM;
-        String pollingScript = userAgent.isInternetExplorer() ? POLL_RESULT_FOR_IE : POLL_RESULT;
+        ScriptExecutor executor = new ScriptExecutor() {
+            @Override
+            public Object execute(String script) {
+                return driver.executeScript(script);
+            }
+        };
 
         List<String> missingCssList = new ArrayList<>();
         List<String> missingFramesList = new ArrayList<>();
         List<String> data = new ArrayList<>();
         Separators separators;
         try {
-            String scriptResult = EyesSeleniumUtils.runDomScript(logger, driver, userAgent, Collections.singleton(testId),
-                    domScript, null, pollingScript);
-            scriptResult = GeneralUtils.parseJsonToObject(scriptResult, String.class);
+            String scriptResult = DomScriptUtils.runDomCapture(logger, executor, Collections.singleton(testId), userAgent);
             separators = parseScriptResult(scriptResult, missingCssList, missingFramesList, data);
         } catch (Exception e) {
             throw new EyesException("Failed running dom capture script", e);

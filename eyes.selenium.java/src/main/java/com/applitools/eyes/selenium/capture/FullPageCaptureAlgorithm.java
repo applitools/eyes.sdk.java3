@@ -263,8 +263,8 @@ public class FullPageCaptureAlgorithm {
 
         for (SubregionForStitching partRegion : screenshotParts) {
             logger.log(TraceLevel.Info, Collections.singleton(testId), Stage.CHECK, Type.CAPTURE_SCREENSHOT,
-                    Pair.of("scrollTo", new Location(partRegion.getScrollTo())),
-                    Pair.of("pastePhysicalLocation", new Location(partRegion.getPastePhysicalLocation())),
+                    Pair.of("scrollTo", new Location(partRegion.getScrollTo().x, partRegion.getScrollTo().y)),
+                    Pair.of("pastePhysicalLocation", new Location(partRegion.getPastePhysicalLocation().x, partRegion.getPastePhysicalLocation().y)),
                     Pair.of("physicalCropArea", new Region(partRegion.getLogicalCropArea())),
                     Pair.of("logicalCropArea", new Region(partRegion.getPhysicalCropArea())));
 
@@ -282,7 +282,7 @@ public class FullPageCaptureAlgorithm {
             logger.log(TraceLevel.Info, Collections.singleton(testId), Stage.CHECK, Type.CAPTURE_SCREENSHOT,
                     Pair.of("scrollPosition", scrollPosition),
                     Pair.of("originPosition", originPosition),
-                    Pair.of("pastePhysicalLocation", new Location(partPastePosition)));
+                    Pair.of("pastePhysicalLocation", new Location(partPastePosition.x, partPastePosition.y)));
 
             // Actually taking the screenshot.
             try {

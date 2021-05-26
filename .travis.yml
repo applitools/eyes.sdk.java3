@@ -32,9 +32,10 @@ before_script:
     export APPLITOOLS_REPORT_TO_SANDBOX="false";
     echo "APPLITOOLS_REPORT_TO_SANDBOX=$APPLITOOLS_REPORT_TO_SANDBOX";
     fi
-  - pushd eyes.selenium.java/src/main/node_resources
+  - pushd eyes.ufg.java/src/main/resources
   - npm install
   - popd
+  - mvn install -DskipTests
 jobs:
   include:
     - stage: Test

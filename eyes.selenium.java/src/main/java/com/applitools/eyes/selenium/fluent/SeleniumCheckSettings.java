@@ -7,7 +7,7 @@ import com.applitools.eyes.Region;
 import com.applitools.eyes.fluent.CheckSettings;
 import com.applitools.eyes.fluent.GetRegion;
 import com.applitools.eyes.fluent.ICheckSettingsInternal;
-import com.applitools.eyes.selenium.Borders;
+import com.applitools.eyes.Borders;
 import com.applitools.eyes.selenium.CheckState;
 import com.applitools.eyes.selenium.EyesSeleniumUtils;
 import com.applitools.eyes.selenium.wrappers.EyesSeleniumDriver;

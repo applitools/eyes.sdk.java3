@@ -5,7 +5,7 @@ import com.applitools.eyes.config.Configuration;
 import com.applitools.eyes.config.Feature;
 import com.applitools.eyes.positioning.PositionMemento;
 import com.applitools.eyes.positioning.PositionProvider;
-import com.applitools.eyes.selenium.Borders;
+import com.applitools.eyes.Borders;
 import com.applitools.eyes.selenium.SeleniumJavaScriptExecutor;
 import com.applitools.eyes.selenium.SizeAndBorders;
 import com.applitools.eyes.selenium.frames.Frame;

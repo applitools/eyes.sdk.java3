@@ -10,6 +10,8 @@ import com.applitools.eyes.config.ConfigurationProvider;
 import com.applitools.eyes.debug.DebugScreenshotsProvider;
 import com.applitools.eyes.debug.FileDebugScreenshotsProvider;
 import com.applitools.eyes.debug.NullDebugScreenshotProvider;
+import com.applitools.eyes.dom.DomScriptUtils;
+import com.applitools.eyes.dom.ScriptExecutor;
 import com.applitools.eyes.fluent.CheckSettings;
 import com.applitools.eyes.fluent.GetFloatingRegion;
 import com.applitools.eyes.fluent.GetSimpleRegion;
@@ -38,7 +40,6 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.remote.RemoteWebDriver;
 
 import java.awt.image.BufferedImage;
-import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.*;
@@ -51,10 +52,6 @@ public class VisualGridEyes implements ISeleniumEyes {
     final Map<String, RunningTest> testList = Collections.synchronizedMap(new HashMap<String, RunningTest>());
     private boolean isOpen = false;
 
-    private final String PROCESS_PAGE;
-    private final String PROCESS_PAGE_FOR_IE;
-    private final String POLL_RESULT;
-    private final String POLL_RESULT_FOR_IE;
     private EyesSeleniumDriver webDriver;
     private String url;
     private Boolean isDisabled = Boolean.FALSE;
@@ -90,15 +87,6 @@ public class VisualGridEyes implements ISeleniumEyes {
         ArgumentGuard.notNull(renderingGridManager, "renderingGridRunner");
         this.runner = renderingGridManager;
         this.logger = renderingGridManager.getLogger();
-
-        try {
-            PROCESS_PAGE = GeneralUtils.readInputStreamAsString(VisualGridEyes.class.getResourceAsStream("/dom-snapshot/dist/processPagePoll.js"));
-            PROCESS_PAGE_FOR_IE = GeneralUtils.readInputStreamAsString(VisualGridEyes.class.getResourceAsStream("/dom-snapshot/dist/processPagePollForIE.js"));
-            POLL_RESULT = GeneralUtils.readInputStreamAsString(VisualGridEyes.class.getResourceAsStream("/dom-snapshot/dist/pollResult.js"));
-            POLL_RESULT_FOR_IE = GeneralUtils.readInputStreamAsString(VisualGridEyes.class.getResourceAsStream("/dom-snapshot/dist/pollResultForIE.js"));
-        } catch (IOException e) {
-            throw new EyesException("Failed getting resources for dom scripts", e);
-        }
     }
 
     /**
@@ -584,7 +572,7 @@ public class VisualGridEyes implements ISeleniumEyes {
                     Pair.of("requiredWidth", width),
                     Pair.of("viewportSize", viewportSize));
             BufferedImage bufferedImage = imageProvider.getImage();
-            debugScreenshotsProvider.save(bufferedImage, String.format("snapshot_%s", viewportSize.toString()));
+            debugScreenshotsProvider.save(bufferedImage, String.format("snapshot_%s", viewportSize));
         }
 
         FrameData scriptResult = captureDomSnapshot(testIds, switchTo);
@@ -619,15 +607,14 @@ public class VisualGridEyes implements ISeleniumEyes {
     }
 
     FrameData captureDomSnapshot(Set<String> testIds, EyesTargetLocator switchTo) throws Exception {
-        String domScript = userAgent.isInternetExplorer() ? PROCESS_PAGE_FOR_IE : PROCESS_PAGE;
-        String pollingScript = userAgent.isInternetExplorer() ? POLL_RESULT_FOR_IE : POLL_RESULT;
-        Map<String, Object> arguments = new HashMap<String, Object>() {{
-            put("serializeResources", true);
-            put("dontFetchResources", getConfiguration().isDisableBrowserFetching());
-        }};
+        ScriptExecutor executor = new ScriptExecutor() {
+            @Override
+            public Object execute(String script) {
+                return webDriver.executeScript(script);
+            }
+        };
 
-        String result = EyesSeleniumUtils.runDomScript(logger, webDriver, userAgent, testIds, domScript, arguments, pollingScript);
-        FrameData frameData = GeneralUtils.parseJsonToObject(result, FrameData.class);
+        FrameData frameData = DomScriptUtils.runDomSnapshot(logger, executor, testIds, userAgent, true, getConfiguration().isDisableBrowserFetching());
         analyzeFrameData(testIds, frameData, switchTo);
         return frameData;
     }
