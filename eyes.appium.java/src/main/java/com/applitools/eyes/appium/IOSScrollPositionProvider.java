@@ -308,6 +308,8 @@ public class IOSScrollPositionProvider extends AppiumScrollPositionProvider {
             case "iphone xs max":
             case "iphone 11 pro":
             case "iphone 11 pro max":
+            case "iphone 12":
+            case "iphone 12 pro":
                 statusBarHeight = 132;
                 density = 3;
                 break;
@@ -315,6 +317,14 @@ public class IOSScrollPositionProvider extends AppiumScrollPositionProvider {
             case "iphone 11":
                 statusBarHeight = 88;
                 density = 2;
+                break;
+            case "iphone 12 pro max":
+                statusBarHeight = 141;
+                density = 3;
+                break;
+            case "iphone 12 mini":
+                statusBarHeight = 150;
+                density = 3;
                 break;
         }
         return statusBarHeight / density;
