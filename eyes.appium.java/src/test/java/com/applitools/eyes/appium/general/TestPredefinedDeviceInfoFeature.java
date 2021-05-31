@@ -53,6 +53,7 @@ public class TestPredefinedDeviceInfoFeature extends ReportingTestSuite {
         EyesAppiumDriver eyesDriver = new EyesAppiumDriver(new Logger(), eyes, remoteWebDriver);
         Assert.assertEquals(eyesDriver.getStatusBarHeight(), 72);
         Assert.assertEquals(eyesDriver.getViewportRect().get("height").intValue(), 1708);
+        Assert.assertEquals(eyesDriver.getViewportRect().get("width").intValue(), 1080);
 
         Configuration configuration = eyes.getConfiguration();
         configuration.setFeatures(Feature.USE_PREDEFINED_DEVICE_INFO);
@@ -60,5 +61,6 @@ public class TestPredefinedDeviceInfoFeature extends ReportingTestSuite {
 
         Assert.assertEquals(eyesDriver.getStatusBarHeight(), 112);
         Assert.assertEquals(eyesDriver.getViewportRect().get("height").intValue(), 1930);
+        Assert.assertEquals(eyesDriver.getViewportRect().get("width").intValue(), 1080);
     }
 }

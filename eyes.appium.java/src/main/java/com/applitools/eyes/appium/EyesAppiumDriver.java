@@ -67,7 +67,18 @@ public class EyesAppiumDriver extends EyesWebDriver {
         int width = rectMap.get("width").intValue();
         int height = rectMap.get("height").intValue();
         if (getEyesBase().getConfiguration().isFeatureActivated(Feature.USE_PREDEFINED_DEVICE_INFO)) {
-            height = getDeviceViewportHeight();
+            Map<String, MobileDeviceInfo> mobileDevicesInfo = getEyesBase().getMobileDeviceInfo();
+            String deviceName = getEyesBase().getConfiguration().getDeviceInfo();
+            deviceName = deviceName == null ? EyesDriverUtils.getMobileDeviceName(this) : deviceName;
+            for (MobileDeviceInfo mobileDeviceInfo : mobileDevicesInfo.values()) {
+                for (String name : mobileDeviceInfo.getAliases()) {
+                    if (deviceName.equalsIgnoreCase(name)) {
+                        height = mobileDeviceInfo.getViewportRect().getHeight();
+                        width = mobileDeviceInfo.getViewportRect().getWidth();
+                        break;
+                    }
+                }
+            }
         } else {
             height = ensureViewportHeight(height);
         }
@@ -130,23 +141,6 @@ public class EyesAppiumDriver extends EyesWebDriver {
         } else {
             return ((Long) pixelRatio).doubleValue();
         }
-    }
-
-    public int getDeviceViewportHeight() {
-        if (getEyesBase().getConfiguration().isFeatureActivated(Feature.USE_PREDEFINED_DEVICE_INFO)) {
-            Map<String, MobileDeviceInfo> mobileDevicesInfo = getEyesBase().getMobileDeviceInfo();
-            String deviceName = getEyesBase().getConfiguration().getDeviceInfo();
-            deviceName = deviceName == null ? EyesDriverUtils.getMobileDeviceName(this) : deviceName;
-            for (MobileDeviceInfo mobileDeviceInfo : mobileDevicesInfo.values()) {
-                for (String name : mobileDeviceInfo.getAliases()) {
-                    if (deviceName.equalsIgnoreCase(name)) {
-                        return mobileDeviceInfo.getViewportRect().getHeight();
-                    }
-                }
-            }
-        }
-        Map<String, Long> rectMap = (Map<String, Long>) getCachedSessionDetails().get("viewportRect");
-        return ensureViewportHeight(rectMap.get("height").intValue());
     }
 
     public int getStatusBarHeight() {
