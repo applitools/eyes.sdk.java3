@@ -1,3 +1,7 @@
+## [vNext]
+### Updated
+- The `USE_PREDEFINED_DEVICE_INFO` feature now use viewport width from server. [Trello 2560](https://trello.com/c/3OwifFgu)
+
 ## [3.202.0] - 2021-05-26
 ### Added
 - New connectivity package for android.
