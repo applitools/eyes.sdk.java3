@@ -9,6 +9,7 @@ import com.applitools.eyes.debug.DebugScreenshotsProvider;
 import com.applitools.eyes.exceptions.TestFailedException;
 import com.applitools.eyes.locators.*;
 import com.applitools.eyes.logging.Stage;
+import com.applitools.eyes.logging.TraceLevel;
 import com.applitools.eyes.positioning.PositionProvider;
 import com.applitools.eyes.selenium.fluent.SeleniumCheckSettings;
 import com.applitools.eyes.selenium.fluent.Target;
@@ -1637,7 +1638,7 @@ public class Eyes implements IEyesBase {
      * @param message the massage to log
      */
     public void log(String message) {
-        activeEyes.getLogger().log(new HashSet<String>(), Stage.GENERAL, Pair.of("message", message));
+        activeEyes.getLogger().log(TraceLevel.Notice, Stage.GENERAL,message);
     }
 
     /**

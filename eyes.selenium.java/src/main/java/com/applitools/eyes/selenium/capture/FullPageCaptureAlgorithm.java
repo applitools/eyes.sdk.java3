@@ -138,7 +138,7 @@ public class FullPageCaptureAlgorithm {
             // "getImagePart", since "entirePageSize" might be that of a frame.
             if (scaledInitialScreenshot.getWidth() >= entireSize.getWidth() && scaledInitialScreenshot.getHeight() >= entireSize.getHeight()) {
                 logger.log(TraceLevel.Warn, Collections.singleton(testId), Stage.CHECK, Type.CAPTURE_SCREENSHOT,
-                        Pair.of("message", "Seems the image is already a full page screenshot"));
+                        "Seems the image is already a full page screenshot");
                 originProvider.restoreState(originalPosition);
                 return scaledInitialScreenshot;
             }

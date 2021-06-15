@@ -3,9 +3,6 @@ package com.applitools.eyes;
 import com.applitools.connectivity.ServerConnector;
 import com.applitools.eyes.logging.*;
 import com.applitools.eyes.utils.ReportingTestSuite;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import org.apache.commons.lang3.tuple.Pair;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
@@ -25,7 +22,7 @@ public class TestLogger extends ReportingTestSuite {
         NetworkLogHandler networkLogHandler = new NetworkLogHandler(serverConnector);
         Logger logger = new Logger(networkLogHandler);
         logger.setAgentId("agentId");
-        logger.log(TraceLevel.Warn, Collections.singleton("testId"), Stage.GENERAL, Type.CLOSE_BATCH, Pair.of("message", "hello"));
+        logger.log(TraceLevel.Warn, Collections.singleton("testId"), Stage.GENERAL, Type.CLOSE_BATCH, "hello");
         Assert.assertEquals(networkLogHandler.clientEvents.size(), 1);
         ClientEvent event = networkLogHandler.clientEvents.getEvents().get(0);
 

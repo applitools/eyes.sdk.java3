@@ -458,7 +458,7 @@ public abstract class EyesBase implements IEyesBase {
 
     public SessionStopInfo prepareStopSession(boolean isAborted) {
         if (runningSession == null || !isOpen) {
-            logger.log(getTestId(), Stage.CLOSE, Pair.of("message", "Tried to close a non opened test"));
+            logger.log(getTestId(), Stage.CLOSE, "Tried to close a non opened test");
             return null;
         }
 

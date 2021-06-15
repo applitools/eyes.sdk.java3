@@ -2,6 +2,8 @@
 ### Updated
 - The `USE_PREDEFINED_DEVICE_INFO` feature now use viewport width from server. [Trello 2560](https://trello.com/c/3OwifFgu)
 - Updated net module to work on android properly.
+### Fixed
+- It's now possible to link between a render request to its render result with the logs.
 
 ## [3.202.0] - 2021-05-26
 ### Added
