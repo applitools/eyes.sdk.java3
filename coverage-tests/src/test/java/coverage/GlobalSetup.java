@@ -3,6 +3,7 @@ package coverage;
 import com.applitools.connectivity.RestClient;
 import com.applitools.connectivity.ServerConnector;
 import com.applitools.eyes.*;
+import org.openqa.selenium.WebDriver;
 import org.testng.annotations.AfterSuite;
 import org.testng.annotations.BeforeSuite;
 
@@ -10,11 +11,19 @@ import javax.ws.rs.HttpMethod;
 import javax.ws.rs.core.UriBuilder;
 import java.net.URI;
 
-public class GlobalSetup extends BuildDriver {
+public class GlobalSetup {
 
+    protected WebDriver driver;
+    protected WebDriver eyesDriver;
     protected static BatchInfo batch;
     protected static String apiKey;
+    public static boolean useDocker;
+    public static boolean CI;
+    public static boolean useEG;
 
+    public WebDriver getDriver() {
+        return eyesDriver == null ? driver : eyesDriver;
+    }
     @BeforeSuite
     public void globalSetup() {
         String name = System.getenv("APPLITOOLS_BATCH_NAME");
@@ -23,6 +32,25 @@ public class GlobalSetup extends BuildDriver {
         String id = System.getenv("APPLITOOLS_BATCH_ID");
         if (id != null) batch.setId(id);
         apiKey = System.getenv("APPLITOOLS_API_KEY");
+        String EG_URL = System.getenv("EXECUTION_GRID_URL");
+        useEG = EG_URL != null;
+        String CI = System.getenv("CI");
+        GlobalSetup.CI = CI != null && CI.equals("true");
+        useDocker = !GlobalSetup.CI;
+        String envVar = System.getenv("USE_SELENIUM_DOCKER");
+        if (envVar != null && envVar.equals("false")) {
+            useDocker = false;
+        }
+        if(!useDocker) {
+            String chromeDriverPath = System.getenv("CHROME_DRIVER_PATH");
+            if(chromeDriverPath == null) throw new RuntimeException("CHROME DRIVER PATH not set for the execution on CI or without docker");
+            System.setProperty("webdriver.chrome.driver", chromeDriverPath);
+            String firefoxDriverPath = System.getenv("FIREFOX_DRIVER_PATH");
+            if(firefoxDriverPath == null) throw new RuntimeException("FIREFOX DRIVER PATH not set for the execution on CI or without docker");
+            System.setProperty("webdriver.gecko.driver", firefoxDriverPath);
+        }
+
+
     }
 
     @AfterSuite

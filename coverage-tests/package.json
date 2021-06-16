@@ -14,11 +14,11 @@
     "url": "git+https://github.com/applitools/sdk.coverage.tests.git"
   },
   "scripts": {
-    "java": "yarn && yarn docker:start && yarn test && yarn report",
+    "java": "yarn && yarn test && yarn report",
     "local": "yarn install --no-lockfile && yarn docker:start && yarn test && yarn report; yarn docker:stop",
     "release": "yarn && yarn docker:start && yarn test && yarn report:prod",
     "generate": "coverage-tests generate ./configuration --pascalizeTests --strict",
-    "test": "yarn generate && mvn test",
+    "test": "yarn generate && mvn test -DsuiteFile=EGSuite.xml",
     "report": "yarn move:report && coverage-tests report ./configuration  --sandbox$( [ -z $APPLITOOLS_REPORT_ID ] || echo \" --reportId $APPLITOOLS_REPORT_ID\" )",
     "report:prod": "yarn move:report && coverage-tests report ./configuration --reportId $APPLITOOLS_REPORT_ID",
     "move:report": "mv ./target/surefire-reports/java_coverage_tests/coverage-test-report.xml ./coverage-test-report.xml",
@@ -26,6 +26,6 @@
     "docker:stop": "docker stop selenium_chrome selenium_firefox && docker rm selenium_chrome selenium_firefox"
   },
   "dependencies": {
-    "@applitools/sdk-coverage-tests": "^2.3.2"
+    "@applitools/sdk-coverage-tests": "^2.3.14"
   }
 }
