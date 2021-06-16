@@ -24,10 +24,21 @@ public class BuildDriver {
     private final String APP_PROPERTY = "app";
     private final String HEADLESS_PROPERTY = "headless";
     private final String LEGACY_PROPERTY = "legacy";
-    private final String SELENIUM_CHROME_URL = "http://localhost:4444/wd/hub";
+    private final String SELENIUM_CHROME_URL = getChromeUrl();
     private final String SELENIUM_FIREFOX_URL = "http://localhost:4445/wd/hub";
     private final String SAUCE_URL = "https://ondemand.saucelabs.com:443/wd/hub";
 
+
+    private static String getChromeUrl() {
+        String url;
+        String token = System.getenv("EXECUTION_GRID_TOKEN");
+        if (token != null) {
+            url = "https://exec-wus.applitools.com/" + token;
+        } else {
+            url = "http://localhost:4444/wd/hub";
+        }
+        return url;
+    }
 
     public WebDriver getDriver() {
         return eyesDriver == null ? driver : eyesDriver;
@@ -238,6 +249,7 @@ public class BuildDriver {
             return caps.merge(sauce);
         }
     }
+
     public Capabilities setSauceCredentials(Capabilities caps) {
         return setSauceCredentials(caps, true, new MutableCapabilities());
     }
