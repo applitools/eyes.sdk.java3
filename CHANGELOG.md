@@ -1,6 +1,7 @@
 ## [3.203.1] - 2021-06-21
 ### Updated
 - Better logs for following resources parsing.
+- Timeout for downloading resources reduced from 30 seconds to 10 seconds. [Trello 2604](https://trello.com/c/mNTo6koP)
 
 ## [3.203.0] - 2021-06-15
 ### Updated
