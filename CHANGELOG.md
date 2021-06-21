@@ -1,3 +1,7 @@
+## [3.203.1] - 2021-06-21
+### Updated
+- Better logs for following resources parsing.
+
 ## [3.203.0] - 2021-06-15
 ### Updated
 - The `USE_PREDEFINED_DEVICE_INFO` feature now use viewport width from server. [Trello 2560](https://trello.com/c/3OwifFgu)

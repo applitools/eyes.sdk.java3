@@ -92,12 +92,14 @@ public class EyesServiceRunner extends Thread {
     public void addResourceCollectionTask(FrameData domData, List<CheckTask> checkTasks) {
         String resourceCollectionTaskId = UUID.randomUUID().toString();
         Set<String> testIds = new HashSet<>();
+        testIds.add(resourceCollectionTaskId);
         for (CheckTask checkTask : checkTasks) {
             testIds.add(checkTask.getTestId());
         }
         domData.setTestIds(testIds);
         resourceCollectionService.addInput(resourceCollectionTaskId, domData);
         resourceCollectionTasksMapping.put(resourceCollectionTaskId, Pair.of(domData, checkTasks));
+        logger.log(testIds, Stage.RESOURCE_COLLECTION, Pair.of("resourceCollectionTaskId", resourceCollectionTaskId));
     }
 
     @Override
