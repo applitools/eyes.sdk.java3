@@ -103,87 +103,70 @@ public class EyesAppiumElement extends RemoteWebElement {
         return wrapElement(webElement.findElement(by));
     }
 
-    @Override
     public WebElement findElementById(String using) {
-        return wrapElement(webElement.findElementById(using));
+        return wrapElement(webElement.findElement(By.id(using)));
     }
 
-    @Override
     public List<WebElement> findElementsById(String using) {
-        return wrapElements(webElement.findElementsById(using));
+        return wrapElements(webElement.findElements(By.id(using)));
     }
 
-    @Override
     public WebElement findElementByLinkText(String using) {
-        return wrapElement(webElement.findElementByLinkText(using));
+        return wrapElement(webElement.findElement(By.linkText(using)));
     }
 
-    @Override
     public List<WebElement> findElementsByLinkText(String using) {
-        return wrapElements(webElement.findElementsByLinkText(using));
+        return wrapElements(webElement.findElements(By.linkText(using)));
     }
 
-    @Override
     public WebElement findElementByName(String using) {
-        return wrapElement(webElement.findElementByName(using));
+        return wrapElement(webElement.findElement(By.name(using)));
     }
 
-    @Override
     public List<WebElement> findElementsByName(String using) {
-        return wrapElements(webElement.findElementsByName(using));
+        return wrapElements(webElement.findElements(By.name(using)));
     }
 
-    @Override
     public WebElement findElementByClassName(String using) {
-        return wrapElement(webElement.findElementByClassName(using));
+        return wrapElement(webElement.findElement(By.className(using)));
     }
 
-    @Override
     public List<WebElement> findElementsByClassName(String using) {
-        return wrapElements(webElement.findElementsByClassName(using));
+        return wrapElements(webElement.findElements(By.className(using)));
     }
 
-    @Override
     public WebElement findElementByCssSelector(String using) {
-        return wrapElement(webElement.findElementByCssSelector(using));
+        return wrapElement(webElement.findElement(By.cssSelector(using)));
     }
 
-    @Override
     public List<WebElement> findElementsByCssSelector(String using) {
-        return wrapElements(webElement.findElementsByCssSelector(using));
+        return wrapElements(webElement.findElements(By.cssSelector(using)));
     }
 
-    @Override
     public WebElement findElementByXPath(String using) {
-        return wrapElement(webElement.findElementByXPath(using));
+        return wrapElement(webElement.findElement(By.xpath(using)));
     }
 
-    @Override
     public List<WebElement> findElementsByXPath(String using) {
-        return wrapElements(webElement.findElementsByXPath(using));
+        return wrapElements(webElement.findElements(By.xpath(using)));
     }
 
-    @Override
     public WebElement findElementByPartialLinkText(String using) {
-        return wrapElement(webElement.findElementByPartialLinkText(using));
+        return wrapElement(webElement.findElement(By.partialLinkText(using)));
     }
 
-    @Override
     public List<WebElement> findElementsByPartialLinkText(String using) {
-        return wrapElements(webElement.findElementsByPartialLinkText(using));
+        return wrapElements(webElement.findElements(By.partialLinkText(using)));
     }
 
-    @Override
     public WebElement findElementByTagName(String using) {
-        return wrapElement(webElement.findElementByTagName(using));
+        return wrapElement(webElement.findElement(By.tagName(using)));
     }
 
-    @Override
     public List<WebElement> findElementsByTagName(String using) {
-        return wrapElements(webElement.findElementsByTagName(using));
+        return wrapElements(webElement.findElements(By.tagName(using)));
     }
 
-    @Override
     public boolean equals(Object obj) {
         return (obj instanceof RemoteWebElement) && webElement.equals(obj);
     }
