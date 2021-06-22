@@ -1,6 +1,8 @@
 ## [vNext]
 ### Fixed
 - Caching the results of resources parsing properly. [Trello 2620](https://trello.com/c/7uutwpyx)
+### Added 
+- Scrollable offset calculation with iOS helper library for XCUIElementTypeCollectionView. [Trello 2633](https://trello.com/c/dQqN02TN)
 
 ## [3.203.1] - 2021-06-21
 ### Updated
