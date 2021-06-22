@@ -392,7 +392,7 @@ public class AndroidScrollPositionProvider extends AppiumScrollPositionProvider 
                 if (element.getAttribute("className").equals("android.widget.HorizontalScrollView")) {
                     continue;
                 }
-                List<MobileElement> child = scrollableView.findElements(By.xpath(EyesAppiumUtils.SCROLLVIEW_XPATH));
+                List<WebElement> child = scrollableView.findElements(By.xpath(EyesAppiumUtils.SCROLLVIEW_XPATH));
                 return child.isEmpty() ? element : child.get(0);
             }
         }
