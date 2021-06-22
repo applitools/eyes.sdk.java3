@@ -14,7 +14,7 @@ public class CollectionViewTest extends IOSTestSetup {
 
         eyes.open(driver, getApplicationName(), "XCUIElementTypeCollectionView");
 
-        eyes.check(Target.window().fully().withName("Fullpage"));
+        eyes.check(Target.window().fully().withName("Fullpage").timeout(0));
 
         eyes.close();
     }
