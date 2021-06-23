@@ -62,7 +62,7 @@ public abstract class TestSetup extends ReportingTestSuite implements ITest {
     }
 
     protected void setCapabilities() {
-        capabilities.setCapability("browserstack.appium_version", "1.17.0");
+        capabilities.setCapability("browserstack.appium_version", "1.21.0");
         setAppCapability();
     }
 
