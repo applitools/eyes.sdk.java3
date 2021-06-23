@@ -71,4 +71,15 @@ public class TextRegion {
     public int hashCode() {
         return Objects.hash(x, y, width, height, text);
     }
+
+    @Override
+    public String toString() {
+        return "TextRegion{" +
+                "x=" + x +
+                ", y=" + y +
+                ", width=" + width +
+                ", height=" + height +
+                ", text='" + text + '\'' +
+                '}';
+    }
 }
