@@ -11,6 +11,7 @@ import org.w3c.dom.css.CSSRuleList;
 
 import java.io.IOException;
 import java.net.URI;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -43,15 +44,19 @@ public class TestResourceParsing extends ReportingTestSuite {
     public void testParseCss() throws IOException {
         String cssContent = GeneralUtils.readInputStreamAsString(getClass().getResourceAsStream("/css_file_with_urls.css"));
         RGridResource resource = new RGridResource( "https://test.com", "text/css", cssContent.getBytes());
-        Set<URI> newResources = resource.parse(new Logger(), "https://test.com/home/#a#b");
+        Set<URI> newResources = resource.parse(new Logger(), Collections.<String>emptySet());
         Assert.assertEquals(newResources.size(), 4);
+
+        resource.resetContent();
+        Set<URI> cachedParsedResources = resource.parse(new Logger(), Collections.<String>emptySet());
+        Assert.assertEquals(cachedParsedResources, newResources);
     }
 
     @Test
     public void testParseCssBadFile() throws IOException {
         String cssContent = GeneralUtils.readInputStreamAsString(getClass().getResourceAsStream("/clientlibs_all.default.css"));
         RGridResource resource = new RGridResource( "https://test.com", "text/css", cssContent.getBytes());
-        Set<URI> newResources = resource.parse(new Logger(), "");
+        Set<URI> newResources = resource.parse(new Logger(), Collections.<String>emptySet());
 
         // There are exactly 54 imported urls in the resources file but only 38 unique urls
         Assert.assertEquals(newResources.size(), 38);
@@ -65,7 +70,7 @@ public class TestResourceParsing extends ReportingTestSuite {
     }
 
     @Test
-    void testGetImportedUrls() throws IOException {
+    public void testGetImportedUrls() throws IOException {
         Set<String> imported = CssTokenizer.getImportedUrls(
                 "@import url('innerstyle2.css');\n" +
                         "p {\n" +

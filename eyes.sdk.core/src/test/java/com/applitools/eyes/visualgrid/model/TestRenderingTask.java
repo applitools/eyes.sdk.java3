@@ -55,7 +55,7 @@ public class TestRenderingTask extends ReportingTestSuite {
         for (int i = 0; i < 200; i++) {
             RGridResource resource = mock(RGridResource.class);
             when(resource.getUrl()).thenReturn(String.format("http://%d.com", i));
-            when(resource.parse(ArgumentMatchers.<Logger>any(), anyString())).thenAnswer(new Answer<Set<URI>>() {
+            when(resource.parse(ArgumentMatchers.<Logger>any(), ArgumentMatchers.<Set<String>>any())).thenAnswer(new Answer<Set<URI>>() {
                 @Override
                 public Set<URI> answer(InvocationOnMock invocation) throws Throwable {
                     Thread.sleep(500);
@@ -101,7 +101,7 @@ public class TestRenderingTask extends ReportingTestSuite {
         RGridResource cachedResource = mock(RGridResource.class);
         when(cachedResource.getUrl()).thenReturn("12");
         when(cachedResource.getContentType()).thenReturn("");
-        when(cachedResource.parse(ArgumentMatchers.<Logger>any(), anyString()))
+        when(cachedResource.parse(ArgumentMatchers.<Logger>any(), ArgumentMatchers.<Set<String>>any()))
                 .thenReturn(stringsToUris(getInnerMap(urls, "12").keySet()));
         domAnalyzer.cachedResources.put("12", cachedResource);
 
@@ -130,7 +130,7 @@ public class TestRenderingTask extends ReportingTestSuite {
                                 when(resource.getUrl()).thenReturn(url.toString());
                                 when(resource.getContentType()).thenReturn("");
                                 try {
-                                    when(resource.parse(ArgumentMatchers.<Logger>any(), anyString()))
+                                    when(resource.parse(ArgumentMatchers.<Logger>any(), ArgumentMatchers.<Set<String>>any()))
                                             .thenReturn(stringsToUris(innerUrls.keySet()));
                                 } catch (URISyntaxException e) {
                                     throw new IllegalStateException(e);
