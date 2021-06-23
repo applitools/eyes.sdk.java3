@@ -1,3 +1,7 @@
+## [vNext]
+### Fixed
+- Caching the results of resources parsing properly. [Trello 2620](https://trello.com/c/7uutwpyx)
+
 ## [3.203.1] - 2021-06-21
 ### Updated
 - Better logs for following resources parsing.
