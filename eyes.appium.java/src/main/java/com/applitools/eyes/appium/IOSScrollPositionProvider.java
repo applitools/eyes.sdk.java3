@@ -351,6 +351,25 @@ public class IOSScrollPositionProvider extends AppiumScrollPositionProvider {
                     scrollableOffset = firstElement.getLocation().getY() + firstElement.getSize().getHeight();
                 }
                 break;
+            case "XCUIElementTypeCollectionView":
+                try {
+                    WebElement trigger = driver.findElement(MobileBy.name("applitools_grab_scrollable_data_button"));
+
+                    TouchAction triggerAction = new TouchAction(driver);
+                    triggerAction.tap(new PointOption().withCoordinates(trigger.getLocation().x, trigger.getLocation().y)).waitAction(new WaitOptions().withDuration(Duration.ofMillis(1000)));
+                    triggerAction.release();
+                    driver.performTouchAction(triggerAction);
+
+                    WebElement contentInfo = driver.findElement(MobileBy.name("applitools_content_size_label"));
+                    try {
+                        scrollableOffset = Integer.parseInt(contentInfo.getText().split(",")[1].trim().replace("}", ""));
+                    } catch (NumberFormatException | ArrayIndexOutOfBoundsException ignored) {
+                        logger.log(TraceLevel.Debug, eyesDriver.getTestId(), Stage.CHECK,  "Can not parse applitools_content_size_label value");
+                    }
+                } catch (NoSuchElementException ignored) {
+                    logger.log(TraceLevel.Debug, eyesDriver.getTestId(), Stage.CHECK,  "Helper library is not provided");
+                }
+                break;
         }
         return scrollableOffset;
     }
