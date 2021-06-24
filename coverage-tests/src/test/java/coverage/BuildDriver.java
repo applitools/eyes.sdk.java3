@@ -24,18 +24,18 @@ public class BuildDriver {
     private final String APP_PROPERTY = "app";
     private final String HEADLESS_PROPERTY = "headless";
     private final String LEGACY_PROPERTY = "legacy";
-    private final String SELENIUM_CHROME_URL = getChromeUrl();
+    private final String LOCAL_PROPERTY = "local";
+    private final String SELENIUM_LOCAL_CHROME_URL = "http://localhost:4444/wd/hub";
     private final String SELENIUM_FIREFOX_URL = "http://localhost:4445/wd/hub";
     private final String SAUCE_URL = "https://ondemand.saucelabs.com:443/wd/hub";
+    private final String EG_TOKEN = System.getenv("EXECUTION_GRID_TOKEN");
 
-
-    private static String getChromeUrl() {
+    private String getChromeUrl(boolean local) {
         String url;
-        String token = System.getenv("EXECUTION_GRID_TOKEN");
-        if (token != null) {
-            url = "https://exec-wus.applitools.com/" + token;
+        if (EG_TOKEN == null || local) {
+            url = SELENIUM_LOCAL_CHROME_URL;
         } else {
-            url = "http://localhost:4444/wd/hub";
+            url = "https://exec-wus.applitools.com/" + EG_TOKEN;
         }
         return url;
     }
@@ -55,7 +55,7 @@ public class BuildDriver {
     }
 
     public void buildDriver(Capabilities capabilities) {
-        buildDriver(capabilities, SELENIUM_CHROME_URL);
+        buildDriver(capabilities, getChromeUrl(false));
     }
 
     public void buildDriver() {
@@ -68,12 +68,13 @@ public class BuildDriver {
         String url;
         boolean headless = !isHeadless(root) || getHeadless(root);
         boolean legacy = isLegacy(root) && getLegacy(root);
+        boolean local = isLocal(root) && getLocal(root);
         if (isBrowser(root)) {
             String browserName = getBrowserName(root);
             switch (browserName) {
                 case "chrome":
                     caps = getChromeCaps(headless);
-                    url = SELENIUM_CHROME_URL;
+                    url = getChromeUrl(local);
                     break;
                 case "firefox":
                     caps = getFirefoxCaps(headless);
@@ -104,7 +105,7 @@ public class BuildDriver {
             switch (device) {
                 case "Android 8.0 Chrome Emulator":
                     caps = getAndroid8ChromeEmulator(false);
-                    url = SELENIUM_CHROME_URL;
+                    url = SELENIUM_LOCAL_CHROME_URL;
                     break;
                 case "Samsung Galaxy S8":
                     caps = getSamsungGalaxyS8();
@@ -120,6 +121,9 @@ public class BuildDriver {
                 app.setCapability("app", getApp(root));
                 caps = caps.merge(app);
             }
+        } else if (local){
+            caps = getChromeCaps(headless);
+            url = getChromeUrl(true);
         } else {
             throw new RuntimeException("Generated test env options contain no browser and no device property");
         }
@@ -295,5 +299,13 @@ public class BuildDriver {
 
     private boolean getLegacy(JsonElement root) {
         return root.getAsJsonObject().get(LEGACY_PROPERTY).getAsBoolean();
+    }
+
+    private boolean isLocal(JsonElement root) {
+        return root.getAsJsonObject().get(LOCAL_PROPERTY) != null;
+    }
+
+    private boolean getLocal(JsonElement root) {
+        return root.getAsJsonObject().get(LOCAL_PROPERTY).getAsBoolean();
     }
 }
