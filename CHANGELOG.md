@@ -1,3 +1,7 @@
+## [vNext]
+### Updated
+- Dom Snapshot 4.5.3
+
 ## [3.204.0] - 2021-06-23
 ### Fixed
 - Caching the results of resources parsing properly. [Trello 2620](https://trello.com/c/7uutwpyx)
