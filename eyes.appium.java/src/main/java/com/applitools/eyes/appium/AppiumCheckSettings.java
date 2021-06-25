@@ -82,6 +82,7 @@ public class AppiumCheckSettings extends CheckSettings implements ImplicitInitia
         clone.scrollRootElementId = this.scrollRootElementId;
         clone.scrollRootElementSelector = this.scrollRootElementSelector;
         clone.scrollRootElement = this.scrollRootElement;
+        clone.captureStatusBar = this.captureStatusBar;
         return clone;
     }
 
