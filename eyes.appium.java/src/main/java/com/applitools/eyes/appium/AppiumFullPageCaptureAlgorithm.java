@@ -1,6 +1,7 @@
 package com.applitools.eyes.appium;
 
 import com.applitools.eyes.*;
+import com.applitools.eyes.appium.capture.MobileImageProvider;
 import com.applitools.eyes.capture.EyesScreenshotFactory;
 import com.applitools.eyes.capture.ImageProvider;
 import com.applitools.eyes.debug.DebugScreenshotsProvider;
@@ -251,6 +252,9 @@ public class AppiumFullPageCaptureAlgorithm {
     private BufferedImage getTopLeftScreenshot() {
         moveToTopLeft(0, 0, 0, 0);
         BufferedImage image = imageProvider.getImage();
+        if (imageProvider instanceof MobileImageProvider) {
+            ((MobileImageProvider) imageProvider).setCaptureStatusBar(false);
+        }
         debugScreenshotsProvider.save(image, "original");
 
         // FIXME - scaling should be refactored

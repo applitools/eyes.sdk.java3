@@ -2,7 +2,6 @@ package com.applitools.eyes.appium.capture;
 
 import com.applitools.eyes.appium.EyesAppiumDriver;
 import com.applitools.eyes.appium.EyesAppiumUtils;
-import com.applitools.eyes.capture.ImageProvider;
 import com.applitools.eyes.selenium.wrappers.EyesWebDriver;
 import com.applitools.utils.ImageUtils;
 import org.openqa.selenium.OutputType;
@@ -10,12 +9,10 @@ import org.openqa.selenium.OutputType;
 import java.awt.image.BufferedImage;
 import java.util.Map;
 
-public class AndroidViewportScreenshotImageProvider implements ImageProvider {
-
-    private final EyesAppiumDriver driver;
+public class AndroidViewportScreenshotImageProvider extends MobileImageProvider {
 
     public AndroidViewportScreenshotImageProvider(EyesWebDriver driver) {
-        this.driver = (EyesAppiumDriver) driver;
+        super((EyesAppiumDriver) driver);
     }
 
     @Override

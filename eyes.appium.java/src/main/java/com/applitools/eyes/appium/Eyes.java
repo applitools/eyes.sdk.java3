@@ -3,6 +3,7 @@ package com.applitools.eyes.appium;
 import com.applitools.ICheckSettings;
 import com.applitools.eyes.*;
 import com.applitools.eyes.appium.capture.ImageProviderFactory;
+import com.applitools.eyes.appium.capture.MobileImageProvider;
 import com.applitools.eyes.appium.capture.MobileScreenshotProvider;
 import com.applitools.eyes.appium.locators.AndroidVisualLocatorProvider;
 import com.applitools.eyes.appium.locators.IOSVisualLocatorProvider;
@@ -457,10 +458,17 @@ public class Eyes extends EyesBase {
 
         ArgumentGuard.notNull(checkSettings, "checkSettings");
 
+        boolean tmpCaptureStatusBar = configuration.isCaptureStatusBar();
         ICheckSettingsInternal checkSettingsInternal = (ICheckSettingsInternal) checkSettings;
         AppiumCheckSettings appiumCheckTarget = (checkSettings instanceof AppiumCheckSettings) ? (AppiumCheckSettings) checkSettings : null;
         if (appiumCheckTarget != null) {
             appiumCheckTarget.init(logger, driver);
+            if (appiumCheckTarget.getCaptureStatusBar() != null && appiumCheckTarget.isNotRegion()) {
+                configuration.setCaptureStatusBar(appiumCheckTarget.getCaptureStatusBar());
+            }
+            if (!appiumCheckTarget.isNotRegion()) {
+                configuration.setCaptureStatusBar(false);
+            }
         }
         String name = checkSettingsInternal.getName();
 
@@ -495,6 +503,7 @@ public class Eyes extends EyesBase {
         }
 
         this.stitchContent = false;
+        configuration.setCaptureStatusBar(tmpCaptureStatusBar);
 
         ValidationResult validationResult = new ValidationResult();
         validationResult.setAsExpected(result.getAsExpected());
@@ -571,6 +580,10 @@ public class Eyes extends EyesBase {
     @Override
     protected EyesScreenshot getScreenshot(Region targetRegion, ICheckSettingsInternal checkSettingsInternal) {
         EyesScreenshot result;
+
+        if (imageProvider instanceof MobileImageProvider) {
+            ((MobileImageProvider) imageProvider).setCaptureStatusBar(configuration.isCaptureStatusBar());
+        }
 
         if (getForceFullPageScreenshot() || stitchContent) {
             result = getFullPageScreenshot();
