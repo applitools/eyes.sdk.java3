@@ -1,3 +1,7 @@
+## [vNext]
+### Added 
+- Allow to make a screenshot with status bar via captureStatusBar() functionality. [Trello 2520](https://trello.com/c/dvFOU51I)
+
 ## [3.204.1] - 2021-06-24
 ### Updated
 - Dom Snapshot 4.5.3
