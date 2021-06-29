@@ -19,7 +19,9 @@ public class AndroidViewportScreenshotImageProvider extends MobileImageProvider 
     public BufferedImage getImage() {
         BufferedImage screenshot = ImageUtils.imageFromBytes(driver.getScreenshotAs(OutputType.BYTES));
         Map<String, Integer> systemBarHeights = EyesAppiumUtils.getSystemBarsHeights(driver);
-        screenshot = cropTop(screenshot, systemBarHeights.get(EyesAppiumUtils.STATUS_BAR));
+        if (!captureStatusBar) {
+            screenshot = cropTop(screenshot, systemBarHeights.get(EyesAppiumUtils.STATUS_BAR));
+        }
         screenshot = cropBottom(screenshot, systemBarHeights.get(EyesAppiumUtils.NAVIGATION_BAR));
 
         BufferedImage result = new BufferedImage(screenshot.getWidth(), screenshot.getHeight(), BufferedImage.TYPE_4BYTE_ABGR);
