@@ -247,6 +247,12 @@ public class AppiumCheckSettings extends CheckSettings implements ImplicitInitia
         return clone;
     }
 
+    public AppiumCheckSettings captureStatusBar() {
+        AppiumCheckSettings clone = this.clone();
+        clone.captureStatusBar = true;
+        return clone;
+    }
+
     public AppiumCheckSettings captureStatusBar(boolean captureStatusBar) {
         AppiumCheckSettings clone = this.clone();
         clone.captureStatusBar = captureStatusBar;
