@@ -59,7 +59,7 @@ public class AndroidFullPageCaptureAlgorithm extends AppiumFullPageCaptureAlgori
                     scrollViewRegion.getHeight() - stitchingAdjustment);
 
             currentPosition = new Location(0,
-                    scrollViewRegion.getTop() + ((scrollViewRegion.getHeight()) * (step)) - (stitchingAdjustment*step - stitchingAdjustment));
+                    (scrollViewRegion.getTop() + statusBarHeight) + ((scrollViewRegion.getHeight()) * (step)) - (stitchingAdjustment*step - stitchingAdjustment));
 
             // We should use original view location for scroll positions due to better calculation positions on the screen
             int startY = scrollViewRegion.getHeight() + originalViewLocation.getY() - 1 - (step != maxScrollSteps ? stitchingAdjustment/2 : 0);
@@ -92,7 +92,7 @@ public class AndroidFullPageCaptureAlgorithm extends AppiumFullPageCaptureAlgori
                         initialPartSize.getWidth(),
                         cropTo);
                 currentPosition = new Location(0,
-                        scrollViewRegion.getTop() + ((scrollViewRegion.getHeight()) * (step)) - (stitchingAdjustment*step));
+                        scrollViewRegion.getTop() + statusBarHeight + ((scrollViewRegion.getHeight()) * (step)) - (stitchingAdjustment*step));
             }
             captureAndStitchCurrentPart(regionToCrop);
         }
@@ -101,7 +101,7 @@ public class AndroidFullPageCaptureAlgorithm extends AppiumFullPageCaptureAlgori
         if (heightUnderScrollableView > 0) { // check if there is views under the scrollable view
             regionToCrop = new Region(0, scrollViewRegion.getHeight() + scrollViewRegion.getTop() - stitchingAdjustment, initialPartSize.getWidth(), heightUnderScrollableView);
 
-            currentPosition = new Location(0, scrollViewRegion.getTop() + contentSize.getScrollContentHeight() - stitchingAdjustment);
+            currentPosition = new Location(0, scrollViewRegion.getTop() + statusBarHeight + contentSize.getScrollContentHeight() - stitchingAdjustment);
 
             captureAndStitchCurrentPart(regionToCrop);
         }

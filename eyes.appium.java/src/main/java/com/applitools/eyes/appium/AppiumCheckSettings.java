@@ -35,6 +35,7 @@ public class AppiumCheckSettings extends CheckSettings implements ImplicitInitia
     private By scrollRootElementSelector;
     @JsonSerialize(using = WebElementSerializer.class)
     private WebElement scrollRootElement;
+    private Boolean captureStatusBar;
 
     protected AppiumCheckSettings() {
         super();
@@ -81,6 +82,7 @@ public class AppiumCheckSettings extends CheckSettings implements ImplicitInitia
         clone.scrollRootElementId = this.scrollRootElementId;
         clone.scrollRootElementSelector = this.scrollRootElementSelector;
         clone.scrollRootElement = this.scrollRootElement;
+        clone.captureStatusBar = this.captureStatusBar;
         return clone;
     }
 
@@ -245,6 +247,18 @@ public class AppiumCheckSettings extends CheckSettings implements ImplicitInitia
         return clone;
     }
 
+    public AppiumCheckSettings captureStatusBar() {
+        AppiumCheckSettings clone = this.clone();
+        clone.captureStatusBar = true;
+        return clone;
+    }
+
+    public AppiumCheckSettings captureStatusBar(boolean captureStatusBar) {
+        AppiumCheckSettings clone = this.clone();
+        clone.captureStatusBar = captureStatusBar;
+        return clone;
+    }
+
     public String getScrollRootElementId() {
         return this.scrollRootElementId;
     }
@@ -255,5 +269,13 @@ public class AppiumCheckSettings extends CheckSettings implements ImplicitInitia
 
     public WebElement getScrollRootElement() {
         return this.scrollRootElement;
+    }
+
+    public Boolean getCaptureStatusBar() {
+        return this.captureStatusBar;
+    }
+
+    public boolean isNotRegion() {
+        return getTargetRegion() == null && getTargetElement() == null && getTargetSelector()== null;
     }
 }

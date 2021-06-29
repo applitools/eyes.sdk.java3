@@ -59,6 +59,7 @@ public class Configuration implements IConfiguration {
     private boolean isVisualGrid = false;
     private boolean disableBrowserFetching = true;
     private boolean useCookies = true;
+    private boolean captureStatusBar = false;
     @JsonIgnore
     private IDebugResourceWriter debugResourceWriter = new NullDebugResourceWriter();
 
@@ -129,6 +130,7 @@ public class Configuration implements IConfiguration {
         this.debugResourceWriter = other.getDebugResourceWriter();
         this.isDefaultLayoutBreakpointsSet = other.isDefaultLayoutBreakpointsSet();
         this.layoutBreakpoints = other.getLayoutBreakpoints();
+        this.captureStatusBar = other.isCaptureStatusBar();
     }
 
     public Configuration() {
@@ -835,5 +837,13 @@ public class Configuration implements IConfiguration {
 
     public List<Integer> getLayoutBreakpoints() {
         return layoutBreakpoints;
+    }
+
+    public boolean isCaptureStatusBar() {
+        return captureStatusBar;
+    }
+
+    public void setCaptureStatusBar(boolean captureStatusBar) {
+        this.captureStatusBar = captureStatusBar;
     }
 }

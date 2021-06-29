@@ -1,6 +1,7 @@
 package com.applitools.eyes.appium;
 
 import com.applitools.eyes.*;
+import com.applitools.eyes.appium.capture.MobileImageProvider;
 import com.applitools.eyes.capture.EyesScreenshotFactory;
 import com.applitools.eyes.capture.ImageProvider;
 import com.applitools.eyes.debug.DebugScreenshotsProvider;
@@ -8,6 +9,7 @@ import com.applitools.eyes.logging.Stage;
 import com.applitools.eyes.logging.Type;
 import com.applitools.eyes.positioning.PositionMemento;
 import com.applitools.eyes.positioning.PositionProvider;
+import com.applitools.eyes.selenium.EyesDriverUtils;
 import com.applitools.eyes.selenium.exceptions.EyesDriverOperationException;
 import com.applitools.eyes.selenium.positioning.NullRegionPositionCompensation;
 import com.applitools.eyes.selenium.positioning.RegionPositionCompensation;
@@ -53,6 +55,8 @@ public class AppiumFullPageCaptureAlgorithm {
     private final WebElement cutElement;
     protected Integer stitchingAdjustment = DEFAULT_STITCHING_ADJUSTMENT;
 
+    protected int statusBarHeight = 0;
+
     public AppiumFullPageCaptureAlgorithm(Logger logger, String testId, PositionProvider originProvider,
                                           PositionProvider positionProvider,
                                           ScrollPositionProvider scrollProvider,
@@ -83,6 +87,7 @@ public class AppiumFullPageCaptureAlgorithm {
         if (stitchingAdjustment != null) {
             this.stitchingAdjustment = stitchingAdjustment;
         }
+        statusBarHeight = 0;
     }
 
     public AppiumFullPageCaptureAlgorithm(Logger logger, String testId,
@@ -251,6 +256,9 @@ public class AppiumFullPageCaptureAlgorithm {
     private BufferedImage getTopLeftScreenshot() {
         moveToTopLeft(0, 0, 0, 0);
         BufferedImage image = imageProvider.getImage();
+        if (imageProvider instanceof MobileImageProvider) {
+            ((MobileImageProvider) imageProvider).setCaptureStatusBar(false);
+        }
         debugScreenshotsProvider.save(image, "original");
 
         // FIXME - scaling should be refactored
@@ -348,6 +356,7 @@ public class AppiumFullPageCaptureAlgorithm {
         }
 
         debugScreenshotsProvider.save(stitchedImage, "stitched");
+        ((MobileImageProvider) imageProvider).reset();
     }
 
     protected void stitchPartIntoContainer(BufferedImage partImage) {
@@ -399,12 +408,16 @@ public class AppiumFullPageCaptureAlgorithm {
             return ImageUtils.scaleImage(image, scaleProvider.getScaleRatio(), true);
         }
 
+        if (imageProvider instanceof MobileImageProvider && ((MobileImageProvider)imageProvider).wasCaptureStatusBar()
+                && EyesDriverUtils.isAndroid(((AppiumScrollPositionProvider) scrollProvider).eyesDriver.getRemoteWebDriver())) {
+            statusBarHeight = EyesAppiumUtils.getSystemBarsHeights(((AppiumScrollPositionProvider) scrollProvider).eyesDriver).get(EyesAppiumUtils.STATUS_BAR);
+        }
         // Otherwise, make a big image to stitch smaller parts into
         //Notice stitchedImage uses the same type of image as the screenshots.
         // Use initial image width for stitched image to prevent wrong image part size
         // if scrollable view has some padding or margins
         stitchedImage = new BufferedImage(
-                image.getWidth(), entireSize.getHeight(), image.getType());
+                image.getWidth(), entireSize.getHeight() + statusBarHeight, image.getType());
 
         // First of all we want to stitch the screenshot we already captured at (0, 0)
         Raster initialPart = image.getData();
