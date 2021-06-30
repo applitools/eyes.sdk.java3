@@ -1,6 +1,8 @@
-## [vNext]
+## [3.205.0] - 2021-06-30
 ### Added 
 - Allow to make a screenshot with status bar via captureStatusBar() functionality. [Trello 2520](https://trello.com/c/dvFOU51I)
+### Updated
+- Added `fonts.gstatic.com` to the list of domain that we try to download without useragent header. [Trello 2620](https://trello.com/c/7uutwpyx)
 
 ## [3.204.1] - 2021-06-24
 ### Updated
