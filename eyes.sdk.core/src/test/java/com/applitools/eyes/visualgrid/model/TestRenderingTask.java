@@ -42,7 +42,7 @@ public class TestRenderingTask extends ReportingTestSuite {
         frameData.setResourceUrls(new ArrayList<String>());
         frameData.setFrames(new ArrayList<FrameData>());
         frameData.setBlobs(new ArrayList<BlobData>());
-        DomAnalyzer domAnalyzer = new DomAnalyzer(new Logger(), new MockServerConnector(), new NullDebugResourceWriter(), frameData, new HashMap<String, RGridResource>(), new TaskListener<Map<String, RGridResource>>() {
+        DomAnalyzer domAnalyzer = new DomAnalyzer(new Logger(), new MockServerConnector(), new MockServerConnector(), null, new NullDebugResourceWriter(), frameData, new HashMap<String, RGridResource>(), new TaskListener<Map<String, RGridResource>>() {
             @Override
             public void onComplete(Map<String, RGridResource> taskResponse) {
             }
@@ -95,7 +95,7 @@ public class TestRenderingTask extends ReportingTestSuite {
         ServerConnector serverConnector = mock(ServerConnector.class);
 
         final SyncTaskListener<Map<String, RGridResource>> listener = new SyncTaskListener<>(new Logger(new StdoutLogHandler()), "dom analyzer");
-        final DomAnalyzer domAnalyzer = new DomAnalyzer(new Logger(), serverConnector, new NullDebugResourceWriter(),
+        final DomAnalyzer domAnalyzer = new DomAnalyzer(new Logger(), serverConnector, serverConnector, null, new NullDebugResourceWriter(),
                 frameData, new HashMap<String, RGridResource>(), listener);
 
         RGridResource cachedResource = mock(RGridResource.class);

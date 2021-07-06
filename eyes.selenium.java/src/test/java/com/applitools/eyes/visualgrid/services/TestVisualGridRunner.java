@@ -388,6 +388,12 @@ public class TestVisualGridRunner {
         Assert.assertNull(visualGridRunner.getProxy());
         Assert.assertEquals(visualGridRunner.eyesServiceRunner.getAutProxy(), p1);
 
+        visualGridRunner = new VisualGridRunner(new RunnerOptions().autProxy(p1, new String[]{"google"}));
+        Assert.assertEquals(visualGridRunner.eyesServiceRunner.getAutProxy(), p1);
+
+        visualGridRunner = new VisualGridRunner(new RunnerOptions().autProxy(null, new String[]{"google"}));
+        Assert.assertNull(visualGridRunner.eyesServiceRunner.getAutProxy());
+
         visualGridRunner = new VisualGridRunner(new RunnerOptions());
         Eyes eyes = new Eyes(visualGridRunner);
         eyes.setServerConnector(new MockServerConnector());

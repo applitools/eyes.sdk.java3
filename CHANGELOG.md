@@ -1,3 +1,9 @@
+## [vNext]
+### Added
+- autProxy is now enabled for specific domains through the `RunnerOptions` class. [Trello 2604](https://trello.com/c/mNTo6koP)
+### Updated
+= Reverted timeout for downloading resources to 30 seconds. [Trello 2604](https://trello.com/c/mNTo6koP)
+
 ## [3.205.0] - 2021-06-30
 ### Added 
 - Allow to make a screenshot with status bar via captureStatusBar() functionality. [Trello 2520](https://trello.com/c/dvFOU51I)

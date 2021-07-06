@@ -58,8 +58,8 @@ public class EyesServiceRunner extends Thread {
         resourceCollectionService.setDebugResourceWriter(debugResourceWriter);
     }
 
-    public void setAutProxy(AbstractProxySettings proxy) {
-        resourceCollectionService.setAutProxy(proxy);
+    public void setAutProxy(AbstractProxySettings proxy, String[] autProxyDomains) {
+        resourceCollectionService.setAutProxy(proxy, autProxyDomains);
     }
 
     public AbstractProxySettings getAutProxy() {
