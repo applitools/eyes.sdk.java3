@@ -11,6 +11,7 @@ public class RunnerOptions {
 
     private boolean isAutProxySet = false;
     private AbstractProxySettings autProxy = null;
+    private String[] autProxyDomains = null;
 
     public RunnerOptions testConcurrency(int testConcurrency) {
         this.testConcurrency = testConcurrency;
@@ -59,8 +60,24 @@ public class RunnerOptions {
         return this;
     }
 
+    /**
+     * Setting a separated proxy for requests made to the given domains. Requests to other non-eyes domains will be sent without a proxy.
+     * If the AUT proxy is set, it cannot be changed again for those specific requests by any means.
+     * If AUT proxy is set to null, the behavior will be the same as {@link #autProxy(AbstractProxySettings)}
+     */
+    public RunnerOptions autProxy(AbstractProxySettings autProxy, String[] domains) {
+        isAutProxySet = true;
+        this.autProxy = autProxy;
+        this.autProxyDomains = domains;
+        return this;
+    }
+
     public AbstractProxySettings getAutProxy() {
         return autProxy;
+    }
+
+    public String[] getAutProxyDomains() {
+        return autProxyDomains;
     }
 
     public boolean isAutProxySet() {
