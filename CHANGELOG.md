@@ -1,4 +1,4 @@
-## [vNext]
+## [3.206.0] - 2021-07-07
 ### Added
 - autProxy is now enabled for specific domains through the `RunnerOptions` class. [Trello 2604](https://trello.com/c/mNTo6koP)
 ### Updated
