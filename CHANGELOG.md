@@ -1,3 +1,7 @@
+## [vNext]
+### Added
+- Support iPad Pro 11 safari tests. [Trello 2659](https://trello.com/c/Z83V8TWC)
+
 ## [3.206.0] - 2021-07-07
 ### Added
 - autProxy is now enabled for specific domains through the `RunnerOptions` class. [Trello 2604](https://trello.com/c/mNTo6koP)
