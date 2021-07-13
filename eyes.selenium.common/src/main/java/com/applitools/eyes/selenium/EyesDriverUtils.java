@@ -151,6 +151,25 @@ public class EyesDriverUtils {
         return false;
     }
 
+    public static boolean isMobileDeviceByContext(WebDriver driver) {
+        driver = getUnderlyingDriver(driver);
+        try {
+            if (reflectionInstanceof(driver, "AppiumDriver")) {
+                Method getContext;
+                try {
+                    getContext = driver.getClass().getDeclaredMethod("getContext");
+                    getContext.setAccessible(true);
+                } catch (NoSuchMethodException ignored) {
+                    getContext = driver.getClass().getMethod("getContext");
+                }
+                return getContext.invoke(driver).equals("NATIVE_APP");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
     /**
      * Is landscape orientation boolean.
      * @param logger the logger

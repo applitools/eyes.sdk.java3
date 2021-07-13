@@ -1,6 +1,8 @@
 ## [vNext]
 ### Added
 - Support iPad Pro 11 safari tests. [Trello 2659](https://trello.com/c/Z83V8TWC)
+### Updated 
+- Checking driver context to define if mobile device used while getting device pixel ratio. [Trello 2650](https://trello.com/c/elq5kosS)
 
 ## [3.206.0] - 2021-07-07
 ### Added

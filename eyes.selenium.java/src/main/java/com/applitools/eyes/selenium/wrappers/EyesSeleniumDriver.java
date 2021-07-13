@@ -178,7 +178,7 @@ public class EyesSeleniumDriver extends EyesWebDriver implements HasInputDevices
 
     @Override
     protected double getDevicePixelRatioInner() {
-        if (EyesDriverUtils.isMobileDevice(this)) {
+        if (EyesDriverUtils.isMobileDeviceByContext(this)) {
             return SeleniumEyes.DEFAULT_DEVICE_PIXEL_RATIO;
         }
         return Float.parseFloat(executeScript("return window.devicePixelRatio").toString());
