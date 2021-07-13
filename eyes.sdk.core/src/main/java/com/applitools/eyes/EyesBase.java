@@ -15,11 +15,11 @@ import com.applitools.eyes.exceptions.TestFailedException;
 import com.applitools.eyes.fluent.CheckSettings;
 import com.applitools.eyes.fluent.ICheckSettingsInternal;
 import com.applitools.eyes.locators.BaseOcrRegion;
+import com.applitools.eyes.locators.TextRegion;
+import com.applitools.eyes.locators.TextRegionSettings;
 import com.applitools.eyes.logging.Stage;
 import com.applitools.eyes.logging.TraceLevel;
 import com.applitools.eyes.logging.Type;
-import com.applitools.eyes.locators.TextRegion;
-import com.applitools.eyes.locators.TextRegionSettings;
 import com.applitools.eyes.positioning.InvalidPositionProvider;
 import com.applitools.eyes.positioning.PositionProvider;
 import com.applitools.eyes.scaling.FixedScaleProvider;
@@ -778,7 +778,7 @@ public abstract class EyesBase implements IEyesBase {
 
         ArgumentGuard.isValidState(getIsOpen(), "Eyes not open");
         if (checkSettingsInternal.getOcrRegion() != null) {
-            AppOutput appOutput = getAppOutputWithScreenshot(region, checkSettingsInternal, null);
+            AppOutput appOutput = getAppOutputWithScreenshot(region, checkSettingsInternal);
             checkSettingsInternal.getOcrRegion().setAppOutput(appOutput);
             result = new MatchResult();
             result.setAsExpected(true);
@@ -911,10 +911,8 @@ public abstract class EyesBase implements IEyesBase {
                 // A callback which will call getAppOutput
                 new AppOutputProvider() {
                     @Override
-                    public AppOutput getAppOutput(Region region,
-                                                                ICheckSettingsInternal checkSettingsInternal,
-                                                                ImageMatchSettings imageMatchSettings) {
-                        return getAppOutputWithScreenshot(region, checkSettingsInternal, imageMatchSettings);
+                    public AppOutput getAppOutput(Region region, ICheckSettingsInternal checkSettingsInternal) {
+                        return getAppOutputWithScreenshot(region, checkSettingsInternal);
                     }
                 }
         );
@@ -1156,7 +1154,7 @@ public abstract class EyesBase implements IEyesBase {
      * @return The updated app output and screenshot.
      */
 
-    private AppOutput getAppOutputWithScreenshot(Region region, ICheckSettingsInternal checkSettingsInternal, ImageMatchSettings imageMatchSettings) {
+    private AppOutput getAppOutputWithScreenshot(Region region, ICheckSettingsInternal checkSettingsInternal) {
         // Getting the screenshot (abstract function implemented by each SDK).
         EyesScreenshot screenshot = getScreenshot(region, checkSettingsInternal);
         String domUrl = null;
@@ -1164,9 +1162,6 @@ public abstract class EyesBase implements IEyesBase {
             domUrl = screenshot.domUrl;
         }
 
-        if (imageMatchSettings != null) {
-            MatchWindowTask.collectRegions(this, screenshot, checkSettingsInternal, imageMatchSettings);
-        }
         String title = getTitle();
         Location location = region == null ? null : region.getLocation();
         if (screenshot != null && screenshot.getOriginalLocation() != null) {

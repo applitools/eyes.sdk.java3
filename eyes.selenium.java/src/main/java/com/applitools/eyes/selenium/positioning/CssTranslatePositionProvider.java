@@ -1,6 +1,9 @@
 package com.applitools.eyes.selenium.positioning;
 
-import com.applitools.eyes.*;
+import com.applitools.eyes.IEyesJsExecutor;
+import com.applitools.eyes.Location;
+import com.applitools.eyes.Logger;
+import com.applitools.eyes.RectangleSize;
 import com.applitools.eyes.positioning.PositionMemento;
 import com.applitools.eyes.positioning.PositionProvider;
 import com.applitools.eyes.selenium.EyesDriverUtils;

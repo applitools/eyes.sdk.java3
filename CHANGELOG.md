@@ -7,6 +7,7 @@
 - Cleanup stitched image if real size is smaller than expected. [Trello 2552](https://trello.com/c/cxcv9edh)
 ### Fixed
 - If we fail downloading a resource, we send and empty resource with the correct status code.
+- Simple regions' location in tests with css stitching is now correct. [Trello 2655](https://trello.com/c/hTwRpY39)
 
 ## [3.206.0] - 2021-07-07
 ### Added
