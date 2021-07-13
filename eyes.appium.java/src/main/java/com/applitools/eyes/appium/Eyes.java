@@ -628,7 +628,12 @@ public class Eyes extends RunningTest implements IEyes {
             testIds.add(runningTest.getTestId());
         }
         try {
-            driver.findElementByName("UFG_TriggerArea").click();
+            List<WebElement> list = driver.findElementsByName("UFG_TriggerArea");
+            if (list.isEmpty()) {
+                logger.log(TraceLevel.Error, testIds, Stage.CHECK, null, Pair.of("message", "There are no UFG_TriggerArea on the screen."));
+                throw new Exception("Please check integration of UFG lib in the application.");
+            }
+            list.get(list.size() -1).click();
             String base64 = driver.findElementByName("UFG_Label").getAttribute("value");
             byte[] resources = Base64.decodeBase64(base64);
             List<CheckTask> checkTasks = new ArrayList<>();
