@@ -373,4 +373,10 @@ public class IOSScrollPositionProvider extends AppiumScrollPositionProvider {
         }
         return scrollableOffset;
     }
+
+    @Override
+    public void cleanupCachedData() {
+        super.cleanupCachedData();
+        this.firstVisibleChild = null;
+    }
 }
