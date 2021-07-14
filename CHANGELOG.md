@@ -3,11 +3,12 @@
 - Support iPad Pro 11 safari tests. [Trello 2659](https://trello.com/c/Z83V8TWC)
 - Clean cached data in IOSScrollPositionProvider. [Trello 2661](https://trello.com/c/J5nCNBkF)
 ### Updated 
-- Checking driver context to define if mobile device used while getting device pixel ratio. [Trello 2650](https://trello.com/c/elq5kosS)
+- Checking driver context to define if mobile device used while getting pixel ratio of the device. [Trello 2650](https://trello.com/c/elq5kosS)
 - Cleanup stitched image if real size is smaller than expected. [Trello 2552](https://trello.com/c/cxcv9edh)
 ### Fixed
 - If we fail downloading a resource, we send and empty resource with the correct status code.
 - Simple regions' location in tests with css stitching is now correct. [Trello 2655](https://trello.com/c/hTwRpY39)
+- When failed switching to a frame returned by dom snapshot script, the frame will be ignored. [Trello 2667](https://trello.com/c/F9lTfMzD)
 
 ## [3.206.0] - 2021-07-07
 ### Added
