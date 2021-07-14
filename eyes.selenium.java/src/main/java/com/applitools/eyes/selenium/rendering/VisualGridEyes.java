@@ -22,6 +22,7 @@ import com.applitools.eyes.selenium.*;
 import com.applitools.eyes.selenium.fluent.*;
 import com.applitools.eyes.selenium.frames.Frame;
 import com.applitools.eyes.selenium.frames.FrameChain;
+import com.applitools.eyes.selenium.wrappers.EyesRemoteWebElement;
 import com.applitools.eyes.selenium.wrappers.EyesSeleniumDriver;
 import com.applitools.eyes.selenium.wrappers.EyesTargetLocator;
 import com.applitools.eyes.visualgrid.model.*;
@@ -643,7 +644,10 @@ public class VisualGridEyes implements ISeleniumEyes {
 
             try {
                 WebElement frame = webDriver.findElement(By.cssSelector(crossFrame.getSelector()));
-                switchTo.frame(frame);
+                if (!switchToFrame(testIds, frame, switchTo)) {
+                    continue;
+                }
+
                 FrameData result = captureDomSnapshot(testIds, switchTo);
                 try {
                     String url = GeneralUtils.sanitizeURL(result.getUrl());
@@ -671,14 +675,29 @@ public class VisualGridEyes implements ISeleniumEyes {
 
             try {
                 WebElement frameElement = webDriver.findElement(By.cssSelector(frame.getSelector()));
-                switchTo.frame(frameElement);
-                analyzeFrameData(testIds, frame, switchTo);
+                if (switchToFrame(testIds, frameElement, switchTo)) {
+                    analyzeFrameData(testIds, frame, switchTo);
+                }
             } catch (Throwable t) {
                 GeneralUtils.logExceptionStackTrace(logger, Stage.CHECK, Type.DOM_SCRIPT, t, testIds.toArray(new String[0]));
             } finally {
                 switchTo.frames(frameChain);
             }
         }
+    }
+
+    private boolean switchToFrame(Set<String> testIds, WebElement frame, EyesTargetLocator switchTo) {
+        EyesRemoteWebElement htmlBeforeSwitch = (EyesRemoteWebElement) webDriver.findElement(By.tagName("html"));
+        String idBeforeSwitch = htmlBeforeSwitch.getId();
+        switchTo.frame(frame);
+        EyesRemoteWebElement htmlAfterSwitch = (EyesRemoteWebElement) webDriver.findElement(By.tagName("html"));
+        String idAfterSwitch = htmlAfterSwitch.getId();
+        if (idBeforeSwitch.equals(idAfterSwitch)) {
+            logger.log(TraceLevel.Warn, testIds, Stage.CHECK, Type.DOM_SCRIPT, "Failed switching to cross origin iframe. Ignoring");
+            webDriver.getFrameChain().pop();
+            return false;
+        }
+        return true;
     }
 
     private void waitBeforeDomSnapshot() {
