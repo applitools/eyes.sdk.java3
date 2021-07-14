@@ -64,4 +64,20 @@ public class FixedCutProvider implements CutProvider {
 
         return rect;
     }
+
+    public int getHeader() {
+        return header;
+    }
+
+    public int getFooter() {
+        return footer;
+    }
+
+    public int getLeft() {
+        return left;
+    }
+
+    public int getRight() {
+        return right;
+    }
 }
