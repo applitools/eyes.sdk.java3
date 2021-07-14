@@ -379,4 +379,8 @@ public class IOSScrollPositionProvider extends AppiumScrollPositionProvider {
         super.cleanupCachedData();
         this.firstVisibleChild = null;
     }
+
+    public WebElement getFirstVisibleChild() {
+        return this.firstVisibleChild;
+    }
 }
