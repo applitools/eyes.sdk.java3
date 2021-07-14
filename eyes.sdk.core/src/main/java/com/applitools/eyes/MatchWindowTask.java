@@ -6,6 +6,9 @@ import com.applitools.eyes.config.Configuration;
 import com.applitools.eyes.fluent.*;
 import com.applitools.eyes.logging.Stage;
 import com.applitools.eyes.logging.TraceLevel;
+import com.applitools.eyes.positioning.PositionMemento;
+import com.applitools.eyes.positioning.PositionProvider;
+import com.applitools.eyes.positioning.VerbosePositionProvider;
 import com.applitools.eyes.visualgrid.model.IGetFloatingRegionOffsets;
 import com.applitools.eyes.visualgrid.model.MutableRegion;
 import com.applitools.eyes.visualgrid.model.VisualGridSelector;
@@ -281,9 +284,18 @@ public class MatchWindowTask {
                 Pair.of("checkSettings", checkSettingsInternal));
         ImageMatchSettings imageMatchSettings = createImageMatchSettings(checkSettingsInternal, eyesBase);
         if (imageMatchSettings != null) {
+            PositionProvider positionProvider = eyesBase.getPositionProvider();
+            PositionMemento originalState = null;
+            if (positionProvider instanceof VerbosePositionProvider) {
+                originalState = positionProvider.getState();
+                positionProvider.setPosition(new Location(0, 0));
+            }
             collectSimpleRegions(eyesBase, checkSettingsInternal, imageMatchSettings, screenshot);
             collectFloatingRegions(checkSettingsInternal, imageMatchSettings, screenshot);
             collectAccessibilityRegions(checkSettingsInternal, imageMatchSettings, screenshot);
+            if (positionProvider instanceof VerbosePositionProvider && originalState != null) {
+                positionProvider.restoreState(originalState);
+            }
         }
 
         return imageMatchSettings;

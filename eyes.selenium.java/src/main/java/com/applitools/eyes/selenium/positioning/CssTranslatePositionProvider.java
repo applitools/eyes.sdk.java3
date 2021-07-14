@@ -3,6 +3,7 @@ package com.applitools.eyes.selenium.positioning;
 import com.applitools.eyes.*;
 import com.applitools.eyes.positioning.PositionMemento;
 import com.applitools.eyes.positioning.PositionProvider;
+import com.applitools.eyes.positioning.VerbosePositionProvider;
 import com.applitools.eyes.selenium.EyesDriverUtils;
 import com.applitools.utils.ArgumentGuard;
 import org.openqa.selenium.WebElement;
@@ -11,7 +12,7 @@ import org.openqa.selenium.WebElement;
  * A {@link PositionProvider} which is based on CSS translates. This is
  * useful when we want to stitch a page which contains fixed position elements.
  */
-public class CssTranslatePositionProvider implements PositionProvider, ISeleniumPositionProvider{
+public class CssTranslatePositionProvider implements VerbosePositionProvider, ISeleniumPositionProvider{
 
     protected final Logger logger;
     protected final IEyesJsExecutor executor;
