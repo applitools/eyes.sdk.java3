@@ -4,6 +4,8 @@
 - Clean cached data in IOSScrollPositionProvider. [Trello 2661](https://trello.com/c/J5nCNBkF)
 ### Updated 
 - Checking driver context to define if mobile device used while getting device pixel ratio. [Trello 2650](https://trello.com/c/elq5kosS)
+### Fixed
+- If we fail downloading a resource, we send and empty resource with the correct status code.
 
 ## [3.206.0] - 2021-07-07
 ### Added
