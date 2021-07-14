@@ -3,8 +3,10 @@ package com.applitools.eyes.fluent;
 import com.applitools.ICheckSettings;
 import com.applitools.eyes.*;
 import com.applitools.eyes.locators.BaseOcrRegion;
+import com.applitools.eyes.positioning.PositionProvider;
 import com.applitools.eyes.visualgrid.model.VisualGridOption;
 import com.applitools.eyes.visualgrid.model.VisualGridSelector;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 
 import java.util.*;
@@ -564,6 +566,15 @@ public class CheckSettings implements ICheckSettings, ICheckSettingsInternal {
     @Override
     public String getVariationGroupId() {
         return variationGroupId;
+    }
+
+    /**
+     * Internal Usage
+     */
+    @JsonIgnore
+    @Override
+    public PositionProvider getStepPositionProvider() {
+        return null;
     }
 
     @Override

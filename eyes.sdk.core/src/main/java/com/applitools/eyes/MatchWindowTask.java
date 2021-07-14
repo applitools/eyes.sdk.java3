@@ -6,6 +6,8 @@ import com.applitools.eyes.config.Configuration;
 import com.applitools.eyes.fluent.*;
 import com.applitools.eyes.logging.Stage;
 import com.applitools.eyes.logging.TraceLevel;
+import com.applitools.eyes.positioning.PositionMemento;
+import com.applitools.eyes.positioning.PositionProvider;
 import com.applitools.eyes.visualgrid.model.IGetFloatingRegionOffsets;
 import com.applitools.eyes.visualgrid.model.MutableRegion;
 import com.applitools.eyes.visualgrid.model.VisualGridSelector;
@@ -54,13 +56,6 @@ public class MatchWindowTask {
         this.defaultRetryTimeout = retryTimeout;
         this.eyes = eyes;
         this.appOutputProvider = appOutputProvider;
-    }
-
-    public static void collectRegions(EyesBase eyes, EyesScreenshot screenshot,
-                                      ICheckSettingsInternal checkSettingsInternal, ImageMatchSettings imageMatchSettings) {
-        collectSimpleRegions(eyes, checkSettingsInternal, imageMatchSettings, screenshot);
-        collectFloatingRegions(checkSettingsInternal, imageMatchSettings, screenshot);
-        collectAccessibilityRegions(checkSettingsInternal, imageMatchSettings, screenshot);
     }
 
     public static void collectRegions(ImageMatchSettings imageMatchSettings, ICheckSettingsInternal checkSettingsInternal) {
@@ -233,14 +228,13 @@ public class MatchWindowTask {
      */
     public MatchResult matchWindow(Trigger[] userInputs, Region region, String tag, boolean shouldRunOnceOnTimeout,
                                    ICheckSettingsInternal checkSettingsInternal, String source) {
-        ImageMatchSettings imageMatchSettings = createImageMatchSettings(checkSettingsInternal, this.eyes);
         int retryTimeout = checkSettingsInternal.getTimeout();
         if (retryTimeout < 0) {
             retryTimeout = defaultRetryTimeout;
         }
 
         EyesScreenshot screenshot = takeScreenshot(userInputs, region, tag, shouldRunOnceOnTimeout,
-                checkSettingsInternal, imageMatchSettings, retryTimeout, source);
+                checkSettingsInternal, retryTimeout, source);
 
         updateLastScreenshot(screenshot);
         return matchResult;
@@ -280,10 +274,20 @@ public class MatchWindowTask {
                 Pair.of("configuration", eyesBase.getConfiguration()),
                 Pair.of("checkSettings", checkSettingsInternal));
         ImageMatchSettings imageMatchSettings = createImageMatchSettings(checkSettingsInternal, eyesBase);
+
         if (imageMatchSettings != null) {
+            PositionProvider positionProvider = checkSettingsInternal.getStepPositionProvider();
+            PositionMemento originalState = null;
+            if (positionProvider != null) {
+                originalState = positionProvider.getState();
+                positionProvider.setPosition(new Location(0, 0));
+            }
             collectSimpleRegions(eyesBase, checkSettingsInternal, imageMatchSettings, screenshot);
             collectFloatingRegions(checkSettingsInternal, imageMatchSettings, screenshot);
             collectAccessibilityRegions(checkSettingsInternal, imageMatchSettings, screenshot);
+            if (positionProvider != null && originalState != null) {
+                positionProvider.restoreState(originalState);
+            }
         }
 
         return imageMatchSettings;
@@ -315,7 +319,6 @@ public class MatchWindowTask {
     private EyesScreenshot takeScreenshot(Trigger[] userInputs, Region region, String tag,
                                           boolean shouldMatchWindowRunOnceOnTimeout,
                                           ICheckSettingsInternal checkSettingsInternal,
-                                          ImageMatchSettings imageMatchSettings,
                                           int retryTimeout, String source) {
         EyesScreenshot screenshot;
         lastScreenshotHash = null;
@@ -326,17 +329,16 @@ public class MatchWindowTask {
             if (shouldMatchWindowRunOnceOnTimeout) {
                 GeneralUtils.sleep(retryTimeout);
             }
-            screenshot = tryTakeScreenshot(userInputs, region, tag, checkSettingsInternal, imageMatchSettings, source);
+            screenshot = tryTakeScreenshot(userInputs, region, tag, checkSettingsInternal, source);
         } else {
-            screenshot = retryTakingScreenshot(userInputs, region, tag, checkSettingsInternal, imageMatchSettings,
+            screenshot = retryTakingScreenshot(userInputs, region, tag, checkSettingsInternal,
                     retryTimeout, source);
         }
         return screenshot;
     }
 
     private EyesScreenshot retryTakingScreenshot(Trigger[] userInputs, Region region, String tag,
-                                                 ICheckSettingsInternal checkSettingsInternal,
-                                                 ImageMatchSettings imageMatchSettings, int retryTimeout, String source) {
+                                                 ICheckSettingsInternal checkSettingsInternal, int retryTimeout, String source) {
         // Start the retry timer.
         long start = System.currentTimeMillis();
 
@@ -350,7 +352,7 @@ public class MatchWindowTask {
             // Wait before trying again.
             GeneralUtils.sleep(MATCH_INTERVAL);
 
-            screenshot = tryTakeScreenshot(userInputs, region, tag, checkSettingsInternal, imageMatchSettings, source);
+            screenshot = tryTakeScreenshot(userInputs, region, tag, checkSettingsInternal, source);
 
             if (matchResult.getAsExpected()) {
                 break;
@@ -361,15 +363,14 @@ public class MatchWindowTask {
 
         // if we're here because we haven't found a match yet, try once more
         if (!matchResult.getAsExpected()) {
-            screenshot = tryTakeScreenshot(userInputs, region, tag, checkSettingsInternal, imageMatchSettings, source);
+            screenshot = tryTakeScreenshot(userInputs, region, tag, checkSettingsInternal, source);
         }
         return screenshot;
     }
 
     private EyesScreenshot tryTakeScreenshot(Trigger[] userInputs, Region region, String tag,
-                                             ICheckSettingsInternal checkSettingsInternal,
-                                             ImageMatchSettings imageMatchSettings, String source) {
-        AppOutput appOutput = appOutputProvider.getAppOutput(region, checkSettingsInternal, imageMatchSettings);
+                                             ICheckSettingsInternal checkSettingsInternal, String source) {
+        AppOutput appOutput = appOutputProvider.getAppOutput(region, checkSettingsInternal);
         EyesScreenshot screenshot = appOutput.getScreenshot();
         String currentScreenshotHash = GeneralUtils.getSha256hash(appOutput.getScreenshotBytes());
         if (currentScreenshotHash.equals(lastScreenshotHash)) {

@@ -8,6 +8,7 @@ import com.applitools.eyes.fluent.CheckSettings;
 import com.applitools.eyes.fluent.GetRegion;
 import com.applitools.eyes.fluent.ICheckSettingsInternal;
 import com.applitools.eyes.Borders;
+import com.applitools.eyes.positioning.PositionProvider;
 import com.applitools.eyes.selenium.CheckState;
 import com.applitools.eyes.selenium.EyesSeleniumUtils;
 import com.applitools.eyes.selenium.wrappers.EyesSeleniumDriver;
@@ -638,6 +639,11 @@ public class SeleniumCheckSettings extends CheckSettings implements ISeleniumChe
             frameChain.remove(frameChain.size() - 1);
             targetElement = EyesSeleniumUtils.findFrameByFrameCheckTarget(lastFrame, driver);
         }
+    }
+
+    @Override
+    public PositionProvider getStepPositionProvider() {
+        return state == null ? null : state.getStitchPositionProvider();
     }
 }
 
