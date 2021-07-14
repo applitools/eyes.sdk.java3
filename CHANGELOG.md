@@ -1,6 +1,7 @@
 ## [vNext]
 ### Added
 - Support iPad Pro 11 safari tests. [Trello 2659](https://trello.com/c/Z83V8TWC)
+- Clean cached data in IOSScrollPositionProvider. [Trello 2661](https://trello.com/c/J5nCNBkF)
 ### Updated 
 - Checking driver context to define if mobile device used while getting device pixel ratio. [Trello 2650](https://trello.com/c/elq5kosS)
 
