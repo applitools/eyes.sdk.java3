@@ -3,6 +3,7 @@ package com.applitools.eyes.visualgrid.model;
 import com.applitools.connectivity.Cookie;
 import com.applitools.connectivity.MockServerConnector;
 import com.applitools.connectivity.ServerConnector;
+import com.applitools.connectivity.UfgConnector;
 import com.applitools.eyes.*;
 import com.applitools.eyes.utils.ReportingTestSuite;
 import com.applitools.utils.GeneralUtils;
@@ -29,10 +30,74 @@ import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-public class TestRenderingTask extends ReportingTestSuite {
+public class TestDomAnalyzer extends ReportingTestSuite {
 
-    public TestRenderingTask() {
+    public TestDomAnalyzer() {
         super.setGroupName("core");
+    }
+
+    @Test
+    public void testSpecificDomainConnector() throws URISyntaxException {
+        FrameData frameData = new FrameData();
+        frameData.setUrl("http://google.com");
+        frameData.setResourceUrls(new ArrayList<String>());
+        frameData.setFrames(new ArrayList<FrameData>());
+        frameData.setBlobs(new ArrayList<BlobData>());
+        frameData.setTestIds(new HashSet<String>());
+        frameData.setCookies(new HashSet<Cookie>());
+
+        UserAgent userAgent = mock(UserAgent.class);
+        when(userAgent.getOriginalUserAgentString()).thenReturn("useragent");
+        frameData.setUserAgent(userAgent);
+
+        UfgConnector defaultConnector = mock(UfgConnector.class);
+        UfgConnector customConnector = mock(UfgConnector.class);
+        final AtomicInteger defaultConnectorResources = new AtomicInteger();
+        final AtomicInteger customConnectorResources = new AtomicInteger();
+        when(defaultConnector.downloadResource(ArgumentMatchers.<URI>any(), anyString(), anyString(),
+                ArgumentMatchers.<Cookie>anySet(), ArgumentMatchers.<TaskListener<RGridResource>>any()))
+                .thenAnswer(new Answer<Object>() {
+                    @Override
+                    public Object answer(InvocationOnMock invocation) {
+                        defaultConnectorResources.incrementAndGet();
+                        TaskListener<RGridResource> listener = invocation.getArgument(4);
+                        listener.onComplete(new RGridResource(invocation.<URI>getArgument(0).toString(), "type", null));
+                        return null;
+                    }
+                });
+        when(customConnector.downloadResource(ArgumentMatchers.<URI>any(), anyString(), anyString(),
+                ArgumentMatchers.<Cookie>anySet(), ArgumentMatchers.<TaskListener<RGridResource>>any()))
+                .thenAnswer(new Answer<Object>() {
+                    @Override
+                    public Object answer(InvocationOnMock invocation) {
+                        customConnectorResources.incrementAndGet();
+                        TaskListener<RGridResource> listener = invocation.getArgument(4);
+                        listener.onComplete(new RGridResource(invocation.<URI>getArgument(0).toString(), "type", null));
+                        return null;
+                    }
+                });
+
+
+        DomAnalyzer domAnalyzer = new DomAnalyzer(new Logger(new StdoutLogHandler()), defaultConnector, customConnector, new String[]{"custom1", "custom2"}, new NullDebugResourceWriter(), frameData, new HashMap<String, RGridResource>(), new TaskListener<Map<String, RGridResource>>() {
+            @Override
+            public void onComplete(Map<String, RGridResource> taskResponse) {
+            }
+
+            @Override
+            public void onFail() {
+            }
+        });
+
+        for (int i = 0; i < 10; i++) {
+            domAnalyzer.resourcesToDownload.add(Pair.of(frameData, new URI(String.format("https://custom1/%d", i))));
+            domAnalyzer.resourcesToDownload.add(Pair.of(frameData, new URI(String.format("https://custom2/%d", i))));
+            domAnalyzer.resourcesToDownload.add(Pair.of(frameData, new URI(String.format("https://custom3/%d", i))));
+        }
+
+        while (!domAnalyzer.run());
+
+        Assert.assertEquals(defaultConnectorResources.get(), 10);
+        Assert.assertEquals(customConnectorResources.get(), 20);
     }
 
     @Test
@@ -124,7 +189,7 @@ public class TestRenderingTask extends ReportingTestSuite {
 
                                 counter.getAndIncrement();
                                 URI url = invocationOnMock.getArgument(0);
-                                Map innerUrls = TestRenderingTask.this.getInnerMap(urls, url.toString());
+                                Map innerUrls = TestDomAnalyzer.this.getInnerMap(urls, url.toString());
 
                                 RGridResource resource = mock(RGridResource.class);
                                 when(resource.getUrl()).thenReturn(url.toString());

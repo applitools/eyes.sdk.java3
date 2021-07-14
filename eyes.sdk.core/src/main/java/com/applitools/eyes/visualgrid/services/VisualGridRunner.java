@@ -84,10 +84,10 @@ public class VisualGridRunner extends EyesRunner {
         setServerUrl(runnerOptions.getServerUrl());
         init(suiteName);
         if (runnerOptions.isAutProxySet()) {
-            eyesServiceRunner.setAutProxy(runnerOptions.getAutProxy(), runnerOptions.getAutProxyDomains());
+            eyesServiceRunner.setAutProxy(runnerOptions.getAutProxy(), runnerOptions.getAutProxyDomains(), runnerOptions.getAutProxyMode());
         } else {
             if (runnerOptions.getProxy() != null) {
-                eyesServiceRunner.setAutProxy(runnerOptions.getProxy(), null);
+                eyesServiceRunner.setAutProxy(runnerOptions.getProxy(), null, null);
             }
         }
         setProxy(runnerOptions.getProxy());
@@ -206,7 +206,7 @@ public class VisualGridRunner extends EyesRunner {
     public void setProxy(AbstractProxySettings proxySettings) {
         super.setProxy(proxySettings);
         if (proxySettings != null) {
-            eyesServiceRunner.setAutProxy(proxySettings, null);
+            eyesServiceRunner.setAutProxy(proxySettings, null, null);
         }
     }
 
