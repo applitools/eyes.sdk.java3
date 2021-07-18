@@ -11,6 +11,7 @@ import com.applitools.eyes.Borders;
 import com.applitools.eyes.positioning.PositionProvider;
 import com.applitools.eyes.selenium.CheckState;
 import com.applitools.eyes.selenium.EyesSeleniumUtils;
+import com.applitools.eyes.selenium.positioning.CssTranslatePositionProvider;
 import com.applitools.eyes.selenium.wrappers.EyesSeleniumDriver;
 import com.applitools.eyes.selenium.wrappers.EyesWebDriver;
 import com.applitools.eyes.serializers.BySerializer;
@@ -643,7 +644,8 @@ public class SeleniumCheckSettings extends CheckSettings implements ISeleniumChe
 
     @Override
     public PositionProvider getStepPositionProvider() {
-        return state == null ? null : state.getStitchPositionProvider();
+        return state != null && state.getStitchPositionProvider() != null
+                && state.getStitchPositionProvider() instanceof CssTranslatePositionProvider ? state.getStitchPositionProvider() : null;
     }
 }
 
