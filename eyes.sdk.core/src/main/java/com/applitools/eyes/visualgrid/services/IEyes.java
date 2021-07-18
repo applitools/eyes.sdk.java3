@@ -17,14 +17,6 @@ public interface IEyes extends IEyesBase {
 
     TestResults close(boolean throwEx);
 
-    void serverUrl(String serverUrl);
-
-    void apiKey(String apiKey);
-
-    void proxy(AbstractProxySettings proxySettings);
-
-    boolean isEyesClosed();
-
     Logger getLogger();
 
     IBatchCloser getBatchCloser();
