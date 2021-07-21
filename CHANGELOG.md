@@ -1,3 +1,7 @@
+## [3.207.1] - 2021-07-21
+### Fixed
+- Aut proxy is now working properly with the domains list.
+
 ## [3.207.0] - 2021-07-18
 ### Added
 - Support iPad Pro 11 safari tests. [Trello 2659](https://trello.com/c/Z83V8TWC)

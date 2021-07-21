@@ -92,12 +92,17 @@ public class TestDomAnalyzer extends ReportingTestSuite {
             domAnalyzer.resourcesToDownload.add(Pair.of(frameData, new URI(String.format("https://custom1/%d", i))));
             domAnalyzer.resourcesToDownload.add(Pair.of(frameData, new URI(String.format("https://custom2/%d", i))));
             domAnalyzer.resourcesToDownload.add(Pair.of(frameData, new URI(String.format("https://custom3/%d", i))));
+            domAnalyzer.resourcesToDownload.add(Pair.of(frameData, new URI(String.format("https://sub.custom1/%d", i))));
+            domAnalyzer.resourcesToDownload.add(Pair.of(frameData, new URI(String.format("https://sub.custom2/%d", i))));
+            domAnalyzer.resourcesToDownload.add(Pair.of(frameData, new URI(String.format("https://sub.custom3/%d", i))));
+            domAnalyzer.resourcesToDownload.add(Pair.of(frameData, new URI(String.format("https://sub.acustom1/%d", i))));
+            domAnalyzer.resourcesToDownload.add(Pair.of(frameData, new URI(String.format("https://sub.custom1.com/%d", i))));
         }
 
         while (!domAnalyzer.run());
 
-        Assert.assertEquals(defaultConnectorResources.get(), 10);
-        Assert.assertEquals(customConnectorResources.get(), 20);
+        Assert.assertEquals(defaultConnectorResources.get(), 40);
+        Assert.assertEquals(customConnectorResources.get(), 40);
     }
 
     @Test
