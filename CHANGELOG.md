@@ -1,3 +1,7 @@
+## [vNext] - 2021-07-27
+### Fixed
+- MultiLogHandler has a concurrency bug. [Trello 2677](https://trello.com/c/hf6rCEQR)
+
 ## [3.207.1] - 2021-07-21
 ### Fixed
 - Aut proxy is now working properly with the domains list.
