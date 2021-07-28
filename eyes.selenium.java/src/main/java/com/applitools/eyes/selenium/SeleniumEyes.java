@@ -886,7 +886,8 @@ public class SeleniumEyes extends RunningTest implements ISeleniumEyes {
         Region elementBounds = EyesRemoteWebElement.getClientBounds(targetElement, driver, logger);
         Region elementInnerBounds = EyesRemoteWebElement.getClientBoundsWithoutBorders(targetElement, driver);
 
-        boolean isScrollableElement = scrollSize.getHeight() > elementInnerBounds.getHeight() || scrollSize.getWidth() > elementInnerBounds.getWidth();
+        boolean isScrollableElement = scrollSize.getHeight() - elementInnerBounds.getHeight() > 1 ||
+                scrollSize.getWidth() - elementInnerBounds.getWidth() > 1;
 
         if (isScrollableElement) {
             elementBounds = elementInnerBounds;
