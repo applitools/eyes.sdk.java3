@@ -1,4 +1,4 @@
-## [vNext] - 2021-07-27
+## [3.207.2] - 2021-07-27
 ### Fixed
 - MultiLogHandler has a concurrency bug. [Trello 2677](https://trello.com/c/hf6rCEQR)
 - Defining an element as scrollable only if the difference between client height and scroll height is more than 1 pixel. [Trello 2669](https://trello.com/c/9xPhdtkE)
