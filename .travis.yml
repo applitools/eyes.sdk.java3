@@ -72,8 +72,8 @@ jobs:
         - echo $APPLITOOLS_REPORT_ID
         - google-chrome --version
         - chromium-browser --version
-        - latestChromeDriverURL=$(wget http://chromedriver.storage.googleapis.com/LATEST_RELEASE -q -O -)
-        - wget "http://chromedriver.storage.googleapis.com/${latestChromeDriverURL}/chromedriver_linux64.zip"
+        - chromeVersion=$(google-chrome --version | cut -d ' ' -f3)
+        - wget "http://chromedriver.storage.googleapis.com/${chromeVersion}/chromedriver_linux64.zip"
         - unzip chromedriver_linux64.zip -d /home/travis/build/
         - chmod +x /home/travis/build/chromedriver
         - /home/travis/build/chromedriver --version
@@ -91,8 +91,8 @@ jobs:
       if: type != cron
       script:
         - echo $APPLITOOLS_REPORT_ID
-        - latestChromeDriverURL=$(wget http://chromedriver.storage.googleapis.com/LATEST_RELEASE -q -O -)
-        - wget "http://chromedriver.storage.googleapis.com/${latestChromeDriverURL}/chromedriver_linux64.zip"
+        - chromeVersion=$(google-chrome --version | cut -d ' ' -f3)
+        - wget "http://chromedriver.storage.googleapis.com/${chromeVersion}/chromedriver_linux64.zip"
         - unzip chromedriver_linux64.zip -d /home/travis/build/
         - chmod +x /home/travis/build/chromedriver
         - /home/travis/build/chromedriver --version
