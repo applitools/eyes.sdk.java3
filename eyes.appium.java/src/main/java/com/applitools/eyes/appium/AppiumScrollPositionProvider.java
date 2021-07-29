@@ -62,7 +62,7 @@ public abstract class AppiumScrollPositionProvider implements ScrollPositionProv
         return firstVisibleChild;
     }
 
-    protected ContentSize getCachedContentSize () {
+    protected ContentSize getCachedContentSize() {
         if (contentSize != null) {
             return contentSize;
         }
@@ -227,6 +227,6 @@ public abstract class AppiumScrollPositionProvider implements ScrollPositionProv
 
     public void setScrollRootElement(WebElement scrollRootElement) {
         this.scrollRootElement = scrollRootElement;
-        this.cachedScrollableView = scrollRootElement;
+//        this.cachedScrollableView = scrollRootElement;
     }
 }
