@@ -72,11 +72,7 @@ jobs:
         - echo $APPLITOOLS_REPORT_ID
         - google-chrome --version
         - chromium-browser --version
-        - chromeVersion=$(google-chrome --version | cut -d ' ' -f3)
-        - wget "http://chromedriver.storage.googleapis.com/${chromeVersion}/chromedriver_linux64.zip"
-        - unzip chromedriver_linux64.zip -d /home/travis/build/
-        - chmod +x /home/travis/build/chromedriver
-        - /home/travis/build/chromedriver --version
+        - chmod +x ./initChromeDriver.sh && ./initChromeDriver.sh
         - env webdriver.chrome.driver=/home/travis/build/
         - echo $TRAVIS_EVENT_TYPE
         - echo $TRAVIS_BRANCH
@@ -91,10 +87,7 @@ jobs:
       if: type != cron
       script:
         - echo $APPLITOOLS_REPORT_ID
-        - chromeVersion=$(google-chrome --version | cut -d ' ' -f3)
-        - wget "http://chromedriver.storage.googleapis.com/${chromeVersion}/chromedriver_linux64.zip"
-        - unzip chromedriver_linux64.zip -d /home/travis/build/
-        - chmod +x /home/travis/build/chromedriver
+        - chmod +x ./initChromeDriver.sh && ./initChromeDriver.sh
         - /home/travis/build/chromedriver --version
         - env webdriver.chrome.driver=/home/travis/build/
         - sed -i 's/passedTestsSuite.xml/mobileTestsSuite.xml/g' $TRAVIS_BUILD_DIR/eyes.selenium.java/pom.xml;
