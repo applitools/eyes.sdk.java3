@@ -209,6 +209,7 @@ public class AndroidScrollPositionProvider extends AppiumScrollPositionProvider 
                 hiddenElement.click();
                 scrolled = true;
                 try { Thread.sleep(1000); } catch (InterruptedException ignored) {}
+                hiddenElement.clear();
             }
         } catch (NoSuchElementException | StaleElementReferenceException e) {
             GeneralUtils.logExceptionStackTrace(logger, Stage.CHECK, e);
@@ -225,6 +226,7 @@ public class AndroidScrollPositionProvider extends AppiumScrollPositionProvider 
                 hiddenElement.click();
                 scrolled = true;
                 try { Thread.sleep(1000); } catch (InterruptedException ignored) {}
+                hiddenElement.clear();
             }
         } catch (NoSuchElementException | StaleElementReferenceException e) {
             GeneralUtils.logExceptionStackTrace(logger, Stage.CHECK, e);

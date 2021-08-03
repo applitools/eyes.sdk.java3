@@ -1,3 +1,7 @@
+## [vNext]
+### Updated
+- Updated scroll mechanism with helper library for Android. [Trello 2633](https://trello.com/c/dQqN02TN)
+
 ## [3.207.2] - 2021-07-27
 ### Fixed
 - MultiLogHandler has a concurrency bug. [Trello 2677](https://trello.com/c/hf6rCEQR)
