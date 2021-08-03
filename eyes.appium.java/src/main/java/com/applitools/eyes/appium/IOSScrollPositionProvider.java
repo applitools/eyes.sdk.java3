@@ -383,4 +383,10 @@ public class IOSScrollPositionProvider extends AppiumScrollPositionProvider {
     public WebElement getFirstVisibleChild() {
         return this.firstVisibleChild;
     }
+
+    @Override
+    public void setScrollRootElement(WebElement scrollRootElement) {
+        super.setScrollRootElement(scrollRootElement);
+        this.cachedScrollableView = scrollRootElement;
+    }
 }
