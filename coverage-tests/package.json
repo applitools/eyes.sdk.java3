@@ -15,10 +15,11 @@
   },
   "scripts": {
     "java": "yarn && yarn test && yarn report",
+    "release": "yarn && yarn test && yarn report:prod",
     "local": "yarn install --no-lockfile && yarn docker:start && yarn test && yarn report; yarn docker:stop",
-    "release": "yarn && yarn docker:start && yarn test && yarn report:prod",
     "generate": "coverage-tests generate ./configuration --pascalizeTests --strict",
     "test": "yarn generate && mvn test -DsuiteFile=EGSuite.xml",
+    "test:local": "yarn generate && mvn test",
     "report": "yarn move:report && coverage-tests report ./configuration  --sandbox$( [ -z $APPLITOOLS_REPORT_ID ] || echo \" --reportId $APPLITOOLS_REPORT_ID\" )",
     "report:prod": "yarn move:report && coverage-tests report ./configuration --reportId $APPLITOOLS_REPORT_ID",
     "move:report": "mv ./target/surefire-reports/java_coverage_tests/coverage-test-report.xml ./coverage-test-report.xml",
