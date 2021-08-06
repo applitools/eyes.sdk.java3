@@ -20,7 +20,7 @@ public class DriverBuilder {
     }};
     protected boolean headless = true;
     protected boolean legacy = false;
-    protected boolean localDriver = false;
+    protected boolean executionGrid = false;
     protected String browser = "chrome";
 
     public DriverBuilder headless(boolean headless) {
@@ -38,13 +38,13 @@ public class DriverBuilder {
         return this;
     }
 
-    public DriverBuilder localDriver(boolean localDriver) {
-        this.localDriver = localDriver;
+    public DriverBuilder executionGrid(boolean executionGrid) {
+        this.executionGrid = executionGrid;
         return this;
     }
 
     public WebDriver build() throws MalformedURLException {
         Builder builder = browserBuilders.get(browser);
-        return builder.build(headless, legacy, localDriver);
+        return builder.build(headless, legacy, executionGrid);
     }
 }
