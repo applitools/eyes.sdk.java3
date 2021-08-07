@@ -9,4 +9,4 @@ module.exports = {
   tests: "https://raw.githubusercontent.com/applitools/sdk.coverage.tests/eg_java/coverage-tests.js",
   ext: ".java",
   outPath: "./src/test/java/coverage/generic",
-}
+};

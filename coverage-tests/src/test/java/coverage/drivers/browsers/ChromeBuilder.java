@@ -2,6 +2,7 @@ package coverage.drivers.browsers;
 
 import coverage.GlobalSetup;
 import coverage.drivers.SELENIUM;
+import coverage.exceptions.MissingEnvVarException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
@@ -18,7 +19,7 @@ public class ChromeBuilder implements Builder {
             options.addArguments("--no-sandbox", "--disable-gpu");
         }
         if (executionGrid) {
-            if (GlobalSetup.EG_URL == null) throw new RuntimeException("No URL for the execution grid is provided");
+            if (GlobalSetup.EG_URL == null) throw new MissingEnvVarException("EXECUTION_GRID_URL");
 
             return new RemoteWebDriver(new URL(GlobalSetup.EG_URL), options);
         }

@@ -3,6 +3,7 @@ package coverage;
 import com.applitools.connectivity.RestClient;
 import com.applitools.connectivity.ServerConnector;
 import com.applitools.eyes.*;
+import coverage.exceptions.MissingEnvVarException;
 import org.openqa.selenium.WebDriver;
 import org.testng.annotations.AfterSuite;
 import org.testng.annotations.BeforeSuite;
@@ -42,10 +43,10 @@ public class GlobalSetup {
         }
         if(!useDocker) {
             String chromeDriverPath = System.getenv("CHROME_DRIVER_PATH");
-            if(chromeDriverPath == null) throw new RuntimeException("CHROME DRIVER PATH not set for the execution on CI or without docker");
+            if(chromeDriverPath == null) throw new MissingEnvVarException("CHROME_DRIVER_PATH");
             System.setProperty("webdriver.chrome.driver", chromeDriverPath);
             String firefoxDriverPath = System.getenv("FIREFOX_DRIVER_PATH");
-            if(firefoxDriverPath == null) throw new RuntimeException("FIREFOX DRIVER PATH not set for the execution on CI or without docker");
+            if(firefoxDriverPath == null) throw new MissingEnvVarException("FIREFOX_DRIVER_PATH");
             System.setProperty("webdriver.gecko.driver", firefoxDriverPath);
         }
 
