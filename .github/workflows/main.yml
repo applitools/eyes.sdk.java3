@@ -34,7 +34,7 @@ jobs:
           java-version: '8'
           distribution: 'adopt'
       - name: echo netrc
-      - run: echo ~/.netrc
+        run: echo ~/.netrc
       - name: auth github
         run: echo -e "\n\nmachine github.com\n  login ${{ secrets.GITHUB_TOKEN }}\n" >~/.netrc
       - name: init submodule
