@@ -33,6 +33,10 @@ jobs:
         with:
           java-version: '8'
           distribution: 'adopt'
+      - name: pwd
+        run: pwd
+      - name: ls
+        run: ls
       - name: cd to ufg
         run: pushd eyes.ufg.java/src/main/resources
       - name: npm install
