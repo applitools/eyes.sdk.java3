@@ -33,6 +33,8 @@ jobs:
         with:
           java-version: '8'
           distribution: 'adopt'
+      - name: auth github
+        run: echo -e "\n\nmachine github.com\n  login ${{ secrets.GITHUB_TOKEN }}\n" >~/.netrc
       - name: init submodule
         run: git submodule update --init --recursive
       - name: cd to ufg
