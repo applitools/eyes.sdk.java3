@@ -3,7 +3,7 @@ package coverage;
 import com.applitools.eyes.*;
 import com.applitools.eyes.metadata.SessionResults;
 import com.applitools.eyes.appium.*;
-import coverage.drivers.nativeBuilders.NativeDriverBuilder;
+import coverage.drivers.appium.NativeDriverBuilder;
 
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;

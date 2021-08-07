@@ -1,6 +1,6 @@
 package coverage.drivers.browsers;
 
-import coverage.drivers.CapabilitiesBuilder;
+import coverage.drivers.CapabilitiesHelper;
 import coverage.drivers.SELENIUM;
 import org.openqa.selenium.Capabilities;
 import org.openqa.selenium.WebDriver;
@@ -11,7 +11,7 @@ import java.net.URL;
 
 public class Safari12Builder implements Builder{
     public WebDriver build(boolean headless, boolean legacy, boolean executionGrid) throws MalformedURLException {
-        Capabilities caps = CapabilitiesBuilder.getSafari12(legacy);
+        Capabilities caps = CapabilitiesHelper.getSafari12(legacy);
         return new RemoteWebDriver(new URL(SELENIUM.SAUCE.url), caps);
     }
 }

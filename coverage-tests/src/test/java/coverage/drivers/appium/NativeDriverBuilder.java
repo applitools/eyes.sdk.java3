@@ -1,4 +1,4 @@
-package coverage.drivers.nativeBuilders;
+package coverage.drivers.appium;
 
 import coverage.drivers.browsers.DriverBuilder;
 import org.openqa.selenium.WebDriver;
@@ -8,15 +8,13 @@ import java.util.HashMap;
 
 public class NativeDriverBuilder extends DriverBuilder {
 
-    public NativeDriverBuilder() {}
+    private String device;
+    private String app;
     protected static HashMap<String, NativeBuilder> nativeBuilders = new HashMap<String, NativeBuilder>()
     {{
         put("Samsung Galaxy S8", new SamsungGalaxyS8());
         put("iPhone XS", new IPhoneXS());
     }};
-
-    private String device;
-    private String app;
 
     public NativeDriverBuilder device(String device) {
         this.device = device;

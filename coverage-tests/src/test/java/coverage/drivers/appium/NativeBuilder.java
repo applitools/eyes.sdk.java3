@@ -1,4 +1,4 @@
-package coverage.drivers.nativeBuilders;
+package coverage.drivers.appium;
 
 import org.openqa.selenium.WebDriver;
 

@@ -7,7 +7,10 @@ import java.util.HashMap;
 
 public class DriverBuilder {
 
-    public DriverBuilder() {}
+    protected boolean headless = true;
+    protected boolean legacy = false;
+    protected boolean executionGrid = false;
+    protected String browser = "chrome";
 
     static HashMap<String, Builder> browserBuilders = new HashMap<String, Builder>()
     {{
@@ -18,10 +21,6 @@ public class DriverBuilder {
         put("ie-11", new InternetExplorer11Builder());
         put("edge-18", new Edge18Builder());
     }};
-    protected boolean headless = true;
-    protected boolean legacy = false;
-    protected boolean executionGrid = false;
-    protected String browser = "chrome";
 
     public DriverBuilder headless(boolean headless) {
         this.headless = headless;

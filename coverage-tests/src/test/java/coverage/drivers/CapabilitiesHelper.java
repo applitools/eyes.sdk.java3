@@ -12,7 +12,7 @@ import org.openqa.selenium.safari.SafariOptions;
 import java.util.HashMap;
 import java.util.Map;
 
-public class CapabilitiesBuilder {
+public class CapabilitiesHelper {
     public static Capabilities getChromeCaps(boolean headless) {
         return new ChromeOptions().setHeadless(headless);
     }

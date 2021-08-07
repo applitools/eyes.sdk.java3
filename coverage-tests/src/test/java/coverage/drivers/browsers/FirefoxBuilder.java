@@ -12,9 +12,6 @@ import java.net.URL;
 
 public class FirefoxBuilder implements Builder {
 
-    public FirefoxBuilder() {
-    }
-
     public WebDriver build(boolean headless, boolean legacy, boolean executionGrid) throws MalformedURLException {
         FirefoxOptions options = new FirefoxOptions().setHeadless(headless);
         if (GlobalSetup.CI) {

@@ -12,9 +12,6 @@ import java.net.URL;
 
 public class ChromeBuilder implements Builder {
 
-    public ChromeBuilder() {
-    }
-
     public WebDriver build(boolean headless, boolean legacy, boolean executionGrid) throws MalformedURLException {
         ChromeOptions options = new ChromeOptions().setHeadless(headless);
         if (GlobalSetup.CI) {
