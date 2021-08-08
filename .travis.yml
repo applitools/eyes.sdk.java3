@@ -38,6 +38,10 @@ before_script:
   - mvn install -DskipTests
 jobs:
   include:
+    - stage: Codacy scan
+      script:
+        - pwd
+        - ls
     - stage: Test
       name: Core
       script:
@@ -135,8 +139,4 @@ jobs:
           TEST_COVERAGE_GAP=$(cat testCoverageGap.txt);
           ./sendMail.sh "$SDK" "$TRAVIS_TAG" "$CHANGELOG" "$TEST_COVERAGE_GAP";
           fi
-    - stage: Codacy scan
-      script:
-        - pwd
-        - ls
      
