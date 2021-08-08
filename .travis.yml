@@ -49,10 +49,10 @@ jobs:
         - cd ..
         - pwd
         - ls
-        - && curl -L https://github.com/codacy/codacy-analysis-cli/archive/master.tar.gz | tar xvz
+        - curl -L https://github.com/codacy/codacy-analysis-cli/archive/master.tar.gz | tar xvz
         - pwd
         - ls
-        - && cd codacy-analysis-cli-* && sudo make install
+        - cd codacy-analysis-cli-* && sudo make install
         - pwd
         - ls
         - echo $TRAVIS_COMMIT
