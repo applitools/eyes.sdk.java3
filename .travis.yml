@@ -42,6 +42,22 @@ jobs:
       script:
         - pwd
         - ls
+        - cd eyes.ufg.java
+        - pwd
+        - ls
+        - cd ..
+        - cd ..
+        - pwd
+        - ls
+        - cd .. && curl -L https://github.com/codacy/codacy-analysis-cli/archive/master.tar.gz | tar xvz
+        - pwd
+        - ls
+        - cd .. && cd codacy-analysis-cli-* && sudo make install
+        - pwd
+        - ls
+        - echo $TRAVIS_COMMIT
+        - echo $TRAVIS_BUILD_DIR
+        - export CODACY_PROJECT_TOKEN=$CODACY_PROJECT_TOKEN && cd .. && codacy-analysis-cli analyze --tool spotbugs --upload --verbose --allow-network --max-allowed-issues 999999 --commit-uuid $TRAVIS_COMMIT --directory $TRAVIS_BUILD_DIR
     - stage: Test
       name: Core
       script:
