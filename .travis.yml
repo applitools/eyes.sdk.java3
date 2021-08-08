@@ -58,7 +58,7 @@ jobs:
         - echo $TRAVIS_COMMIT
         - echo $TRAVIS_BUILD_DIR
         - echo $CODACY_PROJECT_TOKEN
-        - codacy-analysis-cli analyze --tool spotbugs --upload --verbose --allow-network --max-allowed-issues 999999 --commit-uuid $TRAVIS_COMMIT --directory $TRAVIS_BUILD_DIR
+        - cd .. && codacy-analysis-cli analyze --tool spotbugs --upload --verbose --allow-network --max-allowed-issues 999999 --commit-uuid $TRAVIS_COMMIT --directory $TRAVIS_BUILD_DIR
     - stage: Test
       name: Core
       script:
