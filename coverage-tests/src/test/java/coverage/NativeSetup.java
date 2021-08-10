@@ -3,34 +3,20 @@ package coverage;
 import com.applitools.eyes.*;
 import com.applitools.eyes.metadata.SessionResults;
 import com.applitools.eyes.appium.*;
-import io.appium.java_client.android.AndroidDriver;
-import io.appium.java_client.ios.IOSDriver;
-import org.openqa.selenium.Capabilities;
-import org.openqa.selenium.Platform;
+import coverage.drivers.appium.NativeDriverBuilder;
+
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.Actions;
 import com.applitools.eyes.utils.TestUtils;
 import org.testng.Assert;
 
-import java.net.MalformedURLException;
-import java.net.URL;
-
 public class NativeSetup extends GlobalSetup {
 
     protected Eyes eyes;
 
-    public void buildDriver(Capabilities caps, String url) {
-        Platform platform = caps.getPlatform();
-        try {
-            if (platform.is(Platform.ANDROID)) {
-                driver = new AndroidDriver<>(new URL(url), caps);
-            } else if (platform.is(Platform.IOS)) {
-                driver = new IOSDriver<>(new URL(url), caps);
-            }
-        } catch (MalformedURLException ignored) {
-            ignored.printStackTrace();
-        }
+    public NativeDriverBuilder buildDriver() {
+        return  new NativeDriverBuilder();
     }
 
     // Eyes configuration
