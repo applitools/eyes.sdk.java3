@@ -1,3 +1,7 @@
+## [vNext]
+### Updated
+- Use original height of scrollable element to calculate scroll steps. [Trello 2633](https://trello.com/c/dQqN02TN)
+
 ## [3.207.3] - 2021-08-03
 ### Updated
 - Updated scroll mechanism with helper library for Android. [Trello 2633](https://trello.com/c/dQqN02TN)
