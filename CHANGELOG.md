@@ -1,4 +1,4 @@
-## [vNext]
+## [3.208.0] - 2021-08-24
 ### Added
 - Pixel 5 support for UFG tests. [Trello 2698](https://trello.com/c/Iky7ZWVp)
 
