@@ -1,3 +1,7 @@
+## [vNext]
+### Added
+- Pixel 5 support for UFG tests. [Trello 2698](https://trello.com/c/Iky7ZWVp)
+
 ## [3.207.4] - 2021-08-21
 ### Updated
 - Use original height of scrollable element to calculate scroll steps. [Trello 2633](https://trello.com/c/dQqN02TN)
