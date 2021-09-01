@@ -53,6 +53,7 @@ public class AndroidFullPageCaptureAlgorithm extends AppiumFullPageCaptureAlgori
 
         currentPosition = new Location(0, 0);
 
+        // part before scrollable content
         if (contentSize.getTop() - statusBarHeight > 0) {
             Region partRegion = new Region(0, 0, initialPartSize.getWidth(), topPosition);
             captureAndStitchCurrentPart(partRegion);
@@ -61,20 +62,20 @@ public class AndroidFullPageCaptureAlgorithm extends AppiumFullPageCaptureAlgori
 
         int xPos = contentSize.getLeft() + 1;
 
+        boolean behaviorScrolled = false;
+        // scrollable content
         for (int step = 0; step <= maxScrollSteps; step++) {
             BufferedImage partImage = imageProvider.getImage();
             debugScreenshotsProvider.save(partImage,
                     "original-scrolled=" + currentPosition.toStringForFilename());
 
             Region partRegion = new Region(0,
-                    topPosition + (step != 0 ? stitchingAdjustment : 0),
+                    topPosition + (step != 0 ? stitchingAdjustment/2 : 0),
                     initialPartSize.getWidth(),
-                    contentSize.getHeight() - (step != 0 ? stitchingAdjustment : 0));
+                    oneScrollStep - (step != 0 ? stitchingAdjustment/2 : 0));
 
-            int startY = contentSize.getHeight() + contentSize.getTop() - 1;
-            int endY = contentSize.getHeight() + contentSize.getTop() - oneScrollStep;
-//            int startY = contentSize.getHeight() + contentSize.getTop() - 1 - (step != maxScrollSteps ? stitchingAdjustment/2 : 0);
-//            int endY = contentSize.getTop() + (step != maxScrollSteps ? stitchingAdjustment/2 : 0);
+            int startY = contentSize.getHeight() + contentSize.getTop() - 1 - (step != maxScrollSteps ? stitchingAdjustment/2 : 0);
+            int endY = contentSize.getHeight() + contentSize.getTop() - oneScrollStep + (step != maxScrollSteps ? stitchingAdjustment/2 : 0);
 
             boolean isScrolledWithHelperLibrary = false;
             if (scrollableElementId != null) { // it means that we want to scroll on a specific element
@@ -97,33 +98,43 @@ public class AndroidFullPageCaptureAlgorithm extends AppiumFullPageCaptureAlgori
             }
 
             if (step == maxScrollSteps && maxScrollSteps != 0) {
-                int croppedHeight = contentSize.getScrollContentHeight() - (oneScrollStep * step) - stitchingAdjustment;
+                int croppedHeight = contentSize.getScrollContentHeight() - (oneScrollStep * step) + (stitchingAdjustment*step) - stitchingAdjustment/2;
                 if (croppedHeight > 0) {
                     int cropFrom = (contentSize.getHeight() + topPosition) - croppedHeight;
+                    if (behaviorOffset > 0) {
+                        int updatedPosition = ((AndroidScrollPositionProvider) scrollProvider).getFirstScrollableView().getLocation().getY() - statusBarHeight;
+                        cropFrom += updatedPosition - stitchingAdjustment - stitchingAdjustment/4;
+                    }
                     partRegion = new Region(0,
                             cropFrom,
                             initialPartSize.getWidth(),
                             croppedHeight);
                 }
+                currentPosition = new Location(0, currentPosition.getY());
             }
 
             setRegionInScreenshot(partImage, partRegion, new NullRegionPositionCompensation());
             partImage = cropPartToRegion(partImage, partRegion);
             stitchPartIntoContainer(partImage);
-            currentPosition = new Location(0, currentPosition.getY() + partImage.getHeight());
+            currentPosition = new Location(0, currentPosition.getY() + partImage.getHeight() - stitchingAdjustment/2);
 
             if (step == maxScrollSteps - 1 && behaviorOffset > 0) {
-                ((AndroidScrollPositionProvider) scrollProvider).tryScrollBehaviorOffsetWithHelperLibrary(scrollableElementId, behaviorOffset);
+                behaviorScrolled = ((AndroidScrollPositionProvider) scrollProvider).tryScrollBehaviorOffsetWithHelperLibrary(scrollableElementId, behaviorOffset);
             }
         }
 
+        // part after scrollable content
         int remainingHeight = initialPartSize.getHeight() - topPosition - contentSize.getHeight();
         if (remainingHeight > 0) {
+            currentPosition = new Location(0, currentPosition.getY() + stitchingAdjustment/2);
             Region partRegion = new Region(0, topPosition + contentSize.getHeight(), initialPartSize.getWidth(), remainingHeight);
             captureAndStitchCurrentPart(partRegion);
             currentPosition = new Location(0, currentPosition.getY() + partRegion.getHeight());
         }
 
+        if (behaviorScrolled) {
+            ((AndroidScrollPositionProvider) scrollProvider).tryScrollBehaviorOffsetWithHelperLibrary(scrollableElementId, -behaviorOffset);
+        }
         moveToTopLeft();
     }
 
@@ -132,7 +143,6 @@ public class AndroidFullPageCaptureAlgorithm extends AppiumFullPageCaptureAlgori
         boolean isScrolledWithHelperLibrary = false;
         if (scrollableElementId != null) {
             isScrolledWithHelperLibrary = ((AndroidScrollPositionProvider) scrollProvider).moveToTop(scrollableElementId);
-            ((AndroidScrollPositionProvider) scrollProvider).tryScrollBehaviorOffsetWithHelperLibrary(scrollableElementId, -1);
         }
         if (!isScrolledWithHelperLibrary) {
             super.moveToTopLeft();
