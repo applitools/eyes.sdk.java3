@@ -450,8 +450,7 @@ public class AndroidScrollPositionProvider extends AppiumScrollPositionProvider 
         MobileElement hiddenElement;
         if (version.length == 3 &&
                 Integer.parseInt(version[0]) >= 1 &&
-                Integer.parseInt(version[1]) >= 3 &&
-                Integer.parseInt(version[2]) >= 1) {
+                Integer.parseInt(version[1]) >= 3) {
             hiddenElement = ((AndroidDriver<AndroidElement>) driver).findElement(MobileBy.AndroidUIAutomator("new UiSelector().description(\"EyesAppiumHelperEDT\")"));
             if (hiddenElement != null) {
                 String elementId = resourceId.split("/")[1];

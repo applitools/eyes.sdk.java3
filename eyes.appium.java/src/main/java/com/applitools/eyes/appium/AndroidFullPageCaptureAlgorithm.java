@@ -115,6 +115,15 @@ public class AndroidFullPageCaptureAlgorithm extends AppiumFullPageCaptureAlgori
                             cropTo);
                 }
             }
+            if (maxScrollSteps == 1 && behaviorOffset > 0) {
+                behaviorScrolled = ((AndroidScrollPositionProvider) scrollProvider).tryScrollBehaviorOffsetWithHelperLibrary(scrollableElementId, behaviorOffset);
+                if (behaviorScrolled) {
+                    regionToCrop = new Region(0,
+                            (regionToCrop.getTop() - stitchingAdjustment) - stitchingAdjustment/4,
+                            initialPartSize.getWidth(),
+                            regionToCrop.getHeight());
+                }
+            }
             captureAndStitchCurrentPart(regionToCrop);
 
             if (step == maxScrollSteps - 1 && behaviorOffset > 0) {
