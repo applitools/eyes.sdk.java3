@@ -6,11 +6,8 @@ import com.applitools.eyes.capture.ImageProvider;
 import com.applitools.eyes.debug.DebugScreenshotsProvider;
 import com.applitools.eyes.logging.Stage;
 import com.applitools.eyes.logging.TraceLevel;
-import com.applitools.eyes.selenium.positioning.NullRegionPositionCompensation;
 import org.apache.commons.lang3.tuple.Pair;
 import org.openqa.selenium.WebElement;
-
-import java.awt.image.BufferedImage;
 
 public class AndroidFullPageCaptureAlgorithm extends AppiumFullPageCaptureAlgorithm {
 
@@ -63,7 +60,7 @@ public class AndroidFullPageCaptureAlgorithm extends AppiumFullPageCaptureAlgori
 
         // We need to set position margin to avoid shadow at the top of view
         int oneScrollStep = originalScrollableViewHeight - stitchingAdjustment;
-        int maxScrollSteps = contentSize.getScrollContentHeight() / oneScrollStep;
+        int maxScrollSteps = (contentSize.getScrollContentHeight() - behaviorOffset) / oneScrollStep;
         logger.log(TraceLevel.Debug, testId, Stage.CHECK,
                 Pair.of("entireScrollableHeight", contentSize.getScrollContentHeight()),
                 Pair.of("oneScrollStep", oneScrollStep));
@@ -109,6 +106,7 @@ public class AndroidFullPageCaptureAlgorithm extends AppiumFullPageCaptureAlgori
                 currentPosition = new Location(0,
                         scrollViewRegion.getTop() + statusBarHeight + ((originalScrollableViewHeight) * (step)) - (stitchingAdjustment*step));
                 if (behaviorScrolled) {
+                    cropFrom = originalViewLocation.getY() + originalScrollableViewHeight - cropTo;
                     regionToCrop = new Region(0,
                             (cropFrom - stitchingAdjustment) - stitchingAdjustment/4,
                             initialPartSize.getWidth(),
@@ -118,8 +116,9 @@ public class AndroidFullPageCaptureAlgorithm extends AppiumFullPageCaptureAlgori
             if (maxScrollSteps == 1 && behaviorOffset > 0) {
                 behaviorScrolled = ((AndroidScrollPositionProvider) scrollProvider).tryScrollBehaviorOffsetWithHelperLibrary(scrollableElementId, behaviorOffset);
                 if (behaviorScrolled) {
+                    int cropFrom = originalViewLocation.getY() + originalScrollableViewHeight - regionToCrop.getHeight();
                     regionToCrop = new Region(0,
-                            (regionToCrop.getTop() - stitchingAdjustment) - stitchingAdjustment/4,
+                            (cropFrom - stitchingAdjustment) - stitchingAdjustment/4,
                             initialPartSize.getWidth(),
                             regionToCrop.getHeight());
                 }

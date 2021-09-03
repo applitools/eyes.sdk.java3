@@ -1,3 +1,7 @@
+## [vNext]
+### Updated
+- Android fullpage algorithm. CollapsingToolbar and NestedScrollView elements. [Trello 2633](https://trello.com/c/dQqN02TN)
+
 ## [3.208.0] - 2021-08-24
 ### Added
 - Pixel 5 support for UFG tests. [Trello 2698](https://trello.com/c/Iky7ZWVp)

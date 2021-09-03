@@ -403,6 +403,14 @@ public class AndroidScrollPositionProvider extends AppiumScrollPositionProvider 
                     }
                     GeneralUtils.logExceptionStackTrace(logger, Stage.CHECK, e);
                 }
+                int position;
+                if (activeScroll instanceof EyesAppiumElement) {
+                    position = (int) (activeScroll.getLocation().getY() * eyesDriver.getDevicePixelRatio());
+                } else {
+                    position = activeScroll.getLocation().getY();
+                }
+                this.contentSize.top = position;
+                this.contentSize.height = activeScroll.getRect().getHeight();
             }
         } catch (NoSuchElementException e) {
             GeneralUtils.logExceptionStackTrace(logger, Stage.CHECK, e);
