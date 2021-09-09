@@ -6,7 +6,6 @@ import com.applitools.eyes.selenium.Eyes;
 import com.applitools.eyes.utils.ReportingTestSuite;
 import com.applitools.eyes.utils.SeleniumUtils;
 import com.applitools.eyes.utils.TestUtils;
-import com.applitools.eyes.visualgrid.model.DeviceName;
 import com.applitools.eyes.visualgrid.services.VisualGridRunner;
 import org.openqa.selenium.WebDriver;
 import org.testng.annotations.BeforeClass;
@@ -25,7 +24,7 @@ public class BasicDemo extends ReportingTestSuite {
 
     @DataProvider(name = "booleanDP")
     public Object[] dp() {
-        return new Object[]{Boolean.TRUE};
+        return new Object[]{Boolean.TRUE, Boolean.FALSE};
     }
 
     @BeforeClass
@@ -48,7 +47,6 @@ public class BasicDemo extends ReportingTestSuite {
         EyesRunner runner = useVisualGrid ? new VisualGridRunner(10) : new ClassicRunner();
         String suffix = useVisualGrid ? "_VG" : "";
         Eyes eyes = new Eyes(runner);
-        eyes.setConfiguration(eyes.getConfiguration().addDeviceEmulation(DeviceName.Pixel_5));
         eyes.setLogHandler(logger);
         eyes.setBatch(batch);
         //eyes.setProxy(new ProxySettings("http://localhost:8888"));
