@@ -131,4 +131,9 @@ public class MockServerConnector extends ServerConnector {
     public void sendLogs(AsyncRequestCallback callback, LogSessionsClientEvents clientEvents) {
         callback.onComplete(new MockedResponse(logger, 200, "ok", new byte[0]));
     }
+
+    @Override
+    public BatchConfig getBatchConfig(String batchId) {
+        return new BatchConfig();
+    }
 }

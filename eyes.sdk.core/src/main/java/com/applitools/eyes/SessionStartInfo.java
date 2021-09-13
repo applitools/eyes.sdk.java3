@@ -34,6 +34,7 @@ public class SessionStartInfo {
     private String branchName;
     private String parentBranchName;
     private String baselineBranchName;
+    private String parentBranchBaselineSavedBefore;
     private Boolean saveDiffs;
     private ImageMatchSettings defaultMatchSettings;
     private List<PropertyData> properties;
@@ -47,7 +48,7 @@ public class SessionStartInfo {
     public SessionStartInfo(String testId, String agentId, SessionType sessionType, String appIdOrName, String verId,
                             String scenarioIdOrName, BatchInfo batchInfo, String baselineEnvName, String environmentName,
                             Object environment, ImageMatchSettings defaultMatchSettings, String branchName,
-                            String parentBranchName, String baselineBranchName, Boolean saveDiffs,
+                            String parentBranchName, String baselineBranchName, String parentBranchBaselineSavedBefore, Boolean saveDiffs,
                             List<PropertyData> properties, String agentSessionId, String agentRunId, Integer timeout) {
         ArgumentGuard.notNullOrEmpty(agentId, "agentId");
         ArgumentGuard.notNullOrEmpty(appIdOrName, "appIdOrName");
@@ -69,6 +70,7 @@ public class SessionStartInfo {
         this.branchName = branchName;
         this.parentBranchName = parentBranchName;
         this.baselineBranchName = baselineBranchName;
+        this.parentBranchBaselineSavedBefore = parentBranchBaselineSavedBefore;
         this.saveDiffs = saveDiffs;
         this.properties = properties;
         this.agentSessionId = agentSessionId;
@@ -160,6 +162,10 @@ public class SessionStartInfo {
 
     public String getAgentRunId() {
         return agentRunId;
+    }
+
+    public String getParentBranchBaselineSavedBefore() {
+        return parentBranchBaselineSavedBefore;
     }
 
     @Override

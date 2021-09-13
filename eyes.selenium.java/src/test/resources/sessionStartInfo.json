@@ -34,6 +34,7 @@
   "branchName" : "some branch",
   "parentBranchName" : "parent branch",
   "baselineBranchName" : "baseline branch",
+  "parentBranchBaselineSavedBefore" : "time",
   "saveDiffs" : null,
   "defaultMatchSettings" : {
     "matchLevel" : "STRICT",
