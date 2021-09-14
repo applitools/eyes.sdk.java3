@@ -24,6 +24,8 @@ git:
 before_install:
   - echo -e "\n\nmachine github.com\n  login $GITHUB_TOKEN\n" >~/.netrc
   - git submodule update --init --recursive
+  - git checkout master
+  - git checkout $TRAVIS_BRANCH
 before_script:
   - export APPLITOOLS_REPORT_ID=${TRAVIS_COMMIT:0:7}-$TRAVIS_BUILD_NUMBER
   - echo "Travis tag is $TRAVIS_TAG"

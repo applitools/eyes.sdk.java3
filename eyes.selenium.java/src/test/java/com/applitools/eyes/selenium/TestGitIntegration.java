@@ -36,6 +36,8 @@ public class TestGitIntegration {
         Eyes eyes = new Eyes();
         eyes.setServerConnector(serverConnector);
         eyes.setLogHandler(new StdoutLogHandler());
+        eyes.setBranchName(null);
+        eyes.setParentBranchName(null);
         eyes.setBatch(batchInfo);
 
         // Getting branches names from the server to calculate merge base time
@@ -65,20 +67,5 @@ public class TestGitIntegration {
         }
 
         Assert.assertNull(reference.get());
-
-        // Not sending a request but using user defined branches names to calculate merge base time
-        eyes.setBranchName("develop");
-        eyes.setParentBranchName("master");
-        driver = SeleniumUtils.createChromeDriver();
-        try {
-            eyes.open(driver, "app", "test");
-            eyes.checkWindow();
-            eyes.close();
-        } finally {
-            driver.quit();
-            eyes.abortIfNotClosed();
-        }
-
-        Assert.assertNotNull(reference.get());
     }
 }
