@@ -914,6 +914,8 @@ public abstract class EyesBase implements IEyesBase {
 
             scmSourceBranch = batchConfig.getScmSourceBranch();
             scmTargetBranch = batchConfig.getScmTargetBranch();
+        } else if (System.getenv("CI") != null) {
+            return null;
         }
 
         if (scmSourceBranch == null || scmTargetBranch == null) {
