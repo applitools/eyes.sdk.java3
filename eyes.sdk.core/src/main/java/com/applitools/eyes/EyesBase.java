@@ -894,6 +894,7 @@ public abstract class EyesBase implements IEyesBase {
     }
 
     private String getScmMergeBaseTime(BatchInfo batchInfo) throws Exception {
+        System.out.println("1");
         if (batchInfo.getScmMergeBaseTime() != null) {
             return batchInfo.getScmMergeBaseTime();
         }
@@ -902,6 +903,7 @@ public abstract class EyesBase implements IEyesBase {
         String scmTargetBranch = getConfiguration().getParentBranchName();
         boolean isBatchConfigRequired = !batchInfo.isGeneratedId() && scmSourceBranch == null && scmTargetBranch == null;
         if (isBatchConfigRequired) {
+            System.out.println("2");
             BatchConfig batchConfig = serverConnector.getBatchConfig(batchInfo.getId());
             if (batchConfig == null) {
                 logger.log(TraceLevel.Warn, getTestId(), Stage.OPEN, String.format("Failed getting config of batch %s", batchInfo.getId()));
@@ -915,14 +917,17 @@ public abstract class EyesBase implements IEyesBase {
             scmSourceBranch = batchConfig.getScmSourceBranch();
             scmTargetBranch = batchConfig.getScmTargetBranch();
         } else if (System.getenv("CI") != null) {
+            System.out.println("3");
             return null;
         }
 
         if (scmSourceBranch == null || scmTargetBranch == null) {
+            System.out.println("4");
             logger.log(TraceLevel.Warn, getTestId(), Stage.OPEN, String.format("Got null scm branch for batch %s", batchInfo.getId()));
             return null;
         }
 
+        System.out.printf("5 - %s:%s%n", scmSourceBranch, scmTargetBranch);
         if (scmSourceBranch.equals(scmTargetBranch)) {
             return null;
         }
@@ -936,19 +941,23 @@ public abstract class EyesBase implements IEyesBase {
         Process process = builder.start();
         int exitCode = process.waitFor();
         if (exitCode != 0) {
+            System.out.println("6");
             throw new EyesException("Failed running git merge-base: " + GeneralUtils.readInputStreamAsString(process.getErrorStream()));
         }
 
         String mergeBaseRev = GeneralUtils.readInputStreamAsString(process.getInputStream());
+        System.out.println("7 - " + mergeBaseRev);
         mergeBaseRev = mergeBaseRev.replace("\n", "").replace("\r", "");
         builder = new ProcessBuilder();
         builder.command("git", "show", "-q", "--format=%cI", mergeBaseRev);
         process = builder.start();
         exitCode = process.waitFor();
         if (exitCode != 0) {
+            System.out.println("8");
             throw new EyesException("Failed running git show: " + GeneralUtils.readInputStreamAsString(process.getErrorStream()));
         }
         String result = GeneralUtils.readInputStreamAsString(process.getInputStream());
+        System.out.println("9" + result);
         result = result.replace("\n", "").replace("\r", "");
         return result;
     }
