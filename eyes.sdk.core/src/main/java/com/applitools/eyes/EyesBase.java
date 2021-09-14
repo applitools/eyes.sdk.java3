@@ -902,6 +902,7 @@ public abstract class EyesBase implements IEyesBase {
         String scmSourceBranch = getConfiguration().getBranchName();
         String scmTargetBranch = getConfiguration().getParentBranchName();
         boolean isBatchConfigRequired = !batchInfo.isGeneratedId() && scmSourceBranch == null && scmTargetBranch == null;
+        System.out.println(batchInfo.isGeneratedId() + " " + scmSourceBranch + " " + scmTargetBranch);
         if (isBatchConfigRequired) {
             System.out.println("2");
             BatchConfig batchConfig = serverConnector.getBatchConfig(batchInfo.getId());
