@@ -20,6 +20,7 @@ addons:
 # $SDK
 git:
   submodules: false
+  depth: false
 before_install:
   - echo -e "\n\nmachine github.com\n  login $GITHUB_TOKEN\n" >~/.netrc
   - git submodule update --init --recursive
