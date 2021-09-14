@@ -481,4 +481,13 @@
             </class>
         </classes>
     </test>
+    <test name="TestGitIntegration">
+        <classes>
+            <class name="com.applitools.eyes.selenium.TestGitIntegration">
+                <methods>
+                    <include name="testGitIntegration"/>
+                </methods>
+            </class>
+        </classes>
+    </test>
 </suite>

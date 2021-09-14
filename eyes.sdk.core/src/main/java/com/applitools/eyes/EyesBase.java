@@ -876,14 +876,81 @@ public abstract class EyesBase implements IEyesBase {
 
         String agentSessionId = UUID.randomUUID().toString();
         Object appEnv = getAppEnvironment();
+        String scmMergeBaseTime = null;
+        try {
+            scmMergeBaseTime = getScmMergeBaseTime(configGetter.getBatch());
+            configGetter.getBatch().setScmMergeBaseTime(scmMergeBaseTime);
+        } catch (Exception e) {
+            GeneralUtils.logExceptionStackTrace(logger, Stage.OPEN, e, getTestId());
+        }
         sessionStartInfo = new SessionStartInfo(getTestId(), getFullAgentId(), configGetter.getSessionType(), getAppName(),
                 null, getTestName(), configGetter.getBatch(), getBaselineEnvName(), configGetter.getEnvironmentName(),
-                appEnv, configGetter.getDefaultMatchSettings(), configGetter.getBranchName(),
-                configGetter.getParentBranchName(), configGetter.getBaselineBranchName(), configGetter.getSaveDiffs(),
-                properties, agentSessionId, agentRunId, configGetter.getAbortIdleTestTimeout());
+                appEnv, configGetter.getDefaultMatchSettings(), configGetter.getBranchName(), configGetter.getParentBranchName(),
+                configGetter.getBaselineBranchName(), scmMergeBaseTime, configGetter.getSaveDiffs(), properties, agentSessionId,
+                agentRunId, configGetter.getAbortIdleTestTimeout());
 
         logger.log(TraceLevel.Info, getTestId(), Stage.OPEN, Pair.of("configuration", getConfiguration()));
         return sessionStartInfo;
+    }
+
+    private String getScmMergeBaseTime(BatchInfo batchInfo) throws Exception {
+        if (batchInfo.getScmMergeBaseTime() != null) {
+            return batchInfo.getScmMergeBaseTime();
+        }
+
+        String scmSourceBranch = getConfiguration().getBranchName();
+        String scmTargetBranch = getConfiguration().getParentBranchName();
+        boolean isBatchConfigRequired = !batchInfo.isGeneratedId() && scmSourceBranch == null && scmTargetBranch == null;
+        if (isBatchConfigRequired) {
+            BatchConfig batchConfig = serverConnector.getBatchConfig(batchInfo.getId());
+            if (batchConfig == null) {
+                logger.log(TraceLevel.Warn, getTestId(), Stage.OPEN, String.format("Failed getting config of batch %s", batchInfo.getId()));
+                return null;
+            }
+
+            if (batchConfig.getScmMergeBaseTime() != null) {
+                return batchConfig.getScmMergeBaseTime();
+            }
+
+            scmSourceBranch = batchConfig.getScmSourceBranch();
+            scmTargetBranch = batchConfig.getScmTargetBranch();
+        } else if (System.getenv("CI") != null) {
+            return null;
+        }
+
+        if (scmSourceBranch == null || scmTargetBranch == null) {
+            logger.log(TraceLevel.Warn, getTestId(), Stage.OPEN, String.format("Got null scm branch for batch %s", batchInfo.getId()));
+            return null;
+        }
+
+        if (scmSourceBranch.equals(scmTargetBranch)) {
+            return null;
+        }
+
+        return getScmMergeTimeFromGit(scmTargetBranch);
+    }
+
+    private String getScmMergeTimeFromGit(String scmTargetBranch) throws Exception {
+        ProcessBuilder builder = new ProcessBuilder();
+        builder.command("git", "merge-base",  "HEAD", scmTargetBranch);
+        Process process = builder.start();
+        int exitCode = process.waitFor();
+        if (exitCode != 0) {
+            throw new EyesException("Failed running git merge-base: " + GeneralUtils.readInputStreamAsString(process.getErrorStream()));
+        }
+
+        String mergeBaseRev = GeneralUtils.readInputStreamAsString(process.getInputStream());
+        mergeBaseRev = mergeBaseRev.replace("\n", "").replace("\r", "");
+        builder = new ProcessBuilder();
+        builder.command("git", "show", "-q", "--format=%cI", mergeBaseRev);
+        process = builder.start();
+        exitCode = process.waitFor();
+        if (exitCode != 0) {
+            throw new EyesException("Failed running git show: " + GeneralUtils.readInputStreamAsString(process.getErrorStream()));
+        }
+        String result = GeneralUtils.readInputStreamAsString(process.getInputStream());
+        result = result.replace("\n", "").replace("\r", "");
+        return result;
     }
 
     protected void openBase() throws EyesException {

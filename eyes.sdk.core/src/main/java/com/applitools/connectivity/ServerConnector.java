@@ -30,7 +30,8 @@ import java.util.*;
 
 public class ServerConnector extends UfgConnector {
 
-    static final String CLOSE_BATCH = "api/sessions/batches/%s/close/bypointerid";
+    static final String CLOSE_BATCH_PATH = "api/sessions/batches/%s/close/bypointerid";
+    static final String BATCH_CONFIG_PATH = "api/sessions/batches/%s/config/bypointerid";
     static final String MOBILE_DEVICES_PATH = "/app/info/mobile/devices";
     public static final String API_PATH = "/api/sessions/running";
     private static final String LOG_PATH = "/api/sessions/log";
@@ -353,6 +354,25 @@ public class ServerConnector extends UfgConnector {
         sendLongRequest(request, HttpMethod.POST, callback, postData, MediaType.APPLICATION_JSON);
     }
 
+    public BatchConfig getBatchConfig(String batchId) {
+        final String path = String.format(BATCH_CONFIG_PATH, batchId);
+        final AsyncRequest request = makeEyesRequest(new HttpRequestBuilder() {
+            @Override
+            public AsyncRequest build() {
+                return restClient.target(serverUrl.toString()).path(path)
+                        .queryParam("apiKey", getApiKey())
+                        .asyncRequest(MediaType.APPLICATION_JSON);
+            }
+        });
+
+        final SyncTaskListener<BatchConfig> listener = new SyncTaskListener<>(logger, "batchConfig");
+        List<Integer> validStatusCodes = new ArrayList<>();
+        validStatusCodes.add(HttpStatus.SC_OK);
+        ResponseParsingCallback<BatchConfig> callback = new ResponseParsingCallback<>(this, validStatusCodes, listener, new TypeReference<BatchConfig>() {});
+        sendLongRequest(request, HttpMethod.GET, callback, null, MediaType.APPLICATION_JSON);
+        return listener.get();
+    }
+
     public void closeBatch(String batchId) {
         closeBatch(batchId, serverUrl.toString());
     }
@@ -371,7 +391,7 @@ public class ServerConnector extends UfgConnector {
             return;
         }
 
-        final String path = String.format(CLOSE_BATCH, batchId);
+        final String path = String.format(CLOSE_BATCH_PATH, batchId);
         initClient();
         AsyncRequest request = makeEyesRequest(new HttpRequestBuilder() {
             @Override

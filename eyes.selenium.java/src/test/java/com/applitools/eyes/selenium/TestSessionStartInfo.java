@@ -50,6 +50,7 @@ public class TestSessionStartInfo extends ReportingTestSuite {
                 ims, "some branch",
                 "parent branch",
                 "baseline branch",
+                "time",
                 null,
                 null,
                 null,

@@ -35,6 +35,11 @@ public class BatchInfo {
     @JsonProperty("properties")
     private final List<Map<String, String>> properties = new ArrayList<>();
 
+    @JsonIgnore
+    private boolean isGeneratedId;
+    @JsonIgnore
+    private String scmMergeBaseTime = null;
+
     /**
      * Creates a new BatchInfo instance.
      *
@@ -46,6 +51,7 @@ public class BatchInfo {
         String envVarBatchId = GeneralUtils.getEnvString("APPLITOOLS_BATCH_ID");
         String envSequenceName = GeneralUtils.getEnvString("APPLITOOLS_BATCH_SEQUENCE");
         this.id = envVarBatchId != null ? envVarBatchId : UUID.randomUUID().toString();
+        this.isGeneratedId = envVarBatchId == null;
         this.name = name != null ? name : GeneralUtils.getEnvString("APPLITOOLS_BATCH_NAME");
         String env_batch_notify = GeneralUtils.getEnvString("APPLITOOLS_BATCH_NOTIFY");
         this.notifyOnCompletion = Boolean.parseBoolean(env_batch_notify);
@@ -58,6 +64,7 @@ public class BatchInfo {
         this.sequenceName = batchSequenceName;
         this.name = name;
         this.startedAt = startedAt;
+        this.isGeneratedId = false;
     }
 
     public BatchInfo() {
@@ -99,6 +106,7 @@ public class BatchInfo {
     public void setId (String id) {
         ArgumentGuard.notNullOrEmpty(id, "id");
         this.id = id;
+        this.isGeneratedId = false;
     }
 
     /**
@@ -182,5 +190,20 @@ public class BatchInfo {
     @JsonIgnore
     public List<Map<String, String>> getProperties() {
         return this.properties;
+    }
+
+    @JsonIgnore
+    public boolean isGeneratedId() {
+        return isGeneratedId;
+    }
+
+    @JsonIgnore
+    public String getScmMergeBaseTime() {
+        return scmMergeBaseTime;
+    }
+
+    @JsonIgnore
+    public void setScmMergeBaseTime(String scmMergeBaseTime) {
+        this.scmMergeBaseTime = scmMergeBaseTime;
     }
 }
