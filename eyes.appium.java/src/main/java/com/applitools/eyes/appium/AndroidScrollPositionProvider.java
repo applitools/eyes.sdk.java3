@@ -173,11 +173,6 @@ public class AndroidScrollPositionProvider extends AppiumScrollPositionProvider 
         curScrollPos = getScrollPosFromScrollData(contentSize, lastScrollData, supposedScrollAmt, isDown);
     }
 
-    public Location scrollDown(boolean returnAbsoluteLocation) {
-        scroll(true);
-        return getCurrentPositionWithoutStatusBar(returnAbsoluteLocation);
-    }
-
     @Override
     public void scrollTo(int startX, int startY, int endX, int endY, boolean shouldCancel) {
         logger.log(TraceLevel.Debug, eyesDriver.getTestId(), Stage.CHECK,
