@@ -125,22 +125,26 @@ public class IOSScrollPositionProvider extends AppiumScrollPositionProvider {
 
     @Override
     public Location getCurrentPosition(boolean absolute) {
-        WebElement activeScroll = getFirstScrollableView();
-        if (activeScroll.getAttribute("type").equals("XCUIElementTypeCollectionView")) {
-            triggerHelperButton();
-            try {
-                WebElement offsetLabel = driver.findElement(MobileBy.name("applitools_content_offset_label"));
-                try { Thread.sleep(500); } catch (InterruptedException ignored) {}
-                int contentOffset = (int) Double.parseDouble(offsetLabel.getText().split(",")[1].trim().replace("}", ""));
-                return new Location(0, contentOffset);
-            } catch (NumberFormatException | ArrayIndexOutOfBoundsException ignored) {
-                logger.log(TraceLevel.Debug, eyesDriver.getTestId(), Stage.CHECK,  "Can not parse applitools_content_offset_label value");
-                return super.getCurrentPosition(absolute);
-            } catch (NoSuchElementException ignored) {
-                logger.log(TraceLevel.Debug, eyesDriver.getTestId(), Stage.CHECK,  "Can not find helper library elements");
+        try {
+            WebElement activeScroll = getFirstScrollableView();
+            if (activeScroll.getAttribute("type").equals("XCUIElementTypeCollectionView")) {
+                triggerHelperButton();
+                try {
+                    WebElement offsetLabel = driver.findElement(MobileBy.name("applitools_content_offset_label"));
+                    try { Thread.sleep(500); } catch (InterruptedException ignored) {}
+                    int contentOffset = (int) Double.parseDouble(offsetLabel.getText().split(",")[1].trim().replace("}", ""));
+                    return new Location(0, contentOffset);
+                } catch (NumberFormatException | ArrayIndexOutOfBoundsException ignored) {
+                    logger.log(TraceLevel.Debug, eyesDriver.getTestId(), Stage.CHECK,  "Can not parse applitools_content_offset_label value");
+                    return super.getCurrentPosition(absolute);
+                } catch (NoSuchElementException ignored) {
+                    logger.log(TraceLevel.Debug, eyesDriver.getTestId(), Stage.CHECK,  "Can not find helper library elements");
+                    return super.getCurrentPosition(absolute);
+                }
+            } else {
                 return super.getCurrentPosition(absolute);
             }
-        } else {
+        } catch (NoSuchElementException ignored) {
             return super.getCurrentPosition(absolute);
         }
     }

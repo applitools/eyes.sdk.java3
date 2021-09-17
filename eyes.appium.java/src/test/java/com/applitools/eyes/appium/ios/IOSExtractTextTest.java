@@ -28,9 +28,9 @@ public class IOSExtractTextTest extends IOSTestSetup {
         Map<String, List<TextRegion>> textRegions = eyes.extractTextRegions(new TextRegionSettings("Scroll view"));
         Assert.assertEquals(textRegions.size(), 1);
         List<TextRegion> regions = textRegions.get("Scroll view");
-        Assert.assertEquals(regions.size(), 2);
+        Assert.assertEquals(regions.size(), 3);
         TextRegion region = regions.get(0);
-        Assert.assertEquals(region, new TextRegion(159, 416, 73, 13, "Scroll view"));
+        Assert.assertEquals(region, new TextRegion(159, 386, 73, 13, "Scroll view"));
         eyes.close();
     }
 }
