@@ -199,8 +199,6 @@ public abstract class AppiumScrollPositionProvider implements ScrollPositionProv
         setPosition(new Location(9999999, 9999999));
     }
 
-    public abstract Location scrollDown(boolean returnAbsoluteLocation);
-
     public abstract void scrollTo(int startX, int startY, int endX, int endY, boolean shouldCancel);
 
     int getStatusBarHeight() {
