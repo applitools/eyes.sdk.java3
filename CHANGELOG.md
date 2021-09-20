@@ -1,4 +1,4 @@
-## [vNext]
+## [3.208.2] - 2021-09-20
 ### Updated
 - Used iOS helper library for full page functionality when CollectionView presented. [Trello 2633](https://trello.com/c/dQqN02TN)
 
