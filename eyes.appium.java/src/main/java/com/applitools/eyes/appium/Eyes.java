@@ -285,7 +285,7 @@ public class Eyes extends EyesBase {
     }
 
     private void adjustStitchOverlap(WebDriver driver) {
-        if (EyesDriverUtils.isIOS(driver)) {
+        if (EyesDriverUtils.isIOS(driver) && configuration.getStitchOverlap() == DEFAULT_STITCH_OVERLAP) {
             configuration.setStitchOverlap(IOS_STITCH_OVERLAP);
         }
     }

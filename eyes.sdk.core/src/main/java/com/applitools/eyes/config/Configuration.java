@@ -16,6 +16,7 @@ import java.util.*;
 public class Configuration implements IConfiguration {
     private static final int DEFAULT_MATCH_TIMEOUT = 2000; // Milliseconds;
     private static final int DEFAULT_WAIT_BEFORE_SCREENSHOTS = 100;
+    public static final int DEFAULT_STITCH_OVERLAP = 10;
 
     private String branchName = GeneralUtils.getEnvString("APPLITOOLS_BRANCH");
 
@@ -40,7 +41,7 @@ public class Configuration implements IConfiguration {
     private String osInfo;
     // Used for automatic save of a test run.
     private boolean saveNewTests, saveFailedTests;
-    private int stitchOverlap = 10;
+    private int stitchOverlap = DEFAULT_STITCH_OVERLAP;
     private Boolean isSendDom = true;
     private String apiKey = null;
     private String serverUrl = null;

@@ -18,6 +18,7 @@ import com.applitools.utils.ArgumentGuard;
 import com.applitools.utils.GeneralUtils;
 import com.applitools.utils.ImageUtils;
 import org.apache.commons.lang3.tuple.Pair;
+import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 
 import java.awt.image.BufferedImage;
@@ -126,10 +127,13 @@ public class AppiumFullPageCaptureAlgorithm {
         RectangleSize lastSuccessfulPartSize = new RectangleSize(initialPartSize.getWidth(), initialPartSize.getHeight());
         PositionMemento originalStitchedState = scrollProvider.getState();
 
+        By selector = By.xpath("//AppiumAUT/XCUIElementTypeApplication[1]/XCUIElementTypeWindow[1]/XCUIElementTypeOther[1]/XCUIElementTypeOther[1]/XCUIElementTypeOther[1]/XCUIElementTypeOther[1]/XCUIElementTypeOther[1]/XCUIElementTypeOther[1]/XCUIElementTypeOther[1]/XCUIElementTypeOther[1]/XCUIElementTypeOther[1]/XCUIElementTypeOther[1]/XCUIElementTypeOther[1]/XCUIElementTypeOther[1]/XCUIElementTypeOther[1]/XCUIElementTypeTable[1]");
+
         int statusBarHeight = ((AppiumScrollPositionProvider) scrollProvider).getStatusBarHeight();
 
         // scrollViewRegion is the (upscaled) region of the scrollview on the screen
         Region scrollViewRegion = scaleSafe(((AppiumScrollPositionProvider) scrollProvider).getScrollableViewRegion());
+
         // we modify the region by one pixel to make sure we don't accidentally get a pixel of the header above it
         Location newLoc = new Location(scrollViewRegion.getLeft(), scrollViewRegion.getTop() - scaleSafe(statusBarHeight) + 1);
         RectangleSize newSize = new RectangleSize(initialPartSize.getWidth(), scrollViewRegion.getHeight() - 1);
@@ -149,10 +153,12 @@ public class AppiumFullPageCaptureAlgorithm {
         int startY = downscaleSafe(scrollViewRegion.getHeight() + scrollViewRegion.getTop()) - 1 - stitchingAdjustment/2;
         int endY = startY - oneScrollStep + 2 + stitchingAdjustment/2;
         for (int step = 1; step <= maxScrollSteps; step++) {
+            WebElement scrollableElement = ((IOSScrollPositionProvider) scrollProvider).eyesDriver.findElement(By.xpath("//AppiumAUT/XCUIElementTypeApplication[1]/XCUIElementTypeWindow[1]/XCUIElementTypeOther[1]/XCUIElementTypeOther[1]/XCUIElementTypeOther[1]/XCUIElementTypeOther[1]/XCUIElementTypeOther[1]/XCUIElementTypeOther[1]/XCUIElementTypeOther[1]/XCUIElementTypeOther[1]/XCUIElementTypeOther[1]/XCUIElementTypeOther[1]/XCUIElementTypeOther[1]/XCUIElementTypeOther[1]/XCUIElementTypeOther[1]/XCUIElementTypeTable[1]"));
+
             regionToCrop = new Region(0,
-                    scrollViewRegion.getTop() + stitchingAdjustment,
+                    scaleSafe(scrollableElement.getLocation().getY() - statusBarHeight) + stitchingAdjustment,
                     initialPartSize.getWidth(),
-                    scrollViewRegion.getHeight() - stitchingAdjustment);
+                    scaleSafe(scrollableElement.getSize().getHeight()) - stitchingAdjustment);
 
             ((AppiumScrollPositionProvider) scrollProvider).scrollTo(xPos, startY, xPos, endY, false);
 
@@ -363,6 +369,9 @@ public class AppiumFullPageCaptureAlgorithm {
         // We should stitch images from the start of X coordinate
         stitchedImage.getRaster()
                 .setRect(0, currentPosition.getY(), partImage.getData());
+
+        debugScreenshotsProvider.save(stitchedImage,
+                "original-stitched_=" + currentPosition.toStringForFilename());
     }
 
 

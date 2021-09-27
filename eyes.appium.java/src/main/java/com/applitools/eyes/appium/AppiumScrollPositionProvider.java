@@ -50,15 +50,16 @@ public abstract class AppiumScrollPositionProvider implements ScrollPositionProv
     }
 
     protected WebElement getCachedFirstVisibleChild () {
-        WebElement activeScroll = getFirstScrollableView();
-        if (firstVisibleChild == null) {
+//        WebElement activeScroll = getFirstScrollableView();
+        WebElement activeScroll = driver.findElement(By.xpath("//AppiumAUT/XCUIElementTypeApplication[1]/XCUIElementTypeWindow[1]/XCUIElementTypeOther[1]/XCUIElementTypeOther[1]/XCUIElementTypeOther[1]/XCUIElementTypeOther[1]/XCUIElementTypeOther[1]/XCUIElementTypeOther[1]/XCUIElementTypeOther[1]/XCUIElementTypeOther[1]/XCUIElementTypeOther[1]/XCUIElementTypeOther[1]/XCUIElementTypeOther[1]/XCUIElementTypeOther[1]/XCUIElementTypeOther[1]/XCUIElementTypeTable[1]"));
+//        if (firstVisibleChild == null) {
             firstVisibleChild = EyesAppiumUtils.getFirstVisibleChild(activeScroll);
-        } else {
+//        } else {
             Rectangle firstVisibleChildRect = firstVisibleChild.getRect();
             if (firstVisibleChildRect.getWidth() == 0 && firstVisibleChildRect.getHeight() == 0) {
                 firstVisibleChild = EyesAppiumUtils.getFirstVisibleChild(activeScroll);
             }
-        }
+//        }
         return firstVisibleChild;
     }
 
@@ -79,13 +80,14 @@ public abstract class AppiumScrollPositionProvider implements ScrollPositionProv
     }
 
     public Location getScrollableViewLocation() {
-        if (cachedScrollableViewLocation != null) {
-            return cachedScrollableViewLocation;
-        }
+//        if (cachedScrollableViewLocation != null) {
+//            return cachedScrollableViewLocation;
+//        }
         WebElement activeScroll, firstVisChild;
         Point scrollLoc, firstVisChildLoc;
         try {
-            activeScroll = getFirstScrollableView();
+//            activeScroll = getFirstScrollableView();
+            activeScroll = driver.findElement(By.xpath("//AppiumAUT/XCUIElementTypeApplication[1]/XCUIElementTypeWindow[1]/XCUIElementTypeOther[1]/XCUIElementTypeOther[1]/XCUIElementTypeOther[1]/XCUIElementTypeOther[1]/XCUIElementTypeOther[1]/XCUIElementTypeOther[1]/XCUIElementTypeOther[1]/XCUIElementTypeOther[1]/XCUIElementTypeOther[1]/XCUIElementTypeOther[1]/XCUIElementTypeOther[1]/XCUIElementTypeOther[1]/XCUIElementTypeOther[1]/XCUIElementTypeTable[1]"));
             firstVisChild = getCachedFirstVisibleChild();
         } catch (NoSuchElementException e) {
             return new Location(0, 0);
@@ -104,9 +106,9 @@ public abstract class AppiumScrollPositionProvider implements ScrollPositionProv
     }
 
     public Region getScrollableViewRegion() {
-        if (cachedScrollableViewRegion != null) {
-            return cachedScrollableViewRegion;
-        }
+//        if (cachedScrollableViewRegion != null) {
+//            return cachedScrollableViewRegion;
+//        }
         try {
             WebElement activeScroll = getFirstScrollableView();
             Location scrollLoc = getScrollableViewLocation();
@@ -154,6 +156,7 @@ public abstract class AppiumScrollPositionProvider implements ScrollPositionProv
     }
 
     public Location getCurrentPositionWithoutStatusBar(boolean absolute) {
+//        asdfasdf
         Location loc = getScrollableViewLocation();
         Location childLoc = getFirstVisibleChildLocation();
         Location pos;
@@ -208,10 +211,14 @@ public abstract class AppiumScrollPositionProvider implements ScrollPositionProv
     public abstract Region getElementRegion(WebElement element, boolean shouldStitchContent, Boolean statusBarExists);
 
     protected WebElement getFirstScrollableView() {
-        if (cachedScrollableView != null) {
-            return cachedScrollableView;
+//        if (cachedScrollableView != null) {
+//            return cachedScrollableView;
+//        }
+        if (scrollRootElement != null) {
+            cachedScrollableView = driver.findElement(By.xpath("//AppiumAUT/XCUIElementTypeApplication[1]/XCUIElementTypeWindow[1]/XCUIElementTypeOther[1]/XCUIElementTypeOther[1]/XCUIElementTypeOther[1]/XCUIElementTypeOther[1]/XCUIElementTypeOther[1]/XCUIElementTypeOther[1]/XCUIElementTypeOther[1]/XCUIElementTypeOther[1]/XCUIElementTypeOther[1]/XCUIElementTypeOther[1]/XCUIElementTypeOther[1]/XCUIElementTypeOther[1]/XCUIElementTypeOther[1]/XCUIElementTypeTable[1]"));
+        } else {
+            cachedScrollableView = EyesAppiumUtils.getFirstScrollableView(driver);
         }
-        cachedScrollableView = EyesAppiumUtils.getFirstScrollableView(driver);
         return cachedScrollableView;
     }
 
