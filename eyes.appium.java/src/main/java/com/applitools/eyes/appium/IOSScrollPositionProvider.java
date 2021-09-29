@@ -104,8 +104,8 @@ public class IOSScrollPositionProvider extends AppiumScrollPositionProvider {
     public Location getCurrentPositionWithoutStatusBar(boolean absolute) {
         WebElement activeScroll = getFirstScrollableView();
         if (activeScroll.getAttribute("type").equals("XCUIElementTypeCollectionView")) {
-            triggerHelperButton();
             try {
+                triggerHelperButton();
                 WebElement offsetLabel = driver.findElement(MobileBy.name("applitools_content_offset_label"));
                 int contentOffset = (int) Double.parseDouble(offsetLabel.getText().split(",")[1].trim().replace("}", ""));
 
@@ -128,8 +128,8 @@ public class IOSScrollPositionProvider extends AppiumScrollPositionProvider {
         try {
             WebElement activeScroll = getFirstScrollableView();
             if (activeScroll.getAttribute("type").equals("XCUIElementTypeCollectionView")) {
-                triggerHelperButton();
                 try {
+                    triggerHelperButton();
                     WebElement offsetLabel = driver.findElement(MobileBy.name("applitools_content_offset_label"));
                     try { Thread.sleep(500); } catch (InterruptedException ignored) {}
                     int contentOffset = (int) Double.parseDouble(offsetLabel.getText().split(",")[1].trim().replace("}", ""));
