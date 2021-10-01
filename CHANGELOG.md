@@ -1,3 +1,7 @@
+## [vNext]
+### Updated
+- iOS full page algorithm. Added `setContentInset` and `setCacheScrollableSize` methods to Configuration. [Trello 2721](https://trello.com/c/aiSRO9WJ)
+
 ## [3.208.2] - 2021-09-20
 ### Updated
 - Used iOS helper library for full page functionality when CollectionView presented. [Trello 2633](https://trello.com/c/dQqN02TN)
