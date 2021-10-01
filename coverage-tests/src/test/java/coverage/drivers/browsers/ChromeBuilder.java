@@ -15,7 +15,7 @@ public class ChromeBuilder implements Builder {
 
     public WebDriver build(boolean headless, boolean legacy, boolean executionGrid) throws MalformedURLException {
         ChromeOptions options = new ChromeOptions().setHeadless(headless);
-        if (GlobalSetup.CI) {
+        /*if (GlobalSetup.CI) {
             options.addArguments("--no-sandbox", "--disable-gpu");
         }
         if (executionGrid) {
@@ -23,7 +23,8 @@ public class ChromeBuilder implements Builder {
 
             return new RemoteWebDriver(new URL(GlobalSetup.EG_URL), options);
         }
-        /*if (GlobalSetup.useDocker) return new RemoteWebDriver(new URL(SELENIUM.CHROME_LOCAL.url), options);*/
+        //if (GlobalSetup.useDocker) return new RemoteWebDriver(new URL(SELENIUM.CHROME_LOCAL.url), options);
+		*/
         return new ChromeDriver(options);
     }
 }
