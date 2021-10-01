@@ -23,7 +23,7 @@ public class ChromeBuilder implements Builder {
 
             return new RemoteWebDriver(new URL(GlobalSetup.EG_URL), options);
         }
-        if (GlobalSetup.useDocker) return new RemoteWebDriver(new URL(SELENIUM.CHROME_LOCAL.url), options);
+        //if (GlobalSetup.useDocker) return new RemoteWebDriver(new URL(SELENIUM.CHROME_LOCAL.url), options);
         return new ChromeDriver(options);
     }
 }
