@@ -3,6 +3,8 @@ package com.applitools.eyes.appium.capture;
 import com.applitools.eyes.appium.EyesAppiumDriver;
 import com.applitools.eyes.capture.ImageProvider;
 
+import java.awt.image.BufferedImage;
+
 public abstract class MobileImageProvider implements ImageProvider {
 
     protected boolean captureStatusBar = false;
@@ -27,5 +29,12 @@ public abstract class MobileImageProvider implements ImageProvider {
 
     public void reset() {
         wasCapturedStatusBar = null;
+    }
+
+    protected BufferedImage cropTop(BufferedImage screenshot, Integer cropHeight) {
+        if (cropHeight == null || cropHeight <= 0 || cropHeight >= screenshot.getHeight()) {
+            return screenshot;
+        }
+        return screenshot.getSubimage(0, cropHeight, screenshot.getWidth(), screenshot.getHeight() - cropHeight);
     }
 }

@@ -241,6 +241,7 @@ public class EyesAppiumElement extends RemoteWebElement {
         int x = (int) Math.round(((Number) rawPoint.get("x")).doubleValue());
         int y = (int) Math.round(((Number) rawPoint.get("y")).doubleValue());
         Point location =  new Point(x, y);
+        // TODO check element location because when it is in landscape mode Y coordinate is wrong after next part
         location = new Point(location.getX(), location.getY() - driver.getStatusBarHeight());
         if (pixelRatio == 1.0) {
             return location;

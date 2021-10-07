@@ -19,11 +19,11 @@ public class MobileViewportScreenshotImageProvider extends MobileImageProvider {
     @Override
     public BufferedImage getImage() {
         String screenshot64;
+        screenshot64 = driver.getScreenshotAs(OutputType.BASE64);
+        BufferedImage screenshot = ImageUtils.imageFromBase64(screenshot64);
         if (!captureStatusBar) {
-            screenshot64 = (String) driver.executeScript("mobile: viewportScreenshot");
-        } else {
-            screenshot64 = driver.getScreenshotAs(OutputType.BASE64);
+            screenshot = cropTop(screenshot, driver.getStatusBarHeight());
         }
-        return ImageUtils.imageFromBase64(screenshot64);
+        return screenshot;
     }
 }
