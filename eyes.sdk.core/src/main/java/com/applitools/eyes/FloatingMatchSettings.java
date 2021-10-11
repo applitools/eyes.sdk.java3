@@ -26,10 +26,17 @@ public class FloatingMatchSettings {
         this.maxRightOffset = maxRightOffset;
     }
 
+    public int getTop() {
+        return Math.max(0, top);
+    }
+
+    public int getLeft() {
+        return Math.max(0, left);
+    }
 
     @Override
     public int hashCode() {
-        return left*30000 + top*2000 + width*500 + height;
+        return getLeft()*30000 + getTop()*2000 + width*500 + height;
     }
 
     @Override
