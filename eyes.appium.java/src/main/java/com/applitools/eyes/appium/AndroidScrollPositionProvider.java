@@ -234,8 +234,12 @@ public class AndroidScrollPositionProvider extends AppiumScrollPositionProvider 
         return scrolled;
     }
 
-    public int getBehaviorOffsetWithHelperLibrary(String elementId) {
+    public int getBehaviorOffsetWithHelperLibrary() {
         int offset = -1;
+        if (scrollRootElement == null) {
+            return offset;
+        }
+        String elementId = scrollRootElement.getAttribute("resourceId").split("/")[1];
         try {
             MobileElement hiddenElement = ((AndroidDriver<AndroidElement>) driver).findElement(MobileBy.AndroidUIAutomator("new UiSelector().description(\"EyesAppiumHelperEDT\")"));
             if (hiddenElement != null) {
