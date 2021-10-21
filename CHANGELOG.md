@@ -1,6 +1,8 @@
-## [3.208.3] - 2021-10-25
+## [3.209.0-beta] - 2021-10-26
 ### Updated
-- Prepared tests for Appium/UFG version releases 
+- Prepared tests for Appium/UFG version releases
+### Added
+- Support for Android UFG Beta
 
 ## [3.208.2] - 2021-09-20
 ### Updated
