@@ -271,6 +271,20 @@ public class AndroidScrollPositionProvider extends AppiumScrollPositionProvider 
         return scrolled;
     }
 
+    public void tryDumpVHSWithHelperLibrary() {
+        try {
+            MobileElement hiddenElement = ((AndroidDriver<AndroidElement>) driver).findElement(MobileBy.AndroidUIAutomator("new UiSelector().description(\"EyesAppiumHelperEDT\")"));
+            if (hiddenElement != null) {
+                hiddenElement.setValue("dumpVHS;0;0;0");
+                hiddenElement.click();
+                try { Thread.sleep(5_000); } catch (InterruptedException ignored) {}
+                hiddenElement.clear();
+            }
+        } catch (NoSuchElementException | NumberFormatException | StaleElementReferenceException e) {
+            GeneralUtils.logExceptionStackTrace(logger, Stage.CHECK, e);
+        }
+    }
+
     @Override
     public Region getElementRegion(WebElement element, boolean shouldStitchContent, Boolean statusBarExists) {
         Region region = new Region(element.getLocation().getX(),
