@@ -443,7 +443,8 @@ public class AndroidScrollPositionProvider extends AppiumScrollPositionProvider 
                 Pair.of("entireSize", entireSize),
                 Pair.of("verticalScrollGap", verticalScrollGap),
                 Pair.of("scrollContentHeight", scrollContentHeight));
-        return entireSize;
+        int behaviourOffset = getBehaviorOffsetWithHelperLibrary();
+        return new RectangleSize(entireSize.getWidth(), entireSize.getHeight() + behaviourOffset);
     }
 
     @Override
@@ -472,6 +473,9 @@ public class AndroidScrollPositionProvider extends AppiumScrollPositionProvider 
 
     private String getScrollableContentSize(String resourceId) {
         String scrollableContentSize = "";
+        if (resourceId == null) {
+            return scrollableContentSize;
+        }
         String[] version = EyesAppiumUtils.getHelperLibraryVersion(eyesDriver, logger).split("\\.");
         MobileElement hiddenElement;
         if (version.length == 3 &&
