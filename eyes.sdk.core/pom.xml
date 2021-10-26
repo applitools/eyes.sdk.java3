@@ -24,7 +24,11 @@
         <dependency>
             <groupId>com.applitools</groupId>
             <artifactId>eyes-ufg-java3</artifactId>
+<<<<<<< HEAD
             <version>3.209.1</version>
+=======
+            <version>3.208.3-SNAPSHOT</version>
+>>>>>>> SNAPSHOT Version up + CHANGELOG.md
             <!--This exclusion does nothing. We need it for running tests for all 3 connectivity packages-->
             <exclusions>
                 <exclusion>
@@ -36,7 +40,11 @@
         <dependency>
             <groupId>com.applitools</groupId>
             <artifactId>eyes-connectivity-java3-jersey2x</artifactId>
+<<<<<<< HEAD
             <version>3.209.1</version>
+=======
+            <version>3.208.3-SNAPSHOT</version>
+>>>>>>> SNAPSHOT Version up + CHANGELOG.md
         </dependency>
     </dependencies>
 
