@@ -1,3 +1,7 @@
+## [vNext]
+### Updated
+- Changed checking of `isMobileDevice`. Handle exceptions correctly. [Trello 2712](https://trello.com/c/89U7DfV0)
+
 ## [3.208.3] - 2021-10-25
 ### Updated
 - Prepared tests for Appium/UFG version releases 
