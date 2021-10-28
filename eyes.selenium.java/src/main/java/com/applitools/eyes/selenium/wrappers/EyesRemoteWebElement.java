@@ -716,14 +716,14 @@ public class EyesRemoteWebElement extends RemoteWebElement {
                 if (isNative) {
                     if (platform.equals(Platform.IOS)) {
                         List<WebElement> list = driver.getRemoteWebDriver().findElements(By.className("XCUIElementTypeWebView"));
-                        if (list.size() > 0) {
+                        if (!list.isEmpty()) {
                             WebElement webView = list.get(0);
                             region.setTop(region.getTop() + webView.getLocation().getY());
                         }
                     }
                     if (platform.equals(Platform.ANDROID)) {
                         List<WebElement> list = driver.getRemoteWebDriver().findElements(By.className("android.webkit.WebView"));
-                        if (list.size() > 0) {
+                        if (!list.isEmpty()) {
                             WebElement webView = list.get(0);
                             Double pixelRatio = (Double) driver.getRemoteWebDriver().getCapabilities().getCapability("pixelRatio");
                             region.setTop((region.getTop() + (int)(webView.getLocation().getY()/pixelRatio)));

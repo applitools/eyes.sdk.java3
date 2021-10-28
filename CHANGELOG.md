@@ -1,3 +1,7 @@
+## [vNext]
+### Updated
+- Translate coordinates of web elements inside WebView according to WebView location on the device screen. [Trello 2607](https://trello.com/c/u5yzG8XE)
+
 ## [3.208.3] - 2021-10-25
 ### Updated
 - Prepared tests for Appium/UFG version releases 
