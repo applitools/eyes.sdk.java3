@@ -135,37 +135,53 @@ public class EyesDriverUtils {
     public static boolean isMobileDevice(WebDriver driver) {
         driver = getUnderlyingDriver(driver);
         try {
-            if (reflectionInstanceof(driver, "AppiumDriver")) {
-                Method isBrowser;
-                try {
-                    isBrowser = driver.getClass().getDeclaredMethod("isBrowser");
-                    isBrowser.setAccessible(true);
-                } catch (NoSuchMethodException ignored) {
-                    isBrowser = driver.getClass().getMethod("isBrowser");
-                }
-                return isBrowser.invoke(driver).equals(false);
+            return isMobileDeviceInner(driver);
+        } catch (Exception ignored) {
+            try {
+                return isMobileDeviceByContextInner(driver);
+            } catch (Exception e) {
+                return false;
             }
-        } catch (Exception e) {
-            e.printStackTrace();
         }
-        return false;
     }
 
     public static boolean isMobileDeviceByContext(WebDriver driver) {
         driver = getUnderlyingDriver(driver);
         try {
-            if (reflectionInstanceof(driver, "AppiumDriver")) {
-                Method getContext;
-                try {
-                    getContext = driver.getClass().getDeclaredMethod("getContext");
-                    getContext.setAccessible(true);
-                } catch (NoSuchMethodException ignored) {
-                    getContext = driver.getClass().getMethod("getContext");
-                }
-                return getContext.invoke(driver).equals("NATIVE_APP");
+            return isMobileDeviceByContextInner(driver);
+        } catch (Exception ignored) {
+            try {
+                return isMobileDeviceInner(driver);
+            } catch (Exception e) {
+                return false;
             }
-        } catch (Exception e) {
-            e.printStackTrace();
+        }
+    }
+
+    private static boolean isMobileDeviceInner(WebDriver driver) throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
+        if (reflectionInstanceof(driver, "AppiumDriver")) {
+            Method isBrowser;
+            try {
+                isBrowser = driver.getClass().getDeclaredMethod("isBrowser");
+                isBrowser.setAccessible(true);
+            } catch (NoSuchMethodException ignored) {
+                isBrowser = driver.getClass().getMethod("isBrowser");
+            }
+            return isBrowser.invoke(driver).equals(false);
+        }
+        return false;
+    }
+
+    private static boolean isMobileDeviceByContextInner(WebDriver driver) throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
+        if (reflectionInstanceof(driver, "AppiumDriver")) {
+            Method getContext;
+            try {
+                getContext = driver.getClass().getDeclaredMethod("getContext");
+                getContext.setAccessible(true);
+            } catch (NoSuchMethodException ignored) {
+                getContext = driver.getClass().getMethod("getContext");
+            }
+            return getContext.invoke(driver).equals("NATIVE_APP");
         }
         return false;
     }
