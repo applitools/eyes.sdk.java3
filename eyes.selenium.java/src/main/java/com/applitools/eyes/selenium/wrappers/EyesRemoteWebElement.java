@@ -698,7 +698,21 @@ public class EyesRemoteWebElement extends RemoteWebElement {
 
     private static void checkForNativeWebView(Region region, EyesSeleniumDriver driver) {
         try {
-            Platform platform = driver.getRemoteWebDriver().getCapabilities().getPlatform();
+            Platform platform = Platform.ANY;
+            try {
+                String driverClass = (String) driver.getRemoteWebDriver().getCapabilities().getCapability("driverClass");
+                if (driverClass != null) {
+                    if (driverClass.equals("io.appium.java_client.android.AndroidDriver")) {
+                        platform = Platform.ANDROID;
+                    } else if (driverClass.equals("io.appium.java_client.ios.IOSDriver")) {
+                        platform = Platform.IOS;
+                    }
+                }
+            } catch (Exception ignored) {
+            }
+            if (platform == Platform.ANY) {
+                platform = driver.getRemoteWebDriver().getCapabilities().getPlatform();
+            }
             if (platform.equals(Platform.IOS) || platform.equals(Platform.ANDROID)) {
                 RemoteExecuteMethod executeMethod = new RemoteExecuteMethod(driver.getRemoteWebDriver());
                 String defaultContext = (String) executeMethod.execute(DriverCommand.GET_CURRENT_CONTEXT_HANDLE, null);
