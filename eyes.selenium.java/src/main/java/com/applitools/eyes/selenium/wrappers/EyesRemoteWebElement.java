@@ -727,22 +727,31 @@ public class EyesRemoteWebElement extends RemoteWebElement {
                         break;
                     }
                 }
-                if (isNative) {
-                    if (platform.equals(Platform.IOS)) {
-                        List<WebElement> list = driver.getRemoteWebDriver().findElements(By.className("XCUIElementTypeWebView"));
-                        if (!list.isEmpty()) {
-                            WebElement webView = list.get(0);
-                            region.setTop(region.getTop() + webView.getLocation().getY());
+                try {
+                    if (isNative) {
+                        if (platform.equals(Platform.IOS)) {
+                            List<WebElement> list = driver.getRemoteWebDriver().findElements(By.className("XCUIElementTypeWebView"));
+                            if (!list.isEmpty()) {
+                                WebElement webView = list.get(0);
+                                region.setTop(region.getTop() + webView.getLocation().getY());
+                            }
+                        }
+                        if (platform.equals(Platform.ANDROID)) {
+                            List<WebElement> list = driver.getRemoteWebDriver().findElements(By.className("android.webkit.WebView"));
+                            if (!list.isEmpty()) {
+                                WebElement webView = list.get(0);
+                                Object pixelRationObject = driver.getRemoteWebDriver().getCapabilities().getCapability("pixelRatio");
+                                double pixelRatio;
+                                if (pixelRationObject instanceof Double) {
+                                    pixelRatio = (Double) pixelRationObject;
+                                } else {
+                                    pixelRatio = ((Long) pixelRationObject).doubleValue();
+                                }
+                                region.setTop((region.getTop() + (int)(webView.getLocation().getY()/pixelRatio)));
+                            }
                         }
                     }
-                    if (platform.equals(Platform.ANDROID)) {
-                        List<WebElement> list = driver.getRemoteWebDriver().findElements(By.className("android.webkit.WebView"));
-                        if (!list.isEmpty()) {
-                            WebElement webView = list.get(0);
-                            Double pixelRatio = (Double) driver.getRemoteWebDriver().getCapabilities().getCapability("pixelRatio");
-                            region.setTop((region.getTop() + (int)(webView.getLocation().getY()/pixelRatio)));
-                        }
-                    }
+                } finally {
                     Map<String, String> params = new HashMap<>();
                     params.put("name", defaultContext);
                     executeMethod.execute(DriverCommand.SWITCH_TO_CONTEXT, params);
