@@ -11,25 +11,25 @@ class EnvironmentModifier extends ReportingTestSuite {
 
     public EnvironmentModifier() {
         super.setGroupName("selenium");
-        try {
-            Class<?> processEnvironment = Class.forName("java.lang.ProcessEnvironment");
-
-            Field unmodifiableMapField = getAccessibleField(processEnvironment, "theUnmodifiableEnvironment");
-
-            Object unmodifiableMap = unmodifiableMapField.get(null);
-
-            Class unmodifiableMapClass = Class.forName("java.util.Collections$UnmodifiableMap");
-            Field field = getAccessibleField(unmodifiableMapClass, "m");
-            Object obj = field.get(unmodifiableMap);
-            //noinspection unchecked
-            unmodifiedEnvMap = (Map<String, String>) obj;
-
-//            Field mapField = getAccessibleField(processEnvironment, "theEnvironment");
-//            environmentMap = (Map<String, String>) mapField.get(null);
-
-        } catch (ClassNotFoundException | NoSuchFieldException | IllegalAccessException e) {
-            e.printStackTrace();
-        }
+//        try {
+//            Class<?> processEnvironment = Class.forName("java.lang.ProcessEnvironment");
+//
+//            Field unmodifiableMapField = getAccessibleField(processEnvironment, "theUnmodifiableEnvironment");
+//
+//            Object unmodifiableMap = unmodifiableMapField.get(null);
+//
+//            Class unmodifiableMapClass = Class.forName("java.util.Collections$UnmodifiableMap");
+//            Field field = getAccessibleField(unmodifiableMapClass, "m");
+//            Object obj = field.get(unmodifiableMap);
+//            //noinspection unchecked
+//            unmodifiedEnvMap = (Map<String, String>) obj;
+//
+////            Field mapField = getAccessibleField(processEnvironment, "theEnvironment");
+////            environmentMap = (Map<String, String>) mapField.get(null);
+//
+//        } catch (ClassNotFoundException | NoSuchFieldException | IllegalAccessException e) {
+//            e.printStackTrace();
+//        }
     }
 
     private static Field getAccessibleField(Class<?> clazz, String fieldName)
