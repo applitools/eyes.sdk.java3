@@ -36,12 +36,12 @@ public abstract class TestSetup extends ReportingTestSuite implements ITest {
         setCapabilities();
 
         eyes = new Eyes();
-        eyes.setApiKey(System.getenv("APPLITOOLS_API_KEY"));
+        eyes.setApiKey(GeneralUtils.getEnvString("APPLITOOLS_API_KEY"));
 
         LogHandler logHandler = new StdoutLogHandler(TestUtils.verboseLogs);
         eyes.setLogHandler(logHandler);
         eyes.setSaveNewTests(false);
-        if (System.getenv("APPLITOOLS_USE_PROXY") != null) {
+        if (GeneralUtils.getEnvString("APPLITOOLS_USE_PROXY") != null) {
             eyes.setProxy(new ProxySettings("http://127.0.0.1", 8888));
         }
 

@@ -4,9 +4,11 @@ import com.applitools.eyes.*;
 import com.applitools.eyes.config.Configuration;
 import com.applitools.eyes.metadata.SessionResults;
 import com.applitools.eyes.selenium.fluent.Target;
+import com.applitools.eyes.utils.ReportingTestSuite;
 import com.applitools.eyes.utils.SeleniumUtils;
 import com.applitools.eyes.utils.TestUtils;
 import com.applitools.eyes.visualgrid.services.VisualGridRunner;
+import com.applitools.utils.GeneralUtils;
 import org.openqa.selenium.WebDriver;
 import org.testng.Assert;
 import org.testng.annotations.DataProvider;
@@ -15,7 +17,7 @@ import org.testng.annotations.Test;
 import java.io.IOException;
 import java.util.Calendar;
 
-public class TestConfigurationSentCorrectlyToServer extends EnvironmentModifier {
+public class TestConfigurationSentCorrectlyToServer extends ReportingTestSuite {
 
     @DataProvider(name = "dp")
     public static Object[][] dp() {
@@ -42,8 +44,8 @@ public class TestConfigurationSentCorrectlyToServer extends EnvironmentModifier 
         WebDriver driver = SeleniumUtils.createChromeDriver();
         driver.get("https://applitools.github.io/demo/TestPages/FramesTestPage/");
 
-        String originalBatchSequence = System.getenv("APPLITOOLS_BATCH_SEQUENCE");
-        setEnvironmentVariable("APPLITOOLS_BATCH_SEQUENCE", sequenceNameEnvVar);
+        String originalBatchSequence = GeneralUtils.getEnvString("APPLITOOLS_BATCH_SEQUENCE");
+        GeneralUtils.setEnvironmentVariable("APPLITOOLS_BATCH_SEQUENCE", sequenceNameEnvVar);
 
         String effectiveSequenceName = sequenceName != null ? sequenceName : sequenceNameEnvVar;
 
@@ -56,7 +58,7 @@ public class TestConfigurationSentCorrectlyToServer extends EnvironmentModifier 
 
         if (sequenceNameEnvVar != null) {
             try {
-                setEnvironmentVariable("APPLITOOLS_BATCH_SEQUENCE", originalBatchSequence);
+                GeneralUtils.setEnvironmentVariable("APPLITOOLS_BATCH_SEQUENCE", originalBatchSequence);
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -111,13 +113,13 @@ public class TestConfigurationSentCorrectlyToServer extends EnvironmentModifier 
     public void testSetEnv() {
         String mockKey = "mockKey";
         String mockValue = "mockValue";
-        String envVar = System.getenv(mockKey);
+        String envVar = GeneralUtils.getEnvString(mockKey);
         Assert.assertNull(envVar);
-        printEnv();
-        setEnvironmentVariable(mockKey, mockValue);
+        GeneralUtils.printEnv();
+        GeneralUtils.setEnvironmentVariable(mockKey, mockValue);
         System.out.println("+++++++++++++++++++++++++++++");
-        printEnv();
-        String newEnvVar = System.getenv(mockKey);
+        GeneralUtils.printEnv();
+        String newEnvVar = GeneralUtils.getEnvString(mockKey);
 
         Assert.assertEquals(newEnvVar, mockValue);
 

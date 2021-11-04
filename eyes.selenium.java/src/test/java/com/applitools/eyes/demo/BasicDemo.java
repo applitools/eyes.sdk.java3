@@ -7,6 +7,7 @@ import com.applitools.eyes.utils.ReportingTestSuite;
 import com.applitools.eyes.utils.SeleniumUtils;
 import com.applitools.eyes.utils.TestUtils;
 import com.applitools.eyes.visualgrid.services.VisualGridRunner;
+import com.applitools.utils.GeneralUtils;
 import org.openqa.selenium.WebDriver;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.BeforeMethod;
@@ -29,7 +30,7 @@ public class BasicDemo extends ReportingTestSuite {
 
     @BeforeClass
     public static void beforeAll() {
-        if (TestUtils.runOnCI && System.getenv("TRAVIS") != null) {
+        if (TestUtils.runOnCI && GeneralUtils.getEnvString("TRAVIS") != null) {
             System.setProperty("webdriver.chrome.driver", "/home/travis/build/chromedriver"); // for travis build.
         }
 

@@ -7,6 +7,7 @@ import com.applitools.eyes.utils.SeleniumTestUtils;
 import com.applitools.eyes.utils.SeleniumUtils;
 import com.applitools.eyes.utils.TestUtils;
 import com.applitools.eyes.visualgrid.services.VisualGridRunner;
+import com.applitools.utils.GeneralUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.openqa.selenium.Capabilities;
 import org.openqa.selenium.WebDriver;
@@ -24,7 +25,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public abstract class TestSetup extends ReportingTestSuite implements ITest {
 
-    private static String testNameSuffix = System.getenv("TEST_NAME_SUFFIX");
+    private static String testNameSuffix = GeneralUtils.getEnvString("TEST_NAME_SUFFIX");
     public final String mode;
 
     private boolean useVisualGrid = false;
@@ -114,11 +115,11 @@ public abstract class TestSetup extends ReportingTestSuite implements ITest {
 
     @BeforeClass(alwaysRun = true)
     public void OneTimeSetUp() {
-        if (TestUtils.runOnCI && System.getenv("TRAVIS") != null) {
+        if (TestUtils.runOnCI && GeneralUtils.getEnvString("TRAVIS") != null) {
             System.setProperty("webdriver.chrome.driver", "/home/travis/build/chromedriver"); // for travis build.
         }
 
-        String batchId = System.getenv("APPLITOOLS_BATCH_ID");
+        String batchId = GeneralUtils.getEnvString("APPLITOOLS_BATCH_ID");
         if (batchId != null) {
             TestDataProvider.batchInfo.setId(batchId);
         }
@@ -181,7 +182,7 @@ public abstract class TestSetup extends ReportingTestSuite implements ITest {
         }
 
         RemoteWebDriver webDriver = null;
-        String seleniumServerUrl = System.getenv("SELENIUM_SERVER_URL");
+        String seleniumServerUrl = GeneralUtils.getEnvString("SELENIUM_SERVER_URL");
         try {
             if (seleniumServerUrl != null) {
                 webDriver = new RemoteWebDriver(new URL(seleniumServerUrl), this.options);
@@ -231,7 +232,7 @@ public abstract class TestSetup extends ReportingTestSuite implements ITest {
     private Eyes initEyes() {
         Eyes eyes = new Eyes(this.runner);
 //        eyes.setLogHandler(TestUtils.initLogger());
-        String serverUrl = System.getenv("APPLITOOLS_SERVER_URL");
+        String serverUrl = GeneralUtils.getEnvString("APPLITOOLS_SERVER_URL");
         if (serverUrl != null && serverUrl.length() > 0) {
             eyes.setServerUrl(serverUrl);
         }
@@ -240,7 +241,7 @@ public abstract class TestSetup extends ReportingTestSuite implements ITest {
         eyes.setStitchMode(this.stitchMode);
         eyes.setSaveNewTests(false);
         eyes.setBatch(TestDataProvider.batchInfo);
-        if (System.getenv("APPLITOOLS_USE_PROXY") != null) {
+        if (GeneralUtils.getEnvString("APPLITOOLS_USE_PROXY") != null) {
             eyes.setProxy(new ProxySettings("http://127.0.0.1", 8888));
         }
         return eyes;

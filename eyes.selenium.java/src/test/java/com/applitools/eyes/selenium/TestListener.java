@@ -33,7 +33,7 @@ public class TestListener implements ITestListener {
     }
 
     private boolean isBuildOnTravis() {
-        return System.getenv("TRAVIS") != null && System.getenv("TRAVIS").equals("true");
+        return GeneralUtils.getEnvString("TRAVIS") != null && GeneralUtils.getEnvString("TRAVIS").equals("true");
     }
 
     @Override
