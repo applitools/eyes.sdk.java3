@@ -2,6 +2,7 @@ package com.applitools.eyes.selenium;
 
 import com.applitools.eyes.BatchInfo;
 import com.applitools.eyes.utils.TestUtils;
+import com.applitools.utils.GeneralUtils;
 import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.firefox.FirefoxOptions;
 import org.openqa.selenium.ie.InternetExplorerOptions;
@@ -16,12 +17,12 @@ import java.util.List;
 public class TestDataProvider {
     public final static BatchInfo batchInfo = new BatchInfo("Java3 Tests");
 
-    public final static String SAUCE_USERNAME = System.getenv("SAUCE_USERNAME");
-    public final static String SAUCE_ACCESS_KEY = System.getenv("SAUCE_ACCESS_KEY");
+    public final static String SAUCE_USERNAME = GeneralUtils.getEnvString("SAUCE_USERNAME");
+    public final static String SAUCE_ACCESS_KEY = GeneralUtils.getEnvString("SAUCE_ACCESS_KEY");
     public final static String SAUCE_SELENIUM_URL = "https://ondemand.saucelabs.com:443/wd/hub";
 
-    public final static String BROWSERSTACK_USERNAME = System.getenv("BROWSERSTACK_USERNAME");
-    public final static String BROWSERSTACK_ACCESS_KEY = System.getenv("BROWSERSTACK_ACCESS_KEY");
+    public final static String BROWSERSTACK_USERNAME = GeneralUtils.getEnvString("BROWSERSTACK_USERNAME");
+    public final static String BROWSERSTACK_ACCESS_KEY = GeneralUtils.getEnvString("BROWSERSTACK_ACCESS_KEY");
     public final static String BROWSERSTACK_SELENIUM_URL = "http://hub-cloud.browserstack.com/wd/hub/";
 
     @DataProvider(name = "booleanDP", parallel = true)
@@ -34,7 +35,7 @@ public class TestDataProvider {
     @DataProvider(parallel = true)
     public static Object[][] dp() {
         ChromeOptions chromeOptions = new ChromeOptions();
-        String platformName = System.getenv("APPLITOOLS_TEST_PLATFORM");
+        String platformName = GeneralUtils.getEnvString("APPLITOOLS_TEST_PLATFORM");
         chromeOptions.setCapability(CapabilityType.PLATFORM_NAME, platformName == null ? "Any" : platformName);
 
         FirefoxOptions firefoxOptions = new FirefoxOptions();
@@ -49,7 +50,7 @@ public class TestDataProvider {
             firefoxOptions.setHeadless(true);
         }
 
-        String testPlatforms = System.getenv("APPLITOOLS_TEST_PLATFORMS");
+        String testPlatforms = GeneralUtils.getEnvString("APPLITOOLS_TEST_PLATFORMS");
         if (testPlatforms == null || testPlatforms.isEmpty()) {
             testPlatforms = System.getProperty("os.name");
         }

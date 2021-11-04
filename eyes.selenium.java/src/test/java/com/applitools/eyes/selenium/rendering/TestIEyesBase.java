@@ -10,6 +10,7 @@ import com.applitools.eyes.selenium.fluent.Target;
 import com.applitools.eyes.utils.ReportingTestSuite;
 import com.applitools.eyes.utils.SeleniumUtils;
 import com.applitools.eyes.utils.TestUtils;
+import com.applitools.utils.GeneralUtils;
 import org.openqa.selenium.WebDriver;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
@@ -18,7 +19,7 @@ public abstract class TestIEyesBase extends ReportingTestSuite {
 
     protected final LogHandler logHandler;
     protected final String SERVER_URL = "https://eyes.applitools.com/";
-    protected final String API_KEY = System.getenv("APPLITOOLS_API_KEY");
+    protected final String API_KEY = GeneralUtils.getEnvString("APPLITOOLS_API_KEY");
     protected Logger logger;
     public String LogPath;
 
