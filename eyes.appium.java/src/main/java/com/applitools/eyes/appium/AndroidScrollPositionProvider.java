@@ -232,6 +232,39 @@ public class AndroidScrollPositionProvider extends AppiumScrollPositionProvider 
         return scrolled;
     }
 
+    public int getBehaviorOffsetWithHelperLibrary(String elementId) {
+        int offset = -1;
+        try {
+            MobileElement hiddenElement = ((AndroidDriver<AndroidElement>) driver).findElement(MobileBy.AndroidUIAutomator("new UiSelector().description(\"EyesAppiumHelperEDT\")"));
+            if (hiddenElement != null) {
+                hiddenElement.setValue("behaviorOffset;"+elementId+";0;0");
+                hiddenElement.click();
+                offset = Integer.parseInt(hiddenElement.getText());
+                hiddenElement.clear();
+            }
+        } catch (NoSuchElementException | NumberFormatException | StaleElementReferenceException e) {
+            GeneralUtils.logExceptionStackTrace(logger, Stage.CHECK, e);
+        }
+        return offset;
+    }
+
+    public boolean tryScrollBehaviorOffsetWithHelperLibrary(String elementId, int offset) {
+        boolean scrolled = false;
+        try {
+            MobileElement hiddenElement = ((AndroidDriver<AndroidElement>) driver).findElement(MobileBy.AndroidUIAutomator("new UiSelector().description(\"EyesAppiumHelperEDT\")"));
+            if (hiddenElement != null) {
+                hiddenElement.setValue("behaviorScroll;"+elementId+";" + offset + ";0");
+                hiddenElement.click();
+                scrolled = true;
+                try { Thread.sleep(1500); } catch (InterruptedException ignored) {}
+                hiddenElement.clear();
+            }
+        } catch (NoSuchElementException | NumberFormatException | StaleElementReferenceException e) {
+            GeneralUtils.logExceptionStackTrace(logger, Stage.CHECK, e);
+        }
+        return scrolled;
+    }
+
     @Override
     public Region getElementRegion(WebElement element, boolean shouldStitchContent, Boolean statusBarExists) {
         Region region = new Region(element.getLocation().getX(),
@@ -386,12 +419,12 @@ public class AndroidScrollPositionProvider extends AppiumScrollPositionProvider 
     @Override
     protected WebElement getFirstScrollableView() {
         WebElement scrollableView = EyesAppiumUtils.getFirstScrollableView(driver);
-        if (scrollableView.getAttribute("className").equals("android.widget.HorizontalScrollView")) {
-            List<MobileElement> list = driver.findElements(By.xpath(EyesAppiumUtils.SCROLLVIEW_XPATH));
-            for (WebElement element : list) {
-                if (element.getAttribute("className").equals("android.widget.HorizontalScrollView")) {
-                    continue;
-                }
+                if (scrollableView.getAttribute("className").equals("android.widget.HorizontalScrollView")) {
+                    List<MobileElement> list = driver.findElements(By.xpath(EyesAppiumUtils.SCROLLVIEW_XPATH));
+                    for (WebElement element : list) {
+                        if (element.getAttribute("className").equals("android.widget.HorizontalScrollView")) {
+                            continue;
+                        }
                 List<WebElement> child = scrollableView.findElements(By.xpath(EyesAppiumUtils.SCROLLVIEW_XPATH));
                 return child.isEmpty() ? element : child.get(0);
             }
