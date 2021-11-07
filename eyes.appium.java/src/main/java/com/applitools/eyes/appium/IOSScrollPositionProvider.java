@@ -16,10 +16,13 @@ import io.appium.java_client.touch.WaitOptions;
 import io.appium.java_client.touch.offset.PointOption;
 import org.apache.commons.lang3.tuple.Pair;
 import org.openqa.selenium.*;
+import org.openqa.selenium.interactions.PointerInput;
+import org.openqa.selenium.interactions.Sequence;
 
 import javax.annotation.Nullable;
 import java.awt.image.BufferedImage;
 import java.time.Duration;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 
@@ -169,12 +172,15 @@ public class IOSScrollPositionProvider extends AppiumScrollPositionProvider {
         logger.log(TraceLevel.Debug, eyesDriver.getTestId(), Stage.CHECK,
                 Pair.of("from", new Location(startX, startY)),
                 Pair.of("to", new Location(startX, startY)));
-        TouchAction scrollAction = new TouchAction(driver);
-        scrollAction.press(new PointOption().withCoordinates(startX, startY)).waitAction(new WaitOptions().withDuration(Duration.ofMillis(5000)));
-        scrollAction.moveTo(new PointOption().withCoordinates(startX, endY));
-        scrollAction.release();
 
-        driver.performTouchAction(scrollAction);
+
+        PointerInput finger = new PointerInput(PointerInput.Kind.TOUCH, "finger");
+        Sequence scrollAction = new Sequence(finger, 1);
+        scrollAction.addAction(finger.createPointerMove(Duration.ofMillis(0), PointerInput.Origin.viewport(), startX, startY));
+        scrollAction.addAction(finger.createPointerDown(PointerInput.MouseButton.LEFT.asArg()));
+        scrollAction.addAction(finger.createPointerMove(Duration.ofMillis(5000), PointerInput.Origin.viewport(), endX, endY));
+        scrollAction.addAction(finger.createPointerUp(PointerInput.MouseButton.LEFT.asArg()));
+        driver.perform(Arrays.asList(scrollAction));
 
         try { Thread.sleep(1000); } catch (InterruptedException ignored) {}
     }
@@ -414,12 +420,16 @@ public class IOSScrollPositionProvider extends AppiumScrollPositionProvider {
     }
 
     public void triggerHelperButton() {
-        WebElement trigger = driver.findElement(MobileBy.name("applitools_grab_scrollable_data_button"));
+        WebElement trigger = driver.findElement(By.name("applitools_grab_scrollable_data_button"));
 
-        TouchAction triggerAction = new TouchAction(driver);
-        triggerAction.tap(new PointOption().withCoordinates(trigger.getLocation().x, trigger.getLocation().y)).waitAction(new WaitOptions().withDuration(Duration.ofMillis(1000)));
-        triggerAction.release();
-        driver.performTouchAction(triggerAction);
+        PointerInput finger = new PointerInput(PointerInput.Kind.TOUCH, "finger");
+        Sequence scrollAction = new Sequence(finger, 1);
+        scrollAction.addAction(finger.createPointerMove(Duration.ofMillis(0), PointerInput.Origin.viewport(), trigger.getLocation().x, trigger.getLocation().y));
+        scrollAction.addAction(finger.createPointerDown(PointerInput.MouseButton.LEFT.asArg()));
+        scrollAction.addAction(finger.createPointerMove(Duration.ofMillis(1000), PointerInput.Origin.viewport(), trigger.getLocation().x, trigger.getLocation().y));
+        scrollAction.addAction(finger.createPointerUp(PointerInput.MouseButton.LEFT.asArg()));
+        driver.perform(Arrays.asList(scrollAction));
+
         try { Thread.sleep(500); } catch (InterruptedException ignored) {}
     }
 

@@ -29,7 +29,7 @@ public class AndroidAccessibilityTest extends AndroidTestSetup {
         configuration.setAccessibilityValidation(new AccessibilitySettings(AccessibilityLevel.AA, AccessibilityGuidelinesVersion.WCAG_2_0));
 
         eyes.open(driver, configuration);
-        driver.findElementById("btn_edit_text").click();
+        driver.findElement(By.id("btn_edit_text")).click();
         eyes.check("Launcher screen", Target.window().accessibility(By.xpath("//*[@text='First Edit Text']"), AccessibilityRegionType.GraphicalObject));
         TestResults results = eyes.close(false);
 

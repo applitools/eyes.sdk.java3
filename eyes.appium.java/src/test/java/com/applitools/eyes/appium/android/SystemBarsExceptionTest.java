@@ -25,7 +25,7 @@ public class SystemBarsExceptionTest extends ReportingTestSuite {
         sessionDetails = new HashMap<>();
 
         remoteWebDriver = Mockito.mock(AndroidDriver.class);
-        when(remoteWebDriver.getSessionDetails()).thenReturn(sessionDetails);
+        when(remoteWebDriver.getStatus()).thenReturn(sessionDetails);
 
         when(remoteWebDriver.getSystemBars()).thenThrow(NullPointerException.class);
     }
