@@ -17,7 +17,9 @@ import io.appium.java_client.MobileBy;
 import io.appium.java_client.android.AndroidDriver;
 import org.apache.commons.lang3.tuple.Pair;
 import org.openqa.selenium.*;
+import org.openqa.selenium.remote.DriverCommand;
 import org.openqa.selenium.remote.RemoteWebElement;
+import org.openqa.selenium.remote.Response;
 
 import javax.annotation.Nullable;
 import java.awt.image.BufferedImage;
@@ -83,7 +85,7 @@ public class EyesAppiumUtils {
 
     @Nullable
     public static LastScrollData getLastScrollData(AppiumDriver driver) {
-        Map<String, Long> scrollData = (Map<String, Long>) driver.getSessionDetail("lastScrollData");
+        Map<String, Long> scrollData = (Map<String, Long>) driver.getStatus().get("lastScrollData");
         if (scrollData == null) {
             return null;
         }
@@ -96,16 +98,16 @@ public class EyesAppiumUtils {
             return false;
         }
 
-        AppiumDriver<?> appiumDriver = (AppiumDriver<?>) EyesDriverUtils.getUnderlyingDriver(driver);
+        AppiumDriver appiumDriver = (AppiumDriver) EyesDriverUtils.getUnderlyingDriver(driver);
 
         String originalContext = null;
         try {
             // We must be in native context in order to ask for orientation,
             // because of an Appium bug.
-            originalContext = appiumDriver.getContext();
-            if (appiumDriver.getContextHandles().size() > 1 &&
+            originalContext = appiumDriver.getWindowHandle();
+            if (appiumDriver.getWindowHandles().size() > 1 &&
                     !originalContext.equalsIgnoreCase(NATIVE_APP)) {
-                appiumDriver.context(NATIVE_APP);
+                appiumDriver.switchTo().window(NATIVE_APP);
             } else {
                 originalContext = null;
             }
@@ -113,16 +115,27 @@ public class EyesAppiumUtils {
             originalContext = null;
         }
         try {
-            ScreenOrientation orientation = appiumDriver.getOrientation();
+            ScreenOrientation orientation = getOrientation(appiumDriver);
             return orientation == ScreenOrientation.LANDSCAPE;
         } catch (Exception e) {
             GeneralUtils.logExceptionStackTrace(logger, Stage.GENERAL, e);
             return false;
-        }
-        finally {
+        } finally {
             if (originalContext != null) {
-                appiumDriver.context(originalContext);
+                appiumDriver.switchTo().window(originalContext);
             }
+        }
+    }
+
+    private static ScreenOrientation getOrientation(AppiumDriver driver) {
+        Response response = driver.execute(DriverCommand.GET_SCREEN_ORIENTATION);
+        String orientation = response.getValue().toString().toLowerCase();
+        if (orientation.equals(ScreenOrientation.LANDSCAPE.value())) {
+            return ScreenOrientation.LANDSCAPE;
+        } else if (orientation.equals(ScreenOrientation.PORTRAIT.value())) {
+            return ScreenOrientation.PORTRAIT;
+        } else {
+            throw new WebDriverException("Unexpected orientation returned: " + orientation);
         }
     }
 
@@ -146,6 +159,7 @@ public class EyesAppiumUtils {
     /**
      * Rotates the image as necessary. The rotation is either manually forced
      * by passing a non-null ImageRotation, or automatically inferred.
+     *
      * @param driver   The underlying driver which produced the screenshot.
      * @param image    The image to normalize.
      * @param rotation The degrees by which to rotate the image:
@@ -191,13 +205,13 @@ public class EyesAppiumUtils {
     }
 
     private static void fillSystemBarsHeightsMap(AndroidDriver driver, Map<String, Integer> systemBarHeights) {
-        Map<String, String> systemBars = driver.getSystemBars();
+        Map<String, Map<String, Object>> systemBars = driver.getSystemBars();
         for (String systemBarName : systemBars.keySet()) {
             systemBarHeights.put(systemBarName, getSystemBar(systemBarName, systemBars));
         }
     }
 
-    private static Integer getSystemBar(String systemBarName, Map<String, String> systemBars) {
+    private static Integer getSystemBar(String systemBarName, Map<String, Map<String, Object>> systemBars) {
         if (systemBars.containsKey(systemBarName)) {
             String value = String.valueOf(systemBars.get(systemBarName));
             if (getSystemBarVisibility(value)) {

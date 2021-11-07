@@ -57,7 +57,7 @@ public class EyesAppiumDriver extends EyesWebDriver {
 
     private Map<String, Object> getCachedSessionDetails () {
         if(sessionDetails == null) {
-            sessionDetails = getRemoteWebDriver().getSessionDetails();
+            sessionDetails = getRemoteWebDriver().getStatus();
         }
         return sessionDetails;
     }
