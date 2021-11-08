@@ -58,8 +58,7 @@ public class EyesAppiumDriver extends EyesWebDriver {
 
     private Map<String, Object> getCachedSessionDetails() {
         if (sessionDetails == null) {
-            logger.log(TraceLevel.Notice, "GET_STATUS", Stage.OPEN);
-            sessionDetails = getRemoteWebDriver().getStatus();
+            sessionDetails = getRemoteWebDriver().getSettings();
             StringBuilder sb = new StringBuilder();
             for (Map.Entry<String, ?> p : sessionDetails.entrySet()) {
                 sb.append(p.getKey()).append(": ").append(p.getValue()).append("\n");
