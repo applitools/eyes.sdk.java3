@@ -1,7 +1,6 @@
 package com.applitools.eyes.appium.android;
 
 import com.applitools.eyes.appium.Target;
-import io.appium.java_client.MobileBy;
 import org.openqa.selenium.By;
 import org.testng.annotations.Test;
 
@@ -16,13 +15,13 @@ public class AndroidCheckElementTest extends AndroidTestSetup {
 
         eyes.open(driver, getApplicationName(), "Check element test");
 
-        eyes.check(Target.region(MobileBy.id("btn_recycler_view")));
+        eyes.check(Target.region(By.id("btn_recycler_view")));
 
         driver.findElement(By.id("btn_recycler_view")).click();
 
-        eyes.check(Target.region(MobileBy.id("recycler_view")));
+        eyes.check(Target.region(By.id("recycler_view")));
 
-        eyes.check(Target.region(MobileBy.id("recycler_view")).fully());
+        eyes.check(Target.region(By.id("recycler_view")).fully());
 
         eyes.close();
     }

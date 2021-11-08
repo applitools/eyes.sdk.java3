@@ -1,7 +1,7 @@
 package com.applitools.eyes.appium.ios;
 
 import com.applitools.eyes.appium.Target;
-import io.appium.java_client.MobileBy;
+import io.appium.java_client.AppiumBy;
 import org.openqa.selenium.WebElement;
 import org.testng.annotations.Test;
 
@@ -14,7 +14,7 @@ public class EmptyTableTest extends IOSTestSetup {
         // Start the test.
         eyes.open(driver, getApplicationName(), "Empty XCUIElementTypeTable");
 
-        WebElement showTable = driver.findElement(MobileBy.AccessibilityId("Empty table view"));
+        WebElement showTable = driver.findElement(AppiumBy.accessibilityId("Empty table view"));
         showTable.click();
 
         eyes.check(Target.window().fully().withName("Fullpage"));

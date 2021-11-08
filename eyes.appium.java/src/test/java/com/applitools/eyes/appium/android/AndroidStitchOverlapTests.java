@@ -1,7 +1,6 @@
 package com.applitools.eyes.appium.android;
 
 import com.applitools.eyes.appium.Target;
-import io.appium.java_client.MobileBy;
 import org.openqa.selenium.By;
 import org.testng.annotations.Test;
 
@@ -19,7 +18,7 @@ public class AndroidStitchOverlapTests extends AndroidTestSetup {
 
         eyes.check(Target.window().fully().withName("Fullpage"));
 
-        eyes.check(Target.region(MobileBy.id("recycler_view")).fully().withName("Region fullpage"));
+        eyes.check(Target.region(By.id("recycler_view")).fully().withName("Region fullpage"));
 
         eyes.close();
     }

@@ -2,7 +2,7 @@ package com.applitools.eyes.appium.ios;
 
 import com.applitools.eyes.Region;
 import com.applitools.eyes.appium.Target;
-import io.appium.java_client.MobileBy;
+import io.appium.java_client.AppiumBy;
 import org.openqa.selenium.WebElement;
 import org.testng.annotations.Test;
 
@@ -10,7 +10,7 @@ public class CaptureStatusBarTest extends IOSTestSetup {
 
     @Test
     public void testIOSCheckElement() {
-        WebElement showScrollView = driver.findElement(MobileBy.AccessibilityId("Scroll view"));
+        WebElement showScrollView = driver.findElement(AppiumBy.accessibilityId("Scroll view"));
         showScrollView.click();
 
         eyes.open(driver, getApplicationName(), "captureStatusBar()");
