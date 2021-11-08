@@ -58,6 +58,8 @@ public class EyesAppiumDriver extends EyesWebDriver {
     private Map<String, Object> getCachedSessionDetails () {
         if(sessionDetails == null) {
             sessionDetails = getRemoteWebDriver().getStatus();
+            logger.log(TraceLevel.Notice, Stage.OPEN,
+                    (Pair<String, ?>[]) sessionDetails.entrySet().stream().map(e->Pair.of(e.getKey(), e.getValue())).toArray());
         }
         return sessionDetails;
     }
@@ -197,70 +199,6 @@ public class EyesAppiumDriver extends EyesWebDriver {
         // activities).
         elementsIds.put(((RemoteWebElement) webElement).getId(), webElement);
         return appiumElement;
-    }
-
-    public WebElement findElementByClassName(String className) {
-        return findElement(By.className(className));
-    }
-
-    public List<WebElement> findElementsByClassName(String className) {
-        return findElements(By.className(className));
-    }
-
-    public WebElement findElementByCssSelector(String cssSelector) {
-        return findElement(By.cssSelector(cssSelector));
-    }
-
-    public List<WebElement> findElementsByCssSelector(String cssSelector) {
-        return findElements(By.cssSelector(cssSelector));
-    }
-
-    public WebElement findElementById(String id) {
-        return findElement(By.id(id));
-    }
-
-    public List<WebElement> findElementsById(String id) {
-        return findElements(By.id(id));
-    }
-
-    public WebElement findElementByLinkText(String linkText) {
-        return findElement(By.linkText(linkText));
-    }
-
-    public List<WebElement> findElementsByLinkText(String linkText) {
-        return findElements(By.linkText(linkText));
-    }
-
-    public WebElement findElementByPartialLinkText(String partialLinkText) {
-        return findElement(By.partialLinkText(partialLinkText));
-    }
-
-    public List<WebElement> findElementsByPartialLinkText(String partialLinkText) {
-        return findElements(By.partialLinkText(partialLinkText));
-    }
-
-    public WebElement findElementByName(String name) {
-        return findElement(By.name(name));
-    }
-
-    public List<WebElement> findElementsByName(String name) {
-        return findElements(By.name(name));
-    }
-
-    public WebElement findElementByTagName(String tagName) {
-        return findElement(By.tagName(tagName));
-    }
-
-    public List<WebElement> findElementsByTagName(String tagName) {
-        return findElements(By.tagName(tagName));
-    }
-
-    public WebElement findElementByXPath(String path) {
-        return findElement(By.xpath(path));
-    }
-
-    public List<WebElement> findElementsByXPath(String path) {
-        return findElements(By.xpath(path));
     }
 
     public Capabilities getCapabilities() {
