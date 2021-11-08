@@ -69,7 +69,7 @@ public class EyesAppiumDriver extends EyesWebDriver {
     }
 
     public HashMap<String, Integer> getViewportRect() {
-        Map<String, Long> rectMap = (Map<String, Long>) getCachedSessionDetails().get("viewportRect");
+        Map<String, Long> rectMap = (Map<String, Long>) getCachedSessionDetails().get("appium:viewportRect");
         int width = rectMap.get("width").intValue();
         int height = rectMap.get("height").intValue();
         if (getEyesBase().getConfiguration().isFeatureActivated(Feature.USE_PREDEFINED_DEVICE_INFO)) {
@@ -96,7 +96,7 @@ public class EyesAppiumDriver extends EyesWebDriver {
     }
 
     public int getViewportHeight() {
-        Map<String, Long> rectMap = (Map<String, Long>) getCachedSessionDetails().get("viewportRect");
+        Map<String, Long> rectMap = (Map<String, Long>) getCachedSessionDetails().get("appium:viewportRect");
         return rectMap.get("height").intValue();
     }
 
@@ -121,7 +121,7 @@ public class EyesAppiumDriver extends EyesWebDriver {
 
     public int getDeviceHeight() {
         if (deviceHeight == null) {
-            String deviceScreenSize = (String) getCachedSessionDetails().get("deviceScreenSize");
+            String deviceScreenSize = (String) getCachedSessionDetails().get("appium:deviceScreenSize");
             Pattern p = Pattern.compile("x(\\d+)");
             Matcher m = p.matcher(deviceScreenSize);
             m.find();
@@ -141,7 +141,7 @@ public class EyesAppiumDriver extends EyesWebDriver {
 
     @Override
     protected double getDevicePixelRatioInner() {
-        Object pixelRatio = getCachedSessionDetails().get("pixelRatio");
+        Object pixelRatio = getCachedSessionDetails().get("appium:pixelRatio");
         if (pixelRatio instanceof Double) {
             return (Double) pixelRatio;
         } else {
@@ -162,7 +162,7 @@ public class EyesAppiumDriver extends EyesWebDriver {
                 }
             }
         }
-        Object statusBarHeight = getCachedSessionDetails().get("statBarHeight");
+        Object statusBarHeight = getCachedSessionDetails().get("appium:statBarHeight");
         if (statusBarHeight instanceof Double) {
             return ((Double) statusBarHeight).intValue();
         } else {
