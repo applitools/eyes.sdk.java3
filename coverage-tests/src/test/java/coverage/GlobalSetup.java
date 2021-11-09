@@ -27,25 +27,25 @@ public class GlobalSetup {
     }
     @BeforeSuite
     public void globalSetup() {
-        String name = GeneralUtils.getEnvString("APPLITOOLS_BATCH_NAME");
+        String name = System.getEnv("APPLITOOLS_BATCH_NAME");
         if (name == null) name = "JAVA coverage tests";
         batch = new BatchInfo(name);
-        String id = GeneralUtils.getEnvString("APPLITOOLS_BATCH_ID");
+        String id = System.getEnv("APPLITOOLS_BATCH_ID");
         if (id != null) batch.setId(id);
-        apiKey = GeneralUtils.getEnvString("APPLITOOLS_API_KEY");
-        EG_URL = GeneralUtils.getEnvString("EXECUTION_GRID_URL");
-        String CI = GeneralUtils.getEnvString("CI");
+        apiKey = System.getEnv("APPLITOOLS_API_KEY");
+        EG_URL = System.getEnv("EXECUTION_GRID_URL");
+        String CI = System.getEnv("CI");
         GlobalSetup.CI = CI != null && CI.equals("true");
         useDocker = !GlobalSetup.CI;
-        String envVar = GeneralUtils.getEnvString("USE_SELENIUM_DOCKER");
+        String envVar = System.getEnv("USE_SELENIUM_DOCKER");
         if (envVar != null && envVar.equals("false")) {
             useDocker = false;
         }
         if(!useDocker) {
-            String chromeDriverPath = GeneralUtils.getEnvString("CHROME_DRIVER_PATH");
+            String chromeDriverPath = System.getEnv("CHROME_DRIVER_PATH");
             if(chromeDriverPath == null) throw new MissingEnvVarException("CHROME_DRIVER_PATH");
             System.setProperty("webdriver.chrome.driver", chromeDriverPath);
-            String firefoxDriverPath = GeneralUtils.getEnvString("FIREFOX_DRIVER_PATH");
+            String firefoxDriverPath = System.getEnv("FIREFOX_DRIVER_PATH");
             if(firefoxDriverPath == null) throw new MissingEnvVarException("FIREFOX_DRIVER_PATH");
             System.setProperty("webdriver.gecko.driver", firefoxDriverPath);
         }
@@ -60,7 +60,7 @@ public class GlobalSetup {
             String url = "https://" + server + "/api/sessions/batches/" + batch.getId() + "/close/bypointerid/?apiKey=" + apiKey;
             URI requestUrl = UriBuilder.fromUri(url).build();
             RestClient client = new RestClient(new Logger(), requestUrl, ServerConnector.DEFAULT_CLIENT_TIMEOUT);
-            if (GeneralUtils.getEnvString("APPLITOOLS_USE_PROXY") != null) {
+            if (System.getEnv("APPLITOOLS_USE_PROXY") != null) {
                 client.setProxy(new ProxySettings("http://127.0.0.1", 8888));
             }
             int statusCode = client.sendHttpRequest(requestUrl.toString(), HttpMethod.DELETE).getStatusCode();

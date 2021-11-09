@@ -30,8 +30,8 @@ public class NativeSetup extends GlobalSetup {
         eyes.setBatch(batch);
         eyes.setSaveNewTests(false);
         eyes.setForceFullPageScreenshot(false);
-        String showLogs = GeneralUtils.getEnvString("APPLITOOLS_SHOW_LOGS");
-        String verbose = GeneralUtils.getEnvString("APPLITOOLS_SHOW_LOGS_VERBOSE");
+        String showLogs = System.getEnv("APPLITOOLS_SHOW_LOGS");
+        String verbose = System.getEnv("APPLITOOLS_SHOW_LOGS_VERBOSE");
         if (showLogs != null && showLogs.equals("true")) {
             eyes.setLogHandler(new StdoutLogHandler((verbose != null && verbose.equals("true"))));
         }
