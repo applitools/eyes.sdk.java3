@@ -16,6 +16,6 @@ public class SamsungGalaxyS8 implements NativeBuilder {
         MutableCapabilities appCap = new MutableCapabilities();
         appCap.setCapability("app", app);
         caps = caps.merge(appCap);
-        return new AndroidDriver<>(new URL(SELENIUM.SAUCE.url), caps);
+        return new AndroidDriver(new URL(SELENIUM.SAUCE.url), caps);
     }
 }
