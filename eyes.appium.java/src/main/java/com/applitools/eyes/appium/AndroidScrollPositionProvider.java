@@ -9,15 +9,15 @@ import com.applitools.eyes.logging.TraceLevel;
 import com.applitools.eyes.positioning.PositionMemento;
 import com.applitools.utils.GeneralUtils;
 import io.appium.java_client.AppiumBy;
-import io.appium.java_client.MobileBy;
 import io.appium.java_client.android.AndroidDriver;
 import org.apache.commons.lang3.tuple.Pair;
 import org.openqa.selenium.*;
-import org.openqa.selenium.interactions.*;
+import org.openqa.selenium.interactions.PointerInput;
+import org.openqa.selenium.interactions.Sequence;
 import org.openqa.selenium.remote.RemoteWebElement;
 
 import java.time.Duration;
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 public class AndroidScrollPositionProvider extends AppiumScrollPositionProvider {
@@ -163,7 +163,7 @@ public class AndroidScrollPositionProvider extends AppiumScrollPositionProvider 
         scrollAction.addAction(finger.createPointerDown(PointerInput.MouseButton.LEFT.asArg()));
         scrollAction.addAction(finger.createPointerMove(Duration.ofMillis(1500), PointerInput.Origin.viewport(), endX, endY));
         scrollAction.addAction(finger.createPointerUp(PointerInput.MouseButton.LEFT.asArg()));
-        driver.perform(Arrays.asList(scrollAction));
+        driver.perform(Collections.singletonList(scrollAction));
 
         // because Android scrollbars are visible a bit after touch, we should wait for them to
         // disappear before handing control back to the screenshotter
@@ -438,7 +438,7 @@ public class AndroidScrollPositionProvider extends AppiumScrollPositionProvider 
         if (cachedScrollableView == null) {
             WebElement scrollableView;
             if (scrollRootElement != null) {
-                scrollableView = driver.findElement(MobileBy.id(scrollRootElement.getAttribute("resourceId")));
+                scrollableView = driver.findElement(By.id(scrollRootElement.getAttribute("resourceId")));
             } else {
                 scrollableView = EyesAppiumUtils.getFirstScrollableView(driver);
                 if (scrollableView.getAttribute("className").equals("android.widget.HorizontalScrollView")) {
