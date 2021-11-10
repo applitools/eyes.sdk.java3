@@ -109,7 +109,7 @@ public class AndroidFullPageCaptureAlgorithm extends AppiumFullPageCaptureAlgori
         if (behaviorScrolled) {
             ((AndroidScrollPositionProvider) scrollProvider).tryScrollBehaviorOffsetWithHelperLibrary(scrollableElementId, -behaviorOffset);
         }
-        cleanupStitch(null, currentPosition, lastSuccessfulPartSize, entireSize);
+        cleanupStitch(null, currentPosition, lastSuccessfulPartSize);
 
         moveToTopLeft();
     }

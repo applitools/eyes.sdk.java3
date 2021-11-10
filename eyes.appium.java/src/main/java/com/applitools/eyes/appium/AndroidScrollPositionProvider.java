@@ -186,7 +186,7 @@ public class AndroidScrollPositionProvider extends AppiumScrollPositionProvider 
     public void scrollTo(int startX, int startY, int endX, int endY, boolean shouldCancel) {
         logger.log(TraceLevel.Debug, eyesDriver.getTestId(), Stage.CHECK,
                 Pair.of("from", new Location(startX, startY)),
-                Pair.of("to", new Location(startX, startY)));
+                Pair.of("to", new Location(endX, endY)));
 
         PointerInput finger = new PointerInput(PointerInput.Kind.TOUCH, "finger");
         Sequence scrollAction = new Sequence(finger, 5);

@@ -6,6 +6,7 @@ import com.applitools.eyes.capture.EyesScreenshotFactory;
 import com.applitools.eyes.capture.ImageProvider;
 import com.applitools.eyes.debug.DebugScreenshotsProvider;
 import com.applitools.eyes.logging.Stage;
+import com.applitools.eyes.logging.TraceLevel;
 import com.applitools.eyes.logging.Type;
 import com.applitools.eyes.positioning.PositionMemento;
 import com.applitools.eyes.positioning.PositionProvider;
@@ -55,7 +56,7 @@ public class AppiumFullPageCaptureAlgorithm {
     private final WebElement cutElement;
     protected Integer stitchingAdjustment = DEFAULT_STITCHING_ADJUSTMENT;
 
-    protected int statusBarHeight = 0;
+    protected int statusBarHeight;
 
     public AppiumFullPageCaptureAlgorithm(Logger logger, String testId, PositionProvider originProvider,
                                           PositionProvider positionProvider,
@@ -180,7 +181,7 @@ public class AppiumFullPageCaptureAlgorithm {
             lastSuccessfulPartSize = captureAndStitchCurrentPart(regionToCrop);
         }
 
-        cleanupStitch(originalStitchedState, currentPosition, lastSuccessfulPartSize, entireSize);
+        cleanupStitch(originalStitchedState, currentPosition, lastSuccessfulPartSize);
 
         // 50 - extra offset to avoid overlay elements.
         moveToTopLeft(xPos, endY + statusBarHeight + 50 + stitchingAdjustment, xPos, startY + statusBarHeight);
@@ -339,7 +340,7 @@ public class AppiumFullPageCaptureAlgorithm {
 
     protected void cleanupStitch(PositionMemento originalStitchedState,
                                  Location lastSuccessfulLocation,
-                                 RectangleSize lastSuccessfulPartSize, RectangleSize entireSize) {
+                                 RectangleSize lastSuccessfulPartSize) {
         if (originalStitchedState != null) {
             positionProvider.restoreState(originalStitchedState);
             originProvider.restoreState(originalPosition);
@@ -361,6 +362,7 @@ public class AppiumFullPageCaptureAlgorithm {
     }
 
     protected void stitchPartIntoContainer(BufferedImage partImage) {
+        logger.log(TraceLevel.Debug, Stage.CHECK, Type.STITCH, Pair.of("currentPosition",currentPosition));
         // We should stitch images from the start of X coordinate
         stitchedImage.getRaster()
                 .setRect(0, currentPosition.getY(), partImage.getData());
@@ -413,14 +415,14 @@ public class AppiumFullPageCaptureAlgorithm {
                 && EyesDriverUtils.isAndroid(((AppiumScrollPositionProvider) scrollProvider).eyesDriver.getRemoteWebDriver())) {
             statusBarHeight = EyesAppiumUtils.getSystemBarsHeights(((AppiumScrollPositionProvider) scrollProvider).eyesDriver).get(EyesAppiumUtils.STATUS_BAR);
         }
-        // Otherwise, make a big image to stitch smaller parts into
-        //Notice stitchedImage uses the same type of image as the screenshots.
+        // Otherwise, make a big image to stitch smaller parts into.
+        // Notice stitchedImage uses the same type of image as the screenshots.
         // Use initial image width for stitched image to prevent wrong image part size
-        // if scrollable view has some padding or margins
+        // if scrollable view has some padding or margins.
         stitchedImage = new BufferedImage(
                 image.getWidth(), entireSize.getHeight() + statusBarHeight, image.getType());
 
-        // First of all we want to stitch the screenshot we already captured at (0, 0)
+        // First we want to stitch the screenshot we already captured at (0, 0)
         Raster initialPart = image.getData();
         RectangleSize initialPartSize = new RectangleSize(initialPart.getWidth(),
                 initialPart.getHeight());
