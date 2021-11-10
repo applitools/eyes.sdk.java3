@@ -46,7 +46,7 @@ public class AndroidFullPageCaptureAlgorithm extends AppiumFullPageCaptureAlgori
         RectangleSize lastSuccessfulPartSize = new RectangleSize(initialPartSize.getWidth(), initialPartSize.getHeight());
 
         ContentSize contentSize = ((AppiumScrollPositionProvider) scrollProvider).getCachedContentSize();
-        int xPos = getScrollableViewX() + 1;
+        int xPos = getScrollableViewX() + getScrollableViewWidth() / 2;
         Region regionToCrop;
 
         // We need to set position margin to avoid shadow at the top of view
@@ -144,5 +144,10 @@ public class AndroidFullPageCaptureAlgorithm extends AppiumFullPageCaptureAlgori
     private int getScrollableViewHeight() {
         WebElement element = ((AndroidScrollPositionProvider) scrollProvider).getFirstScrollableView();
         return element.getSize().getHeight();
+    }
+
+    private int getScrollableViewWidth() {
+        WebElement element = ((AndroidScrollPositionProvider) scrollProvider).getFirstScrollableView();
+        return element.getSize().getWidth();
     }
 }

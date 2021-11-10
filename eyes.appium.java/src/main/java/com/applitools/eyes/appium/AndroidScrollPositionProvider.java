@@ -189,7 +189,7 @@ public class AndroidScrollPositionProvider extends AppiumScrollPositionProvider 
                 Pair.of("to", new Location(endX, endY)));
 
         PointerInput finger = new PointerInput(PointerInput.Kind.TOUCH, "finger");
-        Sequence scrollAction = new Sequence(finger, 5);
+        Sequence scrollAction = new Sequence(finger, 0);
         scrollAction.addAction(finger.createPointerMove(Duration.ofMillis(0), PointerInput.Origin.viewport(), startX, startY));
         scrollAction.addAction(finger.createPointerDown(PointerInput.MouseButton.LEFT.asArg()));
         //endY = Math.max(endY - contentSize.touchPadding, 0);

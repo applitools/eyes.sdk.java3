@@ -102,31 +102,32 @@ public class EyesAppiumUtils {
 
         AppiumDriver appiumDriver = (AppiumDriver) EyesDriverUtils.getUnderlyingDriver(driver);
 
-        String originalContext;
-        try {
-            // We must be in native context in order to ask for orientation,
-            // because of an Appium bug.
-            originalContext = appiumDriver.getWindowHandle();
-            if (appiumDriver.getWindowHandles().size() > 1 &&
-                    !originalContext.equalsIgnoreCase(NATIVE_APP)) {
-                appiumDriver.switchTo().window(NATIVE_APP);
-            } else {
-                originalContext = null;
-            }
-        } catch (WebDriverException e) {
-            originalContext = null;
-        }
+//        String originalContext;
+//        try {
+//            // We must be in native context in order to ask for orientation,
+//            // because of an Appium bug.
+//            originalContext = appiumDriver.getWindowHandle();
+//            if (appiumDriver.getWindowHandles().size() > 1 &&
+//                    !originalContext.equalsIgnoreCase(NATIVE_APP)) {
+//                appiumDriver.switchTo().window(NATIVE_APP);
+//            } else {
+//                originalContext = null;
+//            }
+//        } catch (WebDriverException e) {
+//            originalContext = null;
+//        }
         try {
             ScreenOrientation orientation = getOrientation(appiumDriver);
             return orientation == ScreenOrientation.LANDSCAPE;
         } catch (Exception e) {
             GeneralUtils.logExceptionStackTrace(logger, Stage.GENERAL, e);
             return false;
-        } finally {
-            if (originalContext != null) {
-                appiumDriver.switchTo().window(originalContext);
-            }
         }
+//      finally {
+//            if (originalContext != null) {
+//                appiumDriver.switchTo().window(originalContext);
+//            }
+//        }
     }
 
     private static ScreenOrientation getOrientation(AppiumDriver driver) {
