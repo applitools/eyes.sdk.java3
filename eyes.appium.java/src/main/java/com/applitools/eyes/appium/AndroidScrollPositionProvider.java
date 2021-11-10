@@ -167,7 +167,7 @@ public class AndroidScrollPositionProvider extends AppiumScrollPositionProvider 
         driver.perform(Collections.singletonList(scrollAction));
 
         // because Android scrollbars are visible a bit after touch, we should wait for them to
-        // disappear before handing control back to the screenshotter
+        // disappear before handing control back to the screenshot provider
         try {
             Thread.sleep(750);
         } catch (InterruptedException ignored) {
@@ -201,12 +201,12 @@ public class AndroidScrollPositionProvider extends AppiumScrollPositionProvider 
         } else {
             scrollAction.addAction(finger.createPointerUp(PointerInput.MouseButton.LEFT.asArg()));
         }
-        driver.perform(Arrays.asList(scrollAction));
+        driver.perform(Collections.singletonList(scrollAction));
 
         curScrollPos = new Location(curScrollPos.getX(), curScrollPos.getY() + startX);
 
         // because Android scrollbars are visible a bit after touch, we should wait for them to
-        // disappear before handing control back to the screenshotter
+        // disappear before handing control back to the screenshot provider
         try {
             Thread.sleep(750);
         } catch (InterruptedException ignored) {
@@ -338,23 +338,23 @@ public class AndroidScrollPositionProvider extends AppiumScrollPositionProvider 
             return new Location(curScrollPos == null ? 0 : curScrollPos.getX(), 0);
         }
 
-        // if we got scrolldata from a ScrollView (not List or Grid), actively set the scroll
+        // if we got scrollData from a ScrollView (not List or Grid), actively set the scroll
         // position with correct x/y values
         if (scrollData.scrollX != -1 && scrollData.scrollY != -1) {
             return new Location(scrollData.scrollX, scrollData.scrollY);
         }
 
         if (contentSize == null) {
-            // It can happens when we use scroll (touch) actions for navigation on some screens before
+            // It can happen when we use scroll (touch) actions for navigation on some screens before
             // And after that we are executing check() command
             contentSize = new ContentSize();
         }
 
         // otherwise, if we already have a scroll position, just assume we scrolled exactly as much
-        // as the touchaction was supposed to. unfortunately it's not really that simple, because we
-        // might think we scrolled a full page but we hit a barrier and only scrolled a bit. so take
-        // a peek at the fromIndex of the scrolldata; if the position based on the fromIndex is
-        // wildly different than what we thought we scrolled, go with the fromIndex-based position
+        // as the touch action was supposed to. unfortunately it's not really that simple, because we
+        // might think we scrolled a full page, but we hit a barrier and only scrolled a bit. so take
+        // a peek at the fromIndex of the scrollData; if the position based on the fromIndex is
+        // wildly different from what we thought we scrolled, go with the fromIndex-based position
 
         // we really need the number of items per row to do this math correctly.
         // since we don't have that, just use the average item height, which means we might get
