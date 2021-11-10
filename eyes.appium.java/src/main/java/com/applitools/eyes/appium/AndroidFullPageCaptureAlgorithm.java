@@ -87,8 +87,6 @@ public class AndroidFullPageCaptureAlgorithm extends AppiumFullPageCaptureAlgori
                 }
             }
             if (!isScrolledWithHelperLibrary) {
-                // We should use release() touch action for the last scroll action
-                // For some applications scrolling is not executed for the last part with cancel() action
                 ((AppiumScrollPositionProvider) scrollProvider).scrollTo(xPos,
                         startY,
                         xPos,
