@@ -34,16 +34,7 @@ public class ElementPositionProvider implements PositionProvider ,ISeleniumPosit
      * @param location The position to scroll to.
      */
     public Location setPosition(Location location) {
-        Location afterScrollPosition = element.scrollTo(location);
-        if (location.getY() != 0 && afterScrollPosition.getY() < location.getY()) {
-            // We should wait until scroll action will be finished
-            try {
-                Thread.sleep(1000);
-            } catch (InterruptedException ignored) {
-            }
-            afterScrollPosition = getCurrentPosition();
-        }
-        return afterScrollPosition;
+        return element.scrollTo(location);
     }
 
     /**

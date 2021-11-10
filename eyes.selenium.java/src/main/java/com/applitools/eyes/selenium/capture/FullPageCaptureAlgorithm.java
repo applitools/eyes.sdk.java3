@@ -276,6 +276,7 @@ public class FullPageCaptureAlgorithm {
             partAbsoluteLocationInCurrentFrame.translate(stitchOffset.getWidth(), stitchOffset.getHeight());
             Location scrollPosition = new Location(Math.round(partAbsoluteLocationInCurrentFrame.x * sizeRatio), Math.round(partAbsoluteLocationInCurrentFrame.y * sizeRatio));
             Location originPosition = stitchProvider.setPosition(scrollPosition);
+            checkForCorrectPosition(stitchProvider, scrollPosition, originPosition);
 
             int dx = scrollPosition.getX() - originPosition.getX();
             int dy = scrollPosition.getY() - originPosition.getY();
@@ -351,5 +352,28 @@ public class FullPageCaptureAlgorithm {
         // an internal div is set to value which is larger than the viewport).
         regionInScreenshot.intersect(new Region(0, 0, image.getWidth(), image.getHeight()));
         return regionInScreenshot;
+    }
+
+    private void checkForCorrectPosition(PositionProvider stitchProvider, Location targetLocation, Location afterScrollPosition) {
+        int retryCount = 0;
+        boolean isCorrect = false;
+        while (!isCorrect && retryCount < 3) {
+            if (targetLocation.getY() != 0 && afterScrollPosition.getY() < targetLocation.getY()) {
+                // We should wait until scroll action will be finished
+                logger.log(TraceLevel.Info, Collections.singleton(testId), Stage.CHECK, Type.CAPTURE_SCREENSHOT,
+                        "positionAfterScroll is not correct");
+                try {
+                    Thread.sleep(1000);
+                } catch (InterruptedException ignored) {
+                }
+                afterScrollPosition = stitchProvider.setPosition(targetLocation);
+            } else if (afterScrollPosition.getY() == targetLocation.getY()) {
+                isCorrect = true;
+            }
+            logger.log(TraceLevel.Info, Collections.singleton(testId), Stage.CHECK, Type.CAPTURE_SCREENSHOT,
+                    Pair.of("positionAfterScroll", afterScrollPosition),
+                    Pair.of("originPosition", targetLocation));
+            retryCount++;
+        }
     }
 }
