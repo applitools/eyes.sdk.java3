@@ -247,8 +247,12 @@ public class AndroidScrollPositionProvider extends AppiumScrollPositionProvider 
         return scrolled;
     }
 
-    public int getBehaviorOffsetWithHelperLibrary(String elementId) {
+    public int getBehaviorOffsetWithHelperLibrary() {
         int offset = -1;
+        if (scrollRootElement == null) {
+            return offset;
+        }
+        String elementId = scrollRootElement.getAttribute("resourceId").split("/")[1];
         try {
             WebElement hiddenElement = driver.findElement(AppiumBy.androidUIAutomator("new UiSelector().description(\"EyesAppiumHelperEDT\")"));
             if (hiddenElement != null) {
@@ -278,6 +282,20 @@ public class AndroidScrollPositionProvider extends AppiumScrollPositionProvider 
             GeneralUtils.logExceptionStackTrace(logger, Stage.CHECK, e);
         }
         return scrolled;
+    }
+
+    public void tryDumpVHSWithHelperLibrary() {
+        try {
+            WebElement hiddenElement = driver.findElement(AppiumBy.androidUIAutomator("new UiSelector().description(\"EyesAppiumHelperEDT\")"));
+            if (hiddenElement != null) {
+                hiddenElement.sendKeys("dumpVHS;0;0;0");
+                hiddenElement.click();
+                try { Thread.sleep(5_000); } catch (InterruptedException ignored) {}
+                hiddenElement.clear();
+            }
+        } catch (NoSuchElementException | NumberFormatException | StaleElementReferenceException e) {
+            GeneralUtils.logExceptionStackTrace(logger, Stage.CHECK, e);
+        }
     }
 
     @Override
@@ -439,7 +457,8 @@ public class AndroidScrollPositionProvider extends AppiumScrollPositionProvider 
                 Pair.of("entireSize", entireSize),
                 Pair.of("verticalScrollGap", verticalScrollGap),
                 Pair.of("scrollContentHeight", scrollContentHeight));
-        return entireSize;
+        int behaviourOffset = getBehaviorOffsetWithHelperLibrary();
+        return new RectangleSize(entireSize.getWidth(), entireSize.getHeight() + behaviourOffset);
     }
 
     @Override
@@ -470,6 +489,9 @@ public class AndroidScrollPositionProvider extends AppiumScrollPositionProvider 
 
     private String getScrollableContentSize(String resourceId) {
         String scrollableContentSize = "";
+        if (resourceId == null) {
+            return scrollableContentSize;
+        }
         String[] version = EyesAppiumUtils.getHelperLibraryVersion(eyesDriver, logger).split("\\.");
         WebElement hiddenElement;
         if (version.length == 3 &&
