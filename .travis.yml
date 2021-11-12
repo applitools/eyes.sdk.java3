@@ -103,8 +103,8 @@ jobs:
     - name: Generic
       script:
         - echo $APPLITOOLS_REPORT_ID
-        - nvm install 14.5.0
-        - nvm use 14.5.0
+        - nvm install 14
+        - nvm use 14
         - mvn clean install -DskipTests
         - cd coverage-tests;
         - if [[ $TRAVIS_TAG =~ ^RELEASE_CANDIDATE ]]; then
