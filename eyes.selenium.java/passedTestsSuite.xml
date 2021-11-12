@@ -102,8 +102,8 @@
         <parameter name="dont_run"
                    value="TestCheckMany+VG,TestScrollbarsHiddenAndReturned_Fluent+VG,TestCheckWindowWithIgnoreBySelector_Fluent+VG,
                    TestCheckFullWindowWithMultipleIgnoreRegionsBySelector_Fluent+VG,
-                   TestCheckWindowWithIgnoreBySelector_Stretched_Fluent+SCROLL,
-                   TestCheckWindowWithIgnoreBySelector_Centered_Fluent+SCROLL,
+                   TestCheckWindowWithIgnoreBySelector_Stretched_Fluent+VG,
+                   TestCheckWindowWithIgnoreBySelector_Centered_Fluent+VG,
                    TestCheckWindowWithFloatingBySelector_Fluent+VG,
                    TestCheckElementWithIgnoreRegionBySameElement_Fluent+VG"/>
         <classes>
