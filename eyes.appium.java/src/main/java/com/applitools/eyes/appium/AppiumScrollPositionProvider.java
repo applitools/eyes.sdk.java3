@@ -62,7 +62,7 @@ public abstract class AppiumScrollPositionProvider implements ScrollPositionProv
         return firstVisibleChild;
     }
 
-    protected ContentSize getCachedContentSize () {
+    protected ContentSize getCachedContentSize() {
         if (contentSize != null) {
             return contentSize;
         }
@@ -199,8 +199,6 @@ public abstract class AppiumScrollPositionProvider implements ScrollPositionProv
         setPosition(new Location(9999999, 9999999));
     }
 
-    public abstract Location scrollDown(boolean returnAbsoluteLocation);
-
     public abstract void scrollTo(int startX, int startY, int endX, int endY, boolean shouldCancel);
 
     int getStatusBarHeight() {
@@ -227,6 +225,5 @@ public abstract class AppiumScrollPositionProvider implements ScrollPositionProv
 
     public void setScrollRootElement(WebElement scrollRootElement) {
         this.scrollRootElement = scrollRootElement;
-        this.cachedScrollableView = scrollRootElement;
     }
 }

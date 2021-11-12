@@ -1,3 +1,27 @@
+## [3.208.3] - 2021-10-25
+### Updated
+- Prepared tests for Appium/UFG version releases 
+
+## [3.208.2] - 2021-09-20
+### Updated
+- Used iOS helper library for full page functionality when CollectionView presented. [Trello 2633](https://trello.com/c/dQqN02TN)
+
+## [3.208.1] - 2021-09-03
+### Updated
+- Android fullpage algorithm. CollapsingToolbar and NestedScrollView elements. [Trello 2633](https://trello.com/c/dQqN02TN)
+
+## [3.208.0] - 2021-08-24
+### Added
+- Pixel 5 support for UFG tests. [Trello 2698](https://trello.com/c/Iky7ZWVp)
+
+## [3.207.4] - 2021-08-21
+### Updated
+- Use original height of scrollable element to calculate scroll steps. [Trello 2633](https://trello.com/c/dQqN02TN)
+
+## [3.207.3] - 2021-08-03
+### Updated
+- Updated scroll mechanism with helper library for Android. [Trello 2633](https://trello.com/c/dQqN02TN)
+
 ## [3.207.2] - 2021-07-27
 ### Fixed
 - MultiLogHandler has a concurrency bug. [Trello 2677](https://trello.com/c/hf6rCEQR)

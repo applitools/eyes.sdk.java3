@@ -82,11 +82,20 @@ public class TestAccessibility extends ReportingTestSuite {
             // Testing the accessibility regions sent in the session
             ImageMatchSettings matchSettings = sessionResults.getActualAppOutput()[0].getImageMatchSettings();
             List<AccessibilityRegionByRectangle> actual = Arrays.asList(matchSettings.getAccessibility());
-            Assert.assertEquals(new HashSet<>(actual), new HashSet<>(Arrays.asList(
-                    new AccessibilityRegionByRectangle(122, 933, 456, 306, AccessibilityRegionType.LargeText),
-                    new AccessibilityRegionByRectangle(8, 1277, 690, 206, AccessibilityRegionType.LargeText),
-                    new AccessibilityRegionByRectangle(10, 286, 800, 500, AccessibilityRegionType.LargeText)
-            )));
+
+            if (useVisualGrid) { // UFG adds padding for regions, so the values are different than the classic tests
+                Assert.assertEquals(new HashSet<>(actual), new HashSet<>(Arrays.asList(
+                        new AccessibilityRegionByRectangle(122, 932, 456, 307, AccessibilityRegionType.LargeText),
+                        new AccessibilityRegionByRectangle(8, 1276, 690, 207, AccessibilityRegionType.LargeText),
+                        new AccessibilityRegionByRectangle(10, 285, 800, 501, AccessibilityRegionType.LargeText)
+                )));
+            } else {
+                Assert.assertEquals(new HashSet<>(actual), new HashSet<>(Arrays.asList(
+                        new AccessibilityRegionByRectangle(122, 933, 456, 306, AccessibilityRegionType.LargeText),
+                        new AccessibilityRegionByRectangle(8, 1277, 690, 206, AccessibilityRegionType.LargeText),
+                        new AccessibilityRegionByRectangle(10, 286, 800, 500, AccessibilityRegionType.LargeText)
+                )));
+            }
         }
     }
 }

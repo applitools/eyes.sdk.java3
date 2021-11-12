@@ -76,6 +76,7 @@ public class EyesAppiumUtils {
             contentSize.top = element.getLocation().getY();
             contentSize.left = element.getLocation().getX();
             contentSize.scrollableOffset = element.getSize().getHeight();
+            contentSize.setDriver(driver);
         }
         return contentSize;
     }

@@ -100,6 +100,54 @@ public class IOSScrollPositionProvider extends AppiumScrollPositionProvider {
     public void restoreState(PositionMemento state) {
     }
 
+    @Override
+    public Location getCurrentPositionWithoutStatusBar(boolean absolute) {
+        WebElement activeScroll = getFirstScrollableView();
+        if (activeScroll.getAttribute("type").equals("XCUIElementTypeCollectionView")) {
+            triggerHelperButton();
+            try {
+                WebElement offsetLabel = driver.findElement(MobileBy.name("applitools_content_offset_label"));
+                int contentOffset = (int) Double.parseDouble(offsetLabel.getText().split(",")[1].trim().replace("}", ""));
+
+                Region region = getScrollableViewRegion();
+                return new Location(region.getLeft(), region.getTop() + contentOffset - getStatusBarHeight());
+            } catch (NumberFormatException | ArrayIndexOutOfBoundsException ignored) {
+                logger.log(TraceLevel.Debug, eyesDriver.getTestId(), Stage.CHECK,  "Can not parse applitools_content_offset_label value");
+                return super.getCurrentPositionWithoutStatusBar(absolute);
+            } catch (NoSuchElementException ignored) {
+                logger.log(TraceLevel.Debug, eyesDriver.getTestId(), Stage.CHECK,  "Can not find helper library elements");
+                return super.getCurrentPositionWithoutStatusBar(absolute);
+            }
+        } else {
+            return super.getCurrentPositionWithoutStatusBar(absolute);
+        }
+    }
+
+    @Override
+    public Location getCurrentPosition(boolean absolute) {
+        try {
+            WebElement activeScroll = getFirstScrollableView();
+            if (activeScroll.getAttribute("type").equals("XCUIElementTypeCollectionView")) {
+                triggerHelperButton();
+                try {
+                    WebElement offsetLabel = driver.findElement(MobileBy.name("applitools_content_offset_label"));
+                    try { Thread.sleep(500); } catch (InterruptedException ignored) {}
+                    int contentOffset = (int) Double.parseDouble(offsetLabel.getText().split(",")[1].trim().replace("}", ""));
+                    return new Location(0, contentOffset);
+                } catch (NumberFormatException | ArrayIndexOutOfBoundsException ignored) {
+                    logger.log(TraceLevel.Debug, eyesDriver.getTestId(), Stage.CHECK,  "Can not parse applitools_content_offset_label value");
+                    return super.getCurrentPosition(absolute);
+                } catch (NoSuchElementException ignored) {
+                    logger.log(TraceLevel.Debug, eyesDriver.getTestId(), Stage.CHECK,  "Can not find helper library elements");
+                    return super.getCurrentPosition(absolute);
+                }
+            } else {
+                return super.getCurrentPosition(absolute);
+            }
+        } catch (NoSuchElementException ignored) {
+            return super.getCurrentPosition(absolute);
+        }
+    }
 
     private double getScrollDistanceRatio() {
         if (distanceRatio == 0.0) {
@@ -114,11 +162,6 @@ public class IOSScrollPositionProvider extends AppiumScrollPositionProvider {
         }
 
         return distanceRatio;
-    }
-
-    public Location scrollDown(boolean returnAbsoluteLocation) {
-        EyesAppiumUtils.scrollByDirection(driver, SCROLL_DIRECTION_DOWN, getScrollDistanceRatio());
-        return getCurrentPositionWithoutStatusBar(returnAbsoluteLocation);
     }
 
     @Override
@@ -353,16 +396,12 @@ public class IOSScrollPositionProvider extends AppiumScrollPositionProvider {
                 break;
             case "XCUIElementTypeCollectionView":
                 try {
-                    WebElement trigger = driver.findElement(MobileBy.name("applitools_grab_scrollable_data_button"));
-
-                    TouchAction triggerAction = new TouchAction(driver);
-                    triggerAction.tap(new PointOption().withCoordinates(trigger.getLocation().x, trigger.getLocation().y)).waitAction(new WaitOptions().withDuration(Duration.ofMillis(1000)));
-                    triggerAction.release();
-                    driver.performTouchAction(triggerAction);
+                    triggerHelperButton();
 
                     WebElement contentInfo = driver.findElement(MobileBy.name("applitools_content_size_label"));
                     try {
                         scrollableOffset = Integer.parseInt(contentInfo.getText().split(",")[1].trim().replace("}", ""));
+                        logger.log(TraceLevel.Debug, eyesDriver.getTestId(), Stage.CHECK,  "Scrollable offset from Helper library: " + scrollableOffset);
                     } catch (NumberFormatException | ArrayIndexOutOfBoundsException ignored) {
                         logger.log(TraceLevel.Debug, eyesDriver.getTestId(), Stage.CHECK,  "Can not parse applitools_content_size_label value");
                     }
@@ -374,6 +413,16 @@ public class IOSScrollPositionProvider extends AppiumScrollPositionProvider {
         return scrollableOffset;
     }
 
+    public void triggerHelperButton() {
+        WebElement trigger = driver.findElement(MobileBy.name("applitools_grab_scrollable_data_button"));
+
+        TouchAction triggerAction = new TouchAction(driver);
+        triggerAction.tap(new PointOption().withCoordinates(trigger.getLocation().x, trigger.getLocation().y)).waitAction(new WaitOptions().withDuration(Duration.ofMillis(1000)));
+        triggerAction.release();
+        driver.performTouchAction(triggerAction);
+        try { Thread.sleep(500); } catch (InterruptedException ignored) {}
+    }
+
     @Override
     public void cleanupCachedData() {
         super.cleanupCachedData();
@@ -382,5 +431,11 @@ public class IOSScrollPositionProvider extends AppiumScrollPositionProvider {
 
     public WebElement getFirstVisibleChild() {
         return this.firstVisibleChild;
+    }
+
+    @Override
+    public void setScrollRootElement(WebElement scrollRootElement) {
+        super.setScrollRootElement(scrollRootElement);
+        this.cachedScrollableView = scrollRootElement;
     }
 }

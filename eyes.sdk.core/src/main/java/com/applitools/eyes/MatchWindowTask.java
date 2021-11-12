@@ -199,6 +199,13 @@ public class MatchWindowTask {
                 list.remove(i);
             } else {
                 mutableRegion.offset(-location.getX(), -location.getY());
+                // TODO Quick fix, should be moved to a separete method outside.
+                if (mutableRegion.getLeft() < 0) {
+                   mutableRegion.setLeft(0);
+                }
+                if (mutableRegion.getTop() < 0) {
+                    mutableRegion.setTop(0);
+                }
             }
         }
         return list.toArray(new MutableRegion[0]);

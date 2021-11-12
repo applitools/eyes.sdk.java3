@@ -30,13 +30,14 @@ public class TestApiMethods extends ReportingTestSuite {
         runner.setLogHandler(new StdoutLogHandler());
         Eyes eyes = new Eyes(runner);
         eyes.setBatch(TestDataProvider.batchInfo);
+        String testNameSuffix = useVisualGrid ? "_VG" : "";
         try {
             driver.get("https://applitools.com/helloworld");
-            eyes.open(driver, "TestApiMethods", "TestCloseAsync_1", new RectangleSize(800, 600));
+            eyes.open(driver, "TestApiMethods", "TestCloseAsync_1" + testNameSuffix, new RectangleSize(800, 600));
             eyes.check(Target.window().withName("step 1"));
             eyes.closeAsync();
             driver.findElement(By.tagName("button")).click();
-            eyes.open(driver, "TestApiMethods", "TestCloseAsync_2", new RectangleSize(800, 600));
+            eyes.open(driver, "TestApiMethods", "TestCloseAsync_2" + testNameSuffix, new RectangleSize(800, 600));
             eyes.check(Target.window().withName("step 2"));
             eyes.closeAsync();
             runner.getAllTestResults();

@@ -1,0 +1,13 @@
+package coverage.drivers;
+
+public enum SELENIUM {
+    SAUCE("https://ondemand.saucelabs.com:443/wd/hub"),
+    CHROME_LOCAL("http://localhost:4444/wd/hub"),
+    FIREFOX_LOCAL("http://localhost:4445/wd/hub");
+
+    public final String url;
+
+    SELENIUM(String url) {
+       this.url = url;
+    }
+}

@@ -32,12 +32,24 @@ public class AndroidFullPageCaptureAlgorithm extends AppiumFullPageCaptureAlgori
 
     @Override
     protected void captureAndStitchTailParts(RectangleSize entireSize, RectangleSize initialPartSize) {
+        moveToTopLeft();
         // scrollViewRegion is the (upscaled) region of the scrollview on the screen
         Region scrollViewRegion = scaleSafe(((AppiumScrollPositionProvider) scrollProvider).getScrollableViewRegion());
 
+        int scrollableViewHeight = scrollViewRegion.getHeight();
+        int originalScrollableViewHeight = scrollViewRegion.getHeight();
+        int behaviorOffset = 0;
+        boolean behaviorScrolled = false;
+        if (scrollRootElement != null) {
+            int offset = ((AndroidScrollPositionProvider) scrollProvider).getBehaviorOffsetWithHelperLibrary(scrollableElementId);
+            if (offset != -1) {
+                behaviorOffset = offset;
+            }
+        }
+
         Location originalViewLocation = new Location(scrollViewRegion.getLeft(), scrollViewRegion.getTop());
         Location newLoc = new Location(originalViewLocation.getX(), originalViewLocation.getY() - scaleSafe(((AppiumScrollPositionProvider) scrollProvider).getStatusBarHeight()));
-        RectangleSize newSize = new RectangleSize(initialPartSize.getWidth(), scrollViewRegion.getHeight());
+        RectangleSize newSize = new RectangleSize(initialPartSize.getWidth(), scrollableViewHeight);
         scrollViewRegion.setLocation(newLoc);
         scrollViewRegion.setSize(newSize);
 
@@ -47,8 +59,8 @@ public class AndroidFullPageCaptureAlgorithm extends AppiumFullPageCaptureAlgori
         Region regionToCrop;
 
         // We need to set position margin to avoid shadow at the top of view
-        int oneScrollStep = scrollViewRegion.getHeight() - stitchingAdjustment;
-        int maxScrollSteps = contentSize.getScrollContentHeight() / oneScrollStep;
+        int oneScrollStep = originalScrollableViewHeight - stitchingAdjustment;
+        int maxScrollSteps = (contentSize.getScrollContentHeight() - behaviorOffset) / oneScrollStep;
         logger.log(TraceLevel.Debug, testId, Stage.CHECK,
                 Pair.of("entireScrollableHeight", contentSize.getScrollContentHeight()),
                 Pair.of("oneScrollStep", oneScrollStep));
@@ -56,13 +68,13 @@ public class AndroidFullPageCaptureAlgorithm extends AppiumFullPageCaptureAlgori
             regionToCrop = new Region(0,
                     scrollViewRegion.getTop() + stitchingAdjustment,
                     initialPartSize.getWidth(),
-                    scrollViewRegion.getHeight() - stitchingAdjustment);
+                    originalScrollableViewHeight - stitchingAdjustment);
 
             currentPosition = new Location(0,
-                    (scrollViewRegion.getTop() + statusBarHeight) + ((scrollViewRegion.getHeight()) * (step)) - (stitchingAdjustment*step - stitchingAdjustment));
+                    (scrollViewRegion.getTop() + statusBarHeight) + ((originalScrollableViewHeight) * (step)) - (stitchingAdjustment*step - stitchingAdjustment));
 
             // We should use original view location for scroll positions due to better calculation positions on the screen
-            int startY = scrollViewRegion.getHeight() + originalViewLocation.getY() - 1 - (step != maxScrollSteps ? stitchingAdjustment/2 : 0);
+            int startY = originalScrollableViewHeight + originalViewLocation.getY() - 1 - (step != maxScrollSteps ? stitchingAdjustment/2 : 0);
             int endY = originalViewLocation.getY() + (step != maxScrollSteps ? stitchingAdjustment/2 : 0);
             boolean isScrolledWithHelperLibrary = false;
             if (scrollableElementId != null) { // it means that we want to scroll on a specific element
@@ -92,18 +104,43 @@ public class AndroidFullPageCaptureAlgorithm extends AppiumFullPageCaptureAlgori
                         initialPartSize.getWidth(),
                         cropTo);
                 currentPosition = new Location(0,
-                        scrollViewRegion.getTop() + statusBarHeight + ((scrollViewRegion.getHeight()) * (step)) - (stitchingAdjustment*step));
+                        scrollViewRegion.getTop() + statusBarHeight + ((originalScrollableViewHeight) * (step)) - (stitchingAdjustment*step));
+                if (behaviorScrolled) {
+                    cropFrom = originalViewLocation.getY() + originalScrollableViewHeight - cropTo;
+                    regionToCrop = new Region(0,
+                            (cropFrom - stitchingAdjustment) - stitchingAdjustment/4,
+                            initialPartSize.getWidth(),
+                            cropTo);
+                }
+            }
+            if (maxScrollSteps == 1 && behaviorOffset > 0) {
+                behaviorScrolled = ((AndroidScrollPositionProvider) scrollProvider).tryScrollBehaviorOffsetWithHelperLibrary(scrollableElementId, behaviorOffset);
+                if (behaviorScrolled) {
+                    int cropFrom = originalViewLocation.getY() + originalScrollableViewHeight - regionToCrop.getHeight();
+                    regionToCrop = new Region(0,
+                            (cropFrom - stitchingAdjustment) - stitchingAdjustment/4,
+                            initialPartSize.getWidth(),
+                            regionToCrop.getHeight());
+                }
             }
             captureAndStitchCurrentPart(regionToCrop);
+
+            if (step == maxScrollSteps - 1 && behaviorOffset > 0) {
+                behaviorScrolled = ((AndroidScrollPositionProvider) scrollProvider).tryScrollBehaviorOffsetWithHelperLibrary(scrollableElementId, behaviorOffset);
+            }
         }
 
-        int heightUnderScrollableView = initialPartSize.getHeight() - oneScrollStep - scrollViewRegion.getTop();
+        int heightUnderScrollableView = initialPartSize.getHeight() - originalScrollableViewHeight - scrollViewRegion.getTop() - (behaviorScrolled ? scaleSafe(((AppiumScrollPositionProvider) scrollProvider).getStatusBarHeight()) : 0);
         if (heightUnderScrollableView > 0) { // check if there is views under the scrollable view
-            regionToCrop = new Region(0, scrollViewRegion.getHeight() + scrollViewRegion.getTop() - stitchingAdjustment, initialPartSize.getWidth(), heightUnderScrollableView);
+            regionToCrop = new Region(0, originalScrollableViewHeight + scrollViewRegion.getTop() - stitchingAdjustment, initialPartSize.getWidth(), heightUnderScrollableView + stitchingAdjustment);
 
             currentPosition = new Location(0, scrollViewRegion.getTop() + statusBarHeight + contentSize.getScrollContentHeight() - stitchingAdjustment);
 
             captureAndStitchCurrentPart(regionToCrop);
+        }
+
+        if (behaviorScrolled) {
+            ((AndroidScrollPositionProvider) scrollProvider).tryScrollBehaviorOffsetWithHelperLibrary(scrollableElementId, -behaviorOffset);
         }
 
         moveToTopLeft();

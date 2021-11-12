@@ -8,6 +8,7 @@ import com.applitools.eyes.selenium.StitchMode;
 import com.applitools.eyes.visualgrid.model.*;
 import com.applitools.eyes.visualgrid.services.VisualGridRunner;
 import com.fasterxml.jackson.databind.JsonNode;
+import coverage.drivers.browsers.DriverBuilder;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.Actions;
@@ -27,6 +28,10 @@ public class TestSetup extends GlobalSetup {
     protected EyesRunner runner;
 
     // Eyes configuration
+
+    public DriverBuilder buildDriver() {
+        return new DriverBuilder();
+    }
 
     public void initEyes(boolean isVisualGrid, String stitching, String branchName) {
         runner = isVisualGrid ? new VisualGridRunner(10) : new ClassicRunner();
