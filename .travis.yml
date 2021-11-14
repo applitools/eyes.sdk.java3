@@ -105,8 +105,8 @@ jobs:
         - "sh -e /etc/init.d/xvfb start"
         - sleep 3
         - echo $APPLITOOLS_REPORT_ID
-        - nvm install 14.5.0
-        - nvm use 14.5.0
+        - nvm install 14
+        - nvm use 14
         - mvn clean install -DskipTests
         - chmod +x ./initGeckoDriver.sh && ./initGeckoDriver.sh
         - export FIREFOX_DRIVER_PATH=/home/travis/build/geckodriver
