@@ -304,8 +304,7 @@ public class AndroidScrollPositionProvider extends AppiumScrollPositionProvider 
                     element.getAttribute("className").equals("androidx.recyclerview.widget.RecyclerView") ||
                     element.getAttribute("className").equals("androidx.viewpager2.widget.ViewPager2") ||
                     element.getAttribute("className").equals("android.widget.ListView") ||
-                    element.getAttribute("className").equals("android.widget.GridView") ||
-                    element.getAttribute("className").equals("android.widget.ScrollView")) {
+                    element.getAttribute("className").equals("android.widget.GridView")) {
                 try {
                     String scrollableContentSize = getScrollableContentSize(element.getAttribute("resourceId"));
                     try {
@@ -404,8 +403,7 @@ public class AndroidScrollPositionProvider extends AppiumScrollPositionProvider 
                     className.equals("androidx.recyclerview.widget.RecyclerView") ||
                     className.equals("androidx.viewpager2.widget.ViewPager2") ||
                     className.equals("android.widget.ListView") ||
-                    className.equals("android.widget.GridView") ||
-                    className.equals("android.widget.ScrollView")) {
+                    className.equals("android.widget.GridView")) {
                 try {
                     String scrollableContentSize = getScrollableContentSize(activeScroll.getAttribute("resourceId"));
                     try {
