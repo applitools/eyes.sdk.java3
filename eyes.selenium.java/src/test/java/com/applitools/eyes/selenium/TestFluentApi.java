@@ -75,7 +75,12 @@ public class TestFluentApi extends TestSetup {
         getEyes().check("Fluent - Window with floating region by selector", Target.window()
                 .floating(By.id("overflowing-div"), 3, 3, 20, 30));
 
-        setExpectedFloatingRegions(new FloatingMatchSettings(8, 80, 304, 185, 3, 3, 20, 30));
+        // Visual grid inflates regions, so we get different expected results vs. classic
+        if (useVisualGrid) {
+            setExpectedFloatingRegions(new FloatingMatchSettings(8, 80, 304, 185, 3, 3, 20, 30));
+        } else {
+            setExpectedFloatingRegions(new FloatingMatchSettings(8, 81, 304, 184, 3, 3, 20, 30));
+        }
     }
 
     @Test
@@ -117,11 +122,21 @@ public class TestFluentApi extends TestSetup {
     @Test
     public void TestCheckFullWindowWithMultipleIgnoreRegionsBySelector_Fluent() {
         getEyes().check("Fluent - Region by element", Target.window().fully().ignore(By.cssSelector(".ignore")));
-        setExpectedIgnoreRegions(
-                new Region(8, 1276, 690, 207),
-                new Region(122, 932, 456, 307),
-                new Region(10, 285, 800, 501)
-        );
+        // Visual grid inflates regions, so we get different expected results vs. classic
+        if (useVisualGrid) {
+            setExpectedIgnoreRegions(
+                    new Region(8, 1276, 690, 207),
+                    new Region(122, 932, 456, 307),
+                    new Region(10, 285, 800, 501)
+            );
+        } else {
+            setExpectedIgnoreRegions(
+                    new Region(8, 1277, 690, 206),
+                    new Region(122, 933, 456, 306),
+                    new Region(10, 286, 800, 500)
+
+            );
+        }
     }
 
     @Test

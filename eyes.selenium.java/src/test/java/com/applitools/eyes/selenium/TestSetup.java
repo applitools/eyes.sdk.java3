@@ -27,7 +27,7 @@ public abstract class TestSetup extends ReportingTestSuite implements ITest {
     private static String testNameSuffix = System.getenv("TEST_NAME_SUFFIX");
     public final String mode;
 
-    private boolean useVisualGrid = false;
+    protected boolean useVisualGrid = false;
     StitchMode stitchMode = StitchMode.SCROLL;
 
     private EyesRunner runner = new ClassicRunner();
