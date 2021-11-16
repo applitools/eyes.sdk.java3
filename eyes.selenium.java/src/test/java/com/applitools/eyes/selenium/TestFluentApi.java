@@ -72,15 +72,6 @@ public class TestFluentApi extends TestSetup {
         getEyes().check("Fluent - Region by overflowing coordinates", Target.region(new Region(50, 110, 90, 550)));
     }
 
-    // Fixme - even though the ignore region is outside the viewport, it seems to exist (bug in the cropping mechanism?)
-    @Test
-    public void TestCheckElementWithIgnoreRegionByElementOutsideTheViewport_Fluent() {
-        WebElement element = getWebDriver().findElement(By.id("overflowing-div-image"));
-        WebElement ignoreElement = getWebDriver().findElement(By.id("overflowing-div"));
-        setExpectedIgnoreRegions();
-        getEyes().check("Fluent - Region by element", Target.region(element).ignore(ignoreElement));
-    }
-
     @Test
     public void TestCheckElementWithIgnoreRegionBySameElement_Fluent() {
         WebElement element = getWebDriver().findElement(By.id("overflowing-div-image"));

@@ -106,7 +106,6 @@
                 <methods>
                     <include name="TestIgnoreDisplacements" />
                     <include name="TestCheckElementFully_Fluent" />
-                    <include name="TestCheckElementWithIgnoreRegionByElementOutsideTheViewport_Fluent" />
                     <include name="TestCheckMany" />
                     <include name="TestCheckElementWithIgnoreRegionBySameElement_Fluent" />
                     <include name="TestCheckElementFullyAfterScroll" />
