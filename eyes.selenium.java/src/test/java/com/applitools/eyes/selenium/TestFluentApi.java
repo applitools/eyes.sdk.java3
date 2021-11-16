@@ -120,26 +120,6 @@ public class TestFluentApi extends TestSetup {
     }
 
     @Test
-    public void TestCheckFullWindowWithMultipleIgnoreRegionsBySelector_Fluent() {
-        getEyes().check("Fluent - Region by element", Target.window().fully().ignore(By.cssSelector(".ignore")));
-        // Visual grid inflates regions, so we get different expected results vs. classic
-        if (useVisualGrid) {
-            setExpectedIgnoreRegions(
-                    new Region(8, 1276, 690, 207),
-                    new Region(122, 932, 456, 307),
-                    new Region(10, 285, 800, 501)
-            );
-        } else {
-            setExpectedIgnoreRegions(
-                    new Region(8, 1277, 690, 206),
-                    new Region(122, 933, 456, 306),
-                    new Region(10, 286, 800, 500)
-
-            );
-        }
-    }
-
-    @Test
     public void TestCheckMany() {
         getEyes().check(
                 Target.region(By.id("overflowing-div-image")).withName("overflowing div image"),
