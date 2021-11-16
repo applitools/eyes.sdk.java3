@@ -249,8 +249,6 @@ public abstract class TestSetup extends ReportingTestSuite implements ITest {
     protected void beforeOpen(Eyes eyes) {
     }
 
-    ;
-
     @Override
     public String getTestName() {
         return testName;
