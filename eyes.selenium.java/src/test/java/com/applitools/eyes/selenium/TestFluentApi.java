@@ -32,14 +32,6 @@ public class TestFluentApi extends TestSetup {
     }
 
     @Test
-    public void TestCheckRegionWithIgnoreRegion_Fluent() {
-        getEyes().check("Fluent - Region with Ignore region", Target.region(By.id("overflowing-div"))
-                .ignore(new Region(50, 50, 100, 100)));
-
-        setExpectedIgnoreRegions(new Region(50, 50, 100, 100));
-    }
-
-    @Test
     public void TestCheckWindow_Fluent() {
         getEyes().check("Fluent - Window", Target.window());
     }
