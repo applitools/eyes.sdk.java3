@@ -51,7 +51,7 @@ public class TestFluentApi extends TestSetup {
         getEyes().check("Fluent - Window with ignore region by selector centered", Target.window()
                 .ignore(By.id("centered")));
 
-        setExpectedIgnoreRegions(new Region(122, 933, 456, 306));
+        setExpectedIgnoreRegions(new Region(122, 932, 456, 307));
     }
 
     @Test
