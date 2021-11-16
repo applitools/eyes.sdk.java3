@@ -111,15 +111,6 @@ public class TestFluentApi extends TestSetup {
     }
 
     @Test
-    public void TestCheckWindowWithFloatingByRegion_Fluent() {
-        ICheckSettings settings = Target.window()
-                .floating(new Region(10, 10, 20, 20), 3, 3, 20, 30);
-        getEyes().check("Fluent - Window with floating region by region", settings);
-
-        setExpectedFloatingRegions(new FloatingMatchSettings(10, 10, 20, 20, 3, 3, 20, 30));
-    }
-
-    @Test
     public void TestCheckElementFully_Fluent() {
         WebElement element = getWebDriver().findElement(By.id("overflowing-div-image"));
         getEyes().check("Fluent - Region by element - fully", Target.region(element).fully());
