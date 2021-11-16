@@ -71,19 +71,6 @@ public class TestFluentApi extends TestSetup {
     }
 
     @Test
-    public void TestCheckWindowWithFloatingBySelector_Fluent() {
-        getEyes().check("Fluent - Window with floating region by selector", Target.window()
-                .floating(By.id("overflowing-div"), 3, 3, 20, 30));
-
-        // Visual grid inflates regions, so we get different expected results vs. classic
-        if (useVisualGrid) {
-            setExpectedFloatingRegions(new FloatingMatchSettings(8, 80, 304, 185, 3, 3, 20, 30));
-        } else {
-            setExpectedFloatingRegions(new FloatingMatchSettings(8, 81, 304, 184, 3, 3, 20, 30));
-        }
-    }
-
-    @Test
     public void TestCheckRegionByCoordinates_Fluent() {
         getEyes().check("Fluent - Region by coordinates", Target.region(new Region(50, 70, 90, 110)));
     }
