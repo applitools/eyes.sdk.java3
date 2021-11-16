@@ -199,17 +199,11 @@ public class MatchWindowTask {
                 list.remove(i);
             } else {
                 mutableRegion.offset(-location.getX(), -location.getY());
-                // TODO Quick fix: regions should not have negative coords, and if they do - we cap them.
+                // TODO Quick fix, should be moved to a separete method outside.
                 if (mutableRegion.getLeft() < 0) {
-                    // we need to reduce the size, otherwise we'll be moving the region, not really cropping it.
-                    int xShrink = mutableRegion.getLeft();
-                    mutableRegion.setWidth(mutableRegion.getWidth() + xShrink);
-                    mutableRegion.setLeft(0);
+                   mutableRegion.setLeft(0);
                 }
                 if (mutableRegion.getTop() < 0) {
-                    // we need to reduce the size, otherwise we'll be moving the region, not really cropping it.
-                    int yShrink = mutableRegion.getTop();
-                    mutableRegion.setHeight(mutableRegion.getHeight() +  yShrink);
                     mutableRegion.setTop(0);
                 }
             }
