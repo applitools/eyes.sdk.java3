@@ -441,8 +441,7 @@ public class AndroidScrollPositionProvider extends AppiumScrollPositionProvider 
                 Pair.of("entireSize", entireSize),
                 Pair.of("verticalScrollGap", verticalScrollGap),
                 Pair.of("scrollContentHeight", scrollContentHeight));
-        int behaviourOffset = getBehaviorOffsetWithHelperLibrary();
-        return new RectangleSize(entireSize.getWidth(), entireSize.getHeight() + behaviourOffset);
+        return new RectangleSize(entireSize.getWidth(), entireSize.getHeight());
     }
 
     @Override
