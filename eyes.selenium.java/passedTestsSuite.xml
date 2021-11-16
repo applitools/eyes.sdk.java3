@@ -118,7 +118,6 @@
                     <include name="TestCheckRegionWithIgnoreRegion_Fluent" />
                     <include name="TestCheckWindowWithFloatingBySelector_Fluent" />
                     <include name="TestCheckWindowWithIgnoreBySelector_Centered_Fluent" />
-                    <include name="TestCheckScrollableModal" />
                     <include name="TestCheckWindowWithIgnoreBySelector_Fluent" />
                     <include name="TestCheckWindowWithIgnoreBySelector_Stretched_Fluent" />
                     <include name="TestSimpleRegion" />

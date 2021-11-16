@@ -132,12 +132,6 @@ public class TestFluentApi extends TestSetup {
     }
 
     @Test
-    public void TestCheckScrollableModal() {
-        getDriver().findElement(By.id("centered")).click();
-        getEyes().check("Scrollable Modal", Target.region(By.id("modal-content")).fully().scrollRootElement(By.id("modal1")));
-    }
-
-    @Test
     public void TestCheckWindowWithFloatingByRegion_Fluent() {
         ICheckSettings settings = Target.window()
                 .floating(new Region(10, 10, 20, 20), 3, 3, 20, 30);
