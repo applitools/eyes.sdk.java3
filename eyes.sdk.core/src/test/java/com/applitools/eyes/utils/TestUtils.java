@@ -6,7 +6,6 @@ import com.applitools.eyes.*;
 import com.applitools.eyes.metadata.SessionResults;
 import com.applitools.utils.ArgumentGuard;
 import com.applitools.utils.ClassVersionGetter;
-import com.applitools.utils.GeneralUtils;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -26,12 +25,12 @@ import java.util.Calendar;
 import java.util.List;
 
 public class TestUtils {
-    public final static boolean runOnCI = GeneralUtils.getEnvString("CI") != null;
-    public final static boolean runHeadless = runOnCI || "true".equalsIgnoreCase(GeneralUtils.getEnvString("APPLITOOLS_RUN_HEADLESS"));
-    public final static String logsPath = GeneralUtils.getEnvString("APPLITOOLS_LOGS_PATH");
+    public final static boolean runOnCI = System.getenv("CI") != null;
+    public final static boolean runHeadless = runOnCI || "true".equalsIgnoreCase(System.getenv("APPLITOOLS_RUN_HEADLESS"));
+    public final static String logsPath = System.getenv("APPLITOOLS_LOGS_PATH");
     public final static SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy_MM_dd_HH_mm_ss_SSS");
-    public final static boolean verboseLogs = !runOnCI || "true".equalsIgnoreCase(GeneralUtils.getEnvString("APPLITOOLS_VERBOSE_LOGS"));
-    public final static String REPORTING_DIR = GeneralUtils.getEnvString("TRAVIS_BUILD_DIR") + "/report/";
+    public final static boolean verboseLogs = !runOnCI || "true".equalsIgnoreCase(System.getenv("APPLITOOLS_VERBOSE_LOGS"));
+    public final static String REPORTING_DIR = System.getenv("TRAVIS_BUILD_DIR") + "/report/";
 
     public static String initLogPath() {
         return initLogPath(Thread.currentThread().getStackTrace()[2].getMethodName());
@@ -74,7 +73,7 @@ public class TestUtils {
 
         RestClient client = new RestClient(new Logger(new StdoutLogHandler()), apiSessionUri, ServerConnector.DEFAULT_CLIENT_TIMEOUT);
         client.setAgentId(ClassVersionGetter.CURRENT_VERSION);
-        if (GeneralUtils.getEnvString("APPLITOOLS_USE_PROXY") != null) {
+        if (System.getenv("APPLITOOLS_USE_PROXY") != null) {
             client.setProxy(new ProxySettings("http://127.0.0.1", 8888));
         }
 

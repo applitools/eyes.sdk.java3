@@ -2,7 +2,6 @@ package com.applitools.eyes.selenium;
 //
 //import com.applitools.eyes.TestResult;
 //import com.applitools.eyes.TestResultReportSummary;
-import com.applitools.utils.GeneralUtils;
 import org.testng.IInvokedMethod;
 import org.testng.IInvokedMethodListener2;
 import org.testng.ITestContext;
@@ -18,7 +17,7 @@ public class MethodListener implements IInvokedMethodListener2 {
     @Override
     public void beforeInvocation(IInvokedMethod iInvokedMethod, ITestResult iTestResult, ITestContext iTestContext) {
         if (suiteId.get() == null) {
-            String travisCommit = GeneralUtils.getEnvString("TRAVIS_COMMIT");
+            String travisCommit = System.getenv("TRAVIS_COMMIT");
             System.out.println("Unified report: travis commit is " + travisCommit);
             if (travisCommit == null || travisCommit.isEmpty()) {
                 suiteId.set(UUID.randomUUID().toString().substring(0, 12));

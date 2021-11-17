@@ -1,6 +1,5 @@
 package com.applitools.eyes.utils;
 
-import com.applitools.utils.GeneralUtils;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.util.ArrayList;
@@ -22,7 +21,7 @@ public class TestResultReportSummary {
     @JsonProperty("id")
     public String getId() {
         if (this.id == null) {
-            this.id = GeneralUtils.getEnvString("APPLITOOLS_REPORT_ID");
+            this.id = System.getenv("APPLITOOLS_REPORT_ID");
         }
         if (this.id == null) {
             return "0000-0000";
@@ -37,7 +36,7 @@ public class TestResultReportSummary {
 
     @JsonProperty("sandbox")
     public boolean getSandbox() {
-        String isSandbox = GeneralUtils.getEnvString("APPLITOOLS_REPORT_TO_SANDBOX");
+        String isSandbox = System.getenv("APPLITOOLS_REPORT_TO_SANDBOX");
         return !"false".equalsIgnoreCase(isSandbox);
     }
 

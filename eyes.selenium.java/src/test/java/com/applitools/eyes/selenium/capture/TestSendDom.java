@@ -45,7 +45,7 @@ public final class TestSendDom extends ReportingTestSuite {
 
     @BeforeClass(alwaysRun = true)
     public void OneTimeSetUp() {
-        if (TestUtils.runOnCI && GeneralUtils.getEnvString("TRAVIS") != null) {
+        if (TestUtils.runOnCI && System.getenv("TRAVIS") != null) {
             System.setProperty("webdriver.chrome.driver", "/home/travis/build/chromedriver"); // for travis build.
         }
     }

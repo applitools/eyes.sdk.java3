@@ -1,6 +1,5 @@
 package com.applitools.eyes.utils;
 
-import com.applitools.utils.GeneralUtils;
 import org.testng.ITestContext;
 import org.testng.ITestListener;
 import org.testng.ITestResult;
@@ -45,7 +44,7 @@ public class ReportingListener implements ITestListener {
 
     @Override
     public void onStart(ITestContext context) {
-        if (TestUtils.runOnCI && GeneralUtils.getEnvString("TRAVIS") != null) {
+        if (TestUtils.runOnCI && System.getenv("TRAVIS") != null) {
             System.setProperty("webdriver.chrome.driver", "/home/travis/build/chromedriver"); // for travis build.
         }
         TestUtils.createTestResultsDirIfNotExists();
