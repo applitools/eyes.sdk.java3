@@ -50,6 +50,10 @@
 ### Added
 - Support for Android UFG Beta
 
+## [3.208.3] - 2021-10-25
+### Updated
+- Prepared tests for Appium/UFG version releases 
+
 ## [3.208.2] - 2021-09-20
 ### Updated
 - Used iOS helper library for full page functionality when CollectionView presented. [Trello 2633](https://trello.com/c/dQqN02TN)
