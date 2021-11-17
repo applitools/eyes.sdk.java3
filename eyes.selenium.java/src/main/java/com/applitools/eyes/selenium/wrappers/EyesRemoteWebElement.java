@@ -12,14 +12,12 @@ import com.applitools.utils.GeneralUtils;
 import com.google.common.collect.ImmutableMap;
 import org.openqa.selenium.*;
 import org.openqa.selenium.interactions.Coordinates;
-import org.openqa.selenium.remote.DriverCommand;
-import org.openqa.selenium.remote.FileDetector;
-import org.openqa.selenium.remote.RemoteWebElement;
-import org.openqa.selenium.remote.Response;
+import org.openqa.selenium.remote.*;
 
 import java.lang.reflect.Method;
 import java.text.NumberFormat;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -141,9 +139,11 @@ public class EyesRemoteWebElement extends RemoteWebElement {
     public static Region getClientBoundsWithoutBorders(WebElement element, EyesSeleniumDriver driver) {
         String result = (String) driver.executeScript(JS_GET_BOUNDING_CLIENT_RECT_WITHOUT_BORDERS, element);
         String[] data = result.split(";");
-        return new Region(
+        Region region = new Region(
                 Math.round(Float.parseFloat(data[0])), Math.round(Float.parseFloat(data[1])),
                 Math.round(Float.parseFloat(data[2])), Math.round(Float.parseFloat(data[3])));
+        checkForNativeWebView(region, driver);
+        return region;
     }
 
     public Region getBounds() {
@@ -694,5 +694,70 @@ public class EyesRemoteWebElement extends RemoteWebElement {
         return new RectangleSize(
                 Math.round(Float.parseFloat(parts[0])),
                 Math.round(Float.parseFloat(parts[1])));
+    }
+
+    private static void checkForNativeWebView(Region region, EyesSeleniumDriver driver) {
+        try {
+            Platform platform = Platform.ANY;
+            try {
+                String driverClass = (String) driver.getRemoteWebDriver().getCapabilities().getCapability("driverClass");
+                if (driverClass != null) {
+                    if (driverClass.equals("io.appium.java_client.android.AndroidDriver")) {
+                        platform = Platform.ANDROID;
+                    } else if (driverClass.equals("io.appium.java_client.ios.IOSDriver")) {
+                        platform = Platform.IOS;
+                    }
+                }
+            } catch (Exception ignored) {
+            }
+            if (platform == Platform.ANY) {
+                platform = driver.getRemoteWebDriver().getCapabilities().getPlatform();
+            }
+            if (platform.equals(Platform.IOS) || platform.equals(Platform.ANDROID)) {
+                RemoteExecuteMethod executeMethod = new RemoteExecuteMethod(driver.getRemoteWebDriver());
+                String defaultContext = (String) executeMethod.execute(DriverCommand.GET_CURRENT_CONTEXT_HANDLE, null);
+                List<String> contexts = (List<String>) executeMethod.execute(DriverCommand.GET_CONTEXT_HANDLES, null);
+                boolean isNative = false;
+                for (String context : contexts) {
+                    if (context.contains("NATIVE")) {
+                        Map<String, String> params = new HashMap<>();
+                        params.put("name", context);
+                        executeMethod.execute(DriverCommand.SWITCH_TO_CONTEXT, params);
+                        isNative = true;
+                        break;
+                    }
+                }
+                try {
+                    if (isNative) {
+                        if (platform.equals(Platform.IOS)) {
+                            List<WebElement> list = driver.getRemoteWebDriver().findElements(By.className("XCUIElementTypeWebView"));
+                            if (!list.isEmpty()) {
+                                WebElement webView = list.get(0);
+                                region.setTop(region.getTop() + webView.getLocation().getY());
+                            }
+                        }
+                        if (platform.equals(Platform.ANDROID)) {
+                            List<WebElement> list = driver.getRemoteWebDriver().findElements(By.className("android.webkit.WebView"));
+                            if (!list.isEmpty()) {
+                                WebElement webView = list.get(0);
+                                Object pixelRationObject = driver.getRemoteWebDriver().getCapabilities().getCapability("pixelRatio");
+                                double pixelRatio;
+                                if (pixelRationObject instanceof Double) {
+                                    pixelRatio = (Double) pixelRationObject;
+                                } else {
+                                    pixelRatio = ((Long) pixelRationObject).doubleValue();
+                                }
+                                region.setTop((region.getTop() + (int)(webView.getLocation().getY()/pixelRatio)));
+                            }
+                        }
+                    }
+                } finally {
+                    Map<String, String> params = new HashMap<>();
+                    params.put("name", defaultContext);
+                    executeMethod.execute(DriverCommand.SWITCH_TO_CONTEXT, params);
+                }
+            }
+        } catch (Exception ignored) {
+        }
     }
 }

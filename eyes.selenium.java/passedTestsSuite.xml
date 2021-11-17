@@ -106,20 +106,13 @@
                 <methods>
                     <include name="TestIgnoreDisplacements" />
                     <include name="TestCheckElementFully_Fluent" />
-                    <include name="TestCheckElementWithIgnoreRegionByElementOutsideTheViewport_Fluent" />
-                    <include name="TestCheckFullWindowWithMultipleIgnoreRegionsBySelector_Fluent" />
                     <include name="TestCheckMany" />
-                    <include name="TestCheckElementWithIgnoreRegionBySameElement_Fluent" />
                     <include name="TestCheckElementFullyAfterScroll" />
                     <include name="TestCheckOverflowingRegionByCoordinates_Fluent" />
                     <include name="TestCheckRegionByCoordinates_Fluent" />
                     <include name="TestCheckRegionBySelectorAfterManualScroll_Fluent" />
                     <include name="TestCheckWindow_Fluent" />
-                    <include name="TestCheckWindowWithFloatingByRegion_Fluent" />
-                    <include name="TestCheckRegionWithIgnoreRegion_Fluent" />
-                    <include name="TestCheckWindowWithFloatingBySelector_Fluent" />
                     <include name="TestCheckWindowWithIgnoreBySelector_Centered_Fluent" />
-                    <include name="TestCheckScrollableModal" />
                     <include name="TestCheckWindowWithIgnoreBySelector_Fluent" />
                     <include name="TestCheckWindowWithIgnoreBySelector_Stretched_Fluent" />
                     <include name="TestSimpleRegion" />
