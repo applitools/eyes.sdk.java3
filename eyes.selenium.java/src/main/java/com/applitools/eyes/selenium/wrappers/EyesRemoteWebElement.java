@@ -142,7 +142,7 @@ public class EyesRemoteWebElement extends RemoteWebElement {
         Region region = new Region(
                 Math.round(Float.parseFloat(data[0])), Math.round(Float.parseFloat(data[1])),
                 Math.round(Float.parseFloat(data[2])), Math.round(Float.parseFloat(data[3])));
-        checkForNativeWebView(region, driver);
+//        checkForNativeWebView(region, driver);
         return region;
     }
 
