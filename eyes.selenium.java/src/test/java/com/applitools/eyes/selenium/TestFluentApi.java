@@ -32,14 +32,6 @@ public class TestFluentApi extends TestSetup {
     }
 
     @Test
-    public void TestCheckRegionWithIgnoreRegion_Fluent() {
-        getEyes().check("Fluent - Region with Ignore region", Target.region(By.id("overflowing-div"))
-                .ignore(new Region(50, 50, 100, 100)));
-
-        setExpectedIgnoreRegions(new Region(50, 50, 100, 100));
-    }
-
-    @Test
     public void TestCheckWindow_Fluent() {
         getEyes().check("Fluent - Window", Target.window());
     }
@@ -59,7 +51,11 @@ public class TestFluentApi extends TestSetup {
         getEyes().check("Fluent - Window with ignore region by selector centered", Target.window()
                 .ignore(By.id("centered")));
 
-        setExpectedIgnoreRegions(new Region(122, 933, 456, 306));
+        if (useVisualGrid) { // handling visual grid padding
+            setExpectedIgnoreRegions(new Region(122, 932, 456, 307));
+        } else {
+            setExpectedIgnoreRegions(new Region(122, 933, 456, 306));
+        }
     }
 
     @Test
@@ -67,15 +63,11 @@ public class TestFluentApi extends TestSetup {
         getEyes().check("Fluent - Window with ignore region by selector stretched", Target.window()
                 .ignore(By.id("stretched")));
 
-        setExpectedIgnoreRegions(new Region(8, 1277, 690, 206));
-    }
-
-    @Test
-    public void TestCheckWindowWithFloatingBySelector_Fluent() {
-        getEyes().check("Fluent - Window with floating region by selector", Target.window()
-                .floating(By.id("overflowing-div"), 3, 3, 20, 30));
-
-        setExpectedFloatingRegions(new FloatingMatchSettings(8, 81, 304, 184, 3, 3, 20, 30));
+        if (useVisualGrid) { // handling visual grid padding
+            setExpectedIgnoreRegions(new Region(8, 1276, 690, 207));
+        } else {
+            setExpectedIgnoreRegions(new Region(8, 1277, 690, 206));
+        }
     }
 
     @Test
@@ -89,21 +81,6 @@ public class TestFluentApi extends TestSetup {
     }
 
     @Test
-    public void TestCheckElementWithIgnoreRegionByElementOutsideTheViewport_Fluent() {
-        WebElement element = getWebDriver().findElement(By.id("overflowing-div-image"));
-        WebElement ignoreElement = getWebDriver().findElement(By.id("overflowing-div"));
-        setExpectedIgnoreRegions();
-        getEyes().check("Fluent - Region by element", Target.region(element).ignore(ignoreElement));
-    }
-
-    @Test
-    public void TestCheckElementWithIgnoreRegionBySameElement_Fluent() {
-        WebElement element = getWebDriver().findElement(By.id("overflowing-div-image"));
-        getEyes().check("Fluent - Region by element", Target.region(element).ignore(element));
-        setExpectedIgnoreRegions(new Region(0, 0, 304, 184));
-    }
-
-    @Test
     public void TestScrollbarsHiddenAndReturned_Fluent() {
         getEyes().check("Fluent - Window (Before)", Target.window().fully());
         getEyes().check("Fluent - Inner frame div",
@@ -111,16 +88,6 @@ public class TestFluentApi extends TestSetup {
                         .region(By.id("inner-frame-div"))
                         .fully());
         getEyes().check("Fluent - Window (After)", Target.window().fully());
-    }
-
-    @Test
-    public void TestCheckFullWindowWithMultipleIgnoreRegionsBySelector_Fluent() {
-        getEyes().check("Fluent - Region by element", Target.window().fully().ignore(By.cssSelector(".ignore")));
-        setExpectedIgnoreRegions(
-                new Region(8, 1277, 690, 206),
-                new Region(122, 933, 456, 306),
-                new Region(10, 286, 800, 500)
-        );
     }
 
     @Test
@@ -133,21 +100,6 @@ public class TestFluentApi extends TestSetup {
                 Target.frame("frame1").withName("frame1"),
                 Target.region(new Region(30, 50, 300, 620)).withName("rectangle")
         );
-    }
-
-    @Test
-    public void TestCheckScrollableModal() {
-        getDriver().findElement(By.id("centered")).click();
-        getEyes().check("Scrollable Modal", Target.region(By.id("modal-content")).fully().scrollRootElement(By.id("modal1")));
-    }
-
-    @Test
-    public void TestCheckWindowWithFloatingByRegion_Fluent() {
-        ICheckSettings settings = Target.window()
-                .floating(new Region(10, 10, 20, 20), 3, 3, 20, 30);
-        getEyes().check("Fluent - Window with floating region by region", settings);
-
-        setExpectedFloatingRegions(new FloatingMatchSettings(10, 10, 20, 20, 3, 3, 20, 30));
     }
 
     @Test
