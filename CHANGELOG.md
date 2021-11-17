@@ -45,8 +45,6 @@
 - Android full page stitching issue. [Trello 2633](https://trello.com/c/dQqN02TN)
 
 ## [3.209.0-beta] - 2021-10-26
-### Updated
-- Prepared tests for Appium/UFG version releases
 ### Added
 - Support for Android UFG Beta
 
