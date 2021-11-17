@@ -1,5 +1,9 @@
 ## [vNext]
 ### Updated
+- Translate coordinates of web elements inside WebView according to WebView location on the device screen. [Trello 2607](https://trello.com/c/u5yzG8XE)
+
+## [vNext]
+### Updated
 - Changed checking of `isMobileDevice`. Handle exceptions correctly. [Trello 2712](https://trello.com/c/89U7DfV0)
 
 ## [3.210.2] - 2021-11-26
