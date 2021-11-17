@@ -51,7 +51,11 @@ public class TestFluentApi extends TestSetup {
         getEyes().check("Fluent - Window with ignore region by selector centered", Target.window()
                 .ignore(By.id("centered")));
 
-        setExpectedIgnoreRegions(new Region(122, 932, 456, 307));
+        if (useVisualGrid) { // handling visual grid padding
+            setExpectedIgnoreRegions(new Region(122, 932, 456, 307));
+        } else {
+            setExpectedIgnoreRegions(new Region(122, 933, 456, 306));
+        }
     }
 
     @Test
@@ -59,7 +63,11 @@ public class TestFluentApi extends TestSetup {
         getEyes().check("Fluent - Window with ignore region by selector stretched", Target.window()
                 .ignore(By.id("stretched")));
 
-        setExpectedIgnoreRegions(new Region(8, 1277, 690, 206));
+        if (useVisualGrid) { // handling visual grid padding
+            setExpectedIgnoreRegions(new Region(8, 1276, 690, 207));
+        } else {
+            setExpectedIgnoreRegions(new Region(8, 1277, 690, 206));
+        }
     }
 
     @Test
