@@ -73,13 +73,6 @@ public class TestFluentApi extends TestSetup {
     }
 
     @Test
-    public void TestCheckElementWithIgnoreRegionBySameElement_Fluent() {
-        WebElement element = getWebDriver().findElement(By.id("overflowing-div-image"));
-        getEyes().check("Fluent - Region by element", Target.region(element).ignore(element));
-        setExpectedIgnoreRegions(new Region(0, 0, 304, 184));
-    }
-
-    @Test
     public void TestScrollbarsHiddenAndReturned_Fluent() {
         getEyes().check("Fluent - Window (Before)", Target.window().fully());
         getEyes().check("Fluent - Inner frame div",
