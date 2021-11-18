@@ -70,7 +70,7 @@ public class TestConfigurationSentCorrectlyToServer extends EnvironmentModifier 
         try {
             // TODO remove - for debugging
             System.out.printf("****BatchSequence****5 sequenceName: '" + sequenceName + "' , sequenceNameEnvVar: '" + sequenceNameEnvVar + "' , effective: '" + effectiveSequenceName + "' , inBatch: '" + batchInfo.getSequenceName() + "' , original: '" + originalBatchSequence);
-            Assert.assertEquals(effectiveSequenceName, batchInfo.getSequenceName());
+            Assert.assertEquals(batchInfo.getSequenceName(), effectiveSequenceName);
 
             Configuration conf = new Configuration();
             String testName = "Test - " + (useVisualGrid ? "Visual Grid" : "Selenium");
