@@ -50,26 +50,18 @@ public class TestConfigurationSentCorrectlyToServer extends EnvironmentModifier 
         BatchInfo batchInfo = new BatchInfo(TestDataProvider.batchInfo.getName() + "_" + effectiveSequenceName, Calendar.getInstance());
         batchInfo.setId(TestDataProvider.batchInfo.getId() + "_" + effectiveSequenceName);
 
-        // TODO remove - for debugging
-        System.out.printf("****BatchSequence****1 sequenceName: '" + sequenceName + "' , sequenceNameEnvVar: '" + sequenceNameEnvVar + "' , effective: '" + effectiveSequenceName + "' , inBatch: '" + batchInfo.getSequenceName() + "' , original: '" + originalBatchSequence);
-
         if (sequenceName != null) {
-            System.out.printf("****BatchSequence****2 sequenceName: '" + sequenceName + "' , sequenceNameEnvVar: '" + sequenceNameEnvVar + "' , effective: '" + effectiveSequenceName + "' , inBatch: '" + batchInfo.getSequenceName() + "' , original: '" + originalBatchSequence);
             batchInfo.setSequenceName(sequenceName);
         }
 
         if (sequenceNameEnvVar != null) {
             try {
-                System.out.printf("****BatchSequence****3 sequenceName: '" + sequenceName + "' , sequenceNameEnvVar: '" + sequenceNameEnvVar + "' , effective: '" + effectiveSequenceName + "' , inBatch: '" + batchInfo.getSequenceName() + "' , original: '" + originalBatchSequence);
                 setEnvironmentVariable("APPLITOOLS_BATCH_SEQUENCE", originalBatchSequence);
             } catch (Exception e) {
-                System.out.printf("****BatchSequence****4 sequenceName: '" + sequenceName + "' , sequenceNameEnvVar: '" + sequenceNameEnvVar + "' , effective: '" + effectiveSequenceName + "' , inBatch: '" + batchInfo.getSequenceName() + "' , original: '" + originalBatchSequence);
                 e.printStackTrace();
             }
         }
         try {
-            // TODO remove - for debugging
-            System.out.printf("****BatchSequence****5 sequenceName: '" + sequenceName + "' , sequenceNameEnvVar: '" + sequenceNameEnvVar + "' , effective: '" + effectiveSequenceName + "' , inBatch: '" + batchInfo.getSequenceName() + "' , original: '" + originalBatchSequence);
             Assert.assertEquals(batchInfo.getSequenceName(), effectiveSequenceName);
 
             Configuration conf = new Configuration();
