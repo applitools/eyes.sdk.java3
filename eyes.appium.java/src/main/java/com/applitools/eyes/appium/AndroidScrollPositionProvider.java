@@ -173,6 +173,11 @@ public class AndroidScrollPositionProvider extends AppiumScrollPositionProvider 
         curScrollPos = getScrollPosFromScrollData(contentSize, lastScrollData, supposedScrollAmt, isDown);
     }
 
+    public Location scrollDown(boolean returnAbsoluteLocation) {
+        scroll(true);
+        return getCurrentPositionWithoutStatusBar(returnAbsoluteLocation);
+    }
+
     @Override
     public void scrollTo(int startX, int startY, int endX, int endY, boolean shouldCancel) {
         logger.log(TraceLevel.Debug, eyesDriver.getTestId(), Stage.CHECK,
@@ -437,7 +442,7 @@ public class AndroidScrollPositionProvider extends AppiumScrollPositionProvider 
                         if (element.getAttribute("className").equals("android.widget.HorizontalScrollView")) {
                             continue;
                         }
-                        List<MobileElement> child = scrollableView.findElements(By.xpath(EyesAppiumUtils.SCROLLVIEW_XPATH));
+                        List<WebElement> child = scrollableView.findElements(By.xpath(EyesAppiumUtils.SCROLLVIEW_XPATH));
                         scrollableView = child.isEmpty() ? element : child.get(0);
                     }
                 }
@@ -447,7 +452,7 @@ public class AndroidScrollPositionProvider extends AppiumScrollPositionProvider 
         return cachedScrollableView;
     }
 
-    public String getScrollableContentSize(String resourceId) {
+    private String getScrollableContentSize(String resourceId) {
         String scrollableContentSize = "";
         String[] version = EyesAppiumUtils.getHelperLibraryVersion(eyesDriver, logger).split("\\.");
         MobileElement hiddenElement;
