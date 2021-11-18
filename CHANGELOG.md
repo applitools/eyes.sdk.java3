@@ -1,4 +1,6 @@
-## [vNext]
+## [3.209.0] - 2021-11-18
+### Added 
+- Selenium 4 Compatibility
 ### Updated
 - Translate coordinates of web elements inside WebView according to WebView location on the device screen. [Trello 2607](https://trello.com/c/u5yzG8XE)
 
