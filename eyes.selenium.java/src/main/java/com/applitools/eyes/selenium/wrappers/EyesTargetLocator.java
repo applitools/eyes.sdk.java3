@@ -196,6 +196,13 @@ public class EyesTargetLocator implements WebDriver.TargetLocator {
         return driver;
     }
 
+//    @Override
+//    public WebDriver newWindow(WindowType typeHint) {
+//        driver.getFrameChain().clear();
+//        targetLocator.newWindow(typeHint);
+//        return driver;
+//    }
+
     public WebDriver defaultContent() {
         if (driver.getFrameChain().size() != 0) {
             driver.getFrameChain().clear();

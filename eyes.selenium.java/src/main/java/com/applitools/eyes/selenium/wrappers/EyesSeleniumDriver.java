@@ -2,7 +2,9 @@ package com.applitools.eyes.selenium.wrappers;
 
 import com.applitools.eyes.*;
 import com.applitools.eyes.logging.Stage;
-import com.applitools.eyes.selenium.*;
+import com.applitools.eyes.selenium.AppiumJsCommandExtractor;
+import com.applitools.eyes.selenium.EyesDriverUtils;
+import com.applitools.eyes.selenium.SeleniumEyes;
 import com.applitools.eyes.selenium.frames.FrameChain;
 import com.applitools.eyes.selenium.positioning.ImageRotation;
 import com.applitools.eyes.selenium.triggers.EyesKeyboard;
@@ -13,7 +15,6 @@ import com.applitools.utils.GeneralUtils;
 import com.applitools.utils.ImageUtils;
 import org.openqa.selenium.*;
 import org.openqa.selenium.interactions.*;
-import org.openqa.selenium.internal.*;
 import org.openqa.selenium.remote.*;
 
 import java.awt.image.BufferedImage;
@@ -25,9 +26,7 @@ import java.util.*;
  * Used so we'll be able to return the users an object with the same
  * functionality as {@link org.openqa.selenium.remote.RemoteWebDriver}.
  */
-public class EyesSeleniumDriver extends EyesWebDriver implements HasInputDevices, FindsByClassName,
-        FindsByCssSelector, FindsById, FindsByLinkText, FindsByName, FindsByTagName,
-        FindsByXPath, HasTouchScreen, IEyesJsExecutor {
+public class EyesSeleniumDriver extends EyesWebDriver implements HasInputDevices, HasTouchScreen, IEyesJsExecutor {
 
     private final SeleniumEyes eyes;
     private final RemoteWebDriver driver;
