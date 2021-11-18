@@ -20,7 +20,11 @@
     <parent>
         <groupId>com.applitools</groupId>
         <artifactId>eyes-sdk-java3-parent</artifactId>
+<<<<<<< HEAD
         <version>3.210.6</version>
+=======
+        <version>3.209.0</version>
+>>>>>>> Version up + CHANGELOG.md
         <relativePath>../pom.xml</relativePath>
     </parent>
 
@@ -28,12 +32,20 @@
         <dependency>
             <groupId>com.applitools</groupId>
             <artifactId>eyes-selenium-common-java3</artifactId>
+<<<<<<< HEAD
             <version>3.210.6</version>
+=======
+            <version>3.209.0</version>
+>>>>>>> Version up + CHANGELOG.md
         </dependency>
         <dependency>
             <groupId>com.applitools</groupId>
             <artifactId>eyes-sdk-core-java3</artifactId>
+<<<<<<< HEAD
             <version>3.210.6</version>
+=======
+            <version>3.209.0</version>
+>>>>>>> Version up + CHANGELOG.md
             <type>test-jar</type>
             <scope>test</scope>
         </dependency>
@@ -51,11 +63,6 @@
     </dependencies>
 
     <build>
-        <resources>
-            <resource>
-                <directory>src/main/node_resources/node_modules/@applitools</directory>
-            </resource>
-        </resources>
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
