@@ -18,11 +18,7 @@
     <parent>
         <groupId>com.applitools</groupId>
         <artifactId>eyes-sdk-java3-parent</artifactId>
-<<<<<<< HEAD
         <version>3.210.6</version>
-=======
-        <version>3.209.4</version>
->>>>>>> Coverage tests Version up for release candidate
         <relativePath>../pom.xml</relativePath>
     </parent>
 
@@ -30,29 +26,17 @@
         <dependency>
             <groupId>com.applitools</groupId>
             <artifactId>eyes-appium-java3</artifactId>
-<<<<<<< HEAD
             <version>3.210.6</version>
-=======
-            <version>3.209.4</version>
->>>>>>> Coverage tests Version up for release candidate
         </dependency>
         <dependency>
             <groupId>com.applitools</groupId>
             <artifactId>eyes-selenium-java3</artifactId>
-<<<<<<< HEAD
             <version>3.210.6</version>
-=======
-            <version>3.209.4</version>
->>>>>>> Coverage tests Version up for release candidate
         </dependency>
         <dependency>
             <groupId>com.applitools</groupId>
             <artifactId>eyes-sdk-core-java3</artifactId>
-<<<<<<< HEAD
             <version>3.210.6</version>
-=======
-            <version>3.209.4</version>
->>>>>>> Coverage tests Version up for release candidate
             <type>test-jar</type>
             <scope>test</scope>
         </dependency>

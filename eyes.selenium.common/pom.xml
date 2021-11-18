@@ -12,31 +12,19 @@
     <parent>
         <artifactId>eyes-sdk-java3-parent</artifactId>
         <groupId>com.applitools</groupId>
-<<<<<<< HEAD
         <version>3.210.6</version>
-=======
-        <version>3.209.0</version>
->>>>>>> Version up + CHANGELOG.md
     </parent>
 
     <dependencies>
         <dependency>
             <groupId>com.applitools</groupId>
             <artifactId>eyes-sdk-core-java3</artifactId>
-<<<<<<< HEAD
             <version>3.210.6</version>
-=======
-            <version>3.209.0</version>
->>>>>>> Version up + CHANGELOG.md
         </dependency>
         <dependency>
             <groupId>com.applitools</groupId>
             <artifactId>eyes-sdk-core-java3</artifactId>
-<<<<<<< HEAD
             <version>3.210.6</version>
-=======
-            <version>3.209.0</version>
->>>>>>> Version up + CHANGELOG.md
             <type>test-jar</type>
             <scope>test</scope>
         </dependency>
