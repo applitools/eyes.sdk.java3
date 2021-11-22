@@ -30,6 +30,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
 public class DomCapture {
+    private static final String APPLITOOLS_DEBUG_RCA = "APPLITOOLS_DEBUG_RCA";
     private final Phaser cssPhaser = new Phaser(); // Phaser for syncing all callbacks on a single Frame
 
     private static ServerConnector serverConnector = null;
@@ -77,8 +78,18 @@ public class DomCapture {
             for (String url : cssNodesToReplace.keySet()) {
                 try {
                     String escapedCss = new ObjectMapper().writeValueAsString(cssNodesToReplace.get(url).toString());
+                    if ("true".equalsIgnoreCase(GeneralUtils.getEnvString(APPLITOOLS_DEBUG_RCA))) {
+                        logger.log(testId, Stage.CHECK, Type.DOM_SCRIPT,
+                                Pair.of("cssNodeToReplace", url),
+                                Pair.of("escapedCSS", escapedCss));
+                    }
                     if (escapedCss.startsWith("\"") && escapedCss.endsWith("\"")) {
                         escapedCss = escapedCss.substring(1, escapedCss.length() - 1); // remove quotes
+                        if ("true".equalsIgnoreCase(GeneralUtils.getEnvString(APPLITOOLS_DEBUG_RCA))) {
+                            logger.log(testId, Stage.CHECK, Type.DOM_SCRIPT,
+                                    Pair.of("cssNodeToReplace", url),
+                                    Pair.of("escapedCSSAfterRemoveQuotes", escapedCss));
+                        }
                     }
                     cssStringsToReplace.put(url, escapedCss);
                 } catch (JsonProcessingException e) {
@@ -86,7 +97,13 @@ public class DomCapture {
                 }
             }
 
-            return EfficientStringReplace.efficientStringReplace(cssStartToken, cssEndToken, dom, cssStringsToReplace);
+            String domWithReplacedCss = EfficientStringReplace.efficientStringReplace(cssStartToken, cssEndToken, dom, cssStringsToReplace);
+            if ("true".equalsIgnoreCase(GeneralUtils.getEnvString(APPLITOOLS_DEBUG_RCA))) {
+                logger.log(testId, Stage.CHECK, Type.DOM_SCRIPT,
+                        Pair.of("domBeforeCssReplace", dom),
+                        Pair.of("domAfterCssReplace", domWithReplacedCss));
+            }
+            return domWithReplacedCss;
         } finally {
             positionProvider.restoreState(originalPosition);
         }
@@ -106,6 +123,9 @@ public class DomCapture {
         Separators separators;
         try {
             String scriptResult = DomScriptUtils.runDomCapture(logger, executor, Collections.singleton(testId), userAgent);
+            if ("true".equalsIgnoreCase(GeneralUtils.getEnvString(APPLITOOLS_DEBUG_RCA))) {
+                logger.log(testId, Stage.CHECK, Type.DOM_SCRIPT, Pair.of("domCaptureScriptResult", scriptResult));
+            }
             separators = parseScriptResult(scriptResult, missingCssList, missingFramesList, data);
         } catch (Exception e) {
             throw new EyesException("Failed running dom capture script", e);
@@ -172,6 +192,13 @@ public class DomCapture {
                     @Override
                     public void onComplete(RGridResource resource) {
                         try {
+                            if ("true".equalsIgnoreCase(GeneralUtils.getEnvString(APPLITOOLS_DEBUG_RCA))) {
+                                if (resource != null) {
+                                    logger.log(testId, Stage.CHECK, Type.PARSE_RESOURCE, Pair.of("downloadUri", uri), Pair.of("resource", resource));
+                                } else {
+                                    logger.log(testId, Stage.CHECK, Type.PARSE_RESOURCE, Pair.of("downloadUri", uri), Pair.of("resource", "resource is null"));
+                                }
+                            }
                             CssTreeNode node = new CssTreeNode(new String(resource.getContent()));
                             node.parse(logger);
                             List<String> importedUrls = node.getImportedUrls();
