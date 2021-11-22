@@ -340,9 +340,10 @@ public class AppiumFullPageCaptureAlgorithm {
     protected void cleanupStitch(PositionMemento originalStitchedState,
                                  Location lastSuccessfulLocation,
                                  RectangleSize lastSuccessfulPartSize, RectangleSize entireSize) {
-        positionProvider.restoreState(originalStitchedState);
-        originProvider.restoreState(originalPosition);
-
+        if (originalStitchedState != null) {
+            positionProvider.restoreState(originalStitchedState);
+            originProvider.restoreState(originalPosition);
+        }
         // If the actual image size is smaller than the extracted size, we crop the image.
         int actualImageWidth = lastSuccessfulLocation.getX() + lastSuccessfulPartSize.getWidth();
         int actualImageHeight = lastSuccessfulLocation.getY() + lastSuccessfulPartSize.getHeight();

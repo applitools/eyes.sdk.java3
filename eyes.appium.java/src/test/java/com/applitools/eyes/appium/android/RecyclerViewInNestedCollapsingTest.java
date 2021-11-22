@@ -19,9 +19,9 @@ public class RecyclerViewInNestedCollapsingTest extends AndroidTestSetup {
         scrollAction.cancel();
         driver.performTouchAction(scrollAction);
 
-        eyes.open(driver, getApplicationName(), "Check RecyclerView inside NestedScrollView and Collapsing layout");
-
         driver.findElementById("btn_recycler_view_nested_collapsing").click();
+
+        eyes.open(driver, getApplicationName(), "Check RecyclerView inside NestedScrollView and Collapsing layout");
 
         Thread.sleep(1000);
 
