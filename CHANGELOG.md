@@ -52,7 +52,9 @@
 
 ## [3.208.3] - 2021-10-25
 ### Updated
-- Prepared tests for Appium/UFG version releases 
+- Prepared tests for Appium/UFG version releases.
+### Fixed
+- Android full page stitching issue. [Trello 2633](https://trello.com/c/dQqN02TN)
 
 ## [3.208.2] - 2021-09-20
 ### Updated
