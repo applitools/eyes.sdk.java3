@@ -26,7 +26,7 @@
 ### Added
 - APPLITOOLS_DEBUG_RCA envrionment variable for additional DOM debug data. [Trello 2749](https://trello.com/c/V8k6KUQ1/)
 ### Fixed
- - Android full page issue for complex hierarchy. [Trello 2633](https://trello.com/c/dQqN02TN/)
+- Android full page issue for complex hierarchy. [Trello 2633](https://trello.com/c/dQqN02TN/)
 
 ## [3.209.1] - 2021-11-18
 ### Updated
