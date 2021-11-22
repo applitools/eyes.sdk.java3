@@ -234,8 +234,12 @@ public class AndroidScrollPositionProvider extends AppiumScrollPositionProvider 
         return scrolled;
     }
 
-    public int getBehaviorOffsetWithHelperLibrary(String elementId) {
+    public int getBehaviorOffsetWithHelperLibrary() {
         int offset = -1;
+        if (scrollRootElement == null) {
+            return offset;
+        }
+        String elementId = scrollRootElement.getAttribute("resourceId").split("/")[1];
         try {
             MobileElement hiddenElement = ((AndroidDriver<AndroidElement>) driver).findElement(MobileBy.AndroidUIAutomator("new UiSelector().description(\"EyesAppiumHelperEDT\")"));
             if (hiddenElement != null) {
@@ -267,6 +271,20 @@ public class AndroidScrollPositionProvider extends AppiumScrollPositionProvider 
         return scrolled;
     }
 
+    public void tryDumpVHSWithHelperLibrary() {
+        try {
+            MobileElement hiddenElement = ((AndroidDriver<AndroidElement>) driver).findElement(MobileBy.AndroidUIAutomator("new UiSelector().description(\"EyesAppiumHelperEDT\")"));
+            if (hiddenElement != null) {
+                hiddenElement.setValue("dumpVHS;0;0;0");
+                hiddenElement.click();
+                try { Thread.sleep(5_000); } catch (InterruptedException ignored) {}
+                hiddenElement.clear();
+            }
+        } catch (NoSuchElementException | NumberFormatException | StaleElementReferenceException e) {
+            GeneralUtils.logExceptionStackTrace(logger, Stage.CHECK, e);
+        }
+    }
+
     @Override
     public Region getElementRegion(WebElement element, boolean shouldStitchContent, Boolean statusBarExists) {
         Region region = new Region(element.getLocation().getX(),
@@ -286,8 +304,7 @@ public class AndroidScrollPositionProvider extends AppiumScrollPositionProvider 
                     element.getAttribute("className").equals("androidx.recyclerview.widget.RecyclerView") ||
                     element.getAttribute("className").equals("androidx.viewpager2.widget.ViewPager2") ||
                     element.getAttribute("className").equals("android.widget.ListView") ||
-                    element.getAttribute("className").equals("android.widget.GridView") ||
-                    element.getAttribute("className").equals("android.widget.ScrollView")) {
+                    element.getAttribute("className").equals("android.widget.GridView")) {
                 try {
                     String scrollableContentSize = getScrollableContentSize(element.getAttribute("resourceId"));
                     try {
@@ -386,8 +403,7 @@ public class AndroidScrollPositionProvider extends AppiumScrollPositionProvider 
                     className.equals("androidx.recyclerview.widget.RecyclerView") ||
                     className.equals("androidx.viewpager2.widget.ViewPager2") ||
                     className.equals("android.widget.ListView") ||
-                    className.equals("android.widget.GridView") ||
-                    className.equals("android.widget.ScrollView")) {
+                    className.equals("android.widget.GridView")) {
                 try {
                     String scrollableContentSize = getScrollableContentSize(activeScroll.getAttribute("resourceId"));
                     try {
@@ -425,7 +441,7 @@ public class AndroidScrollPositionProvider extends AppiumScrollPositionProvider 
                 Pair.of("entireSize", entireSize),
                 Pair.of("verticalScrollGap", verticalScrollGap),
                 Pair.of("scrollContentHeight", scrollContentHeight));
-        return entireSize;
+        return new RectangleSize(entireSize.getWidth(), entireSize.getHeight());
     }
 
     @Override
@@ -454,6 +470,9 @@ public class AndroidScrollPositionProvider extends AppiumScrollPositionProvider 
 
     private String getScrollableContentSize(String resourceId) {
         String scrollableContentSize = "";
+        if (resourceId == null) {
+            return scrollableContentSize;
+        }
         String[] version = EyesAppiumUtils.getHelperLibraryVersion(eyesDriver, logger).split("\\.");
         MobileElement hiddenElement;
         if (version.length == 3 &&

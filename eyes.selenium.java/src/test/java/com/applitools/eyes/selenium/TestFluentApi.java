@@ -80,6 +80,7 @@ public class TestFluentApi extends TestSetup {
         getEyes().check("Fluent - Region by overflowing coordinates", Target.region(new Region(50, 110, 90, 550)));
     }
 
+    // Fixme - even though the ignore region is outside the viewport, it seems to exist (bug in the cropping mechanism?)
     @Test
     public void TestScrollbarsHiddenAndReturned_Fluent() {
         getEyes().check("Fluent - Window (Before)", Target.window().fully());
