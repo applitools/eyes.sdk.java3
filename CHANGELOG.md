@@ -1,6 +1,6 @@
-## vNext
-### Added 
-- `POSITION_PROVIDER_EXTRA_SCROLL` feature flag to make additional `setPosition` execution for scroll provider. [Trello 2607](https://trello.com/c/u5yzG8XE)
+## [3.210.2] - 2021-11-26
+### Fixed 
+- Robust scrolling for flaky environment - `POSITION_PROVIDER_EXTRA_SCROLL` feature flag . [Trello 2607](https://trello.com/c/u5yzG8XE)
 
 ## [3.210.1] - 2021-11-23
 ### Fixed
