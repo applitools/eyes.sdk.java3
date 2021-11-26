@@ -1678,7 +1678,8 @@ public class SeleniumEyes extends RunningTest implements ISeleniumEyes {
         return new FullPageCaptureAlgorithm(logger, getTestId(), regionPositionCompensation,
                 getConfigurationInstance().getWaitBeforeScreenshots(), debugScreenshotsProvider, screenshotFactory,
                 scaleProviderFactory, cutProviderHandler.get(), getConfigurationInstance().getStitchOverlap(),
-                imageProvider, renderingInfo.getMaxImageHeight(), renderingInfo.getMaxImageArea(), sizeAdjuster);
+                imageProvider, renderingInfo.getMaxImageHeight(), renderingInfo.getMaxImageArea(), sizeAdjuster,
+                getConfigurationInstance().getFeatures());
     }
 
     @Override
