@@ -1,3 +1,7 @@
+## vNext
+### Added 
+- `POSITION_PROVIDER_EXTRA_SCROLL` feature flag to make additional `setPosition` execution for scroll provider. [Trello 2607](https://trello.com/c/u5yzG8XE)
+
 ## [3.210.1] - 2021-11-23
 ### Fixed
 - Updated DOM Snapshot to 4.5.11 ("Cannot assign to read only property 'toString'" issue). [Trello 2756](https://trello.com/c/ofWpZbto/)

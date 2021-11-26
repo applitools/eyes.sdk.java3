@@ -3,6 +3,7 @@ package com.applitools.eyes.selenium.capture;
 import com.applitools.eyes.*;
 import com.applitools.eyes.capture.EyesScreenshotFactory;
 import com.applitools.eyes.capture.ImageProvider;
+import com.applitools.eyes.config.Feature;
 import com.applitools.eyes.debug.DebugScreenshotsProvider;
 import com.applitools.eyes.CutProvider;
 import com.applitools.eyes.logging.Stage;
@@ -20,6 +21,7 @@ import org.apache.commons.lang3.tuple.Pair;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.util.Collections;
+import java.util.List;
 
 public class FullPageCaptureAlgorithm {
     private static final int MIN_SCREENSHOT_PART_SIZE = 10;
@@ -38,13 +40,14 @@ public class FullPageCaptureAlgorithm {
     private final int maxHeight;
     private final int maxArea;
     private BufferedImage stitchedImage;
+    private final List<Feature> features;
 
     public FullPageCaptureAlgorithm(Logger logger, String testId, RegionPositionCompensation regionPositionCompensation,
                                     int waitBeforeScreenshots, DebugScreenshotsProvider debugScreenshotsProvider,
                                     EyesScreenshotFactory screenshotFactory,
                                     ScaleProviderFactory scaleProviderFactory, CutProvider cutProvider,
                                     int stitchingOverlap, ImageProvider imageProvider, int maxHeight, int maxArea,
-                                    ISizeAdjuster sizeAdjuster) {
+                                    ISizeAdjuster sizeAdjuster, List<Feature> features) {
 
         ArgumentGuard.notNull(logger, "logger");
 
@@ -60,6 +63,7 @@ public class FullPageCaptureAlgorithm {
         this.sizeAdjuster = sizeAdjuster != null ? sizeAdjuster : NullSizeAdjuster.getInstance();
         this.maxHeight = maxHeight;
         this.maxArea = maxArea;
+        this.features = features;
 
         this.regionPositionCompensation =
                 regionPositionCompensation != null
@@ -355,6 +359,16 @@ public class FullPageCaptureAlgorithm {
     }
 
     private void checkForCorrectPosition(PositionProvider stitchProvider, Location targetLocation, Location afterScrollPosition) {
+        if (features.contains(Feature.POSITION_PROVIDER_EXTRA_SCROLL)) {
+            int attempt = 0;
+            while (attempt < 4) {
+                stitchProvider.setPosition(targetLocation);
+                try {
+                    Thread.sleep(200);
+                } catch (InterruptedException ignored) { }
+                attempt++;
+            }
+        }
         int retryCount = 0;
         boolean isCorrect = false;
         while (!isCorrect && retryCount < 3) {
