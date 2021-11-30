@@ -38,10 +38,11 @@ public class EyesAppiumDriver extends EyesWebDriver {
     }
 
     @Override
-    public AppiumDriver getRemoteWebDriver () { return this.driver; }
+    public AppiumDriver getRemoteWebDriver() {
+        return this.driver;
+    }
 
     /**
-     *
      * @return The image rotation model.
      */
     public ImageRotation getRotation() {
@@ -55,9 +56,9 @@ public class EyesAppiumDriver extends EyesWebDriver {
         this.rotation = rotation;
     }
 
-    private Map<String, Object> getCachedSessionDetails () {
-        if(sessionDetails == null) {
-            sessionDetails = getRemoteWebDriver().getSessionDetails();
+    private Map<String, Object> getCachedSessionDetails() {
+        if (sessionDetails == null) {
+            sessionDetails = getRemoteWebDriver().getCapabilities().asMap();
         }
         return sessionDetails;
     }
@@ -174,7 +175,7 @@ public class EyesAppiumDriver extends EyesWebDriver {
             if (!(currentElement instanceof RemoteWebElement)) {
                 throw new EyesException(String.format("findElements: element is not a RemoteWebElement: %s", by));
             }
-            resultElementsList.add(new EyesAppiumElement(this, currentElement, 1/getDevicePixelRatio()));
+            resultElementsList.add(new EyesAppiumElement(this, currentElement, 1 / getDevicePixelRatio()));
 
             // For Remote web elements, we can keep the IDs
             elementsIds.put(((RemoteWebElement) currentElement).getId(), currentElement);
@@ -190,7 +191,7 @@ public class EyesAppiumDriver extends EyesWebDriver {
             throw new EyesException("findElement: Element is not a RemoteWebElement: " + by);
         }
 
-        EyesAppiumElement appiumElement = new EyesAppiumElement(this, webElement, 1/ getDevicePixelRatio());
+        EyesAppiumElement appiumElement = new EyesAppiumElement(this, webElement, 1 / getDevicePixelRatio());
 
         // For Remote web elements, we can keep the IDs,
         // for Id based lookup (mainly used for Javascript related
@@ -278,7 +279,7 @@ public class EyesAppiumDriver extends EyesWebDriver {
 
         HashMap<String, Integer> rect = getViewportRect();
         double dpr = getDevicePixelRatio();
-        defaultContentViewportSize = (new RectangleSize(rect.get("width"), rect.get("height"))).scale(1/dpr);
+        defaultContentViewportSize = (new RectangleSize(rect.get("width"), rect.get("height"))).scale(1 / dpr);
         logger.log(TraceLevel.Info, null, Stage.GENERAL, Pair.of("defaultContentViewportSize", defaultContentViewportSize));
         return defaultContentViewportSize;
     }

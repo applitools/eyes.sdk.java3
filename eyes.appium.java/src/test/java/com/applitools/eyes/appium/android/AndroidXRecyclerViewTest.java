@@ -2,6 +2,7 @@ package com.applitools.eyes.appium.android;
 
 import com.applitools.eyes.appium.Target;
 import io.appium.java_client.MobileBy;
+import org.openqa.selenium.By;
 import org.testng.annotations.Test;
 
 public class AndroidXRecyclerViewTest extends AndroidTestSetup {
@@ -10,7 +11,7 @@ public class AndroidXRecyclerViewTest extends AndroidTestSetup {
     public void testAndroidXRecyclerView() {
         eyes.setMatchTimeout(1000);
 
-        driver.findElementById("btn_recycler_view_activity").click();
+        driver.findElement(By.id("btn_recycler_view_activity")).click();
 
         eyes.open(driver, getApplicationName(), "Test RecyclerView");
 

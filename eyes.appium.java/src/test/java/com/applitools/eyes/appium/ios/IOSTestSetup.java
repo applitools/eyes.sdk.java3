@@ -2,7 +2,9 @@ package com.applitools.eyes.appium.ios;
 
 import com.applitools.eyes.appium.TestSetup;
 import com.google.common.collect.ImmutableMap;
+import io.appium.java_client.AppiumDriver;
 import io.appium.java_client.ios.IOSDriver;
+import org.openqa.selenium.remote.RemoteWebDriver;
 
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -22,7 +24,7 @@ public abstract class IOSTestSetup extends TestSetup {
 
     @Override
     protected void initDriver() throws MalformedURLException {
-        driver = new IOSDriver<>(new URL(appiumServerUrl), capabilities);
+        driver = new AppiumDriver(new URL(appiumServerUrl), capabilities);
     }
 
     @Override

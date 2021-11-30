@@ -3,6 +3,7 @@ package com.applitools.eyes.appium.ios;
 import com.applitools.eyes.Location;
 import com.applitools.eyes.Region;
 import com.applitools.eyes.locators.VisualLocator;
+import io.appium.java_client.PerformsTouchActions;
 import io.appium.java_client.TouchAction;
 import io.appium.java_client.touch.WaitOptions;
 import io.appium.java_client.touch.offset.PointOption;
@@ -43,10 +44,10 @@ public class IOSVisualLocatorTest extends IOSTestSetup {
             Location clickLocation = new Location(listViewLocator.getLeft() + listViewLocator.getWidth() / 2,
                     listViewLocator.getTop() + listViewLocator.getHeight() / 2);
 
-            TouchAction actionPress = new TouchAction(driver);
+            TouchAction actionPress = new TouchAction((PerformsTouchActions) driver);
             actionPress.press(PointOption.point(clickLocation.getX(), clickLocation.getY())).waitAction(WaitOptions.waitOptions(Duration.ofMillis(500)));
             actionPress.release();
-            driver.performTouchAction(actionPress);
+            ((PerformsTouchActions) driver).performTouchAction(actionPress);
 
             eyes.checkWindow("ListView screen");
         }

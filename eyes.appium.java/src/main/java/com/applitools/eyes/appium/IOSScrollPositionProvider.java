@@ -10,6 +10,7 @@ import com.applitools.eyes.selenium.EyesDriverUtils;
 import com.applitools.utils.GeneralUtils;
 import com.applitools.utils.ImageUtils;
 import io.appium.java_client.MobileBy;
+import io.appium.java_client.PerformsTouchActions;
 import io.appium.java_client.TouchAction;
 import io.appium.java_client.remote.MobileCapabilityType;
 import io.appium.java_client.touch.WaitOptions;
@@ -169,12 +170,12 @@ public class IOSScrollPositionProvider extends AppiumScrollPositionProvider {
         logger.log(TraceLevel.Debug, eyesDriver.getTestId(), Stage.CHECK,
                 Pair.of("from", new Location(startX, startY)),
                 Pair.of("to", new Location(startX, startY)));
-        TouchAction scrollAction = new TouchAction(driver);
+        TouchAction scrollAction = new TouchAction((PerformsTouchActions) driver);
         scrollAction.press(new PointOption().withCoordinates(startX, startY)).waitAction(new WaitOptions().withDuration(Duration.ofMillis(5000)));
         scrollAction.moveTo(new PointOption().withCoordinates(startX, endY));
         scrollAction.release();
 
-        driver.performTouchAction(scrollAction);
+        ((PerformsTouchActions) driver).performTouchAction(scrollAction);
 
         try { Thread.sleep(1000); } catch (InterruptedException ignored) {}
     }
@@ -416,10 +417,10 @@ public class IOSScrollPositionProvider extends AppiumScrollPositionProvider {
     public void triggerHelperButton() {
         WebElement trigger = driver.findElement(MobileBy.name("applitools_grab_scrollable_data_button"));
 
-        TouchAction triggerAction = new TouchAction(driver);
+        TouchAction triggerAction = new TouchAction((PerformsTouchActions) driver);
         triggerAction.tap(new PointOption().withCoordinates(trigger.getLocation().x, trigger.getLocation().y)).waitAction(new WaitOptions().withDuration(Duration.ofMillis(1000)));
         triggerAction.release();
-        driver.performTouchAction(triggerAction);
+        ((PerformsTouchActions) driver).performTouchAction(triggerAction);
         try { Thread.sleep(500); } catch (InterruptedException ignored) {}
     }
 
