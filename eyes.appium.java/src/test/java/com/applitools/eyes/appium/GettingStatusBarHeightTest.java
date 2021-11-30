@@ -40,7 +40,7 @@ public class GettingStatusBarHeightTest extends ReportingTestSuite {
         sessionDetails = new HashMap<>();
 
         driver = Mockito.mock(AppiumDriver.class);
-        when(driver.getSessionDetails()).thenReturn(sessionDetails);
+        when(driver.getCapabilities().asMap()).thenReturn(sessionDetails);
     }
 
     @Before
