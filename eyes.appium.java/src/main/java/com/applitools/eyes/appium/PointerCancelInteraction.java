@@ -9,7 +9,7 @@ import java.util.Map;
 
 public class PointerCancelInteraction extends Interaction implements Encodable {
 
-    protected PointerCancelInteraction(InputSource source) {
+    public PointerCancelInteraction(InputSource source) {
         super(source);
     }
 

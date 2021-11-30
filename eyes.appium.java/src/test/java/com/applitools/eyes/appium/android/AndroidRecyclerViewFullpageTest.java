@@ -1,19 +1,20 @@
 package com.applitools.eyes.appium.android;
 
 import com.applitools.eyes.appium.Target;
+import org.openqa.selenium.By;
 import org.testng.annotations.Test;
 
-import java.util.concurrent.TimeUnit;
+import java.time.Duration;
 
 public class AndroidRecyclerViewFullpageTest extends AndroidTestSetup {
 
     @Test
     public void testAndroidRecyclerViewFullpage() {
-        driver.manage().timeouts().implicitlyWait(10_000, TimeUnit.MILLISECONDS);
+        driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(10));
 
         eyes.setMatchTimeout(1000);
 
-        driver.findElementById("btn_recycler_view").click();
+        driver.findElement(By.id("btn_recycler_view")).click();
 
         eyes.open(driver, getApplicationName(), "Test RecyclerView");
 

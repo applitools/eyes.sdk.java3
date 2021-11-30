@@ -17,6 +17,6 @@ public class IPhoneXS implements NativeBuilder {
         MutableCapabilities appCap = new MutableCapabilities();
         appCap.setCapability("app", app);
         caps = caps.merge(appCap);
-        return new IOSDriver<>(new URL(SELENIUM.SAUCE.url), caps);
+        return new IOSDriver(new URL(SELENIUM.SAUCE.url), caps);
     }
 }

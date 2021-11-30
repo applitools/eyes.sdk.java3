@@ -3,10 +3,11 @@ package com.applitools.eyes.appium.android;
 import com.applitools.eyes.AccessibilityRegionType;
 import com.applitools.eyes.BatchInfo;
 import com.applitools.eyes.appium.Target;
-import io.appium.java_client.MobileElement;
+import org.openqa.selenium.By;
+import org.openqa.selenium.WebElement;
 import org.testng.annotations.Test;
 
-import java.util.concurrent.TimeUnit;
+import java.time.Duration;
 
 public class AndroidLayoutElementTest extends AndroidTestSetup {
 
@@ -15,14 +16,14 @@ public class AndroidLayoutElementTest extends AndroidTestSetup {
         BatchInfo batch = new BatchInfo("Regions test");
         eyes.setBatch(batch);
 
-        driver.manage().timeouts().implicitlyWait(5, TimeUnit.SECONDS);
+        driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(5));
 
         // Start visual UI testing
         eyes.open(driver, getApplicationName(), "Test regions with element");
 
-        driver.findElementById("btn_activity_as_dialog").click();
+        driver.findElement(By.id("btn_activity_as_dialog")).click();
 
-        MobileElement elem = driver.findElementById("btn_open_dialog");
+        WebElement elem = driver.findElement(By.id("btn_open_dialog"));
         eyes.check(Target.window().layout(elem).withName("layout()"));
 
         eyes.check(Target.window().content(elem).withName("content()"));

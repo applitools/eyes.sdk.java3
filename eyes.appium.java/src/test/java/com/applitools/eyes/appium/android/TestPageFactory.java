@@ -2,7 +2,6 @@ package com.applitools.eyes.appium.android;
 
 import com.applitools.eyes.appium.Target;
 import com.applitools.eyes.selenium.EyesDriverUtils;
-import io.appium.java_client.MobileBy;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.remote.RemoteWebElement;
 import org.openqa.selenium.support.FindBy;

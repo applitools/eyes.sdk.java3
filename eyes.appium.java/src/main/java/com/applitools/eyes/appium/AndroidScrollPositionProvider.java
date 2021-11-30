@@ -9,15 +9,16 @@ import com.applitools.eyes.logging.TraceLevel;
 import com.applitools.eyes.positioning.PositionMemento;
 import com.applitools.utils.GeneralUtils;
 import io.appium.java_client.AppiumBy;
-import io.appium.java_client.MobileBy;
 import io.appium.java_client.android.AndroidDriver;
 import org.apache.commons.lang3.tuple.Pair;
 import org.openqa.selenium.*;
-import org.openqa.selenium.interactions.*;
+import org.openqa.selenium.interactions.PointerInput;
+import org.openqa.selenium.interactions.Sequence;
 import org.openqa.selenium.remote.RemoteWebElement;
 
 import java.time.Duration;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 public class AndroidScrollPositionProvider extends AppiumScrollPositionProvider {
@@ -163,11 +164,14 @@ public class AndroidScrollPositionProvider extends AppiumScrollPositionProvider 
         scrollAction.addAction(finger.createPointerDown(PointerInput.MouseButton.LEFT.asArg()));
         scrollAction.addAction(finger.createPointerMove(Duration.ofMillis(1500), PointerInput.Origin.viewport(), endX, endY));
         scrollAction.addAction(finger.createPointerUp(PointerInput.MouseButton.LEFT.asArg()));
-        driver.perform(Arrays.asList(scrollAction));
+        driver.perform(Collections.singletonList(scrollAction));
 
         // because Android scrollbars are visible a bit after touch, we should wait for them to
-        // disappear before handing control back to the screenshotter
-        try { Thread.sleep(750); } catch (InterruptedException ignored) {}
+        // disappear before handing control back to the screenshot provider
+        try {
+            Thread.sleep(750);
+        } catch (InterruptedException ignored) {
+        }
 
         LastScrollData lastScrollData = EyesAppiumUtils.getLastScrollData(driver);
         curScrollPos = getScrollPosFromScrollData(contentSize, lastScrollData, supposedScrollAmt, isDown);
@@ -182,27 +186,31 @@ public class AndroidScrollPositionProvider extends AppiumScrollPositionProvider 
     public void scrollTo(int startX, int startY, int endX, int endY, boolean shouldCancel) {
         logger.log(TraceLevel.Debug, eyesDriver.getTestId(), Stage.CHECK,
                 Pair.of("from", new Location(startX, startY)),
-                Pair.of("to", new Location(startX, startY)));
+                Pair.of("to", new Location(endX, endY)));
 
         PointerInput finger = new PointerInput(PointerInput.Kind.TOUCH, "finger");
-        Sequence scrollAction = new Sequence(finger, 1);
+        Sequence scrollAction = new Sequence(finger, 0);
         scrollAction.addAction(finger.createPointerMove(Duration.ofMillis(0), PointerInput.Origin.viewport(), startX, startY));
         scrollAction.addAction(finger.createPointerDown(PointerInput.MouseButton.LEFT.asArg()));
-        scrollAction.addAction(finger.createPointerMove(Duration.ofMillis(1500), PointerInput.Origin.viewport(), endX, Math.max(endY - contentSize.touchPadding, 0)));
-
+        //endY = Math.max(endY - contentSize.touchPadding, 0);
+        scrollAction.addAction(finger.createPointerMove(Duration.ofMillis(500), PointerInput.Origin.viewport(), endX, endY));
+        scrollAction.addAction(finger.createPointerMove(Duration.ofMillis(500), PointerInput.Origin.viewport(), endX, endY));
 
         if (shouldCancel) {
             scrollAction.addAction(new PointerCancelInteraction(finger));
         } else {
             scrollAction.addAction(finger.createPointerUp(PointerInput.MouseButton.LEFT.asArg()));
         }
-        driver.perform(Arrays.asList(scrollAction));
+        driver.perform(Collections.singletonList(scrollAction));
 
         curScrollPos = new Location(curScrollPos.getX(), curScrollPos.getY() + startX);
 
         // because Android scrollbars are visible a bit after touch, we should wait for them to
-        // disappear before handing control back to the screenshotter
-        try { Thread.sleep(750); } catch (InterruptedException ignored) {}
+        // disappear before handing control back to the screenshot provider
+        try {
+            Thread.sleep(750);
+        } catch (InterruptedException ignored) {
+        }
     }
 
     public boolean tryScrollWithHelperLibrary(String elementId, int offset, int step, int totalSteps) {
@@ -239,8 +247,12 @@ public class AndroidScrollPositionProvider extends AppiumScrollPositionProvider 
         return scrolled;
     }
 
-    public int getBehaviorOffsetWithHelperLibrary(String elementId) {
+    public int getBehaviorOffsetWithHelperLibrary() {
         int offset = -1;
+        if (scrollRootElement == null) {
+            return offset;
+        }
+        String elementId = scrollRootElement.getAttribute("resourceId").split("/")[1];
         try {
             WebElement hiddenElement = driver.findElement(AppiumBy.androidUIAutomator("new UiSelector().description(\"EyesAppiumHelperEDT\")"));
             if (hiddenElement != null) {
@@ -270,6 +282,20 @@ public class AndroidScrollPositionProvider extends AppiumScrollPositionProvider 
             GeneralUtils.logExceptionStackTrace(logger, Stage.CHECK, e);
         }
         return scrolled;
+    }
+
+    public void tryDumpVHSWithHelperLibrary() {
+        try {
+            WebElement hiddenElement = driver.findElement(AppiumBy.androidUIAutomator("new UiSelector().description(\"EyesAppiumHelperEDT\")"));
+            if (hiddenElement != null) {
+                hiddenElement.sendKeys("dumpVHS;0;0;0");
+                hiddenElement.click();
+                try { Thread.sleep(5_000); } catch (InterruptedException ignored) {}
+                hiddenElement.clear();
+            }
+        } catch (NoSuchElementException | NumberFormatException | StaleElementReferenceException e) {
+            GeneralUtils.logExceptionStackTrace(logger, Stage.CHECK, e);
+        }
     }
 
     @Override
@@ -312,7 +338,8 @@ public class AndroidScrollPositionProvider extends AppiumScrollPositionProvider 
         return region;
     }
 
-    private Location getScrollPosFromScrollData(ContentSize contentSize, LastScrollData scrollData, int supposedScrollAmt, boolean isDown) {
+    private Location getScrollPosFromScrollData(ContentSize contentSize, LastScrollData scrollData,
+                                                int supposedScrollAmt, boolean isDown) {
         logger.log(TraceLevel.Debug, eyesDriver.getTestId(), Stage.CHECK,
                 Pair.of("scrollData", scrollData),
                 Pair.of("contentSize", contentSize));
@@ -329,23 +356,23 @@ public class AndroidScrollPositionProvider extends AppiumScrollPositionProvider 
             return new Location(curScrollPos == null ? 0 : curScrollPos.getX(), 0);
         }
 
-        // if we got scrolldata from a ScrollView (not List or Grid), actively set the scroll
+        // if we got scrollData from a ScrollView (not List or Grid), actively set the scroll
         // position with correct x/y values
         if (scrollData.scrollX != -1 && scrollData.scrollY != -1) {
             return new Location(scrollData.scrollX, scrollData.scrollY);
         }
 
         if (contentSize == null) {
-            // It can happens when we use scroll (touch) actions for navigation on some screens before
+            // It can happen when we use scroll (touch) actions for navigation on some screens before
             // And after that we are executing check() command
             contentSize = new ContentSize();
         }
 
         // otherwise, if we already have a scroll position, just assume we scrolled exactly as much
-        // as the touchaction was supposed to. unfortunately it's not really that simple, because we
-        // might think we scrolled a full page but we hit a barrier and only scrolled a bit. so take
-        // a peek at the fromIndex of the scrolldata; if the position based on the fromIndex is
-        // wildly different than what we thought we scrolled, go with the fromIndex-based position
+        // as the touch action was supposed to. unfortunately it's not really that simple, because we
+        // might think we scrolled a full page, but we hit a barrier and only scrolled a bit. so take
+        // a peek at the fromIndex of the scrollData; if the position based on the fromIndex is
+        // wildly different from what we thought we scrolled, go with the fromIndex-based position
 
         // we really need the number of items per row to do this math correctly.
         // since we don't have that, just use the average item height, which means we might get
@@ -430,7 +457,8 @@ public class AndroidScrollPositionProvider extends AppiumScrollPositionProvider 
                 Pair.of("entireSize", entireSize),
                 Pair.of("verticalScrollGap", verticalScrollGap),
                 Pair.of("scrollContentHeight", scrollContentHeight));
-        return entireSize;
+        int behaviourOffset = getBehaviorOffsetWithHelperLibrary();
+        return new RectangleSize(entireSize.getWidth(), entireSize.getHeight() + behaviourOffset);
     }
 
     @Override
@@ -438,13 +466,15 @@ public class AndroidScrollPositionProvider extends AppiumScrollPositionProvider 
         if (cachedScrollableView == null) {
             WebElement scrollableView;
             if (scrollRootElement != null) {
-                scrollableView = driver.findElement(MobileBy.id(scrollRootElement.getAttribute("resourceId")));
+                scrollableView = driver.findElement(By.id(scrollRootElement.getAttribute("resourceId")));
             } else {
                 scrollableView = EyesAppiumUtils.getFirstScrollableView(driver);
-                if (scrollableView.getAttribute("className").equals("android.widget.HorizontalScrollView")) {
+                String className = scrollableView.getAttribute("className");
+                if (className.equals("android.widget.HorizontalScrollView")) {
                     List<WebElement> list = driver.findElements(By.xpath(EyesAppiumUtils.SCROLLVIEW_XPATH));
                     for (WebElement element : list) {
-                        if (element.getAttribute("className").equals("android.widget.HorizontalScrollView")) {
+                        className = scrollableView.getAttribute("className");
+                        if (className.equals("android.widget.HorizontalScrollView")) {
                             continue;
                         }
                         List<WebElement> child = scrollableView.findElements(By.xpath(EyesAppiumUtils.SCROLLVIEW_XPATH));
@@ -459,6 +489,9 @@ public class AndroidScrollPositionProvider extends AppiumScrollPositionProvider 
 
     private String getScrollableContentSize(String resourceId) {
         String scrollableContentSize = "";
+        if (resourceId == null) {
+            return scrollableContentSize;
+        }
         String[] version = EyesAppiumUtils.getHelperLibraryVersion(eyesDriver, logger).split("\\.");
         WebElement hiddenElement;
         if (version.length == 3 &&

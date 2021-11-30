@@ -38,10 +38,11 @@ public class EyesAppiumDriver extends EyesWebDriver {
     }
 
     @Override
-    public AppiumDriver getRemoteWebDriver () { return this.driver; }
+    public AppiumDriver getRemoteWebDriver() {
+        return this.driver;
+    }
 
     /**
-     *
      * @return The image rotation model.
      */
     public ImageRotation getRotation() {
@@ -55,15 +56,20 @@ public class EyesAppiumDriver extends EyesWebDriver {
         this.rotation = rotation;
     }
 
-    private Map<String, Object> getCachedSessionDetails () {
-        if(sessionDetails == null) {
-            sessionDetails = getRemoteWebDriver().getStatus();
+    private Map<String, Object> getCachedSessionDetails() {
+        if (sessionDetails == null) {
+            sessionDetails = getRemoteWebDriver().getCapabilities().asMap();
+            StringBuilder sb = new StringBuilder();
+            for (Map.Entry<String, ?> p : sessionDetails.entrySet()) {
+                sb.append(p.getKey()).append(": ").append(p.getValue()).append(" ; ");
+            }
+            logger.log(TraceLevel.Notice, "GET_STATUS", Stage.OPEN, sb.toString());
         }
         return sessionDetails;
     }
 
     public HashMap<String, Integer> getViewportRect() {
-        Map<String, Long> rectMap = (Map<String, Long>) getCachedSessionDetails().get("viewportRect");
+        Map<String, Long> rectMap = (Map<String, Long>) getCachedSessionDetails().get("appium:viewportRect");
         int width = rectMap.get("width").intValue();
         int height = rectMap.get("height").intValue();
         if (getEyesBase().getConfiguration().isFeatureActivated(Feature.USE_PREDEFINED_DEVICE_INFO)) {
@@ -90,7 +96,7 @@ public class EyesAppiumDriver extends EyesWebDriver {
     }
 
     public int getViewportHeight() {
-        Map<String, Long> rectMap = (Map<String, Long>) getCachedSessionDetails().get("viewportRect");
+        Map<String, Long> rectMap = (Map<String, Long>) getCachedSessionDetails().get("appium:viewportRect");
         return rectMap.get("height").intValue();
     }
 
@@ -115,7 +121,7 @@ public class EyesAppiumDriver extends EyesWebDriver {
 
     public int getDeviceHeight() {
         if (deviceHeight == null) {
-            String deviceScreenSize = (String) getCachedSessionDetails().get("deviceScreenSize");
+            String deviceScreenSize = (String) getCachedSessionDetails().get("appium:deviceScreenSize");
             Pattern p = Pattern.compile("x(\\d+)");
             Matcher m = p.matcher(deviceScreenSize);
             m.find();
@@ -135,7 +141,7 @@ public class EyesAppiumDriver extends EyesWebDriver {
 
     @Override
     protected double getDevicePixelRatioInner() {
-        Object pixelRatio = getCachedSessionDetails().get("pixelRatio");
+        Object pixelRatio = getCachedSessionDetails().get("appium:pixelRatio");
         if (pixelRatio instanceof Double) {
             return (Double) pixelRatio;
         } else {
@@ -156,7 +162,7 @@ public class EyesAppiumDriver extends EyesWebDriver {
                 }
             }
         }
-        Object statusBarHeight = getCachedSessionDetails().get("statBarHeight");
+        Object statusBarHeight = getCachedSessionDetails().get("appium:statBarHeight");
         if (statusBarHeight instanceof Double) {
             return ((Double) statusBarHeight).intValue();
         } else {
@@ -174,7 +180,7 @@ public class EyesAppiumDriver extends EyesWebDriver {
             if (!(currentElement instanceof RemoteWebElement)) {
                 throw new EyesException(String.format("findElements: element is not a RemoteWebElement: %s", by));
             }
-            resultElementsList.add(new EyesAppiumElement(this, currentElement, 1/getDevicePixelRatio()));
+            resultElementsList.add(new EyesAppiumElement(this, currentElement, 1 / getDevicePixelRatio()));
 
             // For Remote web elements, we can keep the IDs
             elementsIds.put(((RemoteWebElement) currentElement).getId(), currentElement);
@@ -190,77 +196,13 @@ public class EyesAppiumDriver extends EyesWebDriver {
             throw new EyesException("findElement: Element is not a RemoteWebElement: " + by);
         }
 
-        EyesAppiumElement appiumElement = new EyesAppiumElement(this, webElement, 1/ getDevicePixelRatio());
+        EyesAppiumElement appiumElement = new EyesAppiumElement(this, webElement, 1 / getDevicePixelRatio());
 
         // For Remote web elements, we can keep the IDs,
         // for Id based lookup (mainly used for Javascript related
         // activities).
         elementsIds.put(((RemoteWebElement) webElement).getId(), webElement);
         return appiumElement;
-    }
-
-    public WebElement findElementByClassName(String className) {
-        return findElement(By.className(className));
-    }
-
-    public List<WebElement> findElementsByClassName(String className) {
-        return findElements(By.className(className));
-    }
-
-    public WebElement findElementByCssSelector(String cssSelector) {
-        return findElement(By.cssSelector(cssSelector));
-    }
-
-    public List<WebElement> findElementsByCssSelector(String cssSelector) {
-        return findElements(By.cssSelector(cssSelector));
-    }
-
-    public WebElement findElementById(String id) {
-        return findElement(By.id(id));
-    }
-
-    public List<WebElement> findElementsById(String id) {
-        return findElements(By.id(id));
-    }
-
-    public WebElement findElementByLinkText(String linkText) {
-        return findElement(By.linkText(linkText));
-    }
-
-    public List<WebElement> findElementsByLinkText(String linkText) {
-        return findElements(By.linkText(linkText));
-    }
-
-    public WebElement findElementByPartialLinkText(String partialLinkText) {
-        return findElement(By.partialLinkText(partialLinkText));
-    }
-
-    public List<WebElement> findElementsByPartialLinkText(String partialLinkText) {
-        return findElements(By.partialLinkText(partialLinkText));
-    }
-
-    public WebElement findElementByName(String name) {
-        return findElement(By.name(name));
-    }
-
-    public List<WebElement> findElementsByName(String name) {
-        return findElements(By.name(name));
-    }
-
-    public WebElement findElementByTagName(String tagName) {
-        return findElement(By.tagName(tagName));
-    }
-
-    public List<WebElement> findElementsByTagName(String tagName) {
-        return findElements(By.tagName(tagName));
-    }
-
-    public WebElement findElementByXPath(String path) {
-        return findElement(By.xpath(path));
-    }
-
-    public List<WebElement> findElementsByXPath(String path) {
-        return findElements(By.xpath(path));
     }
 
     public Capabilities getCapabilities() {
@@ -278,7 +220,7 @@ public class EyesAppiumDriver extends EyesWebDriver {
 
         HashMap<String, Integer> rect = getViewportRect();
         double dpr = getDevicePixelRatio();
-        defaultContentViewportSize = (new RectangleSize(rect.get("width"), rect.get("height"))).scale(1/dpr);
+        defaultContentViewportSize = (new RectangleSize(rect.get("width"), rect.get("height"))).scale(1 / dpr);
         logger.log(TraceLevel.Info, null, Stage.GENERAL, Pair.of("defaultContentViewportSize", defaultContentViewportSize));
         return defaultContentViewportSize;
     }

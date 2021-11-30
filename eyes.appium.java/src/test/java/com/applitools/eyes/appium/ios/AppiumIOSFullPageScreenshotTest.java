@@ -1,6 +1,6 @@
 package com.applitools.eyes.appium.ios;
 
-import io.appium.java_client.MobileBy;
+import io.appium.java_client.AppiumBy;
 import org.openqa.selenium.WebElement;
 import org.testng.annotations.Test;
 
@@ -14,7 +14,7 @@ public class AppiumIOSFullPageScreenshotTest extends IOSTestSetup {
 
         // Start the test.
         eyes.open(driver, getApplicationName(), "Appium Native iOS with Full page screenshot");
-        WebElement showTable = driver.findElement(MobileBy.AccessibilityId("Table view"));
+        WebElement showTable = driver.findElement(AppiumBy.accessibilityId("Table view"));
         eyes.checkRegion(showTable);
         showTable.click();
         eyes.checkWindow("Big Table");

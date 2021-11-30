@@ -368,10 +368,10 @@ public class MatchWindowTask {
             retry = System.currentTimeMillis() - start;
         }
 
-        // if we're here because we haven't found a match yet, try once more
-        if (!matchResult.getAsExpected()) {
-            screenshot = tryTakeScreenshot(userInputs, region, tag, checkSettingsInternal, source);
-        }
+//        // if we're here because we haven't found a match yet, try once more
+//        if (!matchResult.getAsExpected()) {
+//            screenshot = tryTakeScreenshot(userInputs, region, tag, checkSettingsInternal, source);
+//        }
         return screenshot;
     }
 

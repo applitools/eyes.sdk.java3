@@ -8,18 +8,18 @@ import com.applitools.eyes.logging.TraceLevel;
 import com.applitools.eyes.positioning.PositionMemento;
 import com.applitools.eyes.selenium.EyesDriverUtils;
 import com.applitools.utils.GeneralUtils;
-import com.applitools.utils.ImageUtils;
-import io.appium.java_client.MobileBy;
-import io.appium.java_client.TouchAction;
 import io.appium.java_client.remote.MobileCapabilityType;
-import io.appium.java_client.touch.WaitOptions;
-import io.appium.java_client.touch.offset.PointOption;
 import org.apache.commons.lang3.tuple.Pair;
-import org.openqa.selenium.*;
+import org.openqa.selenium.By;
+import org.openqa.selenium.NoSuchElementException;
+import org.openqa.selenium.Rectangle;
+import org.openqa.selenium.WebElement;
+import org.openqa.selenium.interactions.PointerInput;
+import org.openqa.selenium.interactions.Sequence;
 
 import javax.annotation.Nullable;
-import java.awt.image.BufferedImage;
 import java.time.Duration;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 
@@ -106,7 +106,7 @@ public class IOSScrollPositionProvider extends AppiumScrollPositionProvider {
         if (activeScroll.getAttribute("type").equals("XCUIElementTypeCollectionView")) {
             triggerHelperButton();
             try {
-                WebElement offsetLabel = driver.findElement(MobileBy.name("applitools_content_offset_label"));
+                WebElement offsetLabel = driver.findElement(By.name("applitools_content_offset_label"));
                 int contentOffset = (int) Double.parseDouble(offsetLabel.getText().split(",")[1].trim().replace("}", ""));
 
                 Region region = getScrollableViewRegion();
@@ -130,7 +130,7 @@ public class IOSScrollPositionProvider extends AppiumScrollPositionProvider {
             if (activeScroll.getAttribute("type").equals("XCUIElementTypeCollectionView")) {
                 triggerHelperButton();
                 try {
-                    WebElement offsetLabel = driver.findElement(MobileBy.name("applitools_content_offset_label"));
+                    WebElement offsetLabel = driver.findElement(By.name("applitools_content_offset_label"));
                     try { Thread.sleep(500); } catch (InterruptedException ignored) {}
                     int contentOffset = (int) Double.parseDouble(offsetLabel.getText().split(",")[1].trim().replace("}", ""));
                     return new Location(0, contentOffset);
@@ -149,32 +149,20 @@ public class IOSScrollPositionProvider extends AppiumScrollPositionProvider {
         }
     }
 
-    private double getScrollDistanceRatio() {
-        if (distanceRatio == 0.0) {
-            int viewportHeight = eyesDriver.getDefaultContentViewportSize(false).getHeight() + eyesDriver.getStatusBarHeight();
-            double pixelRatio = eyesDriver.getDevicePixelRatio();
-            // viewport height is in device pixels, whereas element heights are in logical pixels,
-            // so need to scale the scrollview height accordingly.
-            // FIXME: 29/11/2018 should the scrollviewHeight be indeed UNSCALED and WITHOUT the scrollgap
-            //double scrollviewHeight = ((getScrollableViewRegion().getHeight() - verticalScrollGap) * pixelRatio);
-            double scrollviewHeight = getScrollableViewRegion().getHeight() - (cutElement != null ? cutElement.getSize().getHeight() : 0);
-            distanceRatio = scrollviewHeight / viewportHeight;
-        }
-
-        return distanceRatio;
-    }
-
     @Override
     public void scrollTo(int startX, int startY, int endX, int endY, boolean shouldCancel) {
         logger.log(TraceLevel.Debug, eyesDriver.getTestId(), Stage.CHECK,
                 Pair.of("from", new Location(startX, startY)),
                 Pair.of("to", new Location(startX, startY)));
-        TouchAction scrollAction = new TouchAction(driver);
-        scrollAction.press(new PointOption().withCoordinates(startX, startY)).waitAction(new WaitOptions().withDuration(Duration.ofMillis(5000)));
-        scrollAction.moveTo(new PointOption().withCoordinates(startX, endY));
-        scrollAction.release();
 
-        driver.performTouchAction(scrollAction);
+
+        PointerInput finger = new PointerInput(PointerInput.Kind.TOUCH, "finger");
+        Sequence scrollAction = new Sequence(finger, 1);
+        scrollAction.addAction(finger.createPointerMove(Duration.ofMillis(0), PointerInput.Origin.viewport(), startX, startY));
+        scrollAction.addAction(finger.createPointerDown(PointerInput.MouseButton.LEFT.asArg()));
+        scrollAction.addAction(finger.createPointerMove(Duration.ofMillis(5000), PointerInput.Origin.viewport(), endX, endY));
+        scrollAction.addAction(finger.createPointerUp(PointerInput.MouseButton.LEFT.asArg()));
+        driver.perform(Collections.singletonList(scrollAction));
 
         try { Thread.sleep(1000); } catch (InterruptedException ignored) {}
     }
@@ -192,9 +180,9 @@ public class IOSScrollPositionProvider extends AppiumScrollPositionProvider {
             ContentSize contentSize = EyesAppiumUtils.getContentSize(driver, element);
             /*
             * The result of EyesAppiumUtils.getContentSize() is different in the same conditions for different types of views.
-            * E.g. contentSize.top value for type 'XCUIElementTypeTable' INcludes the size of status bar(of cause if
-            * it is visible). But contentSize.top for type 'XCUIElementTypeScrollView' returnes value
-            * EXcluding size of status bar.
+            * E.g. contentSize.top value for type 'XCUIElementTypeTable' includes the size of status bar(of cause if
+            * it is visible). But contentSize.top for type 'XCUIElementTypeScrollView' returns value
+            * excluding size of status bar.
             *
             * It happens so because Appium gives us the result of content size for 'XCUIElementTypeTable'. In case
             * 'XCUIElementTypeScrollView' Appium throws an exception and contentSize is set manually from
@@ -208,11 +196,11 @@ public class IOSScrollPositionProvider extends AppiumScrollPositionProvider {
             * - table view: {(0, 64), (375, 1000)}
             * - scroll view: {(0, 44), (375, 1000)}
             *
-            * Value element.getRect().getY() always INcludes status bar size. Let's use it in calculations.
+            * Value element.getRect().getY() always includes status bar size. Let's use it in calculations.
             * */
             switch (element.getAttribute("type")) {
                 case "XCUIElementTypeTable":
-                    List<WebElement> list = element.findElements(MobileBy.xpath("//XCUIElementTypeTable[1]/*"));
+                    List<WebElement> list = element.findElements(By.xpath("//XCUIElementTypeTable[1]/*"));
                     if (!list.isEmpty()) {
                         WebElement lastElement = list.get(list.size()-1);
                         contentSize.scrollableOffset = lastElement.getLocation().getY() + lastElement.getSize().getHeight()
@@ -220,7 +208,7 @@ public class IOSScrollPositionProvider extends AppiumScrollPositionProvider {
                     }
                     break;
                 case "XCUIElementTypeScrollView":
-                    list = element.findElements(MobileBy.xpath("//XCUIElementTypeScrollView[1]/*"));
+                    list = element.findElements(By.xpath("//XCUIElementTypeScrollView[1]/*"));
                     if (!list.isEmpty()) {
                         WebElement firstElement = list.get(0);
                         contentSize.scrollableOffset = firstElement.getLocation().getY() + firstElement.getSize().getHeight()
@@ -258,13 +246,6 @@ public class IOSScrollPositionProvider extends AppiumScrollPositionProvider {
             GeneralUtils.logExceptionStackTrace(logger, Stage.CHECK, e);
             contentSize = null;
 
-            /*
-             * To get more information about view hierarchy we printed page source to the logs
-             * and saving debug screenshot for current screen
-             */
-            String base64 = driver.getScreenshotAs(OutputType.BASE64);
-            BufferedImage image = ImageUtils.imageFromBase64(base64);
-
             logger.log(TraceLevel.Debug, eyesDriver.getTestId(), Stage.CHECK, Pair.of("pageSource", driver.getPageSource()));
         }
         return contentSize;
@@ -286,7 +267,7 @@ public class IOSScrollPositionProvider extends AppiumScrollPositionProvider {
 
     private WebElement getFirstChild(WebElement activeScroll) {
         if (activeScroll.getAttribute("type").equals("XCUIElementTypeTable")) {
-            List<WebElement> list = activeScroll.findElements(MobileBy.xpath("//XCUIElementTypeTable[1]/*"));
+            List<WebElement> list = activeScroll.findElements(By.xpath("//XCUIElementTypeTable[1]/*"));
             WebElement firstCell = getFirstCellForXCUIElementTypeTable(list);
             if (firstCell == null) {
                 return EyesAppiumUtils.getFirstVisibleChild(activeScroll);
@@ -381,14 +362,14 @@ public class IOSScrollPositionProvider extends AppiumScrollPositionProvider {
         int scrollableOffset = contentSize.scrollableOffset;
         switch (element.getAttribute("type")) {
             case "XCUIElementTypeTable":
-                List<WebElement> list = element.findElements(MobileBy.xpath("//XCUIElementTypeTable[1]/*"));
+                List<WebElement> list = element.findElements(By.xpath("//XCUIElementTypeTable[1]/*"));
                 if (!list.isEmpty()) {
                     WebElement lastElement = list.get(list.size()-1);
                     scrollableOffset = lastElement.getLocation().getY() + lastElement.getSize().getHeight();
                 }
                 break;
             case "XCUIElementTypeScrollView":
-                list = element.findElements(MobileBy.xpath("//XCUIElementTypeScrollView[1]/*"));
+                list = element.findElements(By.xpath("//XCUIElementTypeScrollView[1]/*"));
                 if (!list.isEmpty()) {
                     WebElement firstElement = list.get(0);
                     scrollableOffset = firstElement.getLocation().getY() + firstElement.getSize().getHeight();
@@ -398,7 +379,7 @@ public class IOSScrollPositionProvider extends AppiumScrollPositionProvider {
                 try {
                     triggerHelperButton();
 
-                    WebElement contentInfo = driver.findElement(MobileBy.name("applitools_content_size_label"));
+                    WebElement contentInfo = driver.findElement(By.name("applitools_content_size_label"));
                     try {
                         scrollableOffset = Integer.parseInt(contentInfo.getText().split(",")[1].trim().replace("}", ""));
                         logger.log(TraceLevel.Debug, eyesDriver.getTestId(), Stage.CHECK,  "Scrollable offset from Helper library: " + scrollableOffset);
@@ -414,12 +395,16 @@ public class IOSScrollPositionProvider extends AppiumScrollPositionProvider {
     }
 
     public void triggerHelperButton() {
-        WebElement trigger = driver.findElement(MobileBy.name("applitools_grab_scrollable_data_button"));
+        WebElement trigger = driver.findElement(By.name("applitools_grab_scrollable_data_button"));
 
-        TouchAction triggerAction = new TouchAction(driver);
-        triggerAction.tap(new PointOption().withCoordinates(trigger.getLocation().x, trigger.getLocation().y)).waitAction(new WaitOptions().withDuration(Duration.ofMillis(1000)));
-        triggerAction.release();
-        driver.performTouchAction(triggerAction);
+        PointerInput finger = new PointerInput(PointerInput.Kind.TOUCH, "finger");
+        Sequence scrollAction = new Sequence(finger, 1);
+        scrollAction.addAction(finger.createPointerMove(Duration.ofMillis(0), PointerInput.Origin.viewport(), trigger.getLocation().x, trigger.getLocation().y));
+        scrollAction.addAction(finger.createPointerDown(PointerInput.MouseButton.LEFT.asArg()));
+        scrollAction.addAction(finger.createPointerMove(Duration.ofMillis(1000), PointerInput.Origin.viewport(), trigger.getLocation().x, trigger.getLocation().y));
+        scrollAction.addAction(finger.createPointerUp(PointerInput.MouseButton.LEFT.asArg()));
+        driver.perform(Collections.singletonList(scrollAction));
+
         try { Thread.sleep(500); } catch (InterruptedException ignored) {}
     }
 

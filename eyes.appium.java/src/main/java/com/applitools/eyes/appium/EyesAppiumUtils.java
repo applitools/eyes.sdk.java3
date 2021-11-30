@@ -12,8 +12,8 @@ import com.applitools.utils.ArgumentGuard;
 import com.applitools.utils.GeneralUtils;
 import com.applitools.utils.ImageUtils;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.appium.java_client.AppiumBy;
 import io.appium.java_client.AppiumDriver;
-import io.appium.java_client.MobileBy;
 import io.appium.java_client.android.AndroidDriver;
 import org.apache.commons.lang3.tuple.Pair;
 import org.openqa.selenium.*;
@@ -32,8 +32,8 @@ import java.util.regex.Pattern;
 public class EyesAppiumUtils {
 
     private static final String NATIVE_APP = "NATIVE_APP";
-    static String SCROLLVIEW_XPATH = "//*[@scrollable='true']";
-    private static String FIRST_VIS_XPATH = "/*[@firstVisible='true']";
+    public static final String SCROLLVIEW_XPATH = "//*[@scrollable='true']";
+    private static final String FIRST_VIS_XPATH = "/*[@firstVisible='true']";
 
     public static final String STATUS_BAR = "statusBar";
     public static final String NAVIGATION_BAR = "navigationBar";
@@ -85,10 +85,12 @@ public class EyesAppiumUtils {
 
     @Nullable
     public static LastScrollData getLastScrollData(AppiumDriver driver) {
-        Map<String, Long> scrollData = (Map<String, Long>) driver.getStatus().get("lastScrollData");
+        Object o = driver.getStatus().get("lastScrollData");
+        Map<String, Long> scrollData = (Map<String, Long>) o;
         if (scrollData == null) {
             return null;
         }
+
         return new LastScrollData(scrollData);
     }
 
@@ -100,31 +102,32 @@ public class EyesAppiumUtils {
 
         AppiumDriver appiumDriver = (AppiumDriver) EyesDriverUtils.getUnderlyingDriver(driver);
 
-        String originalContext = null;
-        try {
-            // We must be in native context in order to ask for orientation,
-            // because of an Appium bug.
-            originalContext = appiumDriver.getWindowHandle();
-            if (appiumDriver.getWindowHandles().size() > 1 &&
-                    !originalContext.equalsIgnoreCase(NATIVE_APP)) {
-                appiumDriver.switchTo().window(NATIVE_APP);
-            } else {
-                originalContext = null;
-            }
-        } catch (WebDriverException e) {
-            originalContext = null;
-        }
+//        String originalContext;
+//        try {
+//            // We must be in native context in order to ask for orientation,
+//            // because of an Appium bug.
+//            originalContext = appiumDriver.getWindowHandle();
+//            if (appiumDriver.getWindowHandles().size() > 1 &&
+//                    !originalContext.equalsIgnoreCase(NATIVE_APP)) {
+//                appiumDriver.switchTo().window(NATIVE_APP);
+//            } else {
+//                originalContext = null;
+//            }
+//        } catch (WebDriverException e) {
+//            originalContext = null;
+//        }
         try {
             ScreenOrientation orientation = getOrientation(appiumDriver);
             return orientation == ScreenOrientation.LANDSCAPE;
         } catch (Exception e) {
             GeneralUtils.logExceptionStackTrace(logger, Stage.GENERAL, e);
             return false;
-        } finally {
-            if (originalContext != null) {
-                appiumDriver.switchTo().window(originalContext);
-            }
         }
+//      finally {
+//            if (originalContext != null) {
+//                appiumDriver.switchTo().window(originalContext);
+//            }
+//        }
     }
 
     private static ScreenOrientation getOrientation(AppiumDriver driver) {
@@ -184,7 +187,7 @@ public class EyesAppiumUtils {
     }
 
     public static Map<String, Integer> getSystemBarsHeights(EyesAppiumDriver driver) {
-        Map<String, Integer> systemBarHeights = new HashMap();
+        Map<String, Integer> systemBarHeights = new HashMap<>();
         systemBarHeights.put(STATUS_BAR, null);
         systemBarHeights.put(NAVIGATION_BAR, null);
 
@@ -247,7 +250,7 @@ public class EyesAppiumUtils {
         String version = "";
         if (driver.getRemoteWebDriver() instanceof AndroidDriver) {
             try {
-                WebElement hiddenElement = driver.getRemoteWebDriver().findElement(MobileBy.AndroidUIAutomator("new UiSelector().description(\"EyesAppiumHelper_Version\")"));
+                WebElement hiddenElement = driver.getRemoteWebDriver().findElement(AppiumBy.androidUIAutomator("new UiSelector().description(\"EyesAppiumHelper_Version\")"));
                 if (hiddenElement != null) {
                     version = hiddenElement.getText();
                 }
@@ -255,7 +258,7 @@ public class EyesAppiumUtils {
             }
             if (version == null) {
                 try {
-                    WebElement hiddenElement = driver.getRemoteWebDriver().findElement(MobileBy.AndroidUIAutomator("new UiSelector().description(\"EyesAppiumHelper\")"));
+                    WebElement hiddenElement = driver.getRemoteWebDriver().findElement(AppiumBy.androidUIAutomator("new UiSelector().description(\"EyesAppiumHelper\")"));
                     if (hiddenElement != null) {
                         version = "1.0.0";
                     }

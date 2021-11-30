@@ -32,7 +32,7 @@ public class TestPredefinedDeviceInfoFeature extends ReportingTestSuite {
         capabilities.setCapability("deviceName", "Samsung Galaxy S10");
 
         remoteWebDriver = Mockito.mock(AndroidDriver.class);
-        when(remoteWebDriver.getSessionDetails()).thenReturn(sessionDetails);
+        when(remoteWebDriver.getStatus()).thenReturn(sessionDetails);
         when(remoteWebDriver.getCapabilities()).thenReturn(capabilities);
         when(remoteWebDriver.getSystemBars()).thenThrow(NullPointerException.class);
     }

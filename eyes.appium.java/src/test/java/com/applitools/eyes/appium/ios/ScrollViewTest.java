@@ -1,7 +1,8 @@
 package com.applitools.eyes.appium.ios;
 
 import com.applitools.eyes.appium.Target;
-import io.appium.java_client.MobileBy;
+import io.appium.java_client.AppiumBy;
+import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.testng.annotations.Test;
 
@@ -14,7 +15,7 @@ public class ScrollViewTest extends IOSTestSetup {
         // Start the test.
         eyes.open(driver, getApplicationName(), "XCUIElementTypeScrollView");
 
-        WebElement showScrollView = driver.findElement(MobileBy.AccessibilityId("Scroll view"));
+        WebElement showScrollView = driver.findElement(AppiumBy.accessibilityId("Scroll view"));
         showScrollView.click();
 
         // Check viewport.
@@ -22,9 +23,9 @@ public class ScrollViewTest extends IOSTestSetup {
         // Full page screenshot.
         eyes.check(Target.window().fully(true).withName("Window Fullpage"));
         // Check scroll view's viewport.
-        eyes.check(Target.region(MobileBy.xpath("//XCUIElementTypeScrollView[1]")).withName("ScrollView Viewport"));
+        eyes.check(Target.region(By.xpath("//XCUIElementTypeScrollView[1]")).withName("ScrollView Viewport"));
         // Check full content of scroll view.
-        eyes.check(Target.region(MobileBy.xpath("//XCUIElementTypeScrollView[1]")).fully().withName("ScrollView Fullpage"));
+        eyes.check(Target.region(By.xpath("//XCUIElementTypeScrollView[1]")).fully().withName("ScrollView Fullpage"));
 
         // End the test.
         eyes.close();
