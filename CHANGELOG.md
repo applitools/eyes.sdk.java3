@@ -1,4 +1,4 @@
-## [vNext]
+## [3.210.3] - 2021-11-30
 ### Updated
 - Changed checking of `isMobileDevice`. Handle exceptions correctly. [Trello 2712](https://trello.com/c/89U7DfV0)
 
