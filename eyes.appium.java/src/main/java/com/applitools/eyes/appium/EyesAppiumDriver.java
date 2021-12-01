@@ -15,9 +15,12 @@ import com.applitools.utils.ImageUtils;
 import io.appium.java_client.AppiumDriver;
 import org.apache.commons.lang3.tuple.Pair;
 import org.openqa.selenium.*;
+import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.remote.RemoteWebElement;
 
 import java.awt.image.BufferedImage;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -58,7 +61,21 @@ public class EyesAppiumDriver extends EyesWebDriver {
 
     private Map<String, Object> getCachedSessionDetails() {
         if (sessionDetails == null) {
-            sessionDetails = getRemoteWebDriver().getCapabilities().asMap();
+            AppiumDriver driver = getRemoteWebDriver();
+            sessionDetails = new HashMap<>();
+            sessionDetails.putAll(driver.getCapabilities().asMap());
+            try {
+                Method getSessionDetails = AppiumDriver.class.getMethod("getSessionDetails", null);
+                if (getSessionDetails != null) {
+                    Object extraSessionDetailsObj = getSessionDetails.invoke(driver, null);
+                    if (extraSessionDetailsObj != null) {
+                        Map<String, Object> extraDetails = (Map<String, Object>) extraSessionDetailsObj;
+                        sessionDetails.putAll(extraDetails);
+                    }
+                }
+            } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
+                e.printStackTrace();
+            }
         }
         return sessionDetails;
     }

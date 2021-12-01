@@ -600,7 +600,11 @@ public class EyesDriverUtils {
      */
     public static boolean isIOS(WebDriver driver) {
         driver = getUnderlyingDriver(driver);
-        return ((HasCapabilities) driver).getCapabilities().getPlatform().is(Platform.IOS);
+        Capabilities capabilities = ((HasCapabilities) driver).getCapabilities();
+        Object origOs = capabilities.getCapability("orig_os");
+        Object platformName = capabilities.getCapability("platformName");
+        Platform platform = capabilities.getPlatform();
+        return "ios".equals(origOs) || platform.is(Platform.IOS) || platform.is(Platform.MAC);
     }
 
     /**

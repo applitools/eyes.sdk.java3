@@ -283,7 +283,7 @@ public class EyesAppiumUtils {
 
     public static String getHelperLibraryVersion(EyesAppiumDriver driver, Logger logger) {
         String version = "";
-        if (driver.getRemoteWebDriver() instanceof AndroidDriver) {
+        if (EyesDriverUtils.isAndroid(driver)) {
             try {
                 WebElement hiddenElement = driver.getRemoteWebDriver().findElement(MobileBy.AndroidUIAutomator("new UiSelector().description(\"EyesAppiumHelper_Version\")"));
                 if (hiddenElement != null) {

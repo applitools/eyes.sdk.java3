@@ -474,7 +474,7 @@ public class Eyes extends EyesBase {
 
         ValidationInfo validationInfo = this.fireValidationWillStartEvent(name);
 
-        this.stitchContent = checkSettingsInternal.getStitchContent() == null ? false : checkSettingsInternal.getStitchContent();
+        this.stitchContent = checkSettingsInternal.getStitchContent() != null && checkSettingsInternal.getStitchContent();
 
         final Region targetRegion = checkSettingsInternal.getTargetRegion();
 
