@@ -40,6 +40,8 @@ public abstract class TestSetup extends ReportingTestSuite implements ITest {
         LogHandler logHandler = new StdoutLogHandler(TestUtils.verboseLogs);
         eyes.setLogHandler(logHandler);
         eyes.setSaveNewTests(false);
+        eyes.setSaveDebugScreenshots(true);
+        eyes.setDebugScreenshotsPath("C:\\Temp\\Logs");
         if (System.getenv("APPLITOOLS_USE_PROXY") != null) {
             eyes.setProxy(new ProxySettings("http://127.0.0.1", 8888));
         }

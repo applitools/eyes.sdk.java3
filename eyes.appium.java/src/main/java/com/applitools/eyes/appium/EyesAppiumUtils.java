@@ -238,11 +238,7 @@ public class EyesAppiumUtils {
         systemBarHeights.put(NAVIGATION_BAR, null);
 
         try {
-            if (EyesDriverUtils.isAndroid(driver)) {
-                fillSystemBarsHeightsMap((AndroidDriver) driver.getRemoteWebDriver(), systemBarHeights);
-            } else {
-                fillSystemBarsHeightsMap(driver, systemBarHeights);
-            }
+            fillSystemBarsHeightsMap(driver, systemBarHeights);
         } catch (Exception ignored) {
             int statusBarHeight = driver.getStatusBarHeight();
             int navigationBarHeight = driver.getDeviceHeight() - driver.getViewportHeight() - statusBarHeight;
@@ -251,23 +247,6 @@ public class EyesAppiumUtils {
         }
 
         return systemBarHeights;
-    }
-
-    private static void fillSystemBarsHeightsMap(AndroidDriver driver, Map<String, Integer> systemBarHeights) {
-        Object bars = driver.getSystemBars();
-        String barsClassName = bars.getClass().getName();
-        Map<String, String> systemBars;
-        if (barsClassName.equals("Map<String, Map<String, Object>>")) {
-            Map<String, Map<String, Object>> allBars = (Map<String, Map<String, Object>>) bars;
-            systemBars = (Map<String, String>) allBars.values().toArray()[0];
-        } else if (barsClassName.equals("Map<String, String>")) {
-            systemBars = (Map<String, String>) bars;
-        } else {
-            return;
-        }
-        for (String systemBarName : systemBars.keySet()) {
-            systemBarHeights.put(systemBarName, getSystemBar(systemBarName, systemBars));
-        }
     }
 
     private static Integer getSystemBar(String systemBarName, Map<String, String> systemBars) {
