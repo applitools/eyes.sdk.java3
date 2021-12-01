@@ -271,6 +271,28 @@ public class AndroidScrollPositionProvider extends AppiumScrollPositionProvider 
         return scrolled;
     }
 
+    public String tryGetClassWithHelperLibrary() {
+        String className = null;
+        if (scrollRootElement != null) {
+            String elementId = scrollRootElement.getAttribute("resourceId").split("/")[1];
+            try {
+                MobileElement hiddenElement = ((AndroidDriver<AndroidElement>) driver).findElement(MobileBy.AndroidUIAutomator("new UiSelector().description(\"EyesAppiumHelperEDT\")"));
+                if (hiddenElement != null) {
+                    hiddenElement.setValue("className;"+elementId+";0;0");
+                    hiddenElement.click();
+                    className = hiddenElement.getText();
+                    if (className.isEmpty()) {
+                        className = null;
+                    }
+                    hiddenElement.clear();
+                }
+            } catch (Exception e) {
+                GeneralUtils.logExceptionStackTrace(logger, Stage.CHECK, e);
+            }
+        }
+        return className;
+    }
+
     public void tryDumpVHSWithHelperLibrary() {
         try {
             MobileElement hiddenElement = ((AndroidDriver<AndroidElement>) driver).findElement(MobileBy.AndroidUIAutomator("new UiSelector().description(\"EyesAppiumHelperEDT\")"));
@@ -292,19 +314,24 @@ public class AndroidScrollPositionProvider extends AppiumScrollPositionProvider 
                 element.getSize().getWidth(),
                 element.getSize().getHeight());
         if (shouldStitchContent) {
+            String className = tryGetClassWithHelperLibrary();
+            if (className == null) {
+                className = element.getAttribute("className");
+            }
             logger.log(TraceLevel.Debug, eyesDriver.getTestId(), Stage.CHECK,
-                    Pair.of("elementClass", element.getAttribute("className")));
+                    Pair.of("elementClass", className));
             double devicePixelRatio = eyesDriver.getDevicePixelRatio();
             ContentSize contentSize = EyesAppiumUtils.getContentSize(driver, element);
             region = new Region(contentSize.left,
                     (int) (element.getLocation().y * devicePixelRatio),
                     contentSize.width,
                     contentSize.getScrollContentHeight());
-            if (element.getAttribute("className").equals("android.support.v7.widget.RecyclerView") ||
-                    element.getAttribute("className").equals("androidx.recyclerview.widget.RecyclerView") ||
-                    element.getAttribute("className").equals("androidx.viewpager2.widget.ViewPager2") ||
-                    element.getAttribute("className").equals("android.widget.ListView") ||
-                    element.getAttribute("className").equals("android.widget.GridView")) {
+            if (className.equals("android.support.v7.widget.RecyclerView") ||
+                    className.equals("androidx.recyclerview.widget.RecyclerView") ||
+                    className.equals("androidx.viewpager2.widget.ViewPager2") ||
+                    className.equals("android.widget.ListView") ||
+                    className.equals("android.widget.GridView") ||
+                    (scrollRootElement != null && className.equals("androidx.core.widget.NestedScrollView"))) {
                 try {
                     String scrollableContentSize = getScrollableContentSize(element.getAttribute("resourceId"));
                     try {
@@ -397,13 +424,17 @@ public class AndroidScrollPositionProvider extends AppiumScrollPositionProvider 
             }
             logger.log(TraceLevel.Debug, eyesDriver.getTestId(), Stage.CHECK,
                     Pair.of("elementClass", activeScroll.getAttribute("className")));
-            String className = activeScroll.getAttribute("className");
+            String className = tryGetClassWithHelperLibrary();
+            if (className == null) {
+                className = activeScroll.getAttribute("className");
+            }
 
             if (className.equals("android.support.v7.widget.RecyclerView") ||
                     className.equals("androidx.recyclerview.widget.RecyclerView") ||
                     className.equals("androidx.viewpager2.widget.ViewPager2") ||
                     className.equals("android.widget.ListView") ||
-                    className.equals("android.widget.GridView")) {
+                    className.equals("android.widget.GridView") ||
+                    (scrollRootElement != null && className.equals("androidx.core.widget.NestedScrollView"))) {
                 try {
                     String scrollableContentSize = getScrollableContentSize(activeScroll.getAttribute("resourceId"));
                     try {
