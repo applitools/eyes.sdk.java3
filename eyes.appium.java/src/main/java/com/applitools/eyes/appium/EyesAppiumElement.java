@@ -4,7 +4,6 @@ import com.applitools.eyes.EyesException;
 import com.applitools.eyes.selenium.EyesDriverUtils;
 import com.applitools.utils.ArgumentGuard;
 import com.google.common.collect.ImmutableMap;
-import io.appium.java_client.ios.IOSDriver;
 import org.openqa.selenium.*;
 import org.openqa.selenium.interactions.Coordinates;
 import org.openqa.selenium.remote.DriverCommand;
@@ -46,7 +45,7 @@ public class EyesAppiumElement extends RemoteWebElement {
         }
         int unscaledWidth;
         int unscaledHeight;
-        if (driver.getRemoteWebDriver() instanceof IOSDriver) {
+        if (EyesDriverUtils.isIOS(driver)) {
             unscaledWidth = size.getWidth();
             unscaledHeight = size.getHeight();
         } else {
@@ -223,19 +222,19 @@ public class EyesAppiumElement extends RemoteWebElement {
         Map<String, Object> rawPoint = (Map<String, Object>) response.getValue();
         int x = (int) Math.round(((Number) rawPoint.get("x")).doubleValue());
         int y = (int) Math.round(((Number) rawPoint.get("y")).doubleValue());
-        Point location =  new Point(x, y);
+        Point location = new Point(x, y);
         location = new Point(location.getX(), location.getY() - driver.getStatusBarHeight());
         if (pixelRatio == 1.0) {
             return location;
         }
         int unscaledX;
         int unscaledY;
-        if (driver.getRemoteWebDriver() instanceof IOSDriver) {
+        if (EyesDriverUtils.isIOS(driver)) {
             unscaledX = location.getX();
             unscaledY = location.getY();
         } else {
-            unscaledX = (int) Math.ceil(location.getX()*pixelRatio);
-            unscaledY = (int) Math.ceil(location.getY()*pixelRatio);
+            unscaledX = (int) Math.ceil(location.getX() * pixelRatio);
+            unscaledY = (int) Math.ceil(location.getY() * pixelRatio);
         }
         return new Point(unscaledX, unscaledY);
     }
