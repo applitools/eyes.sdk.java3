@@ -85,6 +85,7 @@ public class EyesDriverUtils {
     /**
      * Extracts the location relative to the entire page from the coordinates
      * (e.g. as opposed to viewport)
+     *
      * @param coordinates The coordinates from which location is extracted.
      * @return The location relative to the entire page
      */
@@ -100,6 +101,7 @@ public class EyesDriverUtils {
     /**
      * Extracts the location relative to the <b>viewport</b> from the
      * coordinates (e.g. as opposed to the entire page).
+     *
      * @param coordinates The coordinates from which location is extracted.
      * @return The location relative to the viewport.
      */
@@ -115,6 +117,7 @@ public class EyesDriverUtils {
     /**
      * For EyesWebDriver instances, returns the underlying WebDriver. For all other types - return the driver received
      * as parameter.
+     *
      * @param driver The driver instance for which to get the underlying WebDriver.
      * @return The underlying WebDriver
      */
@@ -188,6 +191,7 @@ public class EyesDriverUtils {
 
     /**
      * Is landscape orientation boolean.
+     *
      * @param logger the logger
      * @param driver The driver for which to check the orientation.
      * @return {@code true} if this is a mobile device and is in landscape orientation. {@code false} otherwise.
@@ -233,6 +237,7 @@ public class EyesDriverUtils {
 
     /**
      * Select root element string.
+     *
      * @param executor the executor
      * @return the string
      */
@@ -259,6 +264,7 @@ public class EyesDriverUtils {
 
     /**
      * Sets the overflow of the current context's body.
+     *
      * @param executor    The executor to use for setting the overflow.
      * @param value       The overflow value to set.
      * @param rootElement the root element
@@ -286,6 +292,7 @@ public class EyesDriverUtils {
 
     /**
      * Gets current scroll position.
+     *
      * @param executor The executor to use.
      * @return The current scroll position of the current frame.
      */
@@ -297,17 +304,17 @@ public class EyesDriverUtils {
 
     public static Location parseLocationString(Object position) {
         String[] xy = position.toString().split(";");
-        if (xy.length != 2)
-        {
+        if (xy.length != 2) {
             throw new EyesException("Could not get scroll position!");
         }
         float x = Float.parseFloat(xy[0]);
         float y = Float.parseFloat(xy[1]);
-        return new Location((int)Math.ceil(x), (int)Math.ceil(y));
+        return new Location((int) Math.ceil(x), (int) Math.ceil(y));
     }
 
     /**
      * Sets the scroll position of the current frame.
+     *
      * @param executor The executor to use.
      * @param location The position to be set.
      */
@@ -319,6 +326,7 @@ public class EyesDriverUtils {
 
     /**
      * Gets current frame content entire size.
+     *
      * @param executor The executor to use.
      * @return The size of the entire content.
      */
@@ -343,6 +351,7 @@ public class EyesDriverUtils {
 
     /**
      * Gets entire element size.
+     *
      * @param logger   the logger
      * @param executor the executor
      * @param element  the element
@@ -370,6 +379,7 @@ public class EyesDriverUtils {
 
     /**
      * Gets viewport size.
+     *
      * @param executor The executor to use.
      * @return The viewport size.
      */
@@ -387,6 +397,7 @@ public class EyesDriverUtils {
 
     /**
      * Gets viewport size or display size.
+     *
      * @param logger The logger to use.
      * @param driver The web driver to use.
      * @return The viewport size of the current context, or the display size
@@ -422,6 +433,7 @@ public class EyesDriverUtils {
 
     /**
      * Sets browser size.
+     *
      * @param driver       the driver
      * @param requiredSize the required size
      * @return the browser size
@@ -445,6 +457,7 @@ public class EyesDriverUtils {
 
     /**
      * Sets browser size by viewport size.
+     *
      * @param driver               the driver
      * @param actualViewportSize   the actual viewport size
      * @param requiredViewportSize the required viewport size
@@ -466,6 +479,7 @@ public class EyesDriverUtils {
 
     /**
      * Sets viewport size.
+     *
      * @param logger The logger to use.
      * @param driver The web driver to use.
      * @param size   The size to set as the viewport size.
@@ -569,22 +583,24 @@ public class EyesDriverUtils {
 
     /**
      * Is android boolean.
+     *
      * @param driver The driver to test.
      * @return {@code true} if the driver is an Android driver. {@code false} otherwise.
      */
     public static boolean isAndroid(WebDriver driver) {
         driver = getUnderlyingDriver(driver);
-        return reflectionInstanceof(driver, "AndroidDriver");
+        return ((HasCapabilities) driver).getCapabilities().getPlatform().is(Platform.ANDROID);
     }
 
     /**
      * Is ios boolean.
+     *
      * @param driver The driver to test.
      * @return {@code true} if the driver is an iOS driver. {@code false} otherwise.
      */
     public static boolean isIOS(WebDriver driver) {
         driver = getUnderlyingDriver(driver);
-        return reflectionInstanceof(driver, "IOSDriver");
+        return ((HasCapabilities) driver).getCapabilities().getPlatform().is(Platform.IOS);
     }
 
     /**
@@ -628,6 +644,7 @@ public class EyesDriverUtils {
 
     /**
      * Gets current transform.
+     *
      * @param executor The executor to use.
      * @return The current documentElement transform values, according to {@link #JS_TRANSFORM_KEYS}.
      */
@@ -650,6 +667,7 @@ public class EyesDriverUtils {
     /**
      * Sets transforms for document.documentElement according to the given
      * map of style keys and values.
+     *
      * @param executor   The executor to use.
      * @param transforms The transforms to set. Keys are used as style keys,                   and values are the values for those styles.
      */
@@ -668,6 +686,7 @@ public class EyesDriverUtils {
     /**
      * Set the given transform to document.documentElement for all style keys
      * defined in {@link #JS_TRANSFORM_KEYS} .
+     *
      * @param executor  The executor to use.
      * @param transform The transform value to set.
      */
@@ -684,6 +703,7 @@ public class EyesDriverUtils {
 
     /**
      * Returns given element visible portion size.\
+     *
      * @param element The element for which to return the size.
      * @return The given element's visible portion size.
      */
@@ -722,6 +742,7 @@ public class EyesDriverUtils {
 
     /**
      * Translates the current documentElement to the given position.
+     *
      * @param executor The executor to use.
      * @param position The position to translate to.
      */
@@ -741,13 +762,13 @@ public class EyesDriverUtils {
         }
 
         java.lang.reflect.Proxy proxy = (java.lang.reflect.Proxy) webElement;
-        Field[] fields =  Proxy.class.getDeclaredFields();
+        Field[] fields = Proxy.class.getDeclaredFields();
         for (Field field : fields) {
-            if(field.getType().equals(InvocationHandler.class)) {
-                field.setAccessible(true);
+            if (field.getType().equals(InvocationHandler.class)) {
+                //field.setAccessible(true);
                 try {
                     InvocationHandler handler = (InvocationHandler) field.get(proxy);
-                    return  (WebElement) handler.invoke(null, WrapsElement.class.getMethod("getWrappedElement"), null);
+                    return (WebElement) handler.invoke(null, WrapsElement.class.getMethod("getWrappedElement"), null);
                 } catch (Throwable throwable) {
                     throw new EyesException("Failed getting web element from page object", throwable);
                 }

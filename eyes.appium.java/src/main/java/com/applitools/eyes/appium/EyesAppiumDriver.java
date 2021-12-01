@@ -80,9 +80,8 @@ public class EyesAppiumDriver extends EyesWebDriver {
                     }
                 }
             }
-        } else {
-            height = ensureViewportHeight(height);
         }
+
         HashMap<String, Integer> intRectMap = new HashMap<>();
         intRectMap.put("width", width);
         intRectMap.put("height", height);
@@ -93,25 +92,6 @@ public class EyesAppiumDriver extends EyesWebDriver {
     public int getViewportHeight() {
         Map<String, Long> rectMap = (Map<String, Long>) getCachedSessionDetails().get("viewportRect");
         return rectMap.get("height").intValue();
-    }
-
-    private int ensureViewportHeight(int viewportHeight) {
-        if (EyesDriverUtils.isAndroid(driver)) {
-            try {
-                int height = getDeviceHeight();
-                Map<String, Integer> systemBarsHeights = getSystemBarsHeights();
-                for (Integer barHeight : systemBarsHeights.values()) {
-                    if (barHeight != null && barHeight < height) {
-                        height -= barHeight;
-                    }
-                }
-                return height;
-            } catch (Exception e) {
-                GeneralUtils.logExceptionStackTrace(logger, Stage.GENERAL, e);
-            }
-        }
-
-        return viewportHeight;
     }
 
     public int getDeviceHeight() {
