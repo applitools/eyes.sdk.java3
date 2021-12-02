@@ -27,7 +27,8 @@ public abstract class AndroidTestSetup extends TestSetup {
     @Override
     protected void setAppCapability() {
         // To run locally use https://applitools.jfrog.io/artifactory/Examples/android/1.2/app_android.apk
-        capabilities.setCapability("app", "app_android");
+        //capabilities.setCapability("app", "app_android");
+        capabilities.setCapability("app", "bs://008d7170145cf69b136f213a08d9bc97905bab09");
     }
 
     @Override
