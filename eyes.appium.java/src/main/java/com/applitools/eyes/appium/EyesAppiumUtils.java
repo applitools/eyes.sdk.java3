@@ -88,12 +88,38 @@ public class EyesAppiumUtils {
         return contentSize;
     }
 
+    public static Map<String, Object> getSessionDetails(RemoteWebDriver driver) {
+        Map<String, Object> sessionDetails = new HashMap<>();
+        sessionDetails.putAll(driver.getCapabilities().asMap());
+        if (driver instanceof AppiumDriver) {
+            Response response = ((AppiumDriver) driver).execute("getSession");
+            Map<String, Object> resultMap = Map.class.cast(response.getValue());
+            sessionDetails.putAll(resultMap);
+        }
+
+        return sessionDetails;
+    }
+
+    public static Object getSessionDetail(RemoteWebDriver driver, String detailName) {
+        Map<String, Object> details = getSessionDetails(driver);
+        return getSessionDetail(details, detailName);
+    }
+
+    public static Object getSessionDetail(Map<String, Object> details, String detailName) {
+        Object detailValue = details.get("appium:" + detailName);
+        if (detailValue == null) {
+            detailValue = details.get(detailName);
+        }
+        return detailValue;
+    }
+
     @Nullable
     public static LastScrollData getLastScrollData(AppiumDriver driver) {
-        Map<String, Long> scrollData = (Map<String, Long>) driver.getSessionDetails().get("lastScrollData");
-        if (scrollData == null) {
+        Object lastScrollDataObj = getSessionDetail(driver, "lastScrollData");
+        if (lastScrollDataObj == null) {
             return null;
         }
+        Map<String, Long> scrollData = (Map<String, Long>) lastScrollDataObj;
         return new LastScrollData(scrollData);
     }
 

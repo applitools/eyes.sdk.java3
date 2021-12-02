@@ -16,6 +16,7 @@ public abstract class IOSTestSetup extends TestSetup {
         super.setCapabilities();
         capabilities.setCapability("platformName", "iOS");
         capabilities.setCapability("device", "iPhone 12");
+        capabilities.setCapability("deviceName", "iPhone 12");
         capabilities.setCapability("os_version", "14");
         capabilities.setCapability("automationName", "XCUITest");
         capabilities.setCapability("newCommandTimeout", 300);

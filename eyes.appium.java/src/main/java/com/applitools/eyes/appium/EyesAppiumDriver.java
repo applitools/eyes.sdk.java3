@@ -13,6 +13,7 @@ import com.applitools.eyes.selenium.positioning.ImageRotation;
 import com.applitools.utils.GeneralUtils;
 import com.applitools.utils.ImageUtils;
 import io.appium.java_client.AppiumDriver;
+import jdk.jfr.internal.consumer.OngoingStream;
 import org.apache.commons.lang3.tuple.Pair;
 import org.openqa.selenium.*;
 import org.openqa.selenium.remote.RemoteWebDriver;
@@ -61,27 +62,18 @@ public class EyesAppiumDriver extends EyesWebDriver {
 
     private Map<String, Object> getCachedSessionDetails() {
         if (sessionDetails == null) {
-            AppiumDriver driver = getRemoteWebDriver();
-            sessionDetails = new HashMap<>();
-            sessionDetails.putAll(driver.getCapabilities().asMap());
-            try {
-                Method getSessionDetails = AppiumDriver.class.getMethod("getSessionDetails", null);
-                if (getSessionDetails != null) {
-                    Object extraSessionDetailsObj = getSessionDetails.invoke(driver, null);
-                    if (extraSessionDetailsObj != null) {
-                        Map<String, Object> extraDetails = (Map<String, Object>) extraSessionDetailsObj;
-                        sessionDetails.putAll(extraDetails);
-                    }
-                }
-            } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
-                e.printStackTrace();
-            }
+            sessionDetails = EyesAppiumUtils.getSessionDetails(driver);
         }
         return sessionDetails;
     }
 
+    public Object getCachedSessionDetail(String detailName) {
+        Map<String, Object> details = getCachedSessionDetails();
+        return EyesAppiumUtils.getSessionDetail(details, detailName);
+    }
+
     public HashMap<String, Integer> getViewportRect() {
-        Map<String, Long> rectMap = (Map<String, Long>) getCachedSessionDetails().get("viewportRect");
+        Map<String, Long> rectMap = (Map<String, Long>) getCachedSessionDetail("viewportRect");
         int width = rectMap.get("width").intValue();
         int height = rectMap.get("height").intValue();
         if (getEyesBase().getConfiguration().isFeatureActivated(Feature.USE_PREDEFINED_DEVICE_INFO)) {
@@ -107,13 +99,13 @@ public class EyesAppiumDriver extends EyesWebDriver {
     }
 
     public int getViewportHeight() {
-        Map<String, Long> rectMap = (Map<String, Long>) getCachedSessionDetails().get("viewportRect");
+        Map<String, Long> rectMap = (Map<String, Long>) getCachedSessionDetail("viewportRect");
         return rectMap.get("height").intValue();
     }
 
     public int getDeviceHeight() {
         if (deviceHeight == null) {
-            String deviceScreenSize = (String) getCachedSessionDetails().get("deviceScreenSize");
+            String deviceScreenSize = (String) getCachedSessionDetail("deviceScreenSize");
             Pattern p = Pattern.compile("x(\\d+)");
             Matcher m = p.matcher(deviceScreenSize);
             m.find();
@@ -133,7 +125,7 @@ public class EyesAppiumDriver extends EyesWebDriver {
 
     @Override
     protected double getDevicePixelRatioInner() {
-        Object pixelRatio = getCachedSessionDetails().get("pixelRatio");
+        Object pixelRatio = getCachedSessionDetail("pixelRatio");
         if (pixelRatio instanceof Double) {
             return (Double) pixelRatio;
         } else {
@@ -154,7 +146,7 @@ public class EyesAppiumDriver extends EyesWebDriver {
                 }
             }
         }
-        Object statusBarHeight = getCachedSessionDetails().get("statBarHeight");
+        Object statusBarHeight = getCachedSessionDetail("statBarHeight");
         if (statusBarHeight instanceof Double) {
             return ((Double) statusBarHeight).intValue();
         } else {
