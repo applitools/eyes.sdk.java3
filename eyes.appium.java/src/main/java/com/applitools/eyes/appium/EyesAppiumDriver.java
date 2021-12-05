@@ -8,20 +8,15 @@ import com.applitools.eyes.config.Feature;
 import com.applitools.eyes.logging.Stage;
 import com.applitools.eyes.logging.TraceLevel;
 import com.applitools.eyes.selenium.EyesDriverUtils;
-import com.applitools.eyes.selenium.wrappers.EyesWebDriver;
 import com.applitools.eyes.selenium.positioning.ImageRotation;
-import com.applitools.utils.GeneralUtils;
+import com.applitools.eyes.selenium.wrappers.EyesWebDriver;
 import com.applitools.utils.ImageUtils;
 import io.appium.java_client.AppiumDriver;
-import jdk.jfr.internal.consumer.OngoingStream;
 import org.apache.commons.lang3.tuple.Pair;
 import org.openqa.selenium.*;
-import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.remote.RemoteWebElement;
 
 import java.awt.image.BufferedImage;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -183,7 +178,7 @@ public class EyesAppiumDriver extends EyesWebDriver {
         EyesAppiumElement appiumElement = new EyesAppiumElement(this, webElement, 1 / getDevicePixelRatio());
 
         // For Remote web elements, we can keep the IDs,
-        // for Id based lookup (mainly used for Javascript related
+        // for id based lookup (mainly used for Javascript related
         // activities).
         elementsIds.put(((RemoteWebElement) webElement).getId(), webElement);
         return appiumElement;
@@ -259,7 +254,7 @@ public class EyesAppiumDriver extends EyesWebDriver {
 
     /**
      * @param forceQuery If true, we will perform the query even if we have a cached viewport size.
-     * @return The viewport size of the default content (outer most frame).
+     * @return The viewport size of the default content (outer-most frame).
      */
     public RectangleSize getDefaultContentViewportSize(boolean forceQuery) {
         if (defaultContentViewportSize != null && !forceQuery) {
