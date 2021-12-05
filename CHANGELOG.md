@@ -1,6 +1,6 @@
-## vNext
-### Added
-- Support of NestedScrollView for Android. [Trello 2633](https://trello.com/c/dQqN02TN/)
+## [3.210.4] - 2021-12-05
+### Fixed
+- Added Support of NestedScrollView for Android. [Trello 2633](https://trello.com/c/dQqN02TN/)
 
 ## [3.210.3] - 2021-11-30
 ### Updated
