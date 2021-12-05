@@ -146,6 +146,16 @@ public class DomCapture {
         return EfficientStringReplace.efficientStringReplace(separators.iframeStartToken, separators.iframeEndToken, data.get(0), framesData);
     }
 
+    /**
+     * This method parses the string returned by the DOM Capture script. The string is internally divided into
+     * "blocks", starting with the separators section, followed by missing CSS or frames, followed by the actual DOM.
+     *
+     * @param scriptResult
+     * @param missingCssList
+     * @param missingFramesList
+     * @param data
+     * @return
+     */
     private Separators parseScriptResult(String scriptResult, List<String> missingCssList, List<String> missingFramesList, List<String> data) {
         String[] lines = scriptResult.split("\\r?\\n");
         Separators separators = null;
@@ -160,7 +170,7 @@ public class DomCapture {
             int lineIndex = 1;
             do {
                 String str = lines[lineIndex++];
-                if (separators.separator.equals(str)) {
+                if (separators.blockSeparator.equals(str)) {
                     blockIndex++;
                 } else {
                     blocks.get(blockIndex).add(str);
