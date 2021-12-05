@@ -181,7 +181,7 @@ public class IOSScrollPositionProvider extends AppiumScrollPositionProvider {
         try {
             scrollTo_w3c(startX, startY, endX, endY);
         } catch (UnsupportedCommandException e) {
-            scrollTo_legacy(startX, startY, endX, endY, false);
+            scrollTo_legacy(startX, startY, endX, endY, 0, 5000, false);
         }
 
         try {

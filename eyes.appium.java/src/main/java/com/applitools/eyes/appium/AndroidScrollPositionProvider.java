@@ -203,7 +203,7 @@ public class AndroidScrollPositionProvider extends AppiumScrollPositionProvider 
         try {
             scrollTo_w3c(startX, startY, endX, endY);
         } catch (UnsupportedCommandException e) {
-            scrollTo_legacy(startX, startY, endX, endY, shouldCancel);
+            scrollTo_legacy(startX, startY, endX, endY, contentSize.touchPadding, 1500, shouldCancel);
         }
 
         curScrollPos = new Location(curScrollPos.getX(), curScrollPos.getY() + startX);

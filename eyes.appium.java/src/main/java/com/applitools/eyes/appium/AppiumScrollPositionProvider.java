@@ -249,10 +249,10 @@ public abstract class AppiumScrollPositionProvider implements ScrollPositionProv
         driver.perform(Collections.singleton(scrollAction));
     }
 
-    protected void scrollTo_legacy(int startX, int startY, int endX, int endY, boolean shouldCancel) {
+    protected void scrollTo_legacy(int startX, int startY, int endX, int endY, int padding, int wait, boolean shouldCancel) {
         TouchAction scrollAction = new TouchAction((PerformsTouchActions) driver);
-        scrollAction.press(new PointOption().withCoordinates(startX, startY)).waitAction(new WaitOptions().withDuration(Duration.ofMillis(1500)));
-        scrollAction.moveTo(new PointOption().withCoordinates(endX, Math.max(endY - contentSize.touchPadding, 0)));
+        scrollAction.press(new PointOption().withCoordinates(startX, startY)).waitAction(new WaitOptions().withDuration(Duration.ofMillis(wait)));
+        scrollAction.moveTo(new PointOption().withCoordinates(endX, Math.max(endY - padding, 0)));
         if (shouldCancel) {
             scrollAction.cancel();
         } else {
