@@ -1,3 +1,7 @@
+## [3.210.6] - 2021-12-10
+### Fixed
+- Improve usage of `POSITION_PROVIDER_EXTRA_SCROLL` feature in calculating scroll position. [Trello 2751](https://trello.com/c/v03eizvV)
+
 ## [3.210.5] - 2021-12-07
 ### Fixed
 - RCA fix: handling unavailable CSS. [Trello 2749](https://trello.com/c/V8k6KUQ1/)

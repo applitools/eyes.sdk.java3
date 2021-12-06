@@ -317,7 +317,6 @@ public class FullPageCaptureAlgorithm {
             lastLocation = new Location(partPastePosition.x, partPastePosition.y);
             lastSize = new RectangleSize(scaledCroppedPartImage.getWidth(), scaledCroppedPartImage.getHeight());
             stitchedImage.getRaster().setRect(partPastePosition.x, partPastePosition.y, scaledCroppedPartImage.getData());
-            debugScreenshotsProvider.save(stitchedImage, "stitchedImage-" + partPastePosition.getX() + "_" + partPastePosition.getY());
             index++;
         }
 
