@@ -589,7 +589,12 @@ public class EyesDriverUtils {
      */
     public static boolean isAndroid(WebDriver driver) {
         driver = getUnderlyingDriver(driver);
-        return ((HasCapabilities) driver).getCapabilities().getPlatform().is(Platform.ANDROID);
+        Capabilities capabilities = ((HasCapabilities) driver).getCapabilities();
+        Object platformName = capabilities.getCapability("platformName");
+        if (platformName instanceof String && "Android".equalsIgnoreCase((String) platformName)) {
+            return true;
+        }
+        return capabilities.getPlatform().is(Platform.ANDROID);
     }
 
     /**
@@ -601,10 +606,16 @@ public class EyesDriverUtils {
     public static boolean isIOS(WebDriver driver) {
         driver = getUnderlyingDriver(driver);
         Capabilities capabilities = ((HasCapabilities) driver).getCapabilities();
-        Object origOs = capabilities.getCapability("orig_os");
         Object platformName = capabilities.getCapability("platformName");
+        if (platformName instanceof String && "iOS".equalsIgnoreCase((String) platformName)) {
+            return true;
+        }
+        Object origOs = capabilities.getCapability("orig_os");
+        if (origOs instanceof String && "ios".equalsIgnoreCase((String) origOs)) {
+            return true;
+        }
         Platform platform = capabilities.getPlatform();
-        return "ios".equals(origOs) || platform.is(Platform.IOS) || platform.is(Platform.MAC);
+        return platform.is(Platform.IOS) || platform.is(Platform.MAC);
     }
 
     /**

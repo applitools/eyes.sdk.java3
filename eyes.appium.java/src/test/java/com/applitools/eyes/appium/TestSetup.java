@@ -22,7 +22,8 @@ public abstract class TestSetup extends ReportingTestSuite implements ITest {
     // To run locally use http://127.0.0.1:4723/wd/hub
     protected String appiumServerUrl = "http://" + GeneralUtils.getEnvString("BROWSERSTACK_USERNAME") + ":" +
             GeneralUtils.getEnvString("BROWSERSTACK_ACCESS_KEY") + "@hub-cloud.browserstack.com/wd/hub";
-
+//    protected String appiumServerUrl = "https://" + GeneralUtils.getEnvString("SAUCE_USERNAME") + ":" +
+//            GeneralUtils.getEnvString("SAUCE_ACCESS_KEY") + "@ondemand.saucelabs.com:443/wd/hub";
     @Override
     public String getTestName() {
         return getClass().getName();
