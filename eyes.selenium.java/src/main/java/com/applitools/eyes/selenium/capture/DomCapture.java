@@ -66,7 +66,7 @@ public class DomCapture {
                 switchTo.frames(originalFC);
             }
 
-            // At this point we have all the frame DOM data (hopefully), but CSS files might still be downloading..
+            // At this point we have all the frame DOM data (hopefully), but CSS files might still be downloading...
             try {
                 if (shouldWaitForPhaser) {
                     cssPhaser.awaitAdvanceInterruptibly(0, 5, TimeUnit.MINUTES);
