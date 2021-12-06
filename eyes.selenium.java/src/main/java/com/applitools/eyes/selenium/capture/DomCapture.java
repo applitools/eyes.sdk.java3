@@ -143,6 +143,7 @@ public class DomCapture {
             GeneralUtils.logExceptionStackTrace(logger, Stage.CHECK, Type.DOM_SCRIPT, e, testId);
         }
 
+        // This pastes the relevant frames DOM data based on the placeholders. IMPORTANT: this does not place missing CSS yet.
         return EfficientStringReplace.efficientStringReplace(separators.iframeStartToken, separators.iframeEndToken, data.get(0), framesData);
     }
 
