@@ -175,7 +175,7 @@ public class DomCapture {
             do {
                 String str = lines[lineIndex++];
                 // If we encountered a block separator, move on to the next block
-                if (separators.blockSeparator.equals(str)) {
+                if (separators.separator.equals(str)) {
                     blockIndex++;
                 } else {
                     // Add the current line to the current block. Notice that this line updates the missingCss/Frames
