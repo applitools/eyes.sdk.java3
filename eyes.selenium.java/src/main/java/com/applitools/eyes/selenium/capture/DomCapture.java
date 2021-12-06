@@ -61,10 +61,12 @@ public class DomCapture {
             switchTo.defaultContent();
             String baseUrl = (String) driver.executeScript("return document.location.href");
             String dom = getFrameDom(baseUrl, Collections.singletonList(baseUrl));
+
             if (originalFC != null) {
                 switchTo.frames(originalFC);
             }
 
+            // At this point we have all the frame DOM data (hopefully), but CSS files might still be downloading..
             try {
                 if (shouldWaitForPhaser) {
                     cssPhaser.awaitAdvanceInterruptibly(0, 5, TimeUnit.MINUTES);
