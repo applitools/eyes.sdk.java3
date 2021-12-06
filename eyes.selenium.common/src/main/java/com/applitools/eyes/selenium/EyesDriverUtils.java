@@ -162,7 +162,7 @@ public class EyesDriverUtils {
     }
 
     private static boolean isMobileDeviceInner(WebDriver driver) throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
-        if (reflectionInstanceof(driver, "AppiumDriver")) {
+        if (reflectionInstanceOf(driver, "AppiumDriver")) {
             Method isBrowser;
             try {
                 isBrowser = driver.getClass().getDeclaredMethod("isBrowser");
@@ -176,7 +176,7 @@ public class EyesDriverUtils {
     }
 
     private static boolean isMobileDeviceByContextInner(WebDriver driver) throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
-        if (reflectionInstanceof(driver, "AppiumDriver")) {
+        if (reflectionInstanceOf(driver, "AppiumDriver")) {
             Method getContext;
             try {
                 getContext = driver.getClass().getDeclaredMethod("getContext");
@@ -521,7 +521,7 @@ public class EyesDriverUtils {
         }
 
         // Additional attempt. This Solves the "maximized browser" bug
-        // (border size for maximized browser sometimes different than
+        // (border size for maximized browser sometimes different from
         // non-maximized, so the original browser size calculation is
         // wrong).
         setBrowserSizeByViewportSize(driver, actualViewportSize, requiredSize);
@@ -769,7 +769,7 @@ public class EyesDriverUtils {
         Field[] fields = Proxy.class.getDeclaredFields();
         for (Field field : fields) {
             if (field.getType().equals(InvocationHandler.class)) {
-                //field.setAccessible(true);
+                field.setAccessible(true);
                 try {
                     InvocationHandler handler = (InvocationHandler) field.get(proxy);
                     return (WebElement) handler.invoke(null, WrapsElement.class.getMethod("getWrappedElement"), null);
@@ -782,7 +782,7 @@ public class EyesDriverUtils {
         throw new IllegalStateException("InvocationHandler field wasn't found in proxy class");
     }
 
-    private static boolean reflectionInstanceof(Object object, String className) {
+    private static boolean reflectionInstanceOf(Object object, String className) {
         Class<?> objectClass = object.getClass();
         while (objectClass != null) {
             if (objectClass.getSimpleName().equals(className)) {
