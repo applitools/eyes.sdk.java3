@@ -27,7 +27,7 @@ public class NoStatusBarTest extends AndroidTestSetup {
 
         driver.findElement(By.id("btn_no_status_bar")).click();
 
-        eyes.open(driver, getApplicationName(), "Check ScrollView");
+        eyes.open(driver, getApplicationName(), "Test RecyclerView");
 
         eyes.checkWindow();
 
