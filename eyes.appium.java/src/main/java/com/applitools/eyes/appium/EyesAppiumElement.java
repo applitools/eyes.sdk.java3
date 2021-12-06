@@ -20,6 +20,7 @@ public class EyesAppiumElement extends RemoteWebElement {
     private final EyesAppiumDriver driver;
     private final RemoteWebElement webElement;
     private final double pixelRatio;
+    private final AppiumElementScaleProvider scaleProvider;
 
     public EyesAppiumElement(EyesAppiumDriver driver, WebElement webElement, double pixelRatio) {
         ArgumentGuard.notNull(driver, "driver");
@@ -33,6 +34,7 @@ public class EyesAppiumElement extends RemoteWebElement {
         }
         this.pixelRatio = pixelRatio;
         this.driver = driver;
+        this.scaleProvider = new AppiumElementScaleProvider(driver, pixelRatio);
         setParent(driver.getRemoteWebDriver());
         setId(this.webElement.getId());
     }
@@ -43,15 +45,8 @@ public class EyesAppiumElement extends RemoteWebElement {
         if (pixelRatio == 1.0) {
             return size;
         }
-        int unscaledWidth;
-        int unscaledHeight;
-        if (EyesDriverUtils.isIOS(driver)) {
-            unscaledWidth = size.getWidth();
-            unscaledHeight = size.getHeight();
-        } else {
-            unscaledWidth = (int) Math.ceil(size.getWidth() * pixelRatio);
-            unscaledHeight = (int) Math.ceil(size.getHeight() * pixelRatio);
-        }
+        int unscaledWidth = scaleProvider.scale(size.getWidth());
+        int unscaledHeight = scaleProvider.scale(size.getHeight());
         return new Dimension(unscaledWidth, unscaledHeight);
     }
 
@@ -227,15 +222,8 @@ public class EyesAppiumElement extends RemoteWebElement {
         if (pixelRatio == 1.0) {
             return location;
         }
-        int unscaledX;
-        int unscaledY;
-        if (EyesDriverUtils.isIOS(driver)) {
-            unscaledX = location.getX();
-            unscaledY = location.getY();
-        } else {
-            unscaledX = (int) Math.ceil(location.getX() * pixelRatio);
-            unscaledY = (int) Math.ceil(location.getY() * pixelRatio);
-        }
+        int unscaledX = scaleProvider.scale(location.getX());
+        int unscaledY = scaleProvider.scale(location.getY());
         return new Point(unscaledX, unscaledY);
     }
 
