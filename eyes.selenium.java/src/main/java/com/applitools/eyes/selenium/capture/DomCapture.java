@@ -252,6 +252,7 @@ public class DomCapture {
         FrameChain fc = driver.getFrameChain().clone();
         for (String missingFrameLine : missingFramesList) {
             try {
+                // Each frame path is specified in a single line, levels separated by commas
                 String[] missingFrameXpaths = missingFrameLine.split(",");
                 for (String missingFrameXpath : missingFrameXpaths) {
                     WebElement frame = driver.findElement(By.xpath(missingFrameXpath));
@@ -265,12 +266,16 @@ public class DomCapture {
 
                 List<String> newFramePath = new ArrayList<>(framesPath);
                 newFramePath.add(locationAfterSwitch);
+
+                // Starting the DOM capture process for the relevant frame
                 String result = getFrameDom(locationAfterSwitch, newFramePath);
                 framesData.put(missingFrameLine, result);
+
             } catch (Exception e) {
                 GeneralUtils.logExceptionStackTrace(logger, Stage.CHECK, Type.DOM_SCRIPT, e, testId);
                 framesData.put(missingFrameLine, "");
             } finally {
+                // Go back to where we started
                 switchTo.frames(fc);
             }
         }
