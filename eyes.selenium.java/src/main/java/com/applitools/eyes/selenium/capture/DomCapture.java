@@ -209,26 +209,29 @@ public class DomCapture {
                     @Override
                     public void onComplete(RGridResource resource) {
                         try {
+                            String cssString;
                             if (resource != null) { // We only parse the resource if it's not null...
                                 if ("true".equalsIgnoreCase(GeneralUtils.getEnvString(APPLITOOLS_DEBUG_RCA))) {
                                     logger.log(testId, Stage.CHECK, Type.PARSE_RESOURCE, Pair.of("downloadUri", uri), Pair.of("resource", resource));
                                 }
-                                CssTreeNode node = new CssTreeNode(new String(resource.getContent()));
-                                node.parse(logger);
-                                List<String> importedUrls = node.getImportedUrls();
-                                if (!importedUrls.isEmpty()) {
-                                    fetchCssFiles(uri.toString(), importedUrls, node);
-                                }
-
-                                if (parentNode != null) {
-                                    parentNode.addChildNode(cssUrl, node);
-                                } else {
-                                    cssNodesToReplace.put(cssUrl, node);
-                                }
+                                cssString = new String(resource.getContent());
                             } else {
                                 if ("true".equalsIgnoreCase(GeneralUtils.getEnvString(APPLITOOLS_DEBUG_RCA))) {
                                     logger.log(testId, Stage.CHECK, Type.PARSE_RESOURCE, Pair.of("downloadUri", uri), Pair.of("resource", "resource is null"));
                                 }
+                                cssString = "/** CSS resource for: '" +  uri + "' is 'null'. This comment is for debugging purposes **/";
+                            }
+                            CssTreeNode node = new CssTreeNode(cssString);
+                            node.parse(logger);
+                            List<String> importedUrls = node.getImportedUrls();
+                            if (!importedUrls.isEmpty()) {
+                                fetchCssFiles(uri.toString(), importedUrls, node);
+                            }
+
+                            if (parentNode != null) {
+                                parentNode.addChildNode(cssUrl, node);
+                            } else {
+                                cssNodesToReplace.put(cssUrl, node);
                             }
                         } catch (Throwable e) {
                             GeneralUtils.logExceptionStackTrace(logger, Stage.CHECK, Type.DOM_SCRIPT, e, testId);
