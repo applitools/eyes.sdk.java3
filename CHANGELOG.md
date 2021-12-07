@@ -1,3 +1,8 @@
+## [vNext] - 2021-12-07
+### Fixed
+- RCA unavailble CSS handling. [Trello 2749](https://trello.com/c/V8k6KUQ1/)
+
+
 ## [3.210.4] - 2021-12-05
 ### Fixed
 - Added Support of NestedScrollView for Android. [Trello 2633](https://trello.com/c/dQqN02TN/)
