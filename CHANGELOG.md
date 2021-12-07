@@ -1,7 +1,6 @@
-## [vNext] - 2021-12-07
+## [3.210.5] - 2021-12-07
 ### Fixed
-- RCA unavailble CSS handling. [Trello 2749](https://trello.com/c/V8k6KUQ1/)
-
+- RCA fix: handling unavailable CSS. [Trello 2749](https://trello.com/c/V8k6KUQ1/)
 
 ## [3.210.4] - 2021-12-05
 ### Fixed
