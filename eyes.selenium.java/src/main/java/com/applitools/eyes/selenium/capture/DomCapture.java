@@ -61,10 +61,12 @@ public class DomCapture {
             switchTo.defaultContent();
             String baseUrl = (String) driver.executeScript("return document.location.href");
             String dom = getFrameDom(baseUrl, Collections.singletonList(baseUrl));
+
             if (originalFC != null) {
                 switchTo.frames(originalFC);
             }
 
+            // At this point we have all the frame DOM data (hopefully), but CSS files might still be downloading...
             try {
                 if (shouldWaitForPhaser) {
                     cssPhaser.awaitAdvanceInterruptibly(0, 5, TimeUnit.MINUTES);
@@ -143,9 +145,21 @@ public class DomCapture {
             GeneralUtils.logExceptionStackTrace(logger, Stage.CHECK, Type.DOM_SCRIPT, e, testId);
         }
 
+        // This pastes the relevant frames DOM data based on the placeholders. IMPORTANT: this does not place missing CSS yet.
         return EfficientStringReplace.efficientStringReplace(separators.iframeStartToken, separators.iframeEndToken, data.get(0), framesData);
     }
 
+    /**
+     * This method parses the string returned by the DOM Capture script. The string is internally divided into
+     * "blocks", starting with the separators section, followed by missing CSS or frames, followed by the actual DOM.
+     *
+     * @param scriptResult The string result of running the DOM Capture script.
+     * @param missingCssList A container *to be updated in place* for CSS files that could not be retrieved by the script.
+     * @param missingFramesList A container *to be updated in place* for frames that could not be retrieved by the script.
+     * @param data A container *to be updated in place* for frames that could not be retrieved by the script.
+     * @return The separators for the file are the direct returned value. However {@code missingCSSList},
+     *  {@code missingFramesList} and {@code data} are filled as a side effect of this method.
+     */
     private Separators parseScriptResult(String scriptResult, List<String> missingCssList, List<String> missingFramesList, List<String> data) {
         String[] lines = scriptResult.split("\\r?\\n");
         Separators separators = null;
@@ -160,9 +174,12 @@ public class DomCapture {
             int lineIndex = 1;
             do {
                 String str = lines[lineIndex++];
+                // If we encountered a block separator, move on to the next block
                 if (separators.separator.equals(str)) {
                     blockIndex++;
                 } else {
+                    // Add the current line to the current block. Notice that this line updates the missingCss/Frames
+                    // list *in place*.
                     blocks.get(blockIndex).add(str);
                 }
             } while (lineIndex < lines.length);
@@ -192,14 +209,19 @@ public class DomCapture {
                     @Override
                     public void onComplete(RGridResource resource) {
                         try {
-                            if ("true".equalsIgnoreCase(GeneralUtils.getEnvString(APPLITOOLS_DEBUG_RCA))) {
-                                if (resource != null) {
+                            String cssString;
+                            if (resource != null) { // We only parse the resource if it's not null...
+                                if ("true".equalsIgnoreCase(GeneralUtils.getEnvString(APPLITOOLS_DEBUG_RCA))) {
                                     logger.log(testId, Stage.CHECK, Type.PARSE_RESOURCE, Pair.of("downloadUri", uri), Pair.of("resource", resource));
-                                } else {
+                                }
+                                cssString = new String(resource.getContent());
+                            } else {
+                                if ("true".equalsIgnoreCase(GeneralUtils.getEnvString(APPLITOOLS_DEBUG_RCA))) {
                                     logger.log(testId, Stage.CHECK, Type.PARSE_RESOURCE, Pair.of("downloadUri", uri), Pair.of("resource", "resource is null"));
                                 }
+                                cssString = "/** CSS resource for: '" +  uri + "' is 'null'. This comment is for debugging purposes **/";
                             }
-                            CssTreeNode node = new CssTreeNode(new String(resource.getContent()));
+                            CssTreeNode node = new CssTreeNode(cssString);
                             node.parse(logger);
                             List<String> importedUrls = node.getImportedUrls();
                             if (!importedUrls.isEmpty()) {
@@ -219,7 +241,7 @@ public class DomCapture {
                     }
 
                     @Override
-                    public void onFail() {
+                    public void onFail() { // We couldn't download the resource
                         cssPhaser.arriveAndDeregister();
                     }
                 });
@@ -236,6 +258,7 @@ public class DomCapture {
         FrameChain fc = driver.getFrameChain().clone();
         for (String missingFrameLine : missingFramesList) {
             try {
+                // Each frame path is specified in a single line, levels separated by commas
                 String[] missingFrameXpaths = missingFrameLine.split(",");
                 for (String missingFrameXpath : missingFrameXpaths) {
                     WebElement frame = driver.findElement(By.xpath(missingFrameXpath));
@@ -249,12 +272,16 @@ public class DomCapture {
 
                 List<String> newFramePath = new ArrayList<>(framesPath);
                 newFramePath.add(locationAfterSwitch);
+
+                // Starting the DOM capture process for the relevant frame
                 String result = getFrameDom(locationAfterSwitch, newFramePath);
                 framesData.put(missingFrameLine, result);
+
             } catch (Exception e) {
                 GeneralUtils.logExceptionStackTrace(logger, Stage.CHECK, Type.DOM_SCRIPT, e, testId);
                 framesData.put(missingFrameLine, "");
             } finally {
+                // Go back to where we started
                 switchTo.frames(fc);
             }
         }
