@@ -2,6 +2,7 @@ package com.applitools.eyes.appium.android;
 
 import com.applitools.eyes.appium.TestSetup;
 import io.appium.java_client.AppiumDriver;
+import io.appium.java_client.android.AndroidDriver;
 import org.openqa.selenium.remote.RemoteWebDriver;
 
 import java.net.MalformedURLException;
@@ -21,7 +22,7 @@ public abstract class AndroidTestSetup extends TestSetup {
 
     @Override
     protected void initDriver() throws MalformedURLException {
-        driver = new AppiumDriver(new URL(appiumServerUrl), capabilities);
+        driver = new AndroidDriver(new URL(appiumServerUrl), capabilities);
     }
 
     @Override

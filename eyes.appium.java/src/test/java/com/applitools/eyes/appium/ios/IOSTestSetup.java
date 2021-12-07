@@ -25,7 +25,7 @@ public abstract class IOSTestSetup extends TestSetup {
 
     @Override
     protected void initDriver() throws MalformedURLException {
-        driver = new AppiumDriver(new URL(appiumServerUrl), capabilities);
+        driver = new IOSDriver(new URL(appiumServerUrl), capabilities);
     }
 
     @Override
