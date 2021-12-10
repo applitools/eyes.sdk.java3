@@ -280,7 +280,7 @@ public class FullPageCaptureAlgorithm {
             partAbsoluteLocationInCurrentFrame.translate(stitchOffset.getWidth(), stitchOffset.getHeight());
             Location scrollPosition = new Location(Math.round(partAbsoluteLocationInCurrentFrame.x * sizeRatio), Math.round(partAbsoluteLocationInCurrentFrame.y * sizeRatio));
             Location originPosition = stitchProvider.setPosition(scrollPosition);
-            checkForCorrectPosition(stitchProvider, scrollPosition, originPosition);
+            originPosition = checkForCorrectPosition(stitchProvider, scrollPosition, originPosition);
 
             int dx = scrollPosition.getX() - originPosition.getX();
             int dy = scrollPosition.getY() - originPosition.getY();
@@ -358,7 +358,7 @@ public class FullPageCaptureAlgorithm {
         return regionInScreenshot;
     }
 
-    private void checkForCorrectPosition(PositionProvider stitchProvider, Location targetLocation, Location afterScrollPosition) {
+    private Location checkForCorrectPosition(PositionProvider stitchProvider, Location targetLocation, Location afterScrollPosition) {
         if (features.contains(Feature.POSITION_PROVIDER_EXTRA_SCROLL)) {
             int attempt = 0;
             while (attempt < 4) {
@@ -385,9 +385,10 @@ public class FullPageCaptureAlgorithm {
                 isCorrect = true;
             }
             logger.log(TraceLevel.Info, Collections.singleton(testId), Stage.CHECK, Type.CAPTURE_SCREENSHOT,
-                    Pair.of("positionAfterScroll", afterScrollPosition),
-                    Pair.of("originPosition", targetLocation));
+                    Pair.of("afterScrollPosition", afterScrollPosition),
+                    Pair.of("targetLocation", targetLocation));
             retryCount++;
         }
+        return afterScrollPosition;
     }
 }
