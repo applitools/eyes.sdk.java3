@@ -117,7 +117,7 @@ public class VisualGridServiceRunner extends Thread {
         logger.log(testIds, Stage.RESOURCE_COLLECTION, Pair.of("resourceCollectionTaskId", resourceCollectionTaskId));
     }
 
-    public void addNativeMobileResources(byte[] vhs, Map<String, FrameData> resources, String contentType, List<CheckTask> checkTasks) {
+    public void addNativeMobileResources(byte[] vhs, Map<String, FrameData> resources, String contentType, List<CheckTask> checkTasks, VhsCompatibilityParams vhsCompatibilityParams) {
         String resourceCollectionTaskId = UUID.randomUUID().toString();
         Set<String> testIds = new HashSet<>();
         for (CheckTask checkTask : checkTasks) {
@@ -131,6 +131,7 @@ public class VisualGridServiceRunner extends Thread {
             // Eventually IOS case will be the same as android case
             RGridDom dom = new RGridDom(vhsResource);
             dom.setTestIds(testIds);
+            dom.setVhsCompatibilityParams(vhsCompatibilityParams);
             putResourceService.addInput(resourceCollectionTaskId, dom);
         } else {
             if (resources.size() == 0) {
@@ -395,7 +396,7 @@ public class VisualGridServiceRunner extends Thread {
 
             RenderInfo renderInfo = new RenderInfo(browserInfo.getWidth(), browserInfo.getHeight(),
                     sizeMode, checkSettingsInternal.getTargetRegion(), checkSettingsInternal.getVGTargetSelector(),
-                    browserInfo.getEmulationInfo(), browserInfo.getIosDeviceInfo(), browserInfo.getAndroidDeviceInfo());
+                    browserInfo.getEmulationInfo(), browserInfo.getIosDeviceInfo(), browserInfo.getAndroidDeviceInfo(), dom.getVhsCompatibilityParams());
 
             RenderRequest request = new RenderRequest(checkTask.getTestId(), this.renderingInfo.getResultsUrl(), result.getUrl(), dom,
                     dom.getResources(), renderInfo, browserInfo.getPlatform(), "web", browserInfo.getBrowserType(),
@@ -420,7 +421,7 @@ public class VisualGridServiceRunner extends Thread {
             ICheckSettingsInternal checkSettingsInternal = (ICheckSettingsInternal) checkTasks.get(0).getCheckSettings();
             RenderBrowserInfo deviceInfo = checkTask.getBrowserInfo();
             RenderInfo renderInfo = new RenderInfo(deviceInfo.getWidth(), deviceInfo.getHeight(), checkSettingsInternal.getSizeMode(),
-                    null, null, null, deviceInfo.getIosDeviceInfo(), deviceInfo.getAndroidDeviceInfo());
+                    null, null, null, deviceInfo.getIosDeviceInfo(), deviceInfo.getAndroidDeviceInfo(), dom.getVhsCompatibilityParams());
 
             RenderRequest request = new RenderRequest(checkTask.getTestId(), this.renderingInfo.getResultsUrl(), dom, dom.getResources(),
                     renderInfo, deviceInfo.getPlatform(), "native", checkSettingsInternal.getScriptHooks(), checkTask.getRenderer(),

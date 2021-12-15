@@ -44,6 +44,7 @@ import com.applitools.eyes.visualgrid.services.VisualGridRunner;
 import com.applitools.eyes.visualgrid.services.VisualGridRunningTest;
 import com.applitools.utils.*;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.appium.java_client.AppiumDriver;
@@ -643,6 +644,7 @@ public class Eyes extends RunningTest implements IEyes {
             byte[] vhs;
             String vhsContentType;
             String vhsType = null;
+            VhsCompatibilityParams vhsCompatibilityParams = null;
             Map<String, FrameData> resources = new HashMap<>();
             if (EyesDriverUtils.isAndroid(driver)) {
                 AndroidVHSCaptureResult result = getVHSAndroid(testIds);
@@ -651,7 +653,12 @@ public class Eyes extends RunningTest implements IEyes {
                 resources = result.getResources();
                 vhsContentType = String.format("x-applitools-vhs/%s", vhsType);
             } else if (EyesDriverUtils.isIOS(driver)) {
-                vhs = getVHSIos();
+                try {
+                    vhs = getVHSIos();
+                    vhsCompatibilityParams = getVhsCompatibilityParams();
+                } finally {
+                    driver.findElementByAccessibilityId("UFG_ClearArea").click();
+                }
                 vhsContentType = "x-applitools-vhs/ios";
             } else {
                 throw new EyesException("Unknown platform");
@@ -674,7 +681,7 @@ public class Eyes extends RunningTest implements IEyes {
                 return;
             }
             VisualGridRunner visualGridRunner = (VisualGridRunner) runner;
-            visualGridRunner.check(vhs, resources, vhsContentType, checkTasks);
+            visualGridRunner.check(vhs, resources, vhsContentType, checkTasks, vhsCompatibilityParams);
         } catch (Throwable e) {
             Error error = new Error(e);
             for (RunningTest runningTest : visualGridTestList.values()) {
@@ -740,18 +747,25 @@ public class Eyes extends RunningTest implements IEyes {
     }
 
     public byte[] getVHSIos() {
-        try {
-            List<WebElement> list = driver.findElementsByName("UFG_TriggerArea");
-            if (list.isEmpty()) {
-                throw new EyesException("Please check integration of UFG lib in the application");
-            }
-            list.get(list.size() -1).click();
-            String base64 = driver.findElementByName("UFG_Label").getAttribute("value");
-            return Base64.decodeBase64(base64);
-        } finally {
-            driver.findElementByAccessibilityId("UFG_ClearArea").click();
+        List<WebElement> list = driver.findElementsByName("UFG_TriggerArea");
+        if (list.isEmpty()) {
+            throw new EyesException("Please check integration of UFG lib in the application");
         }
+        list.get(list.size() -1).click();
+        String base64 = driver.findElementByName("UFG_Label").getAttribute("value");
+        return Base64.decodeBase64(base64);
+    }
 
+    private VhsCompatibilityParams getVhsCompatibilityParams() {
+        String jsonValue = driver.findElementByName("UFG_SecondaryLabel").getAttribute("value");
+        VhsCompatibilityParams vhsCompatibilityParams = null;
+        try {
+            ObjectMapper mapper = new ObjectMapper();
+            vhsCompatibilityParams = mapper.readValue(jsonValue, VhsCompatibilityParams.class);
+        } catch (JsonProcessingException e) {
+            e.printStackTrace();
+        }
+        return vhsCompatibilityParams;
     }
 
     private ICheckSettings updateCheckSettings(ICheckSettings checkSettings) {
