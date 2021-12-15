@@ -29,7 +29,7 @@ public class TestRenderSerialization {
         String target = "full-page";
         Region region = new Region(40, 50, 60, 70);
         EmulationBaseInfo emulationInfo = new ChromeEmulationInfo(DeviceName.Galaxy_S5, ScreenOrientation.PORTRAIT);
-        RenderInfo renderInfo = new RenderInfo(width, height, target, region, null, emulationInfo, null, null);
+        RenderInfo renderInfo = new RenderInfo(width, height, target, region, null, emulationInfo, null, null, null);
 
         String xpath = "//html/body/some/path/to/some/element[@with:attribute]";
         Object category = "cat";
