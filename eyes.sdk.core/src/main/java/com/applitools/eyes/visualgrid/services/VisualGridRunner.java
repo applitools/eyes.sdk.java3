@@ -4,10 +4,7 @@ import com.applitools.connectivity.ServerConnector;
 import com.applitools.eyes.*;
 import com.applitools.eyes.exceptions.TestFailedException;
 import com.applitools.eyes.services.VisualGridServiceRunner;
-import com.applitools.eyes.visualgrid.model.FrameData;
-import com.applitools.eyes.visualgrid.model.IDebugResourceWriter;
-import com.applitools.eyes.visualgrid.model.RGridResource;
-import com.applitools.eyes.visualgrid.model.RenderingInfo;
+import com.applitools.eyes.visualgrid.model.*;
 
 import java.util.*;
 
