@@ -125,7 +125,7 @@ public class VisualGridRunningTest extends RunningTest {
 
         SyncTaskListener<JobInfo[]> listener = new SyncTaskListener<>(logger, String.format("getJobInfo %s", browserInfo));
         RenderInfo renderInfo = new RenderInfo(browserInfo.getWidth(), browserInfo.getHeight(), null, null,
-                null, browserInfo.getEmulationInfo(), browserInfo.getIosDeviceInfo(), browserInfo.getAndroidDeviceInfo());
+                null, browserInfo.getEmulationInfo(), browserInfo.getIosDeviceInfo(), browserInfo.getAndroidDeviceInfo(), null);
         String platformType = isWeb ? "web" : "native";
         RenderRequest renderRequest = new RenderRequest(renderInfo, browserInfo.getPlatform(), platformType, isWeb ? browserInfo.getBrowserType() : null);
         renderRequest.setTestId(getTestId());
