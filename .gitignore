@@ -20,6 +20,8 @@ eyes.selenium.java/src/main/resources/captureDom.js
 eyes.selenium.java/src/main/resources/processPage.js
 eyes.selenium.java/src/main/resources/processPageAndSerialize.js
 eyes.selenium.java/src/main/resources/processResource.js
+eyes.selenium.java/src/test/**
+screenshot_*.png
 /.java-version
 
 */bin
