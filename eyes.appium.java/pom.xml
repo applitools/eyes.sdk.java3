@@ -18,7 +18,7 @@
         <dependency>
             <groupId>com.applitools</groupId>
             <artifactId>eyes-selenium-common-java3</artifactId>
-            <version>3.209.0-beta</version>
+            <version>3.210.6</version>
         </dependency>
         <dependency>
             <groupId>io.appium</groupId>
