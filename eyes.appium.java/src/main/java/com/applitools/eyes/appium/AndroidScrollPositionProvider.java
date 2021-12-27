@@ -23,7 +23,6 @@ import org.openqa.selenium.remote.RemoteWebElement;
 import java.time.Duration;
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 
 public class AndroidScrollPositionProvider extends AppiumScrollPositionProvider {
 
@@ -171,6 +170,7 @@ public class AndroidScrollPositionProvider extends AppiumScrollPositionProvider 
             scrollAction.addAction(finger.createPointerUp(PointerInput.MouseButton.LEFT.asArg()));
             driver.perform(Collections.singletonList(scrollAction));
         } catch (UnsupportedCommandException e) {
+            logger.log(TraceLevel.Warn, eyesDriver.getTestId(), Stage.CHECK, "Using legacy scroll actions");
             TouchAction scrollAction = new TouchAction((PerformsTouchActions) driver);
             scrollAction.press(new PointOption().withCoordinates(startX, startY)).waitAction(new WaitOptions().withDuration(Duration.ofMillis(1500)));
             scrollAction.moveTo(new PointOption().withCoordinates(endX, endY));
@@ -211,9 +211,10 @@ public class AndroidScrollPositionProvider extends AppiumScrollPositionProvider 
                 Pair.of("to", new Location(startX, startY)));
 
         try {
-            scrollTo_w3c(startX, startY, endX, endY);
+            scrollToW3c(startX, startY, endX, endY);
         } catch (UnsupportedCommandException e) {
-            scrollTo_legacy(startX, startY, endX, endY, contentSize.touchPadding, 1500, shouldCancel);
+            logger.log(TraceLevel.Warn, eyesDriver.getTestId(), Stage.CHECK, "Using legacy scroll actions");
+            scrollToLegacy(startX, startY, endX, endY, contentSize.touchPadding, 1500, shouldCancel);
         }
 
         curScrollPos = new Location(curScrollPos.getX(), curScrollPos.getY() + startY - endY);

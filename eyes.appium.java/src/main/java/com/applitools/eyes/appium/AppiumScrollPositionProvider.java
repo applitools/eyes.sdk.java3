@@ -236,7 +236,7 @@ public abstract class AppiumScrollPositionProvider implements ScrollPositionProv
         this.scrollRootElement = scrollRootElement;
     }
 
-    protected void scrollTo_w3c(int startX, int startY, int endX, int endY) {
+    protected void scrollToW3c(int startX, int startY, int endX, int endY) {
         PointerInput finger = new PointerInput(PointerInput.Kind.TOUCH, "finger");
         Sequence scrollAction = new Sequence(finger, 0);
         scrollAction.addAction(finger.createPointerMove(Duration.ofMillis(0), PointerInput.Origin.viewport(), startX, startY));
@@ -249,7 +249,7 @@ public abstract class AppiumScrollPositionProvider implements ScrollPositionProv
         driver.perform(Collections.singleton(scrollAction));
     }
 
-    protected void scrollTo_legacy(int startX, int startY, int endX, int endY, int padding, int wait, boolean shouldCancel) {
+    protected void scrollToLegacy(int startX, int startY, int endX, int endY, int padding, int wait, boolean shouldCancel) {
         TouchAction scrollAction = new TouchAction((PerformsTouchActions) driver);
         scrollAction.press(new PointOption().withCoordinates(startX, startY)).waitAction(new WaitOptions().withDuration(Duration.ofMillis(wait)));
         scrollAction.moveTo(new PointOption().withCoordinates(endX, Math.max(endY - padding, 0)));
