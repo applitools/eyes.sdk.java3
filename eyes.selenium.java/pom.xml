@@ -45,7 +45,7 @@
         <dependency>
             <groupId>io.appium</groupId>
             <artifactId>java-client</artifactId>
-            <version>7.0.0</version>
+            <version>8.0.0-beta</version>
             <scope>test</scope>
         </dependency>
     </dependencies>

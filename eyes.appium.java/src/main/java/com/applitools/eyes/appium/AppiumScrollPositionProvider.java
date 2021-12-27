@@ -241,7 +241,7 @@ public abstract class AppiumScrollPositionProvider implements ScrollPositionProv
         Sequence scrollAction = new Sequence(finger, 0);
         scrollAction.addAction(finger.createPointerMove(Duration.ofMillis(0), PointerInput.Origin.viewport(), startX, startY));
         scrollAction.addAction(finger.createPointerDown(PointerInput.MouseButton.LEFT.asArg()));
-        //endY = Math.max(endY - contentSize.touchPadding, 0);
+        endY = Math.max(endY - contentSize.touchPadding, 0);
         scrollAction.addAction(finger.createPointerMove(Duration.ofMillis(5000), PointerInput.Origin.viewport(), endX, endY));
         scrollAction.addAction(finger.createPointerMove(Duration.ofMillis(500), PointerInput.Origin.viewport(), endX, endY));
 

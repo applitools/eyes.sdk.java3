@@ -10,6 +10,8 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.mockito.Mockito;
+import org.openqa.selenium.Capabilities;
+import org.openqa.selenium.remote.Response;
 import org.testng.Assert;
 import java.util.HashMap;
 import java.util.Map;
@@ -23,9 +25,23 @@ public class SystemBarsExceptionTest extends ReportingTestSuite {
     @BeforeClass
     public static void beforeClass() {
         sessionDetails = new HashMap<>();
+        Capabilities capabilities = new Capabilities() {
+            @Override
+            public Map<String, Object> asMap() {
+                return sessionDetails;
+            }
+
+            @Override
+            public Object getCapability(String capabilityName) {
+                return sessionDetails.get(capabilityName);
+            }
+        };
 
         remoteWebDriver = Mockito.mock(AndroidDriver.class);
-        when(remoteWebDriver.getCapabilities().asMap()).thenReturn(sessionDetails);
+        Response response = new Response();
+        response.setValue(sessionDetails);
+        when(remoteWebDriver.getCapabilities()).thenReturn(capabilities);
+        when(remoteWebDriver.execute("getSession")).thenReturn(response);
 
         when(remoteWebDriver.getSystemBars()).thenThrow(NullPointerException.class);
     }
