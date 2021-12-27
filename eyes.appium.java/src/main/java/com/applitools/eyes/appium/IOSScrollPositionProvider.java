@@ -179,9 +179,10 @@ public class IOSScrollPositionProvider extends AppiumScrollPositionProvider {
                 Pair.of("to", new Location(startX, startY)));
 
         try {
-            scrollTo_w3c(startX, startY, endX, endY);
+            scrollToW3c(startX, startY, endX, endY);
         } catch (UnsupportedCommandException e) {
-            scrollTo_legacy(startX, startY, endX, endY, 0, 5000, false);
+            logger.log(TraceLevel.Warn, eyesDriver.getTestId(), Stage.CHECK, "Using legacy scroll actions");
+            scrollToLegacy(startX, startY, endX, endY, 0, 5000, false);
         }
 
         try {
@@ -437,6 +438,7 @@ public class IOSScrollPositionProvider extends AppiumScrollPositionProvider {
             driver.perform(Collections.singleton(scrollAction));
 
         } catch (UnsupportedCommandException e) {
+            logger.log(TraceLevel.Warn, eyesDriver.getTestId(), Stage.CHECK, "Using legacy scroll actions");
             TouchAction triggerAction = new TouchAction((PerformsTouchActions) driver);
             triggerAction.tap(new PointOption().withCoordinates(trigger.getLocation().x, trigger.getLocation().y)).waitAction(new WaitOptions().withDuration(Duration.ofMillis(1000)));
             triggerAction.release();

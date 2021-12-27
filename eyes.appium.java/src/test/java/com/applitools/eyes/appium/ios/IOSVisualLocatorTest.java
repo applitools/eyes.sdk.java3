@@ -7,10 +7,13 @@ import io.appium.java_client.PerformsTouchActions;
 import io.appium.java_client.TouchAction;
 import io.appium.java_client.touch.WaitOptions;
 import io.appium.java_client.touch.offset.PointOption;
+import org.openqa.selenium.interactions.PointerInput;
+import org.openqa.selenium.interactions.Sequence;
 import org.testng.annotations.Test;
 
 import java.time.Duration;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -44,10 +47,12 @@ public class IOSVisualLocatorTest extends IOSTestSetup {
             Location clickLocation = new Location(listViewLocator.getLeft() + listViewLocator.getWidth() / 2,
                     listViewLocator.getTop() + listViewLocator.getHeight() / 2);
 
-            TouchAction actionPress = new TouchAction((PerformsTouchActions) driver);
-            actionPress.press(PointOption.point(clickLocation.getX(), clickLocation.getY())).waitAction(WaitOptions.waitOptions(Duration.ofMillis(500)));
-            actionPress.release();
-            ((PerformsTouchActions) driver).performTouchAction(actionPress);
+            PointerInput finger = new PointerInput(PointerInput.Kind.TOUCH, "finger");
+            Sequence scrollAction = new Sequence(finger, 1);
+            scrollAction.addAction(finger.createPointerMove(Duration.ofMillis(0), PointerInput.Origin.viewport(), clickLocation.getX(), clickLocation.getY()));
+            scrollAction.addAction(finger.createPointerDown(PointerInput.MouseButton.LEFT.asArg()));
+            scrollAction.addAction(finger.createPointerUp(PointerInput.MouseButton.LEFT.asArg()));
+            driver.perform(Collections.singletonList(scrollAction));
 
             eyes.checkWindow("ListView screen");
         }
