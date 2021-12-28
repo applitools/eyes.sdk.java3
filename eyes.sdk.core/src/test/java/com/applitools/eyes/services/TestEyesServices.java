@@ -146,6 +146,18 @@ public class TestEyesServices {
         when(matchWindowFailed.getAppOutput()).thenReturn(appOutput3);
         when(matchWindowException.getAppOutput()).thenReturn(appOutput3);
 
+        RunningSession runningSession = mock(RunningSession.class);
+        when(matchWindowSuccess.getTestId()).thenReturn("id");
+        when(matchWindowSuccess.getRunningSession()).thenReturn(runningSession);
+        when(matchWindowFailed.getTestId()).thenReturn("id");
+        when(matchWindowFailed.getRunningSession()).thenReturn(runningSession);
+        when(matchWindowException.getTestId()).thenReturn("id");
+        when(matchWindowException.getRunningSession()).thenReturn(runningSession);
+        when(matchWindowUploadFailed.getTestId()).thenReturn("id");
+        when(matchWindowUploadFailed.getRunningSession()).thenReturn(runningSession);
+        when(matchWindowUploadException.getTestId()).thenReturn("id");
+        when(matchWindowUploadException.getRunningSession()).thenReturn(runningSession);
+
         CheckService checkService = new CheckService(new Logger(), serverConnector);
         checkService.addInput("1", matchWindowSuccess);
         checkService.addInput("2", matchWindowFailed);
@@ -280,9 +292,9 @@ public class TestEyesServices {
             }
         };
 
-        ResourceCollectionService resourceCollectionService = new ResourceCollectionService(new Logger(), serverConnector, null, new HashMap<String, RGridResource>());
-        resourceCollectionService.uploadedResourcesCache.put("2", null);
-        resourceCollectionService.uploadedResourcesCache.put("4", null);
+        PutResourceService putResourceService = new PutResourceService(new Logger(), serverConnector);
+        putResourceService.uploadedResourcesCache.put("2", null);
+        putResourceService.uploadedResourcesCache.put("4", null);
 
         Map<String, RGridResource> resourceMap = new HashMap<>();
         for (int i = 0; i < 5; i++) {
@@ -297,12 +309,13 @@ public class TestEyesServices {
         RGridResource domResource = mock(RGridResource.class);
         when(dom.asResource()).thenReturn(domResource);
         when(domResource.getSha256()).thenReturn("5");
+        when(dom.getResources()).thenReturn(resourceMap);
 
         // Dom has the same url as one of the resources
         when(domResource.getUrl()).thenReturn("http://url1.com");
 
         final SyncTaskListener<List<RGridResource>> listener = new SyncTaskListener<>(new Logger(new StdoutLogHandler()), "test check resources");
-        resourceCollectionService.checkResourcesStatus(dom, resourceMap, new ServiceTaskListener<List<RGridResource>>() {
+        putResourceService.checkResourcesStatus(dom, new ServiceTaskListener<List<RGridResource>>() {
             @Override
             public void onComplete(List<RGridResource> taskResponse) {
                 listener.onComplete(taskResponse);
@@ -351,8 +364,8 @@ public class TestEyesServices {
         Assert.assertEquals(resourceCollectionService.errorQueue.size(), 0);
         Assert.assertEquals(resourceCollectionService.outputQueue.size(), 1);
 
-        Pair<String, Map<String, RGridResource>> pair = resourceCollectionService.outputQueue.get(0);
+        Pair<String, RGridDom> pair = resourceCollectionService.outputQueue.get(0);
         Assert.assertEquals(pair.getLeft(), "1");
-        Assert.assertEquals(pair.getRight().keySet(), new HashSet<>(urls));
+        Assert.assertEquals(pair.getRight().getResources().keySet(), new HashSet<>(urls));
     }
 }

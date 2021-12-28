@@ -26,7 +26,7 @@
 ### Added
 - APPLITOOLS_DEBUG_RCA envrionment variable for additional DOM debug data. [Trello 2749](https://trello.com/c/V8k6KUQ1/)
 ### Fixed
- - Android full page issue for complex hierarchy. [Trello 2633](https://trello.com/c/dQqN02TN/)
+- Android full page issue for complex hierarchy. [Trello 2633](https://trello.com/c/dQqN02TN/)
 
 ## [3.209.1] - 2021-11-18
 ### Updated
@@ -37,6 +37,16 @@
 - Selenium 4 Compatibility
 ### Updated
 - Translate coordinates of web elements inside WebView according to WebView location on the device screen. [Trello 2607](https://trello.com/c/u5yzG8XE)
+
+## [3.208.3] - 2021-10-25
+### Updated
+- Prepared tests for Appium/UFG version releases.
+### Fixed
+- Android full page stitching issue. [Trello 2633](https://trello.com/c/dQqN02TN)
+
+## [3.209.0-beta] - 2021-10-26
+### Added
+- Support for Android UFG Beta
 
 ## [3.208.3] - 2021-10-25
 ### Updated
@@ -59,6 +69,10 @@
 ## [3.207.4] - 2021-08-21
 ### Updated
 - Use original height of scrollable element to calculate scroll steps. [Trello 2633](https://trello.com/c/dQqN02TN)
+
+## [3.207.3-beta] - 2021-08-12
+### Added
+- Supporting ufg tests for android native apps.
 
 ## [3.207.3] - 2021-08-03
 ### Updated
@@ -130,6 +144,22 @@
 ### Fixed
 - Fixed an edge case when there are infinite attempts of downloading a resource. [Trello 2563](https://trello.com/c/nKYEYiQ6)
 - Not adjusting the size for mobile devices if the width ratio is low. [Trello 2558](https://trello.com/c/5MXTjDMs)
+
+## [3.202.0-beta] 2021-07-14
+### Updated
+- Updated appium trigger for ios.
+
+## [3.201.1-beta]
+### Fixed
+- UFG Native Mobile takes full page screenshots by default.
+
+## [3.201.0-beta]
+### Added
+- Added API for `addMobileDevices`.
+
+## [3.200.0-beta]
+### Added
+- UFG for IOS Native tests.
 
 ## [3.201.0]
 ### Added

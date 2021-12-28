@@ -1,6 +1,7 @@
 package com.applitools.eyes.appium;
 
 import com.applitools.ICheckSettings;
+import com.applitools.connectivity.ServerConnector;
 import com.applitools.eyes.*;
 import com.applitools.eyes.appium.capture.ImageProviderFactory;
 import com.applitools.eyes.appium.capture.MobileImageProvider;
@@ -36,9 +37,19 @@ import com.applitools.eyes.selenium.positioning.RegionPositionCompensation;
 import com.applitools.eyes.selenium.regionVisibility.MoveToRegionVisibilityStrategy;
 import com.applitools.eyes.selenium.regionVisibility.NopRegionVisibilityStrategy;
 import com.applitools.eyes.selenium.regionVisibility.RegionVisibilityStrategy;
+import com.applitools.eyes.visualgrid.model.*;
+import com.applitools.eyes.visualgrid.services.CheckTask;
+import com.applitools.eyes.visualgrid.services.IEyes;
+import com.applitools.eyes.visualgrid.services.VisualGridRunner;
+import com.applitools.eyes.visualgrid.services.VisualGridRunningTest;
 import com.applitools.utils.*;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import io.appium.java_client.AppiumDriver;
 import io.appium.java_client.MobileBy;
+import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.lang3.tuple.Pair;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.*;
@@ -46,9 +57,10 @@ import org.openqa.selenium.remote.RemoteWebDriver;
 
 import java.awt.image.BufferedImage;
 import java.net.URI;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 
-public class Eyes extends EyesBase {
+public class Eyes extends RunningTest implements IEyes {
     private static final int USE_DEFAULT_MATCH_TIMEOUT = -1;
     private static final int DEFAULT_STITCH_OVERLAP = 50;
     private static final int IOS_STITCH_OVERLAP = 0;
@@ -56,6 +68,7 @@ public class Eyes extends EyesBase {
     public static final double UNKNOWN_DEVICE_PIXEL_RATIO = 0;
     public static final double DEFAULT_DEVICE_PIXEL_RATIO = 1;
 
+    private final boolean isVisualGrid;
     private Configuration configuration = new Configuration();
     private EyesAppiumDriver driver;
     private VisualLocatorsProvider visualLocatorsProvider;
@@ -70,8 +83,15 @@ public class Eyes extends EyesBase {
     private PropertyHandler<RegionVisibilityStrategy> regionVisibilityStrategyHandler;
     private WebElement scrollRootElement = null;
 
+    final Map<String, RunningTest> visualGridTestList = new HashMap<>();
+
     public Eyes() {
-        super(new ClassicRunner());
+        this(new ClassicRunner());
+    }
+
+    public Eyes(EyesRunner runner) {
+        super(runner);
+        isVisualGrid = runner instanceof VisualGridRunner;
         regionVisibilityStrategyHandler = new SimplePropertyHandler<>();
         regionVisibilityStrategyHandler.set(new MoveToRegionVisibilityStrategy());
         configuration.setStitchOverlap(DEFAULT_STITCH_OVERLAP);
@@ -148,6 +168,11 @@ public class Eyes extends EyesBase {
         tryUpdateDevicePixelRatio();
 
         ensureViewportSize();
+        if (isVisualGrid) {
+            openVisualGrid();
+            return this.driver;
+        }
+
         openBase();
 
         initImageProvider();
@@ -188,7 +213,17 @@ public class Eyes extends EyesBase {
         this.check(checkSettings);
     }
 
-    protected void ensureViewportSize() {
+    @Override
+    public IBatchCloser getBatchCloser() {
+        return this;
+    }
+
+    @Override
+    public String getBatchId() {
+        return getConfiguration().getBatch().getId();
+    }
+
+    private void ensureViewportSize() {
         this.configuration.setViewportSize(driver.getDefaultContentViewportSize());
     }
 
@@ -365,6 +400,13 @@ public class Eyes extends EyesBase {
             return;
         }
 
+        if (isVisualGrid) {
+            for (ICheckSettings checkSetting : checkSettings) {
+                this.check(checkSetting);
+            }
+            return;
+        }
+
         boolean originalForceFPS = getConfigurationInstance().getForceFullPageScreenshot() != null && getConfigurationInstance().getForceFullPageScreenshot();
 
         if (checkSettings.length > 1) {
@@ -432,12 +474,18 @@ public class Eyes extends EyesBase {
         String name = checkSettingsInternal.getName();
         for (EyesScreenshot subScreenshot : subScreenshots) {
             debugScreenshotsProvider.save(subScreenshot.getImage(), String.format("subscreenshot_%s", name));
-
-            ImageMatchSettings ims = MatchWindowTask.createImageMatchSettings(checkSettingsInternal, subScreenshot, this);
             Location location = subScreenshot.getLocationInScreenshot(Location.ZERO, CoordinatesType.SCREENSHOT_AS_IS);
             AppOutput appOutput = new AppOutput(name, subScreenshot, null, null, location);
-            MatchWindowData data = prepareForMatch(checkSettingsInternal, new ArrayList<Trigger>(), appOutput, name, false,
-                    ims, null, getAppName());
+            if (isAsync) {
+                CheckTask checkTask = issueCheck((ICheckSettings) checkSettingsInternal, null, getAppName());
+                checkTask.setAppOutput(appOutput);
+                performMatchAsync(checkTask);
+                continue;
+            }
+
+            ImageMatchSettings ims = MatchWindowTask.createImageMatchSettings(checkSettingsInternal, subScreenshot, this);
+            MatchWindowData data = prepareForMatch(checkSettingsInternal, new ArrayList<Trigger>(), appOutput, name,
+                    false, ims, null, getAppName());
             performMatch(data);
         }
     }
@@ -446,6 +494,11 @@ public class Eyes extends EyesBase {
         logger.log(TraceLevel.Info, Collections.singleton(getTestId()), Stage.CHECK, Type.CALLED,
                 Pair.of("configuration", getConfiguration()),
                 Pair.of("checkSettings", checkSettings));
+
+        if (isVisualGrid) {
+            checkVisualGrid(checkSettings);
+            return;
+        }
 
         if (checkSettings instanceof AppiumCheckSettings) {
             updateCutElement((AppiumCheckSettings) checkSettings);
@@ -511,21 +564,6 @@ public class Eyes extends EyesBase {
     }
 
     @Override
-    public TestResults close(boolean throwEx) {
-        logger.log(getTestId(), Stage.CLOSE, Type.CALLED, Pair.of("throwEx", throwEx));
-        TestResults results = null;
-        try {
-            results = super.close(throwEx);
-        } catch (Throwable e) {
-            GeneralUtils.logExceptionStackTrace(logger, Stage.GENERAL, e, getTestId());
-            if (throwEx) {
-                throw e;
-            }
-        }
-        return results;
-    }
-
-    @Override
     protected void getAppOutputForOcr(BaseOcrRegion ocrRegion) {
         OcrRegion appiumOcrRegion = (OcrRegion) ocrRegion;
         AppiumCheckSettings checkSettings = null;
@@ -549,6 +587,328 @@ public class Eyes extends EyesBase {
     @Override
     protected ScreenshotProvider getScreenshotProvider() {
         return new MobileScreenshotProvider(driver, getDevicePixelRatio());
+    }
+
+    public void openVisualGrid() {
+        runner.setApiKey(getApiKey());
+        runner.setServerUrl(getServerUrl().toString());
+        runner.setProxy(getProxy());
+
+        if (isOpen) {
+            return;
+        }
+
+        isOpen = true;
+        if (this.getConfiguration().getBrowsersInfo().isEmpty()) {
+            throw new EyesException("Device wasn't set in the configuration");
+        }
+
+        if (runner.getAgentId() == null ) {
+            runner.setAgentId(getFullAgentId());
+        }
+
+        VisualGridRunner visualGridRunner = (VisualGridRunner) runner;
+        visualGridRunner.setLogger(logger);
+
+        List<RenderBrowserInfo> deviceInfoList = getConfiguration().getBrowsersInfo();
+        List<RunningTest> newTests = new ArrayList<>();
+        ServerConnector serverConnector = runner.getServerConnector();
+        for (RenderBrowserInfo deviceInfo : deviceInfoList) {
+            if (deviceInfo.getIosDeviceInfo() == null && deviceInfo.getAndroidDeviceInfo() == null) {
+                throw new EyesException("All browser infos must be ios device info or android device info");
+            }
+
+            String agentRunId = String.format("%s_%s", getConfiguration().getTestName(), UUID.randomUUID());
+            RunningTest test = new VisualGridRunningTest(logger, false, getTestId(), getConfiguration(), deviceInfo, this.properties, serverConnector, agentRunId);
+            this.visualGridTestList.put(test.getTestId(), test);
+            newTests.add(test);
+        }
+
+        try {
+            visualGridRunner.open(this, newTests);
+        } catch (Throwable t) {
+            for (RunningTest runningTest : visualGridTestList.values()) {
+                runningTest.openFailed(t);
+            }
+            throw t;
+        }
+    }
+
+    private void checkVisualGrid(ICheckSettings checkSettings) {
+        checkSettings = updateCheckSettings(checkSettings);
+        Set<String> testIds = new HashSet<>();
+        for (RunningTest runningTest : visualGridTestList.values()) {
+            testIds.add(runningTest.getTestId());
+        }
+        try {
+            byte[] vhs;
+            String vhsContentType;
+            String vhsType = null;
+            VhsCompatibilityParams vhsCompatibilityParams = null;
+            Map<String, FrameData> resources = new HashMap<>();
+            if (EyesDriverUtils.isAndroid(driver)) {
+                AndroidVHSCaptureResult result = getVHSAndroid(testIds);
+                vhs = result.getVhs();
+                vhsType = result.getVcrType();
+                resources = result.getResources();
+                vhsContentType = String.format("x-applitools-vhs/%s", vhsType);
+            } else if (EyesDriverUtils.isIOS(driver)) {
+                try {
+                    vhs = getVHSIos();
+                    vhsCompatibilityParams = getVhsCompatibilityParams();
+                } finally {
+                    driver.findElementByAccessibilityId("UFG_ClearArea").click();
+                }
+                vhsContentType = "x-applitools-vhs/ios";
+            } else {
+                throw new EyesException("Unknown platform");
+            }
+
+            List<CheckTask> checkTasks = new ArrayList<>();
+            for (RunningTest runningTest : visualGridTestList.values()) {
+                if (runningTest.isCloseTaskIssued()) {
+                    continue;
+                }
+
+                if (runningTest.getBrowserInfo().getAndroidDeviceInfo() != null) {
+                    runningTest.getBrowserInfo().getAndroidDeviceInfo().setVhsType(vhsType);
+                }
+                checkTasks.add(runningTest.issueCheck(checkSettings, null, null));
+            }
+
+            if (checkTasks.isEmpty()) {
+                logger.log(TraceLevel.Warn, testIds, Stage.CHECK, null, Pair.of("message", "No check tasks created. Tests were probably aborted"));
+                return;
+            }
+            VisualGridRunner visualGridRunner = (VisualGridRunner) runner;
+            visualGridRunner.check(vhs, resources, vhsContentType, checkTasks, vhsCompatibilityParams);
+        } catch (Throwable e) {
+            Error error = new Error(e);
+            for (RunningTest runningTest : visualGridTestList.values()) {
+                runningTest.setTestInExceptionMode(error);
+            }
+        }
+    }
+
+    private AndroidVHSCaptureResult getVHSAndroid(Set<String> testIds) throws Exception {
+        WebElement triggerButton = driver.findElementByAccessibilityId("UFG_TriggerArea");
+        int labelsAmount = Integer.parseInt(triggerButton.getText());
+        triggerButton.click();
+        while (true) {
+            List<WebElement> elementList = driver.findElementsByAccessibilityId("UFG_ClearArea");
+            if (!elementList.isEmpty()) {
+                break;
+            }
+            elementList = driver.findElementsByAccessibilityId("UFG_Label_Error");
+            if ((!elementList.isEmpty())) {
+                throw new EyesException(elementList.get(0).getText());
+            }
+            Thread.sleep(500);
+        }
+        WebElement clearButton = driver.findElementByAccessibilityId("UFG_ClearArea");
+        try {
+            String text = clearButton.getText();
+            String[] textParts = text.split(";");
+            String vcrType = textParts[0].toLowerCase();
+            int vhsParts = Integer.parseInt(textParts[1]);
+            String vhsExpectedHash = textParts[2];
+            logger.log(testIds, Stage.CHECK, Pair.of("vhsParts", vhsParts));
+            StringBuilder builder = new StringBuilder();
+            int vhsPartsDone = 0;
+            while (vhsPartsDone < vhsParts) {
+                if (vhsPartsDone % labelsAmount == 0) {
+                    triggerButton.click();
+                }
+                WebElement label = driver.findElementByAccessibilityId(String.format("UFG_Label_%s", vhsPartsDone % labelsAmount));
+                builder.append(label.getText());
+                vhsPartsDone++;
+                logger.log(TraceLevel.Debug, testIds, Stage.CHECK, null, Pair.of("vhsPartsDone", vhsPartsDone));
+            }
+            String resourcesJson = builder.toString();
+            String vhsActualHash = GeneralUtils.getSha256hash(resourcesJson.getBytes(StandardCharsets.UTF_8));
+            if (!vhsExpectedHash.equalsIgnoreCase(vhsActualHash)) {
+                throw new EyesException(String.format("Didn't get vhs byte correctly. Expected Hash: %s. Actual Hash: %s", vhsExpectedHash, vhsActualHash));
+            }
+
+            ObjectMapper mapper = new ObjectMapper();
+            mapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
+            Map<String, Object> resources = mapper.readValue(resourcesJson, new TypeReference<Map<String, Object>>() {});
+            if (!resources.containsKey("vhs")) {
+                throw new EyesException("vhs not found");
+            }
+
+            String base64VHS = (String) resources.remove("vhs");
+            byte[] vhs = Base64.decodeBase64(base64VHS);
+            resourcesJson = mapper.writeValueAsString(resources);
+            return new AndroidVHSCaptureResult(vhs, vcrType, mapper.readValue(resourcesJson, new TypeReference<Map<String, FrameData>>() {}));
+        } finally {
+            clearButton.click();
+        }
+    }
+
+    public byte[] getVHSIos() {
+        List<WebElement> list = driver.findElementsByName("UFG_TriggerArea");
+        if (list.isEmpty()) {
+            throw new EyesException("Please check integration of UFG lib in the application");
+        }
+        list.get(list.size() -1).click();
+        String base64 = driver.findElementByName("UFG_Label").getAttribute("value");
+        return Base64.decodeBase64(base64);
+    }
+
+    private VhsCompatibilityParams getVhsCompatibilityParams() {
+        String jsonValue = driver.findElementByName("UFG_SecondaryLabel").getAttribute("value");
+        VhsCompatibilityParams vhsCompatibilityParams = null;
+        try {
+            ObjectMapper mapper = new ObjectMapper();
+            vhsCompatibilityParams = mapper.readValue(jsonValue, VhsCompatibilityParams.class);
+        } catch (JsonProcessingException e) {
+            e.printStackTrace();
+        }
+        return vhsCompatibilityParams;
+    }
+
+    private ICheckSettings updateCheckSettings(ICheckSettings checkSettings) {
+        ICheckSettingsInternal checkSettingsInternal = (ICheckSettingsInternal) checkSettings;
+
+        MatchLevel matchLevel = checkSettingsInternal.getMatchLevel();
+        Boolean fully = checkSettingsInternal.isStitchContent();
+        Boolean ignoreDisplacements = checkSettingsInternal.isIgnoreDisplacements();
+
+        if (matchLevel == null) {
+            checkSettings = checkSettings.matchLevel(getConfiguration().getMatchLevel());
+        }
+
+        if (fully == null) {
+            Boolean isForceFullPageScreenshot = getConfiguration().isForceFullPageScreenshot();
+            boolean stitchContent = isForceFullPageScreenshot == null ? checkSettings.isCheckWindow() : isForceFullPageScreenshot;
+            checkSettings = checkSettings.fully(stitchContent);
+        }
+
+        if (ignoreDisplacements == null) {
+            checkSettings = checkSettings.ignoreDisplacements(getConfiguration().getIgnoreDisplacements());
+        }
+
+        List<VisualGridOption> options = new ArrayList<>();
+        options.addAll(getConfiguration().getVisualGridOptions());
+        options.addAll(checkSettingsInternal.getVisualGridOptions());
+        checkSettings = checkSettings.visualGridOptions(options.size() > 0 ? options.toArray(new VisualGridOption[]{}) : null);
+        return checkSettings;
+    }
+
+    @Override
+    public TestResults close(boolean throwEx) {
+        if (isVisualGrid) {
+            closeAsync();
+            return waitForEyesToFinish(throwEx);
+        }
+
+        return super.close(throwEx);
+    }
+
+    @Override
+    public TestResults abortIfNotClosed() {
+        if (isVisualGrid) {
+            abortAsync();
+            return waitForEyesToFinish(false);
+        }
+
+        return super.abortIfNotClosed();
+    }
+
+    public TestResults waitForEyesToFinish(boolean throwException) {
+        if (!isVisualGrid) {
+            return super.waitForEyesToFinish(throwException);
+        }
+
+        while (!isCompleted()) {
+            try {
+                Thread.sleep(500);
+            } catch (InterruptedException ignored) {}
+        }
+
+        List<TestResultContainer> allResults = getAllTestResults();
+        TestResultContainer errorResult = null;
+        TestResults firstResult = null;
+        for (TestResultContainer result : allResults) {
+            if (firstResult == null) {
+                firstResult = result.getTestResults();
+            }
+            if (result.getException() != null) {
+                errorResult = result;
+                break;
+            }
+        }
+        TestResultsSummary testResultsSummary = new TestResultsSummary(allResults);
+        if (errorResult != null) {
+            if (throwException) {
+                throw new TestFailedException(testResultsSummary, errorResult.getException());
+            }
+            return errorResult.getTestResults();
+        }
+
+        return firstResult;
+    }
+
+    @Override
+    public void closeAsync() {
+        logger.log(getTestId(), Stage.CLOSE, Type.CALLED);
+        if (isVisualGrid) {
+            isOpen = false;
+            for (RunningTest runningTest : visualGridTestList.values()) {
+                runningTest.issueClose();
+            }
+        } else {
+            super.closeAsync();
+        }
+    }
+
+    @Override
+    public void abortAsync() {
+        logger.log(getTestId(), Stage.CLOSE, Type.CALLED);
+        if (isVisualGrid) {
+            for (RunningTest runningTest : visualGridTestList.values()) {
+                runningTest.issueAbort(new EyesException("eyes.close wasn't called. Aborted the test"), false);
+            }
+        } else {
+            super.abortAsync();
+        }
+    }
+
+    @Override
+    public Map<String, RunningTest> getAllRunningTests() {
+        return visualGridTestList;
+    }
+
+    @Override
+    public List<TestResultContainer> getAllTestResults() {
+        if (!isVisualGrid) {
+            return super.getAllTestResults();
+        }
+
+        VisualGridRunner visualGridRunner = (VisualGridRunner) runner;
+        List<TestResultContainer> allResults = new ArrayList<>();
+        for (RunningTest runningTest : visualGridTestList.values()) {
+            if (!runningTest.isCompleted()) {
+                if (visualGridRunner.getError() != null) {
+                    throw new EyesException("Execution crashed", visualGridRunner.getError());
+                }
+                return null;
+            }
+
+            allResults.add(runningTest.getTestResultContainer());
+        }
+
+        return allResults;
+    }
+
+    @Override
+    public boolean isCompleted() {
+        if (!isVisualGrid) {
+            return super.isCompleted();
+        }
+
+        return getAllTestResults() != null;
     }
 
     /**
@@ -584,6 +944,9 @@ public class Eyes extends EyesBase {
         if (imageProvider instanceof MobileImageProvider) {
             ((MobileImageProvider) imageProvider).setCaptureStatusBar(configuration.isCaptureStatusBar());
         }
+        // Extra pause to wait for application actions will be finished.
+        // Moving from one screen to another for example or wait until scrollbars becomes invisible
+        try { Thread.sleep(1000); } catch (InterruptedException ignored) {}
 
         if (getForceFullPageScreenshot() || stitchContent) {
             result = getFullPageScreenshot();
