@@ -21,13 +21,16 @@ import static com.applitools.eyes.selenium.TestDataProvider.*;
 
 public class MobileNativeTests extends ReportingTestSuite {
 
+    private final String serverUrl = "https://" + SAUCE_USERNAME + ":" +
+            SAUCE_ACCESS_KEY + "@ondemand.saucelabs.com:443/wd/hub";
+
     public MobileNativeTests() {
         super.setGroupName("selenium");
     }
 
     private void setCapabilities(DesiredCapabilities capabilities, String methodName) {
-        capabilities.setCapability("username", SAUCE_USERNAME);
-        capabilities.setCapability("accesskey", SAUCE_ACCESS_KEY);
+//        capabilities.setCapability("username", SAUCE_USERNAME);
+//        capabilities.setCapability("accessKey", SAUCE_ACCESS_KEY);
         capabilities.setCapability("name", methodName);
     }
 
@@ -55,7 +58,7 @@ public class MobileNativeTests extends ReportingTestSuite {
 
         Eyes eyes = initEyes(capabilities);
 
-        WebDriver driver = new AndroidDriver(new URL(SAUCE_SELENIUM_URL), capabilities);
+        WebDriver driver = new AndroidDriver(new URL(serverUrl), capabilities);
 
         try {
             eyes.open(driver, "Mobile Native Tests", "Android Native App 1");
@@ -85,7 +88,7 @@ public class MobileNativeTests extends ReportingTestSuite {
 
         Eyes eyes = initEyes(capabilities);
 
-        AndroidDriver driver = new AndroidDriver(new URL(SAUCE_SELENIUM_URL), capabilities);
+        AndroidDriver driver = new AndroidDriver(new URL(serverUrl), capabilities);
 
         try {
             eyes.open(driver, "Mobile Native Tests", "Android Native App 2");
@@ -116,7 +119,7 @@ public class MobileNativeTests extends ReportingTestSuite {
         configuration.setFeatures(Feature.USE_PREDEFINED_DEVICE_INFO);
         eyes.setConfiguration(configuration);
 
-        AndroidDriver driver = new AndroidDriver(new URL(SAUCE_SELENIUM_URL), capabilities);
+        AndroidDriver driver = new AndroidDriver(new URL(serverUrl), capabilities);
         try {
             eyes.open(driver, "Mobile Native Tests", "Test Optimize Mobile Info Feature Android");
             eyes.checkWindow("Contact list");
@@ -145,7 +148,7 @@ public class MobileNativeTests extends ReportingTestSuite {
         configuration.setDeviceInfo("iPhone XR");
         eyes.setConfiguration(configuration);
 
-        WebDriver driver = new IOSDriver(new URL(SAUCE_SELENIUM_URL), caps);
+        WebDriver driver = new IOSDriver(new URL(serverUrl), caps);
         try {
             eyes.open(driver, "Mobile Native Tests", "Test Optimize Mobile Info Feature Ios");
             eyes.checkWindow();
