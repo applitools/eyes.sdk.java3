@@ -24,7 +24,7 @@ public class RecyclerViewInNestedCollapsingTest extends AndroidTestSetup {
 
     @Override
     protected void setAppCapability() {
-        capabilities.setCapability("app", "app_androidx");
+        capabilities.setCapability("app", androidXApp());
     }
 
     @Override
