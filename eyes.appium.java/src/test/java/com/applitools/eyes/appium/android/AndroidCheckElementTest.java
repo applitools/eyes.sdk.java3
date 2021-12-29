@@ -22,7 +22,7 @@ public class AndroidCheckElementTest extends AndroidTestSetup {
 
         eyes.check(Target.region(MobileBy.id("recycler_view")));
 
-        eyes.check(Target.region(MobileBy.id("recycler_view")).fully());
+        eyes.check(Target.region(MobileBy.id("recycler_view")).fully().scrollRootElement("recycler_view"));
 
         eyes.close();
     }

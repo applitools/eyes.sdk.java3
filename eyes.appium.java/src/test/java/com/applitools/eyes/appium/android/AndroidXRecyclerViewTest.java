@@ -17,19 +17,18 @@ public class AndroidXRecyclerViewTest extends AndroidTestSetup {
 
         eyes.check(Target.window().withName("Viewport"));
 
-        eyes.check(Target.window().fully().withName("Fullpage"));
+        eyes.check(Target.window().fully().scrollRootElement("recycler_view").withName("Fullpage"));
 
-        eyes.check(Target.region(MobileBy.id("recycler_view")).withName("Region viewport"));
+        eyes.check(Target.region(MobileBy.id("recycler_view")).scrollRootElement("recycler_view").withName("Region viewport"));
 
-        eyes.check(Target.region(MobileBy.id("recycler_view")).fully().withName("Region fullpage"));
+        eyes.check(Target.region(MobileBy.id("recycler_view")).fully().scrollRootElement("recycler_view").withName("Region fullpage"));
 
         eyes.close();
     }
 
     @Override
     protected void setAppCapability() {
-        // To run locally use https://applitools.jfrog.io/artifactory/Examples/androidx/1.0.0/app_androidx.apk
-        capabilities.setCapability("app", "app_androidx");
+        capabilities.setCapability("app", androidXApp());
     }
 
     @Override

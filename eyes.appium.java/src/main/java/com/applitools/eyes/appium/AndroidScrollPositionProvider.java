@@ -185,23 +185,10 @@ public class AndroidScrollPositionProvider extends AppiumScrollPositionProvider 
         } catch (InterruptedException ignored) {
         }
 
-        LastScrollData lastScrollData = EyesAppiumUtils.getLastScrollData(driver);
-//        curScrollPos = getScrollPosFromScrollData(contentSize, lastScrollData, supposedScrollAmt, isDown);
-//        // TODO check this
         curScrollPos = new Location(curScrollPos.getX(), curScrollPos.getY() + supposedScrollAmt);
         if (curScrollPos.getY() <= 0) {
-            // FIXME
-            // If we are using getScrollPosFromScrollData() it cause an exception when scrollable element
-            // is not on the top of the screen. Maybe we should calculate this properly
-            // with top y coordinate and status bar height
             curScrollPos = new Location(curScrollPos.getX(), 0);
-//            curScrollPos = getScrollPosFromScrollData(contentSize, lastScrollData, supposedScrollAmt, isDown);
         }
-    }
-
-    public Location scrollDown(boolean returnAbsoluteLocation) {
-        scroll(true);
-        return getCurrentPositionWithoutStatusBar(returnAbsoluteLocation);
     }
 
     @Override

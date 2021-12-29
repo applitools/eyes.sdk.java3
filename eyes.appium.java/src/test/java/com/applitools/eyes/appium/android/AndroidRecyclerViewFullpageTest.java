@@ -20,7 +20,7 @@ public class AndroidRecyclerViewFullpageTest extends AndroidTestSetup {
 
         eyes.check(Target.window().withName("Viewport"));
 
-        eyes.check(Target.window().fully().withName("Fullpage"));
+        eyes.check(Target.window().fully().scrollRootElement("recycler_view").withName("Fullpage"));
 
         eyes.close();
     }
