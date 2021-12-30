@@ -299,9 +299,9 @@ public class AndroidScrollPositionProvider extends AppiumScrollPositionProvider 
         if (scrollRootElement != null) {
             String elementId = scrollRootElement.getAttribute("resourceId").split("/")[1];
             try {
-                MobileElement hiddenElement = ((AndroidDriver<AndroidElement>) driver).findElement(MobileBy.AndroidUIAutomator("new UiSelector().description(\"EyesAppiumHelperEDT\")"));
+                WebElement hiddenElement =  driver.findElement(MobileBy.AndroidUIAutomator("new UiSelector().description(\"EyesAppiumHelperEDT\")"));
                 if (hiddenElement != null) {
-                    hiddenElement.setValue("className;"+elementId+";0;0");
+                    hiddenElement.sendKeys("className;"+elementId+";0;0");
                     hiddenElement.click();
                     className = hiddenElement.getText();
                     if (className.isEmpty()) {
