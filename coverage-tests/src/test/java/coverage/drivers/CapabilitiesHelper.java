@@ -129,7 +129,6 @@ public class CapabilitiesHelper {
         }
     }
 
-
     public static Capabilities setSauceCredentials(Capabilities caps) {
         return setSauceCredentials(caps, true, new MutableCapabilities());
     }
