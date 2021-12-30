@@ -87,7 +87,7 @@ public class CapabilitiesHelper {
         device.setCapability("deviceName", "Samsung Galaxy S8 FHD GoogleAPI Emulator");
         device.setCapability("automationName", "uiautomator2");
         device.setCapability("newCommandTimeout", 600);
-        return setSauceCredentials(device);
+        return device;
     }
 
     public static Capabilities getIphoneXS() {
@@ -98,7 +98,7 @@ public class CapabilitiesHelper {
         device.setCapability("platformVersion", "13.0");
         device.setCapability("appiumVersion", "1.17.1");
         device.setCapability("deviceName", "iPhone XS Simulator");
-        return setSauceCredentials(device);
+        return device;
     }
 
     public static Capabilities getAndroid8ChromeEmulator(boolean headless) {
@@ -116,8 +116,7 @@ public class CapabilitiesHelper {
     }
 
     public static Capabilities setSauceCredentials(Capabilities caps, boolean legacy, Capabilities options) {
-        return caps;
-        /*MutableCapabilities sauceOpts = new MutableCapabilities();
+        MutableCapabilities sauceOpts = new MutableCapabilities();
         sauceOpts.setCapability("username", System.getenv("SAUCE_USERNAME"));
         sauceOpts.setCapability("accessKey", System.getenv("SAUCE_ACCESS_KEY"));
         sauceOpts = sauceOpts.merge(options);
@@ -127,8 +126,9 @@ public class CapabilitiesHelper {
             MutableCapabilities sauce = new MutableCapabilities();
             sauce.setCapability("sauce:options", sauceOpts);
             return caps.merge(sauce);
-        }*/
+        }
     }
+
 
     public static Capabilities setSauceCredentials(Capabilities caps) {
         return setSauceCredentials(caps, true, new MutableCapabilities());
