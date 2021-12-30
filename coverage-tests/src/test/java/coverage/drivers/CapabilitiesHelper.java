@@ -116,7 +116,8 @@ public class CapabilitiesHelper {
     }
 
     public static Capabilities setSauceCredentials(Capabilities caps, boolean legacy, Capabilities options) {
-        MutableCapabilities sauceOpts = new MutableCapabilities();
+        return caps;
+        /*MutableCapabilities sauceOpts = new MutableCapabilities();
         sauceOpts.setCapability("username", System.getenv("SAUCE_USERNAME"));
         sauceOpts.setCapability("accessKey", System.getenv("SAUCE_ACCESS_KEY"));
         sauceOpts = sauceOpts.merge(options);
@@ -126,7 +127,7 @@ public class CapabilitiesHelper {
             MutableCapabilities sauce = new MutableCapabilities();
             sauce.setCapability("sauce:options", sauceOpts);
             return caps.merge(sauce);
-        }
+        }*/
     }
 
     public static Capabilities setSauceCredentials(Capabilities caps) {
