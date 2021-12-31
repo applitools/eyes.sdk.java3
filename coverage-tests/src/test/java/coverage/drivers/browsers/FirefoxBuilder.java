@@ -17,7 +17,7 @@ public class FirefoxBuilder implements Builder {
         if (GlobalSetup.CI) {
             options.addArguments("--no-sandbox");
         }
-        if (GlobalSetup.useDocker) return new RemoteWebDriver(new URL(SELENIUM.FIREFOX_LOCAL.url), capabilities);
-        return new FirefoxDriver(capabilities);
+        if (GlobalSetup.useDocker) return new RemoteWebDriver(new URL(SELENIUM.FIREFOX_LOCAL.url), options);
+        return new FirefoxDriver(options);
     }
 }
