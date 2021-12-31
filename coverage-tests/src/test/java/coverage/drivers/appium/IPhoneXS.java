@@ -18,6 +18,6 @@ public class IPhoneXS implements NativeBuilder {
         appCap.setCapability("app", app);
         caps = caps.merge(appCap);
         return new IOSDriver(new URL("https://" + System.getenv("SAUCE_USERNAME") +":" +
-                System.getenv("SAUCE_ACCESS_KEY"), caps);
+                System.getenv("SAUCE_ACCESS_KEY") + "@ondemand.saucelabs.com:443/wd/hub"), caps);
     }
 }
