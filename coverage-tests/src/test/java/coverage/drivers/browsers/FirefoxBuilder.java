@@ -13,7 +13,7 @@ import java.net.URL;
 public class FirefoxBuilder implements Builder {
 
     public WebDriver build(boolean headless, boolean legacy, boolean executionGrid) throws MalformedURLException {
-        FirefoxOptions options = new FirefoxOptions().setHeadless(headless).setLegacy(true);
+        FirefoxOptions options = new FirefoxOptions().setHeadless(headless).setLegacy(false);
         if (GlobalSetup.CI) {
             options.addArguments("--no-sandbox");
         }
