@@ -13,11 +13,14 @@ import java.net.URL;
 public class FirefoxBuilder implements Builder {
 
     public WebDriver build(boolean headless, boolean legacy, boolean executionGrid) throws MalformedURLException {
-        FirefoxOptions options = new FirefoxOptions().setHeadless(headless).setLegacy(false);
+        FirefoxOptions options = new FirefoxOptions().setHeadless(headless);
         if (GlobalSetup.CI) {
             options.addArguments("--no-sandbox");
         }
-        if (GlobalSetup.useDocker) return new RemoteWebDriver(new URL(SELENIUM.FIREFOX_LOCAL.url), options);
-        return new FirefoxDriver(options);
+        DesiredCapabilities capabilities = DesiredCapabilities.firefox();
+        capabilities.setCapability("marionette", true);
+        capabilities.merge(options);
+        if (GlobalSetup.useDocker) return new RemoteWebDriver(new URL(SELENIUM.FIREFOX_LOCAL.url), capabilities);
+        return new FirefoxDriver(capabilities);
     }
 }
