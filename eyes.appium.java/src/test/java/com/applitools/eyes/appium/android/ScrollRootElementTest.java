@@ -2,6 +2,7 @@ package com.applitools.eyes.appium.android;
 
 import com.applitools.eyes.appium.Target;
 import io.appium.java_client.MobileBy;
+import org.openqa.selenium.By;
 import org.testng.annotations.Test;
 
 public class ScrollRootElementTest extends AndroidTestSetup {
@@ -10,7 +11,7 @@ public class ScrollRootElementTest extends AndroidTestSetup {
     public void testScrollRootElement() throws InterruptedException {
         eyes.open(driver, getApplicationName(), "Check RecyclerView inside ScrollView");
 
-        driver.findElementById("btn_recycler_view_in_scroll_view_activity").click();
+        driver.findElement(By.id("btn_recycler_view_in_scroll_view_activity")).click();
 
         Thread.sleep(1000);
 
@@ -23,8 +24,7 @@ public class ScrollRootElementTest extends AndroidTestSetup {
 
     @Override
     protected void setAppCapability() {
-        // To run locally use https://applitools.jfrog.io/artifactory/Examples/androidx/1.0.0/app_androidx.apk
-        capabilities.setCapability("app", "app_androidx");
+        capabilities.setCapability("app", androidXApp());
     }
 
     @Override

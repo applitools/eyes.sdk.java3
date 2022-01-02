@@ -47,11 +47,11 @@ public class AppiumCaptureAlgorithmFactory {
     }
 
     public AppiumFullPageCaptureAlgorithm getAlgorithm() {
-        if (EyesDriverUtils.isAndroid(driver.getRemoteWebDriver())) {
+        if (EyesDriverUtils.isAndroid(driver)) {
             return new AndroidFullPageCaptureAlgorithm(logger, testId, scrollProvider, imageProvider,
                     debugScreenshotsProvider, scaleProviderFactory, cutProvider, screenshotFactory,
                     waitBeforeScreenshot, stitchingAdjustment, scrollableElement);
-        } else if (EyesDriverUtils.isIOS(driver.getRemoteWebDriver())) {
+        } else if (EyesDriverUtils.isIOS(driver)) {
             return new AppiumFullPageCaptureAlgorithm(logger, testId, scrollProvider, imageProvider,
                     debugScreenshotsProvider, scaleProviderFactory, cutProvider, screenshotFactory,
                     waitBeforeScreenshot, cutElement, stitchingAdjustment, scrollableElement);

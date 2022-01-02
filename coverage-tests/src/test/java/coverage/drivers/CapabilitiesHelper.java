@@ -87,7 +87,7 @@ public class CapabilitiesHelper {
         device.setCapability("deviceName", "Samsung Galaxy S8 FHD GoogleAPI Emulator");
         device.setCapability("automationName", "uiautomator2");
         device.setCapability("newCommandTimeout", 600);
-        return setSauceCredentials(device);
+        return device;
     }
 
     public static Capabilities getIphoneXS() {
@@ -98,7 +98,7 @@ public class CapabilitiesHelper {
         device.setCapability("platformVersion", "13.0");
         device.setCapability("appiumVersion", "1.17.1");
         device.setCapability("deviceName", "iPhone XS Simulator");
-        return setSauceCredentials(device);
+        return device;
     }
 
     public static Capabilities getAndroid8ChromeEmulator(boolean headless) {

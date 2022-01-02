@@ -420,7 +420,7 @@ public class AppiumFullPageCaptureAlgorithm {
         stitchedImage = new BufferedImage(
                 image.getWidth(), entireSize.getHeight() + statusBarHeight, image.getType());
 
-        // First of all we want to stitch the screenshot we already captured at (0, 0)
+        // First we want to stitch the screenshot we already captured at (0, 0)
         Raster initialPart = image.getData();
         RectangleSize initialPartSize = new RectangleSize(initialPart.getWidth(),
                 initialPart.getHeight());

@@ -1,7 +1,8 @@
 package com.applitools.eyes.appium.android;
 
 import com.applitools.eyes.appium.TestSetup;
-import io.appium.java_client.android.AndroidDriver;
+import io.appium.java_client.AppiumDriver;
+import org.openqa.selenium.remote.RemoteWebDriver;
 
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -20,17 +21,26 @@ public abstract class AndroidTestSetup extends TestSetup {
 
     @Override
     protected void initDriver() throws MalformedURLException {
-        driver = new AndroidDriver<>(new URL(appiumServerUrl), capabilities);
+        driver = new AppiumDriver(new URL(appiumServerUrl), capabilities);
     }
 
     @Override
     protected void setAppCapability() {
-        // To run locally use https://applitools.jfrog.io/artifactory/Examples/android/1.2/app_android.apk
-        capabilities.setCapability("app", "app_android");
+        capabilities.setCapability("app", supportApp());
     }
 
     @Override
     protected String getApplicationName() {
         return "Java Appium - Android";
+    }
+
+    protected String supportApp() {
+//        return "https://applitools.jfrog.io/artifactory/Examples/android/1.3/app-debug.apk";
+        return "app_android";
+    }
+
+    protected String androidXApp() {
+//        return "https://applitools.jfrog.io/artifactory/Examples/androidx/1.3.1/app_androidx.apk";
+        return "app_androidx";
     }
 }

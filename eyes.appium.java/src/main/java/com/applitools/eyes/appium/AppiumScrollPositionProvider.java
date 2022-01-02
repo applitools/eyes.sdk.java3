@@ -12,8 +12,17 @@ import com.applitools.eyes.selenium.positioning.ScrollPositionProvider;
 import com.applitools.utils.ArgumentGuard;
 import com.applitools.utils.GeneralUtils;
 import io.appium.java_client.AppiumDriver;
+import io.appium.java_client.PerformsTouchActions;
+import io.appium.java_client.TouchAction;
+import io.appium.java_client.touch.WaitOptions;
+import io.appium.java_client.touch.offset.PointOption;
 import org.apache.commons.lang3.tuple.Pair;
 import org.openqa.selenium.*;
+import org.openqa.selenium.interactions.PointerInput;
+import org.openqa.selenium.interactions.Sequence;
+
+import java.time.Duration;
+import java.util.Collections;
 
 public abstract class AppiumScrollPositionProvider implements ScrollPositionProvider {
 
@@ -226,4 +235,30 @@ public abstract class AppiumScrollPositionProvider implements ScrollPositionProv
     public void setScrollRootElement(WebElement scrollRootElement) {
         this.scrollRootElement = scrollRootElement;
     }
+
+    protected void scrollToW3c(int startX, int startY, int endX, int endY) {
+        PointerInput finger = new PointerInput(PointerInput.Kind.TOUCH, "finger");
+        Sequence scrollAction = new Sequence(finger, 0);
+        scrollAction.addAction(finger.createPointerMove(Duration.ofMillis(0), PointerInput.Origin.viewport(), startX, startY));
+        scrollAction.addAction(finger.createPointerDown(PointerInput.MouseButton.LEFT.asArg()));
+        endY = Math.max(endY - contentSize.touchPadding, 0);
+        scrollAction.addAction(finger.createPointerMove(Duration.ofMillis(5000), PointerInput.Origin.viewport(), endX, endY));
+        scrollAction.addAction(finger.createPointerMove(Duration.ofMillis(500), PointerInput.Origin.viewport(), endX, endY));
+
+        scrollAction.addAction(finger.createPointerUp(PointerInput.MouseButton.LEFT.asArg()));
+        driver.perform(Collections.singleton(scrollAction));
+    }
+
+    protected void scrollToLegacy(int startX, int startY, int endX, int endY, int padding, int wait, boolean shouldCancel) {
+        TouchAction scrollAction = new TouchAction((PerformsTouchActions) driver);
+        scrollAction.press(new PointOption().withCoordinates(startX, startY)).waitAction(new WaitOptions().withDuration(Duration.ofMillis(wait)));
+        scrollAction.moveTo(new PointOption().withCoordinates(endX, Math.max(endY - padding, 0)));
+        if (shouldCancel) {
+            scrollAction.cancel();
+        } else {
+            scrollAction.release();
+        }
+        ((PerformsTouchActions) driver).performTouchAction(scrollAction);
+    }
+
 }

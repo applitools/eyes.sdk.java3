@@ -6,24 +6,28 @@ import com.applitools.eyes.utils.ReportingTestSuite;
 import com.applitools.eyes.StdoutLogHandler;
 import com.applitools.eyes.utils.TestUtils;
 import com.applitools.utils.GeneralUtils;
-import io.appium.java_client.AppiumDriver;
-import io.appium.java_client.MobileElement;
+import org.openqa.selenium.interactions.PointerInput;
+import org.openqa.selenium.interactions.Sequence;
 import org.openqa.selenium.remote.DesiredCapabilities;
+import org.openqa.selenium.remote.RemoteWebDriver;
 import org.testng.ITest;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 
 import java.net.MalformedURLException;
+import java.time.Duration;
+import java.util.Collections;
 
 public abstract class TestSetup extends ReportingTestSuite implements ITest {
 
     protected DesiredCapabilities capabilities;
-    protected AppiumDriver<MobileElement> driver;
+    protected RemoteWebDriver driver;
     protected Eyes eyes;
     // To run locally use http://127.0.0.1:4723/wd/hub
     protected String appiumServerUrl = "http://" + GeneralUtils.getEnvString("BROWSERSTACK_USERNAME") + ":" +
             GeneralUtils.getEnvString("BROWSERSTACK_ACCESS_KEY") + "@hub-cloud.browserstack.com/wd/hub";
-
+//    protected String appiumServerUrl = "https://" + GeneralUtils.getEnvString("SAUCE_USERNAME") + ":" +
+//            GeneralUtils.getEnvString("SAUCE_ACCESS_KEY") + "@ondemand.saucelabs.com:443/wd/hub";
     @Override
     public String getTestName() {
         return getClass().getName();
@@ -71,4 +75,14 @@ public abstract class TestSetup extends ReportingTestSuite implements ITest {
     protected abstract void setAppCapability();
 
     protected abstract String getApplicationName();
+
+    protected void scrollTo(int startX, int startY, int endX, int endY) {
+        PointerInput finger = new PointerInput(PointerInput.Kind.TOUCH, "finger");
+        Sequence scrollAction = new Sequence(finger, 1);
+        scrollAction.addAction(finger.createPointerMove(Duration.ofMillis(0), PointerInput.Origin.viewport(), startX, startY));
+        scrollAction.addAction(finger.createPointerDown(PointerInput.MouseButton.LEFT.asArg()));
+        scrollAction.addAction(finger.createPointerMove(Duration.ofMillis(1500), PointerInput.Origin.viewport(), endX, endY));
+        scrollAction.addAction(finger.createPointerUp(PointerInput.MouseButton.LEFT.asArg()));
+        driver.perform(Collections.singletonList(scrollAction));
+    }
 }

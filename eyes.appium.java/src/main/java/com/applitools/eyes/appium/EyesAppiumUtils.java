@@ -12,18 +12,25 @@ import com.applitools.utils.ArgumentGuard;
 import com.applitools.utils.GeneralUtils;
 import com.applitools.utils.ImageUtils;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.base.Preconditions;
+import com.google.common.collect.ImmutableMap;
 import io.appium.java_client.AppiumDriver;
 import io.appium.java_client.MobileBy;
+import io.appium.java_client.NoSuchContextException;
 import io.appium.java_client.android.AndroidDriver;
 import org.apache.commons.lang3.tuple.Pair;
 import org.openqa.selenium.*;
+import org.openqa.selenium.NoSuchElementException;
+import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.remote.RemoteWebElement;
+import org.openqa.selenium.remote.Response;
 
 import javax.annotation.Nullable;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -81,13 +88,95 @@ public class EyesAppiumUtils {
         return contentSize;
     }
 
+    public static Map<String, Object> getSessionDetails(RemoteWebDriver driver) {
+        Map<String, Object> sessionDetails = new HashMap<>();
+        sessionDetails.putAll(driver.getCapabilities().asMap());
+        if (driver instanceof AppiumDriver) {
+            Response response = ((AppiumDriver) driver).execute("getSession");
+            Map<String, Object> resultMap = Map.class.cast(response.getValue());
+            sessionDetails.putAll(resultMap);
+        }
+
+        return sessionDetails;
+    }
+
+    public static Object getSessionDetail(RemoteWebDriver driver, String detailName) {
+        Map<String, Object> details = getSessionDetails(driver);
+        return getSessionDetail(details, detailName);
+    }
+
+    public static Object getSessionDetail(Map<String, Object> details, String detailName) {
+        Object detailValue = details.get("appium:" + detailName);
+        if (detailValue == null) {
+            detailValue = details.get(detailName);
+        }
+        return detailValue;
+    }
+
     @Nullable
     public static LastScrollData getLastScrollData(AppiumDriver driver) {
-        Map<String, Long> scrollData = (Map<String, Long>) driver.getSessionDetail("lastScrollData");
-        if (scrollData == null) {
+        Object lastScrollDataObj = getSessionDetail(driver, "lastScrollData");
+        if (lastScrollDataObj == null) {
             return null;
         }
+        Map<String, Long> scrollData = (Map<String, Long>) lastScrollDataObj;
         return new LastScrollData(scrollData);
+    }
+
+    public static WebDriver context(RemoteWebDriver driver, String name) {
+        Preconditions.checkNotNull(name, "Must supply a context name");
+
+        try {
+            execute(driver, "switchToContext", ImmutableMap.of("name", name));
+            return driver;
+        } catch (WebDriverException var3) {
+            throw new NoSuchContextException(var3.getMessage(), var3);
+        }
+    }
+
+    public static String getContext(RemoteWebDriver driver) {
+        Response response = execute(driver, "getCurrentContextHandle");
+        String contextName = String.valueOf(response.getValue());
+        return "null".equalsIgnoreCase(contextName) ? null : contextName;
+    }
+
+    public static Set<String> getContextHandles(RemoteWebDriver driver) {
+        Response response = execute(driver, "getContextHandles");
+        Object value = response.getValue();
+
+        try {
+            List<String> returnedValues = (List) value;
+            return new LinkedHashSet(returnedValues);
+        } catch (ClassCastException var4) {
+            throw new WebDriverException("Returned value cannot be converted to List<String>: " + value, var4);
+        }
+    }
+
+    public static ScreenOrientation getOrientation(RemoteWebDriver driver) {
+        Response response = execute(driver, "getScreenOrientation");
+        String orientation = response.getValue().toString().toLowerCase();
+        if (orientation.equals(ScreenOrientation.LANDSCAPE.value())) {
+            return ScreenOrientation.LANDSCAPE;
+        } else if (orientation.equals(ScreenOrientation.PORTRAIT.value())) {
+            return ScreenOrientation.PORTRAIT;
+        } else {
+            throw new WebDriverException("Unexpected orientation returned: " + orientation);
+        }
+    }
+
+    private static Response execute(RemoteWebDriver driver, String driverCommand) {
+        return execute(driver, driverCommand, ImmutableMap.of());
+    }
+
+    private static Response execute(RemoteWebDriver driver, String driverCommand, Map<String, ?> parameters) {
+        try {
+            Method execute = driver.getClass().getMethod("execute", String.class, Map.class);
+            Response response = (Response) execute.invoke(driver, driverCommand, parameters);
+            return response;
+        } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 
     public static boolean isLandscapeOrientation(Logger logger, WebDriver driver) {
@@ -96,16 +185,16 @@ public class EyesAppiumUtils {
             return false;
         }
 
-        AppiumDriver<?> appiumDriver = (AppiumDriver<?>) EyesDriverUtils.getUnderlyingDriver(driver);
+        RemoteWebDriver appiumDriver = (RemoteWebDriver) EyesDriverUtils.getUnderlyingDriver(driver);
 
         String originalContext = null;
         try {
             // We must be in native context in order to ask for orientation,
             // because of an Appium bug.
-            originalContext = appiumDriver.getContext();
-            if (appiumDriver.getContextHandles().size() > 1 &&
+            originalContext = getContext(appiumDriver);
+            if (getContextHandles(appiumDriver).size() > 1 &&
                     !originalContext.equalsIgnoreCase(NATIVE_APP)) {
-                appiumDriver.context(NATIVE_APP);
+                context(appiumDriver, NATIVE_APP);
             } else {
                 originalContext = null;
             }
@@ -113,15 +202,14 @@ public class EyesAppiumUtils {
             originalContext = null;
         }
         try {
-            ScreenOrientation orientation = appiumDriver.getOrientation();
+            ScreenOrientation orientation = getOrientation(appiumDriver);
             return orientation == ScreenOrientation.LANDSCAPE;
         } catch (Exception e) {
             GeneralUtils.logExceptionStackTrace(logger, Stage.GENERAL, e);
             return false;
-        }
-        finally {
+        } finally {
             if (originalContext != null) {
-                appiumDriver.context(originalContext);
+                context(appiumDriver, originalContext);
             }
         }
     }
@@ -146,6 +234,7 @@ public class EyesAppiumUtils {
     /**
      * Rotates the image as necessary. The rotation is either manually forced
      * by passing a non-null ImageRotation, or automatically inferred.
+     *
      * @param driver   The underlying driver which produced the screenshot.
      * @param image    The image to normalize.
      * @param rotation The degrees by which to rotate the image:
@@ -175,11 +264,7 @@ public class EyesAppiumUtils {
         systemBarHeights.put(NAVIGATION_BAR, null);
 
         try {
-            if (EyesDriverUtils.isAndroid(driver)) {
-                fillSystemBarsHeightsMap((AndroidDriver) driver.getRemoteWebDriver(), systemBarHeights);
-            } else {
-                fillSystemBarsHeightsMap(driver, systemBarHeights);
-            }
+            fillSystemBarsHeightsMap(driver, systemBarHeights);
         } catch (Exception ignored) {
             int statusBarHeight = driver.getStatusBarHeight();
             int navigationBarHeight = driver.getDeviceHeight() - driver.getViewportHeight() - statusBarHeight;
@@ -188,13 +273,6 @@ public class EyesAppiumUtils {
         }
 
         return systemBarHeights;
-    }
-
-    private static void fillSystemBarsHeightsMap(AndroidDriver driver, Map<String, Integer> systemBarHeights) {
-        Map<String, String> systemBars = driver.getSystemBars();
-        for (String systemBarName : systemBars.keySet()) {
-            systemBarHeights.put(systemBarName, getSystemBar(systemBarName, systemBars));
-        }
     }
 
     private static Integer getSystemBar(String systemBarName, Map<String, String> systemBars) {
@@ -231,7 +309,7 @@ public class EyesAppiumUtils {
 
     public static String getHelperLibraryVersion(EyesAppiumDriver driver, Logger logger) {
         String version = "";
-        if (driver.getRemoteWebDriver() instanceof AndroidDriver) {
+        if (EyesDriverUtils.isAndroid(driver)) {
             try {
                 WebElement hiddenElement = driver.getRemoteWebDriver().findElement(MobileBy.AndroidUIAutomator("new UiSelector().description(\"EyesAppiumHelper_Version\")"));
                 if (hiddenElement != null) {

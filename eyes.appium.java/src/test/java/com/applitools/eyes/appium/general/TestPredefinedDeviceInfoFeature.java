@@ -11,7 +11,8 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.mockito.Mockito;
-import org.openqa.selenium.remote.DesiredCapabilities;
+import org.openqa.selenium.Capabilities;
+import org.openqa.selenium.remote.Response;
 import org.testng.Assert;
 
 import java.util.HashMap;
@@ -27,13 +28,24 @@ public class TestPredefinedDeviceInfoFeature extends ReportingTestSuite {
     @BeforeClass
     public static void beforeClass() {
         sessionDetails = new HashMap<>();
+        Capabilities capabilities = new Capabilities() {
+            @Override
+            public Map<String, Object> asMap() {
+                return sessionDetails;
+            }
 
-        DesiredCapabilities capabilities = new DesiredCapabilities();
-        capabilities.setCapability("deviceName", "Samsung Galaxy S10");
+            @Override
+            public Object getCapability(String capabilityName) {
+                return sessionDetails.get(capabilityName);
+            }
+        };
 
         remoteWebDriver = Mockito.mock(AndroidDriver.class);
-        when(remoteWebDriver.getSessionDetails()).thenReturn(sessionDetails);
+        Response response = new Response();
+        response.setValue(sessionDetails);
         when(remoteWebDriver.getCapabilities()).thenReturn(capabilities);
+        when(remoteWebDriver.execute("getSession")).thenReturn(response);
+
         when(remoteWebDriver.getSystemBars()).thenThrow(NullPointerException.class);
     }
 
@@ -45,6 +57,7 @@ public class TestPredefinedDeviceInfoFeature extends ReportingTestSuite {
         viewportRectMap.put("width", 1080L);
         viewportRectMap.put("height", 1708L);
         sessionDetails.put("viewportRect", viewportRectMap);
+        sessionDetails.put("deviceName", "Samsung Galaxy S10");
     }
 
     @Test

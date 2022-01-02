@@ -9,17 +9,19 @@ import com.applitools.eyes.logging.TraceLevel;
 import com.applitools.eyes.positioning.PositionMemento;
 import com.applitools.utils.GeneralUtils;
 import io.appium.java_client.MobileBy;
-import io.appium.java_client.MobileElement;
+import io.appium.java_client.PerformsTouchActions;
 import io.appium.java_client.TouchAction;
 import io.appium.java_client.android.AndroidDriver;
-import io.appium.java_client.android.AndroidElement;
 import io.appium.java_client.touch.WaitOptions;
 import io.appium.java_client.touch.offset.PointOption;
 import org.apache.commons.lang3.tuple.Pair;
 import org.openqa.selenium.*;
+import org.openqa.selenium.interactions.PointerInput;
+import org.openqa.selenium.interactions.Sequence;
 import org.openqa.selenium.remote.RemoteWebElement;
 
 import java.time.Duration;
+import java.util.Collections;
 import java.util.List;
 
 public class AndroidScrollPositionProvider extends AppiumScrollPositionProvider {
@@ -129,7 +131,7 @@ public class AndroidScrollPositionProvider extends AppiumScrollPositionProvider 
         try {
             WebElement activeScroll = getFirstScrollableView();
             EyesAppiumUtils.scrollBackToElement((AndroidDriver) driver, (RemoteWebElement) activeScroll,
-                (RemoteWebElement) element);
+                    (RemoteWebElement) element);
 
             LastScrollData lastScrollData = EyesAppiumUtils.getLastScrollData(driver);
             curScrollPos = new Location(lastScrollData.scrollX, lastScrollData.scrollY);
@@ -159,23 +161,34 @@ public class AndroidScrollPositionProvider extends AppiumScrollPositionProvider 
 
         int supposedScrollAmt = startY - endY; // how much we will scroll if we don't hit a barrier
 
-        TouchAction scrollAction = new TouchAction(driver);
-        scrollAction.press(new PointOption().withCoordinates(startX, startY)).waitAction(new WaitOptions().withDuration(Duration.ofMillis(1500)));
-        scrollAction.moveTo(new PointOption().withCoordinates(endX, endY));
-        scrollAction.release();
-        driver.performTouchAction(scrollAction);
+        try {
+            PointerInput finger = new PointerInput(PointerInput.Kind.TOUCH, "finger");
+            Sequence scrollAction = new Sequence(finger, 1);
+            scrollAction.addAction(finger.createPointerMove(Duration.ofMillis(0), PointerInput.Origin.viewport(), startX, startY));
+            scrollAction.addAction(finger.createPointerDown(PointerInput.MouseButton.LEFT.asArg()));
+            scrollAction.addAction(finger.createPointerMove(Duration.ofMillis(1500), PointerInput.Origin.viewport(), endX, endY));
+            scrollAction.addAction(finger.createPointerUp(PointerInput.MouseButton.LEFT.asArg()));
+            driver.perform(Collections.singletonList(scrollAction));
+        } catch (UnsupportedCommandException e) {
+            logger.log(TraceLevel.Warn, eyesDriver.getTestId(), Stage.CHECK, "Using legacy scroll actions");
+            TouchAction scrollAction = new TouchAction((PerformsTouchActions) driver);
+            scrollAction.press(new PointOption().withCoordinates(startX, startY)).waitAction(new WaitOptions().withDuration(Duration.ofMillis(1500)));
+            scrollAction.moveTo(new PointOption().withCoordinates(endX, endY));
+            scrollAction.release();
+            ((PerformsTouchActions) driver).performTouchAction(scrollAction);
+        }
 
         // because Android scrollbars are visible a bit after touch, we should wait for them to
         // disappear before handing control back to the screenshotter
-        try { Thread.sleep(750); } catch (InterruptedException ignored) {}
+        try {
+            Thread.sleep(750);
+        } catch (InterruptedException ignored) {
+        }
 
-        LastScrollData lastScrollData = EyesAppiumUtils.getLastScrollData(driver);
-        curScrollPos = getScrollPosFromScrollData(contentSize, lastScrollData, supposedScrollAmt, isDown);
-    }
-
-    public Location scrollDown(boolean returnAbsoluteLocation) {
-        scroll(true);
-        return getCurrentPositionWithoutStatusBar(returnAbsoluteLocation);
+        curScrollPos = new Location(curScrollPos.getX(), curScrollPos.getY() + supposedScrollAmt);
+        if (curScrollPos.getY() <= 0) {
+            curScrollPos = new Location(curScrollPos.getX(), 0);
+        }
     }
 
     @Override
@@ -183,32 +196,36 @@ public class AndroidScrollPositionProvider extends AppiumScrollPositionProvider 
         logger.log(TraceLevel.Debug, eyesDriver.getTestId(), Stage.CHECK,
                 Pair.of("from", new Location(startX, startY)),
                 Pair.of("to", new Location(startX, startY)));
-        TouchAction scrollAction = new TouchAction(driver);
-        scrollAction.press(new PointOption().withCoordinates(startX, startY)).waitAction(new WaitOptions().withDuration(Duration.ofMillis(1500)));
-        scrollAction.moveTo(new PointOption().withCoordinates(endX, Math.max(endY - contentSize.touchPadding, 0)));
-        if (shouldCancel) {
-            scrollAction.cancel();
-        } else {
-            scrollAction.release();
-        }
-        driver.performTouchAction(scrollAction);
 
-        curScrollPos = new Location(curScrollPos.getX(), curScrollPos.getY() + startX);
+        try {
+            scrollToW3c(startX, startY, endX, endY);
+        } catch (UnsupportedCommandException e) {
+            logger.log(TraceLevel.Warn, eyesDriver.getTestId(), Stage.CHECK, "Using legacy scroll actions");
+            scrollToLegacy(startX, startY, endX, endY, contentSize.touchPadding, 1500, shouldCancel);
+        }
+
+        curScrollPos = new Location(curScrollPos.getX(), curScrollPos.getY() + startY - endY);
 
         // because Android scrollbars are visible a bit after touch, we should wait for them to
         // disappear before handing control back to the screenshotter
-        try { Thread.sleep(750); } catch (InterruptedException ignored) {}
+        try {
+            Thread.sleep(750);
+        } catch (InterruptedException ignored) {
+        }
     }
 
     public boolean tryScrollWithHelperLibrary(String elementId, int offset, int step, int totalSteps) {
         boolean scrolled = false;
         try {
-            MobileElement hiddenElement = ((AndroidDriver<AndroidElement>) driver).findElement(MobileBy.AndroidUIAutomator("new UiSelector().description(\"EyesAppiumHelperEDT\")"));
+            WebElement hiddenElement = driver.findElement(MobileBy.AndroidUIAutomator("new UiSelector().description(\"EyesAppiumHelperEDT\")"));
             if (hiddenElement != null) {
-                hiddenElement.setValue("scroll;"+elementId+";"+offset+";"+step+";"+totalSteps);
+                hiddenElement.sendKeys("scroll;" + elementId + ";" + offset + ";" + step + ";" + totalSteps);
                 hiddenElement.click();
                 scrolled = true;
-                try { Thread.sleep(1000); } catch (InterruptedException ignored) {}
+                try {
+                    Thread.sleep(1000);
+                } catch (InterruptedException ignored) {
+                }
                 hiddenElement.clear();
             }
         } catch (NoSuchElementException | StaleElementReferenceException e) {
@@ -220,12 +237,15 @@ public class AndroidScrollPositionProvider extends AppiumScrollPositionProvider 
     public boolean moveToTop(String elementId) {
         boolean scrolled = false;
         try {
-            MobileElement hiddenElement = ((AndroidDriver<AndroidElement>) driver).findElement(MobileBy.AndroidUIAutomator("new UiSelector().description(\"EyesAppiumHelperEDT\")"));
+            WebElement hiddenElement = driver.findElement(MobileBy.AndroidUIAutomator("new UiSelector().description(\"EyesAppiumHelperEDT\")"));
             if (hiddenElement != null) {
-                hiddenElement.setValue("moveToTop;"+elementId+";0;-1");
+                hiddenElement.sendKeys("moveToTop;" + elementId + ";0;-1");
                 hiddenElement.click();
                 scrolled = true;
-                try { Thread.sleep(1000); } catch (InterruptedException ignored) {}
+                try {
+                    Thread.sleep(1000);
+                } catch (InterruptedException ignored) {
+                }
                 hiddenElement.clear();
             }
         } catch (NoSuchElementException | StaleElementReferenceException e) {
@@ -241,9 +261,9 @@ public class AndroidScrollPositionProvider extends AppiumScrollPositionProvider 
         }
         String elementId = scrollRootElement.getAttribute("resourceId").split("/")[1];
         try {
-            MobileElement hiddenElement = ((AndroidDriver<AndroidElement>) driver).findElement(MobileBy.AndroidUIAutomator("new UiSelector().description(\"EyesAppiumHelperEDT\")"));
+            WebElement hiddenElement = driver.findElement(MobileBy.AndroidUIAutomator("new UiSelector().description(\"EyesAppiumHelperEDT\")"));
             if (hiddenElement != null) {
-                hiddenElement.setValue("behaviorOffset;"+elementId+";0;0");
+                hiddenElement.sendKeys("behaviorOffset;" + elementId + ";0;0");
                 hiddenElement.click();
                 offset = Integer.parseInt(hiddenElement.getText());
                 hiddenElement.clear();
@@ -257,12 +277,15 @@ public class AndroidScrollPositionProvider extends AppiumScrollPositionProvider 
     public boolean tryScrollBehaviorOffsetWithHelperLibrary(String elementId, int offset) {
         boolean scrolled = false;
         try {
-            MobileElement hiddenElement = ((AndroidDriver<AndroidElement>) driver).findElement(MobileBy.AndroidUIAutomator("new UiSelector().description(\"EyesAppiumHelperEDT\")"));
+            WebElement hiddenElement = driver.findElement(MobileBy.AndroidUIAutomator("new UiSelector().description(\"EyesAppiumHelperEDT\")"));
             if (hiddenElement != null) {
-                hiddenElement.setValue("behaviorScroll;"+elementId+";" + offset + ";0");
+                hiddenElement.sendKeys("behaviorScroll;" + elementId + ";" + offset + ";0");
                 hiddenElement.click();
                 scrolled = true;
-                try { Thread.sleep(1500); } catch (InterruptedException ignored) {}
+                try {
+                    Thread.sleep(1500);
+                } catch (InterruptedException ignored) {
+                }
                 hiddenElement.clear();
             }
         } catch (NoSuchElementException | NumberFormatException | StaleElementReferenceException e) {
@@ -276,9 +299,9 @@ public class AndroidScrollPositionProvider extends AppiumScrollPositionProvider 
         if (scrollRootElement != null) {
             String elementId = scrollRootElement.getAttribute("resourceId").split("/")[1];
             try {
-                MobileElement hiddenElement = ((AndroidDriver<AndroidElement>) driver).findElement(MobileBy.AndroidUIAutomator("new UiSelector().description(\"EyesAppiumHelperEDT\")"));
+                WebElement hiddenElement =  driver.findElement(MobileBy.AndroidUIAutomator("new UiSelector().description(\"EyesAppiumHelperEDT\")"));
                 if (hiddenElement != null) {
-                    hiddenElement.setValue("className;"+elementId+";0;0");
+                    hiddenElement.sendKeys("className;"+elementId+";0;0");
                     hiddenElement.click();
                     className = hiddenElement.getText();
                     if (className.isEmpty()) {
@@ -295,11 +318,14 @@ public class AndroidScrollPositionProvider extends AppiumScrollPositionProvider 
 
     public void tryDumpVHSWithHelperLibrary() {
         try {
-            MobileElement hiddenElement = ((AndroidDriver<AndroidElement>) driver).findElement(MobileBy.AndroidUIAutomator("new UiSelector().description(\"EyesAppiumHelperEDT\")"));
+            WebElement hiddenElement = driver.findElement(MobileBy.AndroidUIAutomator("new UiSelector().description(\"EyesAppiumHelperEDT\")"));
             if (hiddenElement != null) {
-                hiddenElement.setValue("dumpVHS;0;0;0");
+                hiddenElement.sendKeys("dumpVHS;0;0;0");
                 hiddenElement.click();
-                try { Thread.sleep(5_000); } catch (InterruptedException ignored) {}
+                try {
+                    Thread.sleep(5_000);
+                } catch (InterruptedException ignored) {
+                }
                 hiddenElement.clear();
             }
         } catch (NoSuchElementException | NumberFormatException | StaleElementReferenceException e) {
@@ -362,7 +388,7 @@ public class AndroidScrollPositionProvider extends AppiumScrollPositionProvider 
         if (scrollData == null) {
             if (isDown) {
                 return new Location(curScrollPos.getX(),
-                    contentSize.scrollableOffset);
+                        contentSize.scrollableOffset);
             }
 
             return new Location(curScrollPos == null ? 0 : curScrollPos.getX(), 0);
@@ -484,7 +510,7 @@ public class AndroidScrollPositionProvider extends AppiumScrollPositionProvider 
             } else {
                 scrollableView = EyesAppiumUtils.getFirstScrollableView(driver);
                 if (scrollableView.getAttribute("className").equals("android.widget.HorizontalScrollView")) {
-                    List<MobileElement> list = driver.findElements(By.xpath(EyesAppiumUtils.SCROLLVIEW_XPATH));
+                    List<WebElement> list = driver.findElements(By.xpath(EyesAppiumUtils.SCROLLVIEW_XPATH));
                     for (WebElement element : list) {
                         if (element.getAttribute("className").equals("android.widget.HorizontalScrollView")) {
                             continue;
@@ -505,20 +531,20 @@ public class AndroidScrollPositionProvider extends AppiumScrollPositionProvider 
             return scrollableContentSize;
         }
         String[] version = EyesAppiumUtils.getHelperLibraryVersion(eyesDriver, logger).split("\\.");
-        MobileElement hiddenElement;
+        WebElement hiddenElement;
         if (version.length == 3 &&
                 Integer.parseInt(version[0]) >= 1 &&
                 Integer.parseInt(version[1]) >= 3) {
-            hiddenElement = ((AndroidDriver<AndroidElement>) driver).findElement(MobileBy.AndroidUIAutomator("new UiSelector().description(\"EyesAppiumHelperEDT\")"));
+            hiddenElement = driver.findElement(MobileBy.AndroidUIAutomator("new UiSelector().description(\"EyesAppiumHelperEDT\")"));
             if (hiddenElement != null) {
                 String elementId = resourceId.split("/")[1];
-                hiddenElement.setValue("offset;"+elementId+";0;0;0");
+                hiddenElement.sendKeys("offset;" + elementId + ";0;0;0");
                 hiddenElement.click();
                 scrollableContentSize = hiddenElement.getText();
                 hiddenElement.clear();
             }
         } else {
-            hiddenElement = ((AndroidDriver<AndroidElement>) driver).findElement(MobileBy.AndroidUIAutomator("new UiSelector().description(\"EyesAppiumHelper\")"));
+            hiddenElement = driver.findElement(MobileBy.AndroidUIAutomator("new UiSelector().description(\"EyesAppiumHelper\")"));
             if (hiddenElement != null) {
                 hiddenElement.click();
                 scrollableContentSize = hiddenElement.getText();
