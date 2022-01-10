@@ -166,6 +166,7 @@ public abstract class EyesBase implements IEyesBase {
         }
         getServerConnector().setApiKey(apiKey);
         runner.setApiKey(apiKey);
+        runner.setTimeToWaitForOpen(getConfigurationInstance().getTimeToWaitForOpen());
         return this.getConfigurationInstance();
     }
 

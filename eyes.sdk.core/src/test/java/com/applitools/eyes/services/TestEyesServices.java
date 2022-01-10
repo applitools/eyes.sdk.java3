@@ -84,7 +84,8 @@ public class TestEyesServices {
                 super.startSession(listener, sessionStartInfo);
             }
         };
-
+        
+        serverConnector.setTimeToWaitForOpen(60*60*1000);
         OpenService openService = new OpenService(new Logger(), serverConnector, 5);
         openService.addInput("id", mock(SessionStartInfo.class));
         openService.run();

@@ -60,6 +60,8 @@ public class Configuration implements IConfiguration {
     private boolean disableBrowserFetching = true;
     private boolean useCookies = true;
     private boolean captureStatusBar = false;
+    private int timeToWaitForOpen=60*60*1000;
+
     @JsonIgnore
     private IDebugResourceWriter debugResourceWriter = new NullDebugResourceWriter();
 
@@ -392,6 +394,16 @@ public class Configuration implements IConfiguration {
     @Override
     public FailureReports getFailureReports() {
         return failureReports;
+    }
+    
+    public int getTimeToWaitForOpen()
+    {
+        return timeToWaitForOpen;
+    }
+
+    public void setTimeToWaitForOpen(int timeToWaitForOpen)
+    {
+        this.timeToWaitForOpen = timeToWaitForOpen;
     }
 
     public String toString() {

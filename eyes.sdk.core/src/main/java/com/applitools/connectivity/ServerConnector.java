@@ -36,6 +36,7 @@ public class ServerConnector extends UfgConnector {
     private static final String LOG_PATH = "/api/sessions/log";
 
     private static Map<String, MobileDeviceInfo> mobileDevicesInfo = null;
+    private int timeToWaitForOpen;
 
     /***
      * @param logger    Logger instance.
@@ -77,7 +78,23 @@ public class ServerConnector extends UfgConnector {
     public URI getServerUrl() {
         return getServerUrlBase();
     }
-
+    
+    /**
+     * Sets the time to wait for open session with applitools server.
+     * 
+     * @param timeToWaitForOpen
+     *            The time to wait for open.
+     */
+    public void setTimeToWaitForOpen(int timeToWaitForOpen)
+    {
+        this.timeToWaitForOpen = timeToWaitForOpen;
+    }
+    
+    public int getTimeToWaitForOpen()
+    {
+        return timeToWaitForOpen;
+    }
+    
     public void updateClient(HttpClient client) {
         restClient = client;
     }

@@ -115,6 +115,9 @@ public abstract class EyesRunner {
             }
         }
     }
+    public void setTimeToWaitForOpen(int timeToWaitForOpen) {
+                serverConnector.setTimeToWaitForOpen(timeToWaitForOpen);
+    }
 
     public void setServerConnector(ServerConnector serverConnector) {
         this.serverConnector = serverConnector;

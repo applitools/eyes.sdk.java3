@@ -4,7 +4,8 @@ import com.applitools.eyes.*;
 
 import java.net.URI;
 
-public interface IConfiguration {
+public interface IConfiguration
+{
     boolean getSaveNewTests();
 
     Configuration setSaveNewTests(boolean saveNewTests);
@@ -126,4 +127,8 @@ public interface IConfiguration {
     boolean getEnablePatterns();
 
     Configuration setEnablePatterns(boolean enablePatterns);
+
+    int getTimeToWaitForOpen();
+
+    public void setTimeToWaitForOpen(int timeToWaitForOpen);
 }

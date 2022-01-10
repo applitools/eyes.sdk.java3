@@ -16,6 +16,7 @@ public class OpenService extends EyesService<SessionStartInfo, RunningSession> {
     int TIME_TO_WAIT_FOR_OPEN = 60 * 60 * 1000;
 
     private final int eyesConcurrency;
+    private final int timeToWaitForOpen;
     private final AtomicInteger currentTestAmount = new AtomicInteger();
     private boolean isServerConcurrencyLimitReached = false;
 
@@ -24,6 +25,7 @@ public class OpenService extends EyesService<SessionStartInfo, RunningSession> {
     public OpenService(Logger logger, ServerConnector serverConnector, int eyesConcurrency) {
         super(logger, serverConnector);
         this.eyesConcurrency = eyesConcurrency;
+        this.timeToWaitForOpen = serverConnector.getTimeToWaitForOpen();
     }
 
     @Override
@@ -69,7 +71,7 @@ public class OpenService extends EyesService<SessionStartInfo, RunningSession> {
 
             @Override
             public void onFail() {
-                if (timePassed.get() > TIME_TO_WAIT_FOR_OPEN) {
+                if (timePassed.get() > timeToWaitForOpen) {
                     isServerConcurrencyLimitReached = false;
                     listener.onFail(new EyesException("Timeout in start session"));
                     return;
