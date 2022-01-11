@@ -2,6 +2,8 @@ package com.applitools.eyes;
 
 import java.net.URI;
 
+import com.applitools.eyes.config.Configuration;
+
 public interface IEyesBase {
 
     String getApiKey();
@@ -33,4 +35,8 @@ public interface IEyesBase {
     void abortAsync();
 
     TestResults abort();
+    
+    int getTimeToWaitForOpen();
+
+    Configuration setTimeToWaitForOpen(int timeToWaitForOpen);
 }

@@ -191,4 +191,10 @@ public class VisualGridRunningTest extends RunningTest {
     protected Configuration getConfigurationInstance() {
         return configuration;
     }
+
+    @Override
+    public int getTimeToWaitForOpen()
+    {
+        return configuration.getTimeToWaitForOpen();
+    }
 }

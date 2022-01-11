@@ -401,9 +401,10 @@ public class Configuration implements IConfiguration {
         return timeToWaitForOpen;
     }
 
-    public void setTimeToWaitForOpen(int timeToWaitForOpen)
+    public Configuration setTimeToWaitForOpen(int timeToWaitForOpen)
     {
         this.timeToWaitForOpen = timeToWaitForOpen;
+        return this;
     }
 
     public String toString() {

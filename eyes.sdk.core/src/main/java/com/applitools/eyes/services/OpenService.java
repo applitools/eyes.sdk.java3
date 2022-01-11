@@ -13,8 +13,6 @@ import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class OpenService extends EyesService<SessionStartInfo, RunningSession> {
-    int TIME_TO_WAIT_FOR_OPEN = 60 * 60 * 1000;
-
     private final int eyesConcurrency;
     private final int timeToWaitForOpen;
     private final AtomicInteger currentTestAmount = new AtomicInteger();

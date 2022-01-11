@@ -973,4 +973,16 @@ public class VisualGridEyes implements ISeleniumEyes {
     public boolean isCompleted() {
         return getAllTestResults() != null;
     }
+
+    @Override
+    public int getTimeToWaitForOpen()
+    {
+        return getConfiguration().getTimeToWaitForOpen();
+    }
+
+    @Override
+    public Configuration setTimeToWaitForOpen(int timeToWaitForOpen)
+    {
+        return getConfiguration().setTimeToWaitForOpen(timeToWaitForOpen);
+    }
 }

@@ -1854,4 +1854,16 @@ public class Eyes implements IEyesBase {
     public List<String> extractText(BaseOcrRegion... ocrRegions) {
         return seleniumEyes.extractText(ocrRegions);
     }
+
+    @Override
+    public int getTimeToWaitForOpen()
+    {
+        return this.activeEyes.getTimeToWaitForOpen();
+    }
+
+    @Override
+    public Configuration setTimeToWaitForOpen(int timeToWaitForOpen)
+    {
+        return this.activeEyes.setTimeToWaitForOpen(timeToWaitForOpen);
+    }
 }

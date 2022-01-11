@@ -166,10 +166,9 @@ public abstract class EyesBase implements IEyesBase {
         }
         getServerConnector().setApiKey(apiKey);
         runner.setApiKey(apiKey);
-        runner.setTimeToWaitForOpen(getConfigurationInstance().getTimeToWaitForOpen());
         return this.getConfigurationInstance();
     }
-
+    
     /**
      * @return The currently set API key or {@code null} if no key is set.
      */
@@ -180,7 +179,30 @@ public abstract class EyesBase implements IEyesBase {
         return getServerConnector().getApiKey();
     }
 
+    /**
+     * Sets the time to wait for open session with applitools server.
+     * @param timeToWaitForOpen maximal time to connect with server.
+     */
+    public Configuration setTimeToWaitForOpen(int timeToWaitForOpen) {
+        getConfigurationInstance().setTimeToWaitForOpen(timeToWaitForOpen);
+        if (getServerConnector() == null) {
+            throw new EyesException("server connector not set.");
+        }
+        getServerConnector().setTimeToWaitForOpen(timeToWaitForOpen);
+        runner.setTimeToWaitForOpen(timeToWaitForOpen);
+        return this.getConfigurationInstance();
+    }
 
+    /**
+     * @return The currently set time to wait for server connection.
+     */
+    public int getTimeToWaitForOpen() {
+        if (getServerConnector() == null) {
+            throw new EyesException("server connector not set.");
+        }
+        return getServerConnector().getTimeToWaitForOpen();
+    }
+    
     /**
      * Sets the current server URL used by the rest client.
      * @param serverUrl The URI of the rest server, or {@code null} to use

@@ -130,5 +130,5 @@ public interface IConfiguration
 
     int getTimeToWaitForOpen();
 
-    public void setTimeToWaitForOpen(int timeToWaitForOpen);
+    Configuration setTimeToWaitForOpen(int timeToWaitForOpen);
 }

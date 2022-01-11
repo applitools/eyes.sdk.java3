@@ -3,6 +3,7 @@ package com.applitools.eyes.services;
 import com.applitools.connectivity.MockServerConnector;
 import com.applitools.connectivity.ServerConnector;
 import com.applitools.eyes.*;
+import com.applitools.eyes.config.Configuration;
 import com.applitools.eyes.visualgrid.model.*;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import org.apache.commons.lang3.tuple.Pair;
@@ -55,8 +56,8 @@ public class TestEyesServices {
             }
         };
 
+        serverConnector.setTimeToWaitForOpen(1000);
         OpenService openService = new OpenService(new Logger(), serverConnector, 5);
-        openService.TIME_TO_WAIT_FOR_OPEN = 1000;
         openService.addInput("1", mock(SessionStartInfo.class));
         openService.addInput("2", openFailedStartInfo);
         openService.addInput("3", exceptionStartInfo);
@@ -85,7 +86,7 @@ public class TestEyesServices {
             }
         };
         
-        serverConnector.setTimeToWaitForOpen(60*60*1000);
+        serverConnector.setTimeToWaitForOpen(new Configuration().getTimeToWaitForOpen());
         OpenService openService = new OpenService(new Logger(), serverConnector, 5);
         openService.addInput("id", mock(SessionStartInfo.class));
         openService.run();
