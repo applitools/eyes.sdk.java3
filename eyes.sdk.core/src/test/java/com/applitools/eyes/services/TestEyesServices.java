@@ -6,6 +6,8 @@ import com.applitools.eyes.*;
 import com.applitools.eyes.config.Configuration;
 import com.applitools.eyes.visualgrid.model.*;
 import com.fasterxml.jackson.core.JsonProcessingException;
+
+import org.apache.commons.lang3.Range;
 import org.apache.commons.lang3.tuple.Pair;
 import org.testng.Assert;
 import org.testng.annotations.Test;
@@ -94,6 +96,27 @@ public class TestEyesServices {
         Assert.assertEquals(openService.outputQueue.size(), 1);
     }
 
+    @Test
+    public void testServerConnectionTimeoutIsConfigurable()
+    {
+        ServerConnector serverConnector = new MockServerConnector()
+        {
+            @Override
+            public void startSession(final TaskListener<RunningSession> listener, SessionStartInfo sessionStartInfo)
+            {
+                listener.onFail();
+            }
+        };
+
+        serverConnector.setTimeToWaitForOpen(4000);
+        OpenService openService = new OpenService(new Logger(), serverConnector, 1);
+        openService.addInput("id", mock(SessionStartInfo.class));
+        Date startDate = new Date();
+        openService.run();
+        Date finishDate = new Date();
+        Assert.assertTrue(Range.between(4000L, 6100L).contains(finishDate.getTime() - startDate.getTime()));
+    }
+    
     @Test
     public void testCheckService() {
         final byte[] uploadFailed = new byte[] {1, 2, 3};
