@@ -1,4 +1,6 @@
-## [vNext]
+## [3.211.0] - 2021-01-19
+### Updated
+- Device names enum [Trello 2790](https://trello.com/c/5AL4OJXe)
 ### Fixed
 - Added timeout for extremely slow downloads. [Trello 2738](https://trello.com/c/Nf4Fb5Zq)
 
