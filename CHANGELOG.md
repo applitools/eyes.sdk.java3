@@ -1,6 +1,6 @@
 ## [vNext]
 ### Fixed
-- Added timeout for extremely slow downlaods. [Trello 2738](https://trello.com/c/Nf4Fb5Zq)
+- Added timeout for extremely slow downloads. [Trello 2738](https://trello.com/c/Nf4Fb5Zq)
 
 ## [3.210.6] - 2021-12-10
 ### Fixed
