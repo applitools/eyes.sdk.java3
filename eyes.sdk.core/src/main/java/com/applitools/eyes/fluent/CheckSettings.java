@@ -2,6 +2,7 @@ package com.applitools.eyes.fluent;
 
 import com.applitools.ICheckSettings;
 import com.applitools.eyes.*;
+import com.applitools.eyes.config.Configuration;
 import com.applitools.eyes.locators.BaseOcrRegion;
 import com.applitools.eyes.positioning.PositionProvider;
 import com.applitools.eyes.visualgrid.model.VisualGridOption;
@@ -17,25 +18,26 @@ public class CheckSettings implements ICheckSettings, ICheckSettingsInternal {
     protected static final String BEFORE_CAPTURE_SCREENSHOT = "beforeCaptureScreenshot";
 
     private Region targetRegion;
-    private MatchLevel matchLevel = null;
-    private Boolean ignoreCaret = null;
+    private MatchLevel matchLevel = null; // done
+    private Boolean ignoreCaret = null; // done
     private Boolean stitchContent = null;
-    protected final List<GetSimpleRegion> ignoreRegions = new ArrayList<>();
-    protected final List<GetSimpleRegion> layoutRegions = new ArrayList<>();
-    protected final List<GetSimpleRegion> strictRegions = new ArrayList<>();
-    protected final List<GetSimpleRegion> contentRegions = new ArrayList<>();
-    protected final List<GetFloatingRegion> floatingRegions = new ArrayList<>();
+    protected final List<GetSimpleRegion> ignoreRegions = new ArrayList<>(); // done
+    protected final List<GetSimpleRegion> layoutRegions = new ArrayList<>(); // done
+    protected final List<GetSimpleRegion> strictRegions = new ArrayList<>(); // done
+    protected final List<GetSimpleRegion> contentRegions = new ArrayList<>(); // done
+    protected final List<GetFloatingRegion> floatingRegions = new ArrayList<>(); // done
     protected List<GetAccessibilityRegion> accessibilityRegions = new ArrayList<>();
-    private int timeout = -1;
-    protected String name;
-    protected Boolean enablePatterns;
-    protected Boolean sendDom = null;
-    protected Boolean useDom;
-    protected Map<String, String> scriptHooks = new HashMap<>();
-    protected Boolean ignoreDisplacements;
-    private List<VisualGridOption> visualGridOptions = new ArrayList<>();
+    private Integer timeout = null; // done
+    protected String name; // done
+    protected Boolean enablePatterns; // done
+    protected Boolean sendDom = null; // done
+    protected Boolean useDom; // done
+    protected Map<String, String> scriptHooks = new HashMap<>(); // done
+    protected Boolean ignoreDisplacements; // done
+    private List<VisualGridOption> visualGridOptions = new ArrayList<>(); // done
     private BaseOcrRegion ocrRegion = null;
-    private String variationGroupId = null;
+    private String variationGroupId = null; // done
+    private Boolean disableBrowserFetching; // done
 
     protected CheckSettings() { }
 
@@ -47,7 +49,7 @@ public class CheckSettings implements ICheckSettings, ICheckSettingsInternal {
      * For internal use only.
      * @param timeout timeout
      */
-    public CheckSettings(int timeout) {
+    public CheckSettings(Integer timeout) {
         this.timeout = timeout;
     }
 
@@ -251,7 +253,7 @@ public class CheckSettings implements ICheckSettings, ICheckSettingsInternal {
      * {@inheritDoc}
      */
     @Override
-    public ICheckSettings timeout(int timeoutMilliseconds) {
+    public ICheckSettings timeout(Integer timeoutMilliseconds) {
         CheckSettings clone = clone();
         clone.timeout = timeoutMilliseconds;
         return clone;
@@ -311,7 +313,7 @@ public class CheckSettings implements ICheckSettings, ICheckSettingsInternal {
      * {@inheritDoc}
      */
     @Override
-    public ICheckSettings ignoreCaret(boolean ignoreCaret) {
+    public ICheckSettings ignoreCaret(Boolean ignoreCaret) {
         CheckSettings clone = clone();
         clone.ignoreCaret = ignoreCaret;
         return clone;
@@ -352,7 +354,7 @@ public class CheckSettings implements ICheckSettings, ICheckSettingsInternal {
     }
 
     @Override
-    public ICheckSettings useDom(boolean useDom) {
+    public ICheckSettings useDom(Boolean useDom) {
         CheckSettings clone = this.clone();
         clone.useDom = useDom;
         return clone;
@@ -360,7 +362,7 @@ public class CheckSettings implements ICheckSettings, ICheckSettingsInternal {
 
 
     @Override
-    public ICheckSettings sendDom(boolean sendDom) {
+    public ICheckSettings sendDom(Boolean sendDom) {
         CheckSettings clone = this.clone();
         clone.sendDom = sendDom;
         return clone;
@@ -464,6 +466,7 @@ public class CheckSettings implements ICheckSettings, ICheckSettingsInternal {
         clone.visualGridOptions = this.visualGridOptions;
         clone.ocrRegion = this.ocrRegion;
         clone.variationGroupId = this.variationGroupId;
+        clone.disableBrowserFetching = this.disableBrowserFetching;
     }
 
     public void setStitchContent(boolean stitchContent) {
@@ -481,7 +484,7 @@ public class CheckSettings implements ICheckSettings, ICheckSettingsInternal {
     }
 
     @Override
-    public ICheckSettings enablePatterns(boolean enablePatterns) {
+    public ICheckSettings enablePatterns(Boolean enablePatterns) {
         CheckSettings clone = this.clone();
         clone.enablePatterns = enablePatterns;
         return clone;
@@ -508,7 +511,7 @@ public class CheckSettings implements ICheckSettings, ICheckSettingsInternal {
     }
 
     @Override
-    public ICheckSettings ignoreDisplacements(boolean ignoreDisplacements) {
+    public ICheckSettings ignoreDisplacements(Boolean ignoreDisplacements) {
         CheckSettings clone = this.clone();
         clone.ignoreDisplacements = ignoreDisplacements;
         return clone;
@@ -590,11 +593,21 @@ public class CheckSettings implements ICheckSettings, ICheckSettingsInternal {
     }
 
     @Override
-    public boolean isCheckWindow() {
+    public Boolean isCheckWindow() {
         return getTargetRegion() == null && getVGTargetSelector() == null;
     }
 
     public List<VisualGridOption> getVisualGridOptions() {
         return visualGridOptions;
+    }
+
+    public Boolean isDisableBrowserFetching() {
+        return disableBrowserFetching;
+    }
+
+    public ICheckSettings setDisableBrowserFetching(Boolean disableBrowserFetching) {
+        CheckSettings clone = this.clone();
+        clone.disableBrowserFetching = disableBrowserFetching;
+        return clone;
     }
 }

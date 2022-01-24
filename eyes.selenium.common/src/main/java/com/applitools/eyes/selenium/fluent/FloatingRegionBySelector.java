@@ -89,4 +89,8 @@ public class FloatingRegionBySelector implements GetFloatingRegion , IGetSeleniu
     public int getMaxDownOffset() {
         return maxDownOffset;
     }
+
+    public By getSelector() {
+        return selector;
+    }
 }

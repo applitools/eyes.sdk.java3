@@ -7,10 +7,20 @@ public enum StitchMode {
     /**
      * Standard JS scrolling.
      */
-    SCROLL,
+    SCROLL("Scroll"),
 
     /**
      * CSS translation based stitching.
      */
-    CSS
+    CSS("CSS");
+
+    private final String name;
+
+    StitchMode(String name) {
+        this.name = name;
+    }
+
+    public String getName() {
+        return name;
+    }
 }

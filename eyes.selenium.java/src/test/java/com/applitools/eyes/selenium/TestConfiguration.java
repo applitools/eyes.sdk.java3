@@ -38,8 +38,8 @@ public class TestConfiguration extends ReportingTestSuite {
     @Test
     public void testConfigurationEdit() {
         Eyes eyes = new Eyes();
-        int originalMatchTimeout = eyes.getConfiguration().getMatchTimeout();
-        int newMatchTimeout = originalMatchTimeout + 1000;
+        Integer originalMatchTimeout = eyes.getConfiguration().getMatchTimeout();
+        Integer newMatchTimeout = originalMatchTimeout + 1000;
         eyes.getConfiguration().setMatchTimeout(newMatchTimeout);
         Assert.assertEquals(eyes.getConfiguration().getMatchTimeout(), originalMatchTimeout);
 

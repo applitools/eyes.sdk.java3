@@ -271,6 +271,7 @@ public class SeleniumEyes extends RunningTest implements ISeleniumEyes {
 
     @Override
     public WebDriver open(WebDriver driver, String appName, String testName, RectangleSize viewportSize) throws EyesException {
+        // call EyesManager.openEyes
         logger.log(TraceLevel.Info, Collections.singleton(getTestId()), Stage.OPEN, Type.CALLED,
                 Pair.of("appName", appName),
                 Pair.of("testName", testName),
@@ -279,6 +280,8 @@ public class SeleniumEyes extends RunningTest implements ISeleniumEyes {
         if (viewportSize != null && !viewportSize.isEmpty()) {
             getConfigurationInstance().setViewportSize(new RectangleSize(viewportSize));
         }
+        // in this stage we can get all required parameters for calling EyesManager.openEyes
+        // (ManagerRef, DriverRef, EyesConfig)
         return open(driver);
     }
 
@@ -289,6 +292,8 @@ public class SeleniumEyes extends RunningTest implements ISeleniumEyes {
      * @throws EyesException the eyes exception
      */
     public WebDriver open(WebDriver driver) throws EyesException {
+
+        // is it the final place to open eyes?
 
         openLogger();
 

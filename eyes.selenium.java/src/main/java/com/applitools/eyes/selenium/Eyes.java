@@ -8,27 +8,29 @@ import com.applitools.eyes.config.ConfigurationProvider;
 import com.applitools.eyes.debug.DebugScreenshotsProvider;
 import com.applitools.eyes.exceptions.TestFailedException;
 import com.applitools.eyes.locators.*;
-import com.applitools.eyes.logging.Stage;
-import com.applitools.eyes.logging.TraceLevel;
 import com.applitools.eyes.positioning.PositionProvider;
 import com.applitools.eyes.selenium.fluent.SeleniumCheckSettings;
 import com.applitools.eyes.selenium.fluent.Target;
 import com.applitools.eyes.selenium.frames.FrameChain;
 import com.applitools.eyes.selenium.positioning.ImageRotation;
 import com.applitools.eyes.selenium.rendering.VisualGridEyes;
+import com.applitools.eyes.selenium.universal.mapper.DriverMapper;
+import com.applitools.universal.CommandExecutor;
+import com.applitools.universal.Reference;
 import com.applitools.eyes.selenium.wrappers.EyesSeleniumDriver;
 import com.applitools.eyes.triggers.MouseAction;
 import com.applitools.eyes.visualgrid.model.IDebugResourceWriter;
 import com.applitools.eyes.visualgrid.model.RenderingInfo;
-import com.applitools.eyes.visualgrid.services.VisualGridRunner;
+import com.applitools.universal.dto.ConfigurationDto;
+import com.applitools.universal.dto.DriverDto;
+import com.applitools.universal.mapper.ConfigurationMapper;
 import com.applitools.utils.ArgumentGuard;
-import org.apache.commons.lang3.tuple.Pair;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
+
 import java.net.URI;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
@@ -40,12 +42,8 @@ public class Eyes implements IEyesBase {
     private static final int USE_DEFAULT_MATCH_TIMEOUT = -1;
 
     private boolean isVisualGridEyes = false;
-    private VisualGridEyes visualGridEyes = null;
-    private SeleniumEyes seleniumEyes;
-    private ISeleniumEyes activeEyes;
-    private EyesRunner runner = null;
+    private EyesRunner runner;
     private Configuration configuration = new Configuration();
-    private ImageRotation rotation;
     VisualLocatorsProvider visualLocatorsProvider;
     ConfigurationProvider configurationProvider = new ConfigurationProvider() {
         @Override
@@ -53,45 +51,29 @@ public class Eyes implements IEyesBase {
             return configuration;
         }
     };
+    private CommandExecutor commandExecutor;
+
+    /**
+     * this reference has to be used in eyes related requests (Eyes.check, Eyes.locate, Eyes.extractTextRegions, Eyes.extractText, Eyes.close, Eyes.abort)
+     */
+    private Reference eyesRef;
 
     /**
      * Instantiates a new Eyes.
      */
     public Eyes() {
-        seleniumEyes = new SeleniumEyes(configurationProvider, new ClassicRunner());
-        activeEyes = seleniumEyes;
+        this(new ClassicRunner());
     }
 
     /**
      * Instantiates a new Eyes.
-     * @param runner the runner
+     * @param runner0 the runner
      */
-    public Eyes(EyesRunner runner) {
-        this();
-        this.runner = runner == null ? new ClassicRunner() : runner;
-        if (this.runner instanceof VisualGridRunner) {
-            visualGridEyes = new VisualGridEyes((VisualGridRunner) this.runner, configurationProvider);
-            activeEyes = visualGridEyes;
-            isVisualGridEyes = true;
-        } else {
-            seleniumEyes = new SeleniumEyes(configurationProvider, (ClassicRunner) runner);
-            activeEyes = seleniumEyes;
-        }
+    public Eyes(EyesRunner runner0) {
+        this.runner = runner0 == null ? new ClassicRunner() : runner0;
+        commandExecutor = runner.getCommandExecutor();
     }
 
-    private void afterOpen() {
-        visualLocatorsProvider = new BaseVisualLocatorsProvider(
-                getLogger(),
-                seleniumEyes.getTestId(),
-                seleniumEyes.getServerConnector(),
-                seleniumEyes.getScreenshotProvider(),
-                seleniumEyes.getDevicePixelRatio(),
-                seleniumEyes.getConfiguration().getAppName(),
-                getDebugScreenshotsProvider());
-        if (isVisualGridEyes) {
-            visualGridEyes.setImageProvider(seleniumEyes.getImageProvider());
-        }
-    }
 
     /**
      * Open web driver.
@@ -99,14 +81,7 @@ public class Eyes implements IEyesBase {
      * @return the web driver
      */
     public WebDriver open(WebDriver webDriver) {
-        if (activeEyes != seleniumEyes) {
-            configuration.setIsVisualGrid(true);
-            seleniumEyes.open(webDriver);
-        }
-
-        webDriver = activeEyes.open(webDriver);
-        afterOpen();
-        return webDriver;
+        return open(webDriver, configuration.getAppName(), configuration.getTestName());
     }
 
     /**
@@ -117,14 +92,7 @@ public class Eyes implements IEyesBase {
      * @return A wrapped WebDriver which enables SeleniumEyes trigger recording and frame handling.
      */
     public WebDriver open(WebDriver driver, String appName, String testName) {
-        if (activeEyes != seleniumEyes) {
-            configuration.setIsVisualGrid(true);
-            seleniumEyes.open(driver);
-        }
-
-        driver = activeEyes.open(driver, appName, testName, null);
-        afterOpen();
-        return driver;
+        return open(driver, appName, testName, configuration.getViewportSize());
     }
 
     /**
@@ -137,13 +105,16 @@ public class Eyes implements IEyesBase {
      */
     public WebDriver open(WebDriver driver, String appName, String testName,
                           RectangleSize viewportSize) {
-        if (activeEyes != seleniumEyes) {
-            configuration.setIsVisualGrid(true);
-            seleniumEyes.open(driver);
+        DriverDto driverDto = DriverMapper.toDriverDto(driver);
+        configurationProvider.get().setAppName(appName).setTestName(testName);
+
+        if (viewportSize != null && !viewportSize.isEmpty()) {
+            configurationProvider.get().setViewportSize(new RectangleSize(viewportSize));
         }
 
-        driver = activeEyes.open(driver, appName, testName, viewportSize);
-        afterOpen();
+        ConfigurationDto configurationDto = ConfigurationMapper.toConfigurationDto(configuration);
+        eyesRef = commandExecutor.managerOpenEyes(runner.getManagerRef(), driverDto, configurationDto);
+
         return driver;
     }
 
@@ -153,7 +124,6 @@ public class Eyes implements IEyesBase {
      */
     public void setServerUrl(String serverUrl) {
         configuration.setServerUrl(serverUrl);
-        activeEyes.serverUrl(serverUrl);
     }
 
     /**
@@ -161,7 +131,7 @@ public class Eyes implements IEyesBase {
      * @param serverUri the server URI
      */
     public void setServerUrl(URI serverUri) {
-        activeEyes.serverUrl(serverUri.toString());
+        //activeEyes.serverUrl(serverUri.toString());
     }
 
     /**
@@ -171,7 +141,7 @@ public class Eyes implements IEyesBase {
      */
     public void setProxy(AbstractProxySettings proxySettings) {
         configuration.setProxy(proxySettings);
-        activeEyes.proxy(proxySettings);
+        //activeEyes.proxy(proxySettings);
     }
 
     /**
@@ -179,7 +149,7 @@ public class Eyes implements IEyesBase {
      * @param isDisabled If true, all interactions with this API will be silently ignored.
      */
     public void setIsDisabled(Boolean isDisabled) {
-        activeEyes.setIsDisabled(isDisabled);
+        //activeEyes.setIsDisabled(isDisabled);
     }
 
     /**
@@ -207,11 +177,12 @@ public class Eyes implements IEyesBase {
     }
 
     public TestResults abort() {
-        return activeEyes.abort();
+        //return activeEyes.abort();
+        return null;
     }
 
     public void abortAsync() {
-        activeEyes.abortAsync();
+        //activeEyes.abortAsync();
     }
 
     /**
@@ -219,7 +190,8 @@ public class Eyes implements IEyesBase {
      * @return Whether eyes is disabled.
      */
     public boolean getIsDisabled() {
-        return activeEyes.getIsDisabled();
+        //return activeEyes.getIsDisabled();
+        return false;
     }
 
     /**
@@ -227,7 +199,8 @@ public class Eyes implements IEyesBase {
      * @return the api key
      */
     public String getApiKey() {
-        return activeEyes.getApiKey();
+        //return activeEyes.getApiKey();
+        return null;
     }
 
     /**
@@ -236,10 +209,10 @@ public class Eyes implements IEyesBase {
      */
     public void setApiKey(String apiKey) {
         // EyesBase sets the configuration
-        if (seleniumEyes != activeEyes) {
-            seleniumEyes.apiKey(apiKey);
-        }
-        activeEyes.apiKey(apiKey);
+//        if (seleniumEyes != activeEyes) {
+//            seleniumEyes.apiKey(apiKey);
+//        }
+//        activeEyes.apiKey(apiKey);
     }
 
     /**
@@ -395,7 +368,8 @@ public class Eyes implements IEyesBase {
      * @return The full agent id composed of both the base agent id and the user given agent id.
      */
     public String getFullAgentId() {
-        return activeEyes.getFullAgentId();
+        //return activeEyes.getFullAgentId();
+        return null;
     }
 
     /**
@@ -403,7 +377,8 @@ public class Eyes implements IEyesBase {
      * @return Whether a session is open.
      */
     public boolean getIsOpen() {
-        return activeEyes.getIsOpen();
+        //return activeEyes.getIsOpen();
+        return false;
     }
 
     /**
@@ -419,7 +394,7 @@ public class Eyes implements IEyesBase {
      * @param logHandler Handles log messages generated by this API.
      */
     public void setLogHandler(LogHandler logHandler) {
-        activeEyes.setLogHandler(logHandler);
+        //activeEyes.setLogHandler(logHandler);
     }
 
     /**
@@ -427,13 +402,13 @@ public class Eyes implements IEyesBase {
      * @return The currently set log handler.
      */
     public LogHandler getLogHandler() {
-        if (!this.isVisualGridEyes) {
-            return this.seleniumEyes.getLogHandler();
-        } else {
-            if (this.visualGridEyes.getLogger() != null) {
-                return this.visualGridEyes.getLogger().getLogHandler();
-            }
-        }
+//        if (!this.isVisualGridEyes) {
+//            return this.seleniumEyes.getLogHandler();
+//        } else {
+//            if (this.visualGridEyes.getLogger() != null) {
+//                return this.visualGridEyes.getLogger().getLogHandler();
+//            }
+//        }
         return null;
     }
 
@@ -442,7 +417,8 @@ public class Eyes implements IEyesBase {
      * @return the logger
      */
     public Logger getLogger() {
-        return activeEyes.getLogger();
+        //return activeEyes.getLogger();
+        return null;
     }
 
     /**
@@ -450,7 +426,7 @@ public class Eyes implements IEyesBase {
      * @param cutProvider the provider doing the cut.
      */
     public void setImageCut(CutProvider cutProvider) {
-        this.seleniumEyes.setImageCut(cutProvider);
+        //this.seleniumEyes.setImageCut(cutProvider);
     }
 
     /**
@@ -458,7 +434,8 @@ public class Eyes implements IEyesBase {
      * @return the is cut provider explicitly set
      */
     public boolean getIsCutProviderExplicitlySet() {
-        return this.seleniumEyes.getIsCutProviderExplicitlySet();
+        //return this.seleniumEyes.getIsCutProviderExplicitlySet();
+        return false;
     }
 
     /**
@@ -467,7 +444,11 @@ public class Eyes implements IEyesBase {
      * @param checkSettings the check settings
      */
     public void check(String tag, ICheckSettings checkSettings) {
-        activeEyes.check(tag, checkSettings);
+        checkSettings.withName(tag);
+        // implement it here
+
+         // should call command from here directly
+        //activeEyes.check(tag, checkSettings);
     }
 
     /**
@@ -476,7 +457,8 @@ public class Eyes implements IEyesBase {
      * @return the test results
      */
     public TestResults close(boolean shouldThrowException) {
-        return activeEyes.close(shouldThrowException);
+        //return activeEyes.close(shouldThrowException);
+        return null;
     }
 
     /**
@@ -484,7 +466,7 @@ public class Eyes implements IEyesBase {
      * @param scaleRatio The scale ratio to use, or {@code null} to reset                   back to automatic scaling.
      */
     public void setScaleRatio(Double scaleRatio) {
-        this.seleniumEyes.setScaleRatio(scaleRatio);
+        //this.seleniumEyes.setScaleRatio(scaleRatio);
     }
 
     /**
@@ -492,7 +474,8 @@ public class Eyes implements IEyesBase {
      * @return The ratio used to scale the images being validated.
      */
     public double getScaleRatio() {
-        return this.seleniumEyes.getScaleRatio();
+        //return this.seleniumEyes.getScaleRatio();
+        return 0;
     }
 
     /**
@@ -501,14 +484,14 @@ public class Eyes implements IEyesBase {
      * @param value The property value.
      */
     public void addProperty(String name, String value) {
-        activeEyes.addProperty(name, value);
+        //activeEyes.addProperty(name, value);
     }
 
     /**
      * Clears the list of custom properties.
      */
     public void clearProperties() {
-        activeEyes.clearProperties();
+        //activeEyes.clearProperties();
     }
 
     /**
@@ -516,10 +499,10 @@ public class Eyes implements IEyesBase {
      * @param saveDebugScreenshots If true, will save all screenshots to local directory.
      */
     public void setSaveDebugScreenshots(boolean saveDebugScreenshots) {
-        this.seleniumEyes.setSaveDebugScreenshots(saveDebugScreenshots);
-        if (isVisualGridEyes) {
-            visualGridEyes.setSaveDebugScreenshots(saveDebugScreenshots);
-        }
+//        this.seleniumEyes.setSaveDebugScreenshots(saveDebugScreenshots);
+//        if (isVisualGridEyes) {
+//            visualGridEyes.setSaveDebugScreenshots(saveDebugScreenshots);
+//        }
     }
 
     /**
@@ -527,7 +510,8 @@ public class Eyes implements IEyesBase {
      * @return True if screenshots saving enabled.
      */
     public boolean getSaveDebugScreenshots() {
-        return seleniumEyes.getSaveDebugScreenshots();
+        //return seleniumEyes.getSaveDebugScreenshots();
+        return false;
     }
 
     /**
@@ -535,10 +519,10 @@ public class Eyes implements IEyesBase {
      * @param pathToSave Path where you want to save the debug screenshots.
      */
     public void setDebugScreenshotsPath(String pathToSave) {
-        this.seleniumEyes.setDebugScreenshotsPath(pathToSave);
-        if (isVisualGridEyes) {
-            visualGridEyes.setDebugScreenshotsPath(pathToSave);
-        }
+//        this.seleniumEyes.setDebugScreenshotsPath(pathToSave);
+//        if (isVisualGridEyes) {
+//            visualGridEyes.setDebugScreenshotsPath(pathToSave);
+//        }
     }
 
     /**
@@ -546,7 +530,8 @@ public class Eyes implements IEyesBase {
      * @return The path where you want to save the debug screenshots.
      */
     public String getDebugScreenshotsPath() {
-        return this.seleniumEyes.getDebugScreenshotsPath();
+        //return this.seleniumEyes.getDebugScreenshotsPath();
+        return null;
     }
 
     /**
@@ -554,10 +539,10 @@ public class Eyes implements IEyesBase {
      * @param prefix The prefix for the screenshots' names.
      */
     public void setDebugScreenshotsPrefix(String prefix) {
-        this.seleniumEyes.setDebugScreenshotsPrefix(prefix);
-        if (isVisualGridEyes) {
-            visualGridEyes.setDebugScreenshotsPrefix(prefix);
-        }
+//        this.seleniumEyes.setDebugScreenshotsPrefix(prefix);
+//        if (isVisualGridEyes) {
+//            visualGridEyes.setDebugScreenshotsPrefix(prefix);
+//        }
     }
 
     /**
@@ -565,7 +550,8 @@ public class Eyes implements IEyesBase {
      * @return The prefix for the screenshots' names.
      */
     public String getDebugScreenshotsPrefix() {
-        return this.seleniumEyes.getDebugScreenshotsPrefix();
+        //return this.seleniumEyes.getDebugScreenshotsPrefix();
+        return null;
     }
 
     /**
@@ -573,7 +559,8 @@ public class Eyes implements IEyesBase {
      * @return the debug screenshots provider
      */
     public DebugScreenshotsProvider getDebugScreenshotsProvider() {
-        return this.seleniumEyes.getDebugScreenshotsProvider();
+        //return this.seleniumEyes.getDebugScreenshotsProvider();
+        return null;
     }
 
     /**
@@ -1115,7 +1102,7 @@ public class Eyes implements IEyesBase {
      * @param cursor  The cursor's position relative to the control.
      */
     public void addMouseTrigger(MouseAction action, Region control, Location cursor) {
-        this.seleniumEyes.addMouseTrigger(action, control, cursor);
+        //this.seleniumEyes.addMouseTrigger(action, control, cursor);
     }
 
     /**
@@ -1124,7 +1111,7 @@ public class Eyes implements IEyesBase {
      * @param element The WebElement on which the click was called.
      */
     public void addMouseTrigger(MouseAction action, WebElement element) {
-        this.seleniumEyes.addMouseTrigger(action, element);
+        //this.seleniumEyes.addMouseTrigger(action, element);
     }
 
     /**
@@ -1133,7 +1120,7 @@ public class Eyes implements IEyesBase {
      * @param text    The trigger's text.
      */
     public void addTextTrigger(Region control, String text) {
-        this.seleniumEyes.addTextTrigger(control, text);
+        //this.seleniumEyes.addTextTrigger(control, text);
     }
 
     /**
@@ -1142,7 +1129,7 @@ public class Eyes implements IEyesBase {
      * @param text    The trigger's text.
      */
     public void addTextTrigger(WebElement element, String text) {
-        this.seleniumEyes.addTextTrigger(element, text);
+        //this.seleniumEyes.addTextTrigger(element, text);
     }
 
     /**
@@ -1153,7 +1140,8 @@ public class Eyes implements IEyesBase {
      * @return the viewport size
      */
     public RectangleSize getViewportSize() {
-        return this.seleniumEyes.getViewportSize();
+        //return this.seleniumEyes.getViewportSize();
+        return null;
     }
 
     /**
@@ -1192,7 +1180,8 @@ public class Eyes implements IEyesBase {
      * @return the should stitch flag
      */
     public boolean shouldStitchContent() {
-        return seleniumEyes.shouldStitchContent();
+        //return seleniumEyes.shouldStitchContent();
+        return false;
     }
 
     /**
@@ -1240,7 +1229,7 @@ public class Eyes implements IEyesBase {
      * @param shouldScroll Whether to automatically scroll to a region being validated.
      */
     public void setScrollToRegion(boolean shouldScroll) {
-        this.seleniumEyes.setScrollToRegion(shouldScroll);
+        //this.seleniumEyes.setScrollToRegion(shouldScroll);
     }
 
     /**
@@ -1249,7 +1238,8 @@ public class Eyes implements IEyesBase {
      */
     @SuppressWarnings("BooleanMethodIsAlwaysInverted")
     public boolean getScrollToRegion() {
-        return this.seleniumEyes.getScrollToRegion();
+        //return this.seleniumEyes.getScrollToRegion();
+        return false;
     }
 
     /**
@@ -1291,7 +1281,8 @@ public class Eyes implements IEyesBase {
      * @return The image rotation model.
      */
     public ImageRotation getRotation() {
-        return this.seleniumEyes.getRotation();
+        //return this.seleniumEyes.getRotation();
+        return null;
     }
 
     /**
@@ -1299,11 +1290,11 @@ public class Eyes implements IEyesBase {
      * @param rotation The image rotation model.
      */
     public void setRotation(ImageRotation rotation) {
-        this.rotation = rotation;
-        WebDriver driver = getDriver();
-        if (driver != null) {
-            ((EyesSeleniumDriver) driver).setRotation(rotation);
-        }
+        //this.rotation = rotation;
+//        WebDriver driver = getDriver();
+//        if (driver != null) {
+//            ((EyesSeleniumDriver) driver).setRotation(rotation);
+//        }
     }
 
     /**
@@ -1311,7 +1302,8 @@ public class Eyes implements IEyesBase {
      * @return The device pixel ratio, or if the DPR is not known yet or if it wasn't possible to extract it.
      */
     public double getDevicePixelRatio() {
-        return this.seleniumEyes.getDevicePixelRatio();
+        //return this.seleniumEyes.getDevicePixelRatio();
+        return 0;
     }
 
     /**
@@ -1353,7 +1345,7 @@ public class Eyes implements IEyesBase {
      * @param checkSettings Multiple <code>ICheckSettings</code> object representing different regions in the viewport.
      */
     public void check(ICheckSettings... checkSettings) {
-        activeEyes.check(checkSettings);
+        //activeEyes.check(checkSettings);
     }
 
     /**
@@ -1482,7 +1474,8 @@ public class Eyes implements IEyesBase {
      * @return The URI of the eyes server.
      */
     public URI getServerUrl() {
-        return activeEyes.getServerUrl();
+        //return activeEyes.getServerUrl();
+        return null;
     }
 
     /**
@@ -1507,10 +1500,10 @@ public class Eyes implements IEyesBase {
      * @param serverConnector The server connector object to use.
      */
     public void setServerConnector(ServerConnector serverConnector) {
-        this.seleniumEyes.setServerConnector(serverConnector);
-        if (this.isVisualGridEyes) {
-            this.visualGridEyes.setServerConnector(serverConnector);
-        }
+//        this.seleniumEyes.setServerConnector(serverConnector);
+//        if (this.isVisualGridEyes) {
+//            this.visualGridEyes.setServerConnector(serverConnector);
+//        }
     }
 
 
@@ -1614,7 +1607,8 @@ public class Eyes implements IEyesBase {
      * @return The currently set position provider.
      */
     public PositionProvider getPositionProvider() {
-        return this.seleniumEyes.getPositionProvider();
+        //return this.seleniumEyes.getPositionProvider();
+        return null;
     }
 
     /**
@@ -1622,7 +1616,7 @@ public class Eyes implements IEyesBase {
      * @param positionProvider The position provider to be used.
      */
     public void setPositionProvider(PositionProvider positionProvider) {
-        this.seleniumEyes.setPositionProvider(positionProvider);
+        //this.seleniumEyes.setPositionProvider(positionProvider);
     }
 
     /**
@@ -1630,7 +1624,7 @@ public class Eyes implements IEyesBase {
      * @param explicitViewportSize sets the viewport
      */
     public void setExplicitViewportSize(RectangleSize explicitViewportSize) {
-        this.seleniumEyes.setExplicitViewportSize(explicitViewportSize);
+        //this.seleniumEyes.setExplicitViewportSize(explicitViewportSize);
     }
 
     /**
@@ -1638,7 +1632,7 @@ public class Eyes implements IEyesBase {
      * @param message the massage to log
      */
     public void log(String message) {
-        activeEyes.getLogger().log(TraceLevel.Notice, Stage.GENERAL,message);
+        //activeEyes.getLogger().log(TraceLevel.Notice, Stage.GENERAL,message);
     }
 
     /**
@@ -1759,10 +1753,11 @@ public class Eyes implements IEyesBase {
      * @return the driver
      */
     public WebDriver getDriver() {
-        if (!this.isVisualGridEyes) {
-            return this.seleniumEyes.getDriver();
-        }
-        return visualGridEyes.getDriver();
+//        if (!this.isVisualGridEyes) {
+//            return this.seleniumEyes.getDriver();
+//        }
+//        return visualGridEyes.getDriver();
+        return null;
     }
 
     /**
@@ -1770,7 +1765,8 @@ public class Eyes implements IEyesBase {
      * @return Original frame chain
      */
     public FrameChain getOriginalFC() {
-        return this.seleniumEyes.getOriginalFC();
+        //return this.seleniumEyes.getOriginalFC();
+        return null;
     }
 
     /**
@@ -1778,7 +1774,8 @@ public class Eyes implements IEyesBase {
      * @return get Current Frame Position Provider
      */
     public PositionProvider getCurrentFramePositionProvider() {
-        return this.seleniumEyes.getCurrentFramePositionProvider();
+        //return this.seleniumEyes.getCurrentFramePositionProvider();
+        return null;
     }
 
     /**
@@ -1786,7 +1783,8 @@ public class Eyes implements IEyesBase {
      * @return the region to check
      */
     public Region getRegionToCheck() {
-        return this.seleniumEyes.getRegionToCheck();
+        //return this.seleniumEyes.getRegionToCheck();
+        return null;
     }
 
     /**
@@ -1794,7 +1792,7 @@ public class Eyes implements IEyesBase {
      * @param regionToCheck the region to check
      */
     public void setRegionToCheck(Region regionToCheck) {
-        this.seleniumEyes.setRegionToCheck(regionToCheck);
+        //this.seleniumEyes.setRegionToCheck(regionToCheck);
     }
 
     /**
@@ -1802,7 +1800,8 @@ public class Eyes implements IEyesBase {
      * @return the current scroll root web element
      */
     public WebElement getCurrentFrameScrollRootElement() {
-        return this.seleniumEyes.getCurrentFrameScrollRootElement();
+        //return this.seleniumEyes.getCurrentFrameScrollRootElement();
+        return null;
     }
 
     /**
@@ -1810,7 +1809,8 @@ public class Eyes implements IEyesBase {
      * @return the server connector
      */
     public ServerConnector getServerConnector() {
-        return this.seleniumEyes.getServerConnector();
+        //return this.seleniumEyes.getServerConnector();
+        return null;
     }
 
     public com.applitools.eyes.selenium.Configuration getConfiguration() {
@@ -1835,11 +1835,11 @@ public class Eyes implements IEyesBase {
     }
 
     public void closeAsync() {
-        if (isVisualGridEyes) {
-            visualGridEyes.closeAsync();
-        } else {
-            seleniumEyes.close(false);
-        }
+//        if (isVisualGridEyes) {
+//            visualGridEyes.closeAsync();
+//        } else {
+//            seleniumEyes.close(false);
+//        }
     }
 
     public Map<String, List<Region>> locate(VisualLocatorSettings visualLocatorSettings) {
@@ -1848,10 +1848,16 @@ public class Eyes implements IEyesBase {
     }
 
     public Map<String, List<TextRegion>> extractTextRegions(TextRegionSettings textRegionSettings) {
-        return seleniumEyes.extractTextRegions(textRegionSettings);
+        //return seleniumEyes.extractTextRegions(textRegionSettings);
+        return null;
     }
 
     public List<String> extractText(BaseOcrRegion... ocrRegions) {
-        return seleniumEyes.extractText(ocrRegions);
+        //return seleniumEyes.extractText(ocrRegions);
+        return null;
+    }
+
+    public Reference getEyesRef() {
+        return eyesRef;
     }
 }

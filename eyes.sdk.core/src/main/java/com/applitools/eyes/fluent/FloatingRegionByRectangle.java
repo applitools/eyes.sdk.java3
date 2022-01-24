@@ -35,4 +35,20 @@ public class FloatingRegionByRectangle implements GetFloatingRegion {
                 maxUpOffset, maxDownOffset, maxLeftOffset, maxRightOffset));
         return value;
     }
+
+    public int getMaxUpOffset() {
+        return maxUpOffset;
+    }
+
+    public int getMaxDownOffset() {
+        return maxDownOffset;
+    }
+
+    public int getMaxLeftOffset() {
+        return maxLeftOffset;
+    }
+
+    public int getMaxRightOffset() {
+        return maxRightOffset;
+    }
 }

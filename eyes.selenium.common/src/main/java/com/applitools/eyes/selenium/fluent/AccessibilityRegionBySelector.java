@@ -26,6 +26,7 @@ public class AccessibilityRegionBySelector implements GetAccessibilityRegion, IG
     public AccessibilityRegionBySelector(By selector, AccessibilityRegionType regionType) {
         this.selector = selector;
         this.regionType = regionType;
+        //selector.criteria
     }
 
     @Override
@@ -54,5 +55,9 @@ public class AccessibilityRegionBySelector implements GetAccessibilityRegion, IG
     @Override
     public List<WebElement> getElements() {
         return driver.findElements(selector);
+    }
+
+    public By getSelector() {
+        return selector;
     }
 }

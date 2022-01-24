@@ -35,4 +35,8 @@ public interface ICheckSettingsInternal {
     Boolean isIgnoreDisplacements();
 
     List<VisualGridOption> getVisualGridOptions();
+
+    Boolean isDisableBrowserFetching();
+
+    ICheckSettings setDisableBrowserFetching(Boolean disableBrowserFetching);
 }

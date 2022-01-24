@@ -106,7 +106,7 @@ public interface ICheckSettings {
      * @param timeoutMilliseconds The timeout to use in milliseconds.
      * @return An updated clone of this settings object.
      */
-    ICheckSettings timeout(int timeoutMilliseconds);
+    ICheckSettings timeout(Integer timeoutMilliseconds);
 
     /**
      * Shortcut to set the match level to {@code MatchLevel.LAYOUT}.
@@ -144,7 +144,7 @@ public interface ICheckSettings {
      * @param ignoreCaret Whether or not to detect and ignore a blinking caret in the screenshot.
      * @return An updated clone of this settings object.
      */
-    ICheckSettings ignoreCaret(boolean ignoreCaret);
+    ICheckSettings ignoreCaret(Boolean ignoreCaret);
 
     /**
      * Defines to ignore a blinking caret in the screenshot.
@@ -160,13 +160,13 @@ public interface ICheckSettings {
     ICheckSettings withName(String name);
 
 
-    ICheckSettings useDom(boolean useDom);
+    ICheckSettings useDom(Boolean useDom);
 
-    ICheckSettings sendDom(boolean sendDom);
+    ICheckSettings sendDom(Boolean sendDom);
 
     ICheckSettings sendDom();
 
-    ICheckSettings enablePatterns(boolean enablePatterns);
+    ICheckSettings enablePatterns(Boolean enablePatterns);
 
     ICheckSettings enablePatterns();
 
@@ -174,7 +174,7 @@ public interface ICheckSettings {
 
     ICheckSettings beforeRenderScreenshotHook(String scriptHook);
 
-    ICheckSettings ignoreDisplacements(boolean ignoreDisplacements);
+    ICheckSettings ignoreDisplacements(Boolean ignoreDisplacements);
 
     ICheckSettings ignoreDisplacements();
 
@@ -182,5 +182,5 @@ public interface ICheckSettings {
 
     ICheckSettings visualGridOptions(VisualGridOption... options);
 
-    boolean isCheckWindow();
+    Boolean isCheckWindow();
 }

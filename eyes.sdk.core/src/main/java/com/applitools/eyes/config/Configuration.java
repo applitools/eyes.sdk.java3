@@ -14,7 +14,6 @@ import java.util.*;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class Configuration implements IConfiguration {
-    private static final int DEFAULT_MATCH_TIMEOUT = 2000; // Milliseconds;
     private static final int DEFAULT_WAIT_BEFORE_SCREENSHOTS = 100;
 
     private String branchName = GeneralUtils.getEnvString("APPLITOOLS_BRANCH");
@@ -25,55 +24,55 @@ public class Configuration implements IConfiguration {
     private String environmentName;
     private Boolean saveDiffs;
     private SessionType sessionType;
-    protected BatchInfo batch = new BatchInfo(null);
+    protected BatchInfo batch;
     protected String baselineEnvName;
     protected String appName;
     protected String testName;
     protected RectangleSize viewportSize;
-    protected boolean ignoreDisplacements = false;
+    protected Boolean ignoreDisplacements;
     protected ImageMatchSettings defaultMatchSettings = new ImageMatchSettings();
-    private int matchTimeout = DEFAULT_MATCH_TIMEOUT;
+    private Integer matchTimeout;
     private String hostApp;
     private String hostOS;
     private String deviceInfo;
     private String hostingAppInfo;
     private String osInfo;
     // Used for automatic save of a test run.
-    private boolean saveNewTests, saveFailedTests;
-    private int stitchOverlap = 10;
-    private Boolean isSendDom = true;
-    private String apiKey = null;
-    private String serverUrl = null;
-    private AbstractProxySettings proxy = null;
-    private FailureReports failureReports = FailureReports.ON_CLOSE;
-    private AccessibilitySettings accessibilitySettings = null;
-    private boolean enablePatterns;
-    private boolean useDom;
+    private Boolean saveNewTests, saveFailedTests;
+    private Integer stitchOverlap;
+    private Boolean isSendDom;
+    private String apiKey;
+    private String serverUrl;
+    private AbstractProxySettings proxy;
+    private FailureReports failureReports;
+    private AccessibilitySettings accessibilitySettings;
+    private Boolean enablePatterns;
+    private Boolean useDom;
     private Integer abortIdleTestTimeout;
 
     private Boolean forceFullPageScreenshot;
-    private int waitBeforeScreenshots = DEFAULT_WAIT_BEFORE_SCREENSHOTS;
-    private StitchMode stitchMode = StitchMode.SCROLL;
-    private boolean hideScrollbars = true;
-    private boolean hideCaret = true;
-    private boolean isVisualGrid = false;
-    private boolean disableBrowserFetching = true;
-    private boolean useCookies = true;
-    private boolean captureStatusBar = false;
+    private Integer waitBeforeScreenshots;
+    private StitchMode stitchMode;
+    private Boolean hideScrollbars;
+    private Boolean hideCaret;
+    private Boolean isVisualGrid;
+    private Boolean disableBrowserFetching;
+    private Boolean useCookies;
+    private Boolean captureStatusBar;
     @JsonIgnore
-    private IDebugResourceWriter debugResourceWriter = new NullDebugResourceWriter();
+    private IDebugResourceWriter debugResourceWriter = new NullDebugResourceWriter(); // FIXME do we need that true
 
     //Rendering Configuration
-    private Boolean isRenderingConfig = false;
+    private Boolean isRenderingConfig;
 
-    private List<RenderBrowserInfo> browsersInfo = new ArrayList<>();
+    private List<RenderBrowserInfo> browsersInfo = new ArrayList<>();;
 
-    private Set<Feature> features = new HashSet<>();
+    private Set<Feature> features = new HashSet<>();;
 
-    private List<VisualGridOption> visualGridOptions = new ArrayList<>();
+    private List<VisualGridOption> visualGridOptions = new ArrayList<>();;
 
-    private boolean isDefaultLayoutBreakpointsSet = false;
-    private List<Integer> layoutBreakpoints = new ArrayList<>();
+    private Boolean isDefaultLayoutBreakpointsSet;
+    private List<Integer> layoutBreakpoints =  new ArrayList<>();
 
     public Configuration(Configuration other) {
         this.branchName = other.getBranchName();
@@ -134,18 +133,11 @@ public class Configuration implements IConfiguration {
     }
 
     public Configuration() {
-        defaultMatchSettings.setIgnoreCaret(true);
-        agentId = null;// New tests are automatically saved by default.
-        saveNewTests = true;
-        saveFailedTests = false;
-
     }
 
     public Configuration(RectangleSize viewportSize) {
         this();
-        ArrayList<RenderBrowserInfo> browsersInfo = new ArrayList<>();
         browsersInfo.add(new RenderBrowserInfo(viewportSize.getWidth(), viewportSize.getHeight(), BrowserType.CHROME, null));
-        this.browsersInfo = browsersInfo;
     }
 
     public Configuration(String testName) {
@@ -154,34 +146,33 @@ public class Configuration implements IConfiguration {
 
     public Configuration(String appName, String testName, RectangleSize viewportSize) {
         this();
-        ArrayList<RenderBrowserInfo> browsersInfo = new ArrayList<>();
         if (viewportSize != null) {
             browsersInfo.add(new RenderBrowserInfo(viewportSize.getWidth(), viewportSize.getHeight(), BrowserType.CHROME, null));
         }
-        this.browsersInfo = browsersInfo;
         this.testName = testName;
         this.viewportSize = viewportSize;
-        this.setAppName(appName);
+        this.appName = appName;
+
     }
 
     @Override
-    public boolean getSaveNewTests() {
+    public Boolean getSaveNewTests() {
         return saveNewTests;
     }
 
     @Override
-    public Configuration setSaveNewTests(boolean saveNewTests) {
+    public Configuration setSaveNewTests(Boolean saveNewTests) {
         this.saveNewTests = saveNewTests;
         return this;
     }
 
     @Override
-    public boolean getSaveFailedTests() {
+    public Boolean getSaveFailedTests() {
         return saveFailedTests;
     }
 
     @Override
-    public Configuration setSaveFailedTests(boolean saveFailedTests) {
+    public Configuration setSaveFailedTests(Boolean saveFailedTests) {
         this.saveFailedTests = saveFailedTests;
         return this;
     }
@@ -198,12 +189,12 @@ public class Configuration implements IConfiguration {
     }
 
     @Override
-    public int getMatchTimeout() {
+    public Integer getMatchTimeout() {
         return matchTimeout;
     }
 
     @Override
-    public Configuration setMatchTimeout(int matchTimeout) {
+    public Configuration setMatchTimeout(Integer matchTimeout) {
         this.matchTimeout = matchTimeout;
         return this;
     }
@@ -231,12 +222,12 @@ public class Configuration implements IConfiguration {
     }
 
     @Override
-    public int getStitchOverlap() {
+    public Integer getStitchOverlap() {
         return stitchOverlap;
     }
 
     @Override
-    public Configuration setStitchOverlap(int stitchOverlap) {
+    public Configuration setStitchOverlap(Integer stitchOverlap) {
         this.stitchOverlap = stitchOverlap;
         return this;
     }
@@ -353,10 +344,6 @@ public class Configuration implements IConfiguration {
 
     @Override
     public RectangleSize getViewportSize() {
-        if (isRenderingConfig) {
-            RenderBrowserInfo renderBrowserInfo = this.browsersInfo.get(0);
-            return new RectangleSize(renderBrowserInfo.getWidth(), renderBrowserInfo.getHeight());
-        }
         return viewportSize;
     }
 
@@ -420,7 +407,7 @@ public class Configuration implements IConfiguration {
     }
 
     @Override
-    public Configuration setSendDom(boolean sendDom) {
+    public Configuration setSendDom(Boolean sendDom) {
         isSendDom = sendDom;
         return this;
     }
@@ -429,8 +416,9 @@ public class Configuration implements IConfiguration {
      * @return Whether to ignore or the blinking caret or not when comparing images.
      */
     @Override
-    public boolean getIgnoreCaret() {
-        Boolean ignoreCaret = getDefaultMatchSettings().getIgnoreCaret();
+    public Boolean getIgnoreCaret() {
+        Boolean ignoreCaret = null;
+        if (getDefaultMatchSettings() != null) ignoreCaret = getDefaultMatchSettings().getIgnoreCaret();
         return ignoreCaret == null || ignoreCaret;
     }
 
@@ -439,7 +427,7 @@ public class Configuration implements IConfiguration {
      * @param value The ignore value.
      */
     @Override
-    public Configuration setIgnoreCaret(boolean value) {
+    public Configuration setIgnoreCaret(Boolean value) {
         defaultMatchSettings.setIgnoreCaret(value);
         return this;
     }
@@ -486,7 +474,7 @@ public class Configuration implements IConfiguration {
     }
 
     @Override
-    public boolean getIgnoreDisplacements() {
+    public Boolean getIgnoreDisplacements() {
         return this.ignoreDisplacements;
     }
 
@@ -497,7 +485,7 @@ public class Configuration implements IConfiguration {
     }
 
     @Override
-    public Configuration setIgnoreDisplacements(boolean isIgnoreDisplacements) {
+    public Configuration setIgnoreDisplacements(Boolean isIgnoreDisplacements) {
         this.defaultMatchSettings.setIgnoreDisplacements(isIgnoreDisplacements);
         this.ignoreDisplacements = isIgnoreDisplacements;
         return this;
@@ -505,17 +493,18 @@ public class Configuration implements IConfiguration {
 
     @Override
     public AccessibilitySettings getAccessibilityValidation() {
-        return this.accessibilitySettings != null ? this.accessibilitySettings : getDefaultMatchSettings().getAccessibilitySettings();
+        return accessibilitySettings;
+        // TODO
+        //return this.accessibilitySettings != null ? this.accessibilitySettings : getDefaultMatchSettings().getAccessibilitySettings();
     }
 
     @Override
     public Configuration setAccessibilityValidation(AccessibilitySettings accessibilitySettings) {
         if (accessibilitySettings == null) {
-            this.defaultMatchSettings.setAccessibilitySettings(null);
-            this.accessibilitySettings = null;
             return this;
         }
 
+        // TODO do we need such validation here?
         if (accessibilitySettings.getLevel() == null || accessibilitySettings.getGuidelinesVersion() == null) {
             throw new IllegalArgumentException("AccessibilitySettings should have the following properties: ‘level,version’");
         }
@@ -526,26 +515,26 @@ public class Configuration implements IConfiguration {
     }
 
     @Override
-    public Configuration setUseDom(boolean useDom) {
+    public Configuration setUseDom(Boolean useDom) {
         this.defaultMatchSettings.setUseDom(useDom);
         this.useDom = useDom;
         return this;
     }
 
     @Override
-    public boolean getUseDom() {
+    public Boolean getUseDom() {
         return useDom;
     }
 
     @Override
-    public Configuration setEnablePatterns(boolean enablePatterns) {
+    public Configuration setEnablePatterns(Boolean enablePatterns) {
         this.defaultMatchSettings.setEnablePatterns(enablePatterns);
         this.enablePatterns = enablePatterns;
         return this;
     }
 
     @Override
-    public boolean getEnablePatterns() {
+    public Boolean getEnablePatterns() {
         return enablePatterns;
     }
 
@@ -553,7 +542,7 @@ public class Configuration implements IConfiguration {
         return forceFullPageScreenshot;
     }
 
-    public int getWaitBeforeScreenshots() {
+    public Integer getWaitBeforeScreenshots() {
         return waitBeforeScreenshots;
     }
 
@@ -575,7 +564,7 @@ public class Configuration implements IConfiguration {
         return this;
     }
 
-    public boolean getHideScrollbars() {
+    public Boolean getHideScrollbars() {
         return hideScrollbars;
     }
 
@@ -584,7 +573,7 @@ public class Configuration implements IConfiguration {
         return this;
     }
 
-    public boolean getHideCaret() {
+    public Boolean getHideCaret() {
         return hideCaret;
     }
 
@@ -594,6 +583,9 @@ public class Configuration implements IConfiguration {
     }
 
     public Configuration addBrowsers(IRenderingBrowserInfo... browserInfos) {
+        if (browserInfos == null) {
+            return this;
+        }
         for (IRenderingBrowserInfo browserInfo : browserInfos) {
             addBrowser(browserInfo);
         }
@@ -696,21 +688,21 @@ public class Configuration implements IConfiguration {
         return this;
     }
 
-    public boolean isRenderingConfig() {
+    public Boolean isRenderingConfig() {
         return isRenderingConfig;
     }
 
-    public Configuration setRenderingConfig(boolean renderingConfig) {
+    public Configuration setRenderingConfig(Boolean renderingConfig) {
         isRenderingConfig = renderingConfig;
         return this;
     }
 
-    public Configuration setIsVisualGrid(boolean isVisualGrid) {
+    public Configuration setIsVisualGrid(Boolean isVisualGrid) {
         this.isVisualGrid = isVisualGrid;
         return this;
     }
 
-    public boolean isVisualGrid() {
+    public Boolean isVisualGrid() {
         return isVisualGrid;
     }
 
@@ -773,20 +765,20 @@ public class Configuration implements IConfiguration {
         return this;
     }
 
-    public boolean isDisableBrowserFetching() {
+    public Boolean isDisableBrowserFetching() {
         return disableBrowserFetching;
     }
 
-    public Configuration setDisableBrowserFetching(boolean disableBrowserFetching) {
+    public Configuration setDisableBrowserFetching(Boolean disableBrowserFetching) {
         this.disableBrowserFetching = disableBrowserFetching;
         return this;
     }
 
-    public boolean isUseCookies() {
+    public Boolean isUseCookies() {
         return useCookies;
     }
 
-    public Configuration setUseCookies(boolean useCookies) {
+    public Configuration setUseCookies(Boolean useCookies) {
         this.useCookies = useCookies;
         return this;
     }
@@ -809,13 +801,13 @@ public class Configuration implements IConfiguration {
         return this;
     }
 
-    public Configuration setLayoutBreakpoints(boolean shouldSet) {
+    public Configuration setLayoutBreakpoints(Boolean shouldSet) {
         this.isDefaultLayoutBreakpointsSet = shouldSet;
         layoutBreakpoints.clear();
         return this;
     }
 
-    public boolean isDefaultLayoutBreakpointsSet() {
+    public Boolean isDefaultLayoutBreakpointsSet() {
         return isDefaultLayoutBreakpointsSet;
     }
 
@@ -839,11 +831,12 @@ public class Configuration implements IConfiguration {
         return layoutBreakpoints;
     }
 
-    public boolean isCaptureStatusBar() {
+    public Boolean isCaptureStatusBar() {
         return captureStatusBar;
     }
 
-    public void setCaptureStatusBar(boolean captureStatusBar) {
+    public void setCaptureStatusBar(Boolean captureStatusBar) {
         this.captureStatusBar = captureStatusBar;
     }
+
 }

@@ -122,10 +122,12 @@ public class BatchInfo {
     @JsonSerialize(using = Iso8610CalendarSerializer.class)
     public Calendar getStartedAt() {
         try {
+            if (startedAt == null) return null;
             return GeneralUtils.fromISO8601DateTime(startedAt);
         } catch (ParseException ex) {
             throw new EyesException("Failed to parse batch start time", ex);
         }
+
     }
 
     @JsonProperty("startedAt")

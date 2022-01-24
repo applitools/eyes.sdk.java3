@@ -23,6 +23,7 @@ public class SimpleRegionByElement implements GetSimpleRegion, IGetSeleniumRegio
     private EyesWebDriver driver;
     @JsonSerialize(using = WebElementSerializer.class)
     protected final WebElement element;
+
     @JsonIgnore
     protected final Borders padding;
 

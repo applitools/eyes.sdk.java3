@@ -44,4 +44,5 @@ public interface ICheckSettingsInternal extends com.applitools.ICheckSettingsInt
     String getVariationGroupId();
 
     PositionProvider getStepPositionProvider();
+
 }

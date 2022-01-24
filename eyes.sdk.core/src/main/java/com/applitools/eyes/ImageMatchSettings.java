@@ -1,5 +1,7 @@
 package com.applitools.eyes;
 
+import java.util.Arrays;
+
 import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonSetter;
 
@@ -206,9 +208,23 @@ public class ImageMatchSettings {
     }
 
 
+    @Override
     public String toString() {
-        return String.format("Match level: %s, Exact match settings: %s",
-                matchLevel, exact);
+        return "ImageMatchSettings{" +
+            "matchLevel=" + matchLevel +
+            ", exact=" + exact +
+            ", ignoreCaret=" + ignoreCaret +
+            ", ignoreRegions=" + Arrays.toString(ignoreRegions) +
+            ", layoutRegions=" + Arrays.toString(layoutRegions) +
+            ", strictRegions=" + Arrays.toString(strictRegions) +
+            ", contentRegions=" + Arrays.toString(contentRegions) +
+            ", floatingMatchSettings=" + Arrays.toString(floatingMatchSettings) +
+            ", useDom=" + useDom +
+            ", enablePatterns=" + enablePatterns +
+            ", ignoreDisplacements=" + ignoreDisplacements +
+            ", accessibility=" + Arrays.toString(accessibility) +
+            ", accessibilitySettings=" + accessibilitySettings +
+            '}';
     }
 
     public boolean isEnablePatterns() {

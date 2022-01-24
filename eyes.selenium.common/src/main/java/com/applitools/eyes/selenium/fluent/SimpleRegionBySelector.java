@@ -17,6 +17,7 @@ public class SimpleRegionBySelector implements GetSimpleRegion, IGetSeleniumRegi
 
     @JsonIgnore
     private EyesWebDriver driver;
+
     @JsonSerialize(using = BySerializer.class)
     private final By selector;
     @JsonIgnore
@@ -60,5 +61,9 @@ public class SimpleRegionBySelector implements GetSimpleRegion, IGetSeleniumRegi
     @Override
     public List<WebElement> getElements() {
         return driver.findElements(selector);
+    }
+
+    public By getSelector() {
+        return selector;
     }
 }

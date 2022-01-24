@@ -5,21 +5,21 @@ import com.applitools.eyes.*;
 import java.net.URI;
 
 public interface IConfiguration {
-    boolean getSaveNewTests();
+    Boolean getSaveNewTests();
 
-    Configuration setSaveNewTests(boolean saveNewTests);
+    Configuration setSaveNewTests(Boolean saveNewTests);
 
-    boolean getSaveFailedTests();
+    Boolean getSaveFailedTests();
 
-    Configuration setSaveFailedTests(boolean saveFailedTests);
+    Configuration setSaveFailedTests(Boolean saveFailedTests);
 
     ImageMatchSettings getDefaultMatchSettings();
 
     Configuration setDefaultMatchSettings(ImageMatchSettings defaultMatchSettings);
 
-    int getMatchTimeout();
+    Integer getMatchTimeout();
 
-    Configuration setMatchTimeout(int matchTimeout);
+    Configuration setMatchTimeout(Integer matchTimeout);
 
     String getHostApp();
 
@@ -29,9 +29,9 @@ public interface IConfiguration {
 
     Configuration setHostOS(String hostOS);
 
-    int getStitchOverlap();
+    Integer getStitchOverlap();
 
-    Configuration setStitchOverlap(int stitchingOverlap);
+    Configuration setStitchOverlap(Integer stitchingOverlap);
 
     BatchInfo getBatch();
 
@@ -89,11 +89,11 @@ public interface IConfiguration {
 
     Boolean isSendDom();
 
-    Configuration setSendDom(boolean sendDom);
+    Configuration setSendDom(Boolean sendDom);
 
-    boolean getIgnoreCaret();
+    Boolean getIgnoreCaret();
 
-    Configuration setIgnoreCaret(boolean value);
+    Configuration setIgnoreCaret(Boolean value);
 
     String getApiKey();
 
@@ -111,19 +111,19 @@ public interface IConfiguration {
 
     Configuration setMatchLevel(MatchLevel matchLevel);
 
-    boolean getIgnoreDisplacements();
+    Boolean getIgnoreDisplacements();
 
-    Configuration setIgnoreDisplacements(boolean isIgnoreDisplacements);
+    Configuration setIgnoreDisplacements(Boolean isIgnoreDisplacements);
 
     AccessibilitySettings getAccessibilityValidation();
 
     Configuration setAccessibilityValidation(AccessibilitySettings accessibilitySettings);
 
-    boolean getUseDom();
+    Boolean getUseDom();
 
-    Configuration setUseDom(boolean useDom);
+    Configuration setUseDom(Boolean useDom);
 
-    boolean getEnablePatterns();
+    Boolean getEnablePatterns();
 
-    Configuration setEnablePatterns(boolean enablePatterns);
+    Configuration setEnablePatterns(Boolean enablePatterns);
 }

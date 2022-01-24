@@ -312,6 +312,11 @@ public class Eyes extends EyesBase implements IConfiguration {
         return config;
     }
 
+    @Override
+    public Configuration setSendDom(Boolean sendDom) {
+        return null;
+    }
+
     /**
      * Get the inferred environment.
      * @return Inferred environment.
@@ -497,7 +502,7 @@ public class Eyes extends EyesBase implements IConfiguration {
      * Sets the maximum time (in ms) a match operation tries to perform a match.
      * @param ms Total number of ms to wait for a match.
      */
-    public Configuration setMatchTimeout(int ms) {
+    public Configuration setMatchTimeout(Integer ms) {
         final int MIN_MATCH_TIMEOUT = 500;
         if (getIsDisabled()) {
             return config;
@@ -517,7 +522,7 @@ public class Eyes extends EyesBase implements IConfiguration {
      * @return The maximum time in ms {@link #checkWindowBase
      * (RegionProvider, String, boolean, int)} waits for a match.
      */
-    public int getMatchTimeout() {
+    public Integer getMatchTimeout() {
         return this.config.getMatchTimeout();
     }
 
@@ -525,7 +530,7 @@ public class Eyes extends EyesBase implements IConfiguration {
      * Set whether or not new tests are saved by default.
      * @param saveNewTests True if new tests should be saved by default. False otherwise.
      */
-    public Configuration setSaveNewTests(boolean saveNewTests) {
+    public Configuration setSaveNewTests(Boolean saveNewTests) {
         this.config.setSaveNewTests(saveNewTests);
         return config;
     }
@@ -533,7 +538,7 @@ public class Eyes extends EyesBase implements IConfiguration {
     /**
      * @return True if new tests are saved by default.
      */
-    public boolean getSaveNewTests() {
+    public Boolean getSaveNewTests() {
         return config.getSaveNewTests();
     }
 
@@ -541,7 +546,7 @@ public class Eyes extends EyesBase implements IConfiguration {
      * Set whether or not failed tests are saved by default.
      * @param saveFailedTests True if failed tests should be saved by default, false otherwise.
      */
-    public Configuration setSaveFailedTests(boolean saveFailedTests) {
+    public Configuration setSaveFailedTests(Boolean saveFailedTests) {
         this.config.setSaveFailedTests(saveFailedTests);
         return config;
     }
@@ -549,7 +554,7 @@ public class Eyes extends EyesBase implements IConfiguration {
     /**
      * @return True if failed tests are saved by default.
      */
-    public boolean getSaveFailedTests() {
+    public Boolean getSaveFailedTests() {
         return config.getSaveFailedTests();
     }
 
@@ -607,7 +612,7 @@ public class Eyes extends EyesBase implements IConfiguration {
         return config;
     }
 
-    public Configuration setIgnoreDisplacements(boolean isIgnoreDisplacements) {
+    public Configuration setIgnoreDisplacements(Boolean isIgnoreDisplacements) {
         this.config.setIgnoreDisplacements(isIgnoreDisplacements);
         return config;
     }
@@ -616,11 +621,11 @@ public class Eyes extends EyesBase implements IConfiguration {
         return this.config.setAccessibilityValidation(accessibilityValidation);
     }
 
-    public Configuration setUseDom(boolean useDom) {
+    public Configuration setUseDom(Boolean useDom) {
         return config.setUseDom(useDom);
     }
 
-    public Configuration setEnablePatterns(boolean enablePatterns) {
+    public Configuration setEnablePatterns(Boolean enablePatterns) {
         return config.setEnablePatterns(enablePatterns);
     }
 
@@ -632,7 +637,7 @@ public class Eyes extends EyesBase implements IConfiguration {
         return config.getDefaultMatchSettings().getMatchLevel();
     }
 
-    public boolean getIgnoreDisplacements() {
+    public Boolean getIgnoreDisplacements() {
         return config.getIgnoreDisplacements();
     }
 
@@ -640,18 +645,18 @@ public class Eyes extends EyesBase implements IConfiguration {
         return config.getAccessibilityValidation();
     }
 
-    public boolean getUseDom() {
+    public Boolean getUseDom() {
         return config.getUseDom();
     }
 
-    public boolean getEnablePatterns() {
+    public Boolean getEnablePatterns() {
         return config.getEnablePatterns();
     }
 
     /**
      * @return Whether to ignore or the blinking caret or not when comparing images.
      */
-    public boolean getIgnoreCaret() {
+    public Boolean getIgnoreCaret() {
         Boolean ignoreCaret = config.getDefaultMatchSettings().getIgnoreCaret();
         return ignoreCaret == null ? true : ignoreCaret;
     }
@@ -660,7 +665,7 @@ public class Eyes extends EyesBase implements IConfiguration {
      * Sets the ignore blinking caret value.
      * @param value The ignore value.
      */
-    public Configuration setIgnoreCaret(boolean value) {
+    public Configuration setIgnoreCaret(Boolean value) {
         config.getDefaultMatchSettings().setIgnoreCaret(value);
         return config;
     }
@@ -668,7 +673,7 @@ public class Eyes extends EyesBase implements IConfiguration {
     /**
      * Returns the stitching overlap in pixels.
      */
-    public int getStitchOverlap() {
+    public Integer getStitchOverlap() {
         return config.getStitchOverlap();
     }
 
@@ -676,7 +681,7 @@ public class Eyes extends EyesBase implements IConfiguration {
      * Sets the stitching overlap in pixels.
      * @param pixels The width (in pixels) of the overlap.
      */
-    public Configuration setStitchOverlap(int pixels) {
+    public Configuration setStitchOverlap(Integer pixels) {
         this.config.setStitchOverlap(pixels);
         return config;
     }

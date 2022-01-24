@@ -51,6 +51,7 @@ public class OpenService extends EyesService<SessionStartInfo, RunningSession> {
     }
 
     public void operate(final String testId, final SessionStartInfo sessionStartInfo, final ServiceTaskListener<RunningSession> listener) {
+        // is it the final destination for eyes open?
         final AtomicInteger timePassed = new AtomicInteger(0);
         final AtomicInteger sleepDuration = new AtomicInteger(2 * 1000);
         TaskListener<RunningSession> taskListener = new TaskListener<RunningSession>() {

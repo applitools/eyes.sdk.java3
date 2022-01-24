@@ -47,7 +47,7 @@ public class SeleniumCheckSettings extends CheckSettings implements ISeleniumChe
     private CheckState state;
 
     private boolean isDefaultLayoutBreakpointsSet = false;
-    private final List<Integer> layoutBreakpoints = new ArrayList<>();
+    private final List<Integer> layoutBreakpoints = new ArrayList<>();  // done
 
     public SeleniumCheckSettings() {
     }
@@ -424,7 +424,7 @@ public class SeleniumCheckSettings extends CheckSettings implements ISeleniumChe
     }
 
     @Override
-    public SeleniumCheckSettings ignoreCaret(boolean ignoreCaret) {
+    public SeleniumCheckSettings ignoreCaret(Boolean ignoreCaret) {
         return (SeleniumCheckSettings) super.ignoreCaret(ignoreCaret);
     }
 
@@ -459,7 +459,7 @@ public class SeleniumCheckSettings extends CheckSettings implements ISeleniumChe
     }
 
     @Override
-    public SeleniumCheckSettings timeout(int timeoutMilliseconds) {
+    public SeleniumCheckSettings timeout(Integer timeoutMilliseconds) {
         return (SeleniumCheckSettings) super.timeout(timeoutMilliseconds);
     }
 
