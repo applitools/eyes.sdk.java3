@@ -18,6 +18,7 @@ public class Target {
 
     public static SeleniumCheckSettings region(By by)
     {
+        System.out.println("by: " + by);
         return new SeleniumCheckSettings(by);
     }
 

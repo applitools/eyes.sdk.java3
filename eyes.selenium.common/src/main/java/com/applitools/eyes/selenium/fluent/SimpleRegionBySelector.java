@@ -35,6 +35,7 @@ public class SimpleRegionBySelector implements GetSimpleRegion, IGetSeleniumRegi
     @Override
     public void init(Logger logger, EyesWebDriver driver) {
         this.driver = driver;
+        new SimpleRegionBySelector(By.cssSelector("asd"), null);
     }
 
     @Override
