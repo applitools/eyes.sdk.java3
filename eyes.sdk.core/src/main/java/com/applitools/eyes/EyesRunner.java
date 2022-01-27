@@ -9,21 +9,13 @@ import java.util.Map;
 import com.applitools.connectivity.ServerConnector;
 import com.applitools.eyes.logging.Stage;
 import com.applitools.eyes.logging.Type;
-import com.applitools.universal.CommandExecutor;
-import com.applitools.universal.ManagerType;
-import com.applitools.universal.Reference;
 import com.applitools.utils.GeneralUtils;
 import org.apache.commons.lang3.tuple.Pair;
 
 public abstract class EyesRunner {
   protected ServerConnector serverConnector = new ServerConnector();
   private TestResultsSummary allTestResults = null;
-  protected CommandExecutor commandExecutor;
 
-  /**
-   * this reference has to be used in order to perform manager related actions (EyesManager.openEyes, EyesManager.closeAllEyes)
-   */
-  protected Reference managerRef;
 
   /**
    * name of the client sdk
@@ -39,7 +31,7 @@ public abstract class EyesRunner {
    * used for instantiating Classic Runner
    */
   public EyesRunner() {
-    commandExecutor = new CommandExecutor(BASE_AGENT_ID, VERSION);
+
   }
 
   private boolean dontCloseBatches = false;
@@ -174,31 +166,5 @@ public abstract class EyesRunner {
     return serverConnector.getAgentId();
   }
 
-  /**
-   * manager reference
-   */
-  public Reference getManagerRef() {
-    return managerRef;
-  }
 
-  /**
-   * @param  managerRef
-   */
-  public void setManagerRef(Reference managerRef) {
-    this.managerRef = managerRef;
-  }
-
-  /**
-   * command executor
-   */
-  public CommandExecutor getCommandExecutor() {
-    return commandExecutor;
-  }
-
-  /**
-   * @param  commandExecutor
-   */
-  public void setCommandExecutor(CommandExecutor commandExecutor) {
-    this.commandExecutor = commandExecutor;
-  }
 }

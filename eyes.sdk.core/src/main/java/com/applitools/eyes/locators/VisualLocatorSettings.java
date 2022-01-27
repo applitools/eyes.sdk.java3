@@ -6,7 +6,7 @@ import java.util.List;
 public class VisualLocatorSettings {
 
     private List<String> names = new ArrayList<>();
-    private boolean firstOnly = true;
+    private Boolean firstOnly;
 
     public VisualLocatorSettings() {
     }
@@ -58,7 +58,7 @@ public class VisualLocatorSettings {
         return names;
     }
 
-    public boolean isFirstOnly() {
+    public Boolean isFirstOnly() {
         return firstOnly;
     }
 }

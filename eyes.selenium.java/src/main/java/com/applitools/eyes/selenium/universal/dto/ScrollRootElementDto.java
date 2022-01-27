@@ -1,28 +1,25 @@
 package com.applitools.eyes.selenium.universal.dto;
 
-import org.openqa.selenium.By;
-import org.openqa.selenium.WebElement;
-
 /**
  * scroll root element dto
  */
 public class ScrollRootElementDto {
-  private WebElement scrollRootElement;
-  private By scrollRootSelector;
+  private SelectorRegionDto selector;
+  private ElementRegionDto element;
 
-  public WebElement getScrollRootElement() {
-    return scrollRootElement;
+  public SelectorRegionDto getSelector() {
+    return selector;
   }
 
-  public void setScrollRootElement(WebElement scrollRootElement) {
-    this.scrollRootElement = scrollRootElement;
+  public void setSelector(SelectorRegionDto selector) {
+    this.selector = selector;
   }
 
-  public By getScrollRootSelector() {
-    return scrollRootSelector;
+  public ElementRegionDto getElement() {
+    return element;
   }
 
-  public void setScrollRootSelector(By scrollRootSelector) {
-    this.scrollRootSelector = scrollRootSelector;
+  public void setElement(ElementRegionDto element) {
+    this.element = element;
   }
 }

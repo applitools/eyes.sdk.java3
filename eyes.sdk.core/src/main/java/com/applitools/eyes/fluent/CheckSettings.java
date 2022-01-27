@@ -18,26 +18,26 @@ public class CheckSettings implements ICheckSettings, ICheckSettingsInternal {
     protected static final String BEFORE_CAPTURE_SCREENSHOT = "beforeCaptureScreenshot";
 
     private Region targetRegion;
-    private MatchLevel matchLevel = null; // done
-    private Boolean ignoreCaret = null; // done
+    private MatchLevel matchLevel = null;
+    private Boolean ignoreCaret = null;
     private Boolean stitchContent = null;
-    protected final List<GetSimpleRegion> ignoreRegions = new ArrayList<>(); // done
-    protected final List<GetSimpleRegion> layoutRegions = new ArrayList<>(); // done
-    protected final List<GetSimpleRegion> strictRegions = new ArrayList<>(); // done
-    protected final List<GetSimpleRegion> contentRegions = new ArrayList<>(); // done
-    protected final List<GetFloatingRegion> floatingRegions = new ArrayList<>(); // done
+    protected final List<GetSimpleRegion> ignoreRegions = new ArrayList<>();
+    protected final List<GetSimpleRegion> layoutRegions = new ArrayList<>();
+    protected final List<GetSimpleRegion> strictRegions = new ArrayList<>();
+    protected final List<GetSimpleRegion> contentRegions = new ArrayList<>();
+    protected final List<GetFloatingRegion> floatingRegions = new ArrayList<>();
     protected List<GetAccessibilityRegion> accessibilityRegions = new ArrayList<>();
-    private Integer timeout = null; // done
-    protected String name; // done
-    protected Boolean enablePatterns; // done
-    protected Boolean sendDom = null; // done
-    protected Boolean useDom; // done
-    protected Map<String, String> scriptHooks = new HashMap<>(); // done
-    protected Boolean ignoreDisplacements; // done
-    private List<VisualGridOption> visualGridOptions = new ArrayList<>(); // done
+    private Integer timeout = null;
+    protected String name;
+    protected Boolean enablePatterns;
+    protected Boolean sendDom = null;
+    protected Boolean useDom;
+    protected Map<String, String> scriptHooks = new HashMap<>();
+    protected Boolean ignoreDisplacements;
+    private List<VisualGridOption> visualGridOptions = new ArrayList<>();
     private BaseOcrRegion ocrRegion = null;
-    private String variationGroupId = null; // done
-    private Boolean disableBrowserFetching; // done
+    private String variationGroupId = null;
+    private Boolean disableBrowserFetching;
 
     protected CheckSettings() { }
 
@@ -379,7 +379,7 @@ public class CheckSettings implements ICheckSettings, ICheckSettingsInternal {
     }
 
     @Override
-    public int getTimeout() {
+    public Integer getTimeout() {
         return this.timeout;
     }
 

@@ -2,13 +2,9 @@ package com.applitools.eyes.selenium.universal.mapper;
 
 import com.applitools.eyes.AccessibilityRegionByRectangle;
 import com.applitools.eyes.GetAccessibilityRegion;
-import com.applitools.eyes.fluent.SimpleRegionByRectangle;
 import com.applitools.eyes.selenium.fluent.AccessibilityRegionByElement;
 import com.applitools.eyes.selenium.fluent.AccessibilityRegionBySelector;
-import com.applitools.eyes.selenium.fluent.SimpleRegionByElement;
-import com.applitools.eyes.selenium.fluent.SimpleRegionBySelector;
 import com.applitools.eyes.selenium.universal.dto.AccessibilityRegionDto;
-import com.applitools.universal.mapper.RegionMapper;
 
 /**
  * accessibility region mapper

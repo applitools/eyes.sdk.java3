@@ -2,7 +2,10 @@ package com.applitools.eyes;
 
 import com.applitools.eyes.selenium.Configuration;
 import com.applitools.eyes.selenium.Eyes;
-import com.applitools.universal.Reference;
+import com.applitools.eyes.selenium.Reference;
+import com.applitools.eyes.selenium.fluent.Target;
+import org.openqa.selenium.By;
+import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.testng.Assert;
 import org.testng.annotations.Test;
@@ -56,4 +59,16 @@ public class EyesTests {
     Assert.assertEquals("app name", eyes.getConfiguration().getAppName());
     Assert.assertEquals("test name", eyes.getConfiguration().getTestName());
   }
+
+  @Test
+  public void should_OpenAndCheckEyes_When_Configured() {
+    WebDriver webDriver = new ChromeDriver();
+    webDriver.get("http://applitools.github.io/demo/TestPages/FramesTestPage/");
+    Eyes eyes = new Eyes();
+    eyes.open(webDriver, "app name", "test name", new RectangleSize(800, 600));
+    Reference eyesRef = eyes.getEyesRef();
+    eyes.check("Check region ignore region", Target.region(By.cssSelector("overflowing-div")).ignore(new Region(50, 110, 90, 550)));
+  }
+
+
 }

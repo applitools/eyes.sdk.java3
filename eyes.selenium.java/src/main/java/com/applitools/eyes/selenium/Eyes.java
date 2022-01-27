@@ -13,17 +13,21 @@ import com.applitools.eyes.selenium.fluent.SeleniumCheckSettings;
 import com.applitools.eyes.selenium.fluent.Target;
 import com.applitools.eyes.selenium.frames.FrameChain;
 import com.applitools.eyes.selenium.positioning.ImageRotation;
-import com.applitools.eyes.selenium.rendering.VisualGridEyes;
+import com.applitools.eyes.selenium.universal.dto.CheckSettingsDto;
+import com.applitools.eyes.selenium.universal.dto.ConfigurationDto;
+import com.applitools.eyes.selenium.universal.dto.DriverDto;
+import com.applitools.eyes.selenium.universal.dto.OCRExtractSettingsDto;
+import com.applitools.eyes.selenium.universal.dto.OCRSearchSettingsDto;
+import com.applitools.eyes.selenium.universal.dto.VisualLocatorSettingsDto;
+import com.applitools.eyes.selenium.universal.mapper.CheckSettingsMapper;
+import com.applitools.eyes.selenium.universal.mapper.ConfigurationMapper;
 import com.applitools.eyes.selenium.universal.mapper.DriverMapper;
-import com.applitools.universal.CommandExecutor;
-import com.applitools.universal.Reference;
-import com.applitools.eyes.selenium.wrappers.EyesSeleniumDriver;
+import com.applitools.eyes.selenium.universal.mapper.OCRExtractSettingsDtoMapper;
+import com.applitools.eyes.selenium.universal.mapper.OCRSearchSettingsMapper;
+import com.applitools.eyes.selenium.universal.mapper.VisualLocatorSettingsMapper;
 import com.applitools.eyes.triggers.MouseAction;
 import com.applitools.eyes.visualgrid.model.IDebugResourceWriter;
 import com.applitools.eyes.visualgrid.model.RenderingInfo;
-import com.applitools.universal.dto.ConfigurationDto;
-import com.applitools.universal.dto.DriverDto;
-import com.applitools.universal.mapper.ConfigurationMapper;
 import com.applitools.utils.ArgumentGuard;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
@@ -31,6 +35,7 @@ import org.openqa.selenium.WebElement;
 
 
 import java.net.URI;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -444,11 +449,11 @@ public class Eyes implements IEyesBase {
      * @param checkSettings the check settings
      */
     public void check(String tag, ICheckSettings checkSettings) {
-        checkSettings.withName(tag);
-        // implement it here
+        checkSettings = checkSettings.withName(tag);
 
-         // should call command from here directly
-        //activeEyes.check(tag, checkSettings);
+        CheckSettingsDto checkSettingsDto = CheckSettingsMapper.toCheckSettingsDto(checkSettings);
+        ConfigurationDto configurationDto = ConfigurationMapper.toConfigurationDto(configuration);
+        commandExecutor.eyesCheck(eyesRef, checkSettingsDto, configurationDto);
     }
 
     /**
@@ -1844,15 +1849,28 @@ public class Eyes implements IEyesBase {
 
     public Map<String, List<Region>> locate(VisualLocatorSettings visualLocatorSettings) {
         ArgumentGuard.notNull(visualLocatorSettings, "visualLocatorSettings");
-        return visualLocatorsProvider.getLocators(visualLocatorSettings);
+        VisualLocatorSettingsDto visualLocatorSettingsDto = VisualLocatorSettingsMapper
+            .toVisualLocatorSettingsDto(visualLocatorSettings);
+
+        ConfigurationDto configurationDto = ConfigurationMapper.toConfigurationDto(configuration);
+        commandExecutor.locate(eyesRef, visualLocatorSettingsDto, configurationDto);
+
+        return null;
+        // TODO must return from server
     }
 
     public Map<String, List<TextRegion>> extractTextRegions(TextRegionSettings textRegionSettings) {
+        OCRSearchSettingsDto ocrSearchSettingsDto = OCRSearchSettingsMapper.toOCRSearchSettingsDto(textRegionSettings);
         //return seleniumEyes.extractTextRegions(textRegionSettings);
         return null;
     }
 
     public List<String> extractText(BaseOcrRegion... ocrRegions) {
+        List<OCRExtractSettingsDto> ocrExtractSettingsDtoList = OCRExtractSettingsDtoMapper
+            .toOCRExtractSettingsDtoList(Arrays.asList(ocrRegions));
+
+
+
         //return seleniumEyes.extractText(ocrRegions);
         return null;
     }

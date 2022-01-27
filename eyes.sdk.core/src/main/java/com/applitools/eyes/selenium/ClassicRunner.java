@@ -15,7 +15,7 @@ import com.applitools.eyes.SyncTaskListener;
 import com.applitools.eyes.TestResultContainer;
 import com.applitools.eyes.TestResults;
 import com.applitools.eyes.TestResultsSummary;
-import com.applitools.universal.ManagerType;
+
 
 
 /**
@@ -27,7 +27,7 @@ public class ClassicRunner extends EyesRunner {
 
   public ClassicRunner() {
     super();
-    managerRef = commandExecutor.coreMakeManager(ManagerType.CLASSIC.value, null, null);
+    //managerRef = commandExecutor.coreMakeManager(ManagerType.CLASSIC.value, null, null);
   }
 
   @Override

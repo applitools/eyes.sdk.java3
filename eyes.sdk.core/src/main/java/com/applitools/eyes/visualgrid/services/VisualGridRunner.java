@@ -9,7 +9,6 @@ import com.applitools.eyes.visualgrid.model.FrameData;
 import com.applitools.eyes.visualgrid.model.IDebugResourceWriter;
 import com.applitools.eyes.visualgrid.model.RGridResource;
 import com.applitools.eyes.visualgrid.model.RenderingInfo;
-import com.applitools.universal.ManagerType;
 import com.applitools.utils.ArgumentGuard;
 import com.applitools.utils.GeneralUtils;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -65,7 +64,7 @@ public class VisualGridRunner extends EyesRunner {
     public VisualGridRunner(String suiteName) {
         super();
         this.testConcurrency = new TestConcurrency();
-        managerRef = commandExecutor.coreMakeManager(ManagerType.VISUAL_GRID.value, testConcurrency.actualConcurrency, testConcurrency.isLegacy);
+        //managerRef = commandExecutor.coreMakeManager(ManagerType.VISUAL_GRID.value, testConcurrency.actualConcurrency, testConcurrency.isLegacy);
     }
 
     public VisualGridRunner(int testConcurrency) {
@@ -74,7 +73,7 @@ public class VisualGridRunner extends EyesRunner {
 
     public VisualGridRunner(int testConcurrency0, String suiteName) {
         this.testConcurrency = new TestConcurrency(testConcurrency0, true);
-        managerRef = commandExecutor.coreMakeManager(ManagerType.VISUAL_GRID.value, testConcurrency.actualConcurrency, testConcurrency.isLegacy);
+        //managerRef = commandExecutor.coreMakeManager(ManagerType.VISUAL_GRID.value, testConcurrency.actualConcurrency, testConcurrency.isLegacy);
     }
 
     public VisualGridRunner(RunnerOptions runnerOptions) {
@@ -85,7 +84,7 @@ public class VisualGridRunner extends EyesRunner {
         ArgumentGuard.notNull(runnerOptions, "runnerOptions");
         int testConcurrency0 = runnerOptions.getTestConcurrency() == null ? DEFAULT_CONCURRENCY : runnerOptions.getTestConcurrency();
         this.testConcurrency = new TestConcurrency(testConcurrency0, false);
-        managerRef = commandExecutor.coreMakeManager(ManagerType.VISUAL_GRID.value, testConcurrency.actualConcurrency, testConcurrency.isLegacy);
+        //managerRef = commandExecutor.coreMakeManager(ManagerType.VISUAL_GRID.value, testConcurrency.actualConcurrency, testConcurrency.isLegacy);
 
         //setApiKey(runnerOptions.getApiKey());
         //setServerUrl(runnerOptions.getServerUrl());

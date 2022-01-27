@@ -8,7 +8,6 @@ import com.applitools.eyes.fluent.SimpleRegionByRectangle;
 import com.applitools.eyes.selenium.fluent.SimpleRegionByElement;
 import com.applitools.eyes.selenium.fluent.SimpleRegionBySelector;
 import com.applitools.eyes.selenium.universal.dto.SimpleRegionDto;
-import com.applitools.universal.mapper.RegionMapper;
 
 /**
  * simple region mapper
@@ -27,7 +26,7 @@ public class SimpleRegionMapper {
     } else if (getSimpleRegion instanceof SimpleRegionByElement) {
       simpleRegionDto.setElement(((SimpleRegionByElement) getSimpleRegion).getElement());
     } else if (getSimpleRegion instanceof SimpleRegionBySelector) {
-      simpleRegionDto.setSelector(((SimpleRegionBySelector)getSimpleRegion).getSelector());
+      //simpleRegionDto.setSelector(((SimpleRegionBySelector)getSimpleRegion).getSelector());
     }
 
     return simpleRegionDto;

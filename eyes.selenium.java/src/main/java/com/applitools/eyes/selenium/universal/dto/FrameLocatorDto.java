@@ -1,34 +1,13 @@
 package com.applitools.eyes.selenium.universal.dto;
 
-import org.openqa.selenium.By;
-import org.openqa.selenium.WebElement;
-
 /**
  * frame locator dto
  */
 public class FrameLocatorDto {
-  private WebElement frameElement;
-  private By frameSelector;
+  private SelectorRegionDto selector;
+  private ElementRegionDto element;
   private String frameNameOrId;
   private Integer frameIndex;
-  private By scrollRootSelector;
-  private WebElement scrollRootElement;
-
-  public WebElement getFrameElement() {
-    return frameElement;
-  }
-
-  public void setFrameElement(WebElement frameElement) {
-    this.frameElement = frameElement;
-  }
-
-  public By getFrameSelector() {
-    return frameSelector;
-  }
-
-  public void setFrameSelector(By frameSelector) {
-    this.frameSelector = frameSelector;
-  }
 
   public String getFrameNameOrId() {
     return frameNameOrId;
@@ -46,19 +25,19 @@ public class FrameLocatorDto {
     this.frameIndex = frameIndex;
   }
 
-  public By getScrollRootSelector() {
-    return scrollRootSelector;
+  public SelectorRegionDto getSelector() {
+    return selector;
   }
 
-  public void setScrollRootSelector(By scrollRootSelector) {
-    this.scrollRootSelector = scrollRootSelector;
+  public void setSelector(SelectorRegionDto selector) {
+    this.selector = selector;
   }
 
-  public WebElement getScrollRootElement() {
-    return scrollRootElement;
+  public ElementRegionDto getElement() {
+    return element;
   }
 
-  public void setScrollRootElement(WebElement scrollRootElement) {
-    this.scrollRootElement = scrollRootElement;
+  public void setElement(ElementRegionDto element) {
+    this.element = element;
   }
 }

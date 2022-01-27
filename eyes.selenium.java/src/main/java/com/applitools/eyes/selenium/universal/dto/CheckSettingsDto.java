@@ -3,10 +3,6 @@ package com.applitools.eyes.selenium.universal.dto;
 import java.util.List;
 import java.util.Map;
 
-import com.applitools.universal.dto.AccessibilitySettingsDto;
-import com.applitools.universal.dto.ExactMatchSettingsDto;
-import com.applitools.universal.dto.RegionDto;
-import com.applitools.universal.dto.VisualGridOptionDto;
 
 /**
  * check settings dto
@@ -31,24 +27,18 @@ public class CheckSettingsDto {
   private Boolean ignoreCaret;
   private Boolean ignoreDisplacements;
   private AccessibilitySettingsDto accessibilitySettings;
-  private List<SimpleRegionDto> ignoreRegions;
-  private List<SimpleRegionDto> layoutRegions;
-  private List<SimpleRegionDto> strictRegions;
-  private List<SimpleRegionDto> contentRegions;
-  private List<FloatingRegionDto> floatingRegions;
+  private List<TRegion> ignoreRegions;
+  private List<TRegion> layoutRegions;
+  private List<TRegion> strictRegions;
+  private List<TRegion> contentRegions;
+  private List<TFloatingRegion> floatingRegions;
+  private List<TAccessibilityRegion> accessibilityRegions;
 
-
-
-
-
-  private RegionDto targetRegion;
-
-
-  // TODO accessibility regions
-  // TODO region
-  // TODO frames
-  private ScrollRootElementDto scrollRootElement; // TODO scroll root element
-  private Boolean fully; // TODO map stitchContent to fully
+  // ScreenshotSettings
+  private TRegion region;
+  private List<ContextReferenceDto> frames;
+  private TRegion scrollRootElement;
+  private Boolean fully;
 
   public String getName() {
     return name;
@@ -146,54 +136,6 @@ public class CheckSettingsDto {
     this.ignoreDisplacements = ignoreDisplacements;
   }
 
-  public RegionDto getTargetRegion() {
-    return targetRegion;
-  }
-
-  public void setTargetRegion(RegionDto targetRegion) {
-    this.targetRegion = targetRegion;
-  }
-
-  public List<SimpleRegionDto> getIgnoreRegions() {
-    return ignoreRegions;
-  }
-
-  public void setIgnoreRegions(List<SimpleRegionDto> ignoreRegions) {
-    this.ignoreRegions = ignoreRegions;
-  }
-
-  public List<SimpleRegionDto> getLayoutRegions() {
-    return layoutRegions;
-  }
-
-  public void setLayoutRegions(List<SimpleRegionDto> layoutRegions) {
-    this.layoutRegions = layoutRegions;
-  }
-
-  public List<SimpleRegionDto> getStrictRegions() {
-    return strictRegions;
-  }
-
-  public void setStrictRegions(List<SimpleRegionDto> strictRegions) {
-    this.strictRegions = strictRegions;
-  }
-
-  public List<SimpleRegionDto> getContentRegions() {
-    return contentRegions;
-  }
-
-  public void setContentRegions(List<SimpleRegionDto> contentRegions) {
-    this.contentRegions = contentRegions;
-  }
-
-  public List<FloatingRegionDto> getFloatingRegions() {
-    return floatingRegions;
-  }
-
-  public void setFloatingRegions(List<FloatingRegionDto> floatingRegions) {
-    this.floatingRegions = floatingRegions;
-  }
-
   public Boolean getDisableBrowserFetching() {
     return disableBrowserFetching;
   }
@@ -210,13 +152,6 @@ public class CheckSettingsDto {
     this.renderId = renderId;
   }
 
-  public ScrollRootElementDto getScrollRootElement() {
-    return scrollRootElement;
-  }
-
-  public void setScrollRootElement(ScrollRootElementDto scrollRootElement) {
-    this.scrollRootElement = scrollRootElement;
-  }
 
   public Boolean getFully() {
     return fully;
@@ -240,5 +175,77 @@ public class CheckSettingsDto {
 
   public void setAccessibilitySettings(AccessibilitySettingsDto accessibilitySettings) {
     this.accessibilitySettings = accessibilitySettings;
+  }
+
+  public List<TRegion> getIgnoreRegions() {
+    return ignoreRegions;
+  }
+
+  public void setIgnoreRegions(List<TRegion> ignoreRegions) {
+    this.ignoreRegions = ignoreRegions;
+  }
+
+  public List<TRegion> getLayoutRegions() {
+    return layoutRegions;
+  }
+
+  public void setLayoutRegions(List<TRegion> layoutRegions) {
+    this.layoutRegions = layoutRegions;
+  }
+
+  public List<TRegion> getStrictRegions() {
+    return strictRegions;
+  }
+
+  public void setStrictRegions(List<TRegion> strictRegions) {
+    this.strictRegions = strictRegions;
+  }
+
+  public List<TRegion> getContentRegions() {
+    return contentRegions;
+  }
+
+  public void setContentRegions(List<TRegion> contentRegions) {
+    this.contentRegions = contentRegions;
+  }
+
+  public List<ContextReferenceDto> getFrames() {
+    return frames;
+  }
+
+  public void setFrames(List<ContextReferenceDto> frames) {
+    this.frames = frames;
+  }
+
+  public List<TFloatingRegion> getFloatingRegions() {
+    return floatingRegions;
+  }
+
+  public void setFloatingRegions(List<TFloatingRegion> floatingRegions) {
+    this.floatingRegions = floatingRegions;
+  }
+
+  public List<TAccessibilityRegion> getAccessibilityRegions() {
+    return accessibilityRegions;
+  }
+
+  public void setAccessibilityRegions(List<TAccessibilityRegion> accessibilityRegions) {
+    this.accessibilityRegions = accessibilityRegions;
+  }
+
+  public TRegion getRegion() {
+    return region;
+  }
+
+  public void setRegion(TRegion region) {
+    this.region = region;
+  }
+
+  public TRegion getScrollRootElement() {
+    return scrollRootElement;
+  }
+
+  public void setScrollRootElement(TRegion scrollRootElement) {
+    this.scrollRootElement = scrollRootElement;
   }
 }

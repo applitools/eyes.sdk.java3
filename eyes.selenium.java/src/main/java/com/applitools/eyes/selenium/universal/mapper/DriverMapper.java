@@ -2,7 +2,7 @@ package com.applitools.eyes.selenium.universal.mapper;
 
 import java.net.URL;
 
-import com.applitools.universal.dto.DriverDto;
+import com.applitools.eyes.selenium.universal.dto.DriverDto;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.remote.HttpCommandExecutor;
 import org.openqa.selenium.remote.RemoteWebDriver;

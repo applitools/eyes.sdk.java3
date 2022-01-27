@@ -5,11 +5,9 @@ import java.util.stream.Collectors;
 
 import com.applitools.eyes.fluent.FloatingRegionByRectangle;
 import com.applitools.eyes.fluent.GetFloatingRegion;
-import com.applitools.eyes.fluent.SimpleRegionByRectangle;
 import com.applitools.eyes.selenium.fluent.FloatingRegionByElement;
 import com.applitools.eyes.selenium.fluent.FloatingRegionBySelector;
 import com.applitools.eyes.selenium.universal.dto.FloatingRegionDto;
-import com.applitools.universal.mapper.RegionMapper;
 
 /**
  * floating region mapper

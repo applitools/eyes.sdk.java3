@@ -12,7 +12,7 @@ public interface ICheckSettingsInternal {
 
     Region getTargetRegion();
 
-    int getTimeout();
+    Integer getTimeout();
 
     MatchLevel getMatchLevel();
 
