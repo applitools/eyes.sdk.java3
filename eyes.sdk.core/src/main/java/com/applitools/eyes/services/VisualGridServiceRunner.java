@@ -117,14 +117,23 @@ public class VisualGridServiceRunner extends Thread {
         logger.log(testIds, Stage.RESOURCE_COLLECTION, Pair.of("resourceCollectionTaskId", resourceCollectionTaskId));
     }
 
-    public void addNativeMobileResources(byte[] vhs, Map<String, FrameData> resources, String contentType, List<CheckTask> checkTasks, VhsCompatibilityParams vhsCompatibilityParams) {
+    public void addNativeMobileResources(byte[] vhs, Map<String, FrameData> resources, String contentType,
+                                         List<CheckTask> checkTasks, VhsCompatibilityParams vhsCompatibilityParams,
+                                         VHSCaptureType vhsCaptureType, String vhsHash) {
         String resourceCollectionTaskId = UUID.randomUUID().toString();
         Set<String> testIds = new HashSet<>();
         for (CheckTask checkTask : checkTasks) {
             testIds.add(checkTask.getTestId());
         }
 
-        RGridResource vhsResource = new RGridResource("vhs", contentType, vhs);
+        RGridResource vhsResource;
+        if (vhsCaptureType == VHSCaptureType.Hash) {
+            vhsResource = new RGridResource("vhs", contentType, null, vhsHash);
+        } else {
+            vhsResource = new RGridResource("vhs", contentType, vhs);
+        }
+        vhsResource.setVhsCaptureType(vhsCaptureType);
+
         MobileResourceMap mobileResourceMap = new MobileResourceMap(vhsResource, checkTasks.get(0).getBrowserInfo(), resources.size());
         nativeResourceCollectionTasksMapping.put(resourceCollectionTaskId, Pair.of(mobileResourceMap, checkTasks));
         if (checkTasks.get(0).getBrowserInfo().getPlatform().equals("ios")) {

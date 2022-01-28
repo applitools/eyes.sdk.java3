@@ -646,12 +646,16 @@ public class Eyes extends RunningTest implements IEyes {
             String vhsType = null;
             VhsCompatibilityParams vhsCompatibilityParams = null;
             Map<String, FrameData> resources = new HashMap<>();
+            VHSCaptureType vhsCaptureType = VHSCaptureType.Binary;
+            String vhsHash = null;
             if (EyesDriverUtils.isAndroid(driver)) {
                 AndroidVHSCaptureResult result = getVHSAndroid(testIds);
                 vhs = result.getVhs();
                 vhsType = result.getVcrType();
                 resources = result.getResources();
                 vhsContentType = String.format("x-applitools-vhs/%s", vhsType);
+                vhsCaptureType = result.getVhsCaptureType();
+                vhsHash = result.getVhsHash().toLowerCase();
             } else if (EyesDriverUtils.isIOS(driver)) {
                 try {
                     vhs = getVHSIos();
@@ -681,7 +685,7 @@ public class Eyes extends RunningTest implements IEyes {
                 return;
             }
             VisualGridRunner visualGridRunner = (VisualGridRunner) runner;
-            visualGridRunner.check(vhs, resources, vhsContentType, checkTasks, vhsCompatibilityParams);
+            visualGridRunner.check(vhs, resources, vhsContentType, checkTasks, vhsCompatibilityParams, vhsCaptureType, vhsHash);
         } catch (Throwable e) {
             Error error = new Error(e);
             for (RunningTest runningTest : visualGridTestList.values()) {
@@ -694,6 +698,82 @@ public class Eyes extends RunningTest implements IEyes {
         WebElement triggerButton = driver.findElementByAccessibilityId("UFG_TriggerArea");
         int labelsAmount = Integer.parseInt(triggerButton.getText());
         triggerButton.click();
+        waitForNextAction();
+        triggerButton.click();
+        waitForNextAction();
+        waitForClearArea();
+        WebElement clearButton = driver.findElementByAccessibilityId("UFG_ClearArea");
+        try {
+            Map<String, FrameData> resourcesMap;
+            ObjectMapper mapper = new ObjectMapper();
+            mapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
+            String jsonText = clearButton.getText();
+            Map<String, Object> captureResult = mapper.readValue(jsonText.toLowerCase(), new TypeReference<Map<String, Object>>() {});
+            VHSCaptureType captureResultType;
+            if (!captureResult.containsKey("type")) {
+                throw new EyesException("Please update UFG library to the latest version");
+            }
+            String vhsResultType = (String) captureResult.get("type");
+            String vcrType = ((String) captureResult.get("flavorname"));
+            if (vhsResultType.equals("hash")) {
+                captureResultType = VHSCaptureType.Hash;
+            } else {
+                captureResultType = VHSCaptureType.Binary;
+            }
+            String vhsExpectedHash = (String) captureResult.get("vhshash");
+
+            byte[] vhs;
+            String resourcesJson;
+            if (captureResultType == VHSCaptureType.Binary) {
+                int vhsParts = (Integer) captureResult.get("partscount");
+                logger.log(testIds, Stage.CHECK, Pair.of("vhsParts", vhsParts));
+                StringBuilder builder = new StringBuilder();
+                int vhsPartsDone = 0;
+                while (vhsPartsDone < vhsParts) {
+                    if (vhsPartsDone % labelsAmount == 0) {
+                        triggerButton.click();
+                    }
+                    WebElement label = driver.findElementByAccessibilityId(String.format("UFG_Label_%s", vhsPartsDone % labelsAmount));
+                    builder.append(label.getText());
+                    vhsPartsDone++;
+                    logger.log(TraceLevel.Debug, testIds, Stage.CHECK, null, Pair.of("vhsPartsDone", vhsPartsDone));
+                }
+                resourcesJson = builder.toString();
+                String vhsActualHash = GeneralUtils.getSha256hash(resourcesJson.getBytes(StandardCharsets.UTF_8));
+                if (!vhsExpectedHash.equalsIgnoreCase(vhsActualHash)) {
+                    throw new EyesException(String.format("Didn't get vhs byte correctly. Expected Hash: %s. Actual Hash: %s", vhsExpectedHash, vhsActualHash));
+                }
+
+
+                Map<String, Object> resources = mapper.readValue(resourcesJson, new TypeReference<Map<String, Object>>() {});
+                if (!resources.containsKey("vhs")) {
+                    throw new EyesException("vhs not found");
+                }
+
+                String base64VHS = (String) resources.remove("vhs");
+                vhs = Base64.decodeBase64(base64VHS);
+                resourcesJson = mapper.writeValueAsString(resources);
+                resourcesMap = mapper.readValue(resourcesJson, new TypeReference<Map<String, FrameData>>() {});
+            } else {
+                vhs = null;
+                resourcesMap = new HashMap<>();
+            }
+
+            return new AndroidVHSCaptureResult(
+                    vhs,
+                    vcrType,
+                    resourcesMap,
+                    vhsExpectedHash,
+                    captureResultType
+            );
+        } finally {
+            if (clearButton != null) {
+                clearButton.click();
+            }
+        }
+    }
+
+    private void waitForNextAction() throws InterruptedException {
         while (true) {
             List<WebElement> elementList = driver.findElementsByAccessibilityId("UFG_ClearArea");
             if (!elementList.isEmpty()) {
@@ -705,44 +785,19 @@ public class Eyes extends RunningTest implements IEyes {
             }
             Thread.sleep(500);
         }
-        WebElement clearButton = driver.findElementByAccessibilityId("UFG_ClearArea");
-        try {
-            String text = clearButton.getText();
-            String[] textParts = text.split(";");
-            String vcrType = textParts[0].toLowerCase();
-            int vhsParts = Integer.parseInt(textParts[1]);
-            String vhsExpectedHash = textParts[2];
-            logger.log(testIds, Stage.CHECK, Pair.of("vhsParts", vhsParts));
-            StringBuilder builder = new StringBuilder();
-            int vhsPartsDone = 0;
-            while (vhsPartsDone < vhsParts) {
-                if (vhsPartsDone % labelsAmount == 0) {
-                    triggerButton.click();
-                }
-                WebElement label = driver.findElementByAccessibilityId(String.format("UFG_Label_%s", vhsPartsDone % labelsAmount));
-                builder.append(label.getText());
-                vhsPartsDone++;
-                logger.log(TraceLevel.Debug, testIds, Stage.CHECK, null, Pair.of("vhsPartsDone", vhsPartsDone));
-            }
-            String resourcesJson = builder.toString();
-            String vhsActualHash = GeneralUtils.getSha256hash(resourcesJson.getBytes(StandardCharsets.UTF_8));
-            if (!vhsExpectedHash.equalsIgnoreCase(vhsActualHash)) {
-                throw new EyesException(String.format("Didn't get vhs byte correctly. Expected Hash: %s. Actual Hash: %s", vhsExpectedHash, vhsActualHash));
-            }
+    }
 
-            ObjectMapper mapper = new ObjectMapper();
-            mapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
-            Map<String, Object> resources = mapper.readValue(resourcesJson, new TypeReference<Map<String, Object>>() {});
-            if (!resources.containsKey("vhs")) {
-                throw new EyesException("vhs not found");
+    private void waitForClearArea() throws InterruptedException {
+        while (true) {
+            WebElement clearButton = driver.findElementByAccessibilityId("UFG_ClearArea");
+            if (!clearButton.getText().isEmpty()) {
+                break;
             }
-
-            String base64VHS = (String) resources.remove("vhs");
-            byte[] vhs = Base64.decodeBase64(base64VHS);
-            resourcesJson = mapper.writeValueAsString(resources);
-            return new AndroidVHSCaptureResult(vhs, vcrType, mapper.readValue(resourcesJson, new TypeReference<Map<String, FrameData>>() {}));
-        } finally {
-            clearButton.click();
+            List<WebElement> elementList = driver.findElementsByAccessibilityId("UFG_Label_Error");
+            if ((!elementList.isEmpty())) {
+                throw new EyesException(elementList.get(0).getText());
+            }
+            Thread.sleep(500);
         }
     }
 
