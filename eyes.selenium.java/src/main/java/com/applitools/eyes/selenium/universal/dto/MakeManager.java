@@ -1,8 +1,11 @@
 package com.applitools.eyes.selenium.universal.dto;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+
 /**
  * create a manager object
  */
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class MakeManager {
 
   /**

@@ -18,12 +18,16 @@ import com.applitools.eyes.selenium.universal.dto.ConfigurationDto;
 import com.applitools.eyes.selenium.universal.dto.DriverDto;
 import com.applitools.eyes.selenium.universal.dto.OCRExtractSettingsDto;
 import com.applitools.eyes.selenium.universal.dto.OCRSearchSettingsDto;
+import com.applitools.eyes.selenium.universal.dto.RectangleSizeDto;
 import com.applitools.eyes.selenium.universal.dto.VisualLocatorSettingsDto;
+import com.applitools.eyes.selenium.universal.dto.response.CommandCloseResponseDto;
 import com.applitools.eyes.selenium.universal.mapper.CheckSettingsMapper;
 import com.applitools.eyes.selenium.universal.mapper.ConfigurationMapper;
 import com.applitools.eyes.selenium.universal.mapper.DriverMapper;
 import com.applitools.eyes.selenium.universal.mapper.OCRExtractSettingsDtoMapper;
 import com.applitools.eyes.selenium.universal.mapper.OCRSearchSettingsMapper;
+import com.applitools.eyes.selenium.universal.mapper.RectangleSizeMapper;
+import com.applitools.eyes.selenium.universal.mapper.TestResultsMapper;
 import com.applitools.eyes.selenium.universal.mapper.VisualLocatorSettingsMapper;
 import com.applitools.eyes.triggers.MouseAction;
 import com.applitools.eyes.visualgrid.model.IDebugResourceWriter;
@@ -56,6 +60,7 @@ public class Eyes implements IEyesBase {
             return configuration;
         }
     };
+
     private CommandExecutor commandExecutor;
 
     /**
@@ -182,7 +187,8 @@ public class Eyes implements IEyesBase {
     }
 
     public TestResults abort() {
-        //return activeEyes.abort();
+        commandExecutor.abort(eyesRef);
+        // FIXME map response to testResults
         return null;
     }
 
@@ -462,8 +468,8 @@ public class Eyes implements IEyesBase {
      * @return the test results
      */
     public TestResults close(boolean shouldThrowException) {
-        //return activeEyes.close(shouldThrowException);
-        return null;
+        CommandCloseResponseDto closeResponse = commandExecutor.close(eyesRef);
+        return TestResultsMapper.toTestResults(closeResponse);
     }
 
     /**
@@ -1145,7 +1151,6 @@ public class Eyes implements IEyesBase {
      * @return the viewport size
      */
     public RectangleSize getViewportSize() {
-        //return this.seleniumEyes.getViewportSize();
         return null;
     }
 
@@ -1157,8 +1162,11 @@ public class Eyes implements IEyesBase {
      * @return The viewport size of the current context.
      */
     public static RectangleSize getViewportSize(WebDriver driver) {
-        return SeleniumEyes.getViewportSize(driver);
+        DriverDto driverDto = DriverMapper.toDriverDto(driver);
+        RectangleSizeDto rectangleSizeDto = CommandExecutor.getViewportSize(driverDto);
+        return RectangleSizeMapper.toRectangleSize(rectangleSizeDto);
     }
+
 
     /**
      * Set the viewport size using the driver. Call this method if for some
@@ -1797,7 +1805,7 @@ public class Eyes implements IEyesBase {
      * @param regionToCheck the region to check
      */
     public void setRegionToCheck(Region regionToCheck) {
-        //this.seleniumEyes.setRegionToCheck(regionToCheck);
+
     }
 
     /**
@@ -1861,18 +1869,17 @@ public class Eyes implements IEyesBase {
 
     public Map<String, List<TextRegion>> extractTextRegions(TextRegionSettings textRegionSettings) {
         OCRSearchSettingsDto ocrSearchSettingsDto = OCRSearchSettingsMapper.toOCRSearchSettingsDto(textRegionSettings);
-        //return seleniumEyes.extractTextRegions(textRegionSettings);
-        return null;
+        ConfigurationDto configurationDto = ConfigurationMapper.toConfigurationDto(configuration);
+        return commandExecutor.extractTextRegions(eyesRef, ocrSearchSettingsDto, configurationDto);
     }
 
     public List<String> extractText(BaseOcrRegion... ocrRegions) {
         List<OCRExtractSettingsDto> ocrExtractSettingsDtoList = OCRExtractSettingsDtoMapper
             .toOCRExtractSettingsDtoList(Arrays.asList(ocrRegions));
+        ConfigurationDto configurationDto = ConfigurationMapper.toConfigurationDto(configuration);
 
+        return commandExecutor.extractText(eyesRef, ocrExtractSettingsDtoList, configurationDto);
 
-
-        //return seleniumEyes.extractText(ocrRegions);
-        return null;
     }
 
     public Reference getEyesRef() {

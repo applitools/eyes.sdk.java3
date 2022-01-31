@@ -7,6 +7,9 @@ public class RectangleSizeDto {
   private Integer width;
   private Integer height;
 
+  public RectangleSizeDto() {
+  }
+
   public Integer getWidth() {
     return width;
   }

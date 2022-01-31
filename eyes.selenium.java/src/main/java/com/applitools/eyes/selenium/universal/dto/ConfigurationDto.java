@@ -3,9 +3,12 @@ package com.applitools.eyes.selenium.universal.dto;
 import java.util.List;
 import java.util.Set;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+
 /**
  * configuration
  */
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class ConfigurationDto {
   private String branchName;
   private String parentBranchName;

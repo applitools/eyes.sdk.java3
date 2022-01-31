@@ -3,7 +3,7 @@ package com.applitools.eyes.selenium.universal.dto;
 /**
  * response
  */
-public class ResponseDto {
+public class ResponseDto<T> {
 
   /**
    * name of the request this response sent for
@@ -18,9 +18,12 @@ public class ResponseDto {
   /**
    * any output data
    */
-  private ResponsePayload payload;
+  private ResponsePayload<T> payload;
 
-  public ResponseDto(String name, String key, ResponsePayload payload) {
+  public ResponseDto() {
+  }
+
+  public ResponseDto(String name, String key, ResponsePayload<T> payload) {
     this.name = name;
     this.key = key;
     this.payload = payload;
@@ -42,11 +45,11 @@ public class ResponseDto {
     this.key = key;
   }
 
-  public ResponsePayload getPayload() {
+  public ResponsePayload<T> getPayload() {
     return payload;
   }
 
-  public void setPayload(ResponsePayload payload) {
+  public void setPayload(ResponsePayload<T> payload) {
     this.payload = payload;
   }
 

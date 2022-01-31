@@ -14,7 +14,7 @@ public class VisualLocatorSettingsMapper {
     }
 
     VisualLocatorSettingsDto visualLocatorSettingsDto = new VisualLocatorSettingsDto();
-    visualLocatorSettingsDto.setNames(visualLocatorSettings.getNames());
+    visualLocatorSettingsDto.setLocatorNames(visualLocatorSettings.getNames());
     visualLocatorSettingsDto.setFirstOnly(visualLocatorSettings.isFirstOnly());
 
     return visualLocatorSettingsDto;

@@ -6,15 +6,15 @@ import java.util.List;
  * visual locator settings dto
  */
 public class VisualLocatorSettingsDto {
-  private List<String> names;
+  private List<String> locatorNames;
   private Boolean firstOnly;
 
-  public List<String> getNames() {
-    return names;
+  public List<String> getLocatorNames() {
+    return locatorNames;
   }
 
-  public void setNames(List<String> names) {
-    this.names = names;
+  public void setLocatorNames(List<String> locatorNames) {
+    this.locatorNames = locatorNames;
   }
 
   public Boolean getFirstOnly() {

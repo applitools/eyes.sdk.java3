@@ -1,26 +1,31 @@
 package com.applitools.eyes.selenium.universal.dto;
 
 
-import com.applitools.eyes.selenium.Reference;
-
 /**
  * response payload
  */
-public class ResponsePayload {
+public class ResponsePayload<T> {
 
-  private Reference result;
+  private T result;
   private ErrorDto error;
 
-  public ResponsePayload(Reference result, ErrorDto error) {
+  public ResponsePayload() {
+  }
+
+  public ResponsePayload(T result) {
+    this.result = result;
+  }
+
+  public ResponsePayload(T result, ErrorDto error) {
     this.result = result;
     this.error = error;
   }
 
-  public Reference getResult() {
+  public T getResult() {
     return result;
   }
 
-  public void setResult(Reference result) {
+  public void setResult(T result) {
     this.result = result;
   }
 
@@ -30,5 +35,13 @@ public class ResponsePayload {
 
   public void setError(ErrorDto error) {
     this.error = error;
+  }
+
+  @Override
+  public String toString() {
+    return "ResponsePayload{" +
+        "result=" + result +
+        ", error=" + error +
+        '}';
   }
 }

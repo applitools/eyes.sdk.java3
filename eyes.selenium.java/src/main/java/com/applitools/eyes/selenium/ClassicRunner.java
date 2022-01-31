@@ -27,6 +27,7 @@ public class ClassicRunner extends EyesRunner {
   public ClassicRunner() {
     super();
     managerRef = commandExecutor.coreMakeManager(ManagerType.CLASSIC.value, null, null);
+    System.out.println("manager_ref: " + managerRef);
   }
 
   @Override

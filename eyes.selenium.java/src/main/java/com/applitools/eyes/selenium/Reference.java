@@ -1,14 +1,18 @@
 package com.applitools.eyes.selenium;
 
-import com.google.gson.annotations.SerializedName;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
  * reference
  */
 public class Reference {
 
-  @SerializedName("applitools-ref-id")
+  @JsonProperty("applitools-ref-id")
   private String applitoolsRefId;
+
+  public Reference() {
+
+  }
 
   public Reference(String applitoolsRefId) {
     this.applitoolsRefId = applitoolsRefId;

@@ -7,6 +7,9 @@ public class MatchResultDto {
   private Boolean asExpected;
   private Long windowId;
 
+  public MatchResultDto() {
+  }
+
   public MatchResultDto(Boolean asExpected, Long windowId) {
     this.asExpected = asExpected;
     this.windowId = windowId;

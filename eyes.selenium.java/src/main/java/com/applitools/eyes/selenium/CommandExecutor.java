@@ -1,23 +1,32 @@
 package com.applitools.eyes.selenium;
 
+import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 
+import com.applitools.eyes.locators.TextRegion;
 import com.applitools.eyes.selenium.universal.dto.CheckEyes;
 import com.applitools.eyes.selenium.universal.dto.CheckSettingsDto;
 import com.applitools.eyes.selenium.universal.dto.Command;
 import com.applitools.eyes.selenium.universal.dto.ConfigurationDto;
 import com.applitools.eyes.selenium.universal.dto.DriverDto;
 import com.applitools.eyes.selenium.universal.dto.EventDto;
+import com.applitools.eyes.selenium.universal.dto.ExtractTextDto;
 import com.applitools.eyes.selenium.universal.dto.ExtractTextRegionsDto;
 import com.applitools.eyes.selenium.universal.dto.LocateDto;
 import com.applitools.eyes.selenium.universal.dto.MakeManager;
 import com.applitools.eyes.selenium.universal.dto.MakeSdk;
+import com.applitools.eyes.selenium.universal.dto.OCRExtractSettingsDto;
 import com.applitools.eyes.selenium.universal.dto.OCRSearchSettingsDto;
 import com.applitools.eyes.selenium.universal.dto.OpenEyes;
+import com.applitools.eyes.selenium.universal.dto.RectangleSizeDto;
 import com.applitools.eyes.selenium.universal.dto.RequestDto;
 import com.applitools.eyes.selenium.universal.dto.ResponseDto;
 import com.applitools.eyes.selenium.universal.dto.VisualLocatorSettingsDto;
+import com.applitools.eyes.selenium.universal.dto.request.CommandCloseRequestDto;
+import com.applitools.eyes.selenium.universal.dto.request.CommandGetViewportSizeRequestDto;
+import com.applitools.eyes.selenium.universal.dto.response.CommandCloseResponseDto;
 import com.applitools.utils.GeneralUtils;
 
 /**
@@ -25,7 +34,7 @@ import com.applitools.utils.GeneralUtils;
  */
 public class CommandExecutor {
 
-  private USDKConnection connection;
+  private static USDKConnection connection;
 
   public CommandExecutor(String name, String version) {
     connection = new USDKConnection();
@@ -45,7 +54,7 @@ public class CommandExecutor {
     request.setName("Core.makeManager");
     request.setKey(UUID.randomUUID().toString());
     request.setPayload(new MakeManager(type, concurrency, isLegacy));
-    ResponseDto response = checkedCommand(request, true);
+    ResponseDto<Reference> response = (ResponseDto<Reference>) checkedCommand(request, true);
     return response.getPayload().getResult();
   }
 
@@ -54,7 +63,7 @@ public class CommandExecutor {
     request.setName("EyesManager.openEyes");
     request.setKey(UUID.randomUUID().toString());
     request.setPayload(new OpenEyes(ref, driverDto, config));
-    ResponseDto response = checkedCommand(request, true);
+    ResponseDto<Reference> response = (ResponseDto<Reference>) checkedCommand(request, true);
     return response.getPayload().getResult();
   }
 
@@ -75,17 +84,65 @@ public class CommandExecutor {
     // TODO handle response
   }
 
-  public void extractTextRegions(Reference eyesRef, OCRSearchSettingsDto searchSettingsDto, ConfigurationDto config) {
+  public Map<String, List<TextRegion>> extractTextRegions(Reference eyesRef, OCRSearchSettingsDto searchSettingsDto, ConfigurationDto config) {
     RequestDto<ExtractTextRegionsDto> request = new RequestDto<>();
     request.setName("Eyes.extractTextRegions");
     request.setKey(UUID.randomUUID().toString());
     request.setPayload(new ExtractTextRegionsDto(eyesRef, searchSettingsDto, config));
-    checkedCommand(request, true);
-    // TODO handle response
+    ResponseDto<Map<String, List<TextRegion>>> extractTextRegionsResponse =
+        (ResponseDto<Map<String, List<TextRegion>>>) checkedCommand(request, true);
+
+    return extractTextRegionsResponse.getPayload().getResult();
+
   }
 
-  public ResponseDto checkedCommand(Command command, boolean waitResult) {
-    return connection.executeCommand(command, waitResult);
+  public List<String> extractText(Reference eyesRef, List<OCRExtractSettingsDto> extractSettingsDtoList, ConfigurationDto config) {
+    RequestDto<ExtractTextDto> request = new RequestDto<>();
+    request.setName("Eyes.extractText");
+    request.setKey(UUID.randomUUID().toString());
+    request.setPayload(new ExtractTextDto(eyesRef, extractSettingsDtoList, config));
+    ResponseDto<List<String>> responseDto = (ResponseDto<List<String>>) checkedCommand(request, true);
+    return responseDto.getPayload().getResult();
+  }
+
+  public CommandCloseResponseDto close(Reference eyesRef) {
+    RequestDto<CommandCloseRequestDto> request = new RequestDto<>();
+    request.setName("Eyes.close");
+    request.setKey(UUID.randomUUID().toString());
+    request.setPayload(new CommandCloseRequestDto(eyesRef));
+    ResponseDto<List<CommandCloseResponseDto>> closeResponse = (ResponseDto<List<CommandCloseResponseDto>>) checkedCommand(request, true);
+    return closeResponse.getPayload().getResult().get(0);
+  }
+
+  public CommandCloseResponseDto abort(Reference eyesRef) {
+    RequestDto<CommandCloseRequestDto> request = new RequestDto<>();
+    request.setName("Eyes.abort");
+    request.setKey(UUID.randomUUID().toString());
+    request.setPayload(new CommandCloseRequestDto(eyesRef));
+    ResponseDto<List<CommandCloseResponseDto>> closeResponse = (ResponseDto<List<CommandCloseResponseDto>>) checkedCommand(request, true);
+    return closeResponse.getPayload().getResult().get(0);
+  }
+
+  public static RectangleSizeDto getViewportSize(DriverDto driver) {
+    RequestDto<CommandGetViewportSizeRequestDto> request = new RequestDto<>();
+    request.setName("Core.getViewportSize");
+    request.setKey(UUID.randomUUID().toString());
+    request.setPayload(new CommandGetViewportSizeRequestDto(driver));
+    ResponseDto<RectangleSizeDto> getViewportSizeResponse = (ResponseDto<RectangleSizeDto>) checkedCommand(request, true);
+    return getViewportSizeResponse.getPayload().getResult();
+  }
+
+  public static void setViewportSize() {
+    
+  }
+
+  public static ResponseDto<?> checkedCommand(Command command, boolean waitResult) {
+    try {
+      return connection.executeCommand(command, waitResult);
+    } catch (Exception e) {
+      e.printStackTrace();
+    }
+    return null;
   }
 
 }

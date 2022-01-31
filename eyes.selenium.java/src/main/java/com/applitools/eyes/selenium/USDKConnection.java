@@ -1,15 +1,22 @@
 package com.applitools.eyes.selenium;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import com.applitools.eyes.Logger;
 import com.applitools.eyes.SyncTaskListener;
+import com.applitools.eyes.locators.TextRegion;
 import com.applitools.eyes.selenium.universal.dto.Command;
 import com.applitools.eyes.selenium.universal.dto.EventDto;
+import com.applitools.eyes.selenium.universal.dto.MatchResultDto;
+import com.applitools.eyes.selenium.universal.dto.RectangleSizeDto;
 import com.applitools.eyes.selenium.universal.dto.RequestDto;
 import com.applitools.eyes.selenium.universal.dto.ResponseDto;
-import com.google.gson.Gson;
+import com.applitools.eyes.selenium.universal.dto.response.CommandCloseResponseDto;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.asynchttpclient.Dsl;
 import org.asynchttpclient.ws.WebSocket;
 import org.asynchttpclient.ws.WebSocketListener;
@@ -21,13 +28,16 @@ import org.asynchttpclient.ws.WebSocketUpgradeHandler;
 public class USDKConnection {
   private WebSocket webSocket;
   protected Logger logger = new Logger();
-  private SyncTaskListener<ResponseDto> syncTaskListener;
+  private SyncTaskListener<ResponseDto<?>> syncTaskListener;
+  private ObjectMapper objectMapper;
 
-  private Map<String, ResponseDto> map;
+  private Map<String, ResponseDto<?>> map;
 
   public USDKConnection() {
     webSocket = openWebsocket();
     map = new HashMap<>();
+    objectMapper = new ObjectMapper();
+    objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
   }
 
   private WebSocket openWebsocket() {
@@ -49,16 +59,60 @@ public class USDKConnection {
 
                 @Override
                 public void onTextFrame(String payload, boolean finalFragment, int rsv) {
-//                  if (payload.contains("Eyes.check")) {
-//                    ResponseDto<MatchResultDto> responseDto = new Gson().fromJson(payload, ResponseDto.class);
-//                    map.put(responseDto.getKey(), responseDto);
-//                    syncTaskListener.onComplete(responseDto);
-//                    return;
-//                  }
-                  System.out.println("PAYLOAD: " + payload);
-                  ResponseDto response = new Gson().fromJson(payload, ResponseDto.class);
-                  map.put(response.getKey(), response);
-                  syncTaskListener.onComplete(response);
+                  if (payload.contains("Core.makeManager") || payload.contains("EyesManager.openEyes")) {
+                    try {
+                      ResponseDto<Reference> referenceResponseDto = objectMapper.readValue(payload, new TypeReference<ResponseDto<Reference>>() {});
+                      map.put(referenceResponseDto.getKey(), referenceResponseDto);
+                      syncTaskListener.onComplete(referenceResponseDto);
+                    } catch (Exception e) {
+                      e.printStackTrace();
+                    }
+                  } else if(payload.contains("Eyes.check")) {
+                    try {
+                      ResponseDto<MatchResultDto> checkResponse = objectMapper.readValue(payload, new TypeReference<ResponseDto<MatchResultDto>>() {});
+                      map.put(checkResponse.getKey(), checkResponse);
+                      syncTaskListener.onComplete(checkResponse);
+                    } catch (Exception e) {
+                      e.printStackTrace();
+                    }
+                  } else if (payload.contains("Eyes.locate")) {
+                    // FIXME handle response of locate
+                  } else if (payload.contains("Eyes.close") || payload.contains("Eyes.abort")) {
+                    try {
+                      ResponseDto<List<CommandCloseResponseDto>> closeResponse = objectMapper.readValue(payload,
+                          new TypeReference<ResponseDto<List<CommandCloseResponseDto>>>() {});
+                      map.put(closeResponse.getKey(), closeResponse);
+                      syncTaskListener.onComplete(closeResponse);
+                    } catch (Exception e) {
+                      e.printStackTrace();
+                    }
+                  } else if (payload.contains("Eyes.extractTextRegions")) {
+                    try {
+                      ResponseDto<Map<String, List<TextRegion>>> extractTextRegionsResponse = objectMapper
+                          .readValue(payload, new TypeReference<ResponseDto<Map<String, List<TextRegion>>>>() {});
+                      map.put(extractTextRegionsResponse.getKey(), extractTextRegionsResponse);
+                      syncTaskListener.onComplete(extractTextRegionsResponse);
+                    } catch (Exception e) {
+                      e.printStackTrace();
+                    }
+                  } else if (payload.contains("Eyes.extractText")) {
+                    try {
+                      ResponseDto<List<String>> responseDto = objectMapper.readValue(payload, new TypeReference<ResponseDto<List<String>>>() {});
+                      map.put(responseDto.getKey(), responseDto);
+                      syncTaskListener.onComplete(responseDto);
+                    } catch (Exception e) {
+                      e.printStackTrace();
+                    }
+                  } else if (payload.contains("Core.getViewportSize")) {
+                    try {
+                      ResponseDto<RectangleSizeDto> getViewportSizeResponse = objectMapper.readValue(payload, new TypeReference<ResponseDto<RectangleSizeDto>>() {
+                      });
+                      map.put(getViewportSizeResponse.getKey(), getViewportSizeResponse);
+                      syncTaskListener.onComplete(getViewportSizeResponse);
+                    } catch (Exception e) {
+                      e.printStackTrace();
+                    }
+                  }
                 }
 
                 @Override
@@ -72,10 +126,9 @@ public class USDKConnection {
 
   }
 
-  public ResponseDto executeCommand(Command command, boolean waitResult) {
-    Gson gson = new Gson();
+  public ResponseDto<?> executeCommand(Command command, boolean waitResult) throws Exception {
     if (command instanceof EventDto<?>) {
-      webSocket.sendTextFrame(gson.toJson(command));
+      webSocket.sendTextFrame(objectMapper.writeValueAsString(command));
       return null;
     }
 
@@ -83,8 +136,8 @@ public class USDKConnection {
 
     map.put(request.getKey(), null);
 
-    System.out.println("REQUESTED JSON: " + gson.toJson(request));
-    webSocket.sendTextFrame(gson.toJson(request));
+    System.out.println("request: " + objectMapper.writeValueAsString(request));
+    webSocket.sendTextFrame(objectMapper.writeValueAsString(request));
     syncTaskListener = new SyncTaskListener<>(logger, request.getKey());
     if (waitResult) syncTaskListener.get();
     return map.get(request.getKey());

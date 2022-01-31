@@ -35,4 +35,11 @@ public class RequestDto<T> extends Command {
     this.payload = payload;
   }
 
+  @Override
+  public String toString() {
+    return "RequestDto{" +
+        "key='" + key + '\'' +
+        ", payload=" + payload +
+        '}';
+  }
 }

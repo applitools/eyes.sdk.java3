@@ -15,17 +15,17 @@ import java.util.Calendar;
  */
 @JsonIgnoreProperties({"$id", "isPassed"})
 public class TestResults {
-    private int steps;
-    private int matches;
-    private int mismatches;
-    private int missing;
-    private int exactMatches;
-    private int strictMatches;
-    private int contentMatches;
-    private int layoutMatches;
-    private int noneMatches;
+    private Integer steps;
+    private Integer matches;
+    private Integer mismatches;
+    private Integer missing;
+    private Integer exactMatches;
+    private Integer strictMatches;
+    private Integer contentMatches;
+    private Integer layoutMatches;
+    private Integer noneMatches;
     private String url;
-    private boolean isNew;
+    private Boolean isNew;
     private TestResultsStatus status;
     private String name;
     private String secretToken;
@@ -191,21 +191,21 @@ public class TestResults {
     /**
      * @return The total number of test steps.
      */
-    public int getSteps() {
+    public Integer getSteps() {
         return steps;
     }
 
     /**
      * @return The total number of test steps that matched the baseline.
      */
-    public int getMatches() {
+    public Integer getMatches() {
         return matches;
     }
 
     /**
      * @return The total number of test steps that did not match the baseline.
      */
-    public int getMismatches() {
+    public Integer getMismatches() {
         return mismatches;
     }
 
@@ -213,7 +213,7 @@ public class TestResults {
      * @return The total number of baseline test steps that were missing in
      * the test.
      */
-    public int getMissing() {
+    public Integer getMissing() {
         return missing;
     }
 
@@ -221,7 +221,7 @@ public class TestResults {
      * @return The total number of test steps that exactly matched the baseline.
      */
     @SuppressWarnings("UnusedDeclaration")
-    public int getExactMatches() {
+    public Integer getExactMatches() {
         return exactMatches;
     }
 
@@ -230,7 +230,7 @@ public class TestResults {
      * baseline.
      */
     @SuppressWarnings("UnusedDeclaration")
-    public int getStrictMatches() {
+    public Integer getStrictMatches() {
         return strictMatches;
     }
 
@@ -239,7 +239,7 @@ public class TestResults {
      * content.
      */
     @SuppressWarnings("UnusedDeclaration")
-    public int getContentMatches() {
+    public Integer getContentMatches() {
         return contentMatches;
     }
 
@@ -248,7 +248,7 @@ public class TestResults {
      * layout.
      */
     @SuppressWarnings("UnusedDeclaration")
-    public int getLayoutMatches() {
+    public Integer getLayoutMatches() {
         return layoutMatches;
     }
 
@@ -257,7 +257,7 @@ public class TestResults {
      * performing any comparison.
      */
     @SuppressWarnings("UnusedDeclaration")
-    public int getNoneMatches() {
+    public Integer getNoneMatches() {
         return noneMatches;
     }
 
@@ -272,7 +272,7 @@ public class TestResults {
      * @return Whether or not this is a new test.
      */
     @JsonGetter("isNew")
-    public boolean isNew() {
+    public Boolean isNew() {
         return isNew;
     }
 
@@ -294,7 +294,7 @@ public class TestResults {
      * @param steps The number of visual checkpoints in the test.
      */
     @SuppressWarnings("UnusedDeclaration")
-    void setSteps(int steps) {
+    public void setSteps(Integer steps) {
         ArgumentGuard.greaterThanOrEqualToZero(steps, "steps");
         this.steps = steps;
     }
@@ -303,7 +303,7 @@ public class TestResults {
      * @param matches The number of visual matches in the test.
      */
     @SuppressWarnings("UnusedDeclaration")
-    void setMatches(int matches) {
+    public void setMatches(Integer matches) {
         ArgumentGuard.greaterThanOrEqualToZero(matches, "matches");
         this.matches = matches;
     }
@@ -312,7 +312,7 @@ public class TestResults {
      * @param mismatches The number of mismatches in the test.
      */
     @SuppressWarnings("UnusedDeclaration")
-    void setMismatches(int mismatches) {
+    public void setMismatches(Integer mismatches) {
         ArgumentGuard.greaterThanOrEqualToZero(mismatches, "mismatches");
         this.mismatches = mismatches;
     }
@@ -322,7 +322,7 @@ public class TestResults {
      *                the baseline but were not found in the current test.
      */
     @SuppressWarnings("UnusedDeclaration")
-    void setMissing(int missing) {
+    public void setMissing(Integer missing) {
         ArgumentGuard.greaterThanOrEqualToZero(missing, "missing");
         this.missing = missing;
     }
@@ -333,7 +333,7 @@ public class TestResults {
      *                     {@link com.applitools.eyes.MatchLevel#EXACT}
      */
     @SuppressWarnings("UnusedDeclaration")
-    void setExactMatches(int exactMatches) {
+    public void setExactMatches(Integer exactMatches) {
         ArgumentGuard.greaterThanOrEqualToZero(exactMatches, "exactMatches");
         this.exactMatches = exactMatches;
     }
@@ -344,7 +344,7 @@ public class TestResults {
      *                      {@link com.applitools.eyes.MatchLevel#STRICT}
      */
     @SuppressWarnings("UnusedDeclaration")
-    void setStrictMatches(int strictMatches) {
+    public void setStrictMatches(Integer strictMatches) {
         ArgumentGuard.greaterThanOrEqualToZero(strictMatches, "strictMatches");
         this.strictMatches = strictMatches;
     }
@@ -355,7 +355,7 @@ public class TestResults {
      *                       {@link com.applitools.eyes.MatchLevel#CONTENT}
      */
     @SuppressWarnings("UnusedDeclaration")
-    void setContentMatches(int contentMatches) {
+    public void setContentMatches(Integer contentMatches) {
         ArgumentGuard.greaterThanOrEqualToZero(contentMatches, "contentMatches");
         this.contentMatches = contentMatches;
     }
@@ -366,7 +366,7 @@ public class TestResults {
      *                      {@link com.applitools.eyes.MatchLevel#LAYOUT}
      */
     @SuppressWarnings("UnusedDeclaration")
-    void setLayoutMatches(int layoutMatches) {
+    public void setLayoutMatches(Integer layoutMatches) {
         ArgumentGuard.greaterThanOrEqualToZero(layoutMatches, "layoutMatches");
         this.layoutMatches = layoutMatches;
     }
@@ -377,7 +377,7 @@ public class TestResults {
      *                    {@link com.applitools.eyes.MatchLevel#NONE}
      */
     @SuppressWarnings("UnusedDeclaration")
-    void setNoneMatches(int noneMatches) {
+    public void setNoneMatches(Integer noneMatches) {
         ArgumentGuard.greaterThanOrEqualToZero(noneMatches, "noneMatches");
         this.noneMatches = noneMatches;
     }
