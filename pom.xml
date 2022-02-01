@@ -97,19 +97,10 @@
 
     <modules>
         <module>eyes.common.java/eyes.common.java</module>
-        <module>eyes.common.java/eyes.connectivity.java.jboss</module>
-        <module>eyes.common.java/eyes.connectivity.java.jersey1x</module>
-        <module>eyes.common.java/eyes.connectivity.java.jersey2x</module>
-        <module>eyes.common.java/eyes.connectivity.java.net</module>
-        <module>eyes.common.java/eyes.connectivity.java</module>
         <module>eyes.ufg.java</module>
         <module>eyes.sdk.core</module>
-        <module>eyes.images.java</module>
         <module>eyes.selenium.java</module>
-        <module>eyes.appium.java</module>
         <module>eyes.selenium.common</module>
-<!--        <module>eyes.sdk.distribution</module>-->
-<!--        <module>eyes.sdk.distribution.images</module>-->
     </modules>
 
     <distributionManagement>
