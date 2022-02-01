@@ -12,19 +12,19 @@
     <parent>
         <artifactId>eyes-sdk-java3-parent</artifactId>
         <groupId>com.applitools</groupId>
-        <version>3.211.0</version>
+        <version>3.211.1</version>
     </parent>
 
     <dependencies>
         <dependency>
             <groupId>com.applitools</groupId>
             <artifactId>eyes-sdk-core-java3</artifactId>
-            <version>3.211.0</version>
+            <version>3.211.1</version>
         </dependency>
         <dependency>
             <groupId>com.applitools</groupId>
             <artifactId>eyes-sdk-core-java3</artifactId>
-            <version>3.211.0</version>
+            <version>3.211.1</version>
             <type>test-jar</type>
             <scope>test</scope>
         </dependency>
