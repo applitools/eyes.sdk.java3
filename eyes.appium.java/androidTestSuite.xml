@@ -1,0 +1,29 @@
+<!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd" >
+
+<suite name="android suite" verbose="1">
+    <listeners>
+        <listener class-name="com.applitools.eyes.utils.ReportingListener"/>
+    </listeners>
+    <test name="tests">
+        <groups>
+            <run>
+                <exclude name="failed"/>
+            </run>
+        </groups>
+
+        <packages>
+            <package name="com.applitools.eyes.appium.android.*"/>
+            <package name="com.applitools.eyes.appium.general.*"/>
+        </packages>
+    </test>
+    <test name="TestEyes">
+        <classes>
+            <class name="com.applitools.eyes.appium.TestEyes">
+                <methods>
+                    <include name="testEyesApi" />
+                    <include name="testConfigurationEdit" />
+                </methods>
+            </class>
+        </classes>
+    </test>
+</suite>

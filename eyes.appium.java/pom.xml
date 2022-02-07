@@ -1,0 +1,54 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <artifactId>eyes-appium-java3</artifactId>
+    <name>eyes-appium-java3</name>
+    <url>http://www.applitools.com</url>
+
+    <description>Applitools Eyes SDK for Appium Java WebDriver</description>
+
+    <parent>
+        <artifactId>eyes-sdk-java3-parent</artifactId>
+        <groupId>com.applitools</groupId>
+        <version>3.211.1</version>
+    </parent>
+
+    <dependencies>
+        <dependency>
+            <groupId>com.applitools</groupId>
+            <artifactId>eyes-selenium-common-java3</artifactId>
+            <version>3.211.1</version>
+        </dependency>
+        <dependency>
+            <groupId>io.appium</groupId>
+            <artifactId>java-client</artifactId>
+            <version>7.0.0</version>
+        </dependency>
+        <dependency>
+            <groupId>com.applitools</groupId>
+            <artifactId>eyes-sdk-core-java3</artifactId>
+            <version>3.211.1</version>
+            <type>test-jar</type>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>2.22.0</version>
+                <configuration>
+                    <suiteXmlFiles>
+                        <suiteXmlFile>androidTestSuite.xml</suiteXmlFile>
+                    </suiteXmlFiles>
+                    <useFile>false</useFile>
+                    <trimStackTrace>false</trimStackTrace>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+</project>
