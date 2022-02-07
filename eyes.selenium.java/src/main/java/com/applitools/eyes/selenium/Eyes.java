@@ -220,10 +220,7 @@ public class Eyes implements IEyesBase {
      */
     public void setApiKey(String apiKey) {
         // EyesBase sets the configuration
-//        if (seleniumEyes != activeEyes) {
-//            seleniumEyes.apiKey(apiKey);
-//        }
-//        activeEyes.apiKey(apiKey);
+        configuration.setApiKey(apiKey);
     }
 
     /**

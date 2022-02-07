@@ -40,8 +40,8 @@ public class TestResults {
     @JsonDeserialize(using = Iso8610CalendarDeserializer.class)
     private Calendar startedAt;
     private int duration;
-    private boolean isDifferent;
-    private boolean isAborted;
+    private Boolean isDifferent;
+    private Boolean isAborted;
     private SessionUrls appUrls;
     private SessionUrls apiUrls;
     private StepInfo[] stepsInfo;
@@ -158,7 +158,7 @@ public class TestResults {
     }
 
     @JsonSetter("isDifferent")
-    public void setDifferent(boolean different) {
+    public void setDifferent(Boolean different) {
         isDifferent = different;
     }
 
@@ -168,7 +168,7 @@ public class TestResults {
     }
 
     @JsonSetter("isAborted")
-    public void setAborted(boolean aborted) {
+    public void setAborted(Boolean aborted) {
         isAborted = aborted;
     }
 
@@ -393,7 +393,7 @@ public class TestResults {
      * @param isNew Whether or not this test has an existing baseline.
      */
     @JsonSetter("isNew")
-    public void setNew(boolean isNew) {
+    public void setNew(Boolean isNew) {
         this.isNew = isNew;
     }
 
