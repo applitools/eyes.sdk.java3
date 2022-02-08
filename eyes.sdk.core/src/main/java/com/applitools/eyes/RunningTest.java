@@ -4,6 +4,7 @@ import com.applitools.ICheckSettings;
 import com.applitools.eyes.config.Configuration;
 import com.applitools.eyes.fluent.ICheckSettingsInternal;
 import com.applitools.eyes.logging.Stage;
+
 import com.applitools.eyes.selenium.ClassicRunner0;
 import com.applitools.eyes.visualgrid.model.RenderBrowserInfo;
 import com.applitools.eyes.visualgrid.model.VisualGridSelector;
