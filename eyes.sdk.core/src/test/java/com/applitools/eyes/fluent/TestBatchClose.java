@@ -3,7 +3,7 @@ package com.applitools.eyes.fluent;
 import com.applitools.connectivity.ServerConnector;
 import com.applitools.eyes.IBatchCloser;
 import com.applitools.eyes.ProxySettings;
-import com.applitools.eyes.visualgrid.services.VisualGridRunner;
+import com.applitools.eyes.triggers.VisualGridRunner0;
 import com.applitools.utils.GeneralUtils;
 import org.junit.Assert;
 import org.junit.Test;
@@ -23,8 +23,8 @@ import static org.mockito.Mockito.*;
 @PrepareForTest(GeneralUtils.class)
 public class TestBatchClose {
 
-    private VisualGridRunner initRunnerWithBatches(Map<String, IBatchCloser> batchClosers) {
-        VisualGridRunner runner = new VisualGridRunner(10);
+    private VisualGridRunner0 initRunnerWithBatches(Map<String, IBatchCloser> batchClosers) {
+        VisualGridRunner0 runner = new VisualGridRunner0(10);
         for (String key : batchClosers.keySet()) {
             runner.addBatch(key, batchClosers.get(key));
         }
@@ -73,7 +73,7 @@ public class TestBatchClose {
         batchCloserMap.put("third", third);
 
         // default
-        VisualGridRunner runner = initRunnerWithBatches(batchCloserMap);
+        VisualGridRunner0 runner = initRunnerWithBatches(batchCloserMap);
         runner.getAllTestResults();
         verify(first).closeBatch("first");
         verify(second).closeBatch("second");

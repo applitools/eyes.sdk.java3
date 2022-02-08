@@ -23,11 +23,11 @@
     </parent>
 
     <dependencies>
-<!--        <dependency>-->
-<!--            <groupId>com.applitools</groupId>-->
-<!--            <artifactId>eyes-appium-java3</artifactId>-->
-<!--            <version>3.213.0</version>-->
-<!--        </dependency>-->
+        <dependency>
+            <groupId>com.applitools</groupId>
+            <artifactId>eyes-appium-java3</artifactId>
+            <version>3.213.0</version>
+        </dependency>
         <dependency>
             <groupId>com.applitools</groupId>
             <artifactId>eyes-selenium-java3</artifactId>

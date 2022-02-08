@@ -82,7 +82,7 @@ public final class TestSendDom extends ReportingTestSuite {
                 public Configuration get() {
                     return configuration;
                 }
-            }, new ClassicRunner());
+            }, new ClassicRunner0());
         }
 
         public String getDomJson() {

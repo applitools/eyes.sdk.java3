@@ -52,7 +52,7 @@ public class TestSeleniumEyes extends ReportingTestSuite {
 
     @Test
     public void testShouldTakeFullPageScreenshot() {
-        SeleniumEyes eyes = new SeleniumEyes(configurationProvider, new ClassicRunner());
+        SeleniumEyes eyes = new SeleniumEyes(configurationProvider, new ClassicRunner0());
 
         Assert.assertFalse(eyes.shouldTakeFullPageScreenshot(Target.window()));
         Assert.assertTrue(eyes.shouldTakeFullPageScreenshot(Target.window().fully()));
@@ -74,7 +74,7 @@ public class TestSeleniumEyes extends ReportingTestSuite {
 
     @Test
     public void testDebugScreenshot() {
-        SeleniumEyes eyes = new SeleniumEyes(configurationProvider, new ClassicRunner());
+        SeleniumEyes eyes = new SeleniumEyes(configurationProvider, new ClassicRunner0());
 
         final AtomicBoolean wasSavedDebugScreenshot = new AtomicBoolean();
         wasSavedDebugScreenshot.set(false);
@@ -103,7 +103,7 @@ public class TestSeleniumEyes extends ReportingTestSuite {
 
     @Test
     public void testChangeTabs() {
-        SeleniumEyes eyes = new SeleniumEyes(configurationProvider, new ClassicRunner());
+        SeleniumEyes eyes = new SeleniumEyes(configurationProvider, new ClassicRunner0());
         WebDriver driver = SeleniumUtils.createChromeDriver();
         try {
             driver = eyes.open(driver, "Applitools Eyes SDK", "Test Change Tabs", new RectangleSize(800, 800));
@@ -123,7 +123,7 @@ public class TestSeleniumEyes extends ReportingTestSuite {
 
     @Test
     public void testScreenshotTooBig() {
-        ClassicRunner runner = new ClassicRunner();
+        ClassicRunner0 runner = new ClassicRunner0();
         SeleniumEyes eyes = new SeleniumEyes(configurationProvider, runner);
 
         final BufferedImage[] screenshots = new BufferedImage[1];
@@ -240,7 +240,7 @@ public class TestSeleniumEyes extends ReportingTestSuite {
         ChromeDriver driver = SeleniumUtils.createChromeDriver();
         driver.get(TESTED_PAGE_URL);
         try {
-            SeleniumEyes seleniumEyes = new SeleniumEyes(configurationProvider, new ClassicRunner());
+            SeleniumEyes seleniumEyes = new SeleniumEyes(configurationProvider, new ClassicRunner0());
             EyesSeleniumDriver seleniumDriver = (EyesSeleniumDriver) seleniumEyes.open(
                     driver, "Applitools Eyes SDK", "testGetEmptyFrameContentSize", new RectangleSize(800, 800));
             TakesScreenshotImageProvider imageProvider = new TakesScreenshotImageProvider(logger, seleniumDriver);

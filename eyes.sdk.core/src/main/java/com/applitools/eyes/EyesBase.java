@@ -24,7 +24,7 @@ import com.applitools.eyes.positioning.InvalidPositionProvider;
 import com.applitools.eyes.positioning.PositionProvider;
 import com.applitools.eyes.scaling.FixedScaleProvider;
 import com.applitools.eyes.scaling.NullScaleProvider;
-import com.applitools.eyes.selenium.ClassicRunner;
+import com.applitools.eyes.selenium.ClassicRunner0;
 import com.applitools.eyes.triggers.MouseAction;
 import com.applitools.eyes.triggers.MouseTrigger;
 import com.applitools.eyes.triggers.TextTrigger;
@@ -53,7 +53,7 @@ public abstract class EyesBase implements IEyesBase {
 
     private String testId = UUID.randomUUID().toString();
     protected String agentRunId = null;
-    protected ClassicRunner runner;
+    protected ClassicRunner0 runner;
     protected ServerConnector serverConnector;
     protected RunningSession runningSession;
     protected SessionStartInfo sessionStartInfo;
@@ -83,8 +83,8 @@ public abstract class EyesBase implements IEyesBase {
         this(null);
     }
 
-    public EyesBase(ClassicRunner runner) {
-        this.runner = runner != null ? runner : new ClassicRunner();
+    public EyesBase(ClassicRunner0 runner) {
+        this.runner = runner != null ? runner : new ClassicRunner0();
         logger = new Logger();
         initProviders();
 

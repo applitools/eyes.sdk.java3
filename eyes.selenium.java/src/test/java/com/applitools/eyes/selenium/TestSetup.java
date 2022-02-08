@@ -6,6 +6,8 @@ import com.applitools.eyes.utils.ReportingTestSuite;
 import com.applitools.eyes.utils.SeleniumTestUtils;
 import com.applitools.eyes.utils.SeleniumUtils;
 import com.applitools.eyes.utils.TestUtils;
+import com.applitools.eyes.visualgrid.services.EyesRunner0;
+import com.applitools.eyes.triggers.VisualGridRunner0;
 import com.applitools.eyes.visualgrid.services.VisualGridRunner;
 import org.apache.commons.lang3.tuple.Pair;
 import org.openqa.selenium.Capabilities;

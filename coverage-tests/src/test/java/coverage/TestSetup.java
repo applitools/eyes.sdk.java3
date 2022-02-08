@@ -6,6 +6,7 @@ import com.applitools.eyes.selenium.Configuration;
 import com.applitools.eyes.selenium.Eyes;
 import com.applitools.eyes.selenium.StitchMode;
 import com.applitools.eyes.visualgrid.model.*;
+import com.applitools.eyes.visualgrid.services.EyesRunner0;
 import com.applitools.eyes.visualgrid.services.VisualGridRunner;
 import com.fasterxml.jackson.databind.JsonNode;
 import coverage.drivers.browsers.DriverBuilder;

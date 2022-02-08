@@ -49,7 +49,7 @@ public class TestConfiguration extends ReportingTestSuite {
             public com.applitools.eyes.config.Configuration get() {
                 return configuration;
             }
-        }, new ClassicRunner());
+        }, new ClassicRunner0());
         originalMatchTimeout = seleniumEyes.getConfiguration().getMatchTimeout();
         newMatchTimeout = originalMatchTimeout + 1000;
         seleniumEyes.getConfiguration().setMatchTimeout(newMatchTimeout);

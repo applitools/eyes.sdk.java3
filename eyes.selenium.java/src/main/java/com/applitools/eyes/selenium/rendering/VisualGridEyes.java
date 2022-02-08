@@ -27,7 +27,7 @@ import com.applitools.eyes.selenium.wrappers.EyesSeleniumDriver;
 import com.applitools.eyes.selenium.wrappers.EyesTargetLocator;
 import com.applitools.eyes.visualgrid.model.*;
 import com.applitools.eyes.visualgrid.services.CheckTask;
-import com.applitools.eyes.visualgrid.services.VisualGridRunner;
+import com.applitools.eyes.triggers.VisualGridRunner0;
 import com.applitools.eyes.visualgrid.services.VisualGridRunningTest;
 import com.applitools.utils.ArgumentGuard;
 import com.applitools.utils.ClassVersionGetter;
@@ -49,7 +49,7 @@ public class VisualGridEyes implements ISeleniumEyes {
     private final Logger logger;
     private final String eyesId = UUID.randomUUID().toString();
 
-    private final VisualGridRunner runner;
+    private final VisualGridRunner0 runner;
     final Map<String, RunningTest> testList = Collections.synchronizedMap(new HashMap<String, RunningTest>());
     private boolean isOpen = false;
 
@@ -83,7 +83,7 @@ public class VisualGridEyes implements ISeleniumEyes {
                     "} while (el !== null);" +
                     "return '/' + xpath;";
 
-    public VisualGridEyes(VisualGridRunner renderingGridManager, ConfigurationProvider configurationProvider) {
+    public VisualGridEyes(VisualGridRunner0 renderingGridManager, ConfigurationProvider configurationProvider) {
         this.configurationProvider = configurationProvider;
         ArgumentGuard.notNull(renderingGridManager, "renderingGridRunner");
         this.runner = renderingGridManager;
@@ -261,7 +261,7 @@ public class VisualGridEyes implements ISeleniumEyes {
 
     private void initDriver(WebDriver webDriver) {
         if (webDriver instanceof RemoteWebDriver) {
-            SeleniumEyes seleniumEyes = new SeleniumEyes(configurationProvider, new ClassicRunner());
+            SeleniumEyes seleniumEyes = new SeleniumEyes(configurationProvider, new ClassicRunner0());
             this.webDriver = new EyesSeleniumDriver(logger, seleniumEyes, (RemoteWebDriver) webDriver);
         }
         this.url = webDriver.getCurrentUrl();

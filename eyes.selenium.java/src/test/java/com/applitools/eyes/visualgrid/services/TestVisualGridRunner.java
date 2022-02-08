@@ -9,6 +9,7 @@ import com.applitools.eyes.selenium.BrowserType;
 import com.applitools.eyes.selenium.Eyes;
 import com.applitools.eyes.selenium.fluent.Target;
 import com.applitools.eyes.selenium.rendering.VisualGridEyes;
+import com.applitools.eyes.triggers.VisualGridRunner0;
 import com.applitools.eyes.utils.SeleniumUtils;
 import com.applitools.eyes.visualgrid.model.*;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -84,7 +85,7 @@ public class TestVisualGridRunner {
 
     @Test
     public void testRunnerConcurrency() {
-        final VisualGridRunner runner = spy(new VisualGridRunner(new RunnerOptions().testConcurrency(3)));
+        final VisualGridRunner0 runner = spy(new VisualGridRunner0(new RunnerOptions().testConcurrency(3)));
 
         final AtomicInteger currentlyOpenTests = new AtomicInteger(0);
         final AtomicBoolean isFail = new AtomicBoolean(false);
@@ -139,7 +140,7 @@ public class TestVisualGridRunner {
 
     @Test
     public void testRetryWhenServerConcurrencyLimitReached() {
-        final VisualGridRunner runner = new VisualGridRunner(5);
+        final VisualGridRunner0 runner = new VisualGridRunner0(5);
 
         final AtomicInteger counter = new AtomicInteger(0);
         ServerConnector serverConnector = new MockServerConnector() {
@@ -224,15 +225,15 @@ public class TestVisualGridRunner {
 
     @Test
     public void testConcurrencyLogMessage() throws JsonProcessingException {
-        VisualGridRunner runner = new VisualGridRunner();
+        VisualGridRunner0 runner = new VisualGridRunner0();
         Assert.assertEquals(runner.getConcurrencyLog(),
                 String.format("{\"type\":\"runnerStarted\",\"defaultConcurrency\":%d}", VisualGridRunner.DEFAULT_CONCURRENCY));
 
-        runner = new VisualGridRunner(10);
+        runner = new VisualGridRunner0(10);
         Assert.assertEquals(runner.getConcurrencyLog(),
                 String.format("{\"type\":\"runnerStarted\",\"concurrency\":%d}", 10));
 
-        runner = new VisualGridRunner(new RunnerOptions().testConcurrency(10));
+        runner = new VisualGridRunner0(new RunnerOptions().testConcurrency(10));
         Assert.assertEquals(runner.getConcurrencyLog(),
                 String.format("{\"type\":\"runnerStarted\",\"testConcurrency\":%d}", 10));
 

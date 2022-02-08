@@ -5,6 +5,7 @@ import java.util.List;
 
 import com.applitools.connectivity.ServerConnector;
 import com.applitools.eyes.EyesException;
+
 import com.applitools.eyes.EyesRunner;
 import com.applitools.eyes.MatchResult;
 import com.applitools.eyes.MatchWindowData;

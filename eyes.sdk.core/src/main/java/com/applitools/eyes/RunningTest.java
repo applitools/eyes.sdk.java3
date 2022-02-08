@@ -4,7 +4,7 @@ import com.applitools.ICheckSettings;
 import com.applitools.eyes.config.Configuration;
 import com.applitools.eyes.fluent.ICheckSettingsInternal;
 import com.applitools.eyes.logging.Stage;
-import com.applitools.eyes.selenium.ClassicRunner;
+import com.applitools.eyes.selenium.ClassicRunner0;
 import com.applitools.eyes.visualgrid.model.RenderBrowserInfo;
 import com.applitools.eyes.visualgrid.model.VisualGridSelector;
 import com.applitools.eyes.visualgrid.services.CheckTask;
@@ -20,7 +20,7 @@ public abstract class RunningTest extends EyesBase implements IBatchCloser {
     private boolean inOpenProcess = false;
     private boolean startedCloseProcess = false;
 
-    protected RunningTest(ClassicRunner runner) {
+    protected RunningTest(ClassicRunner0 runner) {
         super(runner);
         browserInfo = null;
     }

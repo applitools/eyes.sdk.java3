@@ -26,7 +26,7 @@ import com.applitools.eyes.logging.TraceLevel;
 import com.applitools.eyes.logging.Type;
 import com.applitools.eyes.scaling.FixedScaleProviderFactory;
 import com.applitools.eyes.scaling.NullScaleProvider;
-import com.applitools.eyes.selenium.ClassicRunner;
+import com.applitools.eyes.selenium.ClassicRunner0;
 import com.applitools.eyes.selenium.EyesDriverUtils;
 import com.applitools.eyes.selenium.StitchMode;
 import com.applitools.eyes.selenium.fluent.SimpleRegionByElement;
@@ -71,7 +71,7 @@ public class Eyes extends EyesBase {
     private WebElement scrollRootElement = null;
 
     public Eyes() {
-        super(new ClassicRunner());
+        super(new ClassicRunner0());
         regionVisibilityStrategyHandler = new SimplePropertyHandler<>();
         regionVisibilityStrategyHandler.set(new MoveToRegionVisibilityStrategy());
         configuration.setStitchOverlap(DEFAULT_STITCH_OVERLAP);

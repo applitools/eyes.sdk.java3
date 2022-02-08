@@ -113,7 +113,7 @@ public class SeleniumEyes extends RunningTest implements ISeleniumEyes {
      * Creates a new SeleniumEyes instance that interacts with the SeleniumEyes cloud
      * service.
      */
-    public SeleniumEyes(ConfigurationProvider configurationProvider, ClassicRunner runner) {
+    public SeleniumEyes(ConfigurationProvider configurationProvider, ClassicRunner0 runner) {
         super(runner);
         this.configurationProvider = configurationProvider;
         checkFrameOrElement = false;
