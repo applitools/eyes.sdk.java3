@@ -51,7 +51,7 @@ public class Eyes implements IEyesBase {
     private static final int USE_DEFAULT_MATCH_TIMEOUT = -1;
 
     private boolean isVisualGridEyes = false;
-    private EyesRunner runner;
+    private com.applitools.eyes.EyesRunner runner;
     private Configuration configuration = new Configuration();
     VisualLocatorsProvider visualLocatorsProvider;
     ConfigurationProvider configurationProvider = new ConfigurationProvider() {
@@ -67,6 +67,8 @@ public class Eyes implements IEyesBase {
      * this reference has to be used in eyes related requests (Eyes.check, Eyes.locate, Eyes.extractTextRegions, Eyes.extractText, Eyes.close, Eyes.abort)
      */
     private Reference eyesRef;
+
+    private boolean isClosed;
 
     /**
      * Instantiates a new Eyes.
@@ -141,6 +143,7 @@ public class Eyes implements IEyesBase {
      * @param serverUri the server URI
      */
     public void setServerUrl(URI serverUri) {
+        //configuration.setServerUrl(serverUri.toString())
         //activeEyes.serverUrl(serverUri.toString());
     }
 
@@ -187,7 +190,9 @@ public class Eyes implements IEyesBase {
     }
 
     public TestResults abort() {
-        commandExecutor.abort(eyesRef);
+        if (!isClosed) {
+            commandExecutor.abort(eyesRef);
+        }
         // FIXME map response to testResults
         return null;
     }
@@ -466,6 +471,7 @@ public class Eyes implements IEyesBase {
      */
     public TestResults close(boolean shouldThrowException) {
         CommandCloseResponseDto closeResponse = commandExecutor.close(eyesRef);
+        isClosed = true;
         return TestResultsMapper.toTestResults(closeResponse);
     }
 
