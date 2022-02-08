@@ -68,6 +68,7 @@ public class Eyes implements IEyesBase {
      */
     private Reference eyesRef;
 
+    // used to check abort after close
     private boolean isClosed;
 
     /**
