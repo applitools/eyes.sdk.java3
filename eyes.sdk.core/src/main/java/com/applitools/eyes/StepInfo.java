@@ -75,7 +75,7 @@ public class StepInfo {
     }
 
     private String name;
-    private boolean isDifferent;
+    private Boolean isDifferent;
     private boolean hasBaselineImage;
     private boolean hasCurrentImage;
     private boolean hasCheckpointImage;
@@ -94,7 +94,7 @@ public class StepInfo {
         return isDifferent;
     }
 
-    public void setIsDifferent(boolean different) {
+    public void setIsDifferent(Boolean different) {
         isDifferent = different;
     }
 
