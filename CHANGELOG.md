@@ -1,3 +1,7 @@
+## [3.212.0] - 2021-02-08
+### Updated
+- Updated dependencies [Trello 2805](https://trello.com/c/2UVl1FKq/)
+
 ## [3.211.1] - 2021-02-01
 ### Fixed
 - Device names enum fix [Trello 2790](https://trello.com/c/5AL4OJXe)
