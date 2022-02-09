@@ -5,6 +5,7 @@ import java.util.Map;
 import java.util.UUID;
 
 
+import com.applitools.eyes.Region;
 import com.applitools.eyes.locators.TextRegion;
 import com.applitools.eyes.selenium.universal.dto.CheckEyes;
 import com.applitools.eyes.selenium.universal.dto.CheckSettingsDto;
@@ -75,13 +76,13 @@ public class CommandExecutor {
     ResponseDto responseDto = checkedCommand(request, true);
   }
 
-  public void locate(Reference eyesRef, VisualLocatorSettingsDto locatorSettingsDto, ConfigurationDto config) {
+  public Map<String, List<Region>> locate(Reference eyesRef, VisualLocatorSettingsDto locatorSettingsDto, ConfigurationDto config) {
     RequestDto<LocateDto> request = new RequestDto<>();
     request.setName("Eyes.locate");
     request.setKey(UUID.randomUUID().toString());
     request.setPayload(new LocateDto(eyesRef, locatorSettingsDto, config));
-    checkedCommand(request, true);
-    // TODO handle response
+    ResponseDto<Map<String, List<Region>>> locateResponse = (ResponseDto<Map<String, List<Region>>>)checkedCommand(request, true);
+    return locateResponse.getPayload().getResult();
   }
 
   public Map<String, List<TextRegion>> extractTextRegions(Reference eyesRef, OCRSearchSettingsDto searchSettingsDto, ConfigurationDto config) {

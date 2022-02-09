@@ -6,12 +6,14 @@ import java.util.Map;
 
 import com.applitools.eyes.EyesException;
 import com.applitools.eyes.Logger;
+import com.applitools.eyes.Region;
 import com.applitools.eyes.SyncTaskListener;
 import com.applitools.eyes.locators.TextRegion;
 import com.applitools.eyes.selenium.universal.dto.Command;
 import com.applitools.eyes.selenium.universal.dto.EventDto;
 import com.applitools.eyes.selenium.universal.dto.MatchResultDto;
 import com.applitools.eyes.selenium.universal.dto.RectangleSizeDto;
+import com.applitools.eyes.selenium.universal.dto.RegionDto;
 import com.applitools.eyes.selenium.universal.dto.RequestDto;
 import com.applitools.eyes.selenium.universal.dto.ResponseDto;
 import com.applitools.eyes.selenium.universal.dto.response.CommandCloseResponseDto;
@@ -84,7 +86,17 @@ public class USDKConnection {
                       e.printStackTrace();
                     }
                   } else if (payload.contains("Eyes.locate")) {
-                    // FIXME handle response of locate
+                    try {
+                      ResponseDto<Map<String, List<Region>>> locateResponse = objectMapper
+                          .readValue(payload, new TypeReference<ResponseDto<Map<String, List<Region>>>>() {});
+                      if (locateResponse.getPayload().getError() != null) {
+                        throw new EyesException(locateResponse.getPayload().getError().getMessage());
+                      }
+                      map.put(locateResponse.getKey(), locateResponse);
+                      syncTaskListener.onComplete(locateResponse);
+                    } catch (Exception e) {
+                      e.printStackTrace();
+                    }
                   } else if (payload.contains("Eyes.close") || payload.contains("Eyes.abort")) {
                     try {
                       ResponseDto<List<CommandCloseResponseDto>> closeResponse = objectMapper.readValue(payload,

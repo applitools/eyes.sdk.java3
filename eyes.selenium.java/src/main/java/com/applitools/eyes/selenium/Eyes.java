@@ -1884,10 +1884,7 @@ public class Eyes implements IEyesBase {
             .toVisualLocatorSettingsDto(visualLocatorSettings);
 
         ConfigurationDto configurationDto = ConfigurationMapper.toConfigurationDto(configuration);
-        commandExecutor.locate(eyesRef, visualLocatorSettingsDto, configurationDto);
-
-        return null;
-        // TODO must return from server
+        return commandExecutor.locate(eyesRef, visualLocatorSettingsDto, configurationDto);
     }
 
     public Map<String, List<TextRegion>> extractTextRegions(TextRegionSettings textRegionSettings) {
