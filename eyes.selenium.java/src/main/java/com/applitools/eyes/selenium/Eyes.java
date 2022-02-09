@@ -484,7 +484,7 @@ public class Eyes implements IEyesBase {
         if (!getIsOpen()) {
             throw new EyesException("Eyes not open");
         }
-        List<CommandCloseResponseDto> closeResponse = commandExecutor.close(eyesRef);
+        List<CommandCloseResponseDto> closeResponse = commandExecutor.close(eyesRef, true);
         this.eyesRef = null;
         isClosed = true;
         List<TestResults> testResults = TestResultsMapper.toTestResultsList(closeResponse);
@@ -1868,11 +1868,14 @@ public class Eyes implements IEyesBase {
     }
 
     public void closeAsync() {
-//        if (isVisualGridEyes) {
-//            visualGridEyes.closeAsync();
-//        } else {
-//            seleniumEyes.close(false);
-//        }
+        if (!getIsOpen()) {
+            throw new EyesException("Eyes not open");
+        }
+        List<CommandCloseResponseDto> closeResponse = commandExecutor.close(eyesRef, false);
+        this.eyesRef = null;
+        isClosed = true;
+        List<TestResults> testResults = TestResultsMapper.toTestResultsList(closeResponse);
+        testResults.forEach(testResults1 -> runner.logSessionResultsAndThrowException(false, testResults1));
     }
 
     public Map<String, List<Region>> locate(VisualLocatorSettings visualLocatorSettings) {

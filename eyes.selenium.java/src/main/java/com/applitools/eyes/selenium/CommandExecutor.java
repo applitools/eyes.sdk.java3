@@ -105,12 +105,12 @@ public class CommandExecutor {
     return responseDto.getPayload().getResult();
   }
 
-  public List<CommandCloseResponseDto> close(Reference eyesRef) {
+  public List<CommandCloseResponseDto> close(Reference eyesRef, boolean waitResult) {
     RequestDto<CommandCloseRequestDto> request = new RequestDto<>();
     request.setName("Eyes.close");
     request.setKey(UUID.randomUUID().toString());
     request.setPayload(new CommandCloseRequestDto(eyesRef));
-    ResponseDto<List<CommandCloseResponseDto>> closeResponse = (ResponseDto<List<CommandCloseResponseDto>>) checkedCommand(request, true);
+    ResponseDto<List<CommandCloseResponseDto>> closeResponse = (ResponseDto<List<CommandCloseResponseDto>>) checkedCommand(request, waitResult);
     return closeResponse.getPayload().getResult();
   }
 
