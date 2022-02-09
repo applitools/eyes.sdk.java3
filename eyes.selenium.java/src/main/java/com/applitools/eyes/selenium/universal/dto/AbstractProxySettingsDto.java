@@ -7,7 +7,7 @@ public class AbstractProxySettingsDto {
   private String uri;
   private String username;
   private String password;
-  private int port;
+  private Boolean isHttpOnly;
 
   public String getUri() {
     return uri;
@@ -33,11 +33,11 @@ public class AbstractProxySettingsDto {
     this.password = password;
   }
 
-  public int getPort() {
-    return port;
+  public Boolean getHttpOnly() {
+    return isHttpOnly;
   }
 
-  public void setPort(int port) {
-    this.port = port;
+  public void setHttpOnly(Boolean httpOnly) {
+    isHttpOnly = httpOnly;
   }
 }

@@ -17,7 +17,7 @@ public class AbstractProxySettingsMapper {
     abstractProxySettingsDto.setUri(abstractProxySettings.getUri());
     abstractProxySettingsDto.setUsername(abstractProxySettings.getUsername());
     abstractProxySettingsDto.setPassword(abstractProxySettings.getPassword());
-    abstractProxySettingsDto.setPort(abstractProxySettings.getPort());
+    abstractProxySettingsDto.setHttpOnly(null);
     return abstractProxySettingsDto;
   }
 }
