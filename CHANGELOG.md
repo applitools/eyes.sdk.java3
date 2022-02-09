@@ -1,3 +1,7 @@
+## [vNext]
+### Updated
+- Pass API key to android UFG lib before taking VHS.
+
 ## [3.210.6] - 2021-12-10
 ### Fixed
 - Improve usage of `POSITION_PROVIDER_EXTRA_SCROLL` feature in calculating scroll position. [Trello 2751](https://trello.com/c/v03eizvV)

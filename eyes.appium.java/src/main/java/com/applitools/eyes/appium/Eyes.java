@@ -695,6 +695,7 @@ public class Eyes extends RunningTest implements IEyes {
     }
 
     private AndroidVHSCaptureResult getVHSAndroid(Set<String> testIds) throws Exception {
+        sendApiKeyToVhsLib();
         WebElement triggerButton = driver.findElementByAccessibilityId("UFG_TriggerArea");
         int labelsAmount = Integer.parseInt(triggerButton.getText());
         triggerButton.click();
@@ -799,6 +800,20 @@ public class Eyes extends RunningTest implements IEyes {
             }
             Thread.sleep(500);
         }
+    }
+
+    private void sendApiKeyToVhsLib() throws InterruptedException {
+        List<WebElement> list = driver.findElementsByAccessibilityId("UFG_Apikey");
+        if (list.isEmpty()) {
+            throw new EyesException("Please check integration of UFG lib in the application");
+        }
+        list.get(list.size() - 1).sendKeys(getApiKey());
+        list = driver.findElementsByAccessibilityId("UFG_ApikeyReady");
+        if (list.isEmpty()) {
+            throw new EyesException("Please check integration of UFG lib in the application");
+        }
+        list.get(list.size() - 1).click();
+        Thread.sleep(100);
     }
 
     public byte[] getVHSIos() {
