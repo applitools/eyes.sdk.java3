@@ -191,15 +191,22 @@ public class Eyes implements IEyesBase {
     }
 
     public TestResults abort() {
-        if (!isClosed) {
-            commandExecutor.abort(eyesRef);
+        if (!isClosed && getIsOpen()) {
+            List<CommandCloseResponseDto> abortResponse = commandExecutor.abort(eyesRef, true);
+            List<TestResults> testResults = TestResultsMapper.toTestResultsList(abortResponse);
+            this.eyesRef = null;
+            return testResults.isEmpty() ? null : testResults.get(0);
         }
-        // FIXME map response to testResults
         return null;
     }
 
     public void abortAsync() {
-        //activeEyes.abortAsync();
+        if (!isClosed && getIsOpen()) {
+            List<CommandCloseResponseDto> abortResponse = commandExecutor.abort(eyesRef, false);
+            //List<TestResults> testResults = TestResultsMapper.toTestResultsList(abortResponse);
+            this.eyesRef = null;
+
+        }
     }
 
     /**
@@ -391,8 +398,7 @@ public class Eyes implements IEyesBase {
      * @return Whether a session is open.
      */
     public boolean getIsOpen() {
-        //return activeEyes.getIsOpen();
-        return false;
+        return eyesRef != null;
     }
 
     /**
@@ -471,9 +477,15 @@ public class Eyes implements IEyesBase {
      * @return the test results
      */
     public TestResults close(boolean shouldThrowException) {
-        CommandCloseResponseDto closeResponse = commandExecutor.close(eyesRef);
+        if (!getIsOpen()) {
+            throw new EyesException("Eyes not open");
+        }
+        List<CommandCloseResponseDto> closeResponse = commandExecutor.close(eyesRef);
+        this.eyesRef = null;
         isClosed = true;
-        return TestResultsMapper.toTestResults(closeResponse);
+        List<TestResults> testResults = TestResultsMapper.toTestResultsList(closeResponse);
+        testResults.forEach(testResults1 -> runner.logSessionResultsAndThrowException(shouldThrowException, testResults1));
+        return testResults.get(0);
     }
 
     /**

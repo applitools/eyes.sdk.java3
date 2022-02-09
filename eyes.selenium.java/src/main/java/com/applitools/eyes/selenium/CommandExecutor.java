@@ -105,22 +105,22 @@ public class CommandExecutor {
     return responseDto.getPayload().getResult();
   }
 
-  public CommandCloseResponseDto close(Reference eyesRef) {
+  public List<CommandCloseResponseDto> close(Reference eyesRef) {
     RequestDto<CommandCloseRequestDto> request = new RequestDto<>();
     request.setName("Eyes.close");
     request.setKey(UUID.randomUUID().toString());
     request.setPayload(new CommandCloseRequestDto(eyesRef));
     ResponseDto<List<CommandCloseResponseDto>> closeResponse = (ResponseDto<List<CommandCloseResponseDto>>) checkedCommand(request, true);
-    return closeResponse.getPayload().getResult().get(0);
+    return closeResponse.getPayload().getResult();
   }
 
-  public CommandCloseResponseDto abort(Reference eyesRef) {
+  public List<CommandCloseResponseDto> abort(Reference eyesRef, boolean waitResult) {
     RequestDto<CommandCloseRequestDto> request = new RequestDto<>();
     request.setName("Eyes.abort");
     request.setKey(UUID.randomUUID().toString());
     request.setPayload(new CommandCloseRequestDto(eyesRef));
-    ResponseDto<List<CommandCloseResponseDto>> closeResponse = (ResponseDto<List<CommandCloseResponseDto>>) checkedCommand(request, true);
-    return closeResponse.getPayload().getResult().get(0);
+    ResponseDto<List<CommandCloseResponseDto>> closeResponse = (ResponseDto<List<CommandCloseResponseDto>>) checkedCommand(request, waitResult);
+    return closeResponse.getPayload().getResult();
   }
 
   public static RectangleSizeDto getViewportSize(DriverDto driver) {

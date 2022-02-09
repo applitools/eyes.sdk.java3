@@ -7,6 +7,9 @@ import java.util.HashSet;
 import java.util.Map;
 
 import com.applitools.connectivity.ServerConnector;
+import com.applitools.eyes.exceptions.DiffsFoundException;
+import com.applitools.eyes.exceptions.NewTestException;
+import com.applitools.eyes.exceptions.TestFailedException;
 import com.applitools.eyes.logging.Stage;
 import com.applitools.eyes.logging.Type;
 import com.applitools.eyes.selenium.CommandExecutor;
@@ -200,4 +203,42 @@ public abstract class EyesRunner {
   public void setCommandExecutor(CommandExecutor commandExecutor) {
     this.commandExecutor = commandExecutor;
   }
+
+  public void logSessionResultsAndThrowException(boolean throwEx, TestResults results) {
+    TestResultsStatus status = results.getStatus();
+    String sessionResultsUrl = results.getUrl();
+    String scenarioIdOrName = results.getName();
+    String appIdOrName = results.getAppName();
+    if (status == null) {
+      throw new EyesException("Status is null in the test results");
+    }
+
+    logger.log(results.getId(), Stage.CLOSE, Type.TEST_RESULTS, Pair.of("status", status), Pair.of("url", sessionResultsUrl));
+    switch (status) {
+      case Failed:
+        if (throwEx) {
+          throw new TestFailedException(results, scenarioIdOrName, appIdOrName);
+        }
+        break;
+      case Passed:
+        break;
+      case NotOpened:
+        if (throwEx) {
+          throw new EyesException("Called close before calling open");
+        }
+        break;
+      case Unresolved:
+        if (results.isNew()) {
+          if (throwEx) {
+            throw new NewTestException(results, scenarioIdOrName, appIdOrName);
+          }
+        } else {
+          if (throwEx) {
+            throw new DiffsFoundException(results, scenarioIdOrName, appIdOrName);
+          }
+        }
+        break;
+    }
+  }
+
 }

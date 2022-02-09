@@ -93,4 +93,12 @@ public class TestResultsMapper {
         .stream().map(TestResultsMapper::toStepInfo).toArray(StepInfo[]::new);
 
   }
+
+  public static List<TestResults> toTestResultsList(List<CommandCloseResponseDto> responseDtoList) {
+    if (responseDtoList == null || responseDtoList.isEmpty()) {
+      return null;
+    }
+
+    return responseDtoList.stream().map(TestResultsMapper::toTestResults).collect(Collectors.toList());
+  }
 }
