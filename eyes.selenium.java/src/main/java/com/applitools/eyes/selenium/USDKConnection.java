@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.applitools.eyes.EyesException;
 import com.applitools.eyes.Logger;
 import com.applitools.eyes.SyncTaskListener;
 import com.applitools.eyes.locators.TextRegion;
@@ -63,6 +64,9 @@ public class USDKConnection {
                   if (payload.contains("Core.makeManager") || payload.contains("EyesManager.openEyes")) {
                     try {
                       ResponseDto<Reference> referenceResponseDto = objectMapper.readValue(payload, new TypeReference<ResponseDto<Reference>>() {});
+                      if (referenceResponseDto.getPayload().getError() != null) {
+                        throw new EyesException(referenceResponseDto.getPayload().getError().getMessage());
+                      }
                       map.put(referenceResponseDto.getKey(), referenceResponseDto);
                       syncTaskListener.onComplete(referenceResponseDto);
                     } catch (Exception e) {
@@ -71,6 +75,9 @@ public class USDKConnection {
                   } else if(payload.contains("Eyes.check")) {
                     try {
                       ResponseDto<MatchResultDto> checkResponse = objectMapper.readValue(payload, new TypeReference<ResponseDto<MatchResultDto>>() {});
+                      if (checkResponse.getPayload().getError() != null) {
+                        throw new EyesException(checkResponse.getPayload().getError().getMessage());
+                      }
                       map.put(checkResponse.getKey(), checkResponse);
                       syncTaskListener.onComplete(checkResponse);
                     } catch (Exception e) {
@@ -82,6 +89,9 @@ public class USDKConnection {
                     try {
                       ResponseDto<List<CommandCloseResponseDto>> closeResponse = objectMapper.readValue(payload,
                           new TypeReference<ResponseDto<List<CommandCloseResponseDto>>>() {});
+                      if (closeResponse.getPayload().getError() != null) {
+                        throw new EyesException(closeResponse.getPayload().getError().getMessage());
+                      }
                       map.put(closeResponse.getKey(), closeResponse);
                       syncTaskListener.onComplete(closeResponse);
                     } catch (Exception e) {
@@ -91,6 +101,9 @@ public class USDKConnection {
                     try {
                       ResponseDto<Map<String, List<TextRegion>>> extractTextRegionsResponse = objectMapper
                           .readValue(payload, new TypeReference<ResponseDto<Map<String, List<TextRegion>>>>() {});
+                      if (extractTextRegionsResponse.getPayload().getError() != null) {
+                        throw new EyesException(extractTextRegionsResponse.getPayload().getError().getMessage());
+                      }
                       map.put(extractTextRegionsResponse.getKey(), extractTextRegionsResponse);
                       syncTaskListener.onComplete(extractTextRegionsResponse);
                     } catch (Exception e) {
@@ -99,6 +112,9 @@ public class USDKConnection {
                   } else if (payload.contains("Eyes.extractText")) {
                     try {
                       ResponseDto<List<String>> responseDto = objectMapper.readValue(payload, new TypeReference<ResponseDto<List<String>>>() {});
+                      if (responseDto.getPayload().getError() != null) {
+                        throw new EyesException(responseDto.getPayload().getError().getMessage());
+                      }
                       map.put(responseDto.getKey(), responseDto);
                       syncTaskListener.onComplete(responseDto);
                     } catch (Exception e) {
@@ -108,6 +124,9 @@ public class USDKConnection {
                     try {
                       ResponseDto<RectangleSizeDto> getViewportSizeResponse = objectMapper.readValue(payload, new TypeReference<ResponseDto<RectangleSizeDto>>() {
                       });
+                      if (getViewportSizeResponse.getPayload().getError() != null) {
+                        throw new EyesException(getViewportSizeResponse.getPayload().getError().getMessage());
+                      }
                       map.put(getViewportSizeResponse.getKey(), getViewportSizeResponse);
                       syncTaskListener.onComplete(getViewportSizeResponse);
                     } catch (Exception e) {
