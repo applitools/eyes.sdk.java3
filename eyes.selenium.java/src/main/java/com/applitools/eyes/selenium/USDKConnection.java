@@ -67,6 +67,7 @@ public class USDKConnection {
                     try {
                       ResponseDto<Reference> referenceResponseDto = objectMapper.readValue(payload, new TypeReference<ResponseDto<Reference>>() {});
                       if (referenceResponseDto.getPayload().getError() != null) {
+                        syncTaskListener.onFail();
                         throw new EyesException(referenceResponseDto.getPayload().getError().getMessage());
                       }
                       map.put(referenceResponseDto.getKey(), referenceResponseDto);
@@ -78,6 +79,7 @@ public class USDKConnection {
                     try {
                       ResponseDto<MatchResultDto> checkResponse = objectMapper.readValue(payload, new TypeReference<ResponseDto<MatchResultDto>>() {});
                       if (checkResponse.getPayload().getError() != null) {
+                        syncTaskListener.onFail();
                         throw new EyesException(checkResponse.getPayload().getError().getMessage());
                       }
                       map.put(checkResponse.getKey(), checkResponse);
@@ -90,6 +92,7 @@ public class USDKConnection {
                       ResponseDto<Map<String, List<Region>>> locateResponse = objectMapper
                           .readValue(payload, new TypeReference<ResponseDto<Map<String, List<Region>>>>() {});
                       if (locateResponse.getPayload().getError() != null) {
+                        syncTaskListener.onFail();
                         throw new EyesException(locateResponse.getPayload().getError().getMessage());
                       }
                       map.put(locateResponse.getKey(), locateResponse);
@@ -102,6 +105,7 @@ public class USDKConnection {
                       ResponseDto<List<CommandCloseResponseDto>> closeResponse = objectMapper.readValue(payload,
                           new TypeReference<ResponseDto<List<CommandCloseResponseDto>>>() {});
                       if (closeResponse.getPayload().getError() != null) {
+                        syncTaskListener.onFail();
                         throw new EyesException(closeResponse.getPayload().getError().getMessage());
                       }
                       map.put(closeResponse.getKey(), closeResponse);
@@ -114,6 +118,7 @@ public class USDKConnection {
                       ResponseDto<Map<String, List<TextRegion>>> extractTextRegionsResponse = objectMapper
                           .readValue(payload, new TypeReference<ResponseDto<Map<String, List<TextRegion>>>>() {});
                       if (extractTextRegionsResponse.getPayload().getError() != null) {
+                        syncTaskListener.onFail();
                         throw new EyesException(extractTextRegionsResponse.getPayload().getError().getMessage());
                       }
                       map.put(extractTextRegionsResponse.getKey(), extractTextRegionsResponse);
@@ -125,6 +130,7 @@ public class USDKConnection {
                     try {
                       ResponseDto<List<String>> responseDto = objectMapper.readValue(payload, new TypeReference<ResponseDto<List<String>>>() {});
                       if (responseDto.getPayload().getError() != null) {
+                        syncTaskListener.onFail();
                         throw new EyesException(responseDto.getPayload().getError().getMessage());
                       }
                       map.put(responseDto.getKey(), responseDto);
@@ -137,6 +143,7 @@ public class USDKConnection {
                       ResponseDto<RectangleSizeDto> getViewportSizeResponse = objectMapper.readValue(payload, new TypeReference<ResponseDto<RectangleSizeDto>>() {
                       });
                       if (getViewportSizeResponse.getPayload().getError() != null) {
+                        syncTaskListener.onFail();
                         throw new EyesException(getViewportSizeResponse.getPayload().getError().getMessage());
                       }
                       map.put(getViewportSizeResponse.getKey(), getViewportSizeResponse);

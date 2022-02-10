@@ -144,7 +144,7 @@ public class EyesTests {
     frameSelector.setSelector(ss);
     frameLocatorDto.setSelector(ss);
 
-    contextReferenceDto.setFrame(frameSelector);
+    contextReferenceDto.setFrame("frame1");
     checkSettingsDto.setFrames(Arrays.asList(contextReferenceDto));
 
     ObjectMapper objectMapper = new ObjectMapper();
