@@ -39,7 +39,7 @@ public class TestResults {
     private RectangleSize hostDisplaySize;
     @JsonDeserialize(using = Iso8610CalendarDeserializer.class)
     private Calendar startedAt;
-    private int duration;
+    private Integer duration;
     private Boolean isDifferent;
     private Boolean isAborted;
     private SessionUrls appUrls;
@@ -148,7 +148,7 @@ public class TestResults {
         return duration;
     }
 
-    public void setDuration(int duration) {
+    public void setDuration(Integer duration) {
         this.duration = duration;
     }
 

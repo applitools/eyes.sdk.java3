@@ -7,6 +7,7 @@ import com.applitools.eyes.SessionUrls;
 import com.applitools.eyes.StepInfo;
 import com.applitools.eyes.TestResults;
 import com.applitools.eyes.TestResultsStatus;
+import com.applitools.eyes.selenium.universal.dto.SessionUrlsDto;
 import com.applitools.eyes.selenium.universal.dto.StepInfoDto;
 import com.applitools.eyes.selenium.universal.dto.response.CommandCloseResponseDto;
 
@@ -24,7 +25,7 @@ public class TestResultsMapper {
     testResults.setId(response.getId());
     testResults.setName(response.getName());
     testResults.setSecretToken(response.getSecretToken());
-    testResults.setStatus(TestResultsStatus.valueOf(response.getStatus()));
+    testResults.setStatus(toTestResultsStatus(response.getStatus()));
     testResults.setAppName(response.getAppName());
     testResults.setBatchName(response.getBatchName());
     testResults.setBatchId(response.getBatchId());
@@ -32,30 +33,58 @@ public class TestResultsMapper {
     testResults.setHostOS(response.getHostOS());
     testResults.setHostApp(response.getHostApp());
     testResults.setHostDisplaySize(RectangleSizeMapper.toRectangleSize(response.getHostDisplaySize()));
-    testResults.setStartedAt(null);
+    testResults.setStartedAt(null);    // TODO: add startedAt parameter
     testResults.setDuration(response.getDuration());
+    testResults.setStepsInfo(toStepInfoArray(response.getStepsInfo()));
     testResults.setNew(response.getNew());
     testResults.setDifferent(response.getDifferent());
     testResults.setAborted(response.getAborted());
-    SessionUrls appUrls = new SessionUrls();
-    appUrls.setSession(response.getAppUrls().getSession());
-    appUrls.setBatch(response.getAppUrls().getBatch());
-    testResults.setAppUrls(appUrls);
-    SessionUrls apiUrls = new SessionUrls();
-    apiUrls.setSession(response.getApiUrls().getSession());
-    apiUrls.setBatch(response.getApiUrls().getBatch());
-    testResults.setApiUrls(apiUrls);
-    testResults.setStepsInfo(toStepInfoArray(response.getStepsInfo()));
-    testResults.setSteps(response.getSteps());
-    testResults.setMatches(response.getMatches());
-    testResults.setMismatches(response.getMismatches());
-    testResults.setMissing(response.getMissing());
-    testResults.setExactMatches(response.getExactMatches());
-    testResults.setStrictMatches(response.getStrictMatches());
-    testResults.setContentMatches(response.getContentMatches());
-    testResults.setLayoutMatches(response.getLayoutMatches());
-    testResults.setNoneMatches(response.getNoneMatches());
     testResults.setUrl(response.getUrl());
+
+    SessionUrlsDto respAppUrls = response.getAppUrls();
+    if (respAppUrls != null) {
+      SessionUrls appUrls = new SessionUrls();
+      appUrls.setSession(respAppUrls.getSession());
+      appUrls.setBatch(respAppUrls.getBatch());
+      testResults.setAppUrls(appUrls);
+    }
+
+    SessionUrlsDto respApiUrls = response.getApiUrls();
+    if (respApiUrls != null) {
+      SessionUrls apiUrls = new SessionUrls();
+      apiUrls.setSession(respApiUrls.getSession());
+      apiUrls.setBatch(respApiUrls.getBatch());
+      testResults.setApiUrls(apiUrls);
+    }
+    // TODO: verify if we do need `ArgumentGuard.greaterThanOrEqualToZero` in TestResults methods
+    //  if not we could remove them and skip checking for null for fields below
+    if (response.getSteps() != null){
+      testResults.setSteps(response.getSteps());
+    }
+    if (response.getMatches() != null) {
+      testResults.setMatches(response.getMatches());
+    }
+    if (response.getMismatches() != null) {
+      testResults.setMismatches(response.getMismatches());
+    }
+    if (response.getMissing() != null) {
+      testResults.setMissing(response.getMissing());
+    }
+    if (response.getExactMatches() != null) {
+      testResults.setExactMatches(response.getExactMatches());
+    }
+    if (response.getStrictMatches() != null) {
+      testResults.setStrictMatches(response.getStrictMatches());
+    }
+    if (response.getContentMatches() != null) {
+      testResults.setContentMatches(response.getContentMatches());
+    }
+    if (response.getLayoutMatches() != null) {
+      testResults.setLayoutMatches(response.getLayoutMatches());
+    }
+    if (response.getNoneMatches() != null) {
+      testResults.setNoneMatches(response.getNoneMatches());;
+    }
     return testResults;
   }
 
@@ -82,6 +111,13 @@ public class TestResultsMapper {
     stepInfo.setHasCurrentImage(stepInfoDto.getHasCurrentImage());
 
     return stepInfo;
+  }
+
+  private static TestResultsStatus toTestResultsStatus(String status) {
+    if (status == null){
+      return TestResultsStatus.Disabled;
+    }
+    return TestResultsStatus.valueOf(status);
   }
 
   private static StepInfo[] toStepInfoArray(List<StepInfoDto> stepInfoDtoList) {
