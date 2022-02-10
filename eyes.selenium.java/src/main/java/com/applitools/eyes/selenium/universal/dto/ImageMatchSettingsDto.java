@@ -2,9 +2,12 @@ package com.applitools.eyes.selenium.universal.dto;
 
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+
 /**
  * image match settings
  */
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class ImageMatchSettingsDto {
   private String matchLevel;
   private ExactMatchSettingsDto exact;

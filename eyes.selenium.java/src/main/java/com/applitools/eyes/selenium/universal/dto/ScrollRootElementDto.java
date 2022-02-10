@@ -1,8 +1,11 @@
 package com.applitools.eyes.selenium.universal.dto;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+
 /**
  * scroll root element dto
  */
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class ScrollRootElementDto {
   private SelectorRegionDto selector;
   private ElementRegionDto element;

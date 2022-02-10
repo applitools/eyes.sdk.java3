@@ -1,8 +1,11 @@
 package com.applitools.eyes.selenium.universal.dto;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+
 /**
  * rectangle region dto
  */
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class RectangleRegionDto extends TRegion{
   private Integer x;
   private Integer y;

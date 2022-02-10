@@ -1,8 +1,11 @@
 package com.applitools.eyes.selenium.universal.dto;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+
 /**
  * accessibility region by rectangle dto
  */
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class AccessibilityRegionByRectangleDto {
   private int left;
   private int top;

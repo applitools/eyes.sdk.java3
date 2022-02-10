@@ -3,9 +3,12 @@ package com.applitools.eyes.selenium.universal.dto;
 import java.util.List;
 import java.util.Map;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+
 /**
  * batch dto
  */
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class BatchDto {
   private String id;
   private String batchSequenceName;

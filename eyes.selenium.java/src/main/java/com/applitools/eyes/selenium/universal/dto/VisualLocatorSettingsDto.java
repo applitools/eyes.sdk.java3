@@ -2,9 +2,12 @@ package com.applitools.eyes.selenium.universal.dto;
 
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+
 /**
  * visual locator settings dto
  */
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class VisualLocatorSettingsDto {
   private List<String> locatorNames;
   private Boolean firstOnly;

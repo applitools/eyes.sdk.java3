@@ -1,8 +1,11 @@
 package com.applitools.eyes.selenium.universal.dto;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+
 /**
  * OCR extract settings dto
  */
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class OCRExtractSettingsDto {
   private TRegion target;
   private String hint;

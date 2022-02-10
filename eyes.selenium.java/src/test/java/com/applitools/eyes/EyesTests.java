@@ -5,6 +5,7 @@ import java.util.List;
 
 import com.applitools.eyes.locators.TextRegionSettings;
 import com.applitools.eyes.locators.VisualLocatorSettings;
+import com.applitools.eyes.selenium.CommandExecutor;
 import com.applitools.eyes.selenium.Configuration;
 import com.applitools.eyes.selenium.Eyes;
 import com.applitools.eyes.selenium.Reference;
@@ -112,6 +113,11 @@ public class EyesTests {
 
     Gson gson = new Gson();
     System.out.println(gson.toJson(response));
+
+  }
+
+
+  public void testCheck() {
 
   }
 

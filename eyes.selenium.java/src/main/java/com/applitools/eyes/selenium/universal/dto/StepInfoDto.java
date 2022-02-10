@@ -1,9 +1,12 @@
 package com.applitools.eyes.selenium.universal.dto;
 
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+
 /**
  * step info dto
  */
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class StepInfoDto {
 
   public static class AppUrls {

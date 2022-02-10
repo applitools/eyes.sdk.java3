@@ -1,8 +1,11 @@
 package com.applitools.eyes.selenium.universal.dto;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+
 /**
  * frame locator dto
  */
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class FrameLocatorDto {
   private SelectorRegionDto selector;
   private ElementRegionDto element;

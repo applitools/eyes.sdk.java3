@@ -1,8 +1,11 @@
 package com.applitools.eyes.selenium.universal.dto;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+
 /**
  * ios device info
  */
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class IosDeviceInfoDto {
   private String deviceName;
   private String screenOrientation;

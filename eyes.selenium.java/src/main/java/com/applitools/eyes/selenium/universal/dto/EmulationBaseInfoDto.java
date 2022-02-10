@@ -1,8 +1,11 @@
 package com.applitools.eyes.selenium.universal.dto;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+
 /**
  * emulation base info dto
  */
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class EmulationBaseInfoDto {
   private String screenOrientation;
   private RectangleSizeDto size;

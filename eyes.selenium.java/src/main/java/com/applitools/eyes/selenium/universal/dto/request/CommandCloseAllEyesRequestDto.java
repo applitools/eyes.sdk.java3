@@ -1,6 +1,7 @@
 package com.applitools.eyes.selenium.universal.dto.request;
 
 import com.applitools.eyes.selenium.Reference;
+import com.fasterxml.jackson.annotation.JsonInclude;
 
 /**
  * command close all eyes request dto

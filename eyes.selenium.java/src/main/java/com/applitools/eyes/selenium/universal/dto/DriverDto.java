@@ -2,9 +2,12 @@ package com.applitools.eyes.selenium.universal.dto;
 
 import java.util.Map;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+
 /**
  * custom driver
  */
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class DriverDto {
   private String sessionId;
   private String serverUrl;

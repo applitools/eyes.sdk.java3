@@ -1,8 +1,11 @@
 package com.applitools.eyes.selenium.universal.dto;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+
 /**
  * floating match settings dto
  */
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class FloatingMatchSettingsDto {
   public Integer top;
   public Integer left;

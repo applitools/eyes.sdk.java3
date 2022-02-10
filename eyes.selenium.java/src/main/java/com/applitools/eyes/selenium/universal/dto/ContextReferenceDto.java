@@ -1,8 +1,11 @@
 package com.applitools.eyes.selenium.universal.dto;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+
 /**
  * context reference dto
  */
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class ContextReferenceDto {
   private FrameLocatorDto frame;
   private ScrollRootElementDto scrollRootElement;

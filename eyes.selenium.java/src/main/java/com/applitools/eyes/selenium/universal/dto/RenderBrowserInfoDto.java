@@ -1,8 +1,11 @@
 package com.applitools.eyes.selenium.universal.dto;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+
 /**
  * render browser info
  */
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class RenderBrowserInfoDto {
   private RectangleSizeDto viewportSize;
   private String browserType;

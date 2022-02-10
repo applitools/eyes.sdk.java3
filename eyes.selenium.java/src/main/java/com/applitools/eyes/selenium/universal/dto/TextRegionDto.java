@@ -1,8 +1,11 @@
 package com.applitools.eyes.selenium.universal.dto;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+
 /**
  * @author Kanan
  */
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class TextRegionDto {
   private int x;
   private int y;

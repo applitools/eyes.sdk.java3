@@ -1,8 +1,11 @@
 package com.applitools.eyes.selenium.universal.dto;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+
 /**
  * selector floating region dto
  */
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class SelectorFloatingRegionDto extends TFloatingRegion {
 
   private SelectorRegionDto region;

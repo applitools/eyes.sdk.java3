@@ -1,8 +1,11 @@
 package com.applitools.eyes.selenium.universal.dto;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+
 /**
  * selector region dto
  */
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class SelectorRegionDto extends TRegion{
 
   private String type;

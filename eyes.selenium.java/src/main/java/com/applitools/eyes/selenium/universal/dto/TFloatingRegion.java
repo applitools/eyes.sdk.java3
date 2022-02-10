@@ -1,8 +1,11 @@
 package com.applitools.eyes.selenium.universal.dto;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+
 /**
  * TFloating region
  */
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public abstract class TFloatingRegion {
   protected Integer maxUpOffset;
   protected Integer maxDownOffset;

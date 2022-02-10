@@ -1,8 +1,11 @@
 package com.applitools.eyes.selenium.universal.dto;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+
 /**
  * rectangle size dto
  */
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class RectangleSizeDto {
   private Integer width;
   private Integer height;

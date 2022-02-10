@@ -143,6 +143,7 @@ public class CommandExecutor {
     return closeResponse.getPayload().getResult();
   }
 
+
   public static ResponseDto<?> checkedCommand(Command command, boolean waitResult) {
     try {
       return connection.executeCommand(command, waitResult);

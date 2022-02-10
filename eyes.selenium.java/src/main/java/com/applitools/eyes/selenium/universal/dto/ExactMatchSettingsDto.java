@@ -1,8 +1,11 @@
 package com.applitools.eyes.selenium.universal.dto;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+
 /**
  * exact match settings
  */
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class ExactMatchSettingsDto {
   private Integer minDiffIntensity;
   private Integer minDiffWidth;

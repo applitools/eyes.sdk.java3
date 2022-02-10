@@ -2,9 +2,12 @@ package com.applitools.eyes.selenium.universal.dto;
 
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+
 /**
  * OCR search settings
  */
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class OCRSearchSettingsDto {
   private List<String> patterns;
   private Boolean ignoreCase;
