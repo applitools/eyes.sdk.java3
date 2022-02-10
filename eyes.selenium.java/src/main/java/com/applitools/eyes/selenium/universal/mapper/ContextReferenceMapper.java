@@ -6,9 +6,13 @@ import java.util.stream.Collectors;
 import com.applitools.eyes.selenium.fluent.FrameLocator;
 import com.applitools.eyes.selenium.universal.dto.ContextReferenceDto;
 import com.applitools.eyes.selenium.universal.dto.ElementRegionDto;
+import com.applitools.eyes.selenium.universal.dto.FrameElement;
 import com.applitools.eyes.selenium.universal.dto.FrameLocatorDto;
+import com.applitools.eyes.selenium.universal.dto.FrameNameOrId;
+import com.applitools.eyes.selenium.universal.dto.FrameSelector;
 import com.applitools.eyes.selenium.universal.dto.ScrollRootElementDto;
 import com.applitools.eyes.selenium.universal.dto.SelectorRegionDto;
+import com.google.common.base.Strings;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 
@@ -24,19 +28,30 @@ public class ContextReferenceMapper {
 
     ContextReferenceDto contextReferenceDto = new ContextReferenceDto();
 
-    FrameLocatorDto frameLocatorDto = new FrameLocatorDto();
+
+    if (!Strings.isNullOrEmpty(frameLocator.getFrameNameOrId())) {
+      FrameNameOrId fr = new FrameNameOrId();
+      fr.setFrame(frameLocator.getFrameNameOrId());
+      contextReferenceDto.setFrame(fr);
+    }
+
+
+    //FrameLocatorDto frameLocatorDto = new FrameLocatorDto();
     By by = frameLocator.getFrameSelector();
-    SelectorRegionDto selectorRegionDto =  SelectorRegionMapper.toSelectorRegionDto(by);
-    frameLocatorDto.setSelector(selectorRegionDto);
+    if (by != null) {
+      FrameSelector frameSelector = new FrameSelector();
+      SelectorRegionDto selectorRegionDto =  SelectorRegionMapper.toSelectorRegionDto(by);
+      frameSelector.setSelector(selectorRegionDto);
+      contextReferenceDto.setFrame(frameSelector);
+    }
 
     WebElement element = frameLocator.getFrameReference();
-    ElementRegionDto elementRegionDto = ElementRegionMapper.toElementRegionDto(element);
-    frameLocatorDto.setElement(elementRegionDto);
-
-    frameLocatorDto.setFrameNameOrId(frameLocator.getFrameNameOrId());
-    frameLocatorDto.setFrameIndex(frameLocator.getFrameIndex());
-
-    contextReferenceDto.setFrame(frameLocatorDto);
+    if (element != null) {
+      FrameElement frameElement = new FrameElement();
+      ElementRegionDto elementRegionDto = ElementRegionMapper.toElementRegionDto(element);
+      frameElement.setElement(elementRegionDto);
+      contextReferenceDto.setFrame(frameElement);
+    }
 
     ScrollRootElementDto scrollRootElementDto = new ScrollRootElementDto();
     By scrollBy = frameLocator.getScrollRootSelector();

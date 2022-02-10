@@ -10,8 +10,17 @@ import com.applitools.eyes.selenium.Configuration;
 import com.applitools.eyes.selenium.Eyes;
 import com.applitools.eyes.selenium.Reference;
 import com.applitools.eyes.selenium.fluent.Target;
+import com.applitools.eyes.selenium.universal.dto.CheckSettingsDto;
+import com.applitools.eyes.selenium.universal.dto.ContextReferenceDto;
+import com.applitools.eyes.selenium.universal.dto.FrameLocatorDto;
+import com.applitools.eyes.selenium.universal.dto.FrameNameOrId;
+import com.applitools.eyes.selenium.universal.dto.FrameSelector;
+import com.applitools.eyes.selenium.universal.dto.IFrame;
 import com.applitools.eyes.selenium.universal.dto.ResponseDto;
 import com.applitools.eyes.selenium.universal.dto.ResponsePayload;
+import com.applitools.eyes.selenium.universal.dto.SelectorRegionDto;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.Gson;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
@@ -117,7 +126,31 @@ public class EyesTests {
   }
 
 
-  public void testCheck() {
+  @Test
+  public void testCheck() throws JsonProcessingException {
+    CheckSettingsDto checkSettingsDto = new CheckSettingsDto();
+    checkSettingsDto.setName(null);
+    checkSettingsDto.setLayoutRegions(null);
+    ContextReferenceDto contextReferenceDto = new ContextReferenceDto();
+    contextReferenceDto.setScrollRootElement(null);
+    FrameLocatorDto frameLocatorDto = new FrameLocatorDto();
+    //frameLocatorDto.setFrameIndex(1);
+    frameLocatorDto.setFrameNameOrId("id");
+    //frameLocatorDto.setElement(null);
+    SelectorRegionDto ss = new SelectorRegionDto();
+    ss.setType("type");
+    ss.setSelector("selector");
+    FrameSelector frameSelector = new FrameSelector();
+    frameSelector.setSelector(ss);
+    //frameLocatorDto.setSelector(ss);
+//    FrameNameOrId frameNameOrId = new FrameNameOrId();
+//    frameNameOrId.setFrame("frame1");
+    contextReferenceDto.setFrame(frameSelector);
+    checkSettingsDto.setFrames(Arrays.asList(contextReferenceDto));
+
+    ObjectMapper objectMapper = new ObjectMapper();
+    System.out.println("request: " + objectMapper.writeValueAsString(checkSettingsDto));
+
 
   }
 
