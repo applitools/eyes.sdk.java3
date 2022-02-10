@@ -142,9 +142,8 @@ public class EyesTests {
     ss.setSelector("selector");
     FrameSelector frameSelector = new FrameSelector();
     frameSelector.setSelector(ss);
-    //frameLocatorDto.setSelector(ss);
-//    FrameNameOrId frameNameOrId = new FrameNameOrId();
-//    frameNameOrId.setFrame("frame1");
+    frameLocatorDto.setSelector(ss);
+
     contextReferenceDto.setFrame(frameSelector);
     checkSettingsDto.setFrames(Arrays.asList(contextReferenceDto));
 

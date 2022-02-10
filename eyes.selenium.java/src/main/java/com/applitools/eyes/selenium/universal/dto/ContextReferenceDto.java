@@ -7,14 +7,14 @@ import com.fasterxml.jackson.annotation.JsonInclude;
  */
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class ContextReferenceDto {
-  private IFrame frame; // IFrame
+  private Object frame;
   private ScrollRootElementDto scrollRootElement;
 
-  public IFrame getFrame() {
+  public Object getFrame() {
     return frame;
   }
 
-  public void setFrame(IFrame frame) {
+  public void setFrame(Object frame) {
     this.frame = frame;
   }
 

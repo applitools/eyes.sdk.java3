@@ -30,9 +30,9 @@ public class ContextReferenceMapper {
 
 
     if (!Strings.isNullOrEmpty(frameLocator.getFrameNameOrId())) {
-      FrameNameOrId fr = new FrameNameOrId();
-      fr.setFrame(frameLocator.getFrameNameOrId());
-      contextReferenceDto.setFrame(fr);
+//      FrameNameOrId fr = new FrameNameOrId();
+//      fr.setFrame(frameLocator.getFrameNameOrId());
+      contextReferenceDto.setFrame(frameLocator.getFrameNameOrId());
     }
 
 
