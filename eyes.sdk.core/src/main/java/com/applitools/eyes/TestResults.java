@@ -15,17 +15,17 @@ import java.util.Calendar;
  */
 @JsonIgnoreProperties({"$id", "isPassed"})
 public class TestResults {
-    private Integer steps;
-    private Integer matches;
-    private Integer mismatches;
-    private Integer missing;
-    private Integer exactMatches;
-    private Integer strictMatches;
-    private Integer contentMatches;
-    private Integer layoutMatches;
-    private Integer noneMatches;
+    private int steps;
+    private int matches;
+    private int mismatches;
+    private int missing;
+    private int exactMatches;
+    private int strictMatches;
+    private int contentMatches;
+    private int layoutMatches;
+    private int noneMatches;
     private String url;
-    private Boolean isNew;
+    private boolean isNew;
     private TestResultsStatus status;
     private String name;
     private String secretToken;
@@ -39,9 +39,9 @@ public class TestResults {
     private RectangleSize hostDisplaySize;
     @JsonDeserialize(using = Iso8610CalendarDeserializer.class)
     private Calendar startedAt;
-    private Integer duration;
-    private Boolean isDifferent;
-    private Boolean isAborted;
+    private int duration;
+    private boolean isDifferent;
+    private boolean isAborted;
     private SessionUrls appUrls;
     private SessionUrls apiUrls;
     private StepInfo[] stepsInfo;
@@ -148,7 +148,7 @@ public class TestResults {
         return duration;
     }
 
-    public void setDuration(Integer duration) {
+    public void setDuration(int duration) {
         this.duration = duration;
     }
 
@@ -158,7 +158,7 @@ public class TestResults {
     }
 
     @JsonSetter("isDifferent")
-    public void setDifferent(Boolean different) {
+    public void setDifferent(boolean different) {
         isDifferent = different;
     }
 
@@ -168,7 +168,7 @@ public class TestResults {
     }
 
     @JsonSetter("isAborted")
-    public void setAborted(Boolean aborted) {
+    public void setAborted(boolean aborted) {
         isAborted = aborted;
     }
 
@@ -191,21 +191,21 @@ public class TestResults {
     /**
      * @return The total number of test steps.
      */
-    public Integer getSteps() {
+    public int getSteps() {
         return steps;
     }
 
     /**
      * @return The total number of test steps that matched the baseline.
      */
-    public Integer getMatches() {
+    public int getMatches() {
         return matches;
     }
 
     /**
      * @return The total number of test steps that did not match the baseline.
      */
-    public Integer getMismatches() {
+    public int getMismatches() {
         return mismatches;
     }
 
@@ -213,7 +213,7 @@ public class TestResults {
      * @return The total number of baseline test steps that were missing in
      * the test.
      */
-    public Integer getMissing() {
+    public int getMissing() {
         return missing;
     }
 
@@ -221,7 +221,7 @@ public class TestResults {
      * @return The total number of test steps that exactly matched the baseline.
      */
     @SuppressWarnings("UnusedDeclaration")
-    public Integer getExactMatches() {
+    public int getExactMatches() {
         return exactMatches;
     }
 
@@ -230,7 +230,7 @@ public class TestResults {
      * baseline.
      */
     @SuppressWarnings("UnusedDeclaration")
-    public Integer getStrictMatches() {
+    public int getStrictMatches() {
         return strictMatches;
     }
 
@@ -239,7 +239,7 @@ public class TestResults {
      * content.
      */
     @SuppressWarnings("UnusedDeclaration")
-    public Integer getContentMatches() {
+    public int getContentMatches() {
         return contentMatches;
     }
 
@@ -248,7 +248,7 @@ public class TestResults {
      * layout.
      */
     @SuppressWarnings("UnusedDeclaration")
-    public Integer getLayoutMatches() {
+    public int getLayoutMatches() {
         return layoutMatches;
     }
 
@@ -257,7 +257,7 @@ public class TestResults {
      * performing any comparison.
      */
     @SuppressWarnings("UnusedDeclaration")
-    public Integer getNoneMatches() {
+    public int getNoneMatches() {
         return noneMatches;
     }
 
@@ -272,7 +272,7 @@ public class TestResults {
      * @return Whether or not this is a new test.
      */
     @JsonGetter("isNew")
-    public Boolean isNew() {
+    public boolean isNew() {
         return isNew;
     }
 
@@ -294,7 +294,7 @@ public class TestResults {
      * @param steps The number of visual checkpoints in the test.
      */
     @SuppressWarnings("UnusedDeclaration")
-    public void setSteps(Integer steps) {
+    public void setSteps(int steps) {
         ArgumentGuard.greaterThanOrEqualToZero(steps, "steps");
         this.steps = steps;
     }
@@ -303,7 +303,7 @@ public class TestResults {
      * @param matches The number of visual matches in the test.
      */
     @SuppressWarnings("UnusedDeclaration")
-    public void setMatches(Integer matches) {
+    public void setMatches(int matches) {
         ArgumentGuard.greaterThanOrEqualToZero(matches, "matches");
         this.matches = matches;
     }
@@ -312,7 +312,7 @@ public class TestResults {
      * @param mismatches The number of mismatches in the test.
      */
     @SuppressWarnings("UnusedDeclaration")
-    public void setMismatches(Integer mismatches) {
+    public void setMismatches(int mismatches) {
         ArgumentGuard.greaterThanOrEqualToZero(mismatches, "mismatches");
         this.mismatches = mismatches;
     }
@@ -322,7 +322,7 @@ public class TestResults {
      *                the baseline but were not found in the current test.
      */
     @SuppressWarnings("UnusedDeclaration")
-    public void setMissing(Integer missing) {
+    public void setMissing(int missing) {
         ArgumentGuard.greaterThanOrEqualToZero(missing, "missing");
         this.missing = missing;
     }
@@ -333,7 +333,7 @@ public class TestResults {
      *                     {@link com.applitools.eyes.MatchLevel#EXACT}
      */
     @SuppressWarnings("UnusedDeclaration")
-    public void setExactMatches(Integer exactMatches) {
+    public void setExactMatches(int exactMatches) {
         ArgumentGuard.greaterThanOrEqualToZero(exactMatches, "exactMatches");
         this.exactMatches = exactMatches;
     }
@@ -344,7 +344,7 @@ public class TestResults {
      *                      {@link com.applitools.eyes.MatchLevel#STRICT}
      */
     @SuppressWarnings("UnusedDeclaration")
-    public void setStrictMatches(Integer strictMatches) {
+    public void setStrictMatches(int strictMatches) {
         ArgumentGuard.greaterThanOrEqualToZero(strictMatches, "strictMatches");
         this.strictMatches = strictMatches;
     }
@@ -355,7 +355,7 @@ public class TestResults {
      *                       {@link com.applitools.eyes.MatchLevel#CONTENT}
      */
     @SuppressWarnings("UnusedDeclaration")
-    public void setContentMatches(Integer contentMatches) {
+    public void setContentMatches(int contentMatches) {
         ArgumentGuard.greaterThanOrEqualToZero(contentMatches, "contentMatches");
         this.contentMatches = contentMatches;
     }
@@ -366,7 +366,7 @@ public class TestResults {
      *                      {@link com.applitools.eyes.MatchLevel#LAYOUT}
      */
     @SuppressWarnings("UnusedDeclaration")
-    public void setLayoutMatches(Integer layoutMatches) {
+    public void setLayoutMatches(int layoutMatches) {
         ArgumentGuard.greaterThanOrEqualToZero(layoutMatches, "layoutMatches");
         this.layoutMatches = layoutMatches;
     }
@@ -377,7 +377,7 @@ public class TestResults {
      *                    {@link com.applitools.eyes.MatchLevel#NONE}
      */
     @SuppressWarnings("UnusedDeclaration")
-    public void setNoneMatches(Integer noneMatches) {
+    public void setNoneMatches(int noneMatches) {
         ArgumentGuard.greaterThanOrEqualToZero(noneMatches, "noneMatches");
         this.noneMatches = noneMatches;
     }
@@ -393,7 +393,7 @@ public class TestResults {
      * @param isNew Whether or not this test has an existing baseline.
      */
     @JsonSetter("isNew")
-    public void setNew(Boolean isNew) {
+    public void setNew(boolean isNew) {
         this.isNew = isNew;
     }
 

@@ -56,37 +56,19 @@ public class TestResultsMapper {
       apiUrls.setBatch(respApiUrls.getBatch());
       testResults.setApiUrls(apiUrls);
     }
-    // TODO: verify if we do need `ArgumentGuard.greaterThanOrEqualToZero` in TestResults methods
-    //  if not we could remove them and skip checking for null for fields below
-    if (response.getSteps() != null){
-      testResults.setSteps(response.getSteps());
-    }
-    if (response.getMatches() != null) {
-      testResults.setMatches(response.getMatches());
-    }
-    if (response.getMismatches() != null) {
-      testResults.setMismatches(response.getMismatches());
-    }
-    if (response.getMissing() != null) {
-      testResults.setMissing(response.getMissing());
-    }
-    if (response.getExactMatches() != null) {
-      testResults.setExactMatches(response.getExactMatches());
-    }
-    if (response.getStrictMatches() != null) {
-      testResults.setStrictMatches(response.getStrictMatches());
-    }
-    if (response.getContentMatches() != null) {
-      testResults.setContentMatches(response.getContentMatches());
-    }
-    if (response.getLayoutMatches() != null) {
-      testResults.setLayoutMatches(response.getLayoutMatches());
-    }
-    if (response.getNoneMatches() != null) {
-      testResults.setNoneMatches(response.getNoneMatches());;
-    }
+
+    testResults.setSteps(response.getSteps());
+    testResults.setMatches(response.getMatches());
+    testResults.setMismatches(response.getMismatches());
+    testResults.setMissing(response.getMissing());
+    testResults.setExactMatches(response.getExactMatches());
+    testResults.setStrictMatches(response.getStrictMatches());
+    testResults.setContentMatches(response.getContentMatches());
+    testResults.setLayoutMatches(response.getLayoutMatches());
+    testResults.setNoneMatches(response.getNoneMatches());
     return testResults;
   }
+  
 
   private static StepInfo toStepInfo(StepInfoDto stepInfoDto) {
     if (stepInfoDto == null) {
