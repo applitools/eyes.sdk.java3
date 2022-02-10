@@ -14,6 +14,10 @@ public class TestResultContainer {
         this.exception = exception;
     }
 
+    public TestResultContainer(TestResults testResults) {
+        this.testResults = testResults;
+    }
+
     public TestResults getTestResults() {
         return testResults;
     }

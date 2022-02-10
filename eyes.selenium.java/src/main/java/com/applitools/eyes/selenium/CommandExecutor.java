@@ -25,6 +25,7 @@ import com.applitools.eyes.selenium.universal.dto.RectangleSizeDto;
 import com.applitools.eyes.selenium.universal.dto.RequestDto;
 import com.applitools.eyes.selenium.universal.dto.ResponseDto;
 import com.applitools.eyes.selenium.universal.dto.VisualLocatorSettingsDto;
+import com.applitools.eyes.selenium.universal.dto.request.CommandCloseAllEyesRequestDto;
 import com.applitools.eyes.selenium.universal.dto.request.CommandCloseRequestDto;
 import com.applitools.eyes.selenium.universal.dto.request.CommandGetViewportSizeRequestDto;
 import com.applitools.eyes.selenium.universal.dto.response.CommandCloseResponseDto;
@@ -133,8 +134,13 @@ public class CommandExecutor {
     return getViewportSizeResponse.getPayload().getResult();
   }
 
-  public static void setViewportSize() {
-    
+  public List<CommandCloseResponseDto> closeAllEyes(Reference managerRef) {
+    RequestDto<CommandCloseAllEyesRequestDto> request = new RequestDto<>();
+    request.setName("EyesManager.closeAllEyes");
+    request.setKey(UUID.randomUUID().toString());
+    request.setPayload(new CommandCloseAllEyesRequestDto(managerRef));
+    ResponseDto<List<CommandCloseResponseDto>> closeResponse = (ResponseDto<List<CommandCloseResponseDto>>) checkedCommand(request, true);
+    return closeResponse.getPayload().getResult();
   }
 
   public static ResponseDto<?> checkedCommand(Command command, boolean waitResult) {

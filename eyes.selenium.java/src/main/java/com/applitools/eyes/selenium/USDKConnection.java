@@ -97,7 +97,7 @@ public class USDKConnection {
                     } catch (Exception e) {
                       e.printStackTrace();
                     }
-                  } else if (payload.contains("Eyes.close") || payload.contains("Eyes.abort")) {
+                  } else if (payload.contains("Eyes.close") || payload.contains("Eyes.abort") || payload.contains("EyesManager.closeAllEyes")) {
                     try {
                       ResponseDto<List<CommandCloseResponseDto>> closeResponse = objectMapper.readValue(payload,
                           new TypeReference<ResponseDto<List<CommandCloseResponseDto>>>() {});

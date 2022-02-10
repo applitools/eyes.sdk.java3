@@ -2,9 +2,12 @@ package com.applitools.eyes;
 
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import com.applitools.connectivity.ServerConnector;
 import com.applitools.eyes.exceptions.DiffsFoundException;
@@ -14,6 +17,8 @@ import com.applitools.eyes.logging.Stage;
 import com.applitools.eyes.logging.Type;
 import com.applitools.eyes.selenium.CommandExecutor;
 import com.applitools.eyes.selenium.Reference;
+import com.applitools.eyes.selenium.universal.dto.response.CommandCloseResponseDto;
+import com.applitools.eyes.selenium.universal.mapper.TestResultsMapper;
 import com.applitools.utils.GeneralUtils;
 import org.apache.commons.lang3.tuple.Pair;
 
@@ -57,20 +62,27 @@ public abstract class EyesRunner {
   }
 
   public TestResultsSummary getAllTestResults(boolean shouldThrowException) {
-    logger.log(new HashSet<String>(), Stage.CLOSE, Type.CALLED);
-    if (allTestResults != null) {
-      return allTestResults;
+    List<CommandCloseResponseDto> closeAllEyesResponse = commandExecutor.closeAllEyes(managerRef);
+    List<TestResults> testResults = TestResultsMapper.toTestResultsList(closeAllEyesResponse);
+
+    if (shouldThrowException) {
+      List<TestResults> filteredList = testResults
+          .stream()
+          .filter(testResults1 -> testResults1.getMismatches() > 0).collect(Collectors.toList());
+
+      if (!filteredList.isEmpty()) {
+        StringBuilder sb = new StringBuilder();
+        filteredList.forEach(testResults1 -> sb.append("Name: ").append(testResults1.getName()).append("\n"));
+        throw new EyesException(sb.toString());
+      }
+
     }
 
-    try {
-      allTestResults = getAllTestResultsImpl(shouldThrowException);
-    } finally {
-      deleteAllBatches();
-    }
+    testResults.forEach(testResults1 -> logSessionResultsAndThrowException(shouldThrowException, testResults1));
 
-    serverConnector.closeConnector();
-    logger.getLogHandler().close();
-    return allTestResults;
+    List<TestResultContainer> testResultContainerList = new ArrayList<>();
+    testResults.forEach(testResults1 -> testResultContainerList.add(new TestResultContainer(testResults1)));
+    return new TestResultsSummary(testResultContainerList);
   }
 
   private void deleteAllBatches() {
