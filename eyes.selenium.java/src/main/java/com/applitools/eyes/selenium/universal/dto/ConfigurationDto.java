@@ -54,7 +54,7 @@ public class ConfigurationDto {
   private Boolean useCookies;
   private Boolean captureStatusBar;
   private Boolean isRenderingConfig;
-  private List<RenderBrowserInfoDto> browsersInfo;
+  private List<IBrowsersInfo> browsersInfo;
   private Set<String> features;
   private List<VisualGridOptionDto> visualGridOptions;
   private Boolean isDefaultLayoutBreakpointsSet;
@@ -428,11 +428,11 @@ public class ConfigurationDto {
     isRenderingConfig = renderingConfig;
   }
 
-  public List<RenderBrowserInfoDto> getBrowsersInfo() {
+  public List<IBrowsersInfo> getBrowsersInfo() {
     return browsersInfo;
   }
 
-  public void setBrowsersInfo(List<RenderBrowserInfoDto> browsersInfo) {
+  public void setBrowsersInfo(List<IBrowsersInfo> browsersInfo) {
     this.browsersInfo = browsersInfo;
   }
 
