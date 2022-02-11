@@ -43,6 +43,8 @@ public class TestSetup extends GlobalSetup {
         eyes.setParentBranchName("master");
         eyes.setBatch(batch);
         eyes.setSaveNewTests(false);
+        eyes.setHideScrollbars(true);
+        eyes.setHideCaret(true);
         String showLogs = System.getenv("APPLITOOLS_SHOW_LOGS");
         String verbose = System.getenv("APPLITOOLS_SHOW_LOGS_VERBOSE");
         if (showLogs != null && showLogs.equals("true")) {
