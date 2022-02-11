@@ -78,10 +78,14 @@ public abstract class EyesRunner {
 
     }
 
-    testResults.forEach(testResults1 -> logSessionResultsAndThrowException(shouldThrowException, testResults1));
+    if (testResults != null) {
+      testResults.forEach(testResults1 -> logSessionResultsAndThrowException(shouldThrowException, testResults1));
+    }
 
     List<TestResultContainer> testResultContainerList = new ArrayList<>();
-    testResults.forEach(testResults1 -> testResultContainerList.add(new TestResultContainer(testResults1)));
+    if (testResults != null) {
+      testResults.forEach(testResults1 -> testResultContainerList.add(new TestResultContainer(testResults1)));
+    }
     return new TestResultsSummary(testResultContainerList);
   }
 
@@ -165,17 +169,17 @@ public abstract class EyesRunner {
   }
 
   public void setProxy(AbstractProxySettings proxySettings) {
-    if (proxySettings != null) {
-      if (serverConnector.getProxy() == null) {
-        serverConnector.setProxy(proxySettings);
-      } else if (!serverConnector.getProxy().equals(proxySettings)) {
-        throw new EyesException("Proxy was already set");
-      }
-    }
+//    if (proxySettings != null) {
+//      if (serverConnector.getProxy() == null) {
+//        serverConnector.setProxy(proxySettings);
+//      } else if (!serverConnector.getProxy().equals(proxySettings)) {
+//        throw new EyesException("Proxy was already set");
+//      }
+//    }
   }
 
   public AbstractProxySettings getProxy() {
-    return serverConnector.getProxy();
+    return null; //serverConnector.getProxy();
   }
 
   public void setAgentId(String agentId) {
