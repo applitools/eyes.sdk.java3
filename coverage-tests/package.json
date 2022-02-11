@@ -26,9 +26,11 @@
     "report:prod": "yarn move:report && coverage-tests report ./configuration --reportId $APPLITOOLS_REPORT_ID",
     "move:report": "mv ./target/surefire-reports/java_coverage_tests/coverage-test-report.xml ./coverage-test-report.xml",
     "docker:start": "docker run -d -p 4444:4444 --name selenium_chrome --shm-size 8g selenium/standalone-chrome:3.141.59-20210713 && docker run -d -p 4445:4444 --name selenium_firefox --shm-size 2g selenium/standalone-firefox:3.141.59",
-    "docker:stop": "docker stop selenium_chrome selenium_firefox && docker rm selenium_chrome selenium_firefox"
+    "docker:stop": "docker stop selenium_chrome selenium_firefox && docker rm selenium_chrome selenium_firefox",
+    "universal:debug": "eyes-universal --singleton --lazy"
   },
   "dependencies": {
-    "@applitools/sdk-coverage-tests": "^2.3.18"
+    "@applitools/sdk-coverage-tests": "^2.3.18",
+    "@applitools/eyes-universal": "1.0.7"
   }
 }
