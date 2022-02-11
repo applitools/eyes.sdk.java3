@@ -23,21 +23,21 @@ public class CommandCloseResponseDto {
   private RectangleSizeDto hostDisplaySize;
   private String startedAt;
   private Integer duration;
-  private Boolean isNew;
-  private Boolean isDifferent;
-  private Boolean isAborted;
+  private boolean isNew;
+  private boolean isDifferent;
+  private boolean isAborted;
   private SessionUrlsDto appUrls;
   private SessionUrlsDto apiUrls;
   private List<StepInfoDto> stepsInfo;
-  private Integer steps;
-  private Integer matches;
-  private Integer mismatches;
-  private Integer missing;
-  private Integer exactMatches;
-  private Integer strictMatches;
-  private Integer contentMatches;
-  private Integer layoutMatches;
-  private Integer noneMatches;
+  private int steps;
+  private int matches;
+  private int mismatches;
+  private int missing;
+  private int exactMatches;
+  private int strictMatches;
+  private int contentMatches;
+  private int layoutMatches;
+  private int noneMatches;
   private String url;
 
   public CommandCloseResponseDto() {
