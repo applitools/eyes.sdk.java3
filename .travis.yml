@@ -114,12 +114,13 @@ jobs:
         - export CHROME_DRIVER_PATH=/home/travis/build/chromedriver
         - cd coverage-tests;
         - yarn
-        - yarn universal:debug
+        - yarn universal:travis
         - if [[ $TRAVIS_TAG =~ ^RELEASE_CANDIDATE ]]; then
           yarn release;
           else
           yarn java;
           fi
+        - kill %1
     - stage: Test Appium IOS
       if: type != cron
       script:
