@@ -41,16 +41,16 @@ public class ContextReferenceMapper {
     if (by != null) {
       FrameSelector frameSelector = new FrameSelector();
       SelectorRegionDto selectorRegionDto =  SelectorRegionMapper.toSelectorRegionDto(by);
-      frameSelector.setSelector(selectorRegionDto);
-      contextReferenceDto.setFrame(frameSelector);
+      //frameSelector.setSelector(selectorRegionDto);
+      contextReferenceDto.setFrame(selectorRegionDto);
     }
 
     WebElement element = frameLocator.getFrameReference();
     if (element != null) {
-      FrameElement frameElement = new FrameElement();
+      //FrameElement frameElement = new FrameElement();
       ElementRegionDto elementRegionDto = ElementRegionMapper.toElementRegionDto(element);
-      frameElement.setElement(elementRegionDto);
-      contextReferenceDto.setFrame(frameElement);
+      //frameElement.setElement(elementRegionDto);
+      contextReferenceDto.setFrame(elementRegionDto);
     }
 
     ScrollRootElementDto scrollRootElementDto = null;

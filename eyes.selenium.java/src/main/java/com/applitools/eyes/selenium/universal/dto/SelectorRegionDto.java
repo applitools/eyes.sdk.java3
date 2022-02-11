@@ -8,8 +8,8 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class SelectorRegionDto extends TRegion{
 
-  private String type;
   private String selector;
+  private String type;
 
   public String getType() {
     return type;

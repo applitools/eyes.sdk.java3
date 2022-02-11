@@ -17,7 +17,6 @@ public class IosDeviceInfoMapper {
     iosDeviceInfoDto.setDeviceName(iosDeviceInfo.getDeviceName());
     iosDeviceInfoDto.setScreenOrientation(iosDeviceInfo.getScreenOrientation().getOrientation());
     iosDeviceInfoDto.setVersion(iosDeviceInfo.getVersion().getVersion());
-    iosDeviceInfoDto.setSize(ViewportSizeMapper.toViewportSizeDto(iosDeviceInfo.getSize()));
     return iosDeviceInfoDto;
 
   }

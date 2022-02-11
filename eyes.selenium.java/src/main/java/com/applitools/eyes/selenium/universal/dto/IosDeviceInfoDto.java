@@ -9,8 +9,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 public class IosDeviceInfoDto {
   private String deviceName;
   private String screenOrientation;
-  private String version;
-  private RectangleSizeDto size;
+  private String iosVersion;
 
   public String getDeviceName() {
     return deviceName;
@@ -29,18 +28,11 @@ public class IosDeviceInfoDto {
   }
 
   public String getVersion() {
-    return version;
+    return iosVersion;
   }
 
-  public void setVersion(String version) {
-    this.version = version;
+  public void setVersion(String iosVersion) {
+    this.iosVersion = iosVersion;
   }
 
-  public RectangleSizeDto getSize() {
-    return size;
-  }
-
-  public void setSize(RectangleSizeDto size) {
-    this.size = size;
-  }
 }
