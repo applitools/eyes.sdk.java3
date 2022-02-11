@@ -14,8 +14,8 @@
     "url": "git+https://github.com/applitools/sdk.coverage.tests.git"
   },
   "scripts": {
-    "java": "yarn && yarn test && yarn report",
-    "release": "yarn && yarn test && yarn report:prod",
+    "java": "yarn && yarn test:local && yarn report",
+    "release": "yarn && yarn test:local && yarn report:prod",
     "local": "yarn install --no-lockfile && yarn docker:start && yarn test && yarn report; yarn docker:stop",
     "generate": "coverage-tests generate ./configuration --pascalizeTests --strict",
     "generate:eg": "coverage-tests generate ./configuration/eg_configuration.js --pascalizeTests --strict",
