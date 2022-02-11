@@ -223,8 +223,7 @@ public class Eyes implements IEyesBase {
      * @return the api key
      */
     public String getApiKey() {
-        //return activeEyes.getApiKey();
-        return null;
+        return configuration.getApiKey();
     }
 
     /**
