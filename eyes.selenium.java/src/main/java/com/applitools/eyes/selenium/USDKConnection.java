@@ -62,7 +62,7 @@ public class USDKConnection {
 
                 @Override
                 public void onTextFrame(String payload, boolean finalFragment, int rsv) {
-                  System.out.println("RESPONSE PAYLOAD: " + payload);
+                  //System.out.println("RESPONSE PAYLOAD: " + payload);
                   if (payload.contains("Core.makeManager") || payload.contains("EyesManager.openEyes")) {
                     try {
                       ResponseDto<Reference> referenceResponseDto = objectMapper.readValue(payload, new TypeReference<ResponseDto<Reference>>() {});
@@ -176,7 +176,7 @@ public class USDKConnection {
 
     map.put(request.getKey(), null);
 
-    System.out.println("request: " + objectMapper.writeValueAsString(request));
+    //System.out.println("request: " + objectMapper.writeValueAsString(request));
     webSocket.sendTextFrame(objectMapper.writeValueAsString(request));
     syncTaskListener = new SyncTaskListener<>(logger, request.getKey());
     if (waitResult) syncTaskListener.get();

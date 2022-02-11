@@ -59,7 +59,7 @@ public class CommandExecutor {
     request.setKey(UUID.randomUUID().toString());
     request.setPayload(new MakeManager(type, concurrency, isLegacy));
     ResponseDto<Reference> response = (ResponseDto<Reference>) checkedCommand(request, true);
-    System.out.println("RESP_MAKE_MANAGER: " + response);
+    //System.out.println("RESP_MAKE_MANAGER: " + response);
     if (response != null && response.getPayload().getError() != null) {
       throw new EyesException(response.getPayload().getError().getMessage());
     }
@@ -72,7 +72,7 @@ public class CommandExecutor {
     request.setKey(UUID.randomUUID().toString());
     request.setPayload(new OpenEyes(ref, driverDto, config));
     ResponseDto<Reference> response = (ResponseDto<Reference>) checkedCommand(request, true);
-    System.out.println("RESP_OPEN: " + response);
+    //System.out.println("RESP_OPEN: " + response);
     if (response != null && response.getPayload().getError() != null) {
       throw new EyesException(response.getPayload().getError().getMessage());
     }
@@ -85,7 +85,7 @@ public class CommandExecutor {
     request.setKey(UUID.randomUUID().toString());
     request.setPayload(new CheckEyes(eyesRef, settings, config));
     ResponseDto<MatchResultDto> responseDto = (ResponseDto<MatchResultDto>) checkedCommand(request, true);
-    System.out.println("RESP_CHECK: " + responseDto);
+    //System.out.println("RESP_CHECK: " + responseDto);
     if (responseDto != null && responseDto.getPayload().getError() != null) {
       throw new EyesException(responseDto.getPayload().getError().getMessage());
     }
@@ -97,7 +97,7 @@ public class CommandExecutor {
     request.setKey(UUID.randomUUID().toString());
     request.setPayload(new LocateDto(eyesRef, locatorSettingsDto, config));
     ResponseDto<Map<String, List<Region>>> locateResponse = (ResponseDto<Map<String, List<Region>>>)checkedCommand(request, true);
-    System.out.println("RESP_LOCATE: " + locateResponse);
+    //System.out.println("RESP_LOCATE: " + locateResponse);
     if (locateResponse != null && locateResponse.getPayload().getError() != null) {
       throw new EyesException(locateResponse.getPayload().getError().getMessage());
     }
@@ -111,7 +111,7 @@ public class CommandExecutor {
     request.setPayload(new ExtractTextRegionsDto(eyesRef, searchSettingsDto, config));
     ResponseDto<Map<String, List<TextRegion>>> extractTextRegionsResponse =
         (ResponseDto<Map<String, List<TextRegion>>>) checkedCommand(request, true);
-    System.out.println("RESP_EXTRACT_TEXT_REGIONS: " + extractTextRegionsResponse);
+    //System.out.println("RESP_EXTRACT_TEXT_REGIONS: " + extractTextRegionsResponse);
     if (extractTextRegionsResponse != null && extractTextRegionsResponse.getPayload().getError() != null) {
       throw new EyesException(extractTextRegionsResponse.getPayload().getError().getMessage());
     }
@@ -125,7 +125,7 @@ public class CommandExecutor {
     request.setKey(UUID.randomUUID().toString());
     request.setPayload(new ExtractTextDto(eyesRef, extractSettingsDtoList, config));
     ResponseDto<List<String>> responseDto = (ResponseDto<List<String>>) checkedCommand(request, true);
-    System.out.println("RESP_EXTRACT_TEXT: " + responseDto);
+    //System.out.println("RESP_EXTRACT_TEXT: " + responseDto);
     if (responseDto != null && responseDto.getPayload().getError() != null) {
       throw new EyesException(responseDto.getPayload().getError().getMessage());
     }
@@ -138,7 +138,7 @@ public class CommandExecutor {
     request.setKey(UUID.randomUUID().toString());
     request.setPayload(new CommandCloseRequestDto(eyesRef));
     ResponseDto<List<CommandCloseResponseDto>> closeResponse = (ResponseDto<List<CommandCloseResponseDto>>) checkedCommand(request, waitResult);
-    System.out.println("RESP_CLOSE: " + closeResponse);
+    //System.out.println("RESP_CLOSE: " + closeResponse);
     if (closeResponse != null && closeResponse.getPayload().getError() != null) {
       throw new EyesException(closeResponse.getPayload().getError().getMessage());
     }
@@ -151,7 +151,7 @@ public class CommandExecutor {
     request.setKey(UUID.randomUUID().toString());
     request.setPayload(new CommandCloseRequestDto(eyesRef));
     ResponseDto<List<CommandCloseResponseDto>> closeResponse = (ResponseDto<List<CommandCloseResponseDto>>) checkedCommand(request, waitResult);
-    System.out.println("RESP_ABORT: " + closeResponse);
+    //System.out.println("RESP_ABORT: " + closeResponse);
     if (closeResponse != null && closeResponse.getPayload().getError() != null) {
       throw new EyesException(closeResponse.getPayload().getError().getMessage());
     }
@@ -173,7 +173,7 @@ public class CommandExecutor {
     request.setKey(UUID.randomUUID().toString());
     request.setPayload(new CommandCloseAllEyesRequestDto(managerRef));
     ResponseDto<List<CommandCloseResponseDto>> closeResponse = (ResponseDto<List<CommandCloseResponseDto>>) checkedCommand(request, true);
-    System.out.println("RESP_CLOSE_ALL_EYES: " + closeResponse);
+    //System.out.println("RESP_CLOSE_ALL_EYES: " + closeResponse);
     if (closeResponse != null && closeResponse.getPayload().getError() != null) {
       throw new EyesException(closeResponse.getPayload().getError().getMessage());
     }
