@@ -73,7 +73,7 @@ public class UniversalSdkNativeLoader {
         permissions.add(PosixFilePermission.OTHERS_WRITE);
         permissions.add(PosixFilePermission.OTHERS_EXECUTE);
 
-        Files.setPosixFilePermissions(Paths.get(pathInJar), permissions);
+        Files.setPosixFilePermissions(Paths.get(tempFile.toString()), permissions);
       }
 
       nativeProcess = createProcess(tempFile.toString());
