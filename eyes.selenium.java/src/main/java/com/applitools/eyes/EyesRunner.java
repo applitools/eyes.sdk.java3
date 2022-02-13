@@ -19,6 +19,7 @@ import com.applitools.eyes.selenium.CommandExecutor;
 import com.applitools.eyes.selenium.Reference;
 import com.applitools.eyes.selenium.universal.dto.response.CommandCloseResponseDto;
 import com.applitools.eyes.selenium.universal.mapper.TestResultsMapper;
+import com.applitools.eyes.selenium.universal.server.UniversalSdkNativeLoader;
 import com.applitools.utils.GeneralUtils;
 import org.apache.commons.lang3.tuple.Pair;
 
@@ -46,6 +47,7 @@ public abstract class EyesRunner {
    * used for instantiating Classic Runner
    */
   public EyesRunner() {
+    UniversalSdkNativeLoader.start();
     commandExecutor = new CommandExecutor(BASE_AGENT_ID, VERSION);
   }
 
