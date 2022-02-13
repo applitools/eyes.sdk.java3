@@ -122,6 +122,7 @@ public class UniversalSdkNativeLoader {
     String lastLine = null;
     while ((temp = reader.readLine()) != null) {
       lastLine = temp;
+      break;
     }
     reader.close();
   }
