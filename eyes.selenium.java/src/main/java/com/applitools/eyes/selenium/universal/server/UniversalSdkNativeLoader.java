@@ -1,8 +1,10 @@
 package com.applitools.eyes.selenium.universal.server;
 
 
+import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -77,8 +79,8 @@ public class UniversalSdkNativeLoader {
       }
 
       nativeProcess = createProcess(tempFile.toString());
+      readPortOfProcess(nativeProcess);
       //Files.deleteIfExists(tempFile);
-
     }
 
   }
@@ -103,6 +105,25 @@ public class UniversalSdkNativeLoader {
   private static Process createProcess(String executableName) throws IOException {
     ProcessBuilder builder = new ProcessBuilder(executableName);
     return builder.start();
+  }
+
+  public static void readPortOfProcess(Process process) {
+    try (BufferedReader input = new BufferedReader(new
+        InputStreamReader(process.getInputStream()))) {
+      getLastLine(input);
+    } catch (IOException e) {
+      e.printStackTrace();
+    }
+  }
+
+  // ENHANCE
+  private static void getLastLine(BufferedReader reader) throws IOException {
+    String temp;
+    String lastLine = null;
+    while ((temp = reader.readLine()) != null) {
+      lastLine = temp;
+    }
+    reader.close();
   }
 
 }
