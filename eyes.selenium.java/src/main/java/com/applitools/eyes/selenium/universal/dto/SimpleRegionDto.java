@@ -17,7 +17,6 @@ public class SimpleRegionDto {
   @JsonSerialize(using = WebElementSerializer.class)
   private WebElement element;
 
-
   private RegionDto region;
 
   public WebElement getElement() {

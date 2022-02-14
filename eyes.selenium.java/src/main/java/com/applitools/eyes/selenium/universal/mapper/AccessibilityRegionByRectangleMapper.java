@@ -6,6 +6,7 @@ import java.util.stream.Collectors;
 
 import com.applitools.eyes.AccessibilityRegionByRectangle;
 import com.applitools.eyes.selenium.universal.dto.AccessibilityRegionByRectangleDto;
+import com.applitools.eyes.selenium.universal.dto.RegionDto;
 
 /**
  * Accessibility region by rectangle mapper
@@ -18,10 +19,12 @@ public class AccessibilityRegionByRectangleMapper {
     }
 
     AccessibilityRegionByRectangleDto accRegionDto = new AccessibilityRegionByRectangleDto();
-    accRegionDto.setLeft(accRegion.getLeft());
-    accRegionDto.setTop(accRegion.getTop());
-    accRegionDto.setWidth(accRegion.getWidth());
-    accRegionDto.setHeight(accRegion.getHeight());
+    RegionDto region = new RegionDto();
+    region.setY(accRegion.getTop());
+    region.setX(accRegion.getLeft());
+    region.setWidth(accRegion.getWidth());
+    region.setHeight(accRegion.getHeight());
+    accRegionDto.setRegion(region);
     accRegionDto.setType(accRegion.getType().name());
     return accRegionDto;
   }

@@ -7,47 +7,11 @@ import com.fasterxml.jackson.annotation.JsonInclude;
  */
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class FloatingMatchSettingsDto {
-  public Integer top;
-  public Integer left;
-  public Integer width;
-  public Integer height;
-
-  public Integer maxUpOffset;
-  public Integer maxDownOffset;
-  public Integer maxLeftOffset;
-  public Integer maxRightOffset;
-
-  public Integer getTop() {
-    return top;
-  }
-
-  public void setTop(Integer top) {
-    this.top = top;
-  }
-
-  public Integer getLeft() {
-    return left;
-  }
-
-  public void setLeft(Integer left) {
-    this.left = left;
-  }
-
-  public Integer getWidth() {
-    return width;
-  }
-
-  public void setWidth(Integer width) {
-    this.width = width;
-  }
-
-  public Integer getHeight() {
-    return height;
-  }
-
-  public void setHeight(Integer height) {
-    this.height = height;
-  }
+  private RegionDto region;
+  private Integer maxUpOffset;
+  private Integer maxDownOffset;
+  private Integer maxLeftOffset;
+  private Integer maxRightOffset;
 
   public Integer getMaxUpOffset() {
     return maxUpOffset;
@@ -79,5 +43,13 @@ public class FloatingMatchSettingsDto {
 
   public void setMaxRightOffset(Integer maxRightOffset) {
     this.maxRightOffset = maxRightOffset;
+  }
+
+  public RegionDto getRegion() {
+    return region;
+  }
+
+  public void setRegion(RegionDto region) {
+    this.region = region;
   }
 }

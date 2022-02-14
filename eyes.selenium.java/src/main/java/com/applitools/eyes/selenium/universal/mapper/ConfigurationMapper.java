@@ -1,70 +1,90 @@
 package com.applitools.eyes.selenium.universal.mapper;
 
-import java.util.stream.Collectors;
-
+import com.applitools.eyes.FixedCutProvider;
 import com.applitools.eyes.config.Configuration;
 import com.applitools.eyes.selenium.universal.dto.ConfigurationDto;
+import com.applitools.eyes.selenium.universal.dto.DebugScreenshotHandlerDto;
+import com.applitools.eyes.selenium.universal.dto.ImageCropRectDto;
+import com.applitools.eyes.selenium.universal.dto.ImageCropRegionDto;
+
 
 /**
  * configuration mapper
  */
 public class ConfigurationMapper {
 
-  public static ConfigurationDto toConfigurationDto(Configuration configuration) {
-    if (configuration == null) {
+  public static ConfigurationDto toConfigurationDto(Configuration config) {
+    if (config == null) {
       return null;
     }
+    ConfigurationDto dto = new ConfigurationDto();
 
-    ConfigurationDto configurationDto = new ConfigurationDto();
-    configurationDto.setBranchName(configuration.getBranchName());
-    configurationDto.setParentBranchName(configuration.getParentBranchName());
-    configurationDto.setBaselineBranchName(configuration.getBaselineBranchName());
-    configurationDto.setAgentId(configuration.getAgentId());
-    configurationDto.setEnvironmentName(configuration.getEnvironmentName());
-    configurationDto.setSaveDiffs(configuration.getSaveDiffs());
-    configurationDto.setSessionType(configuration.getSessionType() == null ? null : configuration.getSessionType().name());
-    configurationDto.setBatch(BatchMapper.toBatchDto(configuration.getBatch()));
-    configurationDto.setBaselineEnvName(configuration.getBaselineEnvName());
-    configurationDto.setAppName(configuration.getAppName());
-    configurationDto.setTestName(configuration.getTestName());
-    configurationDto.setViewportSize(ViewportSizeMapper.toViewportSizeDto(configuration.getViewportSize()));
-    configurationDto.setIgnoreDisplacements(configuration.getIgnoreDisplacements());
-    configurationDto.setMatchTimeout(configuration.getMatchTimeout());
-    configurationDto.setHostApp(configuration.getHostApp());
-    configurationDto.setHostOS(configuration.getHostOS());
-    configurationDto.setDeviceInfo(configuration.getDeviceInfo());
-    configurationDto.setHostingAppInfo(configuration.getHostingAppInfo());
-    configurationDto.setOsInfo(configuration.getOsInfo());
+    // EyesBaseConfig
+    dto.setLogs(null);
+    dto.setDebugScreenshots(new DebugScreenshotHandlerDto(config.getSaveDebugScreenshots(),
+        config.getDebugScreenshotsPath(), config.getDebugScreenshotsPrefix()));
+    dto.setAgentId(config.getAgentId());
+    dto.setApiKey(config.getApiKey());
+    dto.setServerUrl(config.getServerUrl().toString());
+    dto.setProxy(ProxyMapper.toProxyDto(config.getProxy()));
+    dto.setDisabled(config.getIsDisabled());
+    dto.setConnectionTimeout(null);
+    dto.setRemoveSession(null);
+    dto.setRemoteEvents(null);
 
-    configurationDto.setSaveNewTests(configuration.getSaveNewTests());
-    configurationDto.setSaveFailedTests(configuration.getSaveFailedTests());
-    configurationDto.setStitchOverlap(configuration.getStitchOverlap());
-    configurationDto.setSendDom(configuration.isSendDom());
-    configurationDto.setApiKey(configuration.getApiKey());
-    //configurationDto.setServerUrl(configuration.getServerUrl().toString());
-    configurationDto.setProxy(AbstractProxySettingsMapper.toAbstractProxySettingsDto(configuration.getProxy()));
-    configurationDto.setFailureReports(configuration.getFailureReports() == null ? null : configuration.getFailureReports().getName());
-    configurationDto.setAccessibilitySettings(AccessibilitySettingsMapper.toAccessibilitySettingsDto(configuration.getAccessibilityValidation()));
-    configurationDto.setEnablePatterns(configuration.getEnablePatterns());
-    configurationDto.setUseDom(configuration.getUseDom());
-    configurationDto.setAbortIdleTestTimeout(configuration.getAbortIdleTestTimeout());
-    configurationDto.setForceFullPageScreenshot(configuration.getForceFullPageScreenshot());
-    configurationDto.setWaitBeforeScreenshots(configuration.getWaitBeforeScreenshots());
-    configurationDto.setStitchMode(configuration.getStitchMode() == null ? null : configuration.getStitchMode().getName());
-    configurationDto.setHideScrollbars(configuration.getHideScrollbars());
-    configurationDto.setHideCaret(configuration.getHideCaret());
-    configurationDto.setVisualGrid(configuration.isVisualGrid());
-    configurationDto.setDisableBrowserFetching(configuration.isDisableBrowserFetching());
-    configurationDto.setUseCookies(configuration.isUseCookies());
-    configurationDto.setCaptureStatusBar(configuration.isCaptureStatusBar());
-    configurationDto.setRenderingConfig(configuration.isRenderingConfig());
-    configurationDto.setBrowsersInfo(RenderBrowserInfoMapper.toRenderBrowserInfoDtoList(configuration.getBrowsersInfo()));
-    configurationDto
-        .setFeatures(configuration.getFeatures().stream().map(Enum::name).collect(Collectors.toSet()));
-    configurationDto.setVisualGridOptions(VisualGridOptionMapper.toVisualGridOptionDtoList(configuration.getVisualGridOptions()));
-    configurationDto.setDefaultLayoutBreakpointsSet(configuration.isDefaultLayoutBreakpointsSet());
-    configurationDto.setLayoutBreakpoints(configuration.getLayoutBreakpoints());
+    // EyesOpenConfig
+    dto.setAppName(config.getAppName());
+    dto.setTestName(config.getTestName());
+    dto.setDisplayName(null);
+    dto.setViewportSize(ViewportSizeMapper.toViewportSizeDto(config.getViewportSize()));
+    dto.setSessionType(config.getSessionType() == null ? null : config.getSessionType().name());
+    dto.setProperties(CustomPropertyMapper.toCustomPropertyDtoList(config.getProperties()));
+    dto.setBatch(BatchMapper.toBatchDto(config.getBatch()));
+    dto.setDefaultMatchSettings(MatchSettingsMapper.toMatchSettingsDto(config.getDefaultMatchSettings())); // TODO defaultMatchSettings?: MatchSettings<Region>
+    dto.setHostApp(config.getHostApp());
+    dto.setHostOS(config.getHostOS());
+    dto.setHostAppInfo(null);
+    dto.setHostOSInfo(null);
+    dto.setDeviceInfo(null);
+    dto.setBaselineEnvName(config.getBaselineEnvName());
+    dto.setEnvironmentName(config.getEnvironmentName());
+    dto.setBranchName(config.getBranchName());
+    dto.setParentBranchName(config.getParentBranchName());
+    dto.setBaselineBranchName(config.getBaselineBranchName());
+    dto.setCompareWithParentBranch(null);
+    dto.setIgnoreBaseline(null);
+    dto.setSaveFailedTests(config.getSaveFailedTests());
+    dto.setSaveNewTests(config.getSaveNewTests());
+    dto.setSaveDiffs(config.getSaveDiffs());
+    dto.setDontCloseBatches(null);
 
-    return configurationDto;
+    // EyesCheckConfig
+    dto.setSendDom(config.isSendDom());
+    dto.setMatchTimeout(config.getMatchTimeout());
+    dto.setForceFullPageScreenshot(config.getForceFullPageScreenshot());
+
+
+    // EyesClassicConfig<TElement, TSelector>
+    dto.setWaitBeforeScreenshots(config.getWaitBeforeScreenshots());
+    dto.setStitchMode(config.getStitchMode() == null ? null : config.getStitchMode().getName()); // 'CSS' | 'Scroll'
+    dto.setHideScrollbars(config.getHideScrollbars());
+    dto.setHideCaret(config.getHideCaret());
+    dto.setStitchOverlap(config.getStitchOverlap());
+    dto.setScrollRootElement(null);
+    FixedCutProvider cutProvider = (FixedCutProvider) config.getCutProvider();
+    dto.setCut(cutProvider == null ? null : new ImageCropRectDto(cutProvider.getHeader(), cutProvider.getRight(),
+        cutProvider.getFooter(), cutProvider.getLeft()));
+    dto.setRotation(config.getRotation());
+    dto.setScaleRatio(config.getScaleRatio());
+
+
+    // EyesUFGConfig
+    dto.setConcurrentSessions(null);
+    dto.setBrowsersInfo(RenderBrowserInfoMapper.toRenderBrowserInfoDtoList(config.getBrowsersInfo()));
+    dto.setVisualGridOptions(VisualGridOptionMapper.toVisualGridOptionDtoList(config.getVisualGridOptions()));
+    dto.setLayoutBreakpoints(config.isDefaultLayoutBreakpointsSet() != null ? config.isDefaultLayoutBreakpointsSet() : config.getLayoutBreakpoints());
+    dto.setDisableBrowserFetching(config.isDisableBrowserFetching());
+
+    return dto;
   }
 }

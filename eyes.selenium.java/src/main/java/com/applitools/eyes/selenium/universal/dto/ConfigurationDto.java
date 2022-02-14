@@ -1,7 +1,6 @@
 package com.applitools.eyes.selenium.universal.dto;
 
 import java.util.List;
-import java.util.Set;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 
@@ -10,79 +9,67 @@ import com.fasterxml.jackson.annotation.JsonInclude;
  */
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class ConfigurationDto {
+  // EyesBaseConfig
+  private Object logs;
+  private DebugScreenshotHandlerDto debugScreenshots;
+  private String agentId;
+  private String apiKey;
+  private String serverUrl;
+  private ProxyDto proxy;
+  private Boolean isDisabled;
+  private Integer connectionTimeout;
+  private Boolean removeSession;
+  private Object remoteEvents;
+
+  // EyesOpenConfig
+  private String appName;
+  private String testName;
+  private String displayName;
+  private RectangleSizeDto viewportSize;
+  private String sessionType;
+  private List<CustomPropertyDto> properties;
+  private BatchDto batch;
+  private MatchSettingsDto defaultMatchSettings; // TODO defaultMatchSettings?: MatchSettings<Region>
+  private String hostApp;
+  private String hostOS;
+  private String hostAppInfo;
+  private String hostOSInfo;
+  private String deviceInfo;
+  private String baselineEnvName;
+  private String environmentName;
   private String branchName;
   private String parentBranchName;
   private String baselineBranchName;
-  private String agentId;
-  private String environmentName;
-  private Boolean saveDiffs;
-  private String sessionType;
-  private BatchDto batch;
-  private String baselineEnvName;
-  private String appName;
-  private String testName;
-  private RectangleSizeDto viewportSize;
-  private Boolean ignoreDisplacements;
-  private ImageMatchSettingsDto defaultMatchSettings;
-
-  private Integer matchTimeout;
-  private String hostApp;
-  private String hostOS;
-  private String deviceInfo;
-  private String hostingAppInfo;
-  private String osInfo;
-  private Boolean saveNewTests;
+  private Boolean compareWithParentBranch;
+  private Boolean ignoreBaseline;
   private Boolean saveFailedTests;
-  private Integer stitchOverlap;
-  private Boolean isSendDom;
-  private String apiKey;
-  private String serverUrl;
-  private AbstractProxySettingsDto proxy;
+  private Boolean saveNewTests;
+  private Boolean saveDiffs;
+  private Boolean dontCloseBatches;
 
-  private String failureReports;
-  private AccessibilitySettingsDto accessibilitySettings;
-  private Boolean enablePatterns;
-  private Boolean useDom;
-  private Integer abortIdleTestTimeout;
+  // EyesCheckConfig
+  private Boolean sendDom;
+  private Integer matchTimeout;
   private Boolean forceFullPageScreenshot;
+
+  // EyesClassicConfig<TElement, TSelector>
   private Integer waitBeforeScreenshots;
-  private String stitchMode;
+  private String stitchMode; // 'CSS' | 'Scroll'
   private Boolean hideScrollbars;
   private Boolean hideCaret;
-  private Boolean isVisualGrid;
+  private Integer stitchOverlap;
+  private IScrollRootElement scrollRootElement; // TElement | TSelector
+  private ICut cut; // ImageCropRect | ImageCropRegion
+  private Integer rotation; // ImageRotation -270 | -180 | -90 | 0 | 90 | 180 | 270
+  private Double scaleRatio;
+
+  // EyesUFGConfig
+  private Integer concurrentSessions;
+  private List<IBrowsersInfo> browsersInfo; // (DesktopBrowserRenderer | ChromeEmulationDeviceRenderer | IOSDeviceRenderer)[]
+  private List<VisualGridOptionDto> visualGridOptions; // Record<string, any>
+  private Object layoutBreakpoints; // boolean | number[]
   private Boolean disableBrowserFetching;
-  private Boolean useCookies;
-  private Boolean captureStatusBar;
-  private Boolean isRenderingConfig;
-  private List<IBrowsersInfo> browsersInfo;
-  private Set<String> features;
-  private List<VisualGridOptionDto> visualGridOptions;
-  private Boolean isDefaultLayoutBreakpointsSet;
-  private List<Integer> layoutBreakpoints;
 
-  public Set<String> getFeatures() {
-    return features;
-  }
-
-  public void setFeatures(Set<String> features) {
-    this.features = features;
-  }
-
-  public List<Integer> getLayoutBreakpoints() {
-    return layoutBreakpoints;
-  }
-
-  public void setLayoutBreakpoints(List<Integer> layoutBreakpoints) {
-    this.layoutBreakpoints = layoutBreakpoints;
-  }
-
-  public Boolean getDefaultLayoutBreakpointsSet() {
-    return isDefaultLayoutBreakpointsSet;
-  }
-
-  public void setDefaultLayoutBreakpointsSet(Boolean defaultLayoutBreakpointsSet) {
-    isDefaultLayoutBreakpointsSet = defaultLayoutBreakpointsSet;
-  }
 
   public List<VisualGridOptionDto> getVisualGridOptions() {
     return visualGridOptions;
@@ -90,14 +77,6 @@ public class ConfigurationDto {
 
   public void setVisualGridOptions(List<VisualGridOptionDto> visualGridOptions) {
     this.visualGridOptions = visualGridOptions;
-  }
-
-  public String getFailureReports() {
-    return failureReports;
-  }
-
-  public void setFailureReports(String failureReports) {
-    this.failureReports = failureReports;
   }
 
   public String getAppName() {
@@ -204,19 +183,11 @@ public class ConfigurationDto {
     this.viewportSize = viewportSize;
   }
 
-  public Boolean getIgnoreDisplacements() {
-    return ignoreDisplacements;
-  }
-
-  public void setIgnoreDisplacements(Boolean ignoreDisplacements) {
-    this.ignoreDisplacements = ignoreDisplacements;
-  }
-
-  public ImageMatchSettingsDto getDefaultMatchSettings() {
+  public MatchSettingsDto getDefaultMatchSettings() {
     return defaultMatchSettings;
   }
 
-  public void setDefaultMatchSettings(ImageMatchSettingsDto defaultMatchSettings) {
+  public void setDefaultMatchSettings(MatchSettingsDto defaultMatchSettings) {
     this.defaultMatchSettings = defaultMatchSettings;
   }
 
@@ -252,22 +223,6 @@ public class ConfigurationDto {
     this.deviceInfo = deviceInfo;
   }
 
-  public String getHostingAppInfo() {
-    return hostingAppInfo;
-  }
-
-  public void setHostingAppInfo(String hostingAppInfo) {
-    this.hostingAppInfo = hostingAppInfo;
-  }
-
-  public String getOsInfo() {
-    return osInfo;
-  }
-
-  public void setOsInfo(String osInfo) {
-    this.osInfo = osInfo;
-  }
-
   public Boolean getSaveNewTests() {
     return saveNewTests;
   }
@@ -293,11 +248,11 @@ public class ConfigurationDto {
   }
 
   public Boolean getSendDom() {
-    return isSendDom;
+    return sendDom;
   }
 
   public void setSendDom(Boolean sendDom) {
-    isSendDom = sendDom;
+    this.sendDom = sendDom;
   }
 
   public String getServerUrl() {
@@ -308,44 +263,12 @@ public class ConfigurationDto {
     this.serverUrl = serverUrl;
   }
 
-  public AbstractProxySettingsDto getProxy() {
+  public ProxyDto getProxy() {
     return proxy;
   }
 
-  public void setProxy(AbstractProxySettingsDto proxy) {
+  public void setProxy(ProxyDto proxy) {
     this.proxy = proxy;
-  }
-
-  public AccessibilitySettingsDto getAccessibilitySettings() {
-    return accessibilitySettings;
-  }
-
-  public void setAccessibilitySettings(AccessibilitySettingsDto accessibilitySettings) {
-    this.accessibilitySettings = accessibilitySettings;
-  }
-
-  public Boolean getEnablePatterns() {
-    return enablePatterns;
-  }
-
-  public void setEnablePatterns(Boolean enablePatterns) {
-    this.enablePatterns = enablePatterns;
-  }
-
-  public Boolean getUseDom() {
-    return useDom;
-  }
-
-  public void setUseDom(Boolean useDom) {
-    this.useDom = useDom;
-  }
-
-  public Integer getAbortIdleTestTimeout() {
-    return abortIdleTestTimeout;
-  }
-
-  public void setAbortIdleTestTimeout(Integer abortIdleTestTimeout) {
-    this.abortIdleTestTimeout = abortIdleTestTimeout;
   }
 
   public Boolean getForceFullPageScreenshot() {
@@ -388,13 +311,6 @@ public class ConfigurationDto {
     this.hideCaret = hideCaret;
   }
 
-  public Boolean getVisualGrid() {
-    return isVisualGrid;
-  }
-
-  public void setVisualGrid(Boolean visualGrid) {
-    isVisualGrid = visualGrid;
-  }
 
   public Boolean getDisableBrowserFetching() {
     return disableBrowserFetching;
@@ -402,30 +318,6 @@ public class ConfigurationDto {
 
   public void setDisableBrowserFetching(Boolean disableBrowserFetching) {
     this.disableBrowserFetching = disableBrowserFetching;
-  }
-
-  public Boolean getUseCookies() {
-    return useCookies;
-  }
-
-  public void setUseCookies(Boolean useCookies) {
-    this.useCookies = useCookies;
-  }
-
-  public Boolean getCaptureStatusBar() {
-    return captureStatusBar;
-  }
-
-  public void setCaptureStatusBar(Boolean captureStatusBar) {
-    this.captureStatusBar = captureStatusBar;
-  }
-
-  public Boolean getRenderingConfig() {
-    return isRenderingConfig;
-  }
-
-  public void setRenderingConfig(Boolean renderingConfig) {
-    isRenderingConfig = renderingConfig;
   }
 
   public List<IBrowsersInfo> getBrowsersInfo() {
@@ -436,56 +328,155 @@ public class ConfigurationDto {
     this.browsersInfo = browsersInfo;
   }
 
-  @Override
-  public String toString() {
-    return "ConfigurationDto{" +
-        "branchName='" + branchName + '\'' +
-        ", parentBranchName='" + parentBranchName + '\'' +
-        ", baselineBranchName='" + baselineBranchName + '\'' +
-        ", agentId='" + agentId + '\'' +
-        ", environmentName='" + environmentName + '\'' +
-        ", saveDiffs=" + saveDiffs +
-        ", sessionType='" + sessionType + '\'' +
-        ", batch=" + batch +
-        ", baselineEnvName='" + baselineEnvName + '\'' +
-        ", appName='" + appName + '\'' +
-        ", testName='" + testName + '\'' +
-        ", viewportSize=" + viewportSize +
-        ", ignoreDisplacements=" + ignoreDisplacements +
-        ", defaultMatchSettings=" + defaultMatchSettings +
-        ", matchTimeout=" + matchTimeout +
-        ", hostApp='" + hostApp + '\'' +
-        ", hostOS='" + hostOS + '\'' +
-        ", deviceInfo='" + deviceInfo + '\'' +
-        ", hostingAppInfo='" + hostingAppInfo + '\'' +
-        ", osInfo='" + osInfo + '\'' +
-        ", saveNewTests=" + saveNewTests +
-        ", saveFailedTests=" + saveFailedTests +
-        ", stitchOverlap=" + stitchOverlap +
-        ", isSendDom=" + isSendDom +
-        ", apiKey='" + apiKey + '\'' +
-        ", serverUrl='" + serverUrl + '\'' +
-        ", proxy=" + proxy +
-        ", failureReports='" + failureReports + '\'' +
-        ", accessibilitySettings=" + accessibilitySettings +
-        ", enablePatterns=" + enablePatterns +
-        ", useDom=" + useDom +
-        ", abortIdleTestTimeout=" + abortIdleTestTimeout +
-        ", forceFullPageScreenshot=" + forceFullPageScreenshot +
-        ", waitBeforeScreenshots=" + waitBeforeScreenshots +
-        ", stitchMode='" + stitchMode + '\'' +
-        ", hideScrollbars=" + hideScrollbars +
-        ", hideCaret=" + hideCaret +
-        ", isVisualGrid=" + isVisualGrid +
-        ", disableBrowserFetching=" + disableBrowserFetching +
-        ", useCookies=" + useCookies +
-        ", captureStatusBar=" + captureStatusBar +
-        ", isRenderingConfig=" + isRenderingConfig +
-        ", browsersInfo=" + browsersInfo +
-        ", features=" + features +
-        ", visualGridOptions=" + visualGridOptions +
-        ", isDefaultLayoutBreakpointsSet=" + isDefaultLayoutBreakpointsSet +
-        ", layoutBreakpoints=" + layoutBreakpoints +
-        '}';
+  public Object getLogs() {
+    return logs;
+  }
+
+  public void setLogs(Object logs) {
+    this.logs = logs;
+  }
+
+  public DebugScreenshotHandlerDto getDebugScreenshots() {
+    return debugScreenshots;
+  }
+
+  public void setDebugScreenshots(DebugScreenshotHandlerDto debugScreenshots) {
+    this.debugScreenshots = debugScreenshots;
+  }
+
+  public Boolean getDisabled() {
+    return isDisabled;
+  }
+
+  public void setDisabled(Boolean disabled) {
+    isDisabled = disabled;
+  }
+
+  public Integer getConnectionTimeout() {
+    return connectionTimeout;
+  }
+
+  public void setConnectionTimeout(Integer connectionTimeout) {
+    this.connectionTimeout = connectionTimeout;
+  }
+
+  public Boolean getRemoveSession() {
+    return removeSession;
+  }
+
+  public void setRemoveSession(Boolean removeSession) {
+    this.removeSession = removeSession;
+  }
+
+  public Object getRemoteEvents() {
+    return remoteEvents;
+  }
+
+  public void setRemoteEvents(Object remoteEvents) {
+    this.remoteEvents = remoteEvents;
+  }
+
+  public String getDisplayName() {
+    return displayName;
+  }
+
+  public void setDisplayName(String displayName) {
+    this.displayName = displayName;
+  }
+
+  public List<CustomPropertyDto> getProperties() {
+    return properties;
+  }
+
+  public void setProperties(List<CustomPropertyDto> properties) {
+    this.properties = properties;
+  }
+
+  public String getHostAppInfo() {
+    return hostAppInfo;
+  }
+
+  public void setHostAppInfo(String hostAppInfo) {
+    this.hostAppInfo = hostAppInfo;
+  }
+
+  public String getHostOSInfo() {
+    return hostOSInfo;
+  }
+
+  public void setHostOSInfo(String hostOSInfo) {
+    this.hostOSInfo = hostOSInfo;
+  }
+
+  public Boolean getCompareWithParentBranch() {
+    return compareWithParentBranch;
+  }
+
+  public void setCompareWithParentBranch(Boolean compareWithParentBranch) {
+    this.compareWithParentBranch = compareWithParentBranch;
+  }
+
+  public Boolean getIgnoreBaseline() {
+    return ignoreBaseline;
+  }
+
+  public void setIgnoreBaseline(Boolean ignoreBaseline) {
+    this.ignoreBaseline = ignoreBaseline;
+  }
+
+  public Boolean getDontCloseBatches() {
+    return dontCloseBatches;
+  }
+
+  public void setDontCloseBatches(Boolean dontCloseBatches) {
+    this.dontCloseBatches = dontCloseBatches;
+  }
+
+  public IScrollRootElement getScrollRootElement() {
+    return scrollRootElement;
+  }
+
+  public void setScrollRootElement(IScrollRootElement scrollRootElement) {
+    this.scrollRootElement = scrollRootElement;
+  }
+
+  public ICut getCut() {
+    return cut;
+  }
+
+  public void setCut(ICut cut) {
+    this.cut = cut;
+  }
+
+  public Integer getRotation() {
+    return rotation;
+  }
+
+  public void setRotation(Integer rotation) {
+    this.rotation = rotation;
+  }
+
+  public Double getScaleRatio() {
+    return scaleRatio;
+  }
+
+  public void setScaleRatio(Double scaleRatio) {
+    this.scaleRatio = scaleRatio;
+  }
+
+  public Integer getConcurrentSessions() {
+    return concurrentSessions;
+  }
+
+  public void setConcurrentSessions(Integer concurrentSessions) {
+    this.concurrentSessions = concurrentSessions;
+  }
+
+  public Object getLayoutBreakpoints() {
+    return layoutBreakpoints;
+  }
+
+  public void setLayoutBreakpoints(Object layoutBreakpoints) {
+    this.layoutBreakpoints = layoutBreakpoints;
   }
 }

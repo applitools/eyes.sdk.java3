@@ -11,12 +11,11 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class BatchDto {
   private String id;
-  private String batchSequenceName;
   private String name;
+  private String sequenceName;
   private String startedAt;
   private Boolean notifyOnCompletion;
-  private Boolean isCompleted;
-  private List<Map<String, String>> properties;
+  private List<CustomPropertyDto> properties;
 
   public String getId() {
     return id;
@@ -26,12 +25,12 @@ public class BatchDto {
     this.id = id;
   }
 
-  public String getBatchSequenceName() {
-    return batchSequenceName;
+  public String getSequenceName() {
+    return sequenceName;
   }
 
-  public void setBatchSequenceName(String batchSequenceName) {
-    this.batchSequenceName = batchSequenceName;
+  public void setSequenceName(String sequenceName) {
+    this.sequenceName = sequenceName;
   }
 
   public String getName() {
@@ -58,19 +57,11 @@ public class BatchDto {
     this.notifyOnCompletion = notifyOnCompletion;
   }
 
-  public Boolean getCompleted() {
-    return isCompleted;
-  }
-
-  public void setCompleted(Boolean completed) {
-    isCompleted = completed;
-  }
-
-  public List<Map<String, String>> getProperties() {
+  public List<CustomPropertyDto> getProperties() {
     return properties;
   }
 
-  public void setProperties(List<Map<String, String>> properties) {
+  public void setProperties(List<CustomPropertyDto> properties) {
     this.properties = properties;
   }
 }

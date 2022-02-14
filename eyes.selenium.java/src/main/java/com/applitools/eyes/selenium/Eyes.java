@@ -29,6 +29,7 @@ import com.applitools.eyes.selenium.universal.mapper.OCRSearchSettingsMapper;
 import com.applitools.eyes.selenium.universal.mapper.RectangleSizeMapper;
 import com.applitools.eyes.selenium.universal.mapper.TestResultsMapper;
 import com.applitools.eyes.selenium.universal.mapper.VisualLocatorSettingsMapper;
+import com.applitools.eyes.selenium.wrappers.EyesSeleniumDriver;
 import com.applitools.eyes.triggers.MouseAction;
 import com.applitools.eyes.visualgrid.model.IDebugResourceWriter;
 import com.applitools.eyes.visualgrid.model.RenderingInfo;
@@ -53,6 +54,7 @@ public class Eyes implements IEyesBase {
     private boolean isVisualGridEyes = false;
     private com.applitools.eyes.EyesRunner runner;
     private Configuration configuration = new Configuration();
+    private ImageRotation rotation;
     VisualLocatorsProvider visualLocatorsProvider;
     ConfigurationProvider configurationProvider = new ConfigurationProvider() {
         @Override
@@ -154,7 +156,7 @@ public class Eyes implements IEyesBase {
      *                      If {@code null} then no proxy is set.
      */
     public void setProxy(AbstractProxySettings proxySettings) {
-        configuration.setProxy(proxySettings);
+        this.configuration.setProxy(proxySettings);
         //activeEyes.proxy(proxySettings);
     }
 
@@ -163,7 +165,7 @@ public class Eyes implements IEyesBase {
      * @param isDisabled If true, all interactions with this API will be silently ignored.
      */
     public void setIsDisabled(Boolean isDisabled) {
-        //activeEyes.setIsDisabled(isDisabled);
+        this.configuration.setIsDisabled(isDisabled);
     }
 
     /**
@@ -213,9 +215,8 @@ public class Eyes implements IEyesBase {
      * Gets is disabled.
      * @return Whether eyes is disabled.
      */
-    public boolean getIsDisabled() {
-        //return activeEyes.getIsDisabled();
-        return false;
+    public Boolean getIsDisabled() {
+        return this.configuration.getIsDisabled();
     }
 
     /**
@@ -231,8 +232,7 @@ public class Eyes implements IEyesBase {
      * @param apiKey the api key
      */
     public void setApiKey(String apiKey) {
-        // EyesBase sets the configuration
-        configuration.setApiKey(apiKey);
+        this.configuration.setApiKey(apiKey);
     }
 
     /**
@@ -240,7 +240,7 @@ public class Eyes implements IEyesBase {
      * @param branchName the branch name
      */
     public void setBranchName(String branchName) {
-        configuration.setBranchName(branchName);
+        this.configuration.setBranchName(branchName);
     }
 
 
@@ -436,7 +436,6 @@ public class Eyes implements IEyesBase {
      * @return the logger
      */
     public Logger getLogger() {
-        //return activeEyes.getLogger();
         return null;
     }
 
@@ -445,7 +444,7 @@ public class Eyes implements IEyesBase {
      * @param cutProvider the provider doing the cut.
      */
     public void setImageCut(CutProvider cutProvider) {
-        //this.seleniumEyes.setImageCut(cutProvider);
+        this.configuration.setCutProvider(cutProvider);
     }
 
     /**
@@ -496,16 +495,15 @@ public class Eyes implements IEyesBase {
      * @param scaleRatio The scale ratio to use, or {@code null} to reset                   back to automatic scaling.
      */
     public void setScaleRatio(Double scaleRatio) {
-        //this.seleniumEyes.setScaleRatio(scaleRatio);
+        this.configuration.setScaleRatio(scaleRatio);
     }
 
     /**
      * Gets scale ratio.
      * @return The ratio used to scale the images being validated.
      */
-    public double getScaleRatio() {
-        //return this.seleniumEyes.getScaleRatio();
-        return 0;
+    public Double getScaleRatio() {
+        return this.configuration.getScaleRatio();
     }
 
     /**
@@ -514,34 +512,30 @@ public class Eyes implements IEyesBase {
      * @param value The property value.
      */
     public void addProperty(String name, String value) {
-        //activeEyes.addProperty(name, value);
+        this.configuration.addProperty(name, value);
     }
 
     /**
      * Clears the list of custom properties.
      */
     public void clearProperties() {
-        //activeEyes.clearProperties();
+        this.configuration.clearProperties();
     }
 
     /**
      * Sets save debug screenshots.
      * @param saveDebugScreenshots If true, will save all screenshots to local directory.
      */
-    public void setSaveDebugScreenshots(boolean saveDebugScreenshots) {
-//        this.seleniumEyes.setSaveDebugScreenshots(saveDebugScreenshots);
-//        if (isVisualGridEyes) {
-//            visualGridEyes.setSaveDebugScreenshots(saveDebugScreenshots);
-//        }
+    public void setSaveDebugScreenshots(Boolean saveDebugScreenshots) {
+        this.configuration.setSaveDebugScreenshots(saveDebugScreenshots);
     }
 
     /**
      * Gets save debug screenshots.
      * @return True if screenshots saving enabled.
      */
-    public boolean getSaveDebugScreenshots() {
-        //return seleniumEyes.getSaveDebugScreenshots();
-        return false;
+    public Boolean getSaveDebugScreenshots() {
+        return this.configuration.getSaveDebugScreenshots();
     }
 
     /**
@@ -549,10 +543,7 @@ public class Eyes implements IEyesBase {
      * @param pathToSave Path where you want to save the debug screenshots.
      */
     public void setDebugScreenshotsPath(String pathToSave) {
-//        this.seleniumEyes.setDebugScreenshotsPath(pathToSave);
-//        if (isVisualGridEyes) {
-//            visualGridEyes.setDebugScreenshotsPath(pathToSave);
-//        }
+        this.configuration.setDebugScreenshotsPath(pathToSave);
     }
 
     /**
@@ -560,8 +551,7 @@ public class Eyes implements IEyesBase {
      * @return The path where you want to save the debug screenshots.
      */
     public String getDebugScreenshotsPath() {
-        //return this.seleniumEyes.getDebugScreenshotsPath();
-        return null;
+        return this.configuration.getDebugScreenshotsPath();
     }
 
     /**
@@ -569,10 +559,7 @@ public class Eyes implements IEyesBase {
      * @param prefix The prefix for the screenshots' names.
      */
     public void setDebugScreenshotsPrefix(String prefix) {
-//        this.seleniumEyes.setDebugScreenshotsPrefix(prefix);
-//        if (isVisualGridEyes) {
-//            visualGridEyes.setDebugScreenshotsPrefix(prefix);
-//        }
+        this.configuration.setDebugScreenshotsPrefix(prefix);
     }
 
     /**
@@ -580,8 +567,7 @@ public class Eyes implements IEyesBase {
      * @return The prefix for the screenshots' names.
      */
     public String getDebugScreenshotsPrefix() {
-        //return this.seleniumEyes.getDebugScreenshotsPrefix();
-        return null;
+        return this.configuration.getDebugScreenshotsPrefix();
     }
 
     /**
@@ -1313,8 +1299,7 @@ public class Eyes implements IEyesBase {
      * @return The image rotation model.
      */
     public ImageRotation getRotation() {
-        //return this.seleniumEyes.getRotation();
-        return null;
+        return rotation;
     }
 
     /**
@@ -1322,11 +1307,8 @@ public class Eyes implements IEyesBase {
      * @param rotation The image rotation model.
      */
     public void setRotation(ImageRotation rotation) {
-        //this.rotation = rotation;
-//        WebDriver driver = getDriver();
-//        if (driver != null) {
-//            ((EyesSeleniumDriver) driver).setRotation(rotation);
-//        }
+        this.configuration.setRotation(rotation.getRotation());
+        this.rotation = rotation;
     }
 
     /**

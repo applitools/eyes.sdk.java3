@@ -6,18 +6,18 @@ import com.fasterxml.jackson.annotation.JsonInclude;
  * abstract proxy settings dto
  */
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class AbstractProxySettingsDto {
-  private String uri;
+public class ProxyDto {
+  private String url;
   private String username;
   private String password;
   private Boolean isHttpOnly;
 
-  public String getUri() {
-    return uri;
+  public String getUrl() {
+    return url;
   }
 
-  public void setUri(String uri) {
-    this.uri = uri;
+  public void setUrl(String url) {
+    this.url = url;
   }
 
   public String getUsername() {

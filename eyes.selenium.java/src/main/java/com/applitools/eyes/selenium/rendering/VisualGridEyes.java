@@ -350,7 +350,7 @@ public class VisualGridEyes implements ISeleniumEyes {
         this.isDisabled = disabled;
     }
 
-    public boolean getIsDisabled() {
+    public Boolean getIsDisabled() {
         return this.isDisabled == null ? this.runner.getIsDisabled() : this.isDisabled;
     }
 

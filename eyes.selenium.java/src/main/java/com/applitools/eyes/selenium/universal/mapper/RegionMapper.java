@@ -6,6 +6,7 @@ import java.util.stream.Collectors;
 
 import com.applitools.eyes.Region;
 import com.applitools.eyes.selenium.universal.dto.RegionDto;
+import com.applitools.eyes.selenium.universal.dto.TRegion;
 
 /**
  * region mapper
@@ -18,6 +19,8 @@ public class RegionMapper {
     }
 
     RegionDto regionDto = new RegionDto();
+    regionDto.setX(region.getLeft());
+    regionDto.setY(region.getTop());
     regionDto.setLeft(region.getLeft());
     regionDto.setTop(region.getTop());
     regionDto.setWidth(region.getWidth());
@@ -27,7 +30,7 @@ public class RegionMapper {
     return regionDto;
   }
 
-  public static List<RegionDto> toRegionDtoList(Region[] regions) {
+  public static List<TRegion> toRegionDtoList(Region[] regions) {
     if (regions == null || regions.length == 0) {
       return null;
     }

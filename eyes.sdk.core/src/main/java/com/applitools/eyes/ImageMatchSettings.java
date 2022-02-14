@@ -6,7 +6,7 @@ import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonSetter;
 
 /**
- * Encapsulates match settings for the a session.
+ * Encapsulates match settings for the session.
  */
 public class ImageMatchSettings {
     private MatchLevel matchLevel;

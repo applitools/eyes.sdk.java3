@@ -255,7 +255,7 @@ public abstract class EyesBase implements IEyesBase {
     /**
      * @return Whether eyes is disabled.
      */
-    public boolean getIsDisabled() {
+    public Boolean getIsDisabled() {
         return isDisabled;
     }
 

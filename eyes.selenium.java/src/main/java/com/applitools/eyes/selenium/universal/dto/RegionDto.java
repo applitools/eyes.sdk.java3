@@ -6,7 +6,9 @@ import com.fasterxml.jackson.annotation.JsonInclude;
  * region dto
  */
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class RegionDto {
+public class RegionDto extends TRegion {
+  private Integer x;
+  private Integer y;
   private Integer left;
   private Integer top;
   private Integer width;
@@ -51,5 +53,21 @@ public class RegionDto {
 
   public void setCoordinatesType(String coordinatesType) {
     this.coordinatesType = coordinatesType;
+  }
+
+  public Integer getX() {
+    return x;
+  }
+
+  public void setX(Integer x) {
+    this.x = x;
+  }
+
+  public Integer getY() {
+    return y;
+  }
+
+  public void setY(Integer y) {
+    this.y = y;
   }
 }

@@ -6,7 +6,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
  * selector region dto
  */
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class SelectorRegionDto extends TRegion{
+public class SelectorRegionDto extends TRegion {
 
   private String selector;
   private String type;

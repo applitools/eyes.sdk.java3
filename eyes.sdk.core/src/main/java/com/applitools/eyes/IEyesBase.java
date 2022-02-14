@@ -10,7 +10,7 @@ public interface IEyesBase {
 
     void setIsDisabled(Boolean isDisabled);
 
-    boolean getIsDisabled();
+    Boolean getIsDisabled();
 
     String getFullAgentId();
 

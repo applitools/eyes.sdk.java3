@@ -73,6 +73,14 @@ public class Configuration implements IConfiguration {
 
     private Boolean isDefaultLayoutBreakpointsSet;
     private List<Integer> layoutBreakpoints =  new ArrayList<>();
+    private Boolean saveDebugScreenshots;
+    private String debugScreenshotsPath;
+    private String debugScreenshotsPrefix;
+    private Boolean isDisabled;
+    private final List<PropertyData> properties = new ArrayList<>();
+    private CutProvider cutProvider;
+    private Integer rotation;
+    private Double scaleRatio;
 
     public Configuration(Configuration other) {
         this.branchName = other.getBranchName();
@@ -837,6 +845,82 @@ public class Configuration implements IConfiguration {
 
     public void setCaptureStatusBar(Boolean captureStatusBar) {
         this.captureStatusBar = captureStatusBar;
+    }
+
+    public Configuration setSaveDebugScreenshots(Boolean saveDebugScreenshots) {
+        this.saveDebugScreenshots = saveDebugScreenshots;
+        return this;
+    }
+
+    public Boolean getSaveDebugScreenshots() {
+        return saveDebugScreenshots;
+    }
+
+    public Configuration setDebugScreenshotsPath(String debugScreenshotsPath) {
+        this.debugScreenshotsPath = debugScreenshotsPath;
+        return this;
+    }
+
+    public String getDebugScreenshotsPath() {
+        return debugScreenshotsPath;
+    }
+
+    public Configuration setDebugScreenshotsPrefix(String debugScreenshotsPrefix) {
+        this.debugScreenshotsPrefix = debugScreenshotsPrefix;
+        return this;
+    }
+
+    public String getDebugScreenshotsPrefix() {
+        return debugScreenshotsPrefix;
+    }
+
+    public Configuration setIsDisabled(Boolean isDisabled) {
+        this.isDisabled = isDisabled;
+        return this;
+    }
+
+    public Boolean getIsDisabled() {
+        return isDisabled;
+    }
+
+    public void addProperty(String name, String value) {
+        PropertyData pd = new PropertyData(name, value);
+        properties.add(pd);
+    }
+
+    public void clearProperties() {
+        properties.clear();
+    }
+
+    public List<PropertyData> getProperties() {
+        return properties;
+    }
+
+    public Configuration setCutProvider(CutProvider cutProvider) {
+        this.cutProvider = cutProvider;
+        return this;
+    }
+
+    public CutProvider getCutProvider() {
+        return cutProvider;
+    }
+
+    public Configuration setRotation(Integer rotation) {
+        this.rotation = rotation;
+        return this;
+    }
+
+    public Integer getRotation() {
+        return rotation;
+    }
+
+    public Configuration setScaleRatio(Double scaleRatio) {
+        this.scaleRatio = scaleRatio;
+        return this;
+    }
+
+    public Double getScaleRatio() {
+        return scaleRatio;
     }
 
 }

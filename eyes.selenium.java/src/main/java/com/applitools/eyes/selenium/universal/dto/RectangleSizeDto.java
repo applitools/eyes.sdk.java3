@@ -6,7 +6,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
  * rectangle size dto
  */
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class RectangleSizeDto {
+public class RectangleSizeDto { // TODO rename to SizeDto
   private Integer width;
   private Integer height;
 
