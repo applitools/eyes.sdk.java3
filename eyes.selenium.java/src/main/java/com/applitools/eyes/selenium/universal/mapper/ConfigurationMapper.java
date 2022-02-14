@@ -25,7 +25,7 @@ public class ConfigurationMapper {
         config.getDebugScreenshotsPath(), config.getDebugScreenshotsPrefix()));
     dto.setAgentId(config.getAgentId());
     dto.setApiKey(config.getApiKey());
-    dto.setServerUrl(config.getServerUrl().toString());
+    dto.setServerUrl(config.getServerUrl() == null ? null : config.getServerUrl().toString());
     dto.setProxy(ProxyMapper.toProxyDto(config.getProxy()));
     dto.setDisabled(config.getIsDisabled());
     dto.setConnectionTimeout(null);
