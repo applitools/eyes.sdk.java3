@@ -77,7 +77,6 @@ public class ConfigurationMapper {
     dto.setRotation(config.getRotation());
     dto.setScaleRatio(config.getScaleRatio());
 
-
     // EyesUFGConfig
     dto.setConcurrentSessions(null);
     dto.setBrowsersInfo(RenderBrowserInfoMapper.toRenderBrowserInfoDtoList(config.getBrowsersInfo()));
