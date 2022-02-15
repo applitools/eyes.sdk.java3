@@ -42,7 +42,7 @@ public class Configuration implements IConfiguration {
     private Integer stitchOverlap;
     private Boolean isSendDom;
     private String apiKey;
-    private String serverUrl;
+    private String serverUrl = "https://eyes.applitools.com/";
     private AbstractProxySettings proxy;
     private FailureReports failureReports;
     private AccessibilitySettings accessibilitySettings;
