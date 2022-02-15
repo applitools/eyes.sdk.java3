@@ -5,17 +5,13 @@ import java.util.List;
 
 import com.applitools.eyes.locators.TextRegionSettings;
 import com.applitools.eyes.locators.VisualLocatorSettings;
-import com.applitools.eyes.selenium.ClassicRunner;
 import com.applitools.eyes.selenium.CommandExecutor;
 import com.applitools.eyes.selenium.Configuration;
 import com.applitools.eyes.selenium.Eyes;
 import com.applitools.eyes.selenium.Reference;
 import com.applitools.eyes.selenium.fluent.Target;
 import com.applitools.eyes.selenium.universal.dto.CheckSettingsDto;
-import com.applitools.eyes.selenium.universal.dto.ConfigurationDto;
 import com.applitools.eyes.selenium.universal.dto.ContextReferenceDto;
-import com.applitools.eyes.selenium.universal.dto.DesktopBrowserRendererDto;
-import com.applitools.eyes.selenium.universal.dto.ElementRegionDto;
 import com.applitools.eyes.selenium.universal.dto.FrameLocatorDto;
 import com.applitools.eyes.selenium.universal.dto.FrameNameOrId;
 import com.applitools.eyes.selenium.universal.dto.FrameSelector;
@@ -107,7 +103,7 @@ public class EyesTests {
   @Test
   public void should_OpenEyes_When_ConfiguredExtractTextRegions() {
     Eyes eyes = new Eyes();
-    eyes.open(new ChromeDriver(), null, "test name");
+    eyes.open(new ChromeDriver(), "app name", "test name");
     Reference eyesRef = eyes.getEyesRef();
     eyes.extractTextRegions(new TextRegionSettings("header d: Hello world", "d..+", "make").ignoreCase(true));
   }
@@ -142,37 +138,20 @@ public class EyesTests {
     frameLocatorDto.setFrameNameOrId("id");
     //frameLocatorDto.setElement(null);
     SelectorRegionDto ss = new SelectorRegionDto();
-    ss.setSelector("selector");
     ss.setType("type");
+    ss.setSelector("selector");
     FrameSelector frameSelector = new FrameSelector();
     frameSelector.setSelector(ss);
     frameLocatorDto.setSelector(ss);
-    ElementRegionDto elementRegionDto = new ElementRegionDto();
-    elementRegionDto.setElementId("elementId");
 
-    contextReferenceDto.setFrame(ss);
+    contextReferenceDto.setFrame("frame1");
     checkSettingsDto.setFrames(Arrays.asList(contextReferenceDto));
 
     ObjectMapper objectMapper = new ObjectMapper();
     System.out.println("request: " + objectMapper.writeValueAsString(checkSettingsDto));
+
+
   }
 
-  @Test
-  public void testConfig() throws Exception{
-    ConfigurationDto configurationDto = new ConfigurationDto();
-    DesktopBrowserRendererDto dto = new DesktopBrowserRendererDto();
-    dto.setName("chrome");
-    dto.setWidth(700);
-    dto.setHeight(200);
-    configurationDto.setBrowsersInfo(Arrays.asList(dto));
-    ObjectMapper objectMapper = new ObjectMapper();
-    System.out.println("request: " + objectMapper.writeValueAsString(configurationDto));
-  }
-
-  @Test
-  public void testServer() {
-    ClassicRunner classicRunner = new ClassicRunner();
-    ClassicRunner classicRunner1 = new ClassicRunner();
-  }
 
 }
