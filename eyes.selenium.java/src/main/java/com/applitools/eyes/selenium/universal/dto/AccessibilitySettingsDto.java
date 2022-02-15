@@ -18,11 +18,11 @@ public class AccessibilitySettingsDto {
     this.level = level;
   }
 
-  public String getVersion() {
+  public String getGuidelinesVersion() {
     return guidelinesVersion;
   }
 
-  public void setVersion(String version) {
+  public void setGuidelinesVersion(String version) {
     this.guidelinesVersion = version;
   }
 }
