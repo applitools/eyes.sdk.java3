@@ -39,8 +39,20 @@ import com.applitools.utils.GeneralUtils;
 public class CommandExecutor {
 
   private static USDKConnection connection;
+  private static volatile CommandExecutor instance;
 
-  public CommandExecutor(String name, String version) {
+  public static CommandExecutor getInstance(String name, String version) {
+    if (instance == null) {
+      synchronized (CommandExecutor.class) {
+        if (instance == null) {
+          instance = new CommandExecutor(name, version);
+        }
+      }
+    }
+    return instance;
+  }
+
+  private CommandExecutor(String name, String version) {
     connection = new USDKConnection();
     makeSdk(name, version, GeneralUtils.getPropertyString("user.dir"), "webdriver");
   }
@@ -184,7 +196,6 @@ public class CommandExecutor {
   public static ResponseDto<?> checkedCommand(Command command, boolean waitResult) {
     try {
       return connection.executeCommand(command, waitResult);
-      // handle an error here
     } catch (Exception e) {
       e.printStackTrace();
     }

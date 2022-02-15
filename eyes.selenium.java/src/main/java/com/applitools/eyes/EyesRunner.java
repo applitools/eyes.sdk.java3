@@ -48,7 +48,7 @@ public abstract class EyesRunner {
    */
   public EyesRunner() {
     UniversalSdkNativeLoader.start();
-    commandExecutor = new CommandExecutor(BASE_AGENT_ID, VERSION);
+    commandExecutor = CommandExecutor.getInstance(BASE_AGENT_ID, VERSION);
   }
 
   private boolean dontCloseBatches = false;

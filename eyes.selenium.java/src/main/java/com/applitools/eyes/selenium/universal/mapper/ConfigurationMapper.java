@@ -82,7 +82,8 @@ public class ConfigurationMapper {
     dto.setConcurrentSessions(null);
     dto.setBrowsersInfo(RenderBrowserInfoMapper.toRenderBrowserInfoDtoList(config.getBrowsersInfo()));
     dto.setVisualGridOptions(VisualGridOptionMapper.toVisualGridOptionDtoList(config.getVisualGridOptions()));
-    dto.setLayoutBreakpoints(config.isDefaultLayoutBreakpointsSet() != null ? config.isDefaultLayoutBreakpointsSet() : config.getLayoutBreakpoints());
+    Object layoutBreakpoints = config.isDefaultLayoutBreakpointsSet() != null ? config.isDefaultLayoutBreakpointsSet() : config.getLayoutBreakpoints().isEmpty() ? null : config.getLayoutBreakpoints();
+    dto.setLayoutBreakpoints(layoutBreakpoints);
     dto.setDisableBrowserFetching(config.isDisableBrowserFetching());
 
     return dto;

@@ -25,6 +25,9 @@ public class VisualGridOptionMapper {
   }
 
   public static List<VisualGridOptionDto> toVisualGridOptionDtoList(List<VisualGridOption> visualGridOptions) {
+    if (visualGridOptions == null || visualGridOptions.isEmpty()) {
+      return null;
+    }
     return visualGridOptions.stream().map(VisualGridOptionMapper::toVisualGridOptionDto).collect(Collectors.toList());
   }
 }

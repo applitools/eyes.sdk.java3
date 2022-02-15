@@ -62,14 +62,9 @@ public class USDKConnection {
 
                 @Override
                 public void onTextFrame(String payload, boolean finalFragment, int rsv) {
-                  System.out.println("RESPONSE PAYLOAD: " + payload);
                   if (payload.contains("Core.makeManager") || payload.contains("EyesManager.openEyes")) {
                     try {
                       ResponseDto<Reference> referenceResponseDto = objectMapper.readValue(payload, new TypeReference<ResponseDto<Reference>>() {});
-//                      if (referenceResponseDto.getPayload().getError() != null) {
-//                        syncTaskListener.onFail();
-//                        throw new EyesException(referenceResponseDto.getPayload().getError().getMessage());
-//                      }
                       map.put(referenceResponseDto.getKey(), referenceResponseDto);
                       syncTaskListener.onComplete(referenceResponseDto);
                     } catch (Exception e) {
@@ -78,10 +73,6 @@ public class USDKConnection {
                   } else if(payload.contains("Eyes.check")) {
                     try {
                       ResponseDto<MatchResultDto> checkResponse = objectMapper.readValue(payload, new TypeReference<ResponseDto<MatchResultDto>>() {});
-//                      if (checkResponse.getPayload().getError() != null) {
-//                        syncTaskListener.onFail();
-//                        throw new EyesException(checkResponse.getPayload().getError().getMessage());
-//                      }
                       map.put(checkResponse.getKey(), checkResponse);
                       syncTaskListener.onComplete(checkResponse);
                     } catch (Exception e) {
@@ -91,10 +82,6 @@ public class USDKConnection {
                     try {
                       ResponseDto<Map<String, List<Region>>> locateResponse = objectMapper
                           .readValue(payload, new TypeReference<ResponseDto<Map<String, List<Region>>>>() {});
-//                      if (locateResponse.getPayload().getError() != null) {
-//                        syncTaskListener.onFail();
-//                        throw new EyesException(locateResponse.getPayload().getError().getMessage());
-//                      }
                       map.put(locateResponse.getKey(), locateResponse);
                       syncTaskListener.onComplete(locateResponse);
                     } catch (Exception e) {
@@ -104,10 +91,6 @@ public class USDKConnection {
                     try {
                       ResponseDto<List<CommandCloseResponseDto>> closeResponse = objectMapper.readValue(payload,
                           new TypeReference<ResponseDto<List<CommandCloseResponseDto>>>() {});
-//                      if (closeResponse.getPayload().getError() != null) {
-//                        syncTaskListener.onFail();
-//                        throw new EyesException(closeResponse.getPayload().getError().getMessage());
-//                      }
                       map.put(closeResponse.getKey(), closeResponse);
                       syncTaskListener.onComplete(closeResponse);
                     } catch (Exception e) {
@@ -117,10 +100,6 @@ public class USDKConnection {
                     try {
                       ResponseDto<Map<String, List<TextRegion>>> extractTextRegionsResponse = objectMapper
                           .readValue(payload, new TypeReference<ResponseDto<Map<String, List<TextRegion>>>>() {});
-//                      if (extractTextRegionsResponse.getPayload().getError() != null) {
-//                        syncTaskListener.onFail();
-//                        throw new EyesException(extractTextRegionsResponse.getPayload().getError().getMessage());
-//                      }
                       map.put(extractTextRegionsResponse.getKey(), extractTextRegionsResponse);
                       syncTaskListener.onComplete(extractTextRegionsResponse);
                     } catch (Exception e) {
@@ -129,10 +108,6 @@ public class USDKConnection {
                   } else if (payload.contains("Eyes.extractText")) {
                     try {
                       ResponseDto<List<String>> responseDto = objectMapper.readValue(payload, new TypeReference<ResponseDto<List<String>>>() {});
-//                      if (responseDto.getPayload().getError() != null) {
-//                        syncTaskListener.onFail();
-//                        throw new EyesException(responseDto.getPayload().getError().getMessage());
-//                      }
                       map.put(responseDto.getKey(), responseDto);
                       syncTaskListener.onComplete(responseDto);
                     } catch (Exception e) {
@@ -142,10 +117,6 @@ public class USDKConnection {
                     try {
                       ResponseDto<RectangleSizeDto> getViewportSizeResponse = objectMapper.readValue(payload, new TypeReference<ResponseDto<RectangleSizeDto>>() {
                       });
-//                      if (getViewportSizeResponse.getPayload().getError() != null) {
-//                        syncTaskListener.onFail();
-//                        throw new EyesException(getViewportSizeResponse.getPayload().getError().getMessage());
-//                      }
                       map.put(getViewportSizeResponse.getKey(), getViewportSizeResponse);
                       syncTaskListener.onComplete(getViewportSizeResponse);
                     } catch (Exception e) {
@@ -165,7 +136,7 @@ public class USDKConnection {
 
   }
 
-  // ResponseDto<T> type
+
   public <T> ResponseDto<?> executeCommand(Command command, boolean waitResult) throws Exception {
     if (command instanceof EventDto<?>) {
       webSocket.sendTextFrame(objectMapper.writeValueAsString(command));
