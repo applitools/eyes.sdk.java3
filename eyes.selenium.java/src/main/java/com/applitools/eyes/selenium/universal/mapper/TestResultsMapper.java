@@ -77,15 +77,15 @@ public class TestResultsMapper {
 
     StepInfo stepInfo = new StepInfo();
     StepInfo.AppUrls appUrls = stepInfo.new AppUrls();
-    appUrls.setStep(stepInfoDto.getAppUrls().getStep());
-    appUrls.setStepEditor(stepInfoDto.getAppUrls().getStepEditor());
+    appUrls.setStep(stepInfoDto.getAppUrls() == null ? null : stepInfoDto.getAppUrls().getStep());
+    appUrls.setStepEditor(stepInfoDto.getAppUrls() == null ? null : stepInfoDto.getAppUrls().getStepEditor());
     stepInfo.setAppUrls(appUrls);
     StepInfo.ApiUrls apiUrls = stepInfo.new ApiUrls();
-    apiUrls.setBaselineImage(stepInfoDto.getApiUrls().getBaselineImage());
-    apiUrls.setCheckpointImage(stepInfoDto.getApiUrls().getCheckpointImage());
-    apiUrls.setCheckpointImageThumbnail(stepInfoDto.getApiUrls().getCheckpointImageThumbnail());
-    apiUrls.setCurrentImage(stepInfoDto.getApiUrls().getCurrentImage());
-    apiUrls.setDiffImage(stepInfoDto.getApiUrls().getDiffImage());
+    apiUrls.setBaselineImage(stepInfoDto.getApiUrls() == null ? null : stepInfoDto.getApiUrls().getBaselineImage());
+    apiUrls.setCheckpointImage(stepInfoDto.getApiUrls() == null ? null : stepInfoDto.getApiUrls().getCheckpointImage());
+    apiUrls.setCheckpointImageThumbnail(stepInfoDto.getApiUrls() == null ? null : stepInfoDto.getApiUrls().getCheckpointImageThumbnail());
+    apiUrls.setCurrentImage(stepInfoDto.getApiUrls() == null ? null : stepInfoDto.getApiUrls().getCurrentImage());
+    apiUrls.setDiffImage(stepInfoDto.getApiUrls() == null ? null : stepInfoDto.getApiUrls().getDiffImage());
     stepInfo.setApiUrls(apiUrls);
     stepInfo.setName(stepInfoDto.getName());
     stepInfo.setIsDifferent(stepInfoDto.getDifferent());
