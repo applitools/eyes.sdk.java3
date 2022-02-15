@@ -36,8 +36,8 @@ public class RenderBrowserInfoMapper {
       IOSDeviceRendererDto iosRenderer = new IOSDeviceRendererDto();
       IosDeviceInfoDto iosDevice = new IosDeviceInfoDto();
       iosDevice.setDeviceName(iosDeviceInfo.getDeviceName());
-      iosDevice.setScreenOrientation(iosDeviceInfo.getScreenOrientation().getOrientation());
-      iosDevice.setVersion(iosDeviceInfo.getVersion().getVersion());
+      iosDevice.setScreenOrientation(iosDeviceInfo.getScreenOrientation() == null ? null : iosDeviceInfo.getScreenOrientation().getOrientation());
+      iosDevice.setVersion(iosDeviceInfo.getVersion() == null ? null : iosDeviceInfo.getVersion().getVersion());
       iosRenderer.setIosDeviceInfo(iosDevice);
       return iosRenderer;
     }
