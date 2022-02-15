@@ -101,7 +101,7 @@ public class CapabilitiesHelper {
         return setSauceCredentials(device);
     }
 
-    public static Capabilities getAndroid8ChromeEmulator(boolean headless) {
+    public static ChromeOptions getAndroid8ChromeEmulator(boolean headless) {
         ChromeOptions androidEmulator = new ChromeOptions().setHeadless(headless);
         androidEmulator.addArguments("hide-scrollbars");
         Map<String, Object> deviceMetrics = new HashMap<>();

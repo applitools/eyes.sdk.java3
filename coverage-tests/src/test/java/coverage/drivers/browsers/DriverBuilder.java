@@ -20,6 +20,7 @@ public class DriverBuilder {
         put("safari-12", new Safari12Builder());
         put("ie-11", new InternetExplorer11Builder());
         put("edge-18", new Edge18Builder());
+        put("Android 8.0 Chrome Emulator", new ChromeEmulatorBuilder());
     }};
 
     public DriverBuilder headless(boolean headless) {
@@ -29,6 +30,12 @@ public class DriverBuilder {
 
     public DriverBuilder browser(String browser) {
         this.browser = browser;
+        return this;
+    }
+
+    public DriverBuilder device(String device) {
+        // This method needed to setup the chrome emulation driver build
+        this.browser = device;
         return this;
     }
 
