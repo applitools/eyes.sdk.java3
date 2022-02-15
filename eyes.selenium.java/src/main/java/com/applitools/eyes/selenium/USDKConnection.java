@@ -137,8 +137,9 @@ public class USDKConnection {
   }
 
 
-  public <T> ResponseDto<?> executeCommand(Command command, boolean waitResult) throws Exception {
+  public ResponseDto<?> executeCommand(Command command, boolean waitResult) throws Exception {
     if (command instanceof EventDto<?>) {
+      System.out.println("MAKE_SDK: " + command);
       webSocket.sendTextFrame(objectMapper.writeValueAsString(command));
       return null;
     }
