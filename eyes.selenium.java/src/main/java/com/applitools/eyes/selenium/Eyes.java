@@ -146,8 +146,7 @@ public class Eyes implements IEyesBase {
      * @param serverUri the server URI
      */
     public void setServerUrl(URI serverUri) {
-        //configuration.setServerUrl(serverUri.toString())
-        //activeEyes.serverUrl(serverUri.toString());
+        configuration.setServerUrl(serverUri.toString());
     }
 
     /**
@@ -157,7 +156,7 @@ public class Eyes implements IEyesBase {
      */
     public void setProxy(AbstractProxySettings proxySettings) {
         this.configuration.setProxy(proxySettings);
-        //activeEyes.proxy(proxySettings);
+
     }
 
     /**
@@ -1488,8 +1487,7 @@ public class Eyes implements IEyesBase {
      * @return The URI of the eyes server.
      */
     public URI getServerUrl() {
-        //return activeEyes.getServerUrl();
-        return null;
+        return this.configuration.getServerUrl();
     }
 
     /**
