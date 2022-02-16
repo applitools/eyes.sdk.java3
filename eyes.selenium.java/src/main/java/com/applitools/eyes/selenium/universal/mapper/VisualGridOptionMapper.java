@@ -1,6 +1,7 @@
 package com.applitools.eyes.selenium.universal.mapper;
 
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import com.applitools.eyes.selenium.universal.dto.VisualGridOptionDto;
@@ -24,10 +25,12 @@ public class VisualGridOptionMapper {
 
   }
 
-  public static List<VisualGridOptionDto> toVisualGridOptionDtoList(List<VisualGridOption> visualGridOptions) {
+  public static Map<String, Object> toVisualGridOptionDtoList(List<VisualGridOption> visualGridOptions) {
     if (visualGridOptions == null || visualGridOptions.isEmpty()) {
       return null;
     }
-    return visualGridOptions.stream().map(VisualGridOptionMapper::toVisualGridOptionDto).collect(Collectors.toList());
+
+    return visualGridOptions.stream().collect(Collectors.toMap(VisualGridOption::getKey, VisualGridOption::getValue));
   }
+
 }

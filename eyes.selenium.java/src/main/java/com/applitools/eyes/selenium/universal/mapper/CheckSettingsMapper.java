@@ -38,17 +38,16 @@ public class CheckSettingsMapper {
     checkSettingsDto.setIgnoreCaret(seleniumCheckSettings.getIgnoreCaret());
     checkSettingsDto.setIgnoreDisplacements(seleniumCheckSettings.isIgnoreDisplacements());
     checkSettingsDto.setAccessibilitySettings(null);
+
     checkSettingsDto.setIgnoreRegions(TRegionMapper.toTRegionList(Arrays.asList(seleniumCheckSettings.getIgnoreRegions())));
     checkSettingsDto.setLayoutRegions(TRegionMapper.toTRegionList(Arrays.asList(seleniumCheckSettings.getLayoutRegions())));
     checkSettingsDto.setStrictRegions(TRegionMapper.toTRegionList(Arrays.asList(seleniumCheckSettings.getStrictRegions())));
     checkSettingsDto.setContentRegions(TRegionMapper.toTRegionList(Arrays.asList(seleniumCheckSettings.getContentRegions())));
-    checkSettingsDto.setFloatingRegions(TFloatingRegionMapper.toTFloatingRegionDtoList(Arrays.asList(seleniumCheckSettings.getFloatingRegions())));
+
     checkSettingsDto.setAccessibilityRegions(TAccessibilityRegionMapper.toTAccessibilityRegionDtoList(Arrays.asList(seleniumCheckSettings.getAccessibilityRegions())));
     checkSettingsDto.setRegion(TRegionMapper.toTRegionFromCheckSettings(checkSettings));
     checkSettingsDto.setFrames(ContextReferenceMapper.toContextReferenceDtoList(seleniumCheckSettings.getFrameChain()));
-    checkSettingsDto
-        .setScrollRootElement(TRegionMapper
-            .toTRegionDtoFromScrolls(seleniumCheckSettings.getScrollRootSelector(),
+    checkSettingsDto.setScrollRootElement(TRegionMapper.toTRegionDtoFromScrolls(seleniumCheckSettings.getScrollRootSelector(),
                 seleniumCheckSettings.getScrollRootElement()));
 
     checkSettingsDto.setFully(seleniumCheckSettings.getStitchContent());

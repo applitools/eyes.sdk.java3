@@ -6,10 +6,6 @@ import java.util.stream.Collectors;
 import com.applitools.eyes.selenium.fluent.FrameLocator;
 import com.applitools.eyes.selenium.universal.dto.ContextReferenceDto;
 import com.applitools.eyes.selenium.universal.dto.ElementRegionDto;
-import com.applitools.eyes.selenium.universal.dto.FrameElement;
-import com.applitools.eyes.selenium.universal.dto.FrameLocatorDto;
-import com.applitools.eyes.selenium.universal.dto.FrameNameOrId;
-import com.applitools.eyes.selenium.universal.dto.FrameSelector;
 import com.applitools.eyes.selenium.universal.dto.ScrollRootElementDto;
 import com.applitools.eyes.selenium.universal.dto.SelectorRegionDto;
 import com.google.common.base.Strings;
@@ -30,26 +26,18 @@ public class ContextReferenceMapper {
 
 
     if (!Strings.isNullOrEmpty(frameLocator.getFrameNameOrId())) {
-//      FrameNameOrId fr = new FrameNameOrId();
-//      fr.setFrame(frameLocator.getFrameNameOrId());
       contextReferenceDto.setFrame(frameLocator.getFrameNameOrId());
     }
 
-
-    //FrameLocatorDto frameLocatorDto = new FrameLocatorDto();
     By by = frameLocator.getFrameSelector();
     if (by != null) {
-      FrameSelector frameSelector = new FrameSelector();
       SelectorRegionDto selectorRegionDto =  SelectorRegionMapper.toSelectorRegionDto(by);
-      //frameSelector.setSelector(selectorRegionDto);
       contextReferenceDto.setFrame(selectorRegionDto);
     }
 
     WebElement element = frameLocator.getFrameReference();
     if (element != null) {
-      //FrameElement frameElement = new FrameElement();
       ElementRegionDto elementRegionDto = ElementRegionMapper.toElementRegionDto(element);
-      //frameElement.setElement(elementRegionDto);
       contextReferenceDto.setFrame(elementRegionDto);
     }
 

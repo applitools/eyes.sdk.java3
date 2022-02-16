@@ -14,9 +14,10 @@ public class CheckSettingsDto {
   // CheckSettings
   private String name;
   private Boolean disableBrowserFetching;
-  private List<Integer> layoutBreakpoints;
-  private List<VisualGridOptionDto> visualGridOptions;
+  private Object layoutBreakpoints;
+  private Map<String, Object> visualGridOptions;
   private Map<String, String> hooks;
+
   private String renderId;
   private String variationGroupId;
   private Integer timeout;
@@ -30,12 +31,14 @@ public class CheckSettingsDto {
   private Boolean ignoreCaret;
   private Boolean ignoreDisplacements;
   private AccessibilitySettingsDto accessibilitySettings;
+
   private List<TRegion> ignoreRegions;
   private List<TRegion> layoutRegions;
   private List<TRegion> strictRegions;
   private List<TRegion> contentRegions;
-  private List<TFloatingRegion> floatingRegions;
-  private List<TAccessibilityRegion> accessibilityRegions;
+
+  private Object floatingRegions; // (TRegion | FloatingRegion<TRegion>)[]
+  private Object accessibilityRegions; //  (TRegion | AccessibilityRegion<TRegion>)[]
 
   // ScreenshotSettings
   private TRegion region;
@@ -51,20 +54,12 @@ public class CheckSettingsDto {
     this.name = name;
   }
 
-  public List<Integer> getLayoutBreakpoints() {
+  public Object getLayoutBreakpoints() {
     return layoutBreakpoints;
   }
 
-  public void setLayoutBreakpoints(List<Integer> layoutBreakpoints) {
+  public void setLayoutBreakpoints(Object layoutBreakpoints) {
     this.layoutBreakpoints = layoutBreakpoints;
-  }
-
-  public List<VisualGridOptionDto> getVisualGridOptions() {
-    return visualGridOptions;
-  }
-
-  public void setVisualGridOptions(List<VisualGridOptionDto> visualGridOptions) {
-    this.visualGridOptions = visualGridOptions;
   }
 
   public Map<String, String> getHooks() {
@@ -220,17 +215,6 @@ public class CheckSettingsDto {
     this.frames = frames;
   }
 
-  public List<TFloatingRegion> getFloatingRegions() {
-    return floatingRegions;
-  }
-
-  public void setFloatingRegions(List<TFloatingRegion> floatingRegions) {
-    this.floatingRegions = floatingRegions;
-  }
-
-  public List<TAccessibilityRegion> getAccessibilityRegions() {
-    return accessibilityRegions;
-  }
 
   public void setAccessibilityRegions(List<TAccessibilityRegion> accessibilityRegions) {
     this.accessibilityRegions = accessibilityRegions;
@@ -250,5 +234,29 @@ public class CheckSettingsDto {
 
   public void setScrollRootElement(TRegion scrollRootElement) {
     this.scrollRootElement = scrollRootElement;
+  }
+
+  public Map<String, Object> getVisualGridOptions() {
+    return visualGridOptions;
+  }
+
+  public void setVisualGridOptions(Map<String, Object> visualGridOptions) {
+    this.visualGridOptions = visualGridOptions;
+  }
+
+  public Object getFloatingRegions() {
+    return floatingRegions;
+  }
+
+  public void setFloatingRegions(Object floatingRegions) {
+    this.floatingRegions = floatingRegions;
+  }
+
+  public Object getAccessibilityRegions() {
+    return accessibilityRegions;
+  }
+
+  public void setAccessibilityRegions(Object accessibilityRegions) {
+    this.accessibilityRegions = accessibilityRegions;
   }
 }

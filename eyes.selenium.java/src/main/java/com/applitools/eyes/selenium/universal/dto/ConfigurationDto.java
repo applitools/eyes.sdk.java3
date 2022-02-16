@@ -1,6 +1,7 @@
 package com.applitools.eyes.selenium.universal.dto;
 
 import java.util.List;
+import java.util.Map;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 
@@ -66,18 +67,10 @@ public class ConfigurationDto {
   // EyesUFGConfig
   private Integer concurrentSessions;
   private List<IBrowsersInfo> browsersInfo; // (DesktopBrowserRenderer | ChromeEmulationDeviceRenderer | IOSDeviceRenderer)[]
-  private List<VisualGridOptionDto> visualGridOptions; // Record<string, any>
+  private Map<String,Object> visualGridOptions; // Record<string, any>
   private Object layoutBreakpoints; // boolean | number[]
   private Boolean disableBrowserFetching;
 
-
-  public List<VisualGridOptionDto> getVisualGridOptions() {
-    return visualGridOptions;
-  }
-
-  public void setVisualGridOptions(List<VisualGridOptionDto> visualGridOptions) {
-    this.visualGridOptions = visualGridOptions;
-  }
 
   public String getAppName() {
     return appName;
@@ -478,5 +471,13 @@ public class ConfigurationDto {
 
   public void setLayoutBreakpoints(Object layoutBreakpoints) {
     this.layoutBreakpoints = layoutBreakpoints;
+  }
+
+  public Map<String, Object> getVisualGridOptions() {
+    return visualGridOptions;
+  }
+
+  public void setVisualGridOptions(Map<String, Object> visualGridOptions) {
+    this.visualGridOptions = visualGridOptions;
   }
 }

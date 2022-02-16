@@ -1358,7 +1358,9 @@ public class Eyes implements IEyesBase {
      * @param checkSettings Multiple <code>ICheckSettings</code> object representing different regions in the viewport.
      */
     public void check(ICheckSettings... checkSettings) {
-        //activeEyes.check(checkSettings);
+        for (ICheckSettings checkSettings1 : checkSettings) {
+            check(checkSettings1);
+        }
     }
 
     /**
@@ -1443,7 +1445,7 @@ public class Eyes implements IEyesBase {
      * @param tag            An optional tag to be associated with the match.
      */
     public void checkFrame(WebElement frameReference, int matchTimeout, String tag) {
-        check(tag, Target.frame(frameReference).timeout(matchTimeout));
+        check(tag, Target.frame(frameReference).timeout(matchTimeout).fully());
     }
 
     /**
