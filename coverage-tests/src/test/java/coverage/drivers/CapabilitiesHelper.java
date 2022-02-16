@@ -77,6 +77,16 @@ public class CapabilitiesHelper {
         return setSauceCredentials(ie, legacy, options);
     }
 
+    public static Capabilities getFirefox48() {
+        FirefoxOptions firefox = new FirefoxOptions();
+        firefox.setCapability("version", "48");
+        firefox.setCapability("platform", "Windows 10");
+        MutableCapabilities options = new MutableCapabilities();
+        options.setCapability("name", "IE 11");
+        return setSauceCredentials(firefox, true, options);
+    }
+
+
     public static Capabilities getSamsungGalaxyS8() {
         DesiredCapabilities device = new DesiredCapabilities();
         device.setCapability("browserName", "");

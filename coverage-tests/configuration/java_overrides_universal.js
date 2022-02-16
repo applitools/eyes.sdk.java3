@@ -16,4 +16,8 @@ module.exports = {
     // Feature not present in Selenium
     'should handle check of stale element if selector is preserved': {skip: true}, // Not implemented yet
     'should handle check of stale element in frame if selector is preserved': {skip: true}, // Not implemented yet
+
+    // They are testing a functionality that no longer exists for the SDK
+    'should set viewport size': {skip: true},
+    'should set viewport size on edge legacy': {skip: true},
 }

@@ -20,6 +20,7 @@ public class DriverBuilder {
         put("safari-12", new Safari12Builder());
         put("ie-11", new InternetExplorer11Builder());
         put("edge-18", new Edge18Builder());
+        put("firefox-48", new Firefox48Builder());
         put("Android 8.0 Chrome Emulator", new ChromeEmulatorBuilder());
     }};
 
