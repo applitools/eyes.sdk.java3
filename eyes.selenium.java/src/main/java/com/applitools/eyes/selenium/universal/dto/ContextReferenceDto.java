@@ -8,7 +8,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class ContextReferenceDto {
   private Object frame;
-  private ScrollRootElementDto scrollRootElement;
+  private TRegion scrollRootElement;
 
   public Object getFrame() {
     return frame;
@@ -18,11 +18,11 @@ public class ContextReferenceDto {
     this.frame = frame;
   }
 
-  public ScrollRootElementDto getScrollRootElement() {
+  public TRegion getScrollRootElement() {
     return scrollRootElement;
   }
 
-  public void setScrollRootElement(ScrollRootElementDto scrollRootElement) {
+  public void setScrollRootElement(TRegion scrollRootElement) {
     this.scrollRootElement = scrollRootElement;
   }
 }

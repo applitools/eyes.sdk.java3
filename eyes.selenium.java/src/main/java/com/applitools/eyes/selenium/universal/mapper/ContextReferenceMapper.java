@@ -24,9 +24,12 @@ public class ContextReferenceMapper {
 
     ContextReferenceDto contextReferenceDto = new ContextReferenceDto();
 
-
     if (!Strings.isNullOrEmpty(frameLocator.getFrameNameOrId())) {
       contextReferenceDto.setFrame(frameLocator.getFrameNameOrId());
+    }
+
+    if (frameLocator.getFrameIndex() != null) {
+      contextReferenceDto.setFrame(frameLocator.getFrameIndex());
     }
 
     By by = frameLocator.getFrameSelector();
@@ -41,25 +44,19 @@ public class ContextReferenceMapper {
       contextReferenceDto.setFrame(elementRegionDto);
     }
 
-    ScrollRootElementDto scrollRootElementDto = null;
     By scrollBy = frameLocator.getScrollRootSelector();
     if (scrollBy != null) {
       SelectorRegionDto scrollSelector =  SelectorRegionMapper.toSelectorRegionDto(scrollBy);
-      scrollRootElementDto = new ScrollRootElementDto();
-      scrollRootElementDto.setSelector(scrollSelector);
+      contextReferenceDto.setScrollRootElement(scrollSelector);
     }
 
     WebElement scrollElement = frameLocator.getScrollRootElement();
     if (scrollElement != null) {
       ElementRegionDto elementRegionDto1 = ElementRegionMapper.toElementRegionDto(scrollElement);
-      scrollRootElementDto = new ScrollRootElementDto();
-      scrollRootElementDto.setElement(elementRegionDto1);
+      contextReferenceDto.setScrollRootElement(elementRegionDto1);
     }
 
-    contextReferenceDto.setScrollRootElement(scrollRootElementDto);
-
     return contextReferenceDto;
-
   }
 
   public static List<ContextReferenceDto> toContextReferenceDtoList(List<FrameLocator> frameLocatorList) {

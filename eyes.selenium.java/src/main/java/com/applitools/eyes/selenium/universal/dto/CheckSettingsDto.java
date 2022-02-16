@@ -41,8 +41,8 @@ public class CheckSettingsDto {
   private Object accessibilityRegions; //  (TRegion | AccessibilityRegion<TRegion>)[]
 
   // ScreenshotSettings
-  private TRegion region;
-  private List<ContextReferenceDto> frames;
+  private TRegion region; // RegionReference<TElement, TSelector> - > Region | ElementReference<TElement, TSelector>
+  private Object frames; // (ContextReference<TElement, TSelector> | FrameReference<TElement, TSelector>)[]
   private TRegion scrollRootElement;
   private Boolean fully;
 
@@ -207,7 +207,7 @@ public class CheckSettingsDto {
     this.contentRegions = contentRegions;
   }
 
-  public List<ContextReferenceDto> getFrames() {
+  public Object getFrames() {
     return frames;
   }
 

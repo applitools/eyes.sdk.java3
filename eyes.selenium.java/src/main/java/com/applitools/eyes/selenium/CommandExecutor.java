@@ -32,6 +32,7 @@ import com.applitools.eyes.selenium.universal.dto.request.CommandCloseRequestDto
 import com.applitools.eyes.selenium.universal.dto.request.CommandGetViewportSizeRequestDto;
 import com.applitools.eyes.selenium.universal.dto.response.CommandCloseResponseDto;
 import com.applitools.utils.GeneralUtils;
+import org.openqa.selenium.StaleElementReferenceException;
 
 /**
  * command executor
@@ -73,7 +74,11 @@ public class CommandExecutor {
     ResponseDto<Reference> response = (ResponseDto<Reference>) checkedCommand(request, true);
     System.out.println("RESP_MAKE_MANAGER: " + response);
     if (response != null && response.getPayload().getError() != null) {
-      throw new EyesException(response.getPayload().getError().getMessage());
+      String message = response.getPayload().getError().getMessage();
+      if (message != null && message.contains("stale element reference")) {
+        throw new StaleElementReferenceException(message);
+      }
+      throw new EyesException(message);
     }
     return response.getPayload().getResult();
   }
@@ -86,7 +91,11 @@ public class CommandExecutor {
     ResponseDto<Reference> response = (ResponseDto<Reference>) checkedCommand(request, true);
     System.out.println("RESP_OPEN: " + response);
     if (response != null && response.getPayload().getError() != null) {
-      throw new EyesException(response.getPayload().getError().getMessage());
+      String message = response.getPayload().getError().getMessage();
+      if (message != null && message.contains("stale element reference")) {
+        throw new StaleElementReferenceException(message);
+      }
+      throw new EyesException(message);
     }
     return response.getPayload().getResult();
   }
@@ -99,7 +108,11 @@ public class CommandExecutor {
     ResponseDto<MatchResultDto> responseDto = (ResponseDto<MatchResultDto>) checkedCommand(request, true);
     System.out.println("RESP_CHECK: " + responseDto);
     if (responseDto != null && responseDto.getPayload().getError() != null) {
-      throw new EyesException(responseDto.getPayload().getError().getMessage());
+      String message = responseDto.getPayload().getError().getMessage();
+      if (message != null && message.contains("stale element reference")) {
+        throw new StaleElementReferenceException(message);
+      }
+      throw new EyesException(message);
     }
   }
 
@@ -111,7 +124,11 @@ public class CommandExecutor {
     ResponseDto<Map<String, List<Region>>> locateResponse = (ResponseDto<Map<String, List<Region>>>)checkedCommand(request, true);
     System.out.println("RESP_LOCATE: " + locateResponse);
     if (locateResponse != null && locateResponse.getPayload().getError() != null) {
-      throw new EyesException(locateResponse.getPayload().getError().getMessage());
+      String message = locateResponse.getPayload().getError().getMessage();
+      if (message != null && message.contains("stale element reference")) {
+        throw new StaleElementReferenceException(message);
+      }
+      throw new EyesException(message);
     }
     return locateResponse.getPayload().getResult();
   }
@@ -125,7 +142,11 @@ public class CommandExecutor {
         (ResponseDto<Map<String, List<TextRegion>>>) checkedCommand(request, true);
     System.out.println("RESP_EXTRACT_TEXT_REGIONS: " + extractTextRegionsResponse);
     if (extractTextRegionsResponse != null && extractTextRegionsResponse.getPayload().getError() != null) {
-      throw new EyesException(extractTextRegionsResponse.getPayload().getError().getMessage());
+      String message = extractTextRegionsResponse.getPayload().getError().getMessage();
+      if (message != null && message.contains("stale element reference")) {
+        throw new StaleElementReferenceException(message);
+      }
+      throw new EyesException(message);
     }
     return extractTextRegionsResponse.getPayload().getResult();
 
@@ -139,7 +160,11 @@ public class CommandExecutor {
     ResponseDto<List<String>> responseDto = (ResponseDto<List<String>>) checkedCommand(request, true);
     System.out.println("RESP_EXTRACT_TEXT: " + responseDto);
     if (responseDto != null && responseDto.getPayload().getError() != null) {
-      throw new EyesException(responseDto.getPayload().getError().getMessage());
+      String message = responseDto.getPayload().getError().getMessage();
+      if (message != null && message.contains("stale element reference")) {
+        throw new StaleElementReferenceException(message);
+      }
+      throw new EyesException(message);
     }
     return responseDto.getPayload().getResult();
   }
@@ -152,7 +177,11 @@ public class CommandExecutor {
     ResponseDto<List<CommandCloseResponseDto>> closeResponse = (ResponseDto<List<CommandCloseResponseDto>>) checkedCommand(request, waitResult);
     System.out.println("RESP_CLOSE: " + closeResponse);
     if (closeResponse != null && closeResponse.getPayload().getError() != null) {
-      throw new EyesException(closeResponse.getPayload().getError().getMessage());
+      String message = closeResponse.getPayload().getError().getMessage();
+      if (message != null && message.contains("stale element reference")) {
+        throw new StaleElementReferenceException(message);
+      }
+      throw new EyesException(message);
     }
     return closeResponse.getPayload().getResult();
   }
@@ -165,7 +194,11 @@ public class CommandExecutor {
     ResponseDto<List<CommandCloseResponseDto>> closeResponse = (ResponseDto<List<CommandCloseResponseDto>>) checkedCommand(request, waitResult);
     System.out.println("RESP_ABORT: " + closeResponse);
     if (closeResponse != null && closeResponse.getPayload().getError() != null) {
-      throw new EyesException(closeResponse.getPayload().getError().getMessage());
+      String message = closeResponse.getPayload().getError().getMessage();
+      if (message != null && message.contains("stale element reference")) {
+        throw new StaleElementReferenceException(message);
+      }
+      throw new EyesException(message);
     }
     return closeResponse.getPayload().getResult();
   }
@@ -187,7 +220,11 @@ public class CommandExecutor {
     ResponseDto<List<CommandCloseResponseDto>> closeResponse = (ResponseDto<List<CommandCloseResponseDto>>) checkedCommand(request, true);
     System.out.println("RESP_CLOSE_ALL_EYES: " + closeResponse);
     if (closeResponse != null && closeResponse.getPayload().getError() != null) {
-      throw new EyesException(closeResponse.getPayload().getError().getMessage());
+      String message = closeResponse.getPayload().getError().getMessage();
+      if (message != null && message.contains("stale element reference")) {
+        throw new StaleElementReferenceException(message);
+      }
+      throw new EyesException(message);
     }
     return closeResponse.getPayload().getResult();
   }

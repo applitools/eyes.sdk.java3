@@ -46,14 +46,6 @@ public class TRegionMapper {
     return getSimpleRegionList.stream().map(TRegionMapper::toTRegion).collect(Collectors.toList());
   }
 
-  public static TRegion toTargetRegion(CheckSettings checkSettings) {
-    if (!(checkSettings instanceof SeleniumCheckSettings)) {
-      return null;
-    }
-
-    return null;
-  }
-
   public static TRegion toTRegionFromCheckSettings(ICheckSettings checkSettings) {
     if (!(checkSettings instanceof SeleniumCheckSettings)) {
       return null;
