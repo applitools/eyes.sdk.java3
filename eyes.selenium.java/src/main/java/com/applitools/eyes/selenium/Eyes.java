@@ -461,7 +461,7 @@ public class Eyes implements IEyesBase {
      * @param checkSettings the check settings
      */
     public void check(String tag, ICheckSettings checkSettings) {
-        if (this.getIsDisabled()) {
+        if (this.getIsDisabled() != null && this.getIsDisabled()) {
             return;
         }
         if (!getIsOpen()) {
