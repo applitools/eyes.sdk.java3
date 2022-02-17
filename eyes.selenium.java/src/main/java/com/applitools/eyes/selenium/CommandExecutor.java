@@ -175,13 +175,16 @@ public class CommandExecutor {
     request.setKey(UUID.randomUUID().toString());
     request.setPayload(new CommandCloseRequestDto(eyesRef));
     ResponseDto<List<CommandCloseResponseDto>> closeResponse = (ResponseDto<List<CommandCloseResponseDto>>) checkedCommand(request, waitResult);
-    System.out.println("RESP_CLOSE: " + closeResponse);
-    if (closeResponse != null && closeResponse.getPayload().getError() != null) {
+    System.out.println("RESP_CLOSE: " + closeResponse + ", WAIT_RESULT: " + waitResult);
+    if (closeResponse != null && closeResponse.getPayload() != null && closeResponse.getPayload().getError() != null) {
       String message = closeResponse.getPayload().getError().getMessage();
       if (message != null && message.contains("stale element reference")) {
         throw new StaleElementReferenceException(message);
       }
       throw new EyesException(message);
+    }
+    if (!waitResult) {
+      return null;
     }
     return closeResponse.getPayload().getResult();
   }

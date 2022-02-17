@@ -1861,8 +1861,10 @@ public class Eyes implements IEyesBase {
         List<CommandCloseResponseDto> closeResponse = commandExecutor.close(eyesRef, false);
         this.eyesRef = null;
         isClosed = true;
-        List<TestResults> testResults = TestResultsMapper.toTestResultsList(closeResponse);
-        testResults.forEach(testResults1 -> runner.logSessionResultsAndThrowException(false, testResults1));
+        if (closeResponse != null) {
+            List<TestResults> testResults = TestResultsMapper.toTestResultsList(closeResponse);
+            testResults.forEach(testResults1 -> runner.logSessionResultsAndThrowException(false, testResults1));
+        }
     }
 
     public Map<String, List<Region>> locate(VisualLocatorSettings visualLocatorSettings) {
