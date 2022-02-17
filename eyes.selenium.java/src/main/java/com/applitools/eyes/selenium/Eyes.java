@@ -461,15 +461,18 @@ public class Eyes implements IEyesBase {
      * @param checkSettings the check settings
      */
     public void check(String tag, ICheckSettings checkSettings) {
-        if (this.getIsDisabled() != null && this.getIsDisabled()) {
+        if (this.getIsDisabled()) {
             return;
         }
         if (!getIsOpen()) {
             this.abort();
             throw new EyesException("you must call open() before checking");
         }
-        checkSettings = checkSettings.withName(tag);
 
+        ArgumentGuard.notNull(checkSettings, "checkSettings");
+        if (tag != null) {
+            checkSettings = checkSettings.withName(tag);
+        }
         CheckSettingsDto checkSettingsDto = CheckSettingsMapper.toCheckSettingsDto(checkSettings);
         ConfigurationDto configurationDto = ConfigurationMapper.toConfigurationDto(configuration);
         commandExecutor.eyesCheck(eyesRef, checkSettingsDto, configurationDto);

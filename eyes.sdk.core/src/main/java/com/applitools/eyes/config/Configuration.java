@@ -76,7 +76,7 @@ public class Configuration implements IConfiguration {
     private Boolean saveDebugScreenshots;
     private String debugScreenshotsPath;
     private String debugScreenshotsPrefix;
-    private Boolean isDisabled;
+    private Boolean isDisabled = false;
     private final List<PropertyData> properties = new ArrayList<>();
     private CutProvider cutProvider;
     private Integer rotation;
