@@ -81,9 +81,9 @@ public class VisualGridRunner extends EyesRunner {
 
     public synchronized void check(byte[] vhs, Map<String, FrameData> resources, String contentType,
                                    List<CheckTask> checkTasks, VhsCompatibilityParams vhsCompatibilityParams,
-                                   VHSCaptureType vhsCaptureType, String vhsHash) {
+                                   VHSCaptureMode vhsCaptureMode, String vhsHash) {
         serviceRunner.addNativeMobileResources(vhs, resources, contentType, checkTasks, vhsCompatibilityParams,
-                vhsCaptureType, vhsHash);
+                vhsCaptureMode, vhsHash);
         logMemoryUsage();
     }
 

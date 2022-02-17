@@ -119,7 +119,7 @@ public class VisualGridServiceRunner extends Thread {
 
     public void addNativeMobileResources(byte[] vhs, Map<String, FrameData> resources, String contentType,
                                          List<CheckTask> checkTasks, VhsCompatibilityParams vhsCompatibilityParams,
-                                         VHSCaptureType vhsCaptureType, String vhsHash) {
+                                         VHSCaptureMode vhsCaptureMode, String vhsHash) {
         String resourceCollectionTaskId = UUID.randomUUID().toString();
         Set<String> testIds = new HashSet<>();
         for (CheckTask checkTask : checkTasks) {
@@ -127,12 +127,12 @@ public class VisualGridServiceRunner extends Thread {
         }
 
         RGridResource vhsResource;
-        if (vhsCaptureType == VHSCaptureType.Hash) {
+        if (vhsCaptureMode == VHSCaptureMode.Network) {
             vhsResource = new RGridResource("vhs", contentType, null, vhsHash);
         } else {
             vhsResource = new RGridResource("vhs", contentType, vhs);
         }
-        vhsResource.setVhsCaptureType(vhsCaptureType);
+        vhsResource.setVhsCaptureMode(vhsCaptureMode);
 
         MobileResourceMap mobileResourceMap = new MobileResourceMap(vhsResource, checkTasks.get(0).getBrowserInfo(), resources.size());
         nativeResourceCollectionTasksMapping.put(resourceCollectionTaskId, Pair.of(mobileResourceMap, checkTasks));

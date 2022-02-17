@@ -646,7 +646,7 @@ public class Eyes extends RunningTest implements IEyes {
             String vhsType = null;
             VhsCompatibilityParams vhsCompatibilityParams = null;
             Map<String, FrameData> resources = new HashMap<>();
-            VHSCaptureType vhsCaptureType = VHSCaptureType.Binary;
+            VHSCaptureMode vhsCaptureMode = VHSCaptureMode.Labels;
             String vhsHash = null;
             if (EyesDriverUtils.isAndroid(driver)) {
                 AndroidVHSCaptureResult result = getVHSAndroid(testIds);
@@ -654,7 +654,7 @@ public class Eyes extends RunningTest implements IEyes {
                 vhsType = result.getVcrType();
                 resources = result.getResources();
                 vhsContentType = String.format("x-applitools-vhs/%s", vhsType);
-                vhsCaptureType = result.getVhsCaptureType();
+                vhsCaptureMode = result.getVhsCaptureMode();
                 vhsHash = result.getVhsHash().toLowerCase();
             } else if (EyesDriverUtils.isIOS(driver)) {
                 try {
@@ -685,7 +685,7 @@ public class Eyes extends RunningTest implements IEyes {
                 return;
             }
             VisualGridRunner visualGridRunner = (VisualGridRunner) runner;
-            visualGridRunner.check(vhs, resources, vhsContentType, checkTasks, vhsCompatibilityParams, vhsCaptureType, vhsHash);
+            visualGridRunner.check(vhs, resources, vhsContentType, checkTasks, vhsCompatibilityParams, vhsCaptureMode, vhsHash);
         } catch (Throwable e) {
             Error error = new Error(e);
             for (RunningTest runningTest : visualGridTestList.values()) {
@@ -700,33 +700,35 @@ public class Eyes extends RunningTest implements IEyes {
         int labelsAmount = Integer.parseInt(triggerButton.getText());
         triggerButton.click();
         waitForNextAction();
-        triggerButton.click();
-        waitForNextAction();
-        waitForClearArea();
-        WebElement clearButton = driver.findElementByAccessibilityId("UFG_ClearArea");
+
+        WebElement secondaryLabel = driver.findElementByAccessibilityId("UFG_SecondaryLabel");
         try {
             Map<String, FrameData> resourcesMap;
             ObjectMapper mapper = new ObjectMapper();
             mapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
-            String jsonText = clearButton.getText();
-            Map<String, Object> captureResult = mapper.readValue(jsonText.toLowerCase(), new TypeReference<Map<String, Object>>() {});
-            VHSCaptureType captureResultType;
-            if (!captureResult.containsKey("type")) {
+            String jsonText = secondaryLabel.getText();
+            Map<String, Object> captureResult = mapper.readValue(jsonText, new TypeReference<Map<String, Object>>() {});
+            VHSCaptureMode captureResultType;
+            if (!captureResult.containsKey("mode")) {
                 throw new EyesException("Please update UFG library to the latest version");
             }
-            String vhsResultType = (String) captureResult.get("type");
-            String vcrType = ((String) captureResult.get("flavorname"));
-            if (vhsResultType.equals("hash")) {
-                captureResultType = VHSCaptureType.Hash;
-            } else {
-                captureResultType = VHSCaptureType.Binary;
+            String error = (String) captureResult.get("error");
+            if (!error.isEmpty()) {
+                throw new EyesException(error);
             }
-            String vhsExpectedHash = (String) captureResult.get("vhshash");
+            String vhsResultType = (String) captureResult.get("mode");
+            String vcrType = ((String) captureResult.get("flavorName"));
+            if (vhsResultType.equals("network")) {
+                captureResultType = VHSCaptureMode.Network;
+            } else {
+                captureResultType = VHSCaptureMode.Labels;
+            }
+            String vhsExpectedHash = (String) captureResult.get("vhsHash");
 
             byte[] vhs;
             String resourcesJson;
-            if (captureResultType == VHSCaptureType.Binary) {
-                int vhsParts = (Integer) captureResult.get("partscount");
+            if (captureResultType == VHSCaptureMode.Labels) {
+                int vhsParts = (Integer) captureResult.get("partsCount");
                 logger.log(testIds, Stage.CHECK, Pair.of("vhsParts", vhsParts));
                 StringBuilder builder = new StringBuilder();
                 int vhsPartsDone = 0;
@@ -768,6 +770,7 @@ public class Eyes extends RunningTest implements IEyes {
                     captureResultType
             );
         } finally {
+            WebElement clearButton = driver.findElementByAccessibilityId("UFG_ClearArea");
             if (clearButton != null) {
                 clearButton.click();
             }
@@ -776,27 +779,9 @@ public class Eyes extends RunningTest implements IEyes {
 
     private void waitForNextAction() throws InterruptedException {
         while (true) {
-            List<WebElement> elementList = driver.findElementsByAccessibilityId("UFG_ClearArea");
+            List<WebElement> elementList = driver.findElementsByAccessibilityId("UFG_SecondaryLabel");
             if (!elementList.isEmpty()) {
                 break;
-            }
-            elementList = driver.findElementsByAccessibilityId("UFG_Label_Error");
-            if ((!elementList.isEmpty())) {
-                throw new EyesException(elementList.get(0).getText());
-            }
-            Thread.sleep(500);
-        }
-    }
-
-    private void waitForClearArea() throws InterruptedException {
-        while (true) {
-            WebElement clearButton = driver.findElementByAccessibilityId("UFG_ClearArea");
-            if (!clearButton.getText().isEmpty()) {
-                break;
-            }
-            List<WebElement> elementList = driver.findElementsByAccessibilityId("UFG_Label_Error");
-            if ((!elementList.isEmpty())) {
-                throw new EyesException(elementList.get(0).getText());
             }
             Thread.sleep(500);
         }
