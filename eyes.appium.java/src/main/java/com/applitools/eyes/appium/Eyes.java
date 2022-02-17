@@ -25,7 +25,7 @@ public class Eyes implements IEyesBase {
      * Instantiates a new Eyes.
      */
     public Eyes() {
-        this.originEyes = new com.applitools.eyes.selenium.Eyes(new ClassicRunner());
+        this.originEyes = new com.applitools.eyes.selenium.Eyes(new AppiumRunner());
     }
 
     public com.applitools.eyes.selenium.Configuration getConfiguration() {
@@ -479,9 +479,8 @@ public class Eyes implements IEyesBase {
         return originEyes.getSaveDebugScreenshots();
     }
 
-    // TODO: What to do with appium specific agentid
     public String getBaseAgentId() {
-        return "eyes.appium.java/" + ClassVersionGetter.CURRENT_VERSION;
+        return configure().getAgentId();
     }
 
 
