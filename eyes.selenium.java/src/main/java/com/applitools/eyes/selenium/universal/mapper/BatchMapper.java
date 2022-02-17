@@ -2,6 +2,7 @@ package com.applitools.eyes.selenium.universal.mapper;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import com.applitools.eyes.BatchInfo;
 import com.applitools.eyes.selenium.universal.dto.BatchDto;
@@ -25,11 +26,14 @@ public class BatchMapper {
     batchDto.setStartedAt(batchInfo.getStartedAt() == null ? null : GeneralUtils.toISO8601DateTime(batchInfo.getStartedAt()));
     batchDto.setNotifyOnCompletion(batchInfo.isNotifyOnCompletion());
 
+    List<Map<String, String>> properties = batchInfo.getProperties();
     List<CustomPropertyDto> customPropertyDtoList = new ArrayList<>();
-     batchInfo
-        .getProperties()
-        .forEach(stringStringMap -> stringStringMap
-            .forEach((s, s2) -> customPropertyDtoList.add(new CustomPropertyDto(s, s2))));
+    for (Map<String, String> property : properties) {
+      CustomPropertyDto customPropertyDto = new CustomPropertyDto();
+      customPropertyDto.setName(property.get("name"));
+      customPropertyDto.setValue(property.get("value"));
+      customPropertyDtoList.add(customPropertyDto);
+    }
 
     batchDto.setProperties(customPropertyDtoList);
     return batchDto;
