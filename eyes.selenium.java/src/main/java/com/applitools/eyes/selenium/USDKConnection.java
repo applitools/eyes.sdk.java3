@@ -149,7 +149,7 @@ public class USDKConnection {
 
     map.put(request.getKey(), null);
 
-    System.out.println("request: " + objectMapper.writeValueAsString(request));
+    System.out.println("REQUEST: " + objectMapper.writeValueAsString(request));
     webSocket.sendTextFrame(objectMapper.writeValueAsString(request));
     syncTaskListener = new SyncTaskListener<>(logger, request.getKey());
     if (waitResult) syncTaskListener.get();
