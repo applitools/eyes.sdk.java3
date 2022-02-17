@@ -388,7 +388,7 @@ public class Eyes implements IEyesBase {
      */
     public String getFullAgentId() {
         //return activeEyes.getFullAgentId();
-        return null;
+        return "";
     }
 
     /**
@@ -420,14 +420,7 @@ public class Eyes implements IEyesBase {
      * @return The currently set log handler.
      */
     public LogHandler getLogHandler() {
-//        if (!this.isVisualGridEyes) {
-//            return this.seleniumEyes.getLogHandler();
-//        } else {
-//            if (this.visualGridEyes.getLogger() != null) {
-//                return this.visualGridEyes.getLogger().getLogHandler();
-//            }
-//        }
-        return null;
+        return new NullLogHandler();
     }
 
     /**
@@ -435,7 +428,7 @@ public class Eyes implements IEyesBase {
      * @return the logger
      */
     public Logger getLogger() {
-        return null;
+        return new Logger();
     }
 
     /**
