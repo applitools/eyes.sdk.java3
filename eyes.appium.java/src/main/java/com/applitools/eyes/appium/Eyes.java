@@ -629,5 +629,9 @@ public class Eyes implements IEyesBase {
         originEyes.abortAsync();
     }
 
+    @Deprecated
+    protected Configuration getConfigurationInstance() {
+        return configure();
+    }
 }
 
