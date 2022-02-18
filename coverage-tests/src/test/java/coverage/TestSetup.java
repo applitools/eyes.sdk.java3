@@ -10,6 +10,7 @@ import com.applitools.eyes.visualgrid.services.EyesRunner0;
 import com.applitools.eyes.visualgrid.services.VisualGridRunner;
 import com.fasterxml.jackson.databind.JsonNode;
 import coverage.drivers.browsers.DriverBuilder;
+import io.netty.handler.codec.http.QueryStringDecoder;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.Actions;
@@ -17,6 +18,7 @@ import com.applitools.eyes.metadata.SessionResults;
 import com.applitools.eyes.utils.TestUtils;
 import org.testng.Assert;
 
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -105,7 +107,8 @@ public class TestSetup extends GlobalSetup {
     public JsonNode getDom(TestResults results, String domId) {
         JsonNode dom = null;
         try {
-            dom = TestUtils.getStepDom(eyes.getLogger(), eyes.getServerUrl().toString(), eyes.getApiKey(), domId);
+            String accountId = new QueryStringDecoder(results.getUrl()).parameters().get("accountId").get(0);
+            dom = TestUtils.getStepDom(eyes.getLogger(), eyes.getServerUrl().toString(), GlobalSetup.readApiKey, domId, accountId);
         } catch (Throwable e) {
             e.printStackTrace();
             Assert.fail("Exception appeared while getting session results");

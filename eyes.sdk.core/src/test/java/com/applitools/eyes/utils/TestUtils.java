@@ -162,17 +162,22 @@ public class TestUtils {
     }
 
     public static JsonNode getStepDom(Logger logger, String serverUrl, String apiKey, String domId) throws JsonProcessingException {
+        return getStepDom(logger, serverUrl, apiKey, domId, null);
+    }
+
+
+    public static JsonNode getStepDom(Logger logger, String serverUrl, String apiKey, String domId, String accountId) throws JsonProcessingException {
         ArgumentGuard.notNull(logger, "logger");
         ArgumentGuard.notNull(serverUrl, "serverUrl");
         ArgumentGuard.notNull(apiKey, "apiKey");
         ArgumentGuard.notNull(domId, "domId");
 
-        URI apiSessionUri = UriBuilder.fromUri(serverUrl)
+        UriBuilder builder = UriBuilder.fromUri(serverUrl)
                 .path("api/images/dom")
                 .path(domId)
-                .queryParam("apiKey", apiKey)
-                .build();
-
+                .queryParam("apiKey", apiKey);
+        if (accountId != null) builder.queryParam("accountId", accountId);
+        URI apiSessionUri = builder.build();
         RestClient client = new RestClient(logger, apiSessionUri, ServerConnector.DEFAULT_CLIENT_TIMEOUT);
         ObjectMapper mapper = new ObjectMapper();
         String dom = client.sendHttpRequest(apiSessionUri.toString(), HttpMethod.GET, MediaType.APPLICATION_JSON).getBodyString();
