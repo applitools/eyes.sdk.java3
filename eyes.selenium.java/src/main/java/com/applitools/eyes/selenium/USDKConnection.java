@@ -37,10 +37,14 @@ public class USDKConnection {
   private Map<String, ResponseDto<?>> map;
 
   public USDKConnection() {
-    webSocket = openWebsocket();
+   // webSocket = openWebsocket();
     map = new HashMap<>();
     objectMapper = new ObjectMapper();
     objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+  }
+
+  public void init() {
+   webSocket = openWebsocket();
   }
 
   private WebSocket openWebsocket() {
@@ -138,7 +142,7 @@ public class USDKConnection {
   }
 
 
-  public ResponseDto<?> executeCommand(Command command, boolean waitResult) throws Exception {
+  public synchronized ResponseDto<?> executeCommand(Command command, boolean waitResult) throws Exception {
     if (command instanceof EventDto<?>) {
       System.out.println("MAKE_SDK: " + command);
       webSocket.sendTextFrame(objectMapper.writeValueAsString(command));

@@ -55,6 +55,7 @@ public class CommandExecutor {
 
   private CommandExecutor(String name, String version) {
     connection = new USDKConnection();
+    connection.init();
     makeSdk(name, version, GeneralUtils.getPropertyString("user.dir"), "webdriver");
   }
 
