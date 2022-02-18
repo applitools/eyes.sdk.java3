@@ -456,10 +456,10 @@ public class Eyes implements IEyesBase {
             checkSettings = checkSettings.withName(tag);
         }
         CheckSettingsDto checkSettingsDto = CheckSettingsMapper.toCheckSettingsDto(checkSettings);
-        check(checkSettingsDto);
+        checkDto(checkSettingsDto);
     }
 
-    public void check(CheckSettingsDto checkSettingsDto) {
+    private void checkDto(CheckSettingsDto checkSettingsDto) {
         if (this.getIsDisabled()) {
             return;
         }

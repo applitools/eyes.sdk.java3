@@ -15,6 +15,8 @@ import com.applitools.eyes.selenium.universal.dto.CheckSettingsDto;
 import com.applitools.utils.*;
 import org.openqa.selenium.*;
 
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.net.URI;
 import java.util.*;
 
@@ -501,9 +503,19 @@ public class Eyes implements IEyesBase {
 
     public void check(ICheckSettings checkSettings) {
         CheckSettingsDto checkSettingsDto = AppiumCheckSettingsMapper.toCheckSettingsDto(checkSettings);
-        originEyes.check(checkSettingsDto);
+        this.checkDto(checkSettingsDto);
     }
 
+    private void checkDto(CheckSettingsDto checkSettingsDto) throws EyesException {
+        try {
+            Method checkDto = originEyes.getClass().getDeclaredMethod("checkDto", CheckSettingsDto.class);
+            checkDto.setAccessible(true);
+            checkDto.invoke(originEyes, checkSettingsDto);
+        } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
+            e.printStackTrace();
+            throw new EyesException("selenium.Eyes has changed `checkDto` method name");
+        }
+    }
 
     public void checkElement(WebElement element) {
         originEyes.checkElement(element);
