@@ -18,6 +18,7 @@ public class GlobalSetup {
     protected WebDriver eyesDriver;
     protected static BatchInfo batch;
     protected static String apiKey;
+    protected static String readApiKey;
     public static boolean useDocker;
     public static boolean CI;
     public static String EG_URL;
@@ -33,6 +34,7 @@ public class GlobalSetup {
         String id = System.getenv("APPLITOOLS_BATCH_ID");
         if (id != null) batch.setId(id);
         apiKey = System.getenv("APPLITOOLS_API_KEY");
+        readApiKey = System.getenv("APPLITOOLS_API_KEY_READ");
         EG_URL = System.getenv("EXECUTION_GRID_URL");
         String CI = System.getenv("CI");
         GlobalSetup.CI = CI != null && CI.equals("true");
