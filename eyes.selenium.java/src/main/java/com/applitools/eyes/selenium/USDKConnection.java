@@ -20,6 +20,7 @@ import com.applitools.eyes.selenium.universal.dto.response.CommandCloseResponseD
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.sun.corba.se.impl.orbutil.concurrent.Sync;
 import org.asynchttpclient.Dsl;
 import org.asynchttpclient.ws.WebSocket;
 import org.asynchttpclient.ws.WebSocketListener;
@@ -31,13 +32,11 @@ import org.asynchttpclient.ws.WebSocketUpgradeHandler;
 public class USDKConnection {
   private WebSocket webSocket;
   protected Logger logger = new Logger();
-  private SyncTaskListener<ResponseDto<?>> syncTaskListener;
   private ObjectMapper objectMapper;
 
-  private Map<String, ResponseDto<?>> map;
+  private Map<String, SyncTaskListener<ResponseDto<?>>> map;
 
   public USDKConnection() {
-   // webSocket = openWebsocket();
     map = new HashMap<>();
     objectMapper = new ObjectMapper();
     objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
@@ -70,16 +69,19 @@ public class USDKConnection {
                   if (payload.contains("Core.makeManager") || payload.contains("EyesManager.openEyes")) {
                     try {
                       ResponseDto<Reference> referenceResponseDto = objectMapper.readValue(payload, new TypeReference<ResponseDto<Reference>>() {});
-                      map.put(referenceResponseDto.getKey(), referenceResponseDto);
-                      syncTaskListener.onComplete(referenceResponseDto);
+
+                      SyncTaskListener<ResponseDto<?>> syncTaskLister = map.get(referenceResponseDto.getKey());
+                      syncTaskLister.onComplete(referenceResponseDto);
+                      map.remove(referenceResponseDto.getKey());
                     } catch (Exception e) {
                       e.printStackTrace();
                     }
                   } else if(payload.contains("Eyes.check")) {
                     try {
                       ResponseDto<MatchResultDto> checkResponse = objectMapper.readValue(payload, new TypeReference<ResponseDto<MatchResultDto>>() {});
-                      map.put(checkResponse.getKey(), checkResponse);
-                      syncTaskListener.onComplete(checkResponse);
+                      SyncTaskListener<ResponseDto<?>> syncTaskLister = map.get(checkResponse.getKey());
+                      syncTaskLister.onComplete(checkResponse);
+                      map.remove(checkResponse.getKey());
                     } catch (Exception e) {
                       e.printStackTrace();
                     }
@@ -87,8 +89,9 @@ public class USDKConnection {
                     try {
                       ResponseDto<Map<String, List<Region>>> locateResponse = objectMapper
                           .readValue(payload, new TypeReference<ResponseDto<Map<String, List<Region>>>>() {});
-                      map.put(locateResponse.getKey(), locateResponse);
-                      syncTaskListener.onComplete(locateResponse);
+                      SyncTaskListener<ResponseDto<?>> syncTaskLister = map.get(locateResponse.getKey());
+                      syncTaskLister.onComplete(locateResponse);
+                      map.remove(locateResponse.getKey());
                     } catch (Exception e) {
                       e.printStackTrace();
                     }
@@ -96,8 +99,9 @@ public class USDKConnection {
                     try {
                       ResponseDto<List<CommandCloseResponseDto>> closeResponse = objectMapper.readValue(payload,
                           new TypeReference<ResponseDto<List<CommandCloseResponseDto>>>() {});
-                      map.put(closeResponse.getKey(), closeResponse);
-                      syncTaskListener.onComplete(closeResponse);
+                      SyncTaskListener<ResponseDto<?>> syncTaskLister = map.get(closeResponse.getKey());
+                      syncTaskLister.onComplete(closeResponse);
+                      map.remove(closeResponse.getKey());
                     } catch (Exception e) {
                       e.printStackTrace();
                     }
@@ -105,16 +109,18 @@ public class USDKConnection {
                     try {
                       ResponseDto<Map<String, List<TextRegion>>> extractTextRegionsResponse = objectMapper
                           .readValue(payload, new TypeReference<ResponseDto<Map<String, List<TextRegion>>>>() {});
-                      map.put(extractTextRegionsResponse.getKey(), extractTextRegionsResponse);
-                      syncTaskListener.onComplete(extractTextRegionsResponse);
+                      SyncTaskListener<ResponseDto<?>> syncTaskLister = map.get(extractTextRegionsResponse.getKey());
+                      syncTaskLister.onComplete(extractTextRegionsResponse);
+                      map.remove(extractTextRegionsResponse.getKey());
                     } catch (Exception e) {
                       e.printStackTrace();
                     }
                   } else if (payload.contains("Eyes.extractText")) {
                     try {
                       ResponseDto<List<String>> responseDto = objectMapper.readValue(payload, new TypeReference<ResponseDto<List<String>>>() {});
-                      map.put(responseDto.getKey(), responseDto);
-                      syncTaskListener.onComplete(responseDto);
+                      SyncTaskListener<ResponseDto<?>> syncTaskLister = map.get(responseDto.getKey());
+                      syncTaskLister.onComplete(responseDto);
+                      map.remove(responseDto.getKey());
                     } catch (Exception e) {
                       e.printStackTrace();
                     }
@@ -122,8 +128,9 @@ public class USDKConnection {
                     try {
                       ResponseDto<RectangleSizeDto> getViewportSizeResponse = objectMapper.readValue(payload, new TypeReference<ResponseDto<RectangleSizeDto>>() {
                       });
-                      map.put(getViewportSizeResponse.getKey(), getViewportSizeResponse);
-                      syncTaskListener.onComplete(getViewportSizeResponse);
+                      SyncTaskListener<ResponseDto<?>> syncTaskLister = map.get(getViewportSizeResponse.getKey());
+                      syncTaskLister.onComplete(getViewportSizeResponse);
+                      map.remove(getViewportSizeResponse.getKey());
                     } catch (Exception e) {
                       e.printStackTrace();
                     }
@@ -142,7 +149,7 @@ public class USDKConnection {
   }
 
 
-  public synchronized ResponseDto<?> executeCommand(Command command, boolean waitResult) throws Exception {
+  public synchronized SyncTaskListener executeCommand(Command command, boolean waitResult) throws Exception {
     if (command instanceof EventDto<?>) {
       System.out.println("MAKE_SDK: " + command);
       webSocket.sendTextFrame(objectMapper.writeValueAsString(command));
@@ -151,13 +158,12 @@ public class USDKConnection {
 
     RequestDto<?> request = (RequestDto<?>) command;
 
-    map.put(request.getKey(), null);
+    SyncTaskListener<ResponseDto<?>> syncTaskListener = new SyncTaskListener<>(logger, request.getKey());
+    map.put(request.getKey(), syncTaskListener);
 
     System.out.println("REQUEST: " + objectMapper.writeValueAsString(request));
     webSocket.sendTextFrame(objectMapper.writeValueAsString(request));
-    syncTaskListener = new SyncTaskListener<>(logger, request.getKey());
-    if (waitResult) syncTaskListener.get();
-    return map.get(request.getKey());
+    return syncTaskListener;
   }
 
 }

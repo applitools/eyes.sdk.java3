@@ -7,6 +7,7 @@ import java.util.UUID;
 
 import com.applitools.eyes.EyesException;
 import com.applitools.eyes.Region;
+import com.applitools.eyes.SyncTaskListener;
 import com.applitools.eyes.locators.TextRegion;
 import com.applitools.eyes.selenium.universal.dto.CheckEyes;
 import com.applitools.eyes.selenium.universal.dto.CheckSettingsDto;
@@ -72,7 +73,8 @@ public class CommandExecutor {
     request.setName("Core.makeManager");
     request.setKey(UUID.randomUUID().toString());
     request.setPayload(new MakeManager(type, concurrency, isLegacy));
-    ResponseDto<Reference> response = (ResponseDto<Reference>) checkedCommand(request, true);
+    SyncTaskListener syncTaskListener = checkedCommand(request, true);
+    ResponseDto<Reference> response = (ResponseDto<Reference>) syncTaskListener.get();
     System.out.println("RESP_MAKE_MANAGER: " + response);
     if (response != null && response.getPayload().getError() != null) {
       String message = response.getPayload().getError().getMessage();
@@ -89,16 +91,18 @@ public class CommandExecutor {
     request.setName("EyesManager.openEyes");
     request.setKey(UUID.randomUUID().toString());
     request.setPayload(new OpenEyes(ref, driverDto, config));
-    ResponseDto<Reference> response = (ResponseDto<Reference>) checkedCommand(request, true);
-    System.out.println("RESP_OPEN: " + response);
-    if (response != null && response.getPayload().getError() != null) {
-      String message = response.getPayload().getError().getMessage();
+    SyncTaskListener syncTaskListener = checkedCommand(request, true);
+    ResponseDto<Reference> referenceResponseDto = (ResponseDto<Reference>) syncTaskListener.get();
+
+    System.out.println("RESP_OPEN: " + referenceResponseDto);
+    if (referenceResponseDto != null && referenceResponseDto.getPayload().getError() != null) {
+      String message = referenceResponseDto.getPayload().getError().getMessage();
       if (message != null && message.contains("stale element reference")) {
         throw new StaleElementReferenceException(message);
       }
       throw new EyesException(message);
     }
-    return response.getPayload().getResult();
+    return referenceResponseDto.getPayload().getResult();
   }
 
   public void eyesCheck(Reference eyesRef, CheckSettingsDto settings, ConfigurationDto config) {
@@ -106,7 +110,8 @@ public class CommandExecutor {
     request.setName("Eyes.check");
     request.setKey(UUID.randomUUID().toString());
     request.setPayload(new CheckEyes(eyesRef, settings, config));
-    ResponseDto<MatchResultDto> responseDto = (ResponseDto<MatchResultDto>) checkedCommand(request, true);
+    SyncTaskListener syncTaskListener = checkedCommand(request, true);
+    ResponseDto<MatchResultDto> responseDto = (ResponseDto<MatchResultDto>) syncTaskListener.get();
     System.out.println("RESP_CHECK: " + responseDto);
     if (responseDto != null && responseDto.getPayload().getError() != null) {
       String message = responseDto.getPayload().getError().getMessage();
@@ -122,7 +127,8 @@ public class CommandExecutor {
     request.setName("Eyes.locate");
     request.setKey(UUID.randomUUID().toString());
     request.setPayload(new LocateDto(eyesRef, locatorSettingsDto, config));
-    ResponseDto<Map<String, List<Region>>> locateResponse = (ResponseDto<Map<String, List<Region>>>)checkedCommand(request, true);
+    SyncTaskListener syncTaskListener = checkedCommand(request, true);
+    ResponseDto<Map<String, List<Region>>> locateResponse = (ResponseDto<Map<String, List<Region>>>) syncTaskListener.get();
     System.out.println("RESP_LOCATE: " + locateResponse);
     if (locateResponse != null && locateResponse.getPayload().getError() != null) {
       String message = locateResponse.getPayload().getError().getMessage();
@@ -139,8 +145,8 @@ public class CommandExecutor {
     request.setName("Eyes.extractTextRegions");
     request.setKey(UUID.randomUUID().toString());
     request.setPayload(new ExtractTextRegionsDto(eyesRef, searchSettingsDto, config));
-    ResponseDto<Map<String, List<TextRegion>>> extractTextRegionsResponse =
-        (ResponseDto<Map<String, List<TextRegion>>>) checkedCommand(request, true);
+    SyncTaskListener syncTaskListener = checkedCommand(request, true);
+    ResponseDto<Map<String, List<TextRegion>>> extractTextRegionsResponse = (ResponseDto<Map<String, List<TextRegion>>>) syncTaskListener.get();
     System.out.println("RESP_EXTRACT_TEXT_REGIONS: " + extractTextRegionsResponse);
     if (extractTextRegionsResponse != null && extractTextRegionsResponse.getPayload().getError() != null) {
       String message = extractTextRegionsResponse.getPayload().getError().getMessage();
@@ -158,7 +164,8 @@ public class CommandExecutor {
     request.setName("Eyes.extractText");
     request.setKey(UUID.randomUUID().toString());
     request.setPayload(new ExtractTextDto(eyesRef, extractSettingsDtoList, config));
-    ResponseDto<List<String>> responseDto = (ResponseDto<List<String>>) checkedCommand(request, true);
+    SyncTaskListener syncTaskListener = checkedCommand(request, true);
+    ResponseDto<List<String>> responseDto = (ResponseDto<List<String>>) syncTaskListener.get();
     System.out.println("RESP_EXTRACT_TEXT: " + responseDto);
     if (responseDto != null && responseDto.getPayload().getError() != null) {
       String message = responseDto.getPayload().getError().getMessage();
@@ -175,7 +182,11 @@ public class CommandExecutor {
     request.setName("Eyes.close");
     request.setKey(UUID.randomUUID().toString());
     request.setPayload(new CommandCloseRequestDto(eyesRef));
-    ResponseDto<List<CommandCloseResponseDto>> closeResponse = (ResponseDto<List<CommandCloseResponseDto>>) checkedCommand(request, waitResult);
+    SyncTaskListener syncTaskListener = checkedCommand(request, waitResult);
+    if (!waitResult) {
+      return null;
+    }
+    ResponseDto<List<CommandCloseResponseDto>> closeResponse = (ResponseDto<List<CommandCloseResponseDto>>) syncTaskListener.get();
     System.out.println("RESP_CLOSE: " + closeResponse + ", WAIT_RESULT: " + waitResult);
     if (closeResponse != null && closeResponse.getPayload() != null && closeResponse.getPayload().getError() != null) {
       String message = closeResponse.getPayload().getError().getMessage();
@@ -184,9 +195,7 @@ public class CommandExecutor {
       }
       throw new EyesException(message);
     }
-    if (!waitResult) {
-      return null;
-    }
+
     return closeResponse.getPayload().getResult();
   }
 
@@ -195,7 +204,11 @@ public class CommandExecutor {
     request.setName("Eyes.abort");
     request.setKey(UUID.randomUUID().toString());
     request.setPayload(new CommandCloseRequestDto(eyesRef));
-    ResponseDto<List<CommandCloseResponseDto>> closeResponse = (ResponseDto<List<CommandCloseResponseDto>>) checkedCommand(request, waitResult);
+    SyncTaskListener syncTaskListener = checkedCommand(request, waitResult);
+    if (!waitResult) {
+      return null;
+    }
+    ResponseDto<List<CommandCloseResponseDto>> closeResponse = (ResponseDto<List<CommandCloseResponseDto>>) syncTaskListener.get();
     System.out.println("RESP_ABORT: " + closeResponse);
     if (closeResponse != null && closeResponse.getPayload().getError() != null) {
       String message = closeResponse.getPayload().getError().getMessage();
@@ -212,7 +225,8 @@ public class CommandExecutor {
     request.setName("Core.getViewportSize");
     request.setKey(UUID.randomUUID().toString());
     request.setPayload(new CommandGetViewportSizeRequestDto(driver));
-    ResponseDto<RectangleSizeDto> getViewportSizeResponse = (ResponseDto<RectangleSizeDto>) checkedCommand(request, true);
+    SyncTaskListener syncTaskListener = checkedCommand(request, true);
+    ResponseDto<RectangleSizeDto> getViewportSizeResponse = (ResponseDto<RectangleSizeDto>) syncTaskListener.get();
     return getViewportSizeResponse.getPayload().getResult();
   }
 
@@ -221,7 +235,8 @@ public class CommandExecutor {
     request.setName("EyesManager.closeAllEyes");
     request.setKey(UUID.randomUUID().toString());
     request.setPayload(new CommandCloseAllEyesRequestDto(managerRef));
-    ResponseDto<List<CommandCloseResponseDto>> closeResponse = (ResponseDto<List<CommandCloseResponseDto>>) checkedCommand(request, true);
+    SyncTaskListener syncTaskListener = checkedCommand(request, true);
+    ResponseDto<List<CommandCloseResponseDto>> closeResponse = (ResponseDto<List<CommandCloseResponseDto>>) syncTaskListener.get();
     System.out.println("RESP_CLOSE_ALL_EYES: " + closeResponse);
     if (closeResponse != null && closeResponse.getPayload().getError() != null) {
       String message = closeResponse.getPayload().getError().getMessage();
@@ -234,7 +249,7 @@ public class CommandExecutor {
   }
 
 
-  public static ResponseDto<?> checkedCommand(Command command, boolean waitResult) {
+  public static SyncTaskListener checkedCommand(Command command, boolean waitResult) {
     try {
       return connection.executeCommand(command, waitResult);
     } catch (Exception e) {
