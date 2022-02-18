@@ -384,6 +384,7 @@ public class Eyes implements IEyesBase {
 
     @Deprecated
     public void setScrollToRegion(boolean shouldScroll) {
+        // For backward compatibility
     }
 
     /**
