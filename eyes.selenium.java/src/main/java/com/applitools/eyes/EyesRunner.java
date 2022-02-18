@@ -20,6 +20,7 @@ import com.applitools.eyes.selenium.Reference;
 import com.applitools.eyes.selenium.universal.dto.response.CommandCloseResponseDto;
 import com.applitools.eyes.selenium.universal.mapper.TestResultsMapper;
 import com.applitools.eyes.selenium.universal.server.UniversalSdkNativeLoader;
+import com.applitools.utils.ClassVersionGetter;
 import com.applitools.utils.GeneralUtils;
 import org.apache.commons.lang3.tuple.Pair;
 
@@ -36,19 +37,30 @@ public abstract class EyesRunner {
   /**
    * name of the client sdk
    */
-  protected final String BASE_AGENT_ID = "eyes.sdk.java";
+  protected static String BASE_AGENT_ID = "eyes.sdk.java";
 
   /**
    * version of the client sdk
    */
-  protected final String VERSION = "1.0.0";
+  protected static String VERSION = ClassVersionGetter.CURRENT_VERSION;
 
   /**
    * used for instantiating Classic Runner
    */
   public EyesRunner() {
+    runServer(BASE_AGENT_ID, VERSION);
+  }
+
+  /**
+   * used for instantiating Classic Runner
+   */
+  public EyesRunner(String baseAgentId, String version) {
+    runServer(baseAgentId, version);
+  }
+
+  protected void runServer(String baseAgentId, String version){
     UniversalSdkNativeLoader.start();
-    commandExecutor = CommandExecutor.getInstance(BASE_AGENT_ID, VERSION);
+    commandExecutor = CommandExecutor.getInstance(baseAgentId, version);
   }
 
   private boolean dontCloseBatches = false;

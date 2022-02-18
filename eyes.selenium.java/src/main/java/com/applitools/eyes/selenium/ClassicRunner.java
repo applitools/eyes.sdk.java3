@@ -30,6 +30,11 @@ public class ClassicRunner extends EyesRunner {
     managerRef = commandExecutor.coreMakeManager(ManagerType.CLASSIC.value, null, null);
   }
 
+  protected ClassicRunner(String baseAgentId, String version) {
+    super(baseAgentId, version);
+    managerRef = commandExecutor.coreMakeManager(ManagerType.CLASSIC.value, null, null);
+  }
+
   @Override
   public TestResultsSummary getAllTestResultsImpl(boolean shouldThrowException) {
     if (shouldThrowException) {
