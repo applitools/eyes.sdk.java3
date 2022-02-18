@@ -120,6 +120,9 @@ public class Eyes implements IEyesBase {
      */
     public WebDriver open(WebDriver driver, String appName, String testName,
                           RectangleSize viewportSize) {
+        if (getIsDisabled()) {
+            return driver;
+        }
         DriverDto driverDto = DriverMapper.toDriverDto(driver);
         configurationProvider.get().setAppName(appName).setTestName(testName);
 
@@ -477,6 +480,11 @@ public class Eyes implements IEyesBase {
      * @return the test results
      */
     public TestResults close(boolean shouldThrowException) {
+
+        if (getIsDisabled()) {
+            return null;
+        }
+
         if (!getIsOpen()) {
             throw new EyesException("Eyes not open");
         }
@@ -1848,6 +1856,11 @@ public class Eyes implements IEyesBase {
     }
 
     public void closeAsync() {
+
+        if (getIsDisabled()) {
+            return;
+        }
+
         if (!getIsOpen()) {
             throw new EyesException("Eyes not open");
         }
