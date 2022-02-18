@@ -44,11 +44,6 @@ jobs:
         - echo $APPLITOOLS_REPORT_ID
         - chmod +x ./runTests.sh
         - ./runTests.sh "eyes.sdk.core"
-    - name: Images
-      script:
-        - echo $APPLITOOLS_REPORT_ID
-        - chmod +x ./runTests.sh
-        - ./runTests.sh "eyes.images.java"
     - name: Appium Full Coverage
       if: type = cron AND branch = master
       script:
