@@ -17,7 +17,7 @@ public class SelectorRegionMapper {
     SelectorRegionDto selectorRegionDto = new SelectorRegionDto();
     selectorRegionDto.setSelector(GeneralUtils.getLastWordOfStringWithRegex(by.toString(), ":"));
     if (by instanceof By.ById) {
-      selectorRegionDto.setType("id");
+      selectorRegionDto.setType("css selector");
     } else if (by instanceof By.ByXPath) {
       selectorRegionDto.setType("xpath");
     } else if (by instanceof By.ByLinkText) {
@@ -25,11 +25,11 @@ public class SelectorRegionMapper {
     } else if (by instanceof By.ByPartialLinkText) {
       selectorRegionDto.setType("partial link text");
     } else if (by instanceof By.ByName) {
-      selectorRegionDto.setType("name");
+      selectorRegionDto.setType("css selector");
     } else if (by instanceof By.ByTagName) {
-      selectorRegionDto.setType("tag name");
+      selectorRegionDto.setType("css selector");
     } else if (by instanceof By.ByClassName) {
-      selectorRegionDto.setType("class name");
+      selectorRegionDto.setType("css selector");
     } else if (by instanceof By.ByCssSelector){
       selectorRegionDto.setType("css selector");
     }

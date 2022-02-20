@@ -47,6 +47,7 @@ public class CheckSettingsMapper {
     checkSettingsDto.setFloatingRegions(TFloatingRegionMapper.toTFloatingRegionDtoList(Arrays.asList(seleniumCheckSettings.getFloatingRegions())));
 
     checkSettingsDto.setAccessibilityRegions(TAccessibilityRegionMapper.toTAccessibilityRegionDtoList(Arrays.asList(seleniumCheckSettings.getAccessibilityRegions())));
+    checkSettingsDto.setPageId(seleniumCheckSettings.getPageId());
 
     // ScreenshotSettings
     checkSettingsDto.setRegion(TRegionMapper.toTRegionFromCheckSettings(checkSettings));

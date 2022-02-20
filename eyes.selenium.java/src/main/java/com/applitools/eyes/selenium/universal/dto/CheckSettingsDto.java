@@ -37,14 +37,15 @@ public class CheckSettingsDto {
   private List<TRegion> strictRegions;
   private List<TRegion> contentRegions;
 
-  private Object floatingRegions; // (TRegion | FloatingRegion<TRegion>)[]
-  private Object accessibilityRegions; //  (TRegion | AccessibilityRegion<TRegion>)[]
+  private Object floatingRegions;
+  private Object accessibilityRegions;
 
   // ScreenshotSettings
-  private TRegion region; // RegionReference<TElement, TSelector> - > Region | ElementReference<TElement, TSelector>
-  private Object frames; // (ContextReference<TElement, TSelector> | FrameReference<TElement, TSelector>)[]
+  private TRegion region;
+  private Object frames;
   private TRegion scrollRootElement;
   private Boolean fully;
+  private String pageId;
 
   public String getName() {
     return name;
@@ -258,5 +259,17 @@ public class CheckSettingsDto {
 
   public void setAccessibilityRegions(Object accessibilityRegions) {
     this.accessibilityRegions = accessibilityRegions;
+  }
+
+  public void setFrames(Object frames) {
+    this.frames = frames;
+  }
+
+  public String getPageId() {
+    return pageId;
+  }
+
+  public void setPageId(String pageId) {
+    this.pageId = pageId;
   }
 }

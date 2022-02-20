@@ -47,7 +47,8 @@ public class SeleniumCheckSettings extends CheckSettings implements ISeleniumChe
     private CheckState state;
 
     private boolean isDefaultLayoutBreakpointsSet = false;
-    private final List<Integer> layoutBreakpoints = new ArrayList<>();  // done
+    private final List<Integer> layoutBreakpoints = new ArrayList<>();
+    private String pageId;
 
     public SeleniumCheckSettings() {
     }
@@ -647,5 +648,16 @@ public class SeleniumCheckSettings extends CheckSettings implements ISeleniumChe
         return state != null && state.getStitchPositionProvider() != null
                 && state.getStitchPositionProvider() instanceof CssTranslatePositionProvider ? state.getStitchPositionProvider() : null;
     }
+
+    public SeleniumCheckSettings pageId(String pageId) {
+        SeleniumCheckSettings clone = this.clone();
+        clone.pageId = pageId;
+        return clone;
+    }
+
+    public String getPageId() {
+        return this.pageId;
+    }
+
 }
 
