@@ -20,7 +20,6 @@ import com.applitools.eyes.selenium.universal.dto.response.CommandCloseResponseD
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.sun.corba.se.impl.orbutil.concurrent.Sync;
 import org.asynchttpclient.Dsl;
 import org.asynchttpclient.ws.WebSocket;
 import org.asynchttpclient.ws.WebSocketListener;

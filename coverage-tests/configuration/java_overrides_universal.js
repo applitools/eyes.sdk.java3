@@ -18,6 +18,13 @@ module.exports = {
     'should handle check of stale element in frame if selector is preserved': {skip: true}, // Not implemented yet
 
     // They are testing a functionality that no longer exists for the SDK
+    'should return actual viewport size': {skip: true},
     'should set viewport size': {skip: true},
     'should set viewport size on edge legacy': {skip: true},
+
+    // Chrome emulator have minor diffs with JS sdk
+    'should not fail if scroll root is stale on android': {config: {branchName: 'universal-java'}},
+    'check window fully on android chrome emulator on mobile page with horizontal scroll': {config: {branchName: 'universal-java'}},
+    'check window fully on android chrome emulator on mobile page': {config: {branchName: 'universal-java'}},
+
 }
