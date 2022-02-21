@@ -22,7 +22,8 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
     "windowTitle",
     "tag",
     "isPrimary",
-    "knownVariantId"
+    "knownVariantId",
+    "pageCoverageInfo"
 })
 public class ActualAppOutput {
 
@@ -53,6 +54,9 @@ public class ActualAppOutput {
     private Boolean isPrimary;
     @JsonProperty("knownVariantId")
     private String knownVariantId;
+
+    @JsonProperty("pageCoverageInfo")
+    private PageCoverageInfo pageCoverageInfo;
 
     @JsonProperty("image")
     public Image getImage() {
@@ -170,5 +174,15 @@ public class ActualAppOutput {
 
     public void setKnownVariantId(String knownVariantId) {
         this.knownVariantId = knownVariantId;
+    }
+
+    @JsonProperty("pageCoverageInfo")
+    public PageCoverageInfo getPageCoverageInfo() {
+        return pageCoverageInfo;
+    }
+
+    @JsonProperty("pageCoverageInfo")
+    public void setPageCoverageInfo(PageCoverageInfo pageCoverageInfo) {
+        this.pageCoverageInfo = pageCoverageInfo;
     }
 }

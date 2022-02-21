@@ -53,6 +53,7 @@ public class EyesTests {
     configuration.setBatch(batchInfo);
     configuration.setBaselineEnvName("baseline env name");
     RectangleSize rectangleSize = new RectangleSize(500, 500);
+
     //configuration.setViewportSize(rectangleSize);
     //configuration.setIgnoreDisplacements(false);
 //    ImageMatchSettings imageMatchSettings = new ImageMatchSettings();
