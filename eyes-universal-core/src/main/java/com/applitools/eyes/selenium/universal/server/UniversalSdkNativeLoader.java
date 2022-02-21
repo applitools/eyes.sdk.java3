@@ -1,6 +1,5 @@
 package com.applitools.eyes.selenium.universal.server;
 
-
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -15,8 +14,10 @@ import java.util.Set;
 
 import com.applitools.utils.GeneralUtils;
 
+/**
+ * @author Kanan
+ */
 public class UniversalSdkNativeLoader {
-
   private static Process nativeProcess = null;
 
   public static void start() {
@@ -126,5 +127,4 @@ public class UniversalSdkNativeLoader {
     }
     reader.close();
   }
-
 }
