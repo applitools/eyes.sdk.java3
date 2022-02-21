@@ -75,7 +75,6 @@ public class CommandExecutor {
     request.setPayload(new MakeManager(type, concurrency, isLegacy));
     SyncTaskListener syncTaskListener = checkedCommand(request, true);
     ResponseDto<Reference> response = (ResponseDto<Reference>) syncTaskListener.get();
-    System.out.println("RESP_MAKE_MANAGER: " + response);
     if (response != null && response.getPayload().getError() != null) {
       String message = response.getPayload().getError().getMessage();
       if (message != null && message.contains("stale element reference")) {
@@ -94,7 +93,6 @@ public class CommandExecutor {
     SyncTaskListener syncTaskListener = checkedCommand(request, true);
     ResponseDto<Reference> referenceResponseDto = (ResponseDto<Reference>) syncTaskListener.get();
 
-    System.out.println("RESP_OPEN: " + referenceResponseDto);
     if (referenceResponseDto != null && referenceResponseDto.getPayload().getError() != null) {
       String message = referenceResponseDto.getPayload().getError().getMessage();
       if (message != null && message.contains("stale element reference")) {
@@ -112,7 +110,6 @@ public class CommandExecutor {
     request.setPayload(new CheckEyes(eyesRef, settings, config));
     SyncTaskListener syncTaskListener = checkedCommand(request, true);
     ResponseDto<MatchResultDto> responseDto = (ResponseDto<MatchResultDto>) syncTaskListener.get();
-    System.out.println("RESP_CHECK: " + responseDto);
     if (responseDto != null && responseDto.getPayload().getError() != null) {
       String message = responseDto.getPayload().getError().getMessage();
       if (message != null && message.contains("stale element reference")) {
@@ -129,7 +126,6 @@ public class CommandExecutor {
     request.setPayload(new LocateDto(eyesRef, locatorSettingsDto, config));
     SyncTaskListener syncTaskListener = checkedCommand(request, true);
     ResponseDto<Map<String, List<Region>>> locateResponse = (ResponseDto<Map<String, List<Region>>>) syncTaskListener.get();
-    System.out.println("RESP_LOCATE: " + locateResponse);
     if (locateResponse != null && locateResponse.getPayload().getError() != null) {
       String message = locateResponse.getPayload().getError().getMessage();
       if (message != null && message.contains("stale element reference")) {
@@ -147,7 +143,6 @@ public class CommandExecutor {
     request.setPayload(new ExtractTextRegionsDto(eyesRef, searchSettingsDto, config));
     SyncTaskListener syncTaskListener = checkedCommand(request, true);
     ResponseDto<Map<String, List<TextRegion>>> extractTextRegionsResponse = (ResponseDto<Map<String, List<TextRegion>>>) syncTaskListener.get();
-    System.out.println("RESP_EXTRACT_TEXT_REGIONS: " + extractTextRegionsResponse);
     if (extractTextRegionsResponse != null && extractTextRegionsResponse.getPayload().getError() != null) {
       String message = extractTextRegionsResponse.getPayload().getError().getMessage();
       if (message != null && message.contains("stale element reference")) {
@@ -166,7 +161,6 @@ public class CommandExecutor {
     request.setPayload(new ExtractTextDto(eyesRef, extractSettingsDtoList, config));
     SyncTaskListener syncTaskListener = checkedCommand(request, true);
     ResponseDto<List<String>> responseDto = (ResponseDto<List<String>>) syncTaskListener.get();
-    System.out.println("RESP_EXTRACT_TEXT: " + responseDto);
     if (responseDto != null && responseDto.getPayload().getError() != null) {
       String message = responseDto.getPayload().getError().getMessage();
       if (message != null && message.contains("stale element reference")) {
@@ -187,7 +181,6 @@ public class CommandExecutor {
       return null;
     }
     ResponseDto<List<CommandCloseResponseDto>> closeResponse = (ResponseDto<List<CommandCloseResponseDto>>) syncTaskListener.get();
-    System.out.println("RESP_CLOSE: " + closeResponse + ", WAIT_RESULT: " + waitResult);
     if (closeResponse != null && closeResponse.getPayload() != null && closeResponse.getPayload().getError() != null) {
       String message = closeResponse.getPayload().getError().getMessage();
       if (message != null && message.contains("stale element reference")) {
@@ -209,7 +202,6 @@ public class CommandExecutor {
       return null;
     }
     ResponseDto<List<CommandCloseResponseDto>> closeResponse = (ResponseDto<List<CommandCloseResponseDto>>) syncTaskListener.get();
-    System.out.println("RESP_ABORT: " + closeResponse);
     if (closeResponse != null && closeResponse.getPayload().getError() != null) {
       String message = closeResponse.getPayload().getError().getMessage();
       if (message != null && message.contains("stale element reference")) {
@@ -237,7 +229,6 @@ public class CommandExecutor {
     request.setPayload(new CommandCloseAllEyesRequestDto(managerRef));
     SyncTaskListener syncTaskListener = checkedCommand(request, true);
     ResponseDto<List<CommandCloseResponseDto>> closeResponse = (ResponseDto<List<CommandCloseResponseDto>>) syncTaskListener.get();
-    System.out.println("RESP_CLOSE_ALL_EYES: " + closeResponse);
     if (closeResponse != null && closeResponse.getPayload().getError() != null) {
       String message = closeResponse.getPayload().getError().getMessage();
       if (message != null && message.contains("stale element reference")) {

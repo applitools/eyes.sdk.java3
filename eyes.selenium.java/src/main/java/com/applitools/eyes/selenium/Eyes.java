@@ -207,10 +207,8 @@ public class Eyes implements IEyesBase {
 
     public void abortAsync() {
         if (!isClosed && getIsOpen()) {
-            List<CommandCloseResponseDto> abortResponse = commandExecutor.abort(eyesRef, false);
-            //List<TestResults> testResults = TestResultsMapper.toTestResultsList(abortResponse);
+            commandExecutor.abort(eyesRef, false);
             this.eyesRef = null;
-
         }
     }
 
