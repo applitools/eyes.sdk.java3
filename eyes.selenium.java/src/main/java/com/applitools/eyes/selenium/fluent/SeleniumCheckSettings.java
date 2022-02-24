@@ -11,6 +11,7 @@ import com.applitools.eyes.Borders;
 import com.applitools.eyes.positioning.PositionProvider;
 import com.applitools.eyes.selenium.CheckState;
 import com.applitools.eyes.selenium.EyesSeleniumUtils;
+import com.applitools.eyes.selenium.LazyLoadOptions;
 import com.applitools.eyes.selenium.positioning.CssTranslatePositionProvider;
 import com.applitools.eyes.selenium.wrappers.EyesSeleniumDriver;
 import com.applitools.eyes.selenium.wrappers.EyesWebDriver;
@@ -49,6 +50,7 @@ public class SeleniumCheckSettings extends CheckSettings implements ISeleniumChe
     private boolean isDefaultLayoutBreakpointsSet = false;
     private final List<Integer> layoutBreakpoints = new ArrayList<>();
     private String pageId;
+    private LazyLoadOptions lazyLoadOptions;
 
     public SeleniumCheckSettings() {
     }
@@ -116,6 +118,8 @@ public class SeleniumCheckSettings extends CheckSettings implements ISeleniumChe
         clone.sendDom = this.sendDom;
         clone.isDefaultLayoutBreakpointsSet = this.isDefaultLayoutBreakpointsSet;
         clone.layoutBreakpoints.addAll(this.layoutBreakpoints);
+        clone.pageId = this.pageId;
+        clone.lazyLoadOptions = this.lazyLoadOptions;
         return clone;
     }
 
@@ -659,5 +663,21 @@ public class SeleniumCheckSettings extends CheckSettings implements ISeleniumChe
         return this.pageId;
     }
 
+
+    public SeleniumCheckSettings lazyLoad() {
+        SeleniumCheckSettings clone = this.clone();
+        clone.lazyLoadOptions = new LazyLoadOptions();
+        return clone;
+    }
+
+    public SeleniumCheckSettings lazyLoad(LazyLoadOptions lazyLoadOptions) {
+        SeleniumCheckSettings clone = this.clone();
+        clone.lazyLoadOptions = lazyLoadOptions;
+        return clone;
+    }
+
+    public LazyLoadOptions getLazyLoadOptions() {
+        return this.lazyLoadOptions;
+    }
 }
 
