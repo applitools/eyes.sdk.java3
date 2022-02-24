@@ -48,6 +48,7 @@ public class CheckSettingsMapper {
 
     checkSettingsDto.setAccessibilityRegions(TAccessibilityRegionMapper.toTAccessibilityRegionDtoList(Arrays.asList(seleniumCheckSettings.getAccessibilityRegions())));
     checkSettingsDto.setPageId(seleniumCheckSettings.getPageId());
+    checkSettingsDto.setLazyLoad(seleniumCheckSettings.getLazyLoadOptions());
 
     // ScreenshotSettings
     checkSettingsDto.setRegion(TRegionMapper.toTRegionFromCheckSettings(checkSettings));
@@ -57,6 +58,7 @@ public class CheckSettingsMapper {
                 seleniumCheckSettings.getScrollRootElement()));
 
     checkSettingsDto.setFully(seleniumCheckSettings.getStitchContent());
+
 
     return checkSettingsDto;
   }

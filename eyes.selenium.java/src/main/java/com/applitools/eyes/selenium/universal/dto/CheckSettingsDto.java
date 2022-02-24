@@ -3,6 +3,7 @@ package com.applitools.eyes.selenium.universal.dto;
 import java.util.List;
 import java.util.Map;
 
+import com.applitools.eyes.selenium.LazyLoadOptions;
 import com.fasterxml.jackson.annotation.JsonInclude;
 
 
@@ -46,6 +47,7 @@ public class CheckSettingsDto {
   private TRegion scrollRootElement;
   private Boolean fully;
   private String pageId;
+  private LazyLoadOptions lazyLoad;
 
   public String getName() {
     return name;
@@ -271,5 +273,13 @@ public class CheckSettingsDto {
 
   public void setPageId(String pageId) {
     this.pageId = pageId;
+  }
+
+  public LazyLoadOptions getLazyLoad() {
+    return lazyLoad;
+  }
+
+  public void setLazyLoad(LazyLoadOptions lazyLoad) {
+    this.lazyLoad = lazyLoad;
   }
 }
