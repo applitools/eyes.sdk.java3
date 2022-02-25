@@ -2,21 +2,29 @@
   "version": "3.4",
   "services": {
     "chrome": {
-      "image": "selenium/standalone-chrome:3",
+      "image": "selenium/standalone-chrome",
+      "environment": [
+          "SE_NODE_OVERRIDE_MAX_SESSIONS=true",
+          "SE_NODE_MAX_SESSIONS=15"
+      ],
       "volumes": [
-        "/dev/shm:/dev/shm"
+          "/dev/shm:/dev/shm"
       ],
       "ports": [
-        "4444:4444"
+          "4444:4444"
       ]
     },
     "firefox": {
-      "image": "selenium/standalone-firefox:3",
+      "image": "selenium/standalone-firefox",
+      "environment": [
+          "SE_NODE_OVERRIDE_MAX_SESSIONS=true",
+          "SE_NODE_MAX_SESSIONS=15"
+      ],
       "volumes": [
-        "/dev/shm:/dev/shm"
+          "/dev/shm:/dev/shm"
       ],
       "ports": [
-        "4445:4444"
+          "4445:4444"
       ]
     }
   }
