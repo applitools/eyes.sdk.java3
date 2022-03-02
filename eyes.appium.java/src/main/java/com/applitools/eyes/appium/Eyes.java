@@ -144,7 +144,7 @@ public class Eyes implements IEyesBase {
     }
 
     /**
-     * @return The maximum time in ms {@link #checkWindowBase
+     * @return The maximum time in ms
      * (RegionProvider, String, boolean, int)} waits for a match.
      */
     public int getMatchTimeout() {
@@ -317,6 +317,11 @@ public class Eyes implements IEyesBase {
     /**
      * See {@link #open(WebDriver, String, String, RectangleSize, SessionType)}.
      * {@code sessionType} defaults to {@code null}.
+     *
+     * * @param driver   The web driver that controls the browser hosting the application under test.
+     * @param appName  The name of the application under test.
+     * @param testName The test name. (i.e., the visible part of the document's body) or {@code null} to use the current window's viewport.
+     * @return A wrapped WebDriver which enables SeleniumEyes trigger recording and frame handling.
      */
     public WebDriver open(WebDriver driver, String appName, String testName,
                           RectangleSize viewportSize) {
@@ -338,6 +343,7 @@ public class Eyes implements IEyesBase {
      * @param viewportSize The required browser's viewport size
      *                     (i.e., the visible part of the document's body) or
      *                     {@code null} to use the current window's viewport.
+     * @param sessionType Should always be {@code SEQUENTIAL}
      * @return A wrapped WebDriver which enables Eyes trigger recording and
      * frame handling.
      */
