@@ -16,15 +16,20 @@ public class Target {
         return new SeleniumCheckSettings(region);
     }
 
-    public static SeleniumCheckSettings region(By by)
+    public static SeleniumCheckSettings region(By by) {
+        return new SeleniumCheckSettings(TargetPath.region(by));
+    }
+
+    public static SeleniumCheckSettings region(WebElement webElement) {
+        return new SeleniumCheckSettings(TargetPath.region(webElement));
+    }
+
+    public static SeleniumCheckSettings region(TargetPath targetPath)
     {
         return new SeleniumCheckSettings(by);
     }
 
-    public static SeleniumCheckSettings region(WebElement webElement)
-    {
-        return new SeleniumCheckSettings(webElement);
-    }
+
 
     public static SeleniumCheckSettings frame(By by)
     {

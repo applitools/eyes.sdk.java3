@@ -168,6 +168,10 @@ public class SeleniumCheckSettings extends CheckSettings implements ISeleniumChe
     }
 
     public SeleniumCheckSettings region(By by) {
+        return region(TargetPath.region(by));
+    }
+
+    public SeleniumCheckSettings region(TargetPath targetPath) {
         SeleniumCheckSettings clone = this.clone();
         clone.targetSelector = by;
         return clone;
