@@ -10,8 +10,8 @@ public class TargetPathLocator {
   public TargetPathLocator() {
   }
 
-  public TargetPathLocator(TargetPathLocator locator, PathNodeValue value) {
-    this.parent = locator;
+  public TargetPathLocator(TargetPathLocator parent, PathNodeValue value) {
+    this.parent = parent;
     this.value = value;
   }
 

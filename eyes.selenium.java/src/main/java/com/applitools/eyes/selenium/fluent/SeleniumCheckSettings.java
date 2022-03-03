@@ -34,17 +34,19 @@ public class SeleniumCheckSettings extends CheckSettings implements ISeleniumChe
     public static final String FULL_SELECTOR = "full-selector";
 
     // We'll use TargetPathLocator instead of Selector / WebElement.
-    private TargetPathLocator targetLocator; // FIXME ?
+    private TargetPathLocator targetLocator;
+    // FIXME - remove the targetSelector, targetElement
 //    @JsonSerialize(using = BySerializer.class)
 //    private By targetSelector; // FIXME
 //    @JsonSerialize(using = WebElementSerializer.class)
 //    private WebElement targetElement; // FIXME
 
     private final List<FrameLocator> frameChain = new ArrayList<>();
-    @JsonSerialize(using = WebElementSerializer.class)
-    private WebElement scrollRootElement;
-    @JsonSerialize(using = BySerializer.class)
-    private By scrollRootSelector;
+    // FIXME - remove scrollRootElement/Selector
+//    @JsonSerialize(using = WebElementSerializer.class)
+//    private WebElement scrollRootElement;
+//    @JsonSerialize(using = BySerializer.class)
+//    private By scrollRootSelector;
     private VisualGridSelector selector;
     private CheckState state;
 
