@@ -72,6 +72,10 @@ public class SeleniumCheckSettings extends CheckSettings implements ISeleniumChe
         this.name = tag;
     }
 
+    public SeleniumCheckSettings(TargetPathLocator targetLocator) {
+        this.targetLocator = targetLocator;
+    }
+
     @Override
     public void init(Logger logger, EyesWebDriver driver) {
         initGetRegions(logger, driver, ignoreRegions);
@@ -678,5 +682,11 @@ public class SeleniumCheckSettings extends CheckSettings implements ISeleniumChe
     public LazyLoadOptions getLazyLoadOptions() {
         return this.lazyLoadOptions;
     }
+
+    public TargetPathLocator getTargetPathLocator() {
+        return this.targetLocator;
+    }
+
+
 }
 

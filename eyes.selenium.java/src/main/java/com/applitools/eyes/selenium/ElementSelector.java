@@ -1,12 +1,13 @@
 package com.applitools.eyes.selenium;
 
+import com.applitools.utils.GeneralUtils;
 import org.openqa.selenium.By;
 
 /**
  * element selector
  */
 public class ElementSelector implements PathNodeValue {
-  private By type;
+  private String type;
   private String selector;
 
   public ElementSelector(By by) {

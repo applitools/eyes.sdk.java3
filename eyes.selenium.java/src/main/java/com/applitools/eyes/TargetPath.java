@@ -21,8 +21,8 @@ public class TargetPath {
     return new RegionLocator(null, new ElementSelector(selector));
   }
 
-  public static ShadowDomLocator shadow(By by, String selector) {
-    return new ShadowDomLocator(null, new ElementSelector(by, selector));
+  public static ShadowDomLocator shadow(By by) {
+    return new ShadowDomLocator(null, new ElementSelector(by));
   }
 
   public static ShadowDomLocator shadow(WebElement element) {
@@ -30,7 +30,7 @@ public class TargetPath {
   }
 
   public static ShadowDomLocator shadow(String selector) {
-    return new ShadowDomLocator(null, new ElementSelector(By.ByCssSelector.cssSelector(selector), selector));
+    return new ShadowDomLocator(null, new ElementSelector(selector));
   }
 
 }

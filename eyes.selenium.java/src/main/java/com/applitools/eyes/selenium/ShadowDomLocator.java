@@ -17,11 +17,11 @@ public class ShadowDomLocator extends TargetPathLocator {
   }
 
   public RegionLocator region(By by, String selector) {
-    return new RegionLocator(this, new ElementSelector(by, selector));
+    return new RegionLocator(this, new ElementSelector(by));
   }
 
   public RegionLocator region(String selector) {
-    return new RegionLocator(this, new ElementSelector(By.ByCssSelector.cssSelector(selector), selector));
+    return new RegionLocator(this, new ElementSelector(selector));
   }
 
   public ShadowDomLocator shadow(WebElement element) {
@@ -29,11 +29,11 @@ public class ShadowDomLocator extends TargetPathLocator {
   }
 
   public ShadowDomLocator shadow(By by, String selector) {
-    return new ShadowDomLocator(this, new ElementSelector(by, selector));
+    return new ShadowDomLocator(this, new ElementSelector(by));
   }
 
   public ShadowDomLocator shadow(String selector) {
-    return new ShadowDomLocator(this, new ElementSelector(By.ByCssSelector.cssSelector(selector), selector));
+    return new ShadowDomLocator(this, new ElementSelector(selector));
   }
 
 }
