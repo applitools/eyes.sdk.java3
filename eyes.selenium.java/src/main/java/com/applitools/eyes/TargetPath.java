@@ -9,8 +9,8 @@ import org.openqa.selenium.WebElement;
 
 public class TargetPath {
 
-  public static RegionLocator region(By by, String selector) {
-    return new RegionLocator(null, new ElementSelector(by, selector));
+  public static RegionLocator region(By by) {
+    return new RegionLocator(null, new ElementSelector(by));
   }
 
   public static RegionLocator region(WebElement element) {
@@ -18,7 +18,7 @@ public class TargetPath {
   }
 
   public static RegionLocator region(String selector) {
-    return new RegionLocator(null, new ElementSelector(By.ByCssSelector.cssSelector(selector), selector));
+    return new RegionLocator(null, new ElementSelector(selector));
   }
 
   public static ShadowDomLocator shadow(By by, String selector) {

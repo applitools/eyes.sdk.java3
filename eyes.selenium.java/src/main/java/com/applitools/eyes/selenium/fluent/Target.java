@@ -22,7 +22,6 @@ public class Target {
 
     // region locator
     public static SeleniumCheckSettings region(By by) {
-        // implementation is different
         return new SeleniumCheckSettings(TargetPath.region(by));
     }
 
@@ -34,8 +33,7 @@ public class Target {
     // direct implementation
     public static SeleniumCheckSettings region(TargetPathLocator targetPathLocator)
     {
-        //return new SeleniumCheckSettings(targetPath);
-        return null;
+        return new SeleniumCheckSettings(targetPathLocator);
     }
 
 

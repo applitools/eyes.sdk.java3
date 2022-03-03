@@ -1,13 +1,9 @@
 package com.applitools.eyes.selenium.fluent;
 
-import com.applitools.eyes.AccessibilityRegionType;
-import com.applitools.eyes.Logger;
-import com.applitools.eyes.MatchLevel;
-import com.applitools.eyes.Region;
+import com.applitools.eyes.*;
 import com.applitools.eyes.fluent.CheckSettings;
 import com.applitools.eyes.fluent.GetRegion;
 import com.applitools.eyes.fluent.ICheckSettingsInternal;
-import com.applitools.eyes.Borders;
 import com.applitools.eyes.positioning.PositionProvider;
 import com.applitools.eyes.selenium.CheckState;
 import com.applitools.eyes.selenium.EyesSeleniumUtils;
@@ -36,10 +32,14 @@ public class SeleniumCheckSettings extends CheckSettings implements ISeleniumChe
     public static final String REGION = "region";
     public static final String SELECTOR = "selector";
     public static final String FULL_SELECTOR = "full-selector";
+
+    // We'll use TargetPathLocator instead of Selector / WebElement.
+    private TargetPathLocator targetLocator; // FIXME ?
 //    @JsonSerialize(using = BySerializer.class)
 //    private By targetSelector; // FIXME
 //    @JsonSerialize(using = WebElementSerializer.class)
 //    private WebElement targetElement; // FIXME
+
     private final List<FrameLocator> frameChain = new ArrayList<>();
     @JsonSerialize(using = WebElementSerializer.class)
     private WebElement scrollRootElement;
@@ -52,7 +52,6 @@ public class SeleniumCheckSettings extends CheckSettings implements ISeleniumChe
     private final List<Integer> layoutBreakpoints = new ArrayList<>();
     private String pageId;
     private LazyLoadOptions lazyLoadOptions;
-    private TargetPathLocator targetLocator; // FIXME ?
 
     public SeleniumCheckSettings() {
     }
@@ -61,13 +60,13 @@ public class SeleniumCheckSettings extends CheckSettings implements ISeleniumChe
         super(region);
     }
 
-    public SeleniumCheckSettings(By targetSelector) {
-        this.targetSelector = targetSelector;
-    }
-
-    public SeleniumCheckSettings(WebElement targetElement) {
-        this.targetElement = targetElement;
-    }
+//    public SeleniumCheckSettings(By targetSelector) {
+//        this.targetSelector = targetSelector;
+//    }
+//
+//    public SeleniumCheckSettings(WebElement targetElement) {
+//        this.targetElement = targetElement;
+//    }
 
     public SeleniumCheckSettings(String tag) {
         this.name = tag;
@@ -91,15 +90,15 @@ public class SeleniumCheckSettings extends CheckSettings implements ISeleniumChe
         }
     }
 
-    @Override
-    public By getTargetSelector() {
-        return this.targetSelector;
-    }
-
-    @Override
-    public WebElement getTargetElement() {
-        return this.targetElement;
-    }
+//    @Override
+//    public By getTargetSelector() {
+//        return this.targetSelector;
+//    }
+//
+//    @Override
+//    public WebElement getTargetElement() {
+//        return this.targetElement;
+//    }
 
     @Override
     public List<FrameLocator> getFrameChain() {
@@ -111,8 +110,9 @@ public class SeleniumCheckSettings extends CheckSettings implements ISeleniumChe
     public SeleniumCheckSettings clone() {
         SeleniumCheckSettings clone = new SeleniumCheckSettings();
         super.populateClone(clone);
-        clone.targetElement = this.targetElement;
-        clone.targetSelector = this.targetSelector;
+        clone.targetLocator = this.targetLocator;
+//        clone.targetElement = this.targetElement;
+//        clone.targetSelector = this.targetSelector;
         clone.frameChain.addAll(this.frameChain);
         clone.scrollRootElement = this.scrollRootElement;
         clone.scrollRootSelector = this.scrollRootSelector;
@@ -165,7 +165,7 @@ public class SeleniumCheckSettings extends CheckSettings implements ISeleniumChe
 
     public SeleniumCheckSettings region(WebElement element) {
         SeleniumCheckSettings clone = this.clone();
-        clone.targetElement = element;
+        clone.targetLocator = TargetPath.region(element);
         return clone;
     }
 
@@ -173,9 +173,9 @@ public class SeleniumCheckSettings extends CheckSettings implements ISeleniumChe
         return region(TargetPath.region(by));
     }
 
-    public SeleniumCheckSettings region(TargetPath targetPath) {
+    public SeleniumCheckSettings region(TargetPathLocator targetPathLocator) {
         SeleniumCheckSettings clone = this.clone();
-        clone.targetSelector = by;
+        clone.targetLocator = targetPathLocator;
         return clone;
     }
 
@@ -645,13 +645,6 @@ public class SeleniumCheckSettings extends CheckSettings implements ISeleniumChe
         return layoutBreakpoints;
     }
 
-    public void sanitizeSettings(EyesSeleniumDriver driver, boolean isFully) {
-        if (frameChain.size() > 0 && targetElement == null && targetSelector == null && !isFully) {
-            FrameLocator lastFrame = frameChain.get(frameChain.size() - 1);
-            frameChain.remove(frameChain.size() - 1);
-            targetElement = EyesSeleniumUtils.findFrameByFrameCheckTarget(lastFrame, driver);
-        }
-    }
 
     @Override
     public PositionProvider getStepPositionProvider() {

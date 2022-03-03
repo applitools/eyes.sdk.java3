@@ -606,16 +606,18 @@ public class SeleniumEyes extends RunningTest implements ISeleniumEyes {
         return bBox.offset(offset);
     }
 
+    // FIXME - remove this code if possible
     private WebElement getTargetElement(ISeleniumCheckTarget seleniumCheckTarget) {
-        assert seleniumCheckTarget != null;
-        By targetSelector = seleniumCheckTarget.getTargetSelector();
-        WebElement targetElement = seleniumCheckTarget.getTargetElement();
-        if (targetElement == null && targetSelector != null) {
-            targetElement = this.driver.findElement(targetSelector);
-        } else if (targetElement != null && !(targetElement instanceof EyesRemoteWebElement)) {
-            targetElement = new EyesRemoteWebElement(logger, driver, targetElement);
-        }
-        return targetElement;
+//        assert seleniumCheckTarget != null;
+//        By targetSelector = seleniumCheckTarget.getTargetSelector();
+//        WebElement targetElement = seleniumCheckTarget.getTargetElement();
+//        if (targetElement == null && targetSelector != null) {
+//            targetElement = this.driver.findElement(targetSelector);
+//        } else if (targetElement != null && !(targetElement instanceof EyesRemoteWebElement)) {
+//            targetElement = new EyesRemoteWebElement(logger, driver, targetElement);
+//        }
+//        return targetElement;
+        return null;
     }
 
     /**
@@ -670,128 +672,129 @@ public class SeleniumEyes extends RunningTest implements ISeleniumEyes {
         this.effectiveViewport = new Region(Location.ZERO, size);
     }
 
+    // FIXME - remove this method completely if possible
     public void check(ICheckSettings checkSettings) {
-        if (getIsDisabled()) {
-            return;
-        }
-
-        logger.log(TraceLevel.Info, Collections.singleton(getTestId()), Stage.CHECK, Type.CALLED,
-                Pair.of("configuration", getConfiguration()),
-                Pair.of("checkSettings", checkSettings));
-        try {
-            ArgumentGuard.isValidState(isOpen, "Eyes not open");
-            ArgumentGuard.notNull(checkSettings, "checkSettings");
-            ArgumentGuard.notOfType(checkSettings, ISeleniumCheckTarget.class, "checkSettings");
-            boolean isMobileDevice = EyesDriverUtils.isMobileDevice(driver);
-            String source = null;
-            if (!isMobileDevice) {
-                source = driver.getCurrentUrl();
-            }
-
-            ICheckSettingsInternal checkSettingsInternal = (ICheckSettingsInternal) checkSettings;
-            ISeleniumCheckTarget seleniumCheckTarget = (ISeleniumCheckTarget) checkSettings;
-
-            CheckState state = new CheckState();
-            seleniumCheckTarget.setState(state);
-            Boolean forceFullPageScreenshot = getConfigurationInstance().getForceFullPageScreenshot();
-            Boolean fully = checkSettingsInternal.getStitchContent();
-            state.setStitchContent((fully != null && fully) || (forceFullPageScreenshot != null && forceFullPageScreenshot));
-
-            // Ensure frame is not used as a region
-            ((SeleniumCheckSettings) checkSettings).sanitizeSettings(driver, state.isStitchContent());
-            seleniumCheckTarget.init(logger, driver);
-
-            Region targetRegion = checkSettingsInternal.getTargetRegion();
-
-            this.userDefinedSRE = tryGetUserDefinedSREFromSREContainer(seleniumCheckTarget, driver);
-            WebElement scrollRootElement = this.userDefinedSRE;
-            if (scrollRootElement == null && !isMobileDevice) {
-                scrollRootElement = EyesSeleniumUtils.getDefaultRootElement(logger, driver);
-            }
-
-            currentFramePositionProvider = null;
-            super.positionProviderHandler.set(PositionProviderFactory.getPositionProvider(logger, getConfigurationInstance().getStitchMode(), jsExecutor, scrollRootElement, userAgent));
-            CaretVisibilityProvider caretVisibilityProvider = new CaretVisibilityProvider(driver, getConfigurationInstance());
-
-            PageState pageState = new PageState(logger, driver, getConfigurationInstance().getStitchMode(), userAgent);
-            pageState.preparePage(seleniumCheckTarget, getConfigurationInstance(), scrollRootElement);
-
-            FrameChain frameChainAfterSwitchToTarget = driver.getFrameChain().clone();
-
-            if (this.effectiveViewport == null) {
-                RectangleSize viewportSize = getViewportSize();
-                setEffectiveViewportSize(viewportSize);
-            }
-
-            RectangleSize viewportSize = this.effectiveViewport.getSize();
-            Region effectiveViewport = computeEffectiveViewport(frameChainAfterSwitchToTarget, viewportSize);
-            state.setEffectiveViewport(effectiveViewport);
-            // new Rectangle(Point.Empty, viewportSize_);
-            WebElement targetElement = getTargetElementFromSettings(seleniumCheckTarget);
-
-            caretVisibilityProvider.hideCaret();
-
-            //////////////////////////////////////////////////////////////////
-
-            // Cases:
-            // Target.Region(x,y,w,h).Fully(true) - TODO - NOT TESTED!
-            // Target.Region(x,y,w,h).Fully(false)
-            // Target.Region(element).Fully(true)
-            // Target.Region(element).Fully(false)
-            // Target.Frame(frame).Fully(true)
-            // Target.Frame(frame).Region(x,y,w,h).Fully(true)
-            // Target.Frame(frame).Region(x,y,w,h).Fully(false) - TODO - NOT TESTED!
-            // Target.Frame(frame).Region(element).Fully(true)
-            // Target.Frame(frame).Region(element).Fully(false) - TODO - NOT TESTED!
-            // Target.Window().Fully(true)
-            // Target.Window().Fully(false)
-
-            // Algorithm:
-            // 1. Save current page state
-            // 2. Switch to frame
-            // 3. Maximize desired region or element visibility
-            // 4. Capture desired region of element
-            // 5. Go back to original frame
-            // 6. Restore page state
-
-            if (targetElement != null) {
-                if (isMobileDevice) {
-                    checkNativeElement(checkSettingsInternal, targetElement);
-                } else if (state.isStitchContent()) {
-                    checkFullElement(checkSettingsInternal, targetElement, targetRegion, state, source);
-                } else {
-                    // TODO Verify: if element is outside the viewport, we should still capture entire (outer) bounds
-                    checkElement(checkSettingsInternal, targetElement, targetRegion, state, source);
-                }
-            } else if (targetRegion != null) {
-                // Coordinates should always be treated as "Fully" in case they get out of the viewport.
-                boolean originalFully = state.isStitchContent();
-                state.setStitchContent(true);
-                checkFullRegion(checkSettingsInternal, targetRegion, state, source);
-                state.setStitchContent(originalFully);
-            } else if (!isMobileDevice && seleniumCheckTarget.getFrameChain().size() > 0) {
-                if (state.isStitchContent()) {
-                    checkFullFrame(checkSettingsInternal, state, source);
-                }
-            } else {
-                if (state.isStitchContent()) {
-                    if (userDefinedSRE != null && !isMobileDevice) {
-                        checkFullElement(checkSettingsInternal, userDefinedSRE, null, state, source);
-                    } else {
-                        checkFullWindow(checkSettingsInternal, state, scrollRootElement, source);
-                    }
-                } else {
-                    checkWindow(checkSettingsInternal, state, scrollRootElement, source);
-                }
-            }
-
-            caretVisibilityProvider.restoreCaret();
-
-            pageState.restorePageState();
-        } catch (Exception ex) {
-            GeneralUtils.logExceptionStackTrace(logger, Stage.CHECK, ex, getTestId());
-            throw ex;
-        }
+//        if (getIsDisabled()) {
+//            return;
+//        }
+//
+//        logger.log(TraceLevel.Info, Collections.singleton(getTestId()), Stage.CHECK, Type.CALLED,
+//                Pair.of("configuration", getConfiguration()),
+//                Pair.of("checkSettings", checkSettings));
+//        try {
+//            ArgumentGuard.isValidState(isOpen, "Eyes not open");
+//            ArgumentGuard.notNull(checkSettings, "checkSettings");
+//            ArgumentGuard.notOfType(checkSettings, ISeleniumCheckTarget.class, "checkSettings");
+//            boolean isMobileDevice = EyesDriverUtils.isMobileDevice(driver);
+//            String source = null;
+//            if (!isMobileDevice) {
+//                source = driver.getCurrentUrl();
+//            }
+//
+//            ICheckSettingsInternal checkSettingsInternal = (ICheckSettingsInternal) checkSettings;
+//            ISeleniumCheckTarget seleniumCheckTarget = (ISeleniumCheckTarget) checkSettings;
+//
+//            CheckState state = new CheckState();
+//            seleniumCheckTarget.setState(state);
+//            Boolean forceFullPageScreenshot = getConfigurationInstance().getForceFullPageScreenshot();
+//            Boolean fully = checkSettingsInternal.getStitchContent();
+//            state.setStitchContent((fully != null && fully) || (forceFullPageScreenshot != null && forceFullPageScreenshot));
+//
+//            // Ensure frame is not used as a region
+//            ((SeleniumCheckSettings) checkSettings).sanitizeSettings(driver, state.isStitchContent());
+//            seleniumCheckTarget.init(logger, driver);
+//
+//            Region targetRegion = checkSettingsInternal.getTargetRegion();
+//
+//            this.userDefinedSRE = tryGetUserDefinedSREFromSREContainer(seleniumCheckTarget, driver);
+//            WebElement scrollRootElement = this.userDefinedSRE;
+//            if (scrollRootElement == null && !isMobileDevice) {
+//                scrollRootElement = EyesSeleniumUtils.getDefaultRootElement(logger, driver);
+//            }
+//
+//            currentFramePositionProvider = null;
+//            super.positionProviderHandler.set(PositionProviderFactory.getPositionProvider(logger, getConfigurationInstance().getStitchMode(), jsExecutor, scrollRootElement, userAgent));
+//            CaretVisibilityProvider caretVisibilityProvider = new CaretVisibilityProvider(driver, getConfigurationInstance());
+//
+//            PageState pageState = new PageState(logger, driver, getConfigurationInstance().getStitchMode(), userAgent);
+//            pageState.preparePage(seleniumCheckTarget, getConfigurationInstance(), scrollRootElement);
+//
+//            FrameChain frameChainAfterSwitchToTarget = driver.getFrameChain().clone();
+//
+//            if (this.effectiveViewport == null) {
+//                RectangleSize viewportSize = getViewportSize();
+//                setEffectiveViewportSize(viewportSize);
+//            }
+//
+//            RectangleSize viewportSize = this.effectiveViewport.getSize();
+//            Region effectiveViewport = computeEffectiveViewport(frameChainAfterSwitchToTarget, viewportSize);
+//            state.setEffectiveViewport(effectiveViewport);
+//            // new Rectangle(Point.Empty, viewportSize_);
+//            WebElement targetElement = getTargetElementFromSettings(seleniumCheckTarget);
+//
+//            caretVisibilityProvider.hideCaret();
+//
+//            //////////////////////////////////////////////////////////////////
+//
+//            // Cases:
+//            // Target.Region(x,y,w,h).Fully(true) - TODO - NOT TESTED!
+//            // Target.Region(x,y,w,h).Fully(false)
+//            // Target.Region(element).Fully(true)
+//            // Target.Region(element).Fully(false)
+//            // Target.Frame(frame).Fully(true)
+//            // Target.Frame(frame).Region(x,y,w,h).Fully(true)
+//            // Target.Frame(frame).Region(x,y,w,h).Fully(false) - TODO - NOT TESTED!
+//            // Target.Frame(frame).Region(element).Fully(true)
+//            // Target.Frame(frame).Region(element).Fully(false) - TODO - NOT TESTED!
+//            // Target.Window().Fully(true)
+//            // Target.Window().Fully(false)
+//
+//            // Algorithm:
+//            // 1. Save current page state
+//            // 2. Switch to frame
+//            // 3. Maximize desired region or element visibility
+//            // 4. Capture desired region of element
+//            // 5. Go back to original frame
+//            // 6. Restore page state
+//
+//            if (targetElement != null) {
+//                if (isMobileDevice) {
+//                    checkNativeElement(checkSettingsInternal, targetElement);
+//                } else if (state.isStitchContent()) {
+//                    checkFullElement(checkSettingsInternal, targetElement, targetRegion, state, source);
+//                } else {
+//                    // TODO Verify: if element is outside the viewport, we should still capture entire (outer) bounds
+//                    checkElement(checkSettingsInternal, targetElement, targetRegion, state, source);
+//                }
+//            } else if (targetRegion != null) {
+//                // Coordinates should always be treated as "Fully" in case they get out of the viewport.
+//                boolean originalFully = state.isStitchContent();
+//                state.setStitchContent(true);
+//                checkFullRegion(checkSettingsInternal, targetRegion, state, source);
+//                state.setStitchContent(originalFully);
+//            } else if (!isMobileDevice && seleniumCheckTarget.getFrameChain().size() > 0) {
+//                if (state.isStitchContent()) {
+//                    checkFullFrame(checkSettingsInternal, state, source);
+//                }
+//            } else {
+//                if (state.isStitchContent()) {
+//                    if (userDefinedSRE != null && !isMobileDevice) {
+//                        checkFullElement(checkSettingsInternal, userDefinedSRE, null, state, source);
+//                    } else {
+//                        checkFullWindow(checkSettingsInternal, state, scrollRootElement, source);
+//                    }
+//                } else {
+//                    checkWindow(checkSettingsInternal, state, scrollRootElement, source);
+//                }
+//            }
+//
+//            caretVisibilityProvider.restoreCaret();
+//
+//            pageState.restorePageState();
+//        } catch (Exception ex) {
+//            GeneralUtils.logExceptionStackTrace(logger, Stage.CHECK, ex, getTestId());
+//            throw ex;
+//        }
     }
 
     private void checkFullFrame(ICheckSettingsInternal checkSettingsInternal, CheckState state, String source) {
@@ -832,50 +835,7 @@ public class SeleniumEyes extends RunningTest implements ISeleniumEyes {
                 region.getCoordinatesType());
     }
 
-    private void checkElement(ICheckSettingsInternal checkSettingsInternal, WebElement targetElement,
-                              Region targetRegion, CheckState state, String source) {
-        List<FrameLocator> frameLocators = ((ISeleniumCheckTarget) checkSettingsInternal).getFrameChain();
-        FrameChain currentFrameChain = driver.getFrameChain().clone();
-        Region bounds = EyesRemoteWebElement.getClientBounds(targetElement, driver, logger);
 
-        WebElement defaultSRE = EyesSeleniumUtils.getDefaultRootElement(logger, driver);
-        PositionProvider defaultSREPositionProvider = getPositionProviderForScrollRootElement(defaultSRE);
-        state.setOriginalLocation(bounds.offset(defaultSREPositionProvider.getCurrentPosition()).getLocation());
-
-        WebElement currentFrameSRE = getCurrentFrameScrollRootElement();
-        PositionProvider currentFramePositionProvider = getPositionProviderForScrollRootElement(currentFrameSRE);
-        Location currentFramePosition = currentFramePositionProvider.getCurrentPosition();
-        Location visualOffset = getFrameChainOffset(currentFrameChain);
-        bounds = bounds.offset(visualOffset);
-        currentFramePositionProvider.setPosition(bounds.offset(currentFramePosition).getLocation());
-        Region actualElementBounds = EyesRemoteWebElement.getClientBounds(targetElement, driver, logger);
-        actualElementBounds = actualElementBounds.offset(visualOffset);
-        Location actualFramePosition = new Location(bounds.getLeft() - actualElementBounds.getLeft(),
-                bounds.getTop() - actualElementBounds.getTop());
-        bounds = bounds.offset(-actualFramePosition.getX(), -actualFramePosition.getY());
-
-        EyesTargetLocator switchTo = (EyesTargetLocator) driver.switchTo();
-        FrameChain fcClone = currentFrameChain.clone();
-
-        while (!state.getEffectiveViewport().isIntersected(bounds) && fcClone.size() > 0) {
-            fcClone.pop();
-            switchTo.parentFrame();
-            currentFrameSRE = getCurrentFrameScrollRootElement();
-            currentFramePositionProvider = getPositionProviderForScrollRootElement(currentFrameSRE);
-            currentFramePosition = currentFramePositionProvider.getCurrentPosition();
-            bounds = bounds.offset(currentFramePosition);
-            actualFramePosition = currentFramePositionProvider.setPosition(bounds.getLocation());
-            bounds = bounds.offset(-actualFramePosition.getX(), -actualFramePosition.getY());
-        }
-
-        switchTo.frames(currentFrameChain);
-
-        Region crop = computeCropRectangle(bounds, targetRegion);
-        if (crop == null) {
-            crop = bounds;
-        }
-        checkWindowBase(crop, checkSettingsInternal, source);
-    }
 
     private void checkFullElement(ICheckSettingsInternal checkSettingsInternal, WebElement targetElement,
                                   Region targetRegion, CheckState state, String source) {
@@ -1139,16 +1099,6 @@ public class SeleniumEyes extends RunningTest implements ISeleniumEyes {
         return viewport;
     }
 
-    private WebElement getTargetElementFromSettings(ISeleniumCheckTarget seleniumCheckTarget) {
-        By targetSelector = seleniumCheckTarget.getTargetSelector();
-        WebElement targetElement = seleniumCheckTarget.getTargetElement();
-        if (targetElement == null && targetSelector != null) {
-            targetElement = driver.findElement(targetSelector);
-        } else if (targetElement != null && !(targetElement instanceof EyesRemoteWebElement)) {
-            targetElement = new EyesRemoteWebElement(logger, driver, targetElement);
-        }
-        return targetElement;
-    }
 
     /**
      * Updates the state of scaling related parameters.
