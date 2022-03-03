@@ -17,7 +17,7 @@ public class CheckSettings implements ICheckSettings, ICheckSettingsInternal {
     // For Rendering Grid
     protected static final String BEFORE_CAPTURE_SCREENSHOT = "beforeCaptureScreenshot";
 
-    private Region targetRegion;
+    private Region targetRegion; // FIXME
     private MatchLevel matchLevel = null;
     private Boolean ignoreCaret = null;
     private Boolean stitchContent = null;

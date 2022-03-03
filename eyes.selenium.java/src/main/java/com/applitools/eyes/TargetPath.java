@@ -1,50 +1,36 @@
 package com.applitools.eyes;
 
+import com.applitools.eyes.selenium.ElementReference;
+import com.applitools.eyes.selenium.ElementSelector;
+import com.applitools.eyes.selenium.RegionLocator;
+import com.applitools.eyes.selenium.ShadowDomLocator;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 
 public class TargetPath {
 
-    // Static factories
-    public static TargetPath region(By by) {
-        return new TargetPathLocator().region(by);
-    }
+  public static RegionLocator region(By by, String selector) {
+    return new RegionLocator(null, new ElementSelector(by, selector));
+  }
 
-    public static TargetPath region(WebElement element) {
-        return new TargetPathLocator().region(element);
-    }
+  public static RegionLocator region(WebElement element) {
+    return new RegionLocator(null, new ElementReference(element));
+  }
 
-    public static TargetPath shadow(By by) {
-        return new TargetPathLocator().shadow(by);
-    }
+  public static RegionLocator region(String selector) {
+    return new RegionLocator(null, new ElementSelector(By.ByCssSelector.cssSelector(selector), selector));
+  }
 
-    public static TargetPath shadow(WebElement element) {
-        return new TargetPathLocator().shadow(element);
-    }
+  public static ShadowDomLocator shadow(By by, String selector) {
+    return new ShadowDomLocator(null, new ElementSelector(by, selector));
+  }
 
-    private static class TargetPathLocator {
-        TargetPathLocator parent;
-        PathNode value;
-    }
+  public static ShadowDomLocator shadow(WebElement element) {
+    return new ShadowDomLocator(null, new ElementReference(element));
+  }
 
-    private static class RegionLocator extends TargetPathLocator { }
-
-    private static class ShadowDomLocator extends TargetPathLocator{
-        public TargetPathLocator region(By by) {
-
-        }
-
-        public TargetPathLocator region(WebElement element) {
-
-        }
-
-        public TargetPathLocator shadow(By by) {
-
-        }
-
-        public TargetPathLocator shadow(WebElement element) {
-
-        }
-    }
+  public static ShadowDomLocator shadow(String selector) {
+    return new ShadowDomLocator(null, new ElementSelector(By.ByCssSelector.cssSelector(selector), selector));
+  }
 
 }

@@ -12,6 +12,7 @@ import com.applitools.eyes.positioning.PositionProvider;
 import com.applitools.eyes.selenium.CheckState;
 import com.applitools.eyes.selenium.EyesSeleniumUtils;
 import com.applitools.eyes.selenium.LazyLoadOptions;
+import com.applitools.eyes.selenium.TargetPathLocator;
 import com.applitools.eyes.selenium.positioning.CssTranslatePositionProvider;
 import com.applitools.eyes.selenium.wrappers.EyesSeleniumDriver;
 import com.applitools.eyes.selenium.wrappers.EyesWebDriver;
@@ -35,10 +36,10 @@ public class SeleniumCheckSettings extends CheckSettings implements ISeleniumChe
     public static final String REGION = "region";
     public static final String SELECTOR = "selector";
     public static final String FULL_SELECTOR = "full-selector";
-    @JsonSerialize(using = BySerializer.class)
-    private By targetSelector;
-    @JsonSerialize(using = WebElementSerializer.class)
-    private WebElement targetElement;
+//    @JsonSerialize(using = BySerializer.class)
+//    private By targetSelector; // FIXME
+//    @JsonSerialize(using = WebElementSerializer.class)
+//    private WebElement targetElement; // FIXME
     private final List<FrameLocator> frameChain = new ArrayList<>();
     @JsonSerialize(using = WebElementSerializer.class)
     private WebElement scrollRootElement;
@@ -51,6 +52,7 @@ public class SeleniumCheckSettings extends CheckSettings implements ISeleniumChe
     private final List<Integer> layoutBreakpoints = new ArrayList<>();
     private String pageId;
     private LazyLoadOptions lazyLoadOptions;
+    private TargetPathLocator targetLocator; // FIXME ?
 
     public SeleniumCheckSettings() {
     }

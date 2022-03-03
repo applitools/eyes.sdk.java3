@@ -1,6 +1,8 @@
 package com.applitools.eyes.selenium.fluent;
 
 import com.applitools.eyes.Region;
+import com.applitools.eyes.TargetPath;
+import com.applitools.eyes.selenium.TargetPathLocator;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 
@@ -11,24 +13,30 @@ public class Target {
         return new SeleniumCheckSettings();
     }
 
+    // targetRegion
     public static SeleniumCheckSettings region(Region region)
     {
         return new SeleniumCheckSettings(region);
     }
 
+
+    // region locator
     public static SeleniumCheckSettings region(By by) {
+        // implementation is different
         return new SeleniumCheckSettings(TargetPath.region(by));
     }
 
+    // region locator
     public static SeleniumCheckSettings region(WebElement webElement) {
         return new SeleniumCheckSettings(TargetPath.region(webElement));
     }
 
-    public static SeleniumCheckSettings region(TargetPath targetPath)
+    // direct implementation
+    public static SeleniumCheckSettings region(TargetPathLocator targetPathLocator)
     {
-        return new SeleniumCheckSettings(by);
+        //return new SeleniumCheckSettings(targetPath);
+        return null;
     }
-
 
 
     public static SeleniumCheckSettings frame(By by)
