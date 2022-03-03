@@ -3,7 +3,9 @@ package com.applitools.eyes.selenium.universal.dto;
 import java.util.List;
 import java.util.Map;
 
+import com.applitools.eyes.TargetPath;
 import com.applitools.eyes.selenium.LazyLoadOptions;
+import com.applitools.eyes.selenium.TargetPathLocator;
 import com.fasterxml.jackson.annotation.JsonInclude;
 
 
@@ -44,7 +46,7 @@ public class CheckSettingsDto {
   // ScreenshotSettings
   private TRegion region;
   private Object frames;
-  private TRegion scrollRootElement;
+  private TargetPathLocator scrollRootElement;
   private Boolean fully;
   private String pageId;
   private LazyLoadOptions lazyLoad;
@@ -178,35 +180,35 @@ public class CheckSettingsDto {
     this.accessibilitySettings = accessibilitySettings;
   }
 
-  public List<TRegion> getIgnoreRegions() {
+  public List<TargetPathLocator> getIgnoreRegions() {
     return ignoreRegions;
   }
 
-  public void setIgnoreRegions(List<TRegion> ignoreRegions) {
+  public void setIgnoreRegions(List<TargetPathLocator> ignoreRegions) {
     this.ignoreRegions = ignoreRegions;
   }
 
-  public List<TRegion> getLayoutRegions() {
+  public List<TargetPathLocator> getLayoutRegions() {
     return layoutRegions;
   }
 
-  public void setLayoutRegions(List<TRegion> layoutRegions) {
+  public void setLayoutRegions(List<TargetPathLocator> layoutRegions) {
     this.layoutRegions = layoutRegions;
   }
 
-  public List<TRegion> getStrictRegions() {
+  public List<TargetPathLocator> getStrictRegions() {
     return strictRegions;
   }
 
-  public void setStrictRegions(List<TRegion> strictRegions) {
+  public void setStrictRegions(List<TargetPathLocator> strictRegions) {
     this.strictRegions = strictRegions;
   }
 
-  public List<TRegion> getContentRegions() {
+  public List<TargetPathLocator> getContentRegions() {
     return contentRegions;
   }
 
-  public void setContentRegions(List<TRegion> contentRegions) {
+  public void setContentRegions(List<TargetPathLocator> contentRegions) {
     this.contentRegions = contentRegions;
   }
 
@@ -223,19 +225,19 @@ public class CheckSettingsDto {
     this.accessibilityRegions = accessibilityRegions;
   }
 
-  public TRegion getRegion() {
+  public TargetPathLocator getRegion() {
     return region;
   }
 
-  public void setRegion(TRegion region) {
+  public void setRegion(TargetPathLocator region) {
     this.region = region;
   }
 
-  public TRegion getScrollRootElement() {
+  public TargetPathLocator getScrollRootElement() {
     return scrollRootElement;
   }
 
-  public void setScrollRootElement(TRegion scrollRootElement) {
+  public void setScrollRootElement(TargetPathLocator scrollRootElement) {
     this.scrollRootElement = scrollRootElement;
   }
 

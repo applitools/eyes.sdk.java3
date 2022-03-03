@@ -16,24 +16,24 @@ public class ShadowDomLocator extends TargetPathLocator {
     return new RegionLocator(this, new ElementReference(element));
   }
 
-  public RegionLocator region(By by, String selector) {
+  public RegionLocator region(By by) {
     return new RegionLocator(this, new ElementSelector(by));
   }
 
   public RegionLocator region(String selector) {
-    return new RegionLocator(this, new ElementSelector(selector));
+    return new RegionLocator(this, new ElementSelector(selector)); // this
   }
 
   public ShadowDomLocator shadow(WebElement element) {
     return new ShadowDomLocator(this, new ElementReference(element));
   }
 
-  public ShadowDomLocator shadow(By by, String selector) {
+  public ShadowDomLocator shadow(By by) {
     return new ShadowDomLocator(this, new ElementSelector(by));
   }
 
   public ShadowDomLocator shadow(String selector) {
-    return new ShadowDomLocator(this, new ElementSelector(selector));
+    return new ShadowDomLocator(this, new ElementSelector(selector)); //this
   }
 
   public String toJson() {
@@ -49,3 +49,7 @@ public class ShadowDomLocator extends TargetPathLocator {
   }
 
 }
+
+
+
+
