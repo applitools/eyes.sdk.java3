@@ -8,32 +8,32 @@ import org.openqa.selenium.WebElement;
  */
 public class ShadowDomLocator extends TargetPathLocator {
 
-  public ShadowDomLocator(TargetPathLocator locator, PathNodeValue value) {
-    super(locator, value);
+  public ShadowDomLocator(TargetPathLocator parent, PathNodeValue value) {
+    super(parent, value);
   }
 
-  public RegionLocator region(TargetPathLocator locator, WebElement element) {
-    return new RegionLocator(locator, new ElementReference(element));
+  public RegionLocator region(WebElement element) {
+    return new RegionLocator(this, new ElementReference(element));
   }
 
-  public RegionLocator region(TargetPathLocator locator, By by, String selector) {
-    return new RegionLocator(locator, new ElementSelector(by, selector));
+  public RegionLocator region(By by, String selector) {
+    return new RegionLocator(this, new ElementSelector(by, selector));
   }
 
-  public RegionLocator region(TargetPathLocator locator, String selector) {
-    return new RegionLocator(locator, new ElementSelector(By.ByCssSelector.cssSelector(selector), selector));
+  public RegionLocator region(String selector) {
+    return new RegionLocator(this, new ElementSelector(By.ByCssSelector.cssSelector(selector), selector));
   }
 
-  public ShadowDomLocator shadow(TargetPathLocator locator, WebElement element) {
-    return new ShadowDomLocator(locator, new ElementReference(element));
+  public ShadowDomLocator shadow(WebElement element) {
+    return new ShadowDomLocator(this, new ElementReference(element));
   }
 
-  public ShadowDomLocator shadow(TargetPathLocator locator, By by, String selector) {
-    return new ShadowDomLocator(locator, new ElementSelector(by, selector));
+  public ShadowDomLocator shadow(By by, String selector) {
+    return new ShadowDomLocator(this, new ElementSelector(by, selector));
   }
 
-  public ShadowDomLocator shadow(TargetPathLocator locator, String selector) {
-    return new ShadowDomLocator(locator, new ElementSelector(By.ByCssSelector.cssSelector(selector), selector));
+  public ShadowDomLocator shadow(String selector) {
+    return new ShadowDomLocator(this, new ElementSelector(By.ByCssSelector.cssSelector(selector), selector));
   }
 
 }
