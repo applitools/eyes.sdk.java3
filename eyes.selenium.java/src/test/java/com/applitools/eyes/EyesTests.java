@@ -19,6 +19,7 @@ import com.applitools.eyes.selenium.universal.dto.IFrame;
 import com.applitools.eyes.selenium.universal.dto.ResponseDto;
 import com.applitools.eyes.selenium.universal.dto.ResponsePayload;
 import com.applitools.eyes.selenium.universal.dto.SelectorRegionDto;
+import com.applitools.eyes.selenium.universal.dto.TargetPathLocatorDto;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.Gson;
@@ -151,7 +152,29 @@ public class EyesTests {
     ObjectMapper objectMapper = new ObjectMapper();
     System.out.println("request: " + objectMapper.writeValueAsString(checkSettingsDto));
 
+  }
 
+  @Test
+  public void testLocatorDto() throws JsonProcessingException {
+    TargetPathLocatorDto dto = new TargetPathLocatorDto();
+    dto.setElementId("elementId");
+//    dto.setType("css selector");
+//    dto.setSelector("#s");
+
+    TargetPathLocatorDto shadow = new TargetPathLocatorDto();
+    shadow.setType("css selector");
+    shadow.setSelector(".css");
+
+    dto.setShadow(shadow);
+
+    TargetPathLocatorDto shadow1 = new TargetPathLocatorDto();
+    shadow1.setElementId("elementId1");
+//    shadow1.setSelector("//x");
+//    shadow1.setType("xpath");
+
+    shadow.setShadow(shadow1);
+
+    System.out.println(dto.toJson());
   }
 
 

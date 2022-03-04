@@ -54,8 +54,9 @@ public class CheckSettingsMapper {
     checkSettingsDto.setRegion(TRegionMapper.toTRegionFromCheckSettings(checkSettings));
     checkSettingsDto.setFrames(ContextReferenceMapper.toContextReferenceDtoList(seleniumCheckSettings.getFrameChain()));
 
+    // FIXME
     checkSettingsDto.setScrollRootElement(TRegionMapper.toTRegionDtoFromScrolls(seleniumCheckSettings.getScrollRootSelector(),
-                seleniumCheckSettings.getScrollRootElement()));
+        seleniumCheckSettings.getScrollRootElement()));
 
     checkSettingsDto.setFully(seleniumCheckSettings.getStitchContent());
 

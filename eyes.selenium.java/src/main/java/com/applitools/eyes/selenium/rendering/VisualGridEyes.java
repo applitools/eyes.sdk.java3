@@ -743,38 +743,39 @@ public class VisualGridEyes implements ISeleniumEyes {
     }
 
     private void trySetTargetSelector(SeleniumCheckSettings checkSettings) {
-        WebElement element = checkSettings.getTargetElement();
-        FrameChain frameChain = webDriver.getFrameChain().clone();
-        EyesTargetLocator switchTo = (EyesTargetLocator) webDriver.switchTo();
-        switchToFrame(checkSettings);
-        if (element == null) {
-            By targetSelector = checkSettings.getTargetSelector();
-            if (targetSelector != null) {
-                element = webDriver.findElement(targetSelector);
-            }
-        }
-        if (element != null) {
-            String xpath = (String) webDriver.executeScript(GET_ELEMENT_XPATH_JS, element);
-            VisualGridSelector vgs = new VisualGridSelector(xpath, "target");
-            checkSettings.setTargetSelector(vgs);
-        }
-        switchTo.frames(frameChain);
+//        WebElement element = checkSettings.getTargetElement();
+//        FrameChain frameChain = webDriver.getFrameChain().clone();
+//        EyesTargetLocator switchTo = (EyesTargetLocator) webDriver.switchTo();
+//        switchToFrame(checkSettings);
+//        if (element == null) {
+//            By targetSelector = checkSettings.getTargetSelector();
+//            if (targetSelector != null) {
+//                element = webDriver.findElement(targetSelector);
+//            }
+//        }
+//        if (element != null) {
+//            String xpath = (String) webDriver.executeScript(GET_ELEMENT_XPATH_JS, element);
+//            VisualGridSelector vgs = new VisualGridSelector(xpath, "target");
+//            checkSettings.setTargetSelector(vgs);
+//        }
+//        switchTo.frames(frameChain);
     }
 
     @SuppressWarnings("UnusedReturnValue")
     private int switchToFrame(ISeleniumCheckTarget checkTarget) {
-        if (checkTarget == null) {
-            return 0;
-        }
-
-        List<FrameLocator> frameChain = checkTarget.getFrameChain();
-        int switchedToFrameCount = 0;
-        for (FrameLocator frameLocator : frameChain) {
-            if (switchToFrame(frameLocator)) {
-                switchedToFrameCount++;
-            }
-        }
-        return switchedToFrameCount;
+//        if (checkTarget == null) {
+//            return 0;
+//        }
+//
+//        List<FrameLocator> frameChain = checkTarget.getFrameChain();
+//        int switchedToFrameCount = 0;
+//        for (FrameLocator frameLocator : frameChain) {
+//            if (switchToFrame(frameLocator)) {
+//                switchedToFrameCount++;
+//            }
+//        }
+        //return switchedToFrameCount;
+        return 0;
     }
 
     private boolean switchToFrame(ISeleniumFrameCheckTarget frameTarget) {

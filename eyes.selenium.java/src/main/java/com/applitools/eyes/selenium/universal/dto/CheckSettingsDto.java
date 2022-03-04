@@ -180,35 +180,35 @@ public class CheckSettingsDto {
     this.accessibilitySettings = accessibilitySettings;
   }
 
-  public List<TargetPathLocator> getIgnoreRegions() {
+  public List<TRegion> getIgnoreRegions() {
     return ignoreRegions;
   }
 
-  public void setIgnoreRegions(List<TargetPathLocator> ignoreRegions) {
+  public void setIgnoreRegions(List<TRegion> ignoreRegions) {
     this.ignoreRegions = ignoreRegions;
   }
 
-  public List<TargetPathLocator> getLayoutRegions() {
+  public List<TRegion> getLayoutRegions() {
     return layoutRegions;
   }
 
-  public void setLayoutRegions(List<TargetPathLocator> layoutRegions) {
+  public void setLayoutRegions(List<TRegion> layoutRegions) {
     this.layoutRegions = layoutRegions;
   }
 
-  public List<TargetPathLocator> getStrictRegions() {
+  public List<TRegion> getStrictRegions() {
     return strictRegions;
   }
 
-  public void setStrictRegions(List<TargetPathLocator> strictRegions) {
+  public void setStrictRegions(List<TRegion> strictRegions) {
     this.strictRegions = strictRegions;
   }
 
-  public List<TargetPathLocator> getContentRegions() {
+  public List<TRegion> getContentRegions() {
     return contentRegions;
   }
 
-  public void setContentRegions(List<TargetPathLocator> contentRegions) {
+  public void setContentRegions(List<TRegion> contentRegions) {
     this.contentRegions = contentRegions;
   }
 
@@ -225,11 +225,11 @@ public class CheckSettingsDto {
     this.accessibilityRegions = accessibilityRegions;
   }
 
-  public TargetPathLocator getRegion() {
+  public TRegion getRegion() {
     return region;
   }
 
-  public void setRegion(TargetPathLocator region) {
+  public void setRegion(TRegion region) {
     this.region = region;
   }
 

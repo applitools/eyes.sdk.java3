@@ -8,6 +8,7 @@ import com.applitools.eyes.Region;
 import com.applitools.eyes.fluent.CheckSettings;
 import com.applitools.eyes.fluent.GetSimpleRegion;
 import com.applitools.eyes.fluent.SimpleRegionByRectangle;
+import com.applitools.eyes.selenium.TargetPathLocator;
 import com.applitools.eyes.selenium.fluent.SeleniumCheckSettings;
 import com.applitools.eyes.selenium.fluent.SimpleRegionByElement;
 import com.applitools.eyes.selenium.fluent.SimpleRegionBySelector;
@@ -52,6 +53,8 @@ public class TRegionMapper {
     }
 
     SeleniumCheckSettings seleniumCheckSettings = (SeleniumCheckSettings) checkSettings;
+    TargetPathLocator targetPathLocator = seleniumCheckSettings.getTargetPathLocator();
+
     By by = seleniumCheckSettings.getTargetSelector();
 
     if (by != null) {

@@ -15,10 +15,4 @@ public class TargetPathLocator {
     this.value = value;
   }
 
-  {
-   elementId
-   type
-   selector
-  }
-
 }

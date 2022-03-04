@@ -120,8 +120,8 @@ public class SeleniumCheckSettings extends CheckSettings implements ISeleniumChe
 //        clone.targetElement = this.targetElement;
 //        clone.targetSelector = this.targetSelector;
         clone.frameChain.addAll(this.frameChain);
-        clone.scrollRootElement = this.scrollRootElement;
-        clone.scrollRootSelector = this.scrollRootSelector;
+//        clone.scrollRootElement = this.scrollRootElement;
+//        clone.scrollRootSelector = this.scrollRootSelector;
         clone.selector = this.selector;
         clone.sendDom = this.sendDom;
         clone.isDefaultLayoutBreakpointsSet = this.isDefaultLayoutBreakpointsSet;
@@ -408,7 +408,8 @@ public class SeleniumCheckSettings extends CheckSettings implements ISeleniumChe
     public SeleniumCheckSettings scrollRootElement(By selector) {
         SeleniumCheckSettings clone = this.clone();
         if (frameChain.size() == 0) {
-            clone.scrollRootSelector = selector;
+            // FIXME
+           // clone.scrollRootSelector = selector;
         } else {
             frameChain.get(frameChain.size() - 1).setScrollRootSelector(selector);
         }
@@ -418,7 +419,8 @@ public class SeleniumCheckSettings extends CheckSettings implements ISeleniumChe
     public SeleniumCheckSettings scrollRootElement(WebElement element) {
         SeleniumCheckSettings clone = this.clone();
         if (frameChain.size() == 0) {
-            clone.scrollRootElement = element;
+            // FIXME
+            //clone.scrollRootElement = element;
         } else {
             frameChain.get(frameChain.size() - 1).setScrollRootElement(element);
         }
@@ -522,12 +524,14 @@ public class SeleniumCheckSettings extends CheckSettings implements ISeleniumChe
 
     @Override
     public WebElement getScrollRootElement() {
-        return scrollRootElement;
+        //return scrollRootElement;
+        return null;
     }
 
     @Override
     public By getScrollRootSelector() {
-        return scrollRootSelector;
+        //return scrollRootSelector;
+        return null;
     }
 
     public SeleniumCheckSettings(Region region, boolean isSendDom) {

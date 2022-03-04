@@ -38,20 +38,20 @@ public class PageState {
     }
 
     public void preparePage(ISeleniumCheckTarget seleniumCheckTarget, Configuration config, WebElement userDefinedSRE) {
-        frameStates = new ArrayList<>();
-        originalFrameChain = driver.getFrameChain().clone();
-
-        if (seleniumCheckTarget.getTargetElement() != null ||
-                seleniumCheckTarget.getTargetSelector() != null ||
-                seleniumCheckTarget.getFrameChain().size() > 0) {
-            prepareParentFrames();
-        }
-
-        if (!EyesDriverUtils.isMobileDevice(driver)) {
-            saveCurrentFrameState(frameStates, driver, userDefinedSRE);
-            tryHideScrollbarsInFrame(config, driver, userDefinedSRE);
-            switchToTargetFrame(seleniumCheckTarget, config, frameStates, userDefinedSRE);
-        }
+//        frameStates = new ArrayList<>();
+//        originalFrameChain = driver.getFrameChain().clone();
+//
+//        if (seleniumCheckTarget.getTargetElement() != null ||
+//                seleniumCheckTarget.getTargetSelector() != null ||
+//                seleniumCheckTarget.getFrameChain().size() > 0) {
+//            prepareParentFrames();
+//        }
+//
+//        if (!EyesDriverUtils.isMobileDevice(driver)) {
+//            saveCurrentFrameState(frameStates, driver, userDefinedSRE);
+//            tryHideScrollbarsInFrame(config, driver, userDefinedSRE);
+//            switchToTargetFrame(seleniumCheckTarget, config, frameStates, userDefinedSRE);
+//        }
     }
 
     private void prepareParentFrames() {
