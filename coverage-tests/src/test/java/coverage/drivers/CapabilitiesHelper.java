@@ -100,6 +100,19 @@ public class CapabilitiesHelper {
         return setSauceCredentials(device);
     }
 
+    public static Capabilities getPixel3aXL() {
+        DesiredCapabilities device = new DesiredCapabilities();
+        device.setCapability("browserName", "");
+        device.setCapability("name", "Pixel 3a xl (java)");
+        device.setCapability("platformName", "Android");
+        device.setCapability("platformVersion", "10.0");
+        device.setCapability("appiumVersion", "1.20.2");
+        device.setCapability("deviceName", "Google Pixel 3a XL GoogleAPI Emulator");
+        device.setCapability("automationName", "uiautomator2");
+        device.setCapability("newCommandTimeout", 600);
+        return setSauceCredentials(device);
+    }
+
     public static Capabilities getIphoneXS() {
         DesiredCapabilities device = new DesiredCapabilities();
         device.setCapability("browserName", "");

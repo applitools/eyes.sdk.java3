@@ -11,6 +11,7 @@ public class DriverBuilder {
     protected boolean legacy = false;
     protected boolean executionGrid = false;
     protected String browser = "chrome";
+    protected String device;
 
     static HashMap<String, Builder> browserBuilders = new HashMap<String, Builder>()
     {{
@@ -21,7 +22,13 @@ public class DriverBuilder {
         put("ie-11", new InternetExplorer11Builder());
         put("edge-18", new Edge18Builder());
         put("firefox-48", new Firefox48Builder());
+    }};
+
+    static HashMap<String, DeviceBuilder> deviceBuilders = new HashMap<String, DeviceBuilder>()
+    {{
         put("Android 8.0 Chrome Emulator", new ChromeEmulatorBuilder());
+        put("iPhone XS", new IPhoneXS());
+        put("Pixel 3a XL", new Pixel3aXL());
     }};
 
     public DriverBuilder headless(boolean headless) {
@@ -36,7 +43,7 @@ public class DriverBuilder {
 
     public DriverBuilder device(String device) {
         // This method needed to setup the chrome emulation driver build
-        this.browser = device;
+        this.device = device;
         return this;
     }
 
@@ -51,7 +58,14 @@ public class DriverBuilder {
     }
 
     public WebDriver build() throws MalformedURLException {
-        Builder builder = browserBuilders.get(browser);
-        return builder.build(headless, legacy, executionGrid);
+        if (device == null) {
+            Builder builder = browserBuilders.get(browser);
+            return builder.build(headless, legacy, executionGrid);
+        } else {
+            DeviceBuilder builder = deviceBuilders.get(device);
+            builder.browser(browser);
+            return builder.build(headless, legacy, executionGrid);
+        }
+
     }
 }
