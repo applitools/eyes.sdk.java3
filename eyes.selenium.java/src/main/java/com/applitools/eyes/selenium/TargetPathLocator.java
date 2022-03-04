@@ -15,4 +15,12 @@ public class TargetPathLocator {
     this.value = value;
   }
 
+  public PathNodeValue getValue() {
+    return value;
+  }
+
+  public TargetPathLocator getParent() {
+    return parent;
+  }
+
 }

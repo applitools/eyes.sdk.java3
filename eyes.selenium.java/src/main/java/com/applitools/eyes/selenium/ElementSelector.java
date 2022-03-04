@@ -40,4 +40,20 @@ public class ElementSelector implements PathNodeValue {
     this.selector = selector;
   }
 
+  public String getSelector() {
+    return selector;
+  }
+
+  public String getType() {
+    return type;
+  }
+
+  public void setSelector(String selector) {
+    this.selector = selector;
+  }
+
+  public void setType(String type) {
+    this.type = type;
+  }
+
 }
