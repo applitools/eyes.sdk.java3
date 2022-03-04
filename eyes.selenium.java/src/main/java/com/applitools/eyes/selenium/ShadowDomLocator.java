@@ -35,19 +35,6 @@ public class ShadowDomLocator extends TargetPathLocator {
   public ShadowDomLocator shadow(String selector) {
     return new ShadowDomLocator(this, new ElementSelector(selector)); //this
   }
-
-  public String toJson() {
-//    String parentJson = "";
-//    if (parent != null) {
-//      parentJson = parent.toJson();
-//    }
-//    return parent.toJson() +
-//            "{ selector: " +
-//            "{type: csss selector, selector:blabla }"+
-//            "}";
-    return null;
-  }
-
 }
 
 
