@@ -46,7 +46,7 @@ public class CheckSettingsDto {
   // ScreenshotSettings
   private TRegion region;
   private Object frames;
-  private TargetPathLocator scrollRootElement;
+  private TRegion scrollRootElement;
   private Boolean fully;
   private String pageId;
   private LazyLoadOptions lazyLoad;
@@ -233,11 +233,11 @@ public class CheckSettingsDto {
     this.region = region;
   }
 
-  public TargetPathLocator getScrollRootElement() {
+  public TRegion getScrollRootElement() {
     return scrollRootElement;
   }
 
-  public void setScrollRootElement(TargetPathLocator scrollRootElement) {
+  public void setScrollRootElement(TRegion scrollRootElement) {
     this.scrollRootElement = scrollRootElement;
   }
 

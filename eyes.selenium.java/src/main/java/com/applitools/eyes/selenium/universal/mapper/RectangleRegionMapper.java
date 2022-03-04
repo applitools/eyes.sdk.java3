@@ -8,7 +8,7 @@ import com.applitools.eyes.selenium.universal.dto.RectangleRegionDto;
  */
 public class RectangleRegionMapper {
 
-  public static RectangleRegionDto toRectangleRegionDto(Region region) {
+   public static RectangleRegionDto toRectangleRegionDto(Region region) {
     if (region == null) {
       return null;
     }

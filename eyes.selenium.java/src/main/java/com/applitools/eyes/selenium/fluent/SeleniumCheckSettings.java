@@ -43,10 +43,10 @@ public class SeleniumCheckSettings extends CheckSettings implements ISeleniumChe
 
     private final List<FrameLocator> frameChain = new ArrayList<>();
     // FIXME - remove scrollRootElement/Selector
-//    @JsonSerialize(using = WebElementSerializer.class)
-//    private WebElement scrollRootElement;
-//    @JsonSerialize(using = BySerializer.class)
-//    private By scrollRootSelector;
+    @JsonSerialize(using = WebElementSerializer.class)
+    private WebElement scrollRootElement;
+    @JsonSerialize(using = BySerializer.class)
+    private By scrollRootSelector;
     private VisualGridSelector selector;
     private CheckState state;
 
@@ -524,14 +524,14 @@ public class SeleniumCheckSettings extends CheckSettings implements ISeleniumChe
 
     @Override
     public WebElement getScrollRootElement() {
-        //return scrollRootElement;
-        return null;
+        return scrollRootElement;
+//        return null;
     }
 
     @Override
     public By getScrollRootSelector() {
-        //return scrollRootSelector;
-        return null;
+        return scrollRootSelector;
+//        return null;
     }
 
     public SeleniumCheckSettings(Region region, boolean isSendDom) {

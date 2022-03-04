@@ -12,7 +12,9 @@ import com.applitools.eyes.selenium.TargetPathLocator;
 import com.applitools.eyes.selenium.fluent.SeleniumCheckSettings;
 import com.applitools.eyes.selenium.fluent.SimpleRegionByElement;
 import com.applitools.eyes.selenium.fluent.SimpleRegionBySelector;
+import com.applitools.eyes.selenium.universal.dto.ElementRegionDto;
 import com.applitools.eyes.selenium.universal.dto.TRegion;
+import com.applitools.eyes.selenium.universal.dto.TargetPathLocatorDto;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 
@@ -53,17 +55,10 @@ public class TRegionMapper {
     }
 
     SeleniumCheckSettings seleniumCheckSettings = (SeleniumCheckSettings) checkSettings;
-    TargetPathLocator targetPathLocator = seleniumCheckSettings.getTargetPathLocator();
 
-    By by = seleniumCheckSettings.getTargetSelector();
-
-    if (by != null) {
-      return SelectorRegionMapper.toSelectorRegionDto(by);
-    }
-
-    WebElement element = seleniumCheckSettings.getTargetElement();
-    if (element != null) {
-      return ElementRegionMapper.toElementRegionDto(element);
+    TargetPathLocator locator = seleniumCheckSettings.getTargetPathLocator();
+    if (locator != null) {
+      return TargetPathLocatorMapper.toTargetPathLocatorDto(seleniumCheckSettings.getTargetPathLocator());
     }
 
     Region region = seleniumCheckSettings.getTargetRegion();
