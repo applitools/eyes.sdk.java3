@@ -9,6 +9,7 @@ import com.applitools.eyes.selenium.CommandExecutor;
 import com.applitools.eyes.selenium.Configuration;
 import com.applitools.eyes.selenium.Eyes;
 import com.applitools.eyes.selenium.Reference;
+import com.applitools.eyes.selenium.TargetPathLocator;
 import com.applitools.eyes.selenium.fluent.Target;
 import com.applitools.eyes.selenium.universal.dto.CheckSettingsDto;
 import com.applitools.eyes.selenium.universal.dto.ContextReferenceDto;
@@ -20,11 +21,15 @@ import com.applitools.eyes.selenium.universal.dto.ResponseDto;
 import com.applitools.eyes.selenium.universal.dto.ResponsePayload;
 import com.applitools.eyes.selenium.universal.dto.SelectorRegionDto;
 import com.applitools.eyes.selenium.universal.dto.TargetPathLocatorDto;
+import com.applitools.eyes.selenium.universal.mapper.TRegionMapper;
+import com.applitools.eyes.selenium.universal.mapper.TargetPathLocatorMapper;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.Gson;
+import jdk.jfr.events.ExceptionThrownEvent;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.testng.Assert;
 import org.testng.annotations.Test;
@@ -155,27 +160,24 @@ public class EyesTests {
   }
 
   @Test
-  public void testLocatorDto() throws JsonProcessingException {
-    TargetPathLocatorDto dto = new TargetPathLocatorDto();
-    dto.setElementId("elementId");
-//    dto.setType("css selector");
-//    dto.setSelector("#s");
-
-    TargetPathLocatorDto shadow = new TargetPathLocatorDto();
-    shadow.setType("css selector");
-    shadow.setSelector(".css");
-
-    dto.setShadow(shadow);
-
-    TargetPathLocatorDto shadow1 = new TargetPathLocatorDto();
-    shadow1.setElementId("elementId1");
-//    shadow1.setSelector("//x");
-//    shadow1.setType("xpath");
-
-    shadow.setShadow(shadow1);
-
-    System.out.println(dto.toJson());
+  public void test_target_path_to_dict_shadow_element_region_by_css() throws Exception {
+    TargetPathLocator targetPathLocator = TargetPath.shadow(By.xpath("//x")).shadow("#s").region(".css");
+    TargetPathLocatorDto dto = TargetPathLocatorMapper.toTargetPathLocatorDto(targetPathLocator);
+    //System.out.println(dto.toJson());
   }
 
+  @Test
+  public void test_target_path_to_dict_shadow_by_css_region_by_css() throws Exception {
+    TargetPathLocator targetPathLocator = TargetPath.shadow("#s").region(".css");
+    TargetPathLocatorDto dto = TargetPathLocatorMapper.toTargetPathLocatorDto(targetPathLocator);
+    //System.out.println(dto.toJson());
+  }
+
+  @Test
+  public void test_target_path_to_dict_shadow_by_css() throws Exception {
+    TargetPathLocator targetPathLocator = TargetPath.shadow(".css");
+    TargetPathLocatorDto dto = TargetPathLocatorMapper.toTargetPathLocatorDto(targetPathLocator);
+    //System.out.println(dto.toJson());
+  }
 
 }
