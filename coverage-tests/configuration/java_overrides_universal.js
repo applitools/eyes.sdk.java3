@@ -26,5 +26,11 @@ module.exports = {
     'should not fail if scroll root is stale on android': {config: {branchName: 'universal-java'}},
     'check window fully on android chrome emulator on mobile page with horizontal scroll': {config: {branchName: 'universal-java'}},
     'check window fully on android chrome emulator on mobile page': {config: {branchName: 'universal-java'}},
+    'should abort after close': {skipEmit: true},
+    'should abort unclosed tests': {skipEmit: true},
+    'should abort unclosed tests with vg': {skipEmit: true},
+    'should return aborted tests in getAllTestResults': {skipEmit: true},
+    'should return aborted tests in getAllTestResults with vg': {skipEmit: true},
+    'should return browserInfo in getAllTestResults': {skipEmit: true},
 
 }
