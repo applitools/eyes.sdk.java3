@@ -17,8 +17,10 @@ import com.applitools.eyes.logging.Stage;
 import com.applitools.eyes.logging.Type;
 import com.applitools.eyes.selenium.CommandExecutor;
 import com.applitools.eyes.selenium.Reference;
+import com.applitools.eyes.selenium.universal.dto.TestResultsSummaryDto;
 import com.applitools.eyes.selenium.universal.dto.response.CommandCloseResponseDto;
 import com.applitools.eyes.selenium.universal.mapper.TestResultsMapper;
+import com.applitools.eyes.selenium.universal.mapper.TestResultsSummaryMapper;
 import com.applitools.eyes.selenium.universal.server.UniversalSdkNativeLoader;
 import com.applitools.utils.ClassVersionGetter;
 import com.applitools.utils.GeneralUtils;
@@ -76,31 +78,8 @@ public abstract class EyesRunner {
   }
 
   public TestResultsSummary getAllTestResults(boolean shouldThrowException) {
-    List<CommandCloseResponseDto> closeAllEyesResponse = commandExecutor.closeAllEyes(managerRef);
-    List<TestResults> testResults = TestResultsMapper.toTestResultsList(closeAllEyesResponse);
-
-    if (shouldThrowException) {
-      List<TestResults> filteredList = testResults
-          .stream()
-          .filter(testResults1 -> testResults1.getMismatches() > 0).collect(Collectors.toList());
-
-      if (!filteredList.isEmpty()) {
-        StringBuilder sb = new StringBuilder();
-        filteredList.forEach(testResults1 -> sb.append("Name: ").append(testResults1.getName()).append("\n"));
-        throw new EyesException(sb.toString());
-      }
-
-    }
-
-    if (testResults != null) {
-      testResults.forEach(testResults1 -> logSessionResultsAndThrowException(shouldThrowException, testResults1));
-    }
-
-    List<TestResultContainer> testResultContainerList = new ArrayList<>();
-    if (testResults != null) {
-      testResults.forEach(testResults1 -> testResultContainerList.add(new TestResultContainer(testResults1)));
-    }
-    return new TestResultsSummary(testResultContainerList);
+    TestResultsSummaryDto dto = commandExecutor.closeManager(managerRef, shouldThrowException);
+    return TestResultsSummaryMapper.fromDto(dto);
   }
 
   private void deleteAllBatches() {

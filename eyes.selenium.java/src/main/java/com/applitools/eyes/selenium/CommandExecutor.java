@@ -27,8 +27,10 @@ import com.applitools.eyes.selenium.universal.dto.OpenEyes;
 import com.applitools.eyes.selenium.universal.dto.RectangleSizeDto;
 import com.applitools.eyes.selenium.universal.dto.RequestDto;
 import com.applitools.eyes.selenium.universal.dto.ResponseDto;
+import com.applitools.eyes.selenium.universal.dto.TestResultsSummaryDto;
 import com.applitools.eyes.selenium.universal.dto.VisualLocatorSettingsDto;
 import com.applitools.eyes.selenium.universal.dto.request.CommandCloseAllEyesRequestDto;
+import com.applitools.eyes.selenium.universal.dto.request.CommandCloseManagerRequestDto;
 import com.applitools.eyes.selenium.universal.dto.request.CommandCloseRequestDto;
 import com.applitools.eyes.selenium.universal.dto.request.CommandGetViewportSizeRequestDto;
 import com.applitools.eyes.selenium.universal.dto.response.CommandCloseResponseDto;
@@ -229,6 +231,23 @@ public class CommandExecutor {
     request.setPayload(new CommandCloseAllEyesRequestDto(managerRef));
     SyncTaskListener syncTaskListener = checkedCommand(request, true);
     ResponseDto<List<CommandCloseResponseDto>> closeResponse = (ResponseDto<List<CommandCloseResponseDto>>) syncTaskListener.get();
+    if (closeResponse != null && closeResponse.getPayload().getError() != null) {
+      String message = closeResponse.getPayload().getError().getMessage();
+      if (message != null && message.contains("stale element reference")) {
+        throw new StaleElementReferenceException(message);
+      }
+      throw new EyesException(message);
+    }
+    return closeResponse.getPayload().getResult();
+  }
+
+  public TestResultsSummaryDto closeManager(Reference managerRef, Boolean throwError) {
+    RequestDto<CommandCloseManagerRequestDto> request = new RequestDto<>();
+    request.setName("EyesManage.closeManager");
+    request.setKey(UUID.randomUUID().toString());
+    request.setPayload(new CommandCloseManagerRequestDto(managerRef, throwError));
+    SyncTaskListener syncTaskListener = checkedCommand(request, true);
+    ResponseDto<TestResultsSummaryDto> closeResponse = (ResponseDto<TestResultsSummaryDto>) syncTaskListener.get();
     if (closeResponse != null && closeResponse.getPayload().getError() != null) {
       String message = closeResponse.getPayload().getError().getMessage();
       if (message != null && message.contains("stale element reference")) {

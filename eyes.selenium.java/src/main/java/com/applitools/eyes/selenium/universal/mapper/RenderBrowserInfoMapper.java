@@ -10,8 +10,12 @@ import com.applitools.eyes.selenium.universal.dto.IBrowsersInfo;
 import com.applitools.eyes.selenium.universal.dto.IOSDeviceRendererDto;
 import com.applitools.eyes.selenium.universal.dto.IosDeviceInfoDto;
 import com.applitools.eyes.visualgrid.model.ChromeEmulationInfo;
+import com.applitools.eyes.visualgrid.model.DeviceName;
 import com.applitools.eyes.visualgrid.model.IosDeviceInfo;
+import com.applitools.eyes.visualgrid.model.IosDeviceName;
+import com.applitools.eyes.visualgrid.model.IosVersion;
 import com.applitools.eyes.visualgrid.model.RenderBrowserInfo;
+import com.applitools.eyes.visualgrid.model.ScreenOrientation;
 
 /**
  * Render browser info mapper
@@ -57,6 +61,25 @@ public class RenderBrowserInfoMapper {
     }
 
     return renderBrowserInfos.stream().map(RenderBrowserInfoMapper::toRenderBrowserInfoDto).collect(Collectors.toList());
-
   }
+
+  public static ChromeEmulationInfo toEmulationInfo(ChromeEmulationInfoDto dto) {
+    if (dto == null) {
+      return null;
+    }
+    DeviceName deviceName = DeviceName.valueOf(dto.getDeviceName());
+    ScreenOrientation screenOrientation = ScreenOrientation.valueOf(dto.getScreenOrientation());
+    return new ChromeEmulationInfo(deviceName, screenOrientation);
+  }
+
+  public static IosDeviceInfo toIosDeviceInfo(IosDeviceInfoDto dto) {
+    if (dto == null) {
+      return null;
+    }
+    IosDeviceName iosDeviceName = IosDeviceName.valueOf(dto.getDeviceName());
+    ScreenOrientation screenOrientation = ScreenOrientation.valueOf(dto.getScreenOrientation());
+    IosVersion iosVersion = IosVersion.valueOf(dto.getVersion());
+    return new IosDeviceInfo(iosDeviceName, screenOrientation, iosVersion);
+  }
+
 }

@@ -19,6 +19,7 @@ import com.applitools.utils.GeneralUtils;
  */
 public class UniversalSdkNativeLoader {
   private static Process nativeProcess = null;
+  private static String port;
 
   public static void start() {
     try {
@@ -111,20 +112,26 @@ public class UniversalSdkNativeLoader {
   public static void readPortOfProcess(Process process) {
     try (BufferedReader input = new BufferedReader(new
         InputStreamReader(process.getInputStream()))) {
-      getLastLine(input);
+      getFirstLineAsPort(input);
     } catch (IOException e) {
       e.printStackTrace();
     }
   }
 
   // ENHANCE
-  private static void getLastLine(BufferedReader reader) throws IOException {
+  private static void getFirstLineAsPort(BufferedReader reader) throws IOException {
     String temp;
     String lastLine = null;
     while ((temp = reader.readLine()) != null) {
       lastLine = temp;
+      port = lastLine;
       break;
     }
+    System.out.println("PORT: " + port);
     reader.close();
+  }
+
+  public static String getPort() {
+    return port;
   }
 }

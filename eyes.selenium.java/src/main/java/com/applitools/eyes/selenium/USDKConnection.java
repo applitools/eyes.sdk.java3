@@ -16,7 +16,9 @@ import com.applitools.eyes.selenium.universal.dto.RectangleSizeDto;
 import com.applitools.eyes.selenium.universal.dto.RegionDto;
 import com.applitools.eyes.selenium.universal.dto.RequestDto;
 import com.applitools.eyes.selenium.universal.dto.ResponseDto;
+import com.applitools.eyes.selenium.universal.dto.TestResultsSummaryDto;
 import com.applitools.eyes.selenium.universal.dto.response.CommandCloseResponseDto;
+import com.applitools.eyes.selenium.universal.server.UniversalSdkNativeLoader;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -48,7 +50,8 @@ public class USDKConnection {
   private WebSocket openWebsocket() {
 
     try {
-      return Dsl.asyncHttpClient().prepareGet("ws://localhost:21077/eyes")
+      String url = String.format("ws://localhost:%s/eyes", UniversalSdkNativeLoader.getPort());
+      return Dsl.asyncHttpClient().prepareGet(url)
           .execute(new WebSocketUpgradeHandler.Builder().addWebSocketListener(
               new WebSocketListener() {
 
@@ -64,6 +67,7 @@ public class USDKConnection {
 
                 @Override
                 public void onTextFrame(String payload, boolean finalFragment, int rsv) {
+                  System.out.println("RESPONSE: " + payload);
                   if (payload.contains("Core.makeManager") || payload.contains("EyesManager.openEyes")) {
                     try {
                       ResponseDto<Reference> referenceResponseDto = objectMapper.readValue(payload, new TypeReference<ResponseDto<Reference>>() {});
@@ -132,6 +136,17 @@ public class USDKConnection {
                     } catch (Exception e) {
                       e.printStackTrace();
                     }
+                  } else if (payload.contains("EyesManage.closeManager")) {
+                    try {
+                      ResponseDto<TestResultsSummaryDto> closeManagerResponse = objectMapper.readValue(payload,
+                          new TypeReference<ResponseDto<TestResultsSummaryDto>>() {});
+                      SyncTaskListener<ResponseDto<?>> syncTaskLister = map.get(closeManagerResponse.getKey());
+                      syncTaskLister.onComplete(closeManagerResponse);
+                      map.remove(closeManagerResponse.getKey());
+                    } catch (Exception e) {
+                      e.printStackTrace();
+                    }
+
                   }
                 }
 
@@ -158,6 +173,7 @@ public class USDKConnection {
     SyncTaskListener<ResponseDto<?>> syncTaskListener = new SyncTaskListener<>(logger, request.getKey());
     map.put(request.getKey(), syncTaskListener);
 
+    System.out.println("REQUEST: " + objectMapper.writeValueAsString(request));
     webSocket.sendTextFrame(objectMapper.writeValueAsString(request));
     return syncTaskListener;
   }

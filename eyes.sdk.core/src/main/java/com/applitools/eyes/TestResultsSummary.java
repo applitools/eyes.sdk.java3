@@ -2,26 +2,27 @@ package com.applitools.eyes;
 
 import org.apache.commons.lang3.StringUtils;
 
+import java.net.Inet4Address;
 import java.util.Iterator;
 import java.util.List;
 
 public class TestResultsSummary implements Iterable<TestResultContainer>{
-    private List<TestResultContainer> allResults;
-    private int passed = 0;
-    private int unresolved = 0;
-    private int failed = 0;
-    private int exceptions = 0;
-    private int mismatches = 0;
-    private int missing = 0;
-    private int matches = 0;
+    private List<TestResultContainer> results;
+    private Integer passed;
+    private Integer unresolved;
+    private Integer failed;
+    private Integer exceptions;
+    private Integer mismatches;
+    private Integer missing;
+    private Integer matches;
 
     public TestResultsSummary(List<TestResultContainer> allResults) {
-        this.allResults = allResults;
+        this.results = allResults;
         for (TestResultContainer resultContainer : allResults) {
             TestResults result = null;
             if (resultContainer != null) {
                 if (resultContainer.getException() != null) {
-                    this.exceptions++;
+                    this.exceptions = 1;
                 }
                 result = resultContainer.getTestResults();
             }
@@ -31,30 +32,42 @@ public class TestResultsSummary implements Iterable<TestResultContainer>{
             if (result.getStatus() != null) {
                 switch (result.getStatus()) {
                     case Failed:
-                        this.failed++;
+                        this.failed = 1;
                         break;
                     case Passed:
-                        this.passed++;
+                        this.passed = 1;
                         break;
                     case Unresolved:
-                        this.unresolved++;
+                        this.unresolved = 1;
                         break;
                 }
             }
-            matches += result.getMatches();
-            missing += result.getMissing();
-            mismatches += result.getMismatches();
+            matches = result.getMatches();
+            missing = result.getMissing();
+            mismatches = result.getMismatches();
         }
     }
 
+    public TestResultsSummary(List<TestResultContainer> allResults, Integer passed, Integer unresolved,
+        Integer failed, Integer exceptions, Integer mismatches, Integer missing, Integer matches) {
+        this.results = allResults;
+        this.passed = passed;
+        this.unresolved = unresolved;
+        this.failed = failed;
+        this.exceptions = exceptions;
+        this.mismatches = mismatches;
+        this.missing = missing;
+        this.matches = matches;
+    }
+
     public TestResultContainer[] getAllResults() {
-        return allResults.toArray(new TestResultContainer[0]);
+        return results.toArray(new TestResultContainer[0]);
     }
 
     @Override
     public String toString() {
         return "result summary {" +
-                "\n\tall results=\n\t\t" + StringUtils.join(allResults,"\n\t\t") +
+                "\n\tall results=\n\t\t" + StringUtils.join(results,"\n\t\t") +
                 "\n\tpassed=" + passed +
                 "\n\tunresolved=" + unresolved +
                 "\n\tfailed=" + failed +
@@ -67,10 +80,11 @@ public class TestResultsSummary implements Iterable<TestResultContainer>{
 
     @Override
     public Iterator<TestResultContainer> iterator() {
-        return this.allResults.iterator();
+        return this.results.iterator();
     }
 
     public int size() {
-        return this.allResults.size();
+        return this.results.size();
     }
+
 }
