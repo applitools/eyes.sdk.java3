@@ -30,21 +30,25 @@ public class TestResultsSummaryMapper {
       for (TestResultContainerDto containerDto : containerDtoList) {
         // browserInfo
         BrowserInfoDto browserInfoDto = containerDto.getBrowserInfo();
-        RenderBrowserInfo renderBrowserInfo;
-        if (browserInfoDto.getChromeEmulationInfo() != null) {
-          EmulationBaseInfo emulationBaseInfo = RenderBrowserInfoMapper.toEmulationInfo(browserInfoDto.getChromeEmulationInfo());
-          renderBrowserInfo = new RenderBrowserInfo(emulationBaseInfo);
-        } else if (browserInfoDto.getIosDeviceInfo() != null) {
-          IosDeviceInfo iosDeviceInfo = RenderBrowserInfoMapper.toIosDeviceInfo(browserInfoDto.getIosDeviceInfo());
-          renderBrowserInfo = new RenderBrowserInfo(iosDeviceInfo);
-        } else {
-          renderBrowserInfo = new RenderBrowserInfo(browserInfoDto.getWidth(), browserInfoDto.getHeight(),
-              BrowserType.valueOf(browserInfoDto.getName()));
+        RenderBrowserInfo renderBrowserInfo = null;
+        if (browserInfoDto != null) {
+          if (browserInfoDto.getChromeEmulationInfo() != null) {
+            EmulationBaseInfo emulationBaseInfo = RenderBrowserInfoMapper.toEmulationInfo(browserInfoDto.getChromeEmulationInfo());
+            renderBrowserInfo = new RenderBrowserInfo(emulationBaseInfo);
+          } else if (browserInfoDto.getIosDeviceInfo() != null) {
+            IosDeviceInfo iosDeviceInfo = RenderBrowserInfoMapper.toIosDeviceInfo(browserInfoDto.getIosDeviceInfo());
+            renderBrowserInfo = new RenderBrowserInfo(iosDeviceInfo);
+          } else {
+            renderBrowserInfo = new RenderBrowserInfo(browserInfoDto.getWidth(), browserInfoDto.getHeight(),
+                BrowserType.fromString(browserInfoDto.getName()));
+          }
         }
-
         // exception
-        Exception stack = new Exception(containerDto.getException().getStack());
-        Exception exception = new Exception(containerDto.getException().getMessage(), stack);
+        Exception exception = null;
+        if (containerDto.getException() != null) {
+          Exception stack = new Exception(containerDto.getException().getStack());
+          exception = new Exception(containerDto.getException().getMessage(), stack);
+        }
         TestResultContainer container = new TestResultContainer(containerDto.getTestResults(), renderBrowserInfo, exception);
         containerList.add(container);
       }

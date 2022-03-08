@@ -200,7 +200,9 @@ public class Eyes implements IEyesBase {
             List<CommandCloseResponseDto> abortResponse = commandExecutor.abort(eyesRef, true);
             List<TestResults> testResults = TestResultsMapper.toTestResultsList(abortResponse);
             this.eyesRef = null;
-            return testResults.isEmpty() ? null : testResults.get(0);
+            if (testResults != null) {
+                return testResults.isEmpty() ? null : testResults.get(0);
+            }
         }
         return null;
     }

@@ -127,7 +127,7 @@ public class UniversalSdkNativeLoader {
       port = lastLine;
       break;
     }
-    System.out.println("PORT: " + port);
+
     reader.close();
   }
 

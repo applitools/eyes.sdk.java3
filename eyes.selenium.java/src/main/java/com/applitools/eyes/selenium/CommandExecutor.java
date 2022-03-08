@@ -243,7 +243,7 @@ public class CommandExecutor {
 
   public TestResultsSummaryDto closeManager(Reference managerRef, Boolean throwError) {
     RequestDto<CommandCloseManagerRequestDto> request = new RequestDto<>();
-    request.setName("EyesManage.closeManager");
+    request.setName("EyesManager.closeManager");
     request.setKey(UUID.randomUUID().toString());
     request.setPayload(new CommandCloseManagerRequestDto(managerRef, throwError));
     SyncTaskListener syncTaskListener = checkedCommand(request, true);

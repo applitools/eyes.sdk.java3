@@ -136,7 +136,7 @@ public class USDKConnection {
                     } catch (Exception e) {
                       e.printStackTrace();
                     }
-                  } else if (payload.contains("EyesManage.closeManager")) {
+                  } else if (payload.contains("EyesManager.closeManager")) {
                     try {
                       ResponseDto<TestResultsSummaryDto> closeManagerResponse = objectMapper.readValue(payload,
                           new TypeReference<ResponseDto<TestResultsSummaryDto>>() {});
