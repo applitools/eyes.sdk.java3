@@ -165,12 +165,14 @@ public class AppiumFullPageCaptureAlgorithm {
             ((AppiumScrollPositionProvider) scrollProvider).scrollTo(xPos, startY - contentInset.getBottom(), xPos, endY + contentInset.getBottom(), false);
 
             // That means we need recalculate scrollViewRegion
-            if (scrollRootElementSelector != null) {
+            if (scrollRootElementSelector != null && !cacheScrollableSize) {
                 scrollViewRegion = scaleSafe(((AppiumScrollPositionProvider) scrollProvider).getScrollableViewRegion());
                 // we modify the region by one pixel to make sure we don't accidentally get a pixel of the header above it
                 newLoc = new Location(scrollViewRegion.getLeft(), scrollViewRegion.getTop() - scaleSafe(statusBarHeight) + 1);
                 newSize = new RectangleSize(initialPartSize.getWidth(), scrollViewRegion.getHeight() - 1);
-                scrollViewRegion.setLocation(newLoc);
+                if (scrollRootElementSelector == null && !cacheScrollableSize) {
+                    scrollViewRegion.setLocation(newLoc);
+                }
                 scrollViewRegion.setSize(newSize);
             }
 
