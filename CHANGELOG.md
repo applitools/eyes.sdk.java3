@@ -1,3 +1,7 @@
+## [vNext]
+### Updated
+- iOS full page algorithm. Added `setContentInset` and `setCacheScrollableSize` methods to Configuration. [Trello 2721](https://trello.com/c/aiSRO9WJ)
+
 ## [3.212.1] - 2021-03-22
 ### Fixed
 - Improved android full page when only HorizontalScrollView presented on the screen. [Trello 2782](https://trello.com/c/emnUd7Mk)
