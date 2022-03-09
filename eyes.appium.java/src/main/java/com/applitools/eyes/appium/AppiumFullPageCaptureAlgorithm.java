@@ -170,7 +170,7 @@ public class AppiumFullPageCaptureAlgorithm {
                 // we modify the region by one pixel to make sure we don't accidentally get a pixel of the header above it
                 newLoc = new Location(scrollViewRegion.getLeft(), scrollViewRegion.getTop() - scaleSafe(statusBarHeight) + 1);
                 newSize = new RectangleSize(initialPartSize.getWidth(), scrollViewRegion.getHeight() - 1);
-                if (scrollRootElementSelector == null && !cacheScrollableSize) {
+                if (scrollRootElementSelector == null && scrollRootElement == null) {
                     scrollViewRegion.setLocation(newLoc);
                 }
                 scrollViewRegion.setSize(newSize);
