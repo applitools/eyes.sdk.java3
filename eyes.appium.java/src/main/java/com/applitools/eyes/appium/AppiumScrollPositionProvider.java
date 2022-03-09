@@ -226,6 +226,7 @@ public abstract class AppiumScrollPositionProvider implements ScrollPositionProv
         this.cachedScrollableView = null;
         this.cachedScrollableViewLocation = null;
         this.cachedScrollableViewRegion = null;
+        this.isVerticalScrollGapSet = false;
     }
 
     public void setScrollRootElement(WebElement scrollRootElement) {
