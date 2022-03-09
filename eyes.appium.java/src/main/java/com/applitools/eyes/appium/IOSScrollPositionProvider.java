@@ -431,4 +431,16 @@ public class IOSScrollPositionProvider extends AppiumScrollPositionProvider {
         super.setScrollRootElement(scrollRootElement);
         this.cachedScrollableView = scrollRootElement;
     }
+
+    @Override
+    public int getCachedFirstVisibleChildHeight() {
+        if (cacheScrollableSize) {
+            return 0;
+        }
+        WebElement activeScroll = getFirstScrollableView();
+        if (activeScroll.getAttribute("type").equals("XCUIElementTypeCollectionView")) {
+            return 0;
+        }
+        return getCachedFirstVisibleChild().getSize().height;
+    }
 }

@@ -159,7 +159,7 @@ public class AppiumFullPageCaptureAlgorithm {
         int startY = downscaleSafe(scrollViewRegion.getHeight() + scrollViewRegion.getTop()) - 1 - stitchingAdjustment/2;
         int endY = startY - oneScrollStep + 2 + stitchingAdjustment/2;
 
-        int firstVisibleChildOriginalHeight = ((AppiumScrollPositionProvider) scrollProvider).getCachedFirstVisibleChild().getSize().height;
+        int firstVisibleChildOriginalHeight = ((AppiumScrollPositionProvider) scrollProvider).getCachedFirstVisibleChildHeight();
 
         for (int step = 1; step <= maxScrollSteps; step++) {
             ((AppiumScrollPositionProvider) scrollProvider).scrollTo(xPos, startY - contentInset.getBottom(), xPos, endY + contentInset.getBottom(), false);
@@ -183,7 +183,7 @@ public class AppiumFullPageCaptureAlgorithm {
 
             currentPosition = scaleSafe(((AppiumScrollPositionProvider) scrollProvider).getCurrentPositionWithoutStatusBar(true));
 
-            int firstVisibleChildAfterScrollHeight = ((AppiumScrollPositionProvider) scrollProvider).getCachedFirstVisibleChild().getSize().height;
+            int firstVisibleChildAfterScrollHeight = ((AppiumScrollPositionProvider) scrollProvider).getCachedFirstVisibleChildHeight();
 
             // here we make sure to say that the region we have scrolled to in the main screenshot
             // is also offset by 1, to match the change we made to the scrollViewRegion

@@ -243,4 +243,8 @@ public abstract class AppiumScrollPositionProvider implements ScrollPositionProv
     public void setCacheScrollableSize(boolean cacheScrollableSize) {
         this.cacheScrollableSize = cacheScrollableSize;
     }
+
+    public int getCachedFirstVisibleChildHeight() {
+        return 0;
+    }
 }
