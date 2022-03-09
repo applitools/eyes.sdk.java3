@@ -4,6 +4,7 @@ import com.applitools.eyes.*;
 import com.applitools.eyes.appium.capture.MobileImageProvider;
 import com.applitools.eyes.capture.EyesScreenshotFactory;
 import com.applitools.eyes.capture.ImageProvider;
+import com.applitools.eyes.config.ContentInset;
 import com.applitools.eyes.debug.DebugScreenshotsProvider;
 import com.applitools.eyes.logging.Stage;
 import com.applitools.eyes.logging.Type;
@@ -18,6 +19,7 @@ import com.applitools.utils.ArgumentGuard;
 import com.applitools.utils.GeneralUtils;
 import com.applitools.utils.ImageUtils;
 import org.apache.commons.lang3.tuple.Pair;
+import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 
 import java.awt.image.BufferedImage;
@@ -44,6 +46,7 @@ public class AppiumFullPageCaptureAlgorithm {
     private BufferedImage stitchedImage;
     protected Location currentPosition;
     protected WebElement scrollRootElement;
+    protected By scrollRootElementSelector;
 
     // need to keep track of whether location and dimension coordinates returned by the driver
     // are already scaled to the pixel ratio, or are in "logical" pixels
@@ -56,6 +59,8 @@ public class AppiumFullPageCaptureAlgorithm {
     protected Integer stitchingAdjustment = DEFAULT_STITCHING_ADJUSTMENT;
 
     protected int statusBarHeight = 0;
+    protected ContentInset contentInset = new ContentInset();
+    protected boolean cacheScrollableSize = true;
 
     public AppiumFullPageCaptureAlgorithm(Logger logger, String testId, PositionProvider originProvider,
                                           PositionProvider positionProvider,
@@ -95,7 +100,8 @@ public class AppiumFullPageCaptureAlgorithm {
                                           ImageProvider imageProvider, DebugScreenshotsProvider debugScreenshotsProvider,
                                           ScaleProviderFactory scaleProviderFactory, CutProvider cutProvider,
                                           EyesScreenshotFactory screenshotFactory, int waitBeforeScreenshots, WebElement cutElement,
-                                          Integer stitchingAdjustment, WebElement scrollRootElement) {
+                                          Integer stitchingAdjustment, WebElement scrollRootElement, By scrollRootElementSelector,
+                                          ContentInset contentInset, boolean cacheScrollableSize) {
 
         // ensure that all the scroll/position providers used by the superclass are the same object;
         // getting the current position for appium is very expensive!
@@ -103,7 +109,13 @@ public class AppiumFullPageCaptureAlgorithm {
                 debugScreenshotsProvider, scaleProviderFactory, cutProvider, screenshotFactory,
                 waitBeforeScreenshots, cutElement, stitchingAdjustment);
         this.scrollRootElement = scrollRootElement;
+        this.scrollRootElementSelector = scrollRootElementSelector;
+        this.contentInset = contentInset;
+        this.cacheScrollableSize = cacheScrollableSize;
         scrollProvider.setScrollRootElement(scrollRootElement);
+        scrollProvider.setScrollRootElementSelector(scrollRootElementSelector);
+        scrollProvider.setContentInset(contentInset);
+        scrollProvider.setCacheScrollableSize(cacheScrollableSize);
     }
 
     protected RectangleSize captureAndStitchCurrentPart(Region partRegion) {
@@ -133,9 +145,7 @@ public class AppiumFullPageCaptureAlgorithm {
         // we modify the region by one pixel to make sure we don't accidentally get a pixel of the header above it
         Location newLoc = new Location(scrollViewRegion.getLeft(), scrollViewRegion.getTop() - scaleSafe(statusBarHeight) + 1);
         RectangleSize newSize = new RectangleSize(initialPartSize.getWidth(), scrollViewRegion.getHeight() - 1);
-        if (scrollRootElement == null) {
-            scrollViewRegion.setLocation(newLoc);
-        }
+        scrollViewRegion.setLocation(newLoc);
         scrollViewRegion.setSize(newSize);
 
         ((AppiumScrollPositionProvider) scrollProvider).setCutElement(cutElement);
@@ -148,21 +158,36 @@ public class AppiumFullPageCaptureAlgorithm {
         int maxScrollSteps = contentSize.getScrollContentHeight() / oneScrollStep;
         int startY = downscaleSafe(scrollViewRegion.getHeight() + scrollViewRegion.getTop()) - 1 - stitchingAdjustment/2;
         int endY = startY - oneScrollStep + 2 + stitchingAdjustment/2;
+
+        int firstVisibleChildOriginalHeight = ((AppiumScrollPositionProvider) scrollProvider).getCachedFirstVisibleChild().getSize().height;
+
         for (int step = 1; step <= maxScrollSteps; step++) {
+            ((AppiumScrollPositionProvider) scrollProvider).scrollTo(xPos, startY - contentInset.getBottom(), xPos, endY + contentInset.getBottom(), false);
+
+            // That means we need recalculate scrollViewRegion
+            if (scrollRootElementSelector != null) {
+                scrollViewRegion = scaleSafe(((AppiumScrollPositionProvider) scrollProvider).getScrollableViewRegion());
+                // we modify the region by one pixel to make sure we don't accidentally get a pixel of the header above it
+                newLoc = new Location(scrollViewRegion.getLeft(), scrollViewRegion.getTop() - scaleSafe(statusBarHeight) + 1);
+                newSize = new RectangleSize(initialPartSize.getWidth(), scrollViewRegion.getHeight() - 1);
+                scrollViewRegion.setLocation(newLoc);
+                scrollViewRegion.setSize(newSize);
+            }
+
             regionToCrop = new Region(0,
                     scrollViewRegion.getTop() + stitchingAdjustment,
                     initialPartSize.getWidth(),
                     scrollViewRegion.getHeight() - stitchingAdjustment);
 
-            ((AppiumScrollPositionProvider) scrollProvider).scrollTo(xPos, startY, xPos, endY, false);
-
             currentPosition = scaleSafe(((AppiumScrollPositionProvider) scrollProvider).getCurrentPositionWithoutStatusBar(true));
+
+            int firstVisibleChildAfterScrollHeight = ((AppiumScrollPositionProvider) scrollProvider).getCachedFirstVisibleChild().getSize().height;
 
             // here we make sure to say that the region we have scrolled to in the main screenshot
             // is also offset by 1, to match the change we made to the scrollViewRegion
             // We should set left = 0 because we need to a region from the start of viewport
             currentPosition = new Location(currentPosition.getX(), currentPosition.getY() + 1 + stitchingAdjustment
-                    + (scrollRootElement == null ? 0 : scaleSafe(statusBarHeight)));
+                    + (scrollRootElement == null ? 0 : scaleSafe(statusBarHeight)) + scaleSafe(firstVisibleChildOriginalHeight - firstVisibleChildAfterScrollHeight));
 
             lastSuccessfulPartSize = captureAndStitchCurrentPart(regionToCrop);
         }

@@ -3,6 +3,7 @@ package com.applitools.eyes.appium;
 import com.applitools.eyes.*;
 import com.applitools.eyes.capture.EyesScreenshotFactory;
 import com.applitools.eyes.capture.ImageProvider;
+import com.applitools.eyes.config.ContentInset;
 import com.applitools.eyes.debug.DebugScreenshotsProvider;
 import com.applitools.eyes.logging.Stage;
 import com.applitools.eyes.logging.TraceLevel;
@@ -18,10 +19,12 @@ public class AndroidFullPageCaptureAlgorithm extends AppiumFullPageCaptureAlgori
                                            ImageProvider imageProvider, DebugScreenshotsProvider debugScreenshotsProvider,
                                            ScaleProviderFactory scaleProviderFactory, CutProvider cutProvider,
                                            EyesScreenshotFactory screenshotFactory, int waitBeforeScreenshots,
-                                           Integer stitchingAdjustment, WebElement scrollRootElement) {
+                                           Integer stitchingAdjustment, WebElement scrollRootElement, ContentInset contentInset,
+                                           boolean cacheScrollableSize) {
 
         super(logger, testId, scrollProvider, imageProvider, debugScreenshotsProvider,
-            scaleProviderFactory, cutProvider, screenshotFactory, waitBeforeScreenshots, null, stitchingAdjustment, scrollRootElement);
+                scaleProviderFactory, cutProvider, screenshotFactory, waitBeforeScreenshots, null, stitchingAdjustment,
+                scrollRootElement, null, contentInset, cacheScrollableSize);
 
         // Android returns pixel coordinates which are already scaled according to the pixel ratio
         this.coordinatesAreScaled = true;
