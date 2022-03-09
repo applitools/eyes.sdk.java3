@@ -285,6 +285,12 @@ public class IOSScrollPositionProvider extends AppiumScrollPositionProvider {
                 return EyesAppiumUtils.getFirstVisibleChild(activeScroll);
             }
             return firstCell;
+        } else if (activeScroll.getAttribute("type").equals("XCUIElementTypeScrollView")) {
+            List<WebElement> list = activeScroll.findElements(MobileBy.xpath("//XCUIElementTypeScrollView[1]/*"));
+            if (!list.isEmpty()) {
+                return list.get(0);
+            }
+            return EyesAppiumUtils.getFirstVisibleChild(activeScroll);
         } else {
             return EyesAppiumUtils.getFirstVisibleChild(activeScroll);
         }
