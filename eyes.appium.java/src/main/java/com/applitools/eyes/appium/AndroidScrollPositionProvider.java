@@ -494,6 +494,9 @@ public class AndroidScrollPositionProvider extends AppiumScrollPositionProvider 
                     }
                 }
             }
+            if (scrollableView.getAttribute("className").equals("android.widget.HorizontalScrollView")) {
+                throw new NoSuchElementException("Only HorizontalScrollView presented on the screen");
+            }
             cachedScrollableView = scrollableView;
         }
         return cachedScrollableView;

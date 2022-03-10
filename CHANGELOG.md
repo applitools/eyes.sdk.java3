@@ -1,3 +1,7 @@
+## [vNext]
+### Fixed
+- Improved android full page when only HorizontalScrollView presented on the screen. [Trello 2782](https://trello.com/c/emnUd7Mk)
+
 ## [3.212.0] - 2021-02-08
 ### Updated
 - Updated dependencies [Trello 2805](https://trello.com/c/2UVl1FKq/)
