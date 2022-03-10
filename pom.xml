@@ -6,7 +6,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.applitools</groupId>
     <artifactId>eyes-sdk-java3-parent</artifactId>
-    <version>3.165.2133_0</version>
+    <version>3.165.2133_1</version>
     <packaging>pom</packaging>
     <name>eyes-sdk-java3-parent</name>
     <url>http://www.applitools.com</url>
