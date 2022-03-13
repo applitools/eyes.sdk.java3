@@ -100,17 +100,22 @@ public class CapabilitiesHelper {
         return setSauceCredentials(device);
     }
 
-    public static Capabilities getPixel3aXL() {
+    public static Capabilities getPixel3aXL(boolean legacy) {
         DesiredCapabilities device = new DesiredCapabilities();
         device.setCapability("browserName", "");
-        device.setCapability("name", "Pixel 3a xl (java)");
         device.setCapability("platformName", "Android");
-        device.setCapability("platformVersion", "10.0");
-        device.setCapability("appiumVersion", "1.20.2");
-        device.setCapability("deviceName", "Google Pixel 3a XL GoogleAPI Emulator");
-        device.setCapability("automationName", "uiautomator2");
-        device.setCapability("newCommandTimeout", 600);
-        return setSauceCredentials(device);
+        if(legacy) {
+            device.setCapability("platformVersion", "10.0");
+            device.setCapability("deviceName", "Google Pixel 3a XL GoogleAPI Emulator");
+        } else {
+            device.setCapability("appium:platformVersion", "10.0");
+            device.setCapability("appium:deviceName", "Google Pixel 3a XL GoogleAPI Emulator");
+        }
+
+        MutableCapabilities options = new MutableCapabilities();
+        options.setCapability("appiumVersion", "1.20.2");
+        options.setCapability("name", "Pixel 3a xl (java)");
+        return setSauceCredentials(device, legacy, options);
     }
 
     public static Capabilities getIphoneXS() {

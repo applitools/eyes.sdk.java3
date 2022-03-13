@@ -1,10 +1,12 @@
 package coverage.drivers.browsers;
 
+import coverage.GlobalSetup;
 import coverage.drivers.SELENIUM;
 import io.appium.java_client.android.AndroidDriver;
 import org.openqa.selenium.Capabilities;
 import org.openqa.selenium.MutableCapabilities;
 import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.remote.RemoteWebDriver;
 
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -20,10 +22,10 @@ public class Pixel3aXL implements DeviceBuilder {
     }
 
     public WebDriver build(boolean headless, boolean legacy, boolean executionGrid) throws MalformedURLException {
-        Capabilities caps = getPixel3aXL();
+        Capabilities caps = getPixel3aXL(legacy);
         MutableCapabilities appCap = new MutableCapabilities();
         appCap.setCapability("browserName", browser);
         caps = caps.merge(appCap);
-        return new AndroidDriver<>(new URL(SELENIUM.SAUCE.url), caps);
+        return new RemoteWebDriver(new URL(SELENIUM.SAUCE.url), caps);
     }
 }
