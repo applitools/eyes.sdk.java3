@@ -16,7 +16,7 @@
     <parent>
         <groupId>com.applitools</groupId>
         <artifactId>eyes-sdk-java3-parent</artifactId>
-        <version>3.500.0</version>
+        <version>5.0.0</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
 
@@ -24,7 +24,7 @@
         <dependency>
             <groupId>com.applitools</groupId>
             <artifactId>eyes-ufg-java3</artifactId>
-            <version>3.500.0</version>
+            <version>5.0.0</version>
             <!--This exclusion does nothing. We need it for running tests for all 3 connectivity packages-->
             <exclusions>
                 <exclusion>
