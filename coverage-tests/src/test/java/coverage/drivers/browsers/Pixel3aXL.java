@@ -9,7 +9,6 @@ import org.openqa.selenium.WebDriver;
 import java.net.MalformedURLException;
 import java.net.URL;
 
-import static coverage.drivers.CapabilitiesHelper.getIphoneXS;
 import static coverage.drivers.CapabilitiesHelper.getPixel3aXL;
 
 public class Pixel3aXL implements DeviceBuilder {
