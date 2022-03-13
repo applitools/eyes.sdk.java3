@@ -1,8 +1,6 @@
 package coverage.drivers.browsers;
 
-import coverage.GlobalSetup;
 import coverage.drivers.SELENIUM;
-import io.appium.java_client.android.AndroidDriver;
 import org.openqa.selenium.Capabilities;
 import org.openqa.selenium.MutableCapabilities;
 import org.openqa.selenium.WebDriver;
