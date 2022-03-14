@@ -12,7 +12,9 @@ import org.openqa.selenium.remote.RemoteWebDriver;
 import java.net.MalformedURLException;
 import java.net.URL;
 
-public class ChromeEmulatorBuilder implements Builder {
+public class ChromeEmulatorBuilder implements DeviceBuilder {
+
+    public void browser(String browser) {}
 
     public WebDriver build(boolean headless, boolean legacy, boolean executionGrid) throws MalformedURLException {
         ChromeOptions options = CapabilitiesHelper.getAndroid8ChromeEmulator(headless);
