@@ -67,8 +67,8 @@ public class RenderBrowserInfoMapper {
     if (dto == null) {
       return null;
     }
-    DeviceName deviceName = DeviceName.valueOf(dto.getDeviceName());
-    ScreenOrientation screenOrientation = ScreenOrientation.valueOf(dto.getScreenOrientation());
+    DeviceName deviceName = DeviceName.fromName(dto.getDeviceName());
+    ScreenOrientation screenOrientation = ScreenOrientation.fromOrientation(dto.getScreenOrientation());
     return new ChromeEmulationInfo(deviceName, screenOrientation);
   }
 
@@ -76,9 +76,9 @@ public class RenderBrowserInfoMapper {
     if (dto == null) {
       return null;
     }
-    IosDeviceName iosDeviceName = IosDeviceName.valueOf(dto.getDeviceName());
-    ScreenOrientation screenOrientation = ScreenOrientation.valueOf(dto.getScreenOrientation());
-    IosVersion iosVersion = IosVersion.valueOf(dto.getVersion());
+    IosDeviceName iosDeviceName = IosDeviceName.fromName(dto.getDeviceName());
+    ScreenOrientation screenOrientation = ScreenOrientation.fromOrientation(dto.getScreenOrientation());
+    IosVersion iosVersion = IosVersion.fromVersion(dto.getVersion());
     return new IosDeviceInfo(iosDeviceName, screenOrientation, iosVersion);
   }
 

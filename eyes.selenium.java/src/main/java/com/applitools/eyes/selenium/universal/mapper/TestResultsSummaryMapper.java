@@ -40,7 +40,7 @@ public class TestResultsSummaryMapper {
             renderBrowserInfo = new RenderBrowserInfo(iosDeviceInfo);
           } else {
             renderBrowserInfo = new RenderBrowserInfo(browserInfoDto.getWidth(), browserInfoDto.getHeight(),
-                BrowserType.fromString(browserInfoDto.getName()));
+                BrowserType.fromName(browserInfoDto.getName()));
           }
         }
         // exception
