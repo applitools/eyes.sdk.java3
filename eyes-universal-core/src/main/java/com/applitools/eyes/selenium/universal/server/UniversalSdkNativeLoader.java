@@ -12,6 +12,7 @@ import java.nio.file.attribute.PosixFilePermission;
 import java.util.HashSet;
 import java.util.Set;
 
+import com.applitools.eyes.EyesException;
 import com.applitools.utils.GeneralUtils;
 
 /**
@@ -21,13 +22,18 @@ public class UniversalSdkNativeLoader {
   private static Process nativeProcess = null;
   private static String port;
 
-  public static void start() {
+  public synchronized static void start() {
     try {
       startProcess();
     } catch (Exception e) {
       e.printStackTrace();
+      try {
+        startProcess();
+      } catch (Exception e1) {
+        e1.printStackTrace();
+        throw new EyesException("Failed to start universal server", e1);
+      }
     }
-
   }
 
   public static void stop() {

@@ -155,7 +155,7 @@ public class USDKConnection {
               }).build()).get();
 
     } catch (Exception e) {
-      throw new UnsupportedOperationException();
+      throw new EyesException("Communication with server is failed", e);
     }
 
   }
