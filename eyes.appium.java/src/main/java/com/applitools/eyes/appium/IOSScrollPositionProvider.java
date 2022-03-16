@@ -266,7 +266,7 @@ public class IOSScrollPositionProvider extends AppiumScrollPositionProvider {
     @Override
     protected WebElement getCachedFirstVisibleChild () {
         WebElement activeScroll = getFirstScrollableView();
-        if (firstVisibleChild == null) {
+        if (firstVisibleChild == null || !cacheScrollableSize) {
             firstVisibleChild = getFirstChild(activeScroll);
         } else {
             Rectangle firstVisibleChildRect = firstVisibleChild.getRect();
