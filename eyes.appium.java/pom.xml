@@ -3,14 +3,14 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>eyes-appium-java3</artifactId>
-    <name>eyes-appium-java3</name>
+    <artifactId>eyes-appium-java5</artifactId>
+    <name>eyes-appium-java5</name>
     <url>http://www.applitools.com</url>
 
     <description>Applitools Eyes SDK for Appium Java WebDriver</description>
 
     <parent>
-        <artifactId>eyes-sdk-java3-parent</artifactId>
+        <artifactId>eyes-sdk-java5-parent</artifactId>
         <groupId>com.applitools</groupId>
         <version>5.0.0</version>
     </parent>
@@ -18,12 +18,12 @@
     <dependencies>
         <dependency>
             <groupId>com.applitools</groupId>
-            <artifactId>eyes-selenium-common-java3</artifactId>
+            <artifactId>eyes-selenium-common-java5</artifactId>
             <version>5.0.0</version>
         </dependency>
         <dependency>
             <groupId>com.applitools</groupId>
-            <artifactId>eyes-selenium-java3</artifactId>
+            <artifactId>eyes-selenium-java5</artifactId>
             <version>5.0.0</version>
         </dependency>
         <dependency>
@@ -33,7 +33,7 @@
         </dependency>
         <dependency>
             <groupId>com.applitools</groupId>
-            <artifactId>eyes-sdk-core-java3</artifactId>
+            <artifactId>eyes-sdk-core-java5</artifactId>
             <version>5.0.0</version>
             <type>test-jar</type>
             <scope>test</scope>
