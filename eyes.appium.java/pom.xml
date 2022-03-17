@@ -12,19 +12,19 @@
     <parent>
         <artifactId>eyes-sdk-java5-parent</artifactId>
         <groupId>com.applitools</groupId>
-        <version>5.0.0</version>
+        <version>5.0.1</version>
     </parent>
 
     <dependencies>
         <dependency>
             <groupId>com.applitools</groupId>
             <artifactId>eyes-selenium-common-java5</artifactId>
-            <version>5.0.0</version>
+            <version>5.0.1</version>
         </dependency>
         <dependency>
             <groupId>com.applitools</groupId>
             <artifactId>eyes-selenium-java5</artifactId>
-            <version>5.0.0</version>
+            <version>5.0.1</version>
         </dependency>
         <dependency>
             <groupId>io.appium</groupId>
@@ -34,7 +34,7 @@
         <dependency>
             <groupId>com.applitools</groupId>
             <artifactId>eyes-sdk-core-java5</artifactId>
-            <version>5.0.0</version>
+            <version>5.0.1</version>
             <type>test-jar</type>
             <scope>test</scope>
         </dependency>
