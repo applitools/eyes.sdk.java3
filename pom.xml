@@ -6,7 +6,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.applitools</groupId>
     <artifactId>eyes-sdk-java5-parent</artifactId>
-    <version>5.0.1</version>
+    <version>5.0.2</version>
     <packaging>pom</packaging>
     <name>eyes-sdk-java5-parent</name>
     <url>http://www.applitools.com</url>
@@ -97,6 +97,8 @@
 
     <modules>
         <module>eyes.common.java/eyes.common.java</module>
+        <module>eyes.common.java/eyes.connectivity.java</module>
+        <module>eyes.common.java/eyes.connectivity.java.jersey2x</module>
         <module>eyes.ufg.java</module>
         <module>eyes.sdk.core</module>
         <module>eyes.selenium.java</module>
