@@ -82,6 +82,7 @@ public class Eyes extends RunningTest implements IEyes {
     protected WebElement targetElement = null;
     private PropertyHandler<RegionVisibilityStrategy> regionVisibilityStrategyHandler;
     private WebElement scrollRootElement = null;
+    private boolean apiKeyWasSent = false;
 
     final Map<String, RunningTest> visualGridTestList = new HashMap<>();
 
@@ -788,6 +789,9 @@ public class Eyes extends RunningTest implements IEyes {
     }
 
     private void sendApiKeyToVhsLib() throws InterruptedException {
+        if (apiKeyWasSent) {
+            return;
+        }
         List<WebElement> list = driver.findElementsByAccessibilityId("UFG_Apikey");
         if (list.isEmpty()) {
             throw new EyesException("Please check integration of UFG lib in the application");
@@ -799,6 +803,7 @@ public class Eyes extends RunningTest implements IEyes {
         }
         list.get(list.size() - 1).click();
         Thread.sleep(100);
+        apiKeyWasSent = true;
     }
 
     public byte[] getVHSIos() {

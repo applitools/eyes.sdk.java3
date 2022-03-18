@@ -1,3 +1,7 @@
+## [vNext]
+### Updated
+- Pass API key to android UFG lib before taking VHS only once
+
 ## [3.213.0-beta] - 2022-03-13
 ### Updated
 - Added device names.
