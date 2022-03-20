@@ -661,8 +661,16 @@ public class Eyes extends RunningTest implements IEyes {
                 try {
                     vhs = getVHSIos();
                     vhsCompatibilityParams = getVhsCompatibilityParams();
+                } catch (Throwable e) { // for logging purposes
+                    logger.log(TraceLevel.Error, testIds, Stage.RESOURCE_COLLECTION, Type.DOWNLOAD_RESOURCE, Pair.of("message", "Got an exception during VHS / Compat params creation:" + e.getMessage()));
+                    throw e;
                 } finally {
-                    driver.findElementByAccessibilityId("UFG_ClearArea").click();
+                    try {
+                        // Always try and clear the current state.
+                        driver.findElementByAccessibilityId("UFG_ClearArea").click();
+                    } catch (NoSuchElementException e) {
+                        logger.log(TraceLevel.Error, testIds, Stage.RESOURCE_COLLECTION, Type.CLEANUP, Pair.of("message", "Could not find 'UFG_ClearArea', possibly due to a previous failure."));
+                    }
                 }
                 vhsContentType = "x-applitools-vhs/ios";
             } else {
