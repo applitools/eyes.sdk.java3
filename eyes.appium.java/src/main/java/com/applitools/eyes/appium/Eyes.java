@@ -662,7 +662,7 @@ public class Eyes extends RunningTest implements IEyes {
                     vhs = getVHSIos();
                     vhsCompatibilityParams = getVhsCompatibilityParams();
                 } catch (Throwable e) { // for logging purposes
-                    logger.log(TraceLevel.Error, testIds, Stage.RESOURCE_COLLECTION, Type.DOWNLOAD_RESOURCE, Pair.of("message", "Got an exception during VHS / Compat params creation:" + e.getMessage()));
+                    GeneralUtils.logExceptionStackTrace(logger, Stage.RESOURCE_COLLECTION, Type.DOWNLOAD_RESOURCE, e, testIds);
                     throw e;
                 } finally {
                     try {
