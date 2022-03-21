@@ -4,6 +4,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.nio.file.AccessDeniedException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -36,7 +37,7 @@ public class UniversalSdkNativeLoader {
     }
   }
 
-  public static void stop() {
+  public static void stopProcess() {
     if (nativeProcess != null && nativeProcess.isAlive()) {
       nativeProcess.destroy();
     }
@@ -88,7 +89,7 @@ public class UniversalSdkNativeLoader {
 
       nativeProcess = createProcess(tempFile.toString());
       readPortOfProcess(nativeProcess);
-      //Files.deleteIfExists(tempFile);
+      assignHookToDeleteTempFile(tempFile);
     }
 
   }
@@ -127,7 +128,7 @@ public class UniversalSdkNativeLoader {
   // ENHANCE
   private static void getFirstLineAsPort(BufferedReader reader) throws IOException {
     String temp;
-    String lastLine = null;
+    String lastLine;
     while ((temp = reader.readLine()) != null) {
       lastLine = temp;
       port = lastLine;
@@ -139,5 +140,26 @@ public class UniversalSdkNativeLoader {
 
   public static String getPort() {
     return port;
+  }
+
+  private static void assignHookToDeleteTempFile(Path path) {
+    Runtime.getRuntime().addShutdownHook(
+        new Thread(() -> {
+          try {
+            stopProcess();
+            while (true) { // for WINDOWS
+              try {
+                Files.deleteIfExists(path);
+                break;
+              } catch (AccessDeniedException ignored) {
+                Thread.sleep(1000);
+              }
+            }
+          } catch (IOException | InterruptedException e) {
+            e.printStackTrace();
+            throw new EyesException("Failed to delete temporary executable file", e);
+          }
+        })
+    );
   }
 }
