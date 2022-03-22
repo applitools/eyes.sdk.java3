@@ -1,10 +1,10 @@
 package com.applitools.eyes.selenium.universal.server;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.nio.file.AccessDeniedException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -12,7 +12,6 @@ import java.nio.file.StandardCopyOption;
 import java.nio.file.attribute.PosixFilePermission;
 import java.util.HashSet;
 import java.util.Set;
-
 import com.applitools.eyes.EyesException;
 import com.applitools.utils.GeneralUtils;
 
@@ -60,40 +59,23 @@ public class UniversalSdkNativeLoader {
         suffix = "linux";
       }
 
-      String pathInJar = "runtimes" + "/" + os + "/" + "native" + "/" + "eyes-universal-" + suffix;
+      String pathInJar = getBinaryPath(os, suffix);
       InputStream inputStream = getFileFromResourceAsStream(pathInJar);
-      Path tempFile = Files.createTempFile("eyes-universal-", suffix);
-      Files.copy(inputStream, tempFile, StandardCopyOption.REPLACE_EXISTING);
+      String fileName = "eyes-universal-" + suffix;
+
+      Path tempDirectoryPath = Paths.get(System.getProperty("java.io.tmpdir"));
+      Path tempPath = Paths.get(tempDirectoryPath.toString() + File.separator + fileName);
+
+      Files.copy(inputStream, tempPath, StandardCopyOption.REPLACE_EXISTING);
       inputStream.close();
 
-      if (!osVersion.contains("windows")) {
-        Set<PosixFilePermission> permissions = new HashSet<>();
-
-        /* -------------------------- OWNER Permissions ----------------------- */
-        permissions.add(PosixFilePermission.OWNER_READ);
-        permissions.add(PosixFilePermission.OWNER_WRITE);
-        permissions.add(PosixFilePermission.OWNER_EXECUTE);
-
-        /* -------------------------- GROUP Permissions ----------------------- */
-        permissions.add(PosixFilePermission.GROUP_READ);
-        permissions.add(PosixFilePermission.GROUP_WRITE);
-        permissions.add(PosixFilePermission.GROUP_EXECUTE);
-
-        /* -------------------------- OTHERS Permissions ----------------------- */
-        permissions.add(PosixFilePermission.OTHERS_READ);
-        permissions.add(PosixFilePermission.OTHERS_WRITE);
-        permissions.add(PosixFilePermission.OTHERS_EXECUTE);
-
-        Files.setPosixFilePermissions(Paths.get(tempFile.toString()), permissions);
-      }
-
-      nativeProcess = createProcess(tempFile.toString());
+      setPosixPermissionsToPath(osVersion, tempPath);
+      nativeProcess = createProcess(tempPath.toString());
       readPortOfProcess(nativeProcess);
-      assignHookToDeleteTempFile(tempFile);
+      assignHookToStopProcess();
     }
 
   }
-
 
   // get a input stream from the resources folder
   private static InputStream getFileFromResourceAsStream(String fileName) {
@@ -142,24 +124,43 @@ public class UniversalSdkNativeLoader {
     return port;
   }
 
-  private static void assignHookToDeleteTempFile(Path path) {
+  private static void assignHookToStopProcess() {
     Runtime.getRuntime().addShutdownHook(
-        new Thread(() -> {
-          try {
-            stopProcess();
-            while (true) { // for WINDOWS
-              try {
-                Files.deleteIfExists(path);
-                break;
-              } catch (AccessDeniedException ignored) {
-                Thread.sleep(1000);
-              }
-            }
-          } catch (IOException | InterruptedException e) {
-            e.printStackTrace();
-            throw new EyesException("Failed to delete temporary executable file", e);
-          }
-        })
+        new Thread(UniversalSdkNativeLoader::stopProcess)
     );
+  }
+
+  private static String getBinaryPath(String os, String suffix) {
+    return "runtimes" +
+        "/" +
+        os +
+        "/" +
+        "native" +
+        "/" +
+        "eyes-universal-" +
+        suffix;
+  }
+
+  private static void setPosixPermissionsToPath(String osVersion, Path path) throws Exception {
+    if (!osVersion.contains("windows")) {
+      Set<PosixFilePermission> permissions = new HashSet<>();
+
+      /* -------------------------- OWNER Permissions ----------------------- */
+      permissions.add(PosixFilePermission.OWNER_READ);
+      permissions.add(PosixFilePermission.OWNER_WRITE);
+      permissions.add(PosixFilePermission.OWNER_EXECUTE);
+
+      /* -------------------------- GROUP Permissions ----------------------- */
+      permissions.add(PosixFilePermission.GROUP_READ);
+      permissions.add(PosixFilePermission.GROUP_WRITE);
+      permissions.add(PosixFilePermission.GROUP_EXECUTE);
+
+      /* -------------------------- OTHERS Permissions ----------------------- */
+      permissions.add(PosixFilePermission.OTHERS_READ);
+      permissions.add(PosixFilePermission.OTHERS_WRITE);
+      permissions.add(PosixFilePermission.OTHERS_EXECUTE);
+
+      Files.setPosixFilePermissions(path, permissions);
+    }
   }
 }
