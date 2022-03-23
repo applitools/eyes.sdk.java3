@@ -216,7 +216,9 @@ public abstract class AppiumScrollPositionProvider implements ScrollPositionProv
         if (!cacheScrollableSize && scrollRootElementSelector != null) {
             cachedScrollableView = driver.findElement(scrollRootElementSelector);
         }
-        cachedScrollableView = EyesAppiumUtils.getFirstScrollableView(driver);
+        if (cachedScrollableView == null) {
+            cachedScrollableView = EyesAppiumUtils.getFirstScrollableView(driver);
+        }
         return cachedScrollableView;
     }
 
