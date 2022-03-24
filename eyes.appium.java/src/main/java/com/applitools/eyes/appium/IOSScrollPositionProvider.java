@@ -269,8 +269,12 @@ public class IOSScrollPositionProvider extends AppiumScrollPositionProvider {
         if (firstVisibleChild == null || !cacheScrollableSize) {
             firstVisibleChild = getFirstChild(activeScroll);
         } else {
-            Rectangle firstVisibleChildRect = firstVisibleChild.getRect();
-            if (firstVisibleChildRect.getWidth() == 0 && firstVisibleChildRect.getHeight() == 0) {
+            try {
+                Rectangle firstVisibleChildRect = firstVisibleChild.getRect();
+                if (firstVisibleChildRect.getWidth() == 0 && firstVisibleChildRect.getHeight() == 0) {
+                    firstVisibleChild = getFirstChild(activeScroll);
+                }
+            } catch (StaleElementReferenceException e) {
                 firstVisibleChild = getFirstChild(activeScroll);
             }
         }
