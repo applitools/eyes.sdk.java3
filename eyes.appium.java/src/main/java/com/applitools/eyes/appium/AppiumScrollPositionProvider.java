@@ -4,6 +4,7 @@ import com.applitools.eyes.Location;
 import com.applitools.eyes.Logger;
 import com.applitools.eyes.RectangleSize;
 import com.applitools.eyes.Region;
+import com.applitools.eyes.config.ContentInset;
 import com.applitools.eyes.logging.Stage;
 import com.applitools.eyes.logging.TraceLevel;
 import com.applitools.eyes.positioning.PositionMemento;
@@ -24,6 +25,10 @@ public abstract class AppiumScrollPositionProvider implements ScrollPositionProv
     protected int verticalScrollGap;
     protected WebElement cutElement = null;
     protected WebElement scrollRootElement = null;
+
+    protected By scrollRootElementSelector = null;
+    protected ContentInset contentInset = new ContentInset();
+    protected boolean cacheScrollableSize = true;
 
     protected ContentSize contentSize;
     protected WebElement cachedScrollableView = null;
@@ -79,7 +84,7 @@ public abstract class AppiumScrollPositionProvider implements ScrollPositionProv
     }
 
     public Location getScrollableViewLocation() {
-        if (cachedScrollableViewLocation != null) {
+        if (cacheScrollableSize && cachedScrollableViewLocation != null) {
             return cachedScrollableViewLocation;
         }
         WebElement activeScroll, firstVisChild;
@@ -104,7 +109,7 @@ public abstract class AppiumScrollPositionProvider implements ScrollPositionProv
     }
 
     public Region getScrollableViewRegion() {
-        if (cachedScrollableViewRegion != null) {
+        if (cacheScrollableSize && cachedScrollableViewRegion != null) {
             return cachedScrollableViewRegion;
         }
         try {
@@ -186,7 +191,7 @@ public abstract class AppiumScrollPositionProvider implements ScrollPositionProv
         int scrollContentHeight = contentSize.getScrollContentHeight();
         int outsideScrollViewHeight = windowHeight - contentSize.height;
         return new RectangleSize(contentSize.width,
-            scrollContentHeight + outsideScrollViewHeight + verticalScrollGap);
+                scrollContentHeight + outsideScrollViewHeight + verticalScrollGap + contentInset.getBottom()/2);
     }
 
     public PositionMemento getState() {
@@ -208,10 +213,12 @@ public abstract class AppiumScrollPositionProvider implements ScrollPositionProv
     public abstract Region getElementRegion(WebElement element, boolean shouldStitchContent, Boolean statusBarExists);
 
     protected WebElement getFirstScrollableView() {
-        if (cachedScrollableView != null) {
-            return cachedScrollableView;
+        if (!cacheScrollableSize && scrollRootElementSelector != null) {
+            cachedScrollableView = driver.findElement(scrollRootElementSelector);
         }
-        cachedScrollableView = EyesAppiumUtils.getFirstScrollableView(driver);
+        if (cachedScrollableView == null) {
+            cachedScrollableView = EyesAppiumUtils.getFirstScrollableView(driver);
+        }
         return cachedScrollableView;
     }
 
@@ -221,9 +228,26 @@ public abstract class AppiumScrollPositionProvider implements ScrollPositionProv
         this.cachedScrollableView = null;
         this.cachedScrollableViewLocation = null;
         this.cachedScrollableViewRegion = null;
+        this.isVerticalScrollGapSet = false;
     }
 
     public void setScrollRootElement(WebElement scrollRootElement) {
         this.scrollRootElement = scrollRootElement;
+    }
+
+    public void setScrollRootElementSelector(By scrollRootElementSelector) {
+        this.scrollRootElementSelector = scrollRootElementSelector;
+    }
+
+    public void setContentInset(ContentInset contentInset) {
+        this.contentInset = contentInset;
+    }
+
+    public void setCacheScrollableSize(boolean cacheScrollableSize) {
+        this.cacheScrollableSize = cacheScrollableSize;
+    }
+
+    public int getCachedFirstVisibleChildHeight() {
+        return 0;
     }
 }

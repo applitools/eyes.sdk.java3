@@ -16,6 +16,7 @@ import java.util.*;
 public class Configuration implements IConfiguration {
     private static final int DEFAULT_MATCH_TIMEOUT = 2000; // Milliseconds;
     private static final int DEFAULT_WAIT_BEFORE_SCREENSHOTS = 100;
+    public static final int DEFAULT_STITCH_OVERLAP = 10;
 
     private String branchName = GeneralUtils.getEnvString("APPLITOOLS_BRANCH");
 
@@ -40,7 +41,7 @@ public class Configuration implements IConfiguration {
     private String osInfo;
     // Used for automatic save of a test run.
     private boolean saveNewTests, saveFailedTests;
-    private int stitchOverlap = 10;
+    private int stitchOverlap = DEFAULT_STITCH_OVERLAP;
     private Boolean isSendDom = true;
     private String apiKey = null;
     private String serverUrl = null;
@@ -60,6 +61,9 @@ public class Configuration implements IConfiguration {
     private boolean disableBrowserFetching = true;
     private boolean useCookies = true;
     private boolean captureStatusBar = false;
+    private ContentInset contentInset = new ContentInset();
+    private boolean cacheScrollableSize = true;
+
     @JsonIgnore
     private IDebugResourceWriter debugResourceWriter = new NullDebugResourceWriter();
 
@@ -131,6 +135,8 @@ public class Configuration implements IConfiguration {
         this.isDefaultLayoutBreakpointsSet = other.isDefaultLayoutBreakpointsSet();
         this.layoutBreakpoints = other.getLayoutBreakpoints();
         this.captureStatusBar = other.isCaptureStatusBar();
+        this.contentInset = other.getContentInset();
+        this.cacheScrollableSize = other.isCacheScrollableSize();
     }
 
     public Configuration() {
@@ -845,5 +851,21 @@ public class Configuration implements IConfiguration {
 
     public void setCaptureStatusBar(boolean captureStatusBar) {
         this.captureStatusBar = captureStatusBar;
+    }
+
+    public ContentInset getContentInset() {
+        return contentInset;
+    }
+
+    public void setContentInset(ContentInset contentInset) {
+        this.contentInset = contentInset;
+    }
+
+    public boolean isCacheScrollableSize() {
+        return cacheScrollableSize;
+    }
+
+    public void setCacheScrollableSize(boolean cacheScrollableSize) {
+        this.cacheScrollableSize = cacheScrollableSize;
     }
 }

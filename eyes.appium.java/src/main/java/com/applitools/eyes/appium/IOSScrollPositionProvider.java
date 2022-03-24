@@ -104,8 +104,8 @@ public class IOSScrollPositionProvider extends AppiumScrollPositionProvider {
     public Location getCurrentPositionWithoutStatusBar(boolean absolute) {
         WebElement activeScroll = getFirstScrollableView();
         if (activeScroll.getAttribute("type").equals("XCUIElementTypeCollectionView")) {
-            triggerHelperButton();
             try {
+                triggerHelperButton();
                 WebElement offsetLabel = driver.findElement(MobileBy.name("applitools_content_offset_label"));
                 int contentOffset = (int) Double.parseDouble(offsetLabel.getText().split(",")[1].trim().replace("}", ""));
 
@@ -128,8 +128,8 @@ public class IOSScrollPositionProvider extends AppiumScrollPositionProvider {
         try {
             WebElement activeScroll = getFirstScrollableView();
             if (activeScroll.getAttribute("type").equals("XCUIElementTypeCollectionView")) {
-                triggerHelperButton();
                 try {
+                    triggerHelperButton();
                     WebElement offsetLabel = driver.findElement(MobileBy.name("applitools_content_offset_label"));
                     try { Thread.sleep(500); } catch (InterruptedException ignored) {}
                     int contentOffset = (int) Double.parseDouble(offsetLabel.getText().split(",")[1].trim().replace("}", ""));
@@ -258,13 +258,6 @@ public class IOSScrollPositionProvider extends AppiumScrollPositionProvider {
             GeneralUtils.logExceptionStackTrace(logger, Stage.CHECK, e);
             contentSize = null;
 
-            /*
-             * To get more information about view hierarchy we printed page source to the logs
-             * and saving debug screenshot for current screen
-             */
-            String base64 = driver.getScreenshotAs(OutputType.BASE64);
-            BufferedImage image = ImageUtils.imageFromBase64(base64);
-
             logger.log(TraceLevel.Debug, eyesDriver.getTestId(), Stage.CHECK, Pair.of("pageSource", driver.getPageSource()));
         }
         return contentSize;
@@ -273,11 +266,15 @@ public class IOSScrollPositionProvider extends AppiumScrollPositionProvider {
     @Override
     protected WebElement getCachedFirstVisibleChild () {
         WebElement activeScroll = getFirstScrollableView();
-        if (firstVisibleChild == null) {
+        if (firstVisibleChild == null || !cacheScrollableSize) {
             firstVisibleChild = getFirstChild(activeScroll);
         } else {
-            Rectangle firstVisibleChildRect = firstVisibleChild.getRect();
-            if (firstVisibleChildRect.getWidth() == 0 && firstVisibleChildRect.getHeight() == 0) {
+            try {
+                Rectangle firstVisibleChildRect = firstVisibleChild.getRect();
+                if (firstVisibleChildRect.getWidth() == 0 && firstVisibleChildRect.getHeight() == 0) {
+                    firstVisibleChild = getFirstChild(activeScroll);
+                }
+            } catch (StaleElementReferenceException e) {
                 firstVisibleChild = getFirstChild(activeScroll);
             }
         }
@@ -292,6 +289,12 @@ public class IOSScrollPositionProvider extends AppiumScrollPositionProvider {
                 return EyesAppiumUtils.getFirstVisibleChild(activeScroll);
             }
             return firstCell;
+        } else if (activeScroll.getAttribute("type").equals("XCUIElementTypeScrollView")) {
+            List<WebElement> list = activeScroll.findElements(MobileBy.xpath("//XCUIElementTypeScrollView[1]/*"));
+            if (!list.isEmpty()) {
+                return list.get(0);
+            }
+            return EyesAppiumUtils.getFirstVisibleChild(activeScroll);
         } else {
             return EyesAppiumUtils.getFirstVisibleChild(activeScroll);
         }
@@ -437,5 +440,17 @@ public class IOSScrollPositionProvider extends AppiumScrollPositionProvider {
     public void setScrollRootElement(WebElement scrollRootElement) {
         super.setScrollRootElement(scrollRootElement);
         this.cachedScrollableView = scrollRootElement;
+    }
+
+    @Override
+    public int getCachedFirstVisibleChildHeight() {
+        if (cacheScrollableSize) {
+            return 0;
+        }
+        WebElement activeScroll = getFirstScrollableView();
+        if (activeScroll.getAttribute("type").equals("XCUIElementTypeCollectionView")) {
+            return 0;
+        }
+        return getCachedFirstVisibleChild().getSize().height;
     }
 }

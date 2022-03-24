@@ -69,6 +69,7 @@ public class Eyes extends EyesBase {
     protected WebElement targetElement = null;
     private PropertyHandler<RegionVisibilityStrategy> regionVisibilityStrategyHandler;
     private WebElement scrollRootElement = null;
+    private By scrollRootElementSelector = null;
 
     public Eyes() {
         super(new ClassicRunner());
@@ -285,7 +286,7 @@ public class Eyes extends EyesBase {
     }
 
     private void adjustStitchOverlap(WebDriver driver) {
-        if (EyesDriverUtils.isIOS(driver)) {
+        if (EyesDriverUtils.isIOS(driver) && configuration.getStitchOverlap() == DEFAULT_STITCH_OVERLAP) {
             configuration.setStitchOverlap(IOS_STITCH_OVERLAP);
         }
     }
@@ -715,7 +716,8 @@ public class Eyes extends EyesBase {
         AppiumCaptureAlgorithmFactory algoFactory = new AppiumCaptureAlgorithmFactory(driver, logger, getTestId(),
                 scrollPositionProvider, imageProvider, debugScreenshotsProvider, scaleProviderFactory,
                 cutProviderHandler.get(), screenshotFactory, getConfigurationInstance().getWaitBeforeScreenshots(), cutElement,
-                getStitchOverlap(), scrollRootElement);
+                getStitchOverlap(), scrollRootElement, scrollRootElementSelector, configuration.getContentInset(),
+                configuration.isCacheScrollableSize());
 
         AppiumFullPageCaptureAlgorithm algo = algoFactory.getAlgorithm();
 
@@ -983,6 +985,7 @@ public class Eyes extends EyesBase {
         scrollRootElement = checkSettings.getScrollRootElement();
         if (scrollRootElement == null) {
             if (checkSettings.getScrollRootElementSelector() != null) {
+                scrollRootElementSelector = checkSettings.getScrollRootElementSelector();
                 scrollRootElement = driver.findElement(checkSettings.getScrollRootElementSelector());
             }
             if (scrollRootElement == null && checkSettings.getScrollRootElementId() != null) {
