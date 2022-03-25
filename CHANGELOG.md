@@ -1,4 +1,4 @@
-## [vNext]
+## [3.213.0]
 ### Updated
 - iOS full page algorithm. Added `setContentInset` and `setCacheScrollableSize` methods to Configuration. [Trello 2721](https://trello.com/c/aiSRO9WJ)
 ### Fixed
