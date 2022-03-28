@@ -1,9 +1,12 @@
-## [3.213.2-beta] - 22-03-17
+## [3.213.3-beta] - 2022-03-28
+### Fixed
+- Classic Appium - NPE when no scrollable element exist in the page.
+
+## [3.213.2-beta] - 2022-03-17
 ### Fixed
 - Cleanup masking original errors in VHS grabbing.
 
-
-## [3.213.1-beta] - 22-03-17
+## [3.213.1-beta] - 2022-03-17
 ### Updated
 - Pass API key to android UFG lib before taking VHS only once
 

@@ -20,7 +20,7 @@
     <parent>
         <groupId>com.applitools</groupId>
         <artifactId>eyes-sdk-java3-parent</artifactId>
-        <version>3.213.2-beta</version>
+        <version>3.213.3-beta</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
 
@@ -28,12 +28,12 @@
         <dependency>
             <groupId>com.applitools</groupId>
             <artifactId>eyes-selenium-common-java3</artifactId>
-            <version>3.213.2-beta</version>
+            <version>3.213.3-beta</version>
         </dependency>
         <dependency>
             <groupId>com.applitools</groupId>
             <artifactId>eyes-sdk-core-java3</artifactId>
-            <version>3.213.2-beta</version>
+            <version>3.213.3-beta</version>
             <type>test-jar</type>
             <scope>test</scope>
         </dependency>
