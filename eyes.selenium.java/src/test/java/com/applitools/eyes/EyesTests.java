@@ -1,7 +1,10 @@
 package com.applitools.eyes;
 
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 
 import com.applitools.eyes.locators.TextRegionSettings;
 import com.applitools.eyes.locators.VisualLocatorSettings;
@@ -21,6 +24,7 @@ import com.applitools.eyes.selenium.universal.dto.ResponseDto;
 import com.applitools.eyes.selenium.universal.dto.ResponsePayload;
 import com.applitools.eyes.selenium.universal.dto.SelectorRegionDto;
 import com.applitools.eyes.selenium.universal.dto.TargetPathLocatorDto;
+import com.applitools.eyes.selenium.universal.mapper.DriverMapper;
 import com.applitools.eyes.selenium.universal.mapper.TRegionMapper;
 import com.applitools.eyes.selenium.universal.mapper.TargetPathLocatorMapper;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -28,9 +32,12 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.Gson;
 import jdk.jfr.events.ExceptionThrownEvent;
 import org.openqa.selenium.By;
+import org.openqa.selenium.Capabilities;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
+import org.openqa.selenium.remote.DesiredCapabilities;
+import org.openqa.selenium.remote.RemoteWebDriver;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
@@ -170,14 +177,14 @@ public class EyesTests {
   public void test_target_path_to_dict_shadow_by_css_region_by_css() throws Exception {
     TargetPathLocator targetPathLocator = TargetPath.shadow("#s").region(".css");
     TargetPathLocatorDto dto = TargetPathLocatorMapper.toTargetPathLocatorDto(targetPathLocator);
-    //System.out.println(dto.toJson());
+
   }
 
   @Test
   public void test_target_path_to_dict_shadow_by_css() throws Exception {
     TargetPathLocator targetPathLocator = TargetPath.shadow(".css");
     TargetPathLocatorDto dto = TargetPathLocatorMapper.toTargetPathLocatorDto(targetPathLocator);
-    //System.out.println(dto.toJson());
+
   }
 
 }
