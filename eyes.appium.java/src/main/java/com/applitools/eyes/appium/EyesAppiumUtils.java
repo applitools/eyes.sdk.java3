@@ -14,6 +14,7 @@ import com.applitools.utils.ImageUtils;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableMap;
+import io.appium.java_client.AppiumBy;
 import io.appium.java_client.AppiumDriver;
 import io.appium.java_client.MobileBy;
 import io.appium.java_client.NoSuchContextException;
@@ -311,24 +312,39 @@ public class EyesAppiumUtils {
         String version = "";
         if (EyesDriverUtils.isAndroid(driver)) {
             try {
-                WebElement hiddenElement = driver.getRemoteWebDriver().findElement(MobileBy.AndroidUIAutomator("new UiSelector().description(\"EyesAppiumHelper_Version\")"));
+                WebElement hiddenElement = getHelperElement(driver, logger, "EyesAppiumHelper_Version");
                 if (hiddenElement != null) {
                     version = hiddenElement.getText();
                 }
-            } catch (NoSuchElementException | StaleElementReferenceException ignored) {
-            }
+            } catch (Exception ignored) {}
             if (version == null) {
                 try {
-                    WebElement hiddenElement = driver.getRemoteWebDriver().findElement(MobileBy.AndroidUIAutomator("new UiSelector().description(\"EyesAppiumHelper\")"));
+                    WebElement hiddenElement = getHelperElement(driver, logger, "EyesAppiumHelper");
                     if (hiddenElement != null) {
                         version = "1.0.0";
                     }
-                } catch (NoSuchElementException | StaleElementReferenceException ignored) {
-                }
+                } catch (Exception ignored) {}
             }
         }
-        logger.log(TraceLevel.Debug, driver.getTestId(), Stage.CHECK,
-                Pair.of("helperLibraryVersion", version));
+        logger.log(TraceLevel.Debug, driver.getTestId(), Stage.CHECK, Pair.of("helperLibraryVersion", version));
         return version;
+    }
+
+    // Should be used only for getting version of helper library
+    private static WebElement getHelperElement(EyesAppiumDriver driver, Logger logger, String contentDescription) {
+        WebElement hiddenElement = null;
+        try {
+            String selector = String.format("new UiSelector().description(\"%s\")", contentDescription);
+            hiddenElement =  driver.getRemoteWebDriver().findElement(AppiumBy.androidUIAutomator(selector));
+        } catch (Exception e) {
+            GeneralUtils.logExceptionStackTrace(logger, Stage.CHECK, e);
+            try { // Try to search for element by XPATH. For case when element has displayed=false
+                String selector = String.format("//android.widget.TextView[@content-desc=\"%s\" and @displayed=\"false\"]", contentDescription);
+                hiddenElement = driver.getRemoteWebDriver().findElement(AppiumBy.xpath(selector));
+            } catch (Exception e1) {
+                GeneralUtils.logExceptionStackTrace(logger, Stage.CHECK, e);
+            }
+        }
+        return hiddenElement;
     }
 }
