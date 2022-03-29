@@ -9,6 +9,8 @@ import org.testng.annotations.Factory;
 import org.testng.annotations.Listeners;
 import org.testng.annotations.Test;
 
+import java.time.Duration;
+
 @Listeners(TestListener.class)
 public class TestDuplicates extends TestSetup {
     @Factory(dataProvider = "dp", dataProviderClass = TestDataProvider.class)
@@ -21,7 +23,7 @@ public class TestDuplicates extends TestSetup {
     public void TestDuplicatedIFrames() {
         WebDriver driver = getDriver();
         driver.switchTo().frame(2);
-        WebDriverWait wait = new WebDriverWait(driver, 30);
+        WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(30));
         wait.until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector("#p2")));
         driver.switchTo().defaultContent();
         getEyes().checkWindow("Duplicated Iframes");
