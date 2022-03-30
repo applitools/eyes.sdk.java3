@@ -60,33 +60,4 @@ public class DriverMapper {
     return url;
   }
 
-
-  private static String getRemoteServerUrl(RemoteWebDriver remoteWebDriver) {
-    String url = null;
-    if (remoteWebDriver.getCommandExecutor() instanceof HttpCommandExecutor) {
-      url = ((HttpCommandExecutor) (remoteWebDriver.getCommandExecutor())).getAddressOfRemoteServer().toString();
-    } else {
-      try {
-        final Class<?> remoteDriverClass = remoteWebDriver.getClass();
-        final Field executorField = remoteDriverClass.getDeclaredField(EXECUTOR);
-        executorField.setAccessible(true);
-        Object tracedCommandExecutor = executorField.get(remoteWebDriver); // TracedCommandExecutor
-
-        final Class<?> tracedCommandExecutorClass = tracedCommandExecutor.getClass();
-        final Field delegateField = tracedCommandExecutorClass.getDeclaredField(DELEGATE); // HttpCommandExecutor
-        delegateField.setAccessible(true);
-        Object httpCommandExecutor = delegateField.get(tracedCommandExecutor);
-
-        final Class<?> httpCommandExecutorClass = httpCommandExecutor.getClass();
-        final Field remoteServerField = httpCommandExecutorClass.getDeclaredField(REMOTE_SERVER);
-        remoteServerField.setAccessible(true);
-        Object remoteServer = remoteServerField.get(httpCommandExecutor);
-        url = remoteServer.toString();
-      } catch (Exception e) {
-        e.printStackTrace();
-      }
-    }
-    return url;
-  }
-
 }
