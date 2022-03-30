@@ -3,8 +3,8 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>eyes-sdk-core-java3</artifactId>
-    <name>eyes-sdk-core-java3</name>
+    <artifactId>eyes-sdk-core-java5</artifactId>
+    <name>eyes-sdk-core-java5</name>
     <url>http://www.applitools.com</url>
 
     <description>Applitools Eyes SDK base for Java</description>
@@ -15,28 +15,28 @@
 
     <parent>
         <groupId>com.applitools</groupId>
-        <artifactId>eyes-sdk-java3-parent</artifactId>
-        <version>5.0.0</version>
+        <artifactId>eyes-sdk-java5-parent</artifactId>
+        <version>5.0.2</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
 
     <dependencies>
         <dependency>
             <groupId>com.applitools</groupId>
-            <artifactId>eyes-ufg-java3</artifactId>
-            <version>5.0.0</version>
+            <artifactId>eyes-ufg-java5</artifactId>
+            <version>5.0.2</version>
             <!--This exclusion does nothing. We need it for running tests for all 3 connectivity packages-->
             <exclusions>
                 <exclusion>
                     <groupId>com.applitools</groupId>
-                    <artifactId>eyes-connectivity-java3-REPLACEMENT</artifactId>
+                    <artifactId>eyes-connectivity-java5-REPLACEMENT</artifactId>
                 </exclusion>
             </exclusions>
         </dependency>
         <dependency>
             <groupId>com.applitools</groupId>
-            <artifactId>eyes-connectivity-java3-jersey2x</artifactId>
-            <version>3.210.6</version>
+            <artifactId>eyes-connectivity-java5-jersey2x</artifactId>
+            <version>5.0.2</version>
         </dependency>
         <!-- https://mvnrepository.com/artifact/javax.websocket/javax.websocket-client-api -->
         <dependency>

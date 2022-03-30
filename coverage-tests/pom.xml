@@ -17,26 +17,26 @@
 
     <parent>
         <groupId>com.applitools</groupId>
-        <artifactId>eyes-sdk-java3-parent</artifactId>
-        <version>5.0.0</version>
+        <artifactId>eyes-sdk-java5-parent</artifactId>
+        <version>5.0.2</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
 
     <dependencies>
         <dependency>
             <groupId>com.applitools</groupId>
-            <artifactId>eyes-appium-java3</artifactId>
-            <version>5.0.0</version>
+            <artifactId>eyes-appium-java5</artifactId>
+            <version>5.0.2</version>
         </dependency>
         <dependency>
             <groupId>com.applitools</groupId>
-            <artifactId>eyes-selenium-java3</artifactId>
-            <version>5.0.0</version>
+            <artifactId>eyes-selenium-java5</artifactId>
+            <version>5.0.2</version>
         </dependency>
         <dependency>
             <groupId>com.applitools</groupId>
-            <artifactId>eyes-sdk-core-java3</artifactId>
-            <version>5.0.0</version>
+            <artifactId>eyes-sdk-core-java5</artifactId>
+            <version>5.0.2</version>
             <type>test-jar</type>
             <scope>test</scope>
         </dependency>
