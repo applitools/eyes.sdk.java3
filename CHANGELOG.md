@@ -1,3 +1,12 @@
+## [5.0.3] - 2022-03-30
+### Fixed
+- Universal Core now always started with the same name.
+- Handling TracedCommandExecutor for Selemium 4. [Trello 2848](https://trello.com/c/U1wSAVt2/) 
+
+## [5.0.3] - 2022-03-17
+## Updated 
+- Java Universal SDK Release
+
 ## [3.210.6] - 2021-12-10
 ### Fixed
 - Improve usage of `POSITION_PROVIDER_EXTRA_SCROLL` feature in calculating scroll position. [Trello 2751](https://trello.com/c/v03eizvV)
