@@ -28,6 +28,7 @@ public class DriverMapper {
     driverDto.setCapabilities(remoteDriver.getCapabilities().asMap());
 
     return driverDto;
+
   }
 
 
