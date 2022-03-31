@@ -718,12 +718,12 @@ public class Eyes extends RunningTest implements IEyes {
             String jsonText = secondaryLabel.getText();
             Map<String, Object> captureResult = mapper.readValue(jsonText, new TypeReference<Map<String, Object>>() {});
             VHSCaptureMode captureResultType;
-            if (!captureResult.containsKey("mode")) {
-                throw new EyesException("Please update UFG library to the latest version");
-            }
             String error = (String) captureResult.get("error");
             if (!error.isEmpty()) {
                 throw new EyesException(error);
+            }
+            if (!captureResult.containsKey("mode")) {
+                throw new EyesException("Please update UFG library to the latest version");
             }
             String vhsResultType = (String) captureResult.get("mode");
             String vcrType = ((String) captureResult.get("flavorName"));
@@ -779,9 +779,11 @@ public class Eyes extends RunningTest implements IEyes {
                     captureResultType
             );
         } finally {
-            WebElement clearButton = driver.findElementByAccessibilityId("UFG_ClearArea");
-            if (clearButton != null) {
+            try {
+                WebElement clearButton = driver.findElementByAccessibilityId("UFG_ClearArea");
                 clearButton.click();
+            } catch (NoSuchElementException e) {
+                logger.log(TraceLevel.Error, testIds, Stage.RESOURCE_COLLECTION, Type.CLEANUP, Pair.of("message", "Could not find 'UFG_ClearArea'"));
             }
         }
     }
