@@ -814,14 +814,37 @@ public class Eyes extends RunningTest implements IEyes {
         apiKeyWasSent = true;
     }
 
-    public byte[] getVHSIos() {
+    public byte[] getVHSIos() throws InterruptedException {
+        doClickOnTriggerAreaIOS(true);
+        WebElement ufgLabel;
+        boolean clickSecondTime = false;
+        while (true) {
+            List<WebElement> elementList = driver.findElementsByName("UFG_Label");
+            if (!elementList.isEmpty()) {
+                ufgLabel = elementList.get(elementList.size() - 1);
+                break;
+            } else {
+                // Try to recheck if click on UFG_TriggerArea was not done for some reasons
+                if (!clickSecondTime) {
+                    doClickOnTriggerAreaIOS(false);
+                    clickSecondTime = true;
+                }
+            }
+            Thread.sleep(250);
+        }
+        String base64 = ufgLabel.getAttribute("value");
+        return Base64.decodeBase64(base64);
+    }
+
+    private void doClickOnTriggerAreaIOS(boolean throwEx) {
         List<WebElement> list = driver.findElementsByName("UFG_TriggerArea");
         if (list.isEmpty()) {
+            if (!throwEx) {
+                return;
+            }
             throw new EyesException("Please check integration of UFG lib in the application");
         }
-        list.get(list.size() -1).click();
-        String base64 = driver.findElementByName("UFG_Label").getAttribute("value");
-        return Base64.decodeBase64(base64);
+        list.get(list.size() - 1).click();
     }
 
     private VhsCompatibilityParams getVhsCompatibilityParams() {

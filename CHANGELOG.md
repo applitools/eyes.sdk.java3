@@ -1,3 +1,7 @@
+## [vNext]
+### Fixed
+- Improved handling UFG labels for iOS
+
 ## [3.213.3-beta] - 2022-03-28
 ### Fixed
 - Classic Appium - NPE when no scrollable element exist in the page.
