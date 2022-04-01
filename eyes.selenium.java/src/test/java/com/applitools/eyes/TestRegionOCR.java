@@ -67,9 +67,10 @@ public class TestRegionOCR {
 
         System.out.println(locators);
 
-        eyes.check(Target.region(locators.get("great").get(0)).withName("great"));
+        //eyes.check(Target.region(locators.get("great").get(0)).withName("great"));
 
-        List<String> textsFound = eyes.extractText(new OcrRegion(locators.get("great").get(0)));
+        Region region = new Region(10,10,10,10);
+        List<String> textsFound = eyes.extractText(new OcrRegion(region));
 
         System.out.println(textsFound);
       }
