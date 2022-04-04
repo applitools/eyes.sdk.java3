@@ -705,9 +705,9 @@ public class Eyes extends RunningTest implements IEyes {
 
     private AndroidVHSCaptureResult getVHSAndroid(Set<String> testIds) throws Exception {
         sendApiKeyToVhsLib();
-        WebElement triggerButton = driver.findElementByAccessibilityId("UFG_TriggerArea");
-        int labelsAmount = Integer.parseInt(triggerButton.getText());
-        triggerButton.click();
+        EyesTriggerAreaElement triggerAreaElement = new EyesTriggerAreaElement(driver);
+        int labelsAmount = Integer.parseInt(triggerAreaElement.getText());
+        triggerAreaElement.click();
         waitForNextAction();
 
         WebElement secondaryLabel = driver.findElementByAccessibilityId("UFG_SecondaryLabel");
@@ -743,7 +743,7 @@ public class Eyes extends RunningTest implements IEyes {
                 int vhsPartsDone = 0;
                 while (vhsPartsDone < vhsParts) {
                     if (vhsPartsDone % labelsAmount == 0) {
-                        triggerButton.click();
+                        triggerAreaElement.click();
                     }
                     WebElement label = driver.findElementByAccessibilityId(String.format("UFG_Label_%s", vhsPartsDone % labelsAmount));
                     builder.append(label.getText());

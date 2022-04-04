@@ -2,6 +2,7 @@
 ### Fixed
 - Improved handling UFG labels for iOS
 - Improved handling errors from Android UFG lib
+- Wrap `UFG_TriggerArea` into EyesTriggerAreaElement for correct handling StaleElementReferenceException
 
 ## [3.213.3-beta] - 2022-03-28
 ### Fixed
