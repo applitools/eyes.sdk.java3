@@ -54,6 +54,8 @@ import org.apache.commons.lang3.tuple.Pair;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.*;
 import org.openqa.selenium.remote.RemoteWebDriver;
+import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.WebDriverWait;
 
 import java.awt.image.BufferedImage;
 import java.net.URI;
@@ -64,6 +66,18 @@ public class Eyes extends RunningTest implements IEyes {
     private static final int USE_DEFAULT_MATCH_TIMEOUT = -1;
     private static final int DEFAULT_STITCH_OVERLAP = 50;
     private static final int IOS_STITCH_OVERLAP = 0;
+
+    private static final int UFG_TRIGGER_AREA_WAIT_TIMEOUT_SECONDS = 30; // Time to wait for UFG_Labels to appear
+    private static final int UFG_LABEL_1ST_WAIT_TIMEOUT_SECONDS = 10; // Time to wait for UFG_Labels to appear
+    private static final int UFG_LABEL_2ND_WAIT_TIMEOUT_SECONDS = 20; // Time to wait for UFG_Labels to appear
+    private static final int UFG_LABEL_WAIT_SLEEP_MS = 250; // Time to sleep between searching for UFG_Label
+    private static final String UFG_LABEL_IDENTIFIER = "UFG_Label";
+    private static final String APIKEY_LABEL_IDENTIFIER = "UFG_Apikey";
+    private static final String APIKEY_READY_LABEL_IDENTIFIER = "UFG_ApikeyReady";
+    private static final String UFG_TRIGGER_AREA_LABEL = "UFG_TriggerArea";
+
+    private long timerStartMS; // Used for profiling.
+    private long totalTimeMS;
 
     public static final double UNKNOWN_DEVICE_PIXEL_RATIO = 0;
     public static final double DEFAULT_DEVICE_PIXEL_RATIO = 1;
@@ -85,6 +99,7 @@ public class Eyes extends RunningTest implements IEyes {
     private boolean apiKeyWasSent = false;
 
     final Map<String, RunningTest> visualGridTestList = new HashMap<>();
+
 
     public Eyes() {
         this(new ClassicRunner());
@@ -635,7 +650,29 @@ public class Eyes extends RunningTest implements IEyes {
         }
     }
 
+    private long timerStart() {
+        timerStartMS = System.currentTimeMillis();
+        return timerStartMS;
+    }
+
+    private long timerTakeTimeAndLog(Stage stage, Set<String> testIds, String timedEventName) {
+        long currentTimeMS = System.currentTimeMillis();
+        long measuredTime = currentTimeMS-timerStartMS;
+        logger.log(TraceLevel.Info, testIds, stage, Type.PROFILING,Pair.of(timedEventName, String.valueOf(measuredTime / 1000.0)));
+
+        timerStartMS = currentTimeMS;
+        totalTimeMS += currentTimeMS;
+        return measuredTime;
+    }
+
+    private long timerGetTotalTime() {
+        return totalTimeMS;
+    }
+
     private void checkVisualGrid(ICheckSettings checkSettings) {
+
+        timerStart(); // Profiling related
+
         checkSettings = updateCheckSettings(checkSettings);
         Set<String> testIds = new HashSet<>();
         for (RunningTest runningTest : visualGridTestList.values()) {
@@ -658,9 +695,12 @@ public class Eyes extends RunningTest implements IEyes {
                 vhsCaptureMode = result.getVhsCaptureMode();
                 vhsHash = result.getVhsHash().toLowerCase();
             } else if (EyesDriverUtils.isIOS(driver)) {
+                timerTakeTimeAndLog(Stage.CHECK, testIds, "prepare to take VHS"); // Profiling
                 try {
-                    vhs = getVHSIos();
+                    vhs = getVHSIos(testIds);
+                    timerTakeTimeAndLog(Stage.RESOURCE_COLLECTION, testIds,"got VHS");
                     vhsCompatibilityParams = getVhsCompatibilityParams();
+                    timerTakeTimeAndLog(Stage.RESOURCE_COLLECTION, testIds,"got compatibility params");
                 } catch (Throwable e) { // for logging purposes
                     GeneralUtils.logExceptionStackTrace(logger, Stage.RESOURCE_COLLECTION, Type.DOWNLOAD_RESOURCE, e, testIds);
                     throw e;
@@ -668,6 +708,7 @@ public class Eyes extends RunningTest implements IEyes {
                     try {
                         // Always try and clear the current state.
                         driver.findElementByAccessibilityId("UFG_ClearArea").click();
+                        timerTakeTimeAndLog(Stage.RESOURCE_COLLECTION, testIds,"clicked clear area");
                     } catch (NoSuchElementException e) {
                         logger.log(TraceLevel.Error, testIds, Stage.RESOURCE_COLLECTION, Type.CLEANUP, Pair.of("message", "Could not find 'UFG_ClearArea', possibly due to a previous failure."));
                     }
@@ -705,17 +746,26 @@ public class Eyes extends RunningTest implements IEyes {
 
     private AndroidVHSCaptureResult getVHSAndroid(Set<String> testIds) throws Exception {
         sendApiKeyToVhsLib();
-        EyesTriggerAreaElement triggerAreaElement = new EyesTriggerAreaElement(driver);
-        int labelsAmount = Integer.parseInt(triggerAreaElement.getText());
-        triggerAreaElement.click();
-        waitForNextAction();
+        timerTakeTimeAndLog(Stage.RESOURCE_COLLECTION, testIds,"sent API Key to UFG lib");
 
-        WebElement secondaryLabel = driver.findElementByAccessibilityId("UFG_SecondaryLabel");
+        EyesTriggerAreaElement triggerAreaElement = new EyesTriggerAreaElement(driver, UFG_TRIGGER_AREA_LABEL,
+                UFG_TRIGGER_AREA_WAIT_TIMEOUT_SECONDS, UFG_LABEL_WAIT_SLEEP_MS);
+        triggerAreaElement.searchForTriggerArea();
+        timerTakeTimeAndLog(Stage.RESOURCE_COLLECTION, testIds,"TriggerArea found");
+        int labelsAmount = Integer.parseInt(triggerAreaElement.getText());
+        timerTakeTimeAndLog(Stage.RESOURCE_COLLECTION, testIds,"TriggerArea parsed");
+        triggerAreaElement.click();
+        timerTakeTimeAndLog(Stage.RESOURCE_COLLECTION, testIds,"TriggerArea clicked");
+
+        WebElement secondaryLabel = waitForDataAvailability();
+        timerTakeTimeAndLog(Stage.RESOURCE_COLLECTION, testIds,"UFGSecondary_Label found");
+
         try {
             Map<String, FrameData> resourcesMap;
             ObjectMapper mapper = new ObjectMapper();
             mapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
             String jsonText = secondaryLabel.getText();
+            timerTakeTimeAndLog(Stage.RESOURCE_COLLECTION, testIds,"UFGSecondary_Label data read");
             Map<String, Object> captureResult = mapper.readValue(jsonText, new TypeReference<Map<String, Object>>() {});
             VHSCaptureMode captureResultType;
             String error = (String) captureResult.get("error");
@@ -723,7 +773,7 @@ public class Eyes extends RunningTest implements IEyes {
                 throw new EyesException(error);
             }
             if (!captureResult.containsKey("mode")) {
-                throw new EyesException("Please update UFG library to the latest version");
+                throw new EyesException("UFGSecondary_Label does not contain 'mode'. Please update UFG library to the latest version");
             }
             String vhsResultType = (String) captureResult.get("mode");
             String vcrType = ((String) captureResult.get("flavorName"));
@@ -781,72 +831,92 @@ public class Eyes extends RunningTest implements IEyes {
         } finally {
             try {
                 WebElement clearButton = driver.findElementByAccessibilityId("UFG_ClearArea");
+                timerTakeTimeAndLog(Stage.RESOURCE_COLLECTION, testIds,"UFG_ClearArea found");
                 clearButton.click();
+                timerTakeTimeAndLog(Stage.RESOURCE_COLLECTION, testIds,"UFG_ClearArea clicked");
             } catch (NoSuchElementException e) {
                 logger.log(TraceLevel.Error, testIds, Stage.RESOURCE_COLLECTION, Type.CLEANUP, Pair.of("message", "Could not find 'UFG_ClearArea'"));
             }
         }
     }
 
-    private void waitForNextAction() throws InterruptedException {
-        while (true) {
+    private WebElement waitForDataAvailability() throws InterruptedException {
+        long startTimeMS = System.currentTimeMillis();
+        long currentTimeMS = System.currentTimeMillis();
+        // FIXME - make this code better (constants missing, code duplication)
+        do {
+
             List<WebElement> elementList = driver.findElementsByAccessibilityId("UFG_SecondaryLabel");
             if (!elementList.isEmpty()) {
-                break;
+                return elementList.get(0);
             }
-            Thread.sleep(500);
-        }
+            Thread.sleep(250);
+        } while(((int)Math.floor((currentTimeMS - startTimeMS) / 1000.0)) < 30);
+
+        throw new EyesException("Timed-out trying to find UFG_SecondaryLabel. Screen might be overloaded");
     }
 
     private void sendApiKeyToVhsLib() throws InterruptedException {
         if (apiKeyWasSent) {
             return;
         }
-        List<WebElement> list = driver.findElementsByAccessibilityId("UFG_Apikey");
-        if (list.isEmpty()) {
-            throw new EyesException("Please check integration of UFG lib in the application");
+        try {
+            WebElement apiKeyLabel = new WebDriverWait(driver, UFG_TRIGGER_AREA_WAIT_TIMEOUT_SECONDS, UFG_LABEL_WAIT_SLEEP_MS)
+                    .until(ExpectedConditions.presenceOfElementLocated(By.name(APIKEY_LABEL_IDENTIFIER)));
+            apiKeyLabel.sendKeys(getApiKey());
+
+            try {
+                driver.findElementByAccessibilityId(APIKEY_READY_LABEL_IDENTIFIER).click();
+            } catch (NoSuchElementException e) {
+                throw new EyesException("Failed to find " + APIKEY_READY_LABEL_IDENTIFIER + " label, something is wrong.");
+            }
+        } catch (TimeoutException e) {
+            throw new EyesException("Timed-out waiting for API Key label" + APIKEY_LABEL_IDENTIFIER + " label. Please check integration of UFG lib in the application");
         }
-        list.get(list.size() - 1).sendKeys(getApiKey());
-        list = driver.findElementsByAccessibilityId("UFG_ApikeyReady");
-        if (list.isEmpty()) {
-            throw new EyesException("Please check integration of UFG lib in the application");
-        }
-        list.get(list.size() - 1).click();
         Thread.sleep(100);
         apiKeyWasSent = true;
     }
 
-    public byte[] getVHSIos() throws InterruptedException {
-        doClickOnTriggerAreaIOS(true);
-        WebElement ufgLabel;
-        boolean clickSecondTime = false;
-        while (true) {
-            List<WebElement> elementList = driver.findElementsByName("UFG_Label");
-            if (!elementList.isEmpty()) {
-                ufgLabel = elementList.get(elementList.size() - 1);
-                break;
-            } else {
-                // Try to recheck if click on UFG_TriggerArea was not done for some reasons
-                if (!clickSecondTime) {
-                    doClickOnTriggerAreaIOS(false);
-                    clickSecondTime = true;
-                }
+    public byte[] getVHSIos(Set<String> testIds) throws InterruptedException {
+        // First (and hopefully only) click on the trigger area.
+        doClickOnTriggerAreaIOS(true, UFG_TRIGGER_AREA_WAIT_TIMEOUT_SECONDS);
+        timerTakeTimeAndLog(Stage.RESOURCE_COLLECTION, testIds,"trigger area clicked");
+
+        WebElement ufgLabel = null;
+        try {
+            ufgLabel = new WebDriverWait(driver, UFG_LABEL_1ST_WAIT_TIMEOUT_SECONDS, UFG_LABEL_WAIT_SLEEP_MS)
+                    .until(ExpectedConditions.presenceOfElementLocated(By.name(UFG_LABEL_IDENTIFIER)));
+        } catch(TimeoutException e) {
+            // Workaround for iOS - sometimes an additional "click" is required for something to actually work ( :facepalm: ).
+            // This time there's no point in *waiting* for the TriggerArea. If it's not there - it's a good sign.
+            doClickOnTriggerAreaIOS(false, 0);
+            try {
+                ufgLabel = new WebDriverWait(driver, UFG_LABEL_2ND_WAIT_TIMEOUT_SECONDS, UFG_LABEL_WAIT_SLEEP_MS)
+                        .until(ExpectedConditions.presenceOfElementLocated(By.name(UFG_LABEL_IDENTIFIER)));
+            } catch (TimeoutException e2) {
+                throw new EyesException("Could not find UFG_Label after timeout.");
             }
-            Thread.sleep(250);
         }
+        timerTakeTimeAndLog(Stage.RESOURCE_COLLECTION, testIds,"UFG_Label found");
+
+        // We have a UFG_Label, yay!
         String base64 = ufgLabel.getAttribute("value");
         return Base64.decodeBase64(base64);
     }
 
-    private void doClickOnTriggerAreaIOS(boolean throwEx) {
-        List<WebElement> list = driver.findElementsByName("UFG_TriggerArea");
-        if (list.isEmpty()) {
-            if (!throwEx) {
-                return;
+    private void doClickOnTriggerAreaIOS(boolean throwIfNoTriggerArea, int waitTimeoutSeconds ) {
+        try {
+            WebElement triggerArea = new WebDriverWait(driver, waitTimeoutSeconds, UFG_LABEL_WAIT_SLEEP_MS).until(ExpectedConditions.presenceOfElementLocated(By.name(UFG_TRIGGER_AREA_LABEL)));
+            triggerArea.click();
+        } catch(TimeoutException e) {
+            // Due to some issue with iOS, we sometimes check for the existence of the TriggerArea again. This time if it's not available - we DON'T want
+            // to throw an exception.
+            if (throwIfNoTriggerArea) {
+                throw new EyesException("Timed-out waiting for TriggerArea. Please check integration of UFG lib in the application");
             }
-            throw new EyesException("Please check integration of UFG lib in the application");
+        } catch (Exception e) {
+            throw new EyesException("Unknown error occurred trying to find and click TriggerArea", e);
         }
-        list.get(list.size() - 1).click();
     }
 
     private VhsCompatibilityParams getVhsCompatibilityParams() {

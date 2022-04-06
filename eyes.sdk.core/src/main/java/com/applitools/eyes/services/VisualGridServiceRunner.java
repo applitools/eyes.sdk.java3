@@ -5,6 +5,8 @@ import com.applitools.connectivity.ServerConnector;
 import com.applitools.eyes.*;
 import com.applitools.eyes.fluent.CheckSettings;
 import com.applitools.eyes.logging.Stage;
+import com.applitools.eyes.logging.TraceLevel;
+import com.applitools.eyes.logging.Type;
 import com.applitools.eyes.visualgrid.model.*;
 import com.applitools.eyes.visualgrid.services.CheckTask;
 import com.applitools.eyes.visualgrid.services.IEyes;
@@ -364,6 +366,9 @@ public class VisualGridServiceRunner extends Thread {
                 continue;
             }
 
+            checkTask.renderFinished();
+            double renderTimeSeconds = checkTask.getRenderTimeMS() / 1000.0;
+            logger.log(TraceLevel.Info, Collections.singleton(checkTask.getTestId()), Stage.RENDER, Type.PROFILING, Pair.of("step id", checkTask.getStepId()), Pair.of("render time", renderTimeSeconds));
             checkTask.setAppOutput(pair.getRight());
         }
 
@@ -438,6 +443,7 @@ public class VisualGridServiceRunner extends Thread {
 
             waitingCheckTasks.put(checkTask.getStepId(), checkTask);
             if (checkTask.isReady()) {
+                checkTask.renderStarted();
                 renderService.addInput(checkTask.getStepId(), request);
             } else {
                 waitingRenderRequests.add(request);
