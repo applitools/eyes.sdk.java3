@@ -73,6 +73,7 @@ public class Eyes extends RunningTest implements IEyes {
     private static final int UFG_LABEL_WAIT_SLEEP_MS = 250; // Time to sleep between searching for UFG_Label
     private static final String UFG_LABEL_IDENTIFIER = "UFG_Label";
     private static final String APIKEY_LABEL_IDENTIFIER = "UFG_Apikey";
+    private static final String SECONDARY_LABEL_IDENTIFIER = "UFG_SecondaryLabel";
     private static final String APIKEY_READY_LABEL_IDENTIFIER = "UFG_ApikeyReady";
     private static final String UFG_TRIGGER_AREA_LABEL = "UFG_TriggerArea";
 
@@ -757,7 +758,7 @@ public class Eyes extends RunningTest implements IEyes {
         triggerAreaElement.click();
         timerTakeTimeAndLog(Stage.RESOURCE_COLLECTION, testIds,"TriggerArea clicked");
 
-        WebElement secondaryLabel = waitForDataAvailability();
+        WebElement secondaryLabel = waitForElementAvailability(SECONDARY_LABEL_IDENTIFIER);
         timerTakeTimeAndLog(Stage.RESOURCE_COLLECTION, testIds,"UFGSecondary_Label found");
 
         try {
@@ -840,13 +841,12 @@ public class Eyes extends RunningTest implements IEyes {
         }
     }
 
-    private WebElement waitForDataAvailability() throws InterruptedException {
+    private WebElement waitForElementAvailability(String accessibilityId) throws InterruptedException {
         long startTimeMS = System.currentTimeMillis();
         long currentTimeMS = System.currentTimeMillis();
         // FIXME - make this code better (constants missing, code duplication)
         do {
-
-            List<WebElement> elementList = driver.findElementsByAccessibilityId("UFG_SecondaryLabel");
+            List<WebElement> elementList = driver.findElementsByAccessibilityId(accessibilityId);
             if (!elementList.isEmpty()) {
                 return elementList.get(0);
             }
@@ -861,8 +861,7 @@ public class Eyes extends RunningTest implements IEyes {
             return;
         }
         try {
-            WebElement apiKeyLabel = new WebDriverWait(driver, UFG_TRIGGER_AREA_WAIT_TIMEOUT_SECONDS, UFG_LABEL_WAIT_SLEEP_MS)
-                    .until(ExpectedConditions.presenceOfElementLocated(By.name(APIKEY_LABEL_IDENTIFIER)));
+            WebElement apiKeyLabel = waitForElementAvailability(APIKEY_LABEL_IDENTIFIER);
             apiKeyLabel.sendKeys(getApiKey());
 
             try {
