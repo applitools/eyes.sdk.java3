@@ -923,4 +923,41 @@ public class Configuration implements IConfiguration {
         return scaleRatio;
     }
 
+    public Configuration addMobileDevice(IosDeviceInfo iosDeviceInfo) {
+        return addBrowser(iosDeviceInfo);
+    }
+
+    public Configuration addMobileDevices(IosDeviceInfo iosDeviceInfo, IosDeviceInfo... iosDeviceInfos) {
+        addMobileDevice(iosDeviceInfo);
+        if (iosDeviceInfos == null) {
+            return this;
+        }
+
+        for (IosDeviceInfo info : iosDeviceInfos) {
+            addMobileDevice(info);
+        }
+
+        return this;
+    }
+
+    // TODO: Uncommenting these methods enable android ufg tests.
+    public Configuration addMobileDevice(AndroidDeviceInfo androidDeviceInfo) {
+        RenderBrowserInfo renderBrowserInfo = new RenderBrowserInfo(androidDeviceInfo);
+        this.browsersInfo.add(renderBrowserInfo);
+        return this;
+    }
+
+    public Configuration addMobileDevices(AndroidDeviceInfo androidDeviceInfo, AndroidDeviceInfo... androidDeviceInfos) {
+        addMobileDevice(androidDeviceInfo);
+        if (androidDeviceInfos == null) {
+            return this;
+        }
+
+        for (AndroidDeviceInfo info : androidDeviceInfos) {
+            addMobileDevice(info);
+        }
+
+        return this;
+    }
+
 }
