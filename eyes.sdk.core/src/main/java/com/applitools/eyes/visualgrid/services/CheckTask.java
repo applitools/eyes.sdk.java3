@@ -22,6 +22,10 @@ public class CheckTask {
     private boolean isMatchStarted = false;
     private ImageMatchSettings imageMatchSettings;
 
+    private long renderStartMS; // profiling related
+    private long renderFinishedMS;
+
+
     private RenderStatusResults renderStatusResults;
     private AppOutput appOutput;
 
@@ -54,6 +58,20 @@ public class CheckTask {
         }
 
         return null;
+    }
+
+    public long renderStarted() {
+        renderStartMS = System.currentTimeMillis();
+        return renderStartMS;
+    }
+
+    public long renderFinished() {
+        renderFinishedMS = System.currentTimeMillis();
+        return renderFinishedMS;
+    }
+
+    public long getRenderTimeMS() {
+        return renderFinishedMS - renderStartMS;
     }
 
     public String getAgentId() {

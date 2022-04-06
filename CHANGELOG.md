@@ -1,4 +1,6 @@
-## [vNext]
+## [3.214.0-beta]
+### Added
+- Profiling information
 ### Fixed
 - Improved handling UFG labels for iOS
 - Improved handling errors from Android UFG lib
