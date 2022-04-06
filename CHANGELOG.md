@@ -1,3 +1,7 @@
+## [3.214.1-beta]
+### Fixed
+- Android Labels finding.
+
 ## [3.214.0-beta]
 ### Added
 - Profiling information
