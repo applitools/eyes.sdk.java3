@@ -12,13 +12,13 @@
     <parent>
         <artifactId>eyes-sdk-java3-parent</artifactId>
         <groupId>com.applitools</groupId>
-        <version>3.214.1-beta</version>
+        <version>3.215.0-beta</version>
     </parent>
     <dependencies>
         <dependency>
             <groupId>com.applitools</groupId>
             <artifactId>eyes-selenium-common-java3</artifactId>
-            <version>3.214.1-beta</version>
+            <version>3.215.0-beta</version>
         </dependency>
         <dependency>
             <groupId>io.appium</groupId>
@@ -28,7 +28,7 @@
         <dependency>
             <groupId>com.applitools</groupId>
             <artifactId>eyes-sdk-core-java3</artifactId>
-            <version>3.214.1-beta</version>
+            <version>3.215.0-beta</version>
             <type>test-jar</type>
             <scope>test</scope>
         </dependency>
