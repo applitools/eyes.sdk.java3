@@ -16,6 +16,7 @@ import com.applitools.eyes.SyncTaskListener;
 import com.applitools.eyes.TestResultContainer;
 import com.applitools.eyes.TestResults;
 import com.applitools.eyes.TestResultsSummary;
+import com.applitools.utils.ClassVersionGetter;
 
 
 /**
@@ -24,10 +25,19 @@ import com.applitools.eyes.TestResultsSummary;
 public class ClassicRunner extends EyesRunner {
   private final List<TestResultContainer> allTestResult = new ArrayList<>();
 
+  /**
+   * name of the client sdk
+   */
+  protected static String BASE_AGENT_ID = "eyes.sdk.java";
+
+  /**
+   * version of the client sdk
+   */
+  protected static String VERSION = ClassVersionGetter.CURRENT_VERSION;
+
 
   public ClassicRunner() {
-    super();
-    managerRef = commandExecutor.coreMakeManager(ManagerType.CLASSIC.value, null, null);
+    this(BASE_AGENT_ID, VERSION);
   }
 
   protected ClassicRunner(String baseAgentId, String version) {

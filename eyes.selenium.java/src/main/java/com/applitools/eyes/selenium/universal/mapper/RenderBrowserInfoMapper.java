@@ -3,12 +3,15 @@ package com.applitools.eyes.selenium.universal.mapper;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import com.applitools.eyes.selenium.universal.dto.AndroidDeviceInfoDto;
+import com.applitools.eyes.selenium.universal.dto.AndroidDeviceRendererDto;
 import com.applitools.eyes.selenium.universal.dto.ChromeEmulationDeviceRendererDto;
 import com.applitools.eyes.selenium.universal.dto.ChromeEmulationInfoDto;
 import com.applitools.eyes.selenium.universal.dto.DesktopBrowserRendererDto;
 import com.applitools.eyes.selenium.universal.dto.IBrowsersInfo;
 import com.applitools.eyes.selenium.universal.dto.IOSDeviceRendererDto;
 import com.applitools.eyes.selenium.universal.dto.IosDeviceInfoDto;
+import com.applitools.eyes.visualgrid.model.AndroidDeviceInfo;
 import com.applitools.eyes.visualgrid.model.ChromeEmulationInfo;
 import com.applitools.eyes.visualgrid.model.DeviceName;
 import com.applitools.eyes.visualgrid.model.IosDeviceInfo;
@@ -44,6 +47,16 @@ public class RenderBrowserInfoMapper {
       iosDevice.setVersion(iosDeviceInfo.getVersion() == null ? null : iosDeviceInfo.getVersion().getVersion());
       iosRenderer.setIosDeviceInfo(iosDevice);
       return iosRenderer;
+    } else if (renderBrowserInfo.getAndroidDeviceInfo() != null) {
+      AndroidDeviceInfo androidDeviceInfo = renderBrowserInfo.getAndroidDeviceInfo();
+      AndroidDeviceRendererDto androidDeviceRenderer = new AndroidDeviceRendererDto();
+      AndroidDeviceInfoDto androidDevice = new AndroidDeviceInfoDto();
+      androidDevice.setDeviceName(androidDeviceInfo.getDeviceName());
+      androidDevice.setScreenOrientation(androidDeviceInfo.getScreenOrientation() == null ? null :
+          androidDeviceInfo.getScreenOrientation().getOrientation());
+      androidDevice.setVersion(androidDeviceInfo.getVersion() == null ? null : androidDeviceInfo.getVersion().getVersion());
+      androidDeviceRenderer.setAndroidDeviceInfo(androidDevice);
+      return androidDeviceRenderer;
     }
 
     DesktopBrowserRendererDto desktopBrowserRendererDto = new DesktopBrowserRendererDto();

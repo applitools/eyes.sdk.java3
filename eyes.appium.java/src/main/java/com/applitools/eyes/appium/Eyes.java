@@ -30,6 +30,14 @@ public class Eyes implements IEyesBase {
         this.originEyes = new com.applitools.eyes.selenium.Eyes(new AppiumRunner());
     }
 
+    /**
+     * Instantiates a new Eyes.
+     * @param runner0 the runner
+     */
+    public Eyes(EyesRunner runner0) {
+        this.originEyes = new com.applitools.eyes.selenium.Eyes(runner0);
+    }
+
     public com.applitools.eyes.selenium.Configuration getConfiguration() {
         return originEyes.getConfiguration();
     }
