@@ -108,6 +108,7 @@
         <module>eyes.selenium.java</module>
         <module>eyes.appium.java</module>
         <module>eyes.selenium.common</module>
+<!--        <module>coverage-tests</module>-->
 <!--        <module>eyes.sdk.distribution</module>-->
 <!--        <module>eyes.sdk.distribution.images</module>-->
     </modules>
