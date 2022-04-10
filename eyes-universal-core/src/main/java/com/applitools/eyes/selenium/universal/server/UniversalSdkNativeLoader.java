@@ -72,7 +72,8 @@ public class UniversalSdkNativeLoader {
       setPosixPermissionsToPath(osVersion, tempPath);
       nativeProcess = createProcess(tempPath.toString());
       readPortOfProcess(nativeProcess);
-      assignHookToStopProcess();
+      // FIXME - remove commented code (after verificaiton it's not required).
+//      assignHookToStopProcess();
     }
 
   }
