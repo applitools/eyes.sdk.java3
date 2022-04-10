@@ -1,7 +1,10 @@
-## [5.0.3] - 2022-03-30
+## [5.0.3] - 2022-04-11
+### Updated
+- Java Universal Core 2.1.3 
 ### Fixed
 - Universal Core now always started with the same name.
-- Handling TracedCommandExecutor for Selemium 4. [Trello 2848](https://trello.com/c/U1wSAVt2/) 
+- Handling TracedCommandExecutor for Selenium 4. [Trello 2848](https://trello.com/c/U1wSAVt2/)
+- ExtractTextRegions API. [Trello 2841](https://trello.com/c/NKSyj3Dg/)
 
 ## [5.0.3] - 2022-03-17
 ## Updated 
