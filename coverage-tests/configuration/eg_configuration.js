@@ -3,7 +3,7 @@ module.exports = {
   emitter: "https://raw.githubusercontent.com/applitools/sdk.coverage.tests/universal-sdk/java/emitter.js",
   overrides: [
     "https://raw.githubusercontent.com/applitools/sdk.coverage.tests/universal-sdk/js/overrides.js",
-    "./configuration/java_overrides_universal"
+    "https://raw.githubusercontent.com/applitools/sdk.coverage.tests/universal-sdk/java/overrides.js"
   ],
   template: "https://raw.githubusercontent.com/applitools/sdk.coverage.tests/master/java/template.hbs",
   tests: "https://raw.githubusercontent.com/applitools/sdk.coverage.tests/universal-sdk/coverage-tests.js",
