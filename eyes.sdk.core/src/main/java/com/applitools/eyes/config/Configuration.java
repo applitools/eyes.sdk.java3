@@ -940,7 +940,6 @@ public class Configuration implements IConfiguration {
         return this;
     }
 
-    // TODO: Uncommenting these methods enable android ufg tests.
     public Configuration addMobileDevice(AndroidDeviceInfo androidDeviceInfo) {
         RenderBrowserInfo renderBrowserInfo = new RenderBrowserInfo(androidDeviceInfo);
         this.browsersInfo.add(renderBrowserInfo);
