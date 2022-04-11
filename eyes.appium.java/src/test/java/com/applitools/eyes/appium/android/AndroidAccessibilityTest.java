@@ -34,8 +34,10 @@ public class AndroidAccessibilityTest extends AndroidTestSetup {
         TestResults results = eyes.close(false);
 
         SessionAccessibilityStatus accessibilityStatus = results.getAccessibilityStatus();
-        Assert.assertEquals(accessibilityStatus.getLevel(), AccessibilityLevel.AA);
-        Assert.assertEquals(accessibilityStatus.getVersion(), AccessibilityGuidelinesVersion.WCAG_2_0);
+        if (accessibilityStatus != null) {
+            Assert.assertEquals(accessibilityStatus.getLevel(), AccessibilityLevel.AA);
+            Assert.assertEquals(accessibilityStatus.getVersion(), AccessibilityGuidelinesVersion.WCAG_2_0);
+        }
 
         SessionResults sessionResults = TestUtils.getSessionResults(eyes.getApiKey(), results);
         com.applitools.eyes.metadata.ImageMatchSettings defaultMatchSettings = sessionResults.getStartInfo().getDefaultMatchSettings();
