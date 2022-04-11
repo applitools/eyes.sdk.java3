@@ -1,23 +1,18 @@
 package com.applitools.eyes.selenium.universal.mapper;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 import com.applitools.ICheckSettings;
 import com.applitools.eyes.Region;
-import com.applitools.eyes.fluent.CheckSettings;
 import com.applitools.eyes.fluent.GetSimpleRegion;
 import com.applitools.eyes.fluent.SimpleRegionByRectangle;
-import com.applitools.eyes.selenium.ElementReference;
-import com.applitools.eyes.selenium.ElementSelector;
-import com.applitools.eyes.selenium.PathNodeValue;
 import com.applitools.eyes.selenium.TargetPathLocator;
 import com.applitools.eyes.selenium.fluent.SeleniumCheckSettings;
 import com.applitools.eyes.selenium.fluent.SimpleRegionByElement;
 import com.applitools.eyes.selenium.fluent.SimpleRegionBySelector;
-import com.applitools.eyes.selenium.universal.dto.ElementRegionDto;
 import com.applitools.eyes.selenium.universal.dto.TRegion;
-import com.applitools.eyes.selenium.universal.dto.TargetPathLocatorDto;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 
@@ -49,7 +44,7 @@ public class TRegionMapper {
       return null;
     }
 
-    return getSimpleRegionList.stream().map(TRegionMapper::toTRegion).collect(Collectors.toList());
+    return getSimpleRegionList.stream().filter(Objects::nonNull).map(TRegionMapper::toTRegion).collect(Collectors.toList());
   }
 
   public static TRegion toTRegionFromCheckSettings(ICheckSettings checkSettings) {
