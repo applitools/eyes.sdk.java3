@@ -528,7 +528,7 @@ public class Eyes implements IEyesBase {
             checkDto.invoke(originEyes, checkSettingsDto);
         } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
             e.printStackTrace();
-            throw new EyesException("selenium.Eyes has changed `checkDto` method name");
+            throw new EyesException(e.getMessage());
         }
     }
 
