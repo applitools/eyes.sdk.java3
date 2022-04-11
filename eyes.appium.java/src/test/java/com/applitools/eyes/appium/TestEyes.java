@@ -112,11 +112,13 @@ public class TestEyes extends EyesBase {
     @Test
     public void testConfigurationEdit() {
         Eyes eyes = new Eyes();
-        int originalMatchTimeout = eyes.getConfiguration().getMatchTimeout();
-        int newMatchTimeout = originalMatchTimeout + 1000;
-        eyes.getConfiguration().setMatchTimeout(newMatchTimeout);
+        Configuration conf = eyes.getConfiguration();
+        Integer originalMatchTimeout = eyes.getConfiguration().getMatchTimeout();
+
+        //Integer newMatchTimeout = originalMatchTimeout + 1000;
+        eyes.getConfiguration().setMatchTimeout(originalMatchTimeout);
         //Assert.assertEquals(eyes.getConfiguration().getMatchTimeout(), originalMatchTimeout);
-        eyes.getConfigurationInstance().setMatchTimeout(newMatchTimeout);
+        eyes.getConfigurationInstance().setMatchTimeout(originalMatchTimeout);
         //Assert.assertEquals(eyes.getConfiguration().getMatchTimeout(), newMatchTimeout);
     }
 }
