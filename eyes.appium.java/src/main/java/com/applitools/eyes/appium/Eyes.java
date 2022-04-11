@@ -13,6 +13,8 @@ import com.applitools.eyes.selenium.*;
 import com.applitools.eyes.selenium.positioning.ImageRotation;
 import com.applitools.eyes.selenium.universal.dto.CheckSettingsDto;
 import com.applitools.utils.*;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.openqa.selenium.*;
 
 import java.lang.reflect.InvocationTargetException;
@@ -137,7 +139,7 @@ public class Eyes implements IEyesBase {
         configure().setForceFullPageScreenshot(shouldForce);
     }
 
-    public boolean getForceFullPageScreenshot() {
+    public Boolean getForceFullPageScreenshot() {
         return originEyes.getForceFullPageScreenshot();
     }
 
@@ -155,7 +157,7 @@ public class Eyes implements IEyesBase {
      * @return The maximum time in ms
      * (RegionProvider, String, boolean, int)} waits for a match.
      */
-    public int getMatchTimeout() {
+    public Integer getMatchTimeout() {
         return configure().getMatchTimeout();
     }
 
@@ -173,7 +175,7 @@ public class Eyes implements IEyesBase {
      *
      * @return True if new tests are saved by default.
      */
-    public boolean getSaveNewTests() {
+    public Boolean getSaveNewTests() {
         return configure().getSaveNewTests();
     }
 
@@ -198,7 +200,7 @@ public class Eyes implements IEyesBase {
      *
      * @return Returns the stitching overlap in pixels.
      */
-    public int getStitchOverlap() {
+    public Integer getStitchOverlap() {
         return configure().getStitchOverlap();
     }
 
@@ -268,7 +270,7 @@ public class Eyes implements IEyesBase {
         return configure().getHostOS();
     }
 
-    public boolean getIgnoreCaret() {
+    public Boolean getIgnoreCaret() {
         return configure().getIgnoreCaret();
     }
 
@@ -312,7 +314,7 @@ public class Eyes implements IEyesBase {
         configure().setIgnoreDisplacements(isIgnoreDisplacements);
     }
 
-    public boolean getIgnoreDisplacements() {
+    public Boolean getIgnoreDisplacements() {
         return configure().getIgnoreDisplacements();
     }
 
@@ -518,6 +520,12 @@ public class Eyes implements IEyesBase {
 
     public void check(ICheckSettings checkSettings) {
         CheckSettingsDto checkSettingsDto = AppiumCheckSettingsMapper.toCheckSettingsDto(checkSettings);
+        ObjectMapper obj = new ObjectMapper();
+        try {
+            System.out.println("json: " + obj.writeValueAsString(checkSettingsDto));
+        } catch (JsonProcessingException e) {
+            e.printStackTrace();
+        }
         this.checkDto(checkSettingsDto);
     }
 
