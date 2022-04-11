@@ -1,3 +1,7 @@
+## [5.1.0] - 2022-04-11
+### Added
+- Native Mobile UFG Support
+
 ## [5.0.3] - 2022-04-11
 ### Updated
 - Java Universal Core 2.1.3 
