@@ -20,7 +20,7 @@ public class TRegionMapper extends com.applitools.eyes.selenium.universal.mapper
         By by = appiumCheckSettings.getTargetSelector();
 
         if (by != null) {
-            return SelectorRegionMapper.toSelectorRegionDto(by);
+            return AppiumSelectorRegionMapper.toAppiumSelectorRegionDto(by);
         }
 
         WebElement element = appiumCheckSettings.getTargetElement();
