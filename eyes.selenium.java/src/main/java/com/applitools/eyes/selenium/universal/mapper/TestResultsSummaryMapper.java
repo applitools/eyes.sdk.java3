@@ -39,8 +39,8 @@ public class TestResultsSummaryMapper {
           } else if (browserInfoDto.getIosDeviceInfo() != null) {
             IosDeviceInfo iosDeviceInfo = RenderBrowserInfoMapper.toIosDeviceInfo(browserInfoDto.getIosDeviceInfo());
             renderBrowserInfo = new RenderBrowserInfo(iosDeviceInfo);
-          } else if (browserInfoDto.getAndroidDeviceInfoDto() != null) {
-            AndroidDeviceInfo androidDeviceInfo = RenderBrowserInfoMapper.toAndroidDeviceInfo(browserInfoDto.getAndroidDeviceInfoDto());
+          } else if (browserInfoDto.getAndroidDeviceInfo() != null) {
+            AndroidDeviceInfo androidDeviceInfo = RenderBrowserInfoMapper.toAndroidDeviceInfo(browserInfoDto.getAndroidDeviceInfo());
             renderBrowserInfo = new RenderBrowserInfo(androidDeviceInfo);
           } else {
             renderBrowserInfo = new RenderBrowserInfo(browserInfoDto.getWidth(), browserInfoDto.getHeight(),

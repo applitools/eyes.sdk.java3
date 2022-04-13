@@ -6,7 +6,7 @@ package com.applitools.eyes.selenium.universal.dto;
 public class BrowserInfoDto {
   private ChromeEmulationInfoDto chromeEmulationInfo;
   private IosDeviceInfoDto iosDeviceInfo;
-  private AndroidDeviceInfoDto androidDeviceInfoDto;
+  private AndroidDeviceInfoDto androidDeviceInfo;
   private String name;
   private Integer width;
   private Integer height;
@@ -63,11 +63,11 @@ public class BrowserInfoDto {
     this.height = height;
   }
 
-  public AndroidDeviceInfoDto getAndroidDeviceInfoDto() {
-    return androidDeviceInfoDto;
+  public AndroidDeviceInfoDto getAndroidDeviceInfo() {
+    return androidDeviceInfo;
   }
 
-  public void setAndroidDeviceInfoDto(AndroidDeviceInfoDto androidDeviceInfoDto) {
-    this.androidDeviceInfoDto = androidDeviceInfoDto;
+  public void setAndroidDeviceInfo(AndroidDeviceInfoDto androidDeviceInfo) {
+    this.androidDeviceInfo = androidDeviceInfo;
   }
 }
