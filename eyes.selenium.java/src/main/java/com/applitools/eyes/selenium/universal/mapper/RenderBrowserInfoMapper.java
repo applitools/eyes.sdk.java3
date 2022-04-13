@@ -12,7 +12,9 @@ import com.applitools.eyes.selenium.universal.dto.IBrowsersInfo;
 import com.applitools.eyes.selenium.universal.dto.IOSDeviceRendererDto;
 import com.applitools.eyes.selenium.universal.dto.IosDeviceInfoDto;
 import com.applitools.eyes.visualgrid.model.AndroidDeviceInfo;
+import com.applitools.eyes.visualgrid.model.AndroidDeviceName;
 import com.applitools.eyes.visualgrid.model.ChromeEmulationInfo;
+import com.applitools.eyes.visualgrid.model.DeviceAndroidVersion;
 import com.applitools.eyes.visualgrid.model.DeviceName;
 import com.applitools.eyes.visualgrid.model.IosDeviceInfo;
 import com.applitools.eyes.visualgrid.model.IosDeviceName;
@@ -93,6 +95,17 @@ public class RenderBrowserInfoMapper {
     ScreenOrientation screenOrientation = ScreenOrientation.fromOrientation(dto.getScreenOrientation());
     IosVersion iosVersion = IosVersion.fromVersion(dto.getVersion());
     return new IosDeviceInfo(iosDeviceName, screenOrientation, iosVersion);
+  }
+
+  public static AndroidDeviceInfo toAndroidDeviceInfo(AndroidDeviceInfoDto dto) {
+    if (dto == null) {
+      return null;
+    }
+
+    AndroidDeviceName androidDeviceName = AndroidDeviceName.fromName(dto.getDeviceName());
+    ScreenOrientation screenOrientation = ScreenOrientation.fromOrientation(dto.getScreenOrientation());
+    DeviceAndroidVersion version = DeviceAndroidVersion.fromVersion(dto.getVersion());
+    return new AndroidDeviceInfo(androidDeviceName, screenOrientation, version);
   }
 
 }

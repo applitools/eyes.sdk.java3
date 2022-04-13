@@ -9,6 +9,7 @@ import com.applitools.eyes.selenium.BrowserType;
 import com.applitools.eyes.selenium.universal.dto.BrowserInfoDto;
 import com.applitools.eyes.selenium.universal.dto.TestResultContainerDto;
 import com.applitools.eyes.selenium.universal.dto.TestResultsSummaryDto;
+import com.applitools.eyes.visualgrid.model.AndroidDeviceInfo;
 import com.applitools.eyes.visualgrid.model.EmulationBaseInfo;
 import com.applitools.eyes.visualgrid.model.IosDeviceInfo;
 import com.applitools.eyes.visualgrid.model.RenderBrowserInfo;
@@ -38,6 +39,9 @@ public class TestResultsSummaryMapper {
           } else if (browserInfoDto.getIosDeviceInfo() != null) {
             IosDeviceInfo iosDeviceInfo = RenderBrowserInfoMapper.toIosDeviceInfo(browserInfoDto.getIosDeviceInfo());
             renderBrowserInfo = new RenderBrowserInfo(iosDeviceInfo);
+          } else if (browserInfoDto.getAndroidDeviceInfoDto() != null) {
+            AndroidDeviceInfo androidDeviceInfo = RenderBrowserInfoMapper.toAndroidDeviceInfo(browserInfoDto.getAndroidDeviceInfoDto());
+            renderBrowserInfo = new RenderBrowserInfo(androidDeviceInfo);
           } else {
             renderBrowserInfo = new RenderBrowserInfo(browserInfoDto.getWidth(), browserInfoDto.getHeight(),
                 BrowserType.fromName(browserInfoDto.getName()));
