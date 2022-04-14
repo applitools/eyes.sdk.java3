@@ -116,7 +116,7 @@ public class VisualGridRunner extends EyesRunner {
     protected VisualGridRunner(String baseAgentId, String version) {
         super(baseAgentId, version);
         this.testConcurrency = new TestConcurrency();
-        managerRef = commandExecutor.coreMakeManager(ManagerType.VISUAL_GRID.value, null, null);
+        managerRef = commandExecutor.coreMakeManager(ManagerType.VISUAL_GRID.value, testConcurrency.actualConcurrency, testConcurrency.isLegacy);
     }
 
     protected VisualGridRunner(int testConcurrency0, String baseAgentId, String version) {
