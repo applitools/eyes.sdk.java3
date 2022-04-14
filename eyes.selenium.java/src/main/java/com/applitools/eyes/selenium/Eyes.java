@@ -1852,7 +1852,7 @@ public class Eyes implements IEyesBase {
 
     public void closeAsync() {
 
-        if (getIsDisabled()) {
+        if (Boolean.TRUE.equals(getIsDisabled())) {
             return;
         }
 
