@@ -45,6 +45,7 @@ public class Eyes implements IEyesBase {
     }
 
     public void setConfiguration(Configuration configuration) {
+        configuration.setUseCeilForViewportSize(true);
         originEyes.setConfiguration(configuration);
     }
 
@@ -389,7 +390,7 @@ public class Eyes implements IEyesBase {
     }
 
     public void check(String name, ICheckSettings checkSettings) {
-        if (getIsDisabled()) {
+        if (Boolean.TRUE.equals(getIsDisabled())) {
             return;
         }
 

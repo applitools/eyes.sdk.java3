@@ -40,7 +40,7 @@ public class ConfigurationMapper {
     dto.setSessionType(config.getSessionType() == null ? null : config.getSessionType().name());
     dto.setProperties(CustomPropertyMapper.toCustomPropertyDtoList(config.getProperties()));
     dto.setBatch(BatchMapper.toBatchDto(config.getBatch()));
-    dto.setDefaultMatchSettings(MatchSettingsMapper.toMatchSettingsDto(config.getDefaultMatchSettings())); // TODO defaultMatchSettings?: MatchSettings<Region>
+    dto.setDefaultMatchSettings(MatchSettingsMapper.toMatchSettingsDto(config.getDefaultMatchSettings()));
     dto.setHostApp(config.getHostApp());
     dto.setHostOS(config.getHostOS());
     dto.setHostAppInfo(null);
@@ -66,7 +66,7 @@ public class ConfigurationMapper {
 
     // EyesClassicConfig<TElement, TSelector>
     dto.setWaitBeforeScreenshots(config.getWaitBeforeScreenshots());
-    dto.setStitchMode(config.getStitchMode() == null ? null : config.getStitchMode().getName()); // 'CSS' | 'Scroll'
+    dto.setStitchMode(config.getStitchMode() == null ? null : config.getStitchMode().getName());
     dto.setHideScrollbars(config.getHideScrollbars());
     dto.setHideCaret(config.getHideCaret());
     dto.setStitchOverlap(config.getStitchOverlap());
@@ -84,6 +84,7 @@ public class ConfigurationMapper {
     Object layoutBreakpoints = config.isDefaultLayoutBreakpointsSet() != null ? config.isDefaultLayoutBreakpointsSet() : config.getLayoutBreakpoints().isEmpty() ? null : config.getLayoutBreakpoints();
     dto.setLayoutBreakpoints(layoutBreakpoints);
     dto.setDisableBrowserFetching(config.isDisableBrowserFetching());
+    dto.setUseCeilForViewportSize(config.getUseCeilForViewportSize());
 
     return dto;
   }

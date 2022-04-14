@@ -60,16 +60,17 @@ public class ConfigurationDto {
   private Boolean hideCaret;
   private Integer stitchOverlap;
   private IScrollRootElement scrollRootElement; // TElement | TSelector
-  private ICut cut; // ImageCropRect | ImageCropRegion
-  private Integer rotation; // ImageRotation -270 | -180 | -90 | 0 | 90 | 180 | 270
+  private ICut cut;
+  private Integer rotation;
   private Double scaleRatio;
 
   // EyesUFGConfig
   private Integer concurrentSessions;
-  private List<IBrowsersInfo> browsersInfo; // (DesktopBrowserRenderer | ChromeEmulationDeviceRenderer | IOSDeviceRenderer)[]
-  private Map<String,Object> visualGridOptions; // Record<string, any>
-  private Object layoutBreakpoints; // boolean | number[]
+  private List<IBrowsersInfo> browsersInfo;
+  private Map<String,Object> visualGridOptions;
+  private Object layoutBreakpoints;
   private Boolean disableBrowserFetching;
+  private Boolean useCeilForViewportSize;
 
 
   public String getAppName() {
@@ -479,5 +480,13 @@ public class ConfigurationDto {
 
   public void setVisualGridOptions(Map<String, Object> visualGridOptions) {
     this.visualGridOptions = visualGridOptions;
+  }
+
+  public Boolean getUseCeilForViewportSize() {
+    return useCeilForViewportSize;
+  }
+
+  public void setUseCeilForViewportSize(Boolean useCeilForViewportSize) {
+    this.useCeilForViewportSize = useCeilForViewportSize;
   }
 }

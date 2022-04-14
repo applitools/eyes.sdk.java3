@@ -38,7 +38,8 @@ public class Configuration implements IConfiguration {
     private String hostingAppInfo;
     private String osInfo;
     // Used for automatic save of a test run.
-    private Boolean saveNewTests, saveFailedTests;
+    private Boolean saveNewTests;
+    private Boolean saveFailedTests;
     private Integer stitchOverlap;
     private Boolean isSendDom;
     private String apiKey;
@@ -81,6 +82,7 @@ public class Configuration implements IConfiguration {
     private CutProvider cutProvider;
     private Integer rotation;
     private Double scaleRatio;
+    private Boolean useCeilForViewportSize;
 
     public Configuration(Configuration other) {
         this.branchName = other.getBranchName();
@@ -138,6 +140,7 @@ public class Configuration implements IConfiguration {
         this.isDefaultLayoutBreakpointsSet = other.isDefaultLayoutBreakpointsSet();
         this.layoutBreakpoints = other.getLayoutBreakpoints();
         this.captureStatusBar = other.isCaptureStatusBar();
+        this.useCeilForViewportSize = other.getUseCeilForViewportSize();
     }
 
     public Configuration() {
@@ -959,4 +962,13 @@ public class Configuration implements IConfiguration {
         return this;
     }
 
+
+    public Configuration setUseCeilForViewportSize(Boolean useCeilForViewportSize) {
+        this.useCeilForViewportSize = useCeilForViewportSize;
+        return this;
+    }
+
+    public Boolean getUseCeilForViewportSize() {
+        return useCeilForViewportSize;
+    }
 }
