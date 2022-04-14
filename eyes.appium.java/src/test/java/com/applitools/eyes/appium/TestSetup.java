@@ -21,8 +21,8 @@ public abstract class TestSetup extends ReportingTestSuite implements ITest {
     protected AppiumDriver<MobileElement> driver;
     protected Eyes eyes;
     // To run locally use http://127.0.0.1:4723/wd/hub
-    protected String appiumServerUrl = "http://" + "applitools" + ":" +
-            "zBo67o7BsoKhdkf8Va4u" + "@hub-cloud.browserstack.com/wd/hub";
+    protected String appiumServerUrl = "http://" + GeneralUtils.getEnvString("BROWSERSTACK_USERNAME") + ":" +
+        GeneralUtils.getEnvString("BROWSERSTACK_ACCESS_KEY") + "@hub-cloud.browserstack.com/wd/hub";
 
     @Override
     public String getTestName() {
