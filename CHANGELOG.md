@@ -1,6 +1,6 @@
 ## [5.1.0] - 2022-04-14
-### Added
-- Native Mobile UFG Support
+### Fixed
+- Native Mobile Viewport setting.
 
 ## [5.0.3] - 2022-04-11
 ### Updated
