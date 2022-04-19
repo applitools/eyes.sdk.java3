@@ -2,7 +2,7 @@
   "version": "3.4",
   "services": {
     "chrome": {
-      "image": "selenium/standalone-chrome",
+      "image": "selenium/standalone-chrome:99.0",
       "environment": [
           "SE_NODE_OVERRIDE_MAX_SESSIONS=true",
           "SE_NODE_MAX_SESSIONS=15"
