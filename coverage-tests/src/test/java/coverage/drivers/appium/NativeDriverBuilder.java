@@ -14,6 +14,7 @@ public class NativeDriverBuilder extends DriverBuilder {
     {{
         put("Samsung Galaxy S8", new SamsungGalaxyS8());
         put("iPhone XS", new IPhoneXS());
+        put("Pixel 3 XL", new Pixel3XL());
     }};
 
     public NativeDriverBuilder device(String device) {
