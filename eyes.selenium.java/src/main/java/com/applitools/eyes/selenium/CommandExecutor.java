@@ -9,30 +9,8 @@ import com.applitools.eyes.EyesException;
 import com.applitools.eyes.Region;
 import com.applitools.eyes.SyncTaskListener;
 import com.applitools.eyes.locators.TextRegion;
-import com.applitools.eyes.selenium.universal.dto.CheckEyes;
-import com.applitools.eyes.selenium.universal.dto.CheckSettingsDto;
-import com.applitools.eyes.selenium.universal.dto.Command;
-import com.applitools.eyes.selenium.universal.dto.ConfigurationDto;
-import com.applitools.eyes.selenium.universal.dto.DriverDto;
-import com.applitools.eyes.selenium.universal.dto.EventDto;
-import com.applitools.eyes.selenium.universal.dto.ExtractTextDto;
-import com.applitools.eyes.selenium.universal.dto.ExtractTextRegionsDto;
-import com.applitools.eyes.selenium.universal.dto.LocateDto;
-import com.applitools.eyes.selenium.universal.dto.MakeManager;
-import com.applitools.eyes.selenium.universal.dto.MakeSdk;
-import com.applitools.eyes.selenium.universal.dto.MatchResultDto;
-import com.applitools.eyes.selenium.universal.dto.OCRExtractSettingsDto;
-import com.applitools.eyes.selenium.universal.dto.OCRSearchSettingsDto;
-import com.applitools.eyes.selenium.universal.dto.OpenEyes;
-import com.applitools.eyes.selenium.universal.dto.RectangleSizeDto;
-import com.applitools.eyes.selenium.universal.dto.RequestDto;
-import com.applitools.eyes.selenium.universal.dto.ResponseDto;
-import com.applitools.eyes.selenium.universal.dto.TestResultsSummaryDto;
-import com.applitools.eyes.selenium.universal.dto.VisualLocatorSettingsDto;
-import com.applitools.eyes.selenium.universal.dto.request.CommandCloseAllEyesRequestDto;
-import com.applitools.eyes.selenium.universal.dto.request.CommandCloseManagerRequestDto;
-import com.applitools.eyes.selenium.universal.dto.request.CommandCloseRequestDto;
-import com.applitools.eyes.selenium.universal.dto.request.CommandGetViewportSizeRequestDto;
+import com.applitools.eyes.selenium.universal.dto.*;
+import com.applitools.eyes.selenium.universal.dto.request.*;
 import com.applitools.eyes.selenium.universal.dto.response.CommandCloseResponseDto;
 import com.applitools.utils.GeneralUtils;
 import org.openqa.selenium.StaleElementReferenceException;
@@ -256,6 +234,16 @@ public class CommandExecutor {
       throw new EyesException(message);
     }
     return closeResponse.getPayload().getResult();
+  }
+
+  public void closeBatches(String batchIds, String serverUrl, String apiKey, ProxyDto proxy) {
+    CloseBatchesDto closeBatches = new CloseBatchesDto(batchIds, serverUrl, apiKey, proxy);
+    RequestDto<CommandCloseBatchesRequestDto> request = new RequestDto<>();
+    request.setName("Core.closeBatches");
+    request.setKey(UUID.randomUUID().toString());
+    request.setPayload(new CommandCloseBatchesRequestDto(closeBatches));
+    SyncTaskListener syncTaskListener = checkedCommand(request, true);
+
   }
 
 

@@ -56,7 +56,7 @@ public class ConfigurationMapper {
     dto.setSaveFailedTests(config.getSaveFailedTests());
     dto.setSaveNewTests(config.getSaveNewTests());
     dto.setSaveDiffs(config.getSaveDiffs());
-    dto.setDontCloseBatches(null);
+    dto.setDontCloseBatches(true);
 
     // EyesCheckConfig
     dto.setSendDom(config.isSendDom());
