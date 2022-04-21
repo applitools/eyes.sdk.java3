@@ -146,7 +146,16 @@ public class USDKConnection {
                     } catch (Exception e) {
                       e.printStackTrace();
                     }
-
+                  } else if (payload.contains("Core.closeBatches")) {
+                    try {
+                      ResponseDto<?> closeBatchesResponse = objectMapper.readValue(payload,
+                              new TypeReference<ResponseDto<?>>() {});
+                      SyncTaskListener<ResponseDto<?>> syncTaskLister = map.get(closeBatchesResponse.getKey());
+                      syncTaskLister.onComplete(closeBatchesResponse);
+                      map.remove(closeBatchesResponse.getKey());
+                    } catch (Exception e) {
+                      e.printStackTrace();
+                    }
                   }
                 }
 
