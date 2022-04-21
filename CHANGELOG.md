@@ -1,3 +1,7 @@
+## [vNext]
+### Fixed
+- Fixed NullPointerException when saving final stitched image.
+
 ## [3.212.1-SNAPSHOT] - 2022-03-29
 ### Updated
 - Updated flow with HelperLibrary for Android (search for helper elements also by XPath). [Trello 2633](https://trello.com/c/dQqN02TN/)

@@ -344,16 +344,18 @@ public class AppiumFullPageCaptureAlgorithm {
             positionProvider.restoreState(originalStitchedState);
             originProvider.restoreState(originalPosition);
         }
-        // If the actual image size is smaller than the extracted size, we crop the image.
-        int actualImageWidth = lastSuccessfulLocation.getX() + lastSuccessfulPartSize.getWidth();
-        int actualImageHeight = lastSuccessfulLocation.getY() + lastSuccessfulPartSize.getHeight();
+        if (lastSuccessfulLocation != null && lastSuccessfulPartSize != null) {
+            // If the actual image size is smaller than the extracted size, we crop the image.
+            int actualImageWidth = lastSuccessfulLocation.getX() + lastSuccessfulPartSize.getWidth();
+            int actualImageHeight = lastSuccessfulLocation.getY() + lastSuccessfulPartSize.getHeight();
 
-        if (actualImageWidth < stitchedImage.getWidth() || actualImageHeight < stitchedImage
-                .getHeight()) {
-            stitchedImage = ImageUtils.getImagePart(stitchedImage,
-                    new Region(0, 0,
-                            Math.min(actualImageWidth, stitchedImage.getWidth()),
-                            Math.min(actualImageHeight, stitchedImage.getHeight())));
+            if (actualImageWidth < stitchedImage.getWidth() || actualImageHeight < stitchedImage
+                    .getHeight()) {
+                stitchedImage = ImageUtils.getImagePart(stitchedImage,
+                        new Region(0, 0,
+                                Math.min(actualImageWidth, stitchedImage.getWidth()),
+                                Math.min(actualImageHeight, stitchedImage.getHeight())));
+            }
         }
 
         debugScreenshotsProvider.save(stitchedImage, "stitched");
