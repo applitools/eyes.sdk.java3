@@ -22,6 +22,7 @@ import com.applitools.eyes.selenium.universal.server.UniversalSdkNativeLoader;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.asynchttpclient.DefaultAsyncHttpClientConfig;
 import org.asynchttpclient.Dsl;
 import org.asynchttpclient.ws.WebSocket;
 import org.asynchttpclient.ws.WebSocketListener;
@@ -50,8 +51,9 @@ public class USDKConnection {
   private WebSocket openWebsocket() {
 
     try {
+
       String url = String.format("ws://localhost:%s/eyes", UniversalSdkNativeLoader.getPort());
-      return Dsl.asyncHttpClient().prepareGet(url)
+      return Dsl.asyncHttpClient(new DefaultAsyncHttpClientConfig.Builder().setWebSocketMaxFrameSize(80000)).prepareGet(url)
           .execute(new WebSocketUpgradeHandler.Builder().addWebSocketListener(
               new WebSocketListener() {
 
