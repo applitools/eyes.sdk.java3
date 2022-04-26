@@ -53,7 +53,7 @@ public class USDKConnection {
     try {
 
       String url = String.format("ws://localhost:%s/eyes", UniversalSdkNativeLoader.getPort());
-      return Dsl.asyncHttpClient(new DefaultAsyncHttpClientConfig.Builder().setWebSocketMaxFrameSize(200000)).prepareGet(url)
+      return Dsl.asyncHttpClient(new DefaultAsyncHttpClientConfig.Builder().setWebSocketMaxFrameSize(500000)).prepareGet(url)
           .execute(new WebSocketUpgradeHandler.Builder().addWebSocketListener(
               new WebSocketListener() {
 
