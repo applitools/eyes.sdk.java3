@@ -21,6 +21,7 @@ import com.applitools.utils.GeneralUtils;
 public class UniversalSdkNativeLoader {
   private static Process nativeProcess = null;
   private static String port;
+  private static final String DEFAULT_SERVER_PORT = "21077";
 
   public synchronized static void start() {
     try {
@@ -66,14 +67,17 @@ public class UniversalSdkNativeLoader {
       Path tempDirectoryPath = Paths.get(System.getProperty("java.io.tmpdir"));
       Path tempPath = Paths.get(tempDirectoryPath.toString() + File.separator + fileName);
 
-      Files.copy(inputStream, tempPath, StandardCopyOption.REPLACE_EXISTING);
-      inputStream.close();
+      try {
+        Files.copy(inputStream, tempPath, StandardCopyOption.REPLACE_EXISTING);
+        inputStream.close();
 
-      setPosixPermissionsToPath(osVersion, tempPath);
-      nativeProcess = createProcess(tempPath.toString());
-      readPortOfProcess(nativeProcess);
-      // FIXME - remove commented code (after verificaiton it's not required).
-//      assignHookToStopProcess();
+        setPosixPermissionsToPath(osVersion, tempPath);
+        nativeProcess = createProcess(tempPath.toString());
+        readPortOfProcess(nativeProcess);
+      } catch (Exception e) {
+        port = DEFAULT_SERVER_PORT;
+      }
+
     }
 
   }
