@@ -20,7 +20,7 @@ public class IPhoneXS implements DeviceBuilder {
     }
 
     public WebDriver build(boolean headless, boolean legacy, boolean executionGrid) throws MalformedURLException {
-        Capabilities caps = getIphoneXS();
+        Capabilities caps = getIphoneXS(legacy);
         MutableCapabilities appCap = new MutableCapabilities();
         appCap.setCapability("browserName", browser);
         caps = caps.merge(appCap);

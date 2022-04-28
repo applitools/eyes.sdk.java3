@@ -87,17 +87,25 @@ public class CapabilitiesHelper {
     }
 
 
-    public static Capabilities getSamsungGalaxyS8() {
+    public static Capabilities getSamsungGalaxyS8(boolean legacy) {
         DesiredCapabilities device = new DesiredCapabilities();
         device.setCapability("browserName", "");
-        device.setCapability("name", "Android Demo");
         device.setCapability("platformName", "Android");
-        device.setCapability("platformVersion", "7.0");
-        device.setCapability("appiumVersion", "1.9.1");
-        device.setCapability("deviceName", "Samsung Galaxy S8 FHD GoogleAPI Emulator");
-        device.setCapability("automationName", "uiautomator2");
-        device.setCapability("newCommandTimeout", 600);
-        return setSauceCredentials(device);
+        if(legacy) {
+            device.setCapability("platformVersion", "7.0");
+            device.setCapability("deviceName", "Samsung Galaxy S8 FHD GoogleAPI Emulator");
+            device.setCapability("automationName", "UiAutomator2");
+            device.setCapability("newCommandTimeout", 600);
+        } else {
+            device.setCapability("appium:platformVersion", "7.0");
+            device.setCapability("appium:deviceName", "Samsung Galaxy S8 FHD GoogleAPI Emulator");
+            device.setCapability("appium:automationName", "UiAutomator2");
+            device.setCapability("appium:newCommandTimeout", 600);
+        }
+        MutableCapabilities options = new MutableCapabilities();
+        options.setCapability("appiumVersion", "1.9.1");
+        options.setCapability("name", "Android Galaxy S8 (Java)");
+        return setSauceCredentials(device, legacy, options);
     }
 
     public static Capabilities getPixel3XL(boolean legacy) {
@@ -134,15 +142,21 @@ public class CapabilitiesHelper {
         return setSauceCredentials(device, legacy, options);
     }
 
-    public static Capabilities getIphoneXS() {
+    public static Capabilities getIphoneXS(boolean legacy) {
         DesiredCapabilities device = new DesiredCapabilities();
         device.setCapability("browserName", "");
-        device.setCapability("name", "iOS Native Demo");
         device.setCapability("platformName", "iOS");
-        device.setCapability("platformVersion", "13.0");
-        device.setCapability("appiumVersion", "1.17.1");
-        device.setCapability("deviceName", "iPhone XS Simulator");
-        return setSauceCredentials(device);
+        if (legacy) {
+            device.setCapability("platformVersion", "13.0");
+            device.setCapability("deviceName", "iPhone XS Simulator");
+        } else {
+            device.setCapability("appium:platformVersion", "13.0");
+            device.setCapability("appium:deviceName", "iPhone XS Simulator");
+        }
+        MutableCapabilities options = new MutableCapabilities();
+        options.setCapability("name", "iPhone XS (java))");
+        options.setCapability("appiumVersion", "1.17.1");
+        return setSauceCredentials(device, legacy, options);
     }
 
     public static ChromeOptions getAndroid8ChromeEmulator(boolean headless) {
