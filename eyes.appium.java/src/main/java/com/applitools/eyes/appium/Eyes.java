@@ -521,12 +521,6 @@ public class Eyes implements IEyesBase {
 
     public void check(ICheckSettings checkSettings) {
         CheckSettingsDto checkSettingsDto = AppiumCheckSettingsMapper.toCheckSettingsDto(checkSettings);
-        ObjectMapper obj = new ObjectMapper();
-        try {
-            System.out.println("json: " + obj.writeValueAsString(checkSettingsDto));
-        } catch (JsonProcessingException e) {
-            e.printStackTrace();
-        }
         this.checkDto(checkSettingsDto);
     }
 
