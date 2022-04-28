@@ -13,7 +13,6 @@ import com.applitools.eyes.selenium.universal.dto.Command;
 import com.applitools.eyes.selenium.universal.dto.EventDto;
 import com.applitools.eyes.selenium.universal.dto.MatchResultDto;
 import com.applitools.eyes.selenium.universal.dto.RectangleSizeDto;
-import com.applitools.eyes.selenium.universal.dto.RegionDto;
 import com.applitools.eyes.selenium.universal.dto.RequestDto;
 import com.applitools.eyes.selenium.universal.dto.ResponseDto;
 import com.applitools.eyes.selenium.universal.dto.TestResultsSummaryDto;
@@ -69,7 +68,6 @@ public class USDKConnection {
 
                 @Override
                 public void onTextFrame(String payload, boolean finalFragment, int rsv) {
-                  System.out.println("RESPONSE: " + payload);
                   if (payload.contains("Core.makeManager") || payload.contains("EyesManager.openEyes")) {
                     try {
                       ResponseDto<Reference> referenceResponseDto = objectMapper.readValue(payload, new TypeReference<ResponseDto<Reference>>() {});
@@ -175,7 +173,6 @@ public class USDKConnection {
 
     SyncTaskListener<ResponseDto<?>> syncTaskListener = new SyncTaskListener<>(logger, request.getKey());
     map.put(request.getKey(), syncTaskListener);
-    System.out.println("REQUEST: " + objectMapper.writeValueAsString(request));
     webSocket.sendTextFrame(objectMapper.writeValueAsString(request));
     return syncTaskListener;
   }
