@@ -1,4 +1,4 @@
-## [vNext]
+## [3.212.3-SNAPSHOT] - 2022-05-02
 ### Fixed
 - Initialise `ContentSize` when no scrollable element to avoid NullPointerException
 
