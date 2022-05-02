@@ -1,3 +1,7 @@
+## [vNext]
+### Fixed
+- Initialise `ContentSize` when no scrollable element to avoid NullPointerException
+
 ## [3.212.2-SNAPSHOT] - 2022-04-22
 ### Fixed
 - Fixed NullPointerException when saving final stitched image.

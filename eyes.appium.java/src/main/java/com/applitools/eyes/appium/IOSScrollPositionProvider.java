@@ -268,14 +268,8 @@ public class IOSScrollPositionProvider extends AppiumScrollPositionProvider {
             contentSize.scrollableOffset = getEntireScrollableHeight(activeScroll, contentSize);
         } catch (NoSuchElementException e) {
             GeneralUtils.logExceptionStackTrace(logger, Stage.CHECK, e);
-            contentSize = null;
-
-            /*
-             * To get more information about view hierarchy we printed page source to the logs
-             * and saving debug screenshot for current screen
-             */
-            String base64 = driver.getScreenshotAs(OutputType.BASE64);
-            BufferedImage image = ImageUtils.imageFromBase64(base64);
+            contentSize = new ContentSize();
+            contentSize.setDriver(driver);
 
             logger.log(TraceLevel.Debug, eyesDriver.getTestId(), Stage.CHECK, Pair.of("pageSource", driver.getPageSource()));
         }
