@@ -37,6 +37,7 @@ public class SelectorRegionMapper {
     } else if (by instanceof By.ByCssSelector){
       selectorRegionDto.setType("css selector");
     }
+
     return selectorRegionDto;
   }
 }
