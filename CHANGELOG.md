@@ -1,6 +1,6 @@
-## [5.1.0] - 2022-04-14
-### Fixed
-- Native Mobile Viewport setting.
+## [5.1.0] - 2022-05-04
+### Updated
+- Native Mobile updates. (Universal Core 2.3.1)
 
 ## [5.0.3] - 2022-04-11
 ### Updated
