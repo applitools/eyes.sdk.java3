@@ -108,12 +108,15 @@ jobs:
         - chmod +x ./initChromeDriver.sh && ./initChromeDriver.sh
         - export CHROME_DRIVER_PATH=/home/travis/build/chromedriver
         - cd coverage-tests;
+        - yarn
+        - yarn test:local
+      after_script:
         - if [[ $TRAVIS_TAG =~ ^RELEASE_CANDIDATE ]]; then
-          yarn release;
+          yarn report:prod
           else
-          yarn java;
+          yarn report
           fi
-#    - stage: Test Appium IOS
+    #    - stage: Test Appium IOS
 #      if: type != cron
 #      script:
 #        - echo $APPLITOOLS_REPORT_ID
