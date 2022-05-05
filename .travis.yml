@@ -111,11 +111,11 @@ jobs:
         - yarn
         - yarn test:local
       after_script:
-        - if [[ $TRAVIS_TAG =~ ^RELEASE_CANDIDATE ]]; then
+        - "if [[ $TRAVIS_TAG =~ ^RELEASE_CANDIDATE ]]; then
           yarn report:prod
           else
           yarn report
-          fi
+          fi"
     #    - stage: Test Appium IOS
 #      if: type != cron
 #      script:
