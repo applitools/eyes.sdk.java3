@@ -83,6 +83,7 @@ public class Configuration implements IConfiguration {
     private Integer rotation;
     private Double scaleRatio;
     private Boolean useCeilForViewportSize;
+    private Double waitBeforeCapture;
 
     public Configuration(Configuration other) {
         this.branchName = other.getBranchName();
@@ -141,6 +142,7 @@ public class Configuration implements IConfiguration {
         this.layoutBreakpoints = other.getLayoutBreakpoints();
         this.captureStatusBar = other.isCaptureStatusBar();
         this.useCeilForViewportSize = other.getUseCeilForViewportSize();
+        this.waitBeforeCapture = other.getWaitBeforeCapture();
     }
 
     public Configuration() {
@@ -970,5 +972,20 @@ public class Configuration implements IConfiguration {
 
     public Boolean getUseCeilForViewportSize() {
         return useCeilForViewportSize;
+    }
+
+    /**
+     * @return wait before capture
+     */
+    public Double getWaitBeforeCapture() {
+        return waitBeforeCapture;
+    }
+
+    /**
+     * @param milliSec
+     *          time to wait before each screenshot
+     */
+    public void setWaitBeforeCapture(Double milliSec) {
+        this.waitBeforeCapture = milliSec;
     }
 }

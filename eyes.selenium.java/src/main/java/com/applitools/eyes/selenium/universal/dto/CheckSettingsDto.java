@@ -24,6 +24,7 @@ public class CheckSettingsDto {
   private String renderId;
   private String variationGroupId;
   private Integer timeout;
+  private Double waitBeforeCapture;
 
   // MatchSettings
   private ExactMatchSettingsDto exact;
@@ -283,5 +284,13 @@ public class CheckSettingsDto {
 
   public void setLazyLoad(LazyLoadOptions lazyLoad) {
     this.lazyLoad = lazyLoad;
+  }
+
+  public Double getWaitBeforeCapture() {
+    return waitBeforeCapture;
+  }
+
+  public void setWaitBeforeCapture(Double waitBeforeCapture) {
+    this.waitBeforeCapture = waitBeforeCapture;
   }
 }

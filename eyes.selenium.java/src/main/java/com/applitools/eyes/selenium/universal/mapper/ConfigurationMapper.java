@@ -76,6 +76,7 @@ public class ConfigurationMapper {
         cutProvider.getFooter(), cutProvider.getLeft()));
     dto.setRotation(config.getRotation());
     dto.setScaleRatio(config.getScaleRatio());
+    dto.setWaitBeforeCapture(config.getWaitBeforeCapture());
 
     // EyesUFGConfig
     dto.setConcurrentSessions(null);

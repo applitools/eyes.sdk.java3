@@ -38,6 +38,7 @@ public class CheckSettings implements ICheckSettings, ICheckSettingsInternal {
     private BaseOcrRegion ocrRegion = null;
     private String variationGroupId = null;
     private Boolean disableBrowserFetching;
+    private Double waitBeforeCapture;
 
     protected CheckSettings() { }
 
@@ -467,6 +468,7 @@ public class CheckSettings implements ICheckSettings, ICheckSettingsInternal {
         clone.ocrRegion = this.ocrRegion;
         clone.variationGroupId = this.variationGroupId;
         clone.disableBrowserFetching = this.disableBrowserFetching;
+        clone.waitBeforeCapture = this.waitBeforeCapture;
     }
 
     public void setStitchContent(boolean stitchContent) {
@@ -597,6 +599,13 @@ public class CheckSettings implements ICheckSettings, ICheckSettingsInternal {
         return getTargetRegion() == null && getVGTargetSelector() == null;
     }
 
+    @Override
+    public ICheckSettings waitBeforeCapture(Double milliSec) {
+        CheckSettings clone = clone();
+        clone.waitBeforeCapture = milliSec;
+        return clone;
+    }
+
     public List<VisualGridOption> getVisualGridOptions() {
         return visualGridOptions;
     }
@@ -609,5 +618,9 @@ public class CheckSettings implements ICheckSettings, ICheckSettingsInternal {
         CheckSettings clone = this.clone();
         clone.disableBrowserFetching = disableBrowserFetching;
         return clone;
+    }
+
+    public Double getWaitBeforeCapture() {
+        return waitBeforeCapture;
     }
 }
