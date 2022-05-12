@@ -183,4 +183,11 @@ public interface ICheckSettings {
     ICheckSettings visualGridOptions(VisualGridOption... options);
 
     Boolean isCheckWindow();
+
+    /**
+     * waits before every screenshot capturing.
+     * @param milliSec wait time.
+     * @return An updated clone of this settings object.
+     */
+    ICheckSettings waitBeforeCapture(Double milliSec);
 }

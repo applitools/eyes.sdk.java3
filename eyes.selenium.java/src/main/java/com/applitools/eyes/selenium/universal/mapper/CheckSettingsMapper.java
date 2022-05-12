@@ -30,6 +30,7 @@ public class CheckSettingsMapper {
     checkSettingsDto.setRenderId(null);
     checkSettingsDto.setVariationGroupId(seleniumCheckSettings.getVariationGroupId());
     checkSettingsDto.setTimeout(seleniumCheckSettings.getTimeout());
+    checkSettingsDto.setWaitBeforeCapture(seleniumCheckSettings.getWaitBeforeCapture());
 
     // MatchSettings
     checkSettingsDto.setExact(null);
