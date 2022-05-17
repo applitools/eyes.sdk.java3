@@ -39,7 +39,7 @@ public class AppiumSelectorRegionMapper {
       selectorRegionDto.setType("-android viewtag");
     } else if (by instanceof MobileBy.ByWindowsAutomation) {
       selectorRegionDto.setType("-windows uiautomation");
-    } else if (by instanceof MobileBy.ByIosUIAutomation) {
+    } else if ("ByIosUIAutomation".equals(by.getClass().getSimpleName())) {
       selectorRegionDto.setType("-ios uiautomation");
     } else if (by instanceof MobileBy.ByIosNsPredicate) {
       selectorRegionDto.setType("-ios predicate string");
