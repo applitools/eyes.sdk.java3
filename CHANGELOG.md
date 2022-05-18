@@ -1,3 +1,9 @@
+## [5.2.0] - 2022-05-18
+### Updated
+- Native Mobile updates. (Universal Core 2.5.9)
+### Fixed
+- Fix iOSAutomation selector search for appium 8
+
 ## [5.1.0] - 2022-05-04
 ### Updated
 - Native Mobile updates. (Universal Core 2.3.1)
