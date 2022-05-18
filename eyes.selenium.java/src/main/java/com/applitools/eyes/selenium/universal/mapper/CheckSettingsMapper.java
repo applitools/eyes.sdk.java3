@@ -22,7 +22,9 @@ public class CheckSettingsMapper {
     // CheckSettings
     checkSettingsDto.setName(seleniumCheckSettings.getName());
     checkSettingsDto.setDisableBrowserFetching(seleniumCheckSettings.isDisableBrowserFetching());
-    checkSettingsDto.setLayoutBreakpoints(seleniumCheckSettings.getLayoutBreakpoints());
+    checkSettingsDto.setLayoutBreakpoints(seleniumCheckSettings
+            .getLayoutBreakpoints().isEmpty() ?
+            seleniumCheckSettings.isDefaultLayoutBreakpointsSet() : seleniumCheckSettings.getLayoutBreakpoints());
     checkSettingsDto.setVisualGridOptions(VisualGridOptionMapper.toVisualGridOptionDtoList(seleniumCheckSettings.getVisualGridOptions()));
     checkSettingsDto.setHooks(seleniumCheckSettings.getScriptHooks());
     checkSettingsDto.setRenderId(null);
