@@ -67,15 +67,19 @@ public class TestSetup extends GlobalSetup {
         conf.addBrowsers(browsers);
         eyes.setConfiguration(conf);
     }
+    public void setWaitBeforeCapture(int waitBeforeCapture) {
+        eyes.configure().setWaitBeforeScreenshots(waitBeforeCapture);
+    }
     public void setAccessibilitySettings(AccessibilitySettings settings) {
             ImageMatchSettings current = eyes.getDefaultMatchSettings();
             current.setAccessibilitySettings(settings);
             eyes.setDefaultMatchSettings(current);
     }
     public void setLayoutBreakpoints(int... breakpoints) {
-        Configuration conf = eyes.getConfiguration();
-        conf.setLayoutBreakpoints(breakpoints);
-        eyes.setConfiguration(conf);
+            eyes.configure().setLayoutBreakpoints(breakpoints);
+    }
+    public void setLayoutBreakpoints(boolean shouldSet) {
+        eyes.configure().setLayoutBreakpoints(shouldSet);
     }
 
     // Open
