@@ -530,7 +530,6 @@ public class Eyes implements IEyesBase {
             checkDto.setAccessible(true);
             checkDto.invoke(originEyes, checkSettingsDto);
         } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
-            e.printStackTrace();
             throw new EyesException(e.getMessage());
         }
     }
