@@ -50,7 +50,7 @@ public class SeleniumCheckSettings extends CheckSettings implements ISeleniumChe
     private VisualGridSelector selector;
     private CheckState state;
 
-    private boolean isDefaultLayoutBreakpointsSet = false;
+    private Boolean isDefaultLayoutBreakpointsSet;
     private final List<Integer> layoutBreakpoints = new ArrayList<>();
     private String pageId;
     private LazyLoadOptions lazyLoadOptions;
@@ -619,13 +619,13 @@ public class SeleniumCheckSettings extends CheckSettings implements ISeleniumChe
         return this.state;
     }
 
-    public SeleniumCheckSettings layoutBreakpoints(boolean shouldSet) {
+    public SeleniumCheckSettings layoutBreakpoints(Boolean shouldSet) {
         this.isDefaultLayoutBreakpointsSet = shouldSet;
         layoutBreakpoints.clear();
         return this;
     }
 
-    public boolean isDefaultLayoutBreakpointsSet() {
+    public Boolean isDefaultLayoutBreakpointsSet() {
         return isDefaultLayoutBreakpointsSet;
     }
 

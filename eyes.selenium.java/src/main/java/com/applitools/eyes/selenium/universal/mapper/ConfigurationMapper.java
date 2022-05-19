@@ -81,7 +81,15 @@ public class ConfigurationMapper {
     dto.setConcurrentSessions(null);
     dto.setBrowsersInfo(RenderBrowserInfoMapper.toRenderBrowserInfoDtoList(config.getBrowsersInfo()));
     dto.setVisualGridOptions(VisualGridOptionMapper.toVisualGridOptionDtoList(config.getVisualGridOptions()));
-    Object layoutBreakpoints = config.isDefaultLayoutBreakpointsSet() != null ? config.isDefaultLayoutBreakpointsSet() : config.getLayoutBreakpoints().isEmpty() ? null : config.getLayoutBreakpoints();
+    Object layoutBreakpoints = null;
+    if (config.getLayoutBreakpoints().isEmpty()) {
+      if (config.isDefaultLayoutBreakpointsSet() != null) {
+        layoutBreakpoints = config.isDefaultLayoutBreakpointsSet();
+      }
+    } else {
+      layoutBreakpoints = config.getLayoutBreakpoints();
+    }
+
     dto.setLayoutBreakpoints(layoutBreakpoints);
     dto.setDisableBrowserFetching(config.isDisableBrowserFetching());
     dto.setUseCeilForViewportSize(config.getUseCeilForViewportSize());
