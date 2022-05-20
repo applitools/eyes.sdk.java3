@@ -68,7 +68,7 @@ public class TestSetup extends GlobalSetup {
         eyes.setConfiguration(conf);
     }
     public void setWaitBeforeCapture(int waitBeforeCapture) {
-        eyes.configure().setWaitBeforeScreenshots(waitBeforeCapture);
+        eyes.configure().setWaitBeforeCapture((double) waitBeforeCapture);
     }
     public void setAccessibilitySettings(AccessibilitySettings settings) {
             ImageMatchSettings current = eyes.getDefaultMatchSettings();
