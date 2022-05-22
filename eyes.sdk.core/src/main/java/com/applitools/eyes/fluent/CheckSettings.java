@@ -38,7 +38,7 @@ public class CheckSettings implements ICheckSettings, ICheckSettingsInternal {
     private BaseOcrRegion ocrRegion = null;
     private String variationGroupId = null;
     private Boolean disableBrowserFetching;
-    private Double waitBeforeCapture;
+    private Integer waitBeforeCapture;
 
     protected CheckSettings() { }
 
@@ -600,7 +600,7 @@ public class CheckSettings implements ICheckSettings, ICheckSettingsInternal {
     }
 
     @Override
-    public ICheckSettings waitBeforeCapture(Double milliSec) {
+    public ICheckSettings waitBeforeCapture(Integer milliSec) {
         CheckSettings clone = clone();
         clone.waitBeforeCapture = milliSec;
         return clone;
@@ -620,7 +620,7 @@ public class CheckSettings implements ICheckSettings, ICheckSettingsInternal {
         return clone;
     }
 
-    public Double getWaitBeforeCapture() {
+    public Integer getWaitBeforeCapture() {
         return waitBeforeCapture;
     }
 }

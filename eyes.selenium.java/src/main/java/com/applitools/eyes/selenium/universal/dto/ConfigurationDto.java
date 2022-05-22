@@ -63,7 +63,7 @@ public class ConfigurationDto {
   private ICut cut;
   private Integer rotation;
   private Double scaleRatio;
-  private Double waitBeforeCapture;
+  private Integer waitBeforeCapture;
 
   // EyesUFGConfig
   private Integer concurrentSessions;
@@ -491,11 +491,11 @@ public class ConfigurationDto {
     this.useCeilForViewportSize = useCeilForViewportSize;
   }
 
-  public Double getWaitBeforeCapture() {
+  public Integer getWaitBeforeCapture() {
     return waitBeforeCapture;
   }
 
-  public void setWaitBeforeCapture(Double waitBeforeCapture) {
+  public void setWaitBeforeCapture(Integer waitBeforeCapture) {
     this.waitBeforeCapture = waitBeforeCapture;
   }
 }

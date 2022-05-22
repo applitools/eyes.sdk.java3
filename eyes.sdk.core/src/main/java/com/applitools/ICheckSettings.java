@@ -189,5 +189,5 @@ public interface ICheckSettings {
      * @param milliSec wait time.
      * @return An updated clone of this settings object.
      */
-    ICheckSettings waitBeforeCapture(Double milliSec);
+    ICheckSettings waitBeforeCapture(Integer milliSec);
 }
