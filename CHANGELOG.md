@@ -1,3 +1,9 @@
+## [5.3.0] - 2022-05-18
+### Added
+- Support for waitBeforeCapture. [Trello dev/20](https://trello.com/c/qn2vPtpS)
+### Updated
+- Updated server core to 2.5.19
+
 ## [5.2.0] - 2022-05-18
 ### Updated
 - Native Mobile updates. (Universal Core 2.5.9)
