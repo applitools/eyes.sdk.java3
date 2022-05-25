@@ -6,7 +6,7 @@ module.exports = {
     "https://raw.githubusercontent.com/applitools/sdk.coverage.tests/universal-sdk/java/overrides.js"
   ],
   template: "https://raw.githubusercontent.com/applitools/sdk.coverage.tests/universal-sdk/java/template.hbs",
-  tests: "https://raw.githubusercontent.com/applitools/sdk.coverage.tests/qa/Android_emulator_add_updateData-sdk/coverage-tests.js",
+  tests: "https://raw.githubusercontent.com/applitools/sdk.coverage.tests/qa/Android_emulator_add_updateData/coverage-tests.js",
   ext: ".java",
   outPath: "./src/test/java/coverage/generic",
 };
