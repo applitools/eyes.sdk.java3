@@ -26,9 +26,12 @@
     "report:prod": "yarn move:report && coverage-tests report ./configuration --reportId $APPLITOOLS_REPORT_ID",
     "move:report": "mv ./target/surefire-reports/java_coverage_tests/coverage-test-report.xml ./coverage-test-report.xml",
     "docker:start": "docker-compose up -d",
-    "docker:stop": "docker-compose down"
+    "docker:stop": "docker-compose down",
+    "universal:eg": "eyes-universal eg-client --port 8080"
+
   },
   "dependencies": {
-    "@applitools/sdk-coverage-tests": "^2.3.18"
+    "@applitools/sdk-coverage-tests": "^2.3.18",
+    "@applitools/eyes-universal": "^2.5.19"
   }
 }
