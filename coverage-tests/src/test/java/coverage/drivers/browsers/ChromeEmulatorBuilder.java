@@ -17,7 +17,7 @@ public class ChromeEmulatorBuilder implements DeviceBuilder {
     public void browser(String browser) {}
 
     public WebDriver build(boolean headless, boolean legacy, boolean executionGrid) throws MalformedURLException {
-        ChromeOptions options = CapabilitiesHelper.getAndroid8ChromeEmulator(headless);
+        ChromeOptions options = CapabilitiesHelper.getAndroid8ChromeEmulator(false);
         if (GlobalSetup.CI) {
             options.addArguments("--no-sandbox", "--disable-gpu");
         }
