@@ -36,11 +36,11 @@ public class ProxyDto {
     this.password = password;
   }
 
-  public Boolean getHttpOnly() {
+  public Boolean getIsHttpOnly() {
     return isHttpOnly;
   }
 
-  public void setHttpOnly(Boolean httpOnly) {
-    isHttpOnly = httpOnly;
+  public void setIsHttpOnly(Boolean isHttpOnly) {
+    this.isHttpOnly = isHttpOnly;
   }
 }
