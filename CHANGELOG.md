@@ -1,3 +1,8 @@
+## [5.4.0] - 2022-06-3
+### Updated
+- Updated server core to 2.6.1
+- Proxy isHttpOnly true by defualt (internal). [Trello 2924](https://trello.com/c/8V90y6hL)
+
 ## [5.3.0] - 2022-05-18
 ### Added
 - Support for waitBeforeCapture. [Trello dev/20](https://trello.com/c/qn2vPtpS)
