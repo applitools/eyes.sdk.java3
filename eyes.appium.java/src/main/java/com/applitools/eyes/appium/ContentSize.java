@@ -15,6 +15,8 @@ public class ContentSize {
     public int left;
     public int scrollableOffset;
     public int touchPadding;
+    @JsonIgnore
+    private boolean isEmpty = false;
 
     public String toString() {
         return String.format("{height=%s, width=%s, top=%s, left=%s, scrollableOffset=%s, touchPadding=%s}",
@@ -58,5 +60,16 @@ public class ContentSize {
 
     public int getTouchPadding() {
         return touchPadding;
+    }
+
+    public boolean isEmpty() {
+        return isEmpty;
+    }
+
+    public static ContentSize empty(AppiumDriver driver) {
+        ContentSize contentSize = new ContentSize();
+        contentSize.isEmpty = true;
+        contentSize.driver = driver;
+        return contentSize;
     }
 }

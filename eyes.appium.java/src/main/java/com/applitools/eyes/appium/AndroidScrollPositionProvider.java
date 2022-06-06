@@ -75,8 +75,12 @@ public class AndroidScrollPositionProvider extends AppiumScrollPositionProvider 
     private void checkCurrentScrollPosition() {
         if (curScrollPos == null) {
             ContentSize contentSize = getCachedContentSize();
-            LastScrollData scrollData = EyesAppiumUtils.getLastScrollData(driver);
-            curScrollPos = getScrollPosFromScrollData(contentSize, scrollData, 0, false);
+            if (contentSize.isEmpty()) {
+                curScrollPos = new Location(0, 0);
+            } else {
+                LastScrollData scrollData = EyesAppiumUtils.getLastScrollData(driver);
+                curScrollPos = getScrollPosFromScrollData(contentSize, scrollData, 0, false);
+            }
         }
     }
 
@@ -436,6 +440,7 @@ public class AndroidScrollPositionProvider extends AppiumScrollPositionProvider 
             return entireSize;
         }
         int windowHeight = driver.manage().window().getSize().getHeight() - getStatusBarHeight();
+//        int windowHeight = driver.manage().window().getSize().getHeight();
         ContentSize contentSize = getCachedContentSize();
         if (contentSize == null) {
             return eyesDriver.getDefaultContentViewportSize();
