@@ -82,8 +82,20 @@ public abstract class AppiumScrollPositionProvider implements ScrollPositionProv
             logger.log(TraceLevel.Debug, eyesDriver.getTestId(), Stage.CHECK, Pair.of("contentSize", contentSize));
         } catch (NoSuchElementException e) {
             GeneralUtils.logExceptionStackTrace(logger, Stage.CHECK, e);
-            contentSize = new ContentSize();
-            contentSize.setDriver(driver);
+            contentSize = ContentSize.empty(driver);
+        }
+
+        return contentSize;
+    }
+
+    protected ContentSize getCachedContentSize(boolean forced) {
+        try {
+            WebElement activeScroll = getFirstScrollableView();
+            contentSize = EyesAppiumUtils.getContentSize(driver, activeScroll);
+            logger.log(TraceLevel.Debug, eyesDriver.getTestId(), Stage.CHECK, Pair.of("contentSize", contentSize));
+        } catch (NoSuchElementException e) {
+            GeneralUtils.logExceptionStackTrace(logger, Stage.CHECK, e);
+            contentSize = ContentSize.empty(driver);
         }
 
         return contentSize;
