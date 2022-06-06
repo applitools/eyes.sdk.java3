@@ -23,7 +23,7 @@ public class UniversalSdkNativeLoader {
   private static String port;
   private static final String DEFAULT_SERVER_PORT = "21077";
 
-  private static final String USER_DEFINED_PATH = GeneralUtils.getEnvString("APPLITOOLS_UNIVERSAL_PATH");
+  private static final String BINARY_SERVER_PATH = GeneralUtils.getEnvString("APPLITOOLS_UNIVERSAL_PATH");
 
   public synchronized static void start() {
     try {
@@ -69,8 +69,8 @@ public class UniversalSdkNativeLoader {
       Path directoryPath;
 
       // first check with user defined
-      if (USER_DEFINED_PATH != null) {
-        directoryPath = Paths.get(USER_DEFINED_PATH);
+      if (BINARY_SERVER_PATH != null) {
+        directoryPath = Paths.get(BINARY_SERVER_PATH);
       } else {
         directoryPath = Paths.get(System.getProperty("java.io.tmpdir"));
       }
