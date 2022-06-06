@@ -23,6 +23,8 @@ public class UniversalSdkNativeLoader {
   private static String port;
   private static final String DEFAULT_SERVER_PORT = "21077";
 
+  private static final String USER_DEFINED_PATH = GeneralUtils.getEnvString("APPLITOOLS_UNIVERSAL_PATH");
+
   public synchronized static void start() {
     try {
       startProcess();
@@ -43,7 +45,7 @@ public class UniversalSdkNativeLoader {
     }
   }
 
-  private static void startProcess() throws Exception {
+  private static void startProcess() {
     if (nativeProcess == null || !nativeProcess.isAlive()) {
       String osVersion = GeneralUtils.getPropertyString("os.name").toLowerCase();
       String os;
@@ -64,15 +66,23 @@ public class UniversalSdkNativeLoader {
       InputStream inputStream = getFileFromResourceAsStream(pathInJar);
       String fileName = "eyes-universal-" + suffix;
 
-      Path tempDirectoryPath = Paths.get(System.getProperty("java.io.tmpdir"));
-      Path tempPath = Paths.get(tempDirectoryPath.toString() + File.separator + fileName);
+      Path directoryPath;
+
+      // first check with user defined
+      if (USER_DEFINED_PATH != null) {
+        directoryPath = Paths.get(USER_DEFINED_PATH);
+      } else {
+        directoryPath = Paths.get(System.getProperty("java.io.tmpdir"));
+      }
+
+      Path path = Paths.get(directoryPath + File.separator + fileName);
 
       try {
-        Files.copy(inputStream, tempPath, StandardCopyOption.REPLACE_EXISTING);
+        Files.copy(inputStream, path, StandardCopyOption.REPLACE_EXISTING);
         inputStream.close();
 
-        setPosixPermissionsToPath(osVersion, tempPath);
-        nativeProcess = createProcess(tempPath.toString());
+        setPosixPermissionsToPath(osVersion, path);
+        nativeProcess = createProcess(path.toString());
         readPortOfProcess(nativeProcess);
       } catch (Exception e) {
         port = DEFAULT_SERVER_PORT;
@@ -82,7 +92,7 @@ public class UniversalSdkNativeLoader {
 
   }
 
-  // get a input stream from the resources folder
+  // get an input stream from the resources folder
   private static InputStream getFileFromResourceAsStream(String fileName) {
 
     // The class loader that loaded the class
