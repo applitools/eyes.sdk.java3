@@ -16,12 +16,10 @@ import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableMap;
 import io.appium.java_client.AppiumBy;
 import io.appium.java_client.AppiumDriver;
-import io.appium.java_client.MobileBy;
 import io.appium.java_client.NoSuchContextException;
 import io.appium.java_client.android.AndroidDriver;
 import org.apache.commons.lang3.tuple.Pair;
 import org.openqa.selenium.*;
-import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.remote.RemoteWebElement;
 import org.openqa.selenium.remote.Response;
@@ -265,18 +263,19 @@ public class EyesAppiumUtils {
         systemBarHeights.put(NAVIGATION_BAR, null);
 
         try {
-            fillSystemBarsHeightsMap(driver, systemBarHeights);
+            if (EyesDriverUtils.isAndroid(driver)) {
+                fillSystemBarsHeightsMap((AndroidDriver) driver.getRemoteWebDriver(), systemBarHeights);
+            } else {
+                fillSystemBarsHeightsMap(driver, systemBarHeights);
+            }
         } catch (Exception ignored) {
-            int statusBarHeight = driver.getStatusBarHeight();
-            int navigationBarHeight = driver.getDeviceHeight() - driver.getViewportHeight() - statusBarHeight;
-            systemBarHeights.put(STATUS_BAR, statusBarHeight);
-            systemBarHeights.put(NAVIGATION_BAR, navigationBarHeight);
+            fillSystemBarsHeightsMap(driver, systemBarHeights);
         }
 
         return systemBarHeights;
     }
 
-    private static Integer getSystemBar(String systemBarName, Map<String, String> systemBars) {
+    private static Integer getSystemBar(String systemBarName, Map<String, Map<String, Object>> systemBars) {
         if (systemBars.containsKey(systemBarName)) {
             String value = String.valueOf(systemBars.get(systemBarName));
             if (getSystemBarVisibility(value)) {
@@ -306,6 +305,13 @@ public class EyesAppiumUtils {
         int navigationBarHeight = driver.getDeviceHeight() - driver.getViewportRect().get("height") - statusBarHeight;
         systemBarHeights.put(STATUS_BAR, statusBarHeight);
         systemBarHeights.put(NAVIGATION_BAR, navigationBarHeight);
+    }
+
+    private static void fillSystemBarsHeightsMap(AndroidDriver driver, Map<String, Integer> systemBarHeights) {
+        Map<String, Map<String, Object>> systemBars = driver.getSystemBars();
+        for (String systemBarName : systemBars.keySet()) {
+            systemBarHeights.put(systemBarName, getSystemBar(systemBarName, systemBars));
+        }
     }
 
     public static String getHelperLibraryVersion(EyesAppiumDriver driver, Logger logger) {
