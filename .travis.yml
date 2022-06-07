@@ -118,7 +118,12 @@ jobs:
         - choco install -y --force nodejs-lts
         - choco install googlechrome --x86 --ignore-checksums
         - choco install chromedriver
+        - choco install maven
         - mvn install -DskipTests
+        - cd coverage-tests
+        - npm install
+        - "npm run generate:platform"
+        - mvn test -DsuiteFile=platfromSuite.xml
     #    - stage: Test Appium IOS
 #      if: type != cron
 #      script:
