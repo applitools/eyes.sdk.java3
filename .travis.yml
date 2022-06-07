@@ -113,7 +113,6 @@ jobs:
 #        - chmod +x ./generic_tests.sh && ./generic_tests.sh
     - name: Windows
       os: windows
-      jdk: oraclejdk8
       before_script: skip
       script:
         - choco install -y --force nodejs-lts
