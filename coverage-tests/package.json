@@ -19,6 +19,7 @@
     "local": "yarn install --no-lockfile && yarn docker:start && yarn test && yarn report; yarn docker:stop",
     "generate": "coverage-tests generate ./configuration --pascalizeTests --strict",
     "generate:eg": "coverage-tests generate ./configuration/eg_configuration.js --pascalizeTests --strict",
+    "generate:platform": "coverage-tests generate ./configuration/platform_test.js --pascalizeTests --strict",
     "generate:local": "coverage-tests generate ./configuration/local.js --pascalizeTests --strict",
     "test": "yarn generate:eg && mvn test -DsuiteFile=EGSuite.xml",
     "test:local": "yarn generate && mvn test",

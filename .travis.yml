@@ -109,6 +109,16 @@ jobs:
         - export CHROME_DRIVER_PATH=/home/travis/build/chromedriver
         - cd coverage-tests;
         - chmod +x ./generic_tests.sh && ./generic_tests.sh
+    - name: Windows
+      os: windows
+      language: sh
+      jdk: oraclejdk8
+      before_script: skip
+      script:
+        - choco install -y --force nodejs-lts
+        - choco install googlechrome --x86 --ignore-checksums
+        - choco install chromedriver
+        - mvn install -DskipTests
     #    - stage: Test Appium IOS
 #      if: type != cron
 #      script:
