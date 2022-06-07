@@ -113,9 +113,10 @@ jobs:
 #        - chmod +x ./generic_tests.sh && ./generic_tests.sh
     - name: Windows
       os: windows
+      language: node_js
+      node_js: latest
       before_script: skip
       script:
-        - choco install -y --force nodejs-lts
         - choco install googlechrome --x86 --ignore-checksums
         - choco install chromedriver
         - choco install javaruntime
