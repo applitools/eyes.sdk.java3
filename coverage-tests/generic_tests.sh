@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 RESULT=0
 MESSAGE=""
 yarn install
