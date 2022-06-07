@@ -118,7 +118,9 @@ jobs:
         - choco install -y --force nodejs-lts
         - choco install googlechrome --x86 --ignore-checksums
         - choco install chromedriver
+        - choco install javaruntime
         - choco install maven
+        - refreshenv
         - mvn install -DskipTests
         - cd coverage-tests
         - npm install
