@@ -113,7 +113,6 @@ jobs:
 #        - chmod +x ./generic_tests.sh && ./generic_tests.sh
     - name: Windows
       os: windows
-      language: sh
       jdk: oraclejdk8
       before_script: skip
       script:
@@ -121,8 +120,9 @@ jobs:
         - choco install googlechrome --x86 --ignore-checksums
         - choco install chromedriver
         - choco install javaruntime
+        - refreshenv
         - choco install maven
-        - bash
+        - refreshenv
         - mvn install -DskipTests
         - cd coverage-tests
         - npm install
