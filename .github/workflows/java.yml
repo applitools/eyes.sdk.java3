@@ -1,0 +1,41 @@
+name: Java
+
+on:
+  workflow_dispatch:
+  push:
+
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    needs: dist-build
+    runs-on: windows-latest
+#    env:
+#      APPLITOOLS_API_KEY: ${{ secrets.APPLITOOLS_API_KEY }}
+
+    steps:
+      - uses: actions/checkout@v3
+      - name: Install node
+        uses: actions/setup-node@v3
+        with:
+          node-version: 16
+      - name: Set up Java
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'temurin'
+          java-version: '8'
+          cache: 'maven'
+      - name: Build sdk
+        run: |
+          mvn clean install -DskipTests
+      - name: Generate tests
+        working-directory: ./coverage_tests
+        run: |
+          npm install
+          npm run generate:platform
+      - name: Run tests
+        working-directory: ./coverage_tests
+        run: |
+          mvn test -DsuiteFile=platfromSuite.xml
