@@ -10,7 +10,6 @@ permissions:
 
 jobs:
   test:
-    needs: dist-build
     runs-on: windows-latest
 #    env:
 #      APPLITOOLS_API_KEY: ${{ secrets.APPLITOOLS_API_KEY }}
