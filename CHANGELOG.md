@@ -1,3 +1,10 @@
+## [5.5.0] - 2022-06-9
+### Updated
+- Updated server core to 2.7.1
+### Fixed
+- Handling self-signed certs. [Trello 2930](https://trello.com/c/6PT2JoRM/)
+- Allowing null property value. [Trello 2917](https://trello.com/c/owZVpsey/)
+
 ## [5.4.0] - 2022-06-3
 ### Updated
 - Updated server core to 2.6.1
