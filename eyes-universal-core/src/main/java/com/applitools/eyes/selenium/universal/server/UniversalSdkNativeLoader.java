@@ -16,7 +16,7 @@ import com.applitools.eyes.EyesException;
 import com.applitools.utils.GeneralUtils;
 
 /**
- * @author Kanan
+ * Universal Sdk Native Loader.
  */
 public class UniversalSdkNativeLoader {
   private static Process nativeProcess = null;
@@ -24,6 +24,7 @@ public class UniversalSdkNativeLoader {
   private static final String DEFAULT_SERVER_PORT = "21077";
 
   private static final String BINARY_SERVER_PATH = GeneralUtils.getEnvString("APPLITOOLS_UNIVERSAL_PATH");
+  private static final String TEMP_FOLDER_PATH = GeneralUtils.getPropertyString("java.io.tmpdir");
 
   public synchronized static void start() {
     try {
@@ -72,7 +73,7 @@ public class UniversalSdkNativeLoader {
       if (BINARY_SERVER_PATH != null) {
         directoryPath = Paths.get(BINARY_SERVER_PATH);
       } else {
-        directoryPath = Paths.get(System.getProperty("java.io.tmpdir"));
+        directoryPath = Paths.get(TEMP_FOLDER_PATH);
       }
 
       Path path = Paths.get(directoryPath + File.separator + fileName);
