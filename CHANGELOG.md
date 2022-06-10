@@ -1,3 +1,11 @@
+## [5.6.0] - 2022-06-10
+### Updated
+- Updated server core to 2.7.1
+### Added
+- Setting universal path using ENV variable. [Trello 2892](https://trello.com/c/0Pslnto9/)
+### Fixed
+- Proxy related issue. [Trello 2930](https://trello.com/c/6PT2JoRM/)
+
 ## [5.5.0] - 2022-06-9
 ### Updated
 - Updated server core to 2.7.1
