@@ -9,12 +9,16 @@ import com.applitools.eyes.debug.DebugScreenshotsProvider;
 import com.applitools.eyes.selenium.capture.EyesWebDriverScreenshot;
 import com.applitools.eyes.selenium.capture.TakesScreenshotImageProvider;
 import com.applitools.eyes.selenium.fluent.Target;
+import com.applitools.eyes.selenium.universal.server.UniversalSdkNativeLoader;
 import com.applitools.eyes.selenium.wrappers.EyesRemoteWebElement;
 import com.applitools.eyes.selenium.wrappers.EyesSeleniumDriver;
 import com.applitools.eyes.utils.ReportingTestSuite;
 import com.applitools.eyes.utils.SeleniumUtils;
 import com.applitools.eyes.visualgrid.model.RenderingInfo;
+import com.applitools.utils.GeneralUtils;
 import org.mockito.ArgumentMatchers;
+import org.mockito.MockedStatic;
+import org.mockito.Mockito;
 import org.openqa.selenium.*;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.remote.RemoteWebElement;
@@ -23,10 +27,12 @@ import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
 import java.awt.image.BufferedImage;
+import java.net.URI;
 import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.*;
 
 public class TestSeleniumEyes extends ReportingTestSuite {
@@ -251,6 +257,20 @@ public class TestSeleniumEyes extends ReportingTestSuite {
             Assert.assertEquals(screenshot.getFrameWindow(), new Region(0, 0, 800, 800));
         } finally {
             driver.quit();
+        }
+    }
+
+    @Test
+    public void testUniversalServerPath() {
+        try (MockedStatic<GeneralUtils> utilities = Mockito.mockStatic(GeneralUtils.class)) {
+            utilities.when(() -> GeneralUtils.getEnvString("APPLITOOLS_UNIVERSAL_PATH"))
+                    .thenReturn("path");
+            utilities.when(() -> GeneralUtils.getPropertyString("os.name")).thenReturn("macos");
+            utilities.when(GeneralUtils::getServerUrl).thenReturn(URI.create("http://locahost:8080"));
+            Eyes eyes = new Eyes();
+            eyes.open(new ChromeDriver(), "app name", "test name");
+            assertEquals("21077", UniversalSdkNativeLoader.getPort());
+            assertEquals("path", GeneralUtils.getEnvString("APPLITOOLS_UNIVERSAL_PATH"));
         }
     }
 }
