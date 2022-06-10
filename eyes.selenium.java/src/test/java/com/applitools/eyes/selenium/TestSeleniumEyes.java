@@ -262,7 +262,7 @@ public class TestSeleniumEyes extends ReportingTestSuite {
 
     @Test
     public void testUniversalServerPath() {
-        try (MockedStatic<GeneralUtils> utilities = Mockito.mockStatic(GeneralUtils.class)) {
+        try (MockedStatic<GeneralUtils> utilities = mockStatic(GeneralUtils.class)) {
             utilities.when(() -> GeneralUtils.getEnvString("APPLITOOLS_UNIVERSAL_PATH"))
                     .thenReturn("path");
             utilities.when(() -> GeneralUtils.getPropertyString("os.name")).thenReturn("macos");
