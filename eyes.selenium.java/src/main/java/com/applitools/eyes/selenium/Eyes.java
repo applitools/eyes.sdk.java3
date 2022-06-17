@@ -111,7 +111,10 @@ public class Eyes implements IEyesBase {
             return driver;
         }
 
-        DriverDto driverDto = DriverMapper.toDriverDto(driver, configuration.getWebDriverProxy().getProxyUrl());
+        WebDriverProxySettings wdProxy = configuration.getWebDriverProxy();
+        String wdProxyUrl = wdProxy != null? wdProxy.getProxyUrl() : null;
+
+        DriverDto driverDto = DriverMapper.toDriverDto(driver, wdProxyUrl);
         configurationProvider.get().setAppName(appName).setTestName(testName);
 
         if (viewportSize != null && !viewportSize.isEmpty()) {
