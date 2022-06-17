@@ -3,6 +3,7 @@ package com.applitools.eyes.selenium.universal.mapper;
 import java.lang.reflect.Field;
 
 import com.applitools.eyes.EyesException;
+import com.applitools.eyes.WebdriverProxy;
 import com.applitools.eyes.selenium.universal.dto.DriverDto;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.remote.HttpCommandExecutor;
@@ -18,7 +19,7 @@ public class DriverMapper {
   private static final String ARG$1 = "arg$1";
   private static final String REMOTE_HOST = "remoteHost";
 
-  public static DriverDto toDriverDto(WebDriver driver) {
+  public static DriverDto toDriverDto(WebDriver driver, WebdriverProxy webdriverProxy) {
     if (driver == null) {
       return null;
     }
@@ -30,8 +31,11 @@ public class DriverMapper {
     driverDto.setServerUrl(getRemoteServerUrl(remoteDriver));
     driverDto.setCapabilities(remoteDriver.getCapabilities().asMap());
 
-    return driverDto;
+    if (webdriverProxy != null) {
+      driverDto.setProxy(WebdriverProxyMapper.toWebdriverProxyDto(webdriverProxy));
+    }
 
+    return driverDto;
   }
 
   private static String getRemoteServerUrl(RemoteWebDriver webDriver) {

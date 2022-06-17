@@ -32,7 +32,7 @@ public class DriverMapperTests {
         WebDriver driver = new RemoteWebDriver(new URL(url), capabilities);
 
         // when
-        DriverDto driverDto = DriverMapper.toDriverDto(driver);
+        DriverDto driverDto = DriverMapper.toDriverDto(driver, null);
 
         // then
         assertNotNull(driverDto);

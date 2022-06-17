@@ -13,22 +13,9 @@ import com.applitools.eyes.selenium.fluent.SeleniumCheckSettings;
 import com.applitools.eyes.selenium.fluent.Target;
 import com.applitools.eyes.selenium.frames.FrameChain;
 import com.applitools.eyes.selenium.positioning.ImageRotation;
-import com.applitools.eyes.selenium.universal.dto.CheckSettingsDto;
-import com.applitools.eyes.selenium.universal.dto.ConfigurationDto;
-import com.applitools.eyes.selenium.universal.dto.DriverDto;
-import com.applitools.eyes.selenium.universal.dto.OCRExtractSettingsDto;
-import com.applitools.eyes.selenium.universal.dto.OCRSearchSettingsDto;
-import com.applitools.eyes.selenium.universal.dto.RectangleSizeDto;
-import com.applitools.eyes.selenium.universal.dto.VisualLocatorSettingsDto;
+import com.applitools.eyes.selenium.universal.dto.*;
 import com.applitools.eyes.selenium.universal.dto.response.CommandCloseResponseDto;
-import com.applitools.eyes.selenium.universal.mapper.CheckSettingsMapper;
-import com.applitools.eyes.selenium.universal.mapper.ConfigurationMapper;
-import com.applitools.eyes.selenium.universal.mapper.DriverMapper;
-import com.applitools.eyes.selenium.universal.mapper.OCRExtractSettingsDtoMapper;
-import com.applitools.eyes.selenium.universal.mapper.OCRSearchSettingsMapper;
-import com.applitools.eyes.selenium.universal.mapper.RectangleSizeMapper;
-import com.applitools.eyes.selenium.universal.mapper.TestResultsMapper;
-import com.applitools.eyes.selenium.universal.mapper.VisualLocatorSettingsMapper;
+import com.applitools.eyes.selenium.universal.mapper.*;
 import com.applitools.eyes.selenium.wrappers.EyesSeleniumDriver;
 import com.applitools.eyes.triggers.MouseAction;
 import com.applitools.eyes.visualgrid.model.IDebugResourceWriter;
@@ -124,7 +111,8 @@ public class Eyes implements IEyesBase {
         if (getIsDisabled()) {
             return driver;
         }
-        DriverDto driverDto = DriverMapper.toDriverDto(driver);
+
+        DriverDto driverDto = DriverMapper.toDriverDto(driver, configuration.getWebdriverProxy());
         configurationProvider.get().setAppName(appName).setTestName(testName);
 
         if (viewportSize != null && !viewportSize.isEmpty()) {
@@ -1178,7 +1166,7 @@ public class Eyes implements IEyesBase {
      * @return The viewport size of the current context.
      */
     public static RectangleSize getViewportSize(WebDriver driver) {
-        DriverDto driverDto = DriverMapper.toDriverDto(driver);
+        DriverDto driverDto = DriverMapper.toDriverDto(driver, null);
         RectangleSizeDto rectangleSizeDto = CommandExecutor.getViewportSize(driverDto);
         return RectangleSizeMapper.toRectangleSize(rectangleSizeDto);
     }

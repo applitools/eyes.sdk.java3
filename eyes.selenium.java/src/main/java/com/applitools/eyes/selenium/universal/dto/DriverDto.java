@@ -12,6 +12,7 @@ public class DriverDto {
   private String sessionId;
   private String serverUrl;
   private Map<String, Object> capabilities;
+  private WebdriverProxyDto proxy;
 
   public String getSessionId() {
     return sessionId;
@@ -37,4 +38,11 @@ public class DriverDto {
     this.capabilities = capabilities;
   }
 
+  public WebdriverProxyDto getProxy() {
+    return proxy;
+  }
+
+  public void setProxy(WebdriverProxyDto proxy) {
+    this.proxy = proxy;
+  }
 }
