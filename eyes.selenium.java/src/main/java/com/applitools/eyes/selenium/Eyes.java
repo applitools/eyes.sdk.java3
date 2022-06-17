@@ -16,7 +16,6 @@ import com.applitools.eyes.selenium.positioning.ImageRotation;
 import com.applitools.eyes.selenium.universal.dto.*;
 import com.applitools.eyes.selenium.universal.dto.response.CommandCloseResponseDto;
 import com.applitools.eyes.selenium.universal.mapper.*;
-import com.applitools.eyes.selenium.wrappers.EyesSeleniumDriver;
 import com.applitools.eyes.triggers.MouseAction;
 import com.applitools.eyes.visualgrid.model.IDebugResourceWriter;
 import com.applitools.eyes.visualgrid.model.RenderingInfo;
@@ -112,7 +111,7 @@ public class Eyes implements IEyesBase {
             return driver;
         }
 
-        DriverDto driverDto = DriverMapper.toDriverDto(driver, configuration.getProxyUrl());
+        DriverDto driverDto = DriverMapper.toDriverDto(driver, configuration.getWebDriverProxy().getProxyUrl());
         configurationProvider.get().setAppName(appName).setTestName(testName);
 
         if (viewportSize != null && !viewportSize.isEmpty()) {

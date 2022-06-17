@@ -3,7 +3,6 @@ package com.applitools.eyes.selenium.universal.mapper;
 import java.lang.reflect.Field;
 
 import com.applitools.eyes.EyesException;
-import com.applitools.eyes.WebdriverProxy;
 import com.applitools.eyes.selenium.universal.dto.DriverDto;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.remote.HttpCommandExecutor;

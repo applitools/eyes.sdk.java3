@@ -68,9 +68,9 @@ public class Configuration implements IConfiguration {
 
     private List<RenderBrowserInfo> browsersInfo = new ArrayList<>();;
 
-    private Set<Feature> features = new HashSet<>();;
+    private Set<Feature> features = new HashSet<>();
 
-    private List<VisualGridOption> visualGridOptions = new ArrayList<>();;
+    private List<VisualGridOption> visualGridOptions = new ArrayList<>();
 
     private Boolean isDefaultLayoutBreakpointsSet;
     private List<Integer> layoutBreakpoints =  new ArrayList<>();
@@ -84,7 +84,7 @@ public class Configuration implements IConfiguration {
     private Double scaleRatio;
     private Boolean useCeilForViewportSize;
     private Integer waitBeforeCapture;
-    private String proxyUrl;
+    private WebDriverProxySettings webdriverProxySettings;
 
     public Configuration(Configuration other) {
         this.branchName = other.getBranchName();
@@ -144,7 +144,7 @@ public class Configuration implements IConfiguration {
         this.captureStatusBar = other.isCaptureStatusBar();
         this.useCeilForViewportSize = other.getUseCeilForViewportSize();
         this.waitBeforeCapture = other.getWaitBeforeCapture();
-        this.proxyUrl = other.getProxyUrl();
+        this.webdriverProxySettings = new WebDriverProxySettings(other.getWebDriverProxy().getProxyUrl());
     }
 
     public Configuration() {
@@ -991,12 +991,12 @@ public class Configuration implements IConfiguration {
         this.waitBeforeCapture = milliSec;
     }
 
-    public String getProxyUrl() {
-        return proxyUrl;
+    public WebDriverProxySettings getWebDriverProxy() {
+        return webdriverProxySettings;
     }
 
-    public Configuration setProxyUrl(String proxyUrl) {
-        this.proxyUrl = proxyUrl;
+    public Configuration setWebDriverProxy(WebDriverProxySettings proxySettings) {
+        this.webdriverProxySettings = proxySettings;
         return this;
     }
 }
