@@ -144,7 +144,9 @@ public class Configuration implements IConfiguration {
         this.captureStatusBar = other.isCaptureStatusBar();
         this.useCeilForViewportSize = other.getUseCeilForViewportSize();
         this.waitBeforeCapture = other.getWaitBeforeCapture();
-        this.webdriverProxySettings = new WebDriverProxySettings(other.getWebDriverProxy().getProxyUrl());
+        WebDriverProxySettings wdProxySettings = other.getWebDriverProxy();
+        String wdProxyUrl = wdProxySettings != null ? wdProxySettings.getProxyUrl() : null;
+        this.webdriverProxySettings = new WebDriverProxySettings(wdProxyUrl);
     }
 
     public Configuration() {
