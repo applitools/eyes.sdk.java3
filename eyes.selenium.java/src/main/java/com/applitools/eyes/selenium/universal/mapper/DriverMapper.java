@@ -19,7 +19,7 @@ public class DriverMapper {
   private static final String ARG$1 = "arg$1";
   private static final String REMOTE_HOST = "remoteHost";
 
-  public static DriverDto toDriverDto(WebDriver driver, WebdriverProxy webdriverProxy) {
+  public static DriverDto toDriverDto(WebDriver driver, String proxyUrl) {
     if (driver == null) {
       return null;
     }
@@ -30,10 +30,7 @@ public class DriverMapper {
     driverDto.setSessionId(remoteDriver.getSessionId().toString());
     driverDto.setServerUrl(getRemoteServerUrl(remoteDriver));
     driverDto.setCapabilities(remoteDriver.getCapabilities().asMap());
-
-    if (webdriverProxy != null) {
-      driverDto.setProxy(WebdriverProxyMapper.toWebdriverProxyDto(webdriverProxy));
-    }
+    driverDto.setProxyUrl(proxyUrl);
 
     return driverDto;
   }

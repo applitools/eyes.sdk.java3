@@ -84,7 +84,7 @@ public class Configuration implements IConfiguration {
     private Double scaleRatio;
     private Boolean useCeilForViewportSize;
     private Integer waitBeforeCapture;
-    private WebdriverProxy webdriverProxy;
+    private String proxyUrl;
 
     public Configuration(Configuration other) {
         this.branchName = other.getBranchName();
@@ -144,7 +144,7 @@ public class Configuration implements IConfiguration {
         this.captureStatusBar = other.isCaptureStatusBar();
         this.useCeilForViewportSize = other.getUseCeilForViewportSize();
         this.waitBeforeCapture = other.getWaitBeforeCapture();
-        this.webdriverProxy = other.getWebdriverProxy();
+        this.proxyUrl = other.getProxyUrl();
     }
 
     public Configuration() {
@@ -991,16 +991,12 @@ public class Configuration implements IConfiguration {
         this.waitBeforeCapture = milliSec;
     }
 
-    /**
-     * @param webdriverProxy
-     *          the web driver proxy
-     */
-    public Configuration setWebdriverProxy(WebdriverProxy webdriverProxy) {
-        this.webdriverProxy = webdriverProxy;
-        return this;
+    public String getProxyUrl() {
+        return proxyUrl;
     }
 
-    public WebdriverProxy getWebdriverProxy() {
-        return webdriverProxy;
+    public Configuration setProxyUrl(String proxyUrl) {
+        this.proxyUrl = proxyUrl;
+        return this;
     }
 }
