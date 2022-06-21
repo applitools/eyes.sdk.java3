@@ -1,3 +1,11 @@
+## [5.8.0] - 2022-06-21
+### Updated
+- Updated server core to 2.9.2
+
+## [5.7.0] - 2022-06-10
+### Updated
+- Updated server core to 2.9.1
+
 ## [5.6.0] - 2022-06-10
 ### Updated
 - Updated server core to 2.7.1
