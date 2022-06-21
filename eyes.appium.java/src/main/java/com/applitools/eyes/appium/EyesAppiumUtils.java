@@ -265,6 +265,9 @@ public class EyesAppiumUtils {
         try {
             if (EyesDriverUtils.isAndroid(driver)) {
                 fillSystemBarsHeightsMap((AndroidDriver) driver.getRemoteWebDriver(), systemBarHeights);
+                if (systemBarHeights.get(STATUS_BAR) == 1 && systemBarHeights.get(NAVIGATION_BAR) == 1) {
+                    fillSystemBarsHeightsMap(driver, systemBarHeights);
+                }
             } else {
                 fillSystemBarsHeightsMap(driver, systemBarHeights);
             }
