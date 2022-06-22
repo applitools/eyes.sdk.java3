@@ -1,3 +1,7 @@
+## [3.214.0-SNAPSHOT]
+### Updated
+- Update `jsoup` to the latest version.
+
 ## [3.213.0-SNAPSHOT]
 ### Fixed
 - Set position to `0,0` if no scrollable element on the screen to avoid exceptions during the scroll. [Trello 2923](https://trello.com/c/f5iGuFcC)
