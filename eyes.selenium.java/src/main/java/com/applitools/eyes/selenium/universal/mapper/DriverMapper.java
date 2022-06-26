@@ -17,6 +17,8 @@ public class DriverMapper {
   private static final String REMOTE_SERVER = "remoteServer";
   private static final String ARG$1 = "arg$1";
   private static final String REMOTE_HOST = "remoteHost";
+  private static final String CLIENT_CONFIG = "clientConfig";
+  private static final String BASE_URI = "baseUri";
 
   public static DriverDto toDriverDto(WebDriver driver, String proxyUrl) {
     if (driver == null) {
@@ -78,7 +80,21 @@ public class DriverMapper {
       final Field remoteHost = remoteWebDriverBuilderClass.getDeclaredField(REMOTE_HOST);
       remoteHost.setAccessible(true);
       Object remoteHostObject = remoteHost.get(remoteWebDriverBuilder);
-      return remoteHostObject.toString();
+      if (remoteHostObject != null) {
+        return remoteHostObject.toString();
+      }
+
+      final Field clientConfig = remoteWebDriverBuilderClass.getDeclaredField(CLIENT_CONFIG);
+      clientConfig.setAccessible(true);
+      Object clientConfigObject = clientConfig.get(remoteWebDriverBuilder);
+      final Class<?> clientConfigClass = clientConfigObject.getClass();
+      final Field baseUri = clientConfigClass.getDeclaredField(BASE_URI);
+      baseUri.setAccessible(true);
+      Object baseUriObject = baseUri.get(clientConfigObject);
+      if (baseUriObject != null) {
+          return baseUriObject.toString();
+      }
+      throw  new Exception("Cannot extract remote url from webdriver");
   }
 
 }
