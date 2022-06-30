@@ -11,6 +11,7 @@ public abstract class TFloatingRegion {
   protected Integer maxDownOffset;
   protected Integer maxLeftOffset;
   protected Integer maxRightOffset;
+  protected String regionId;
 
   public Integer getMaxUpOffset() {
     return maxUpOffset;
@@ -42,5 +43,13 @@ public abstract class TFloatingRegion {
 
   public void setMaxRightOffset(Integer maxRightOffset) {
     this.maxRightOffset = maxRightOffset;
+  }
+
+  public String getRegionId() {
+    return regionId;
+  }
+
+  public void setRegionId(String regionId) {
+    this.regionId = regionId;
   }
 }
