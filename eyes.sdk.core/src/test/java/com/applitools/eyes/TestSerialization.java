@@ -5,6 +5,7 @@ import com.applitools.eyes.config.Configuration;
 import com.applitools.eyes.fluent.CheckSettings;
 import com.applitools.eyes.fluent.ICheckSettingsInternal;
 import com.applitools.eyes.utils.ReportingTestSuite;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.testng.Assert;
@@ -210,6 +211,7 @@ public class TestSerialization extends ReportingTestSuite {
                         + "}";
 
         Region r = new Region(left, top, width, height);
+        jsonMapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
         String actualSerialization = jsonMapper.writeValueAsString(r);
 
         Assert.assertEquals(actualSerialization,
