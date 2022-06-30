@@ -211,7 +211,6 @@ public class TestSerialization extends ReportingTestSuite {
                         + "}";
 
         Region r = new Region(left, top, width, height);
-        jsonMapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
         String actualSerialization = jsonMapper.writeValueAsString(r);
 
         Assert.assertEquals(actualSerialization,
