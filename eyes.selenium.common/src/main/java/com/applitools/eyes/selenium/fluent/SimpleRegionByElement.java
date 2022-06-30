@@ -27,6 +27,8 @@ public class SimpleRegionByElement implements GetSimpleRegion, IGetSeleniumRegio
     @JsonIgnore
     protected final Borders padding;
 
+    private String regionId;
+
     public SimpleRegionByElement(WebElement element) {
         this(element, new Borders(0, 0, 0, 0));
     }
@@ -69,5 +71,14 @@ public class SimpleRegionByElement implements GetSimpleRegion, IGetSeleniumRegio
     @Override
     public List<WebElement> getElements() {
         return Collections.singletonList(element);
+    }
+
+    public SimpleRegionByElement regionId(String regionId) {
+        this.regionId = regionId;
+        return this;
+    }
+
+    public String getRegionId() {
+        return regionId;
     }
 }

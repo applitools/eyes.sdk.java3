@@ -6,7 +6,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
  * rectangle region dto
  */
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class RectangleRegionDto extends TRegion{
+public class RectangleRegionDto extends TRegion {
   private Integer x;
   private Integer y;
   private Integer width;

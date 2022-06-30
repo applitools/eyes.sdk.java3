@@ -16,7 +16,7 @@ public class TargetPathLocatorMapper {
         /*
          * Algorithm:
          * create the current element, and create a parent.
-         * Always put the currnet element as the shadow of the parent.
+         * Always put the current element as the shadow of the parent.
          * If the parent doesn't actually exist, we'll drop it (this happens in the last iteration).
          */
         TargetPathLocatorDto currentDto;

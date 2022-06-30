@@ -26,6 +26,7 @@ public class FloatingRegionBySelector implements GetFloatingRegion , IGetSeleniu
     private final int maxDownOffset;
     private final int maxLeftOffset;
     private final int maxRightOffset;
+    private String regionId;
 
     public FloatingRegionBySelector(By regionSelector, int maxUpOffset, int maxDownOffset, int maxLeftOffset, int maxRightOffset) {
         this.selector = regionSelector;
@@ -92,5 +93,14 @@ public class FloatingRegionBySelector implements GetFloatingRegion , IGetSeleniu
 
     public By getSelector() {
         return selector;
+    }
+
+    public FloatingRegionBySelector regionId(String regionId) {
+        this.regionId = regionId;
+        return this;
+    }
+
+    public String getRegionId() {
+        return regionId;
     }
 }

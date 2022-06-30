@@ -36,10 +36,10 @@ public class CheckSettingsDto {
   private Boolean ignoreDisplacements;
   private AccessibilitySettingsDto accessibilitySettings;
 
-  private List<TRegion> ignoreRegions;
-  private List<TRegion> layoutRegions;
-  private List<TRegion> strictRegions;
-  private List<TRegion> contentRegions;
+  private List<CodedRegionReference> ignoreRegions;
+  private List<CodedRegionReference> layoutRegions;
+  private List<CodedRegionReference> strictRegions;
+  private List<CodedRegionReference> contentRegions;
 
   private Object floatingRegions;
   private Object accessibilityRegions;
@@ -181,35 +181,35 @@ public class CheckSettingsDto {
     this.accessibilitySettings = accessibilitySettings;
   }
 
-  public List<TRegion> getIgnoreRegions() {
+  public List<CodedRegionReference> getIgnoreRegions() {
     return ignoreRegions;
   }
 
-  public void setIgnoreRegions(List<TRegion> ignoreRegions) {
+  public void setIgnoreRegions(List<CodedRegionReference> ignoreRegions) {
     this.ignoreRegions = ignoreRegions;
   }
 
-  public List<TRegion> getLayoutRegions() {
+  public List<CodedRegionReference> getLayoutRegions() {
     return layoutRegions;
   }
 
-  public void setLayoutRegions(List<TRegion> layoutRegions) {
+  public void setLayoutRegions(List<CodedRegionReference> layoutRegions) {
     this.layoutRegions = layoutRegions;
   }
 
-  public List<TRegion> getStrictRegions() {
+  public List<CodedRegionReference> getStrictRegions() {
     return strictRegions;
   }
 
-  public void setStrictRegions(List<TRegion> strictRegions) {
+  public void setStrictRegions(List<CodedRegionReference> strictRegions) {
     this.strictRegions = strictRegions;
   }
 
-  public List<TRegion> getContentRegions() {
+  public List<CodedRegionReference> getContentRegions() {
     return contentRegions;
   }
 
-  public void setContentRegions(List<TRegion> contentRegions) {
+  public void setContentRegions(List<CodedRegionReference> contentRegions) {
     this.contentRegions = contentRegions;
   }
 

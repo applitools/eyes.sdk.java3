@@ -27,6 +27,7 @@ public class FloatingRegionByElement implements GetFloatingRegion, IGetSeleniumR
     protected final int maxDownOffset;
     protected final int maxLeftOffset;
     protected final int maxRightOffset;
+    private String regionId;
 
     public FloatingRegionByElement(WebElement element, int maxUpOffset, int maxDownOffset, int maxLeftOffset, int maxRightOffset) {
 
@@ -92,5 +93,14 @@ public class FloatingRegionByElement implements GetFloatingRegion, IGetSeleniumR
     @Override
     public int getMaxDownOffset() {
         return maxDownOffset;
+    }
+
+    public FloatingRegionByElement regionId(String regionId) {
+        this.regionId = regionId;
+        return this;
+    }
+
+    public String getRegionId() {
+        return regionId;
     }
 }

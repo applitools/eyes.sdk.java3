@@ -2,10 +2,11 @@ package com.applitools.eyes.appium;
 
 import com.applitools.ICheckSettings;
 import com.applitools.eyes.selenium.universal.dto.CheckSettingsDto;
+import com.applitools.eyes.selenium.universal.mapper.CodedRegionReferenceMapper;
 import com.applitools.eyes.selenium.universal.mapper.TAccessibilityRegionMapper;
 import com.applitools.eyes.selenium.universal.mapper.TFloatingRegionMapper;
 import com.applitools.eyes.selenium.universal.mapper.VisualGridOptionMapper;
-import com.applitools.eyes.appium.TRegionMapper;
+
 
 import java.util.Arrays;
 
@@ -36,10 +37,14 @@ public class AppiumCheckSettingsMapper {
         checkSettingsDto.setIgnoreDisplacements(appiumCheckSettings.isIgnoreDisplacements());
         checkSettingsDto.setAccessibilitySettings(null);
 
-        checkSettingsDto.setIgnoreRegions(TRegionMapper.toTRegionList(Arrays.asList(appiumCheckSettings.getIgnoreRegions())));
-        checkSettingsDto.setLayoutRegions(TRegionMapper.toTRegionList(Arrays.asList(appiumCheckSettings.getLayoutRegions())));
-        checkSettingsDto.setStrictRegions(TRegionMapper.toTRegionList(Arrays.asList(appiumCheckSettings.getStrictRegions())));
-        checkSettingsDto.setContentRegions(TRegionMapper.toTRegionList(Arrays.asList(appiumCheckSettings.getContentRegions())));
+        checkSettingsDto.setIgnoreRegions(CodedRegionReferenceMapper
+                .toCodedRegionReferenceList(Arrays.asList(appiumCheckSettings.getIgnoreRegions())));
+        checkSettingsDto.setLayoutRegions(CodedRegionReferenceMapper
+                .toCodedRegionReferenceList(Arrays.asList(appiumCheckSettings.getLayoutRegions())));
+        checkSettingsDto.setStrictRegions(CodedRegionReferenceMapper
+                .toCodedRegionReferenceList(Arrays.asList(appiumCheckSettings.getStrictRegions())));
+        checkSettingsDto.setContentRegions(CodedRegionReferenceMapper
+                .toCodedRegionReferenceList(Arrays.asList(appiumCheckSettings.getContentRegions())));
 
         checkSettingsDto.setFloatingRegions(TFloatingRegionMapper.toTFloatingRegionDtoList(Arrays.asList(appiumCheckSettings.getFloatingRegions())));
 

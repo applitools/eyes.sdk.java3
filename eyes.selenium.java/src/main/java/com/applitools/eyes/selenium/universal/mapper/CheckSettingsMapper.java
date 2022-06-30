@@ -41,11 +41,14 @@ public class CheckSettingsMapper {
     checkSettingsDto.setIgnoreCaret(seleniumCheckSettings.getIgnoreCaret());
     checkSettingsDto.setIgnoreDisplacements(seleniumCheckSettings.isIgnoreDisplacements());
     checkSettingsDto.setAccessibilitySettings(null);
-
-    checkSettingsDto.setIgnoreRegions(TRegionMapper.toTRegionList(Arrays.asList(seleniumCheckSettings.getIgnoreRegions())));
-    checkSettingsDto.setLayoutRegions(TRegionMapper.toTRegionList(Arrays.asList(seleniumCheckSettings.getLayoutRegions())));
-    checkSettingsDto.setStrictRegions(TRegionMapper.toTRegionList(Arrays.asList(seleniumCheckSettings.getStrictRegions())));
-    checkSettingsDto.setContentRegions(TRegionMapper.toTRegionList(Arrays.asList(seleniumCheckSettings.getContentRegions())));
+    checkSettingsDto.setIgnoreRegions(CodedRegionReferenceMapper
+            .toCodedRegionReferenceList(Arrays.asList(seleniumCheckSettings.getIgnoreRegions())));
+    checkSettingsDto.setLayoutRegions(CodedRegionReferenceMapper
+            .toCodedRegionReferenceList(Arrays.asList(seleniumCheckSettings.getLayoutRegions())));
+    checkSettingsDto.setStrictRegions(CodedRegionReferenceMapper
+            .toCodedRegionReferenceList(Arrays.asList(seleniumCheckSettings.getStrictRegions())));
+    checkSettingsDto.setContentRegions(CodedRegionReferenceMapper
+            .toCodedRegionReferenceList(Arrays.asList(seleniumCheckSettings.getContentRegions())));
 
     checkSettingsDto.setFloatingRegions(TFloatingRegionMapper.toTFloatingRegionDtoList(Arrays.asList(seleniumCheckSettings.getFloatingRegions())));
 

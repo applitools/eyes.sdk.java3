@@ -23,6 +23,8 @@ public class SimpleRegionBySelector implements GetSimpleRegion, IGetSeleniumRegi
     @JsonIgnore
     private final Borders padding;
 
+    private String regionId;
+
     public SimpleRegionBySelector(By selector) {
         this(selector, new Borders(0, 0, 0, 0));
     }
@@ -66,5 +68,14 @@ public class SimpleRegionBySelector implements GetSimpleRegion, IGetSeleniumRegi
 
     public By getSelector() {
         return selector;
+    }
+
+    public SimpleRegionBySelector regionId(String regionId) {
+        this.regionId = regionId;
+        return this;
+    }
+
+    public String getRegionId() {
+        return regionId;
     }
 }

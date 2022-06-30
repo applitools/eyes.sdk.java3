@@ -35,12 +35,6 @@ public class SeleniumCheckSettings extends CheckSettings implements ISeleniumChe
 
     // We'll use TargetPathLocator instead of Selector / WebElement.
     private TargetPathLocator targetLocator;
-    // FIXME - remove the targetSelector, targetElement
-//    @JsonSerialize(using = BySerializer.class)
-//    private By targetSelector; // FIXME
-//    @JsonSerialize(using = WebElementSerializer.class)
-//    private WebElement targetElement; // FIXME
-
     private final List<FrameLocator> frameChain = new ArrayList<>();
     // FIXME - remove scrollRootElement/Selector
     @JsonSerialize(using = WebElementSerializer.class)
@@ -61,14 +55,6 @@ public class SeleniumCheckSettings extends CheckSettings implements ISeleniumChe
     public SeleniumCheckSettings(Region region) {
         super(region);
     }
-
-//    public SeleniumCheckSettings(By targetSelector) {
-//        this.targetSelector = targetSelector;
-//    }
-//
-//    public SeleniumCheckSettings(WebElement targetElement) {
-//        this.targetElement = targetElement;
-//    }
 
     public SeleniumCheckSettings(String tag) {
         this.name = tag;
@@ -95,16 +81,6 @@ public class SeleniumCheckSettings extends CheckSettings implements ISeleniumChe
             }
         }
     }
-
-//    @Override
-//    public By getTargetSelector() {
-//        return this.targetSelector;
-//    }
-//
-//    @Override
-//    public WebElement getTargetElement() {
-//        return this.targetElement;
-//    }
 
     @Override
     public List<FrameLocator> getFrameChain() {
@@ -193,6 +169,16 @@ public class SeleniumCheckSettings extends CheckSettings implements ISeleniumChe
         return clone;
     }
 
+    public SeleniumCheckSettings ignore(By regionSelector, String regionId, By... regionSelectors) {
+        SeleniumCheckSettings clone = this.clone();
+        clone.ignore_(new SimpleRegionBySelector(regionSelector).regionId(regionId));
+        for (By selector : regionSelectors) {
+            clone.ignore_(new SimpleRegionBySelector(selector).regionId(regionId));
+        }
+
+        return clone;
+    }
+
     public SeleniumCheckSettings ignore(WebElement element, WebElement... elements) {
         SeleniumCheckSettings clone = this.clone();
         clone.ignore_(new SimpleRegionByElement(element));
@@ -204,10 +190,30 @@ public class SeleniumCheckSettings extends CheckSettings implements ISeleniumChe
         return clone;
     }
 
+    public SeleniumCheckSettings ignore(WebElement element, String regionId, WebElement... elements) {
+        SeleniumCheckSettings clone = this.clone();
+        clone.ignore_(new SimpleRegionByElement(element).regionId(regionId));
+        //TODO - FIXME - BUG - this is wrong in case of a cropped image!
+        for (WebElement e : elements) {
+            clone.ignore_(new SimpleRegionByElement(e).regionId(regionId));
+        }
+
+        return clone;
+    }
+
     public SeleniumCheckSettings ignore(By[] regionSelectors) {
         SeleniumCheckSettings clone = this.clone();
         for (By selector : regionSelectors) {
             clone.ignore_(new SimpleRegionBySelector(selector));
+        }
+
+        return clone;
+    }
+
+    public SeleniumCheckSettings ignore(By[] regionSelectors, String regionId) {
+        SeleniumCheckSettings clone = this.clone();
+        for (By selector : regionSelectors) {
+            clone.ignore_(new SimpleRegionBySelector(selector).regionId(regionId));
         }
 
         return clone;
@@ -223,9 +229,25 @@ public class SeleniumCheckSettings extends CheckSettings implements ISeleniumChe
         return clone;
     }
 
+    public SeleniumCheckSettings ignore(WebElement[] elements, String regionId) {
+        SeleniumCheckSettings clone = this.clone();
+        //TODO - FIXME - BUG - this is wrong in case of a cropped image!
+        for (WebElement e : elements) {
+            clone.ignore_(new SimpleRegionByElement(e).regionId(regionId));
+        }
+
+        return clone;
+    }
+
     public SeleniumCheckSettings ignore(By selector, int leftPadding, int topPadding, int rightPadding, int bottomPadding) {
         SeleniumCheckSettings clone = this.clone();
         clone.ignore_(new SimpleRegionBySelector(selector, new Borders(leftPadding, topPadding, rightPadding, bottomPadding)));
+        return clone;
+    }
+
+    public SeleniumCheckSettings ignore(By selector, int leftPadding, int topPadding, int rightPadding, int bottomPadding, String regionId) {
+        SeleniumCheckSettings clone = this.clone();
+        clone.ignore_(new SimpleRegionBySelector(selector, new Borders(leftPadding, topPadding, rightPadding, bottomPadding)).regionId(regionId));
         return clone;
     }
 
@@ -235,11 +257,27 @@ public class SeleniumCheckSettings extends CheckSettings implements ISeleniumChe
         return clone;
     }
 
+    public SeleniumCheckSettings ignore(WebElement element, int leftPadding, int topPadding, int rightPadding, int bottomPadding, String regionId) {
+        SeleniumCheckSettings clone = this.clone();
+        clone.ignore_(new SimpleRegionByElement(element, new Borders(leftPadding, topPadding, rightPadding, bottomPadding)).regionId(regionId));
+        return clone;
+    }
+
     public SeleniumCheckSettings layout(By regionSelector, By... regionSelectors) {
         SeleniumCheckSettings clone = this.clone();
         clone.layout_(new SimpleRegionBySelector(regionSelector));
         for (By selector : regionSelectors) {
             clone.layout_(new SimpleRegionBySelector(selector));
+        }
+
+        return clone;
+    }
+
+    public SeleniumCheckSettings layout(By regionSelector, String regionId, By... regionSelectors) {
+        SeleniumCheckSettings clone = this.clone();
+        clone.layout_(new SimpleRegionBySelector(regionSelector).regionId(regionId));
+        for (By selector : regionSelectors) {
+            clone.layout_(new SimpleRegionBySelector(selector).regionId(regionId));
         }
 
         return clone;
@@ -256,10 +294,30 @@ public class SeleniumCheckSettings extends CheckSettings implements ISeleniumChe
         return clone;
     }
 
+    public SeleniumCheckSettings layout(WebElement element, String regionId, WebElement... elements) {
+        SeleniumCheckSettings clone = this.clone();
+        clone.layout_(new SimpleRegionByElement(element).regionId(regionId));
+        //TODO - FIXME - BUG - this is wrong in case of a cropped image!
+        for (WebElement e : elements) {
+            clone.layout_(new SimpleRegionByElement(e).regionId(regionId));
+        }
+
+        return clone;
+    }
+
     public SeleniumCheckSettings layout(By[] regionSelectors) {
         SeleniumCheckSettings clone = this.clone();
         for (By selector : regionSelectors) {
             clone.layout_(new SimpleRegionBySelector(selector));
+        }
+
+        return clone;
+    }
+
+    public SeleniumCheckSettings layout(By[] regionSelectors, String regionId) {
+        SeleniumCheckSettings clone = this.clone();
+        for (By selector : regionSelectors) {
+            clone.layout_(new SimpleRegionBySelector(selector).regionId(regionId));
         }
 
         return clone;
@@ -275,9 +333,25 @@ public class SeleniumCheckSettings extends CheckSettings implements ISeleniumChe
         return clone;
     }
 
+    public SeleniumCheckSettings layout(WebElement[] elements, String regionId) {
+        SeleniumCheckSettings clone = this.clone();
+        //TODO - FIXME - BUG - this is wrong in case of a cropped image!
+        for (WebElement e : elements) {
+            clone.layout_(new SimpleRegionByElement(e).regionId(regionId));
+        }
+
+        return clone;
+    }
+
     public SeleniumCheckSettings layout(By selector, int leftPadding, int topPadding, int rightPadding, int bottomPadding) {
         SeleniumCheckSettings clone = this.clone();
         clone.layout_(new SimpleRegionBySelector(selector, new Borders(leftPadding, topPadding, rightPadding, bottomPadding)));
+        return clone;
+    }
+
+    public SeleniumCheckSettings layout(By selector, int leftPadding, int topPadding, int rightPadding, int bottomPadding, String regionId) {
+        SeleniumCheckSettings clone = this.clone();
+        clone.layout_(new SimpleRegionBySelector(selector, new Borders(leftPadding, topPadding, rightPadding, bottomPadding)).regionId(regionId));
         return clone;
     }
 
@@ -287,11 +361,27 @@ public class SeleniumCheckSettings extends CheckSettings implements ISeleniumChe
         return clone;
     }
 
+    public SeleniumCheckSettings layout(WebElement element, int leftPadding, int topPadding, int rightPadding, int bottomPadding, String regionId) {
+        SeleniumCheckSettings clone = this.clone();
+        clone.layout_(new SimpleRegionByElement(element, new Borders(leftPadding, topPadding, rightPadding, bottomPadding)).regionId(regionId));
+        return clone;
+    }
+
     public SeleniumCheckSettings strict(By regionSelector, By... regionSelectors) {
         SeleniumCheckSettings clone = this.clone();
         clone.strict_(new SimpleRegionBySelector(regionSelector));
         for (By selector : regionSelectors) {
             clone.strict_(new SimpleRegionBySelector(selector));
+        }
+
+        return clone;
+    }
+
+    public SeleniumCheckSettings strict(By regionSelector, String regionId, By... regionSelectors) {
+        SeleniumCheckSettings clone = this.clone();
+        clone.strict_(new SimpleRegionBySelector(regionSelector).regionId(regionId));
+        for (By selector : regionSelectors) {
+            clone.strict_(new SimpleRegionBySelector(selector).regionId(regionId));
         }
 
         return clone;
@@ -308,10 +398,30 @@ public class SeleniumCheckSettings extends CheckSettings implements ISeleniumChe
         return clone;
     }
 
+    public SeleniumCheckSettings strict(WebElement element, String regionId, WebElement... elements) {
+        SeleniumCheckSettings clone = this.clone();
+        clone.strict_(new SimpleRegionByElement(element).regionId(regionId));
+        //TODO - FIXME - BUG - this is wrong in case of a cropped image!
+        for (WebElement e : elements) {
+            clone.strict_(new SimpleRegionByElement(e).regionId(regionId));
+        }
+
+        return clone;
+    }
+
     public SeleniumCheckSettings strict(By[] regionSelectors) {
         SeleniumCheckSettings clone = this.clone();
         for (By selector : regionSelectors) {
             clone.strict_(new SimpleRegionBySelector(selector));
+        }
+
+        return clone;
+    }
+
+    public SeleniumCheckSettings strict(By[] regionSelectors, String regionId) {
+        SeleniumCheckSettings clone = this.clone();
+        for (By selector : regionSelectors) {
+            clone.strict_(new SimpleRegionBySelector(selector).regionId(regionId));
         }
 
         return clone;
@@ -327,9 +437,25 @@ public class SeleniumCheckSettings extends CheckSettings implements ISeleniumChe
         return clone;
     }
 
+    public SeleniumCheckSettings strict(WebElement[] elements, String regionId) {
+        SeleniumCheckSettings clone = this.clone();
+        //TODO - FIXME - BUG - this is wrong in case of a cropped image!
+        for (WebElement e : elements) {
+            clone.strict_(new SimpleRegionByElement(e).regionId(regionId));
+        }
+
+        return clone;
+    }
+
     public SeleniumCheckSettings strict(By selector, int leftPadding, int topPadding, int rightPadding, int bottomPadding) {
         SeleniumCheckSettings clone = this.clone();
         clone.strict_(new SimpleRegionBySelector(selector, new Borders(leftPadding, topPadding, rightPadding, bottomPadding)));
+        return clone;
+    }
+
+    public SeleniumCheckSettings strict(By selector, int leftPadding, int topPadding, int rightPadding, int bottomPadding, String regionId) {
+        SeleniumCheckSettings clone = this.clone();
+        clone.strict_(new SimpleRegionBySelector(selector, new Borders(leftPadding, topPadding, rightPadding, bottomPadding)).regionId(regionId));
         return clone;
     }
 
@@ -339,11 +465,27 @@ public class SeleniumCheckSettings extends CheckSettings implements ISeleniumChe
         return clone;
     }
 
+    public SeleniumCheckSettings strict(WebElement element, int leftPadding, int topPadding, int rightPadding, int bottomPadding, String regionId) {
+        SeleniumCheckSettings clone = this.clone();
+        clone.strict_(new SimpleRegionByElement(element, new Borders(leftPadding, topPadding, rightPadding, bottomPadding)).regionId(regionId));
+        return clone;
+    }
+
     public SeleniumCheckSettings content(By regionSelector, By... regionSelectors) {
         SeleniumCheckSettings clone = this.clone();
         clone.content_(new SimpleRegionBySelector(regionSelector));
         for (By selector : regionSelectors) {
             clone.content_(new SimpleRegionBySelector(selector));
+        }
+
+        return clone;
+    }
+
+    public SeleniumCheckSettings content(By regionSelector, String regionId, By... regionSelectors) {
+        SeleniumCheckSettings clone = this.clone();
+        clone.content_(new SimpleRegionBySelector(regionSelector).regionId(regionId));
+        for (By selector : regionSelectors) {
+            clone.content_(new SimpleRegionBySelector(selector).regionId(regionId));
         }
 
         return clone;
@@ -360,10 +502,30 @@ public class SeleniumCheckSettings extends CheckSettings implements ISeleniumChe
         return clone;
     }
 
+    public SeleniumCheckSettings content(WebElement element, String regionId, WebElement... elements) {
+        SeleniumCheckSettings clone = this.clone();
+        clone.content_(new SimpleRegionByElement(element).regionId(regionId));
+        //TODO - FIXME - BUG - this is wrong in case of a cropped image!
+        for (WebElement e : elements) {
+            clone.content_(new SimpleRegionByElement(e).regionId(regionId));
+        }
+
+        return clone;
+    }
+
     public SeleniumCheckSettings content(By[] regionSelectors) {
         SeleniumCheckSettings clone = this.clone();
         for (By selector : regionSelectors) {
             clone.content_(new SimpleRegionBySelector(selector));
+        }
+
+        return clone;
+    }
+
+    public SeleniumCheckSettings content(By[] regionSelectors, String regionId) {
+        SeleniumCheckSettings clone = this.clone();
+        for (By selector : regionSelectors) {
+            clone.content_(new SimpleRegionBySelector(selector).regionId(regionId));
         }
 
         return clone;
@@ -379,9 +541,25 @@ public class SeleniumCheckSettings extends CheckSettings implements ISeleniumChe
         return clone;
     }
 
+    public SeleniumCheckSettings content(WebElement[] elements, String regionId) {
+        SeleniumCheckSettings clone = this.clone();
+        //TODO - FIXME - BUG - this is wrong in case of a cropped image!
+        for (WebElement e : elements) {
+            clone.content_(new SimpleRegionByElement(e).regionId(regionId));
+        }
+
+        return clone;
+    }
+
     public SeleniumCheckSettings content(By selector, int leftPadding, int topPadding, int rightPadding, int bottomPadding) {
         SeleniumCheckSettings clone = this.clone();
         clone.content_(new SimpleRegionBySelector(selector, new Borders(leftPadding, topPadding, rightPadding, bottomPadding)));
+        return clone;
+    }
+
+    public SeleniumCheckSettings content(By selector, int leftPadding, int topPadding, int rightPadding, int bottomPadding, String regionId) {
+        SeleniumCheckSettings clone = this.clone();
+        clone.content_(new SimpleRegionBySelector(selector, new Borders(leftPadding, topPadding, rightPadding, bottomPadding)).regionId(regionId));
         return clone;
     }
 
@@ -391,15 +569,33 @@ public class SeleniumCheckSettings extends CheckSettings implements ISeleniumChe
         return clone;
     }
 
+    public SeleniumCheckSettings content(WebElement element, int leftPadding, int topPadding, int rightPadding, int bottomPadding, String regionId) {
+        SeleniumCheckSettings clone = this.clone();
+        clone.content_(new SimpleRegionByElement(element, new Borders(leftPadding, topPadding, rightPadding, bottomPadding)).regionId(regionId));
+        return clone;
+    }
+
     public SeleniumCheckSettings floating(By regionSelector, int maxUpOffset, int maxDownOffset, int maxLeftOffset, int maxRightOffset) {
         SeleniumCheckSettings clone = this.clone();
         clone.floating(new FloatingRegionBySelector(regionSelector, maxUpOffset, maxDownOffset, maxLeftOffset, maxRightOffset));
         return clone;
     }
 
+    public SeleniumCheckSettings floating(By regionSelector, int maxUpOffset, int maxDownOffset, int maxLeftOffset, int maxRightOffset, String regionId) {
+        SeleniumCheckSettings clone = this.clone();
+        clone.floating(new FloatingRegionBySelector(regionSelector, maxUpOffset, maxDownOffset, maxLeftOffset, maxRightOffset).regionId(regionId));
+        return clone;
+    }
+
     public SeleniumCheckSettings floating(WebElement element, int maxUpOffset, int maxDownOffset, int maxLeftOffset, int maxRightOffset) {
         SeleniumCheckSettings clone = this.clone();
         clone.floating(new FloatingRegionByElement(element, maxUpOffset, maxDownOffset, maxLeftOffset, maxRightOffset));
+        return clone;
+    }
+
+    public SeleniumCheckSettings floating(WebElement element, int maxUpOffset, int maxDownOffset, int maxLeftOffset, int maxRightOffset, String regionId) {
+        SeleniumCheckSettings clone = this.clone();
+        clone.floating(new FloatingRegionByElement(element, maxUpOffset, maxDownOffset, maxLeftOffset, maxRightOffset).regionId(regionId));
         return clone;
     }
 
