@@ -28,10 +28,9 @@
     "docker:start": "docker-compose up -d",
     "docker:stop": "docker-compose down",
     "universal:eg": "eyes-universal eg-client --port 8080"
-
   },
   "dependencies": {
-    "@applitools/sdk-coverage-tests": "^2.3.18",
-    "@applitools/eyes-universal": "^2.5.19"
+    "@applitools/eyes-universal": "^2.5.19",
+    "@applitools/sdk-coverage-tests": "^2.3.18"
   }
 }
