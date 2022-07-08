@@ -16,5 +16,4 @@ public class ElementRegionDto extends TRegion {
   public void setElementId(String elementId) {
     this.elementId = elementId;
   }
-
 }
