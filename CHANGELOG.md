@@ -1,4 +1,8 @@
-## [5.11.0] - 2022-06-30
+## [5.11.1] - 2022-07-11
+### Fixed
+- Additional update to the framesize for Websocket. [Trello 2892](https://trello.com/c/0Pslnto9)
+
+## [5.11.0] - 2022-07-11
 ### Updated
 - Increased framesize for Websocket communication. [Trello 2892](https://trello.com/c/0Pslnto9)
 
