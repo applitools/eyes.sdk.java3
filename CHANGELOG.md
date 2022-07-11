@@ -1,3 +1,7 @@
+## [5.11.0] - 2022-06-30
+### Updated
+- Increased framesize for Websocket communication. [Trello 2892](https://trello.com/c/0Pslnto9)
+
 ## [5.10.0] - 2022-06-30
 ### Added
 - Support for coded-regions' regionId. [Trello 1444](https://trello.com/c/0Pslnto9)
