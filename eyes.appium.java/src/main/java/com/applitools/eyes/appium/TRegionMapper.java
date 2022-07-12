@@ -45,7 +45,6 @@ public class TRegionMapper extends com.applitools.eyes.selenium.universal.mapper
         if (element != null) {
             return ElementRegionMapper.toElementRegionDto(element);
         }
-
         return null;
     }
 }
