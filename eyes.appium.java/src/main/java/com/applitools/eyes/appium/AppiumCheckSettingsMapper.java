@@ -57,7 +57,7 @@ public class AppiumCheckSettingsMapper {
         checkSettingsDto.setFully(appiumCheckSettings.getStitchContent());
 
         checkSettingsDto.
-                setScrollRootElement(com.applitools.eyes.selenium.universal.mapper.TRegionMapper.toTRegionDtoFromScrolls(appiumCheckSettings
+                setScrollRootElement(TRegionMapper.toTRegionDtoFromScrolls(appiumCheckSettings
                                 .getScrollRootElementSelector(), appiumCheckSettings.getScrollRootElement()));
 
         return checkSettingsDto;
