@@ -1,3 +1,7 @@
+## [5.12.0] - 2022-07-13
+### Fixed
+- ScrollRootElement not passed in Appium. [Trello 2633](https://trello.com/c/dQqN02TN)
+
 ## [5.11.1] - 2022-07-11
 ### Fixed
 - Additional update to the framesize for Websocket. [Trello 2892](https://trello.com/c/0Pslnto9)
