@@ -12,16 +12,25 @@
         </groups>
 
         <packages>
-            <package name="com.applitools.eyes.appium.android.*"/>
-            <package name="com.applitools.eyes.appium.general.*"/>
+<!--            <package name="com.applitools.eyes.appium.android.*"/>-->
+<!--            <package name="com.applitools.eyes.appium.general.*"/>-->
         </packages>
     </test>
+<!--    <test name="TestEyes">-->
+<!--        <classes>-->
+<!--            <class name="com.applitools.eyes.appium.TestEyes">-->
+<!--                <methods>-->
+<!--                    <include name="testEyesApi" />-->
+<!--                    <include name="testConfigurationEdit" />-->
+<!--                </methods>-->
+<!--            </class>-->
+<!--        </classes>-->
+<!--    </test>-->
     <test name="TestEyes">
         <classes>
-            <class name="com.applitools.eyes.appium.TestEyes">
+            <class name="com.applitools.eyes.appium.ScrollRootElementTest">
                 <methods>
-                    <include name="testEyesApi" />
-                    <include name="testConfigurationEdit" />
+                    <include name="test" />
                 </methods>
             </class>
         </classes>
