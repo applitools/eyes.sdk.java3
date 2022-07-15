@@ -13,7 +13,7 @@ import com.applitools.eyes.selenium.universal.dto.ImageCropRegionDto;
  */
 public class ConfigurationMapper {
 
-  public static ConfigurationDto toConfigurationDto(Configuration config) {
+  public static ConfigurationDto toConfigurationDto(Configuration config, Boolean dontCloseBatches) {
     if (config == null) {
       return null;
     }
@@ -56,7 +56,7 @@ public class ConfigurationMapper {
     dto.setSaveFailedTests(config.getSaveFailedTests());
     dto.setSaveNewTests(config.getSaveNewTests());
     dto.setSaveDiffs(config.getSaveDiffs());
-    dto.setDontCloseBatches(null);
+    dto.setDontCloseBatches(dontCloseBatches);
 
     // EyesCheckConfig
     dto.setSendDom(config.isSendDom());

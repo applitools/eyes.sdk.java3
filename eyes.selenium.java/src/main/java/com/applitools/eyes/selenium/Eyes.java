@@ -121,7 +121,8 @@ public class Eyes implements IEyesBase {
             configurationProvider.get().setViewportSize(new RectangleSize(viewportSize));
         }
 
-        ConfigurationDto configurationDto = ConfigurationMapper.toConfigurationDto(configuration);
+        ConfigurationDto configurationDto = ConfigurationMapper
+                .toConfigurationDto(configuration, runner.isDontCloseBatches());
         eyesRef = commandExecutor.managerOpenEyes(runner.getManagerRef(), driverDto, configurationDto);
         this.driver = driver;
         return driver;
@@ -466,7 +467,8 @@ public class Eyes implements IEyesBase {
 
         ArgumentGuard.notNull(checkSettingsDto, "checkSettings");
 
-        ConfigurationDto configurationDto = ConfigurationMapper.toConfigurationDto(configuration);
+        ConfigurationDto configurationDto = ConfigurationMapper
+                .toConfigurationDto(configuration, runner.isDontCloseBatches());
         commandExecutor.eyesCheck(eyesRef, checkSettingsDto, configurationDto);
     }
     /**
@@ -1863,20 +1865,23 @@ public class Eyes implements IEyesBase {
         VisualLocatorSettingsDto visualLocatorSettingsDto = VisualLocatorSettingsMapper
             .toVisualLocatorSettingsDto(visualLocatorSettings);
 
-        ConfigurationDto configurationDto = ConfigurationMapper.toConfigurationDto(configuration);
+        ConfigurationDto configurationDto = ConfigurationMapper
+                .toConfigurationDto(configuration, runner.isDontCloseBatches());
         return commandExecutor.locate(eyesRef, visualLocatorSettingsDto, configurationDto);
     }
 
     public Map<String, List<TextRegion>> extractTextRegions(TextRegionSettings textRegionSettings) {
         OCRSearchSettingsDto ocrSearchSettingsDto = OCRSearchSettingsMapper.toOCRSearchSettingsDto(textRegionSettings);
-        ConfigurationDto configurationDto = ConfigurationMapper.toConfigurationDto(configuration);
+        ConfigurationDto configurationDto = ConfigurationMapper
+                .toConfigurationDto(configuration, runner.isDontCloseBatches());
         return commandExecutor.extractTextRegions(eyesRef, ocrSearchSettingsDto, configurationDto);
     }
 
     public List<String> extractText(BaseOcrRegion... ocrRegions) {
         List<OCRExtractSettingsDto> ocrExtractSettingsDtoList = OCRExtractSettingsDtoMapper
             .toOCRExtractSettingsDtoList(Arrays.asList(ocrRegions));
-        ConfigurationDto configurationDto = ConfigurationMapper.toConfigurationDto(configuration);
+        ConfigurationDto configurationDto = ConfigurationMapper
+                .toConfigurationDto(configuration, runner.isDontCloseBatches());
 
         return commandExecutor.extractText(eyesRef, ocrExtractSettingsDtoList, configurationDto);
 

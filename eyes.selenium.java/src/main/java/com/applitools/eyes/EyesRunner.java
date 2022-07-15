@@ -65,7 +65,7 @@ public abstract class EyesRunner {
     commandExecutor = CommandExecutor.getInstance(baseAgentId, version);
   }
 
-  private boolean dontCloseBatches = false;
+  private Boolean dontCloseBatches;
 
   protected Logger logger = new Logger();
 
@@ -83,20 +83,20 @@ public abstract class EyesRunner {
   }
 
   private void deleteAllBatches() {
-    if (dontCloseBatches) {
-      return;
-    }
-
-    boolean dontCloseBatchesStr = GeneralUtils.getDontCloseBatches();
-    if (dontCloseBatchesStr) {
-      return;
-    }
-
-    logger.log(new HashSet<String>(), Stage.CLOSE, Type.CLOSE_BATCH, Pair.of("batchSize", batchesServerConnectorsMap.size()));
-    for (String batch : batchesServerConnectorsMap.keySet()) {
-      IBatchCloser connector = batchesServerConnectorsMap.get(batch);
-      connector.closeBatch(batch);
-    }
+//    if (dontCloseBatches) {
+//      return;
+//    }
+//
+//    boolean dontCloseBatchesStr = GeneralUtils.getDontCloseBatches();
+//    if (dontCloseBatchesStr) {
+//      return;
+//    }
+//
+//    logger.log(new HashSet<String>(), Stage.CLOSE, Type.CLOSE_BATCH, Pair.of("batchSize", batchesServerConnectorsMap.size()));
+//    for (String batch : batchesServerConnectorsMap.keySet()) {
+//      IBatchCloser connector = batchesServerConnectorsMap.get(batch);
+//      connector.closeBatch(batch);
+//    }
   }
 
   public void setLogHandler(LogHandler logHandler) {
@@ -248,6 +248,10 @@ public abstract class EyesRunner {
         }
         break;
     }
+  }
+
+  public Boolean isDontCloseBatches() {
+    return dontCloseBatches;
   }
 
 }
