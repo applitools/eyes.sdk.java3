@@ -253,5 +253,4 @@ public abstract class EyesRunner {
   public Boolean isDontCloseBatches() {
     return dontCloseBatches;
   }
-
 }
