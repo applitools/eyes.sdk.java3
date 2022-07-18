@@ -1,3 +1,7 @@
+## [5.13.0] - 2022-07-13
+### Updated
+- Universal core version to 2.9.9 (Appium SRE issue fix). [Trello 2633](https://trello.com/c/dQqN02TN)
+
 ## [5.12.0] - 2022-07-13
 ### Fixed
 - ScrollRootElement not passed in Appium. [Trello 2633](https://trello.com/c/dQqN02TN)
