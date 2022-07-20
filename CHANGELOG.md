@@ -1,3 +1,7 @@
+## [5.14.0] - 2022-07-20
+### Updated
+- Universal core version to 2.9.10. [Trello 2788](https://trello.com/c/U13YMYHO)
+
 ## [5.13.0] - 2022-07-13
 ### Updated
 - Universal core version to 2.9.9 (Appium SRE issue fix). [Trello 2633](https://trello.com/c/dQqN02TN)
