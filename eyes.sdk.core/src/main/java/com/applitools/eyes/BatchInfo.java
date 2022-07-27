@@ -32,6 +32,9 @@ public class BatchInfo {
     @JsonProperty("isCompleted")
     private boolean isCompleted = false;
 
+    @JsonProperty("applyIsCompleted")
+    private boolean applyIsCompleted = false;
+
     @JsonProperty("properties")
     private final List<Map<String, String>> properties = new ArrayList<>();
 
@@ -175,6 +178,18 @@ public class BatchInfo {
     public void setCompleted(boolean completed) {
         isCompleted = completed;
     }
+
+    @JsonIgnore
+    public boolean getApplyIsCompleted() {
+        return applyIsCompleted;
+    }
+
+    @JsonInclude
+    public void setApplyIsCompleted(boolean applyIsCompleted) {
+        this.applyIsCompleted = applyIsCompleted;
+    }
+
+
 
     public BatchInfo addProperty(final String name, final String value) {
         properties.add(new HashMap<String, String>() {{put("name", name);put("value", value);}});
