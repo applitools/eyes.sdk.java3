@@ -56,7 +56,7 @@ public final class TestBatchAPI extends ReportingTestSuite {
             ClassicRunner runner1 = new ClassicRunner();
             runner1.setDontCloseBatches(true);
 
-            BatchInfo batchInfo = new BatchInfo("DontCloseBatch Testing");
+            BatchInfo batchInfo = new BatchInfo("DontCloseBatch Tests");
             String batchId = UUID.randomUUID().toString();
             batchInfo.setId(batchId);
 
@@ -85,7 +85,7 @@ public final class TestBatchAPI extends ReportingTestSuite {
             runner2.setDontCloseBatches(true);
             Eyes eyes2 = new Eyes(runner2);
             eyes2.setApiKey(System.getenv("APPLITOOLS_API_KEY"));
-            BatchInfo batchInfo2 = new BatchInfo("DontCloseBatch Testing2");
+            BatchInfo batchInfo2 = new BatchInfo("If you see this - TestBatchAPI failed");
             batchInfo2.setId(batchId);
             eyes2.setBatch(batchInfo2);
 
@@ -115,7 +115,7 @@ public final class TestBatchAPI extends ReportingTestSuite {
         try {
             ClassicRunner runner1 = new ClassicRunner();
 
-            BatchInfo batchInfo = new BatchInfo("DontCloseBatch Testing");
+            BatchInfo batchInfo = new BatchInfo("CloseBatch By Default Tests");
             String batchId = UUID.randomUUID().toString();
             batchInfo.setId(batchId);
 
