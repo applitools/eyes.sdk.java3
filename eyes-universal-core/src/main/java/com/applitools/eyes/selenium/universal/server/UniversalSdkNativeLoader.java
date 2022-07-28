@@ -83,7 +83,8 @@ public class UniversalSdkNativeLoader {
         setPosixPermissionsToPath(osVersion, path);
         nativeProcess = createProcess(path.toString());
       } catch (Exception e) {
-        e.printStackTrace();
+        System.err.println("Could not start server, error: " + e.getMessage());
+        throw new EyesException("Could not start server", e);
       }
       readPortOfProcess(nativeProcess);
     }
@@ -116,8 +117,8 @@ public class UniversalSdkNativeLoader {
         InputStreamReader(process.getInputStream()))) {
       getFirstLineAsPort(input);
     } catch (Exception e) {
+      System.err.println("Cannot read server port, error: " + e.getMessage());
       e.printStackTrace();
-      System.err.println("Cannot read server port: " + e.getMessage());
       throw new EyesException("Could not read server port", e);
     }
   }
