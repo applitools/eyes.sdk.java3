@@ -46,7 +46,10 @@ public class DriverMapper {
        return url;
       } catch (Exception e) {
         try {
-          final Class<?> remoteDriverClass = webDriver.getClass();
+          Class<?> remoteDriverClass = webDriver.getClass();
+          while (remoteDriverClass != RemoteWebDriver.class) {
+              remoteDriverClass = remoteDriverClass.getSuperclass();
+          }
 
           final Field executorField = remoteDriverClass.getDeclaredField(EXECUTOR);
           executorField.setAccessible(true);
@@ -63,7 +66,7 @@ public class DriverMapper {
           Object remoteServer = remoteServerField.get(httpCommandExecutor);
           url = remoteServer.toString();
         } catch (Exception e1) {
-          e.printStackTrace();
+          e1.printStackTrace();
           throw new EyesException("Unsupported webDriver implementation", e1);
         }
       }
