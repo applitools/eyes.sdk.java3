@@ -51,8 +51,6 @@ public class DriverMapper {
               remoteDriverClass = remoteDriverClass.getSuperclass();
           }
 
-          remoteDriverClass.getDeclaredFields();
-
           final Field executorField = remoteDriverClass.getDeclaredField(EXECUTOR);
           executorField.setAccessible(true);
           Object tracedCommandExecutor = executorField.get(webDriver); // TracedCommandExecutor
