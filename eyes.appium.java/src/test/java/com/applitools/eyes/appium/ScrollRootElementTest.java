@@ -38,5 +38,4 @@ public class ScrollRootElementTest {
             eyes.abortIfNotClosed();
         }
     }
-
 }
