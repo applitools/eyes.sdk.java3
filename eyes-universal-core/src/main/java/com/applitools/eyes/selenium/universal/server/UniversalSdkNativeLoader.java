@@ -117,6 +117,7 @@ public class UniversalSdkNativeLoader {
       getFirstLineAsPort(input);
     } catch (Exception e) {
       e.printStackTrace();
+      System.err.println("Cannot read server port: " + e.getMessage());
       throw new EyesException("Could not read server port", e);
     }
   }
