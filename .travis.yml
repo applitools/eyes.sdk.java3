@@ -58,12 +58,12 @@ jobs:
         - echo $APPLITOOLS_REPORT_ID
         - chmod +x ./runTests.sh
         - ./runTests.sh "selenium4"
-    - name: Selenium Specific
-      if: type != cron
-      script:
-        - echo $APPLITOOLS_REPORT_ID
-        - chmod +x ./runTests.sh
-        - ./runTests.sh "eyes.selenium.java"
+#    - name: Selenium Specific
+#      if: type != cron
+#      script:
+#        - echo $APPLITOOLS_REPORT_ID
+#        - chmod +x ./runTests.sh
+#        - ./runTests.sh "eyes.selenium.java"
 #    - name: Selenium
 #      script:
 #        - echo $APPLITOOLS_REPORT_ID
