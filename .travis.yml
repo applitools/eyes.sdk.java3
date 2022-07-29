@@ -64,7 +64,7 @@ jobs:
         - echo $APPLITOOLS_REPORT_ID
         - chmod +x ./runTests.sh
         - ./runTests.sh "selenium4"
-    #    - name: Selenium
+#    - name: Selenium
 #      script:
 #        - echo $APPLITOOLS_REPORT_ID
 #        - google-chrome --version
