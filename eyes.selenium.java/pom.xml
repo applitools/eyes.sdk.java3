@@ -11,7 +11,7 @@
 
     <properties>
         <defaultSuiteFiles>
-            passedTestsSuite.xml
+            SpecificTestsSuite.xml
         </defaultSuiteFiles>
         <suiteFile>${defaultSuiteFiles}</suiteFile>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
