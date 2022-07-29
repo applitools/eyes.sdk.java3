@@ -1,6 +1,13 @@
 ## [5.14.0] - 2022-07-20
 ### Updated
-- Universal core version to 2.9.10. [Trello 2788](https://trello.com/c/U13YMYHO)
+- Universal core version updared to 2.9.13.
+- Added support for wrapped Serenity driver [Trello 2967](https://trello.com/c/xRUUVSXZ)
+### Fixed
+- Missing resource in web UFG. [Trello 2788](https://trello.com/c/U13YMYHO)
+- "Don't close batches" fix for runner API. [Trello 2968](https://trello.com/c/5Sjvt505)
+- Android Native RecycleView edge case fix. [Trello 2834](https://trello.com/c/MvCP3cer)
+- iOS Native black bars in stitching. [Trello 2543](https://trello.com/c/gT47BTwz)
+- iOS Native Screenshot landscape mode crash. [Trello 2653](https://trello.com/c/ELqus4LO)
 
 ## [5.13.0] - 2022-07-13
 ### Updated
