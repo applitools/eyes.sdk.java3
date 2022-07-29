@@ -18,6 +18,10 @@ public final class TestBatchAPI extends ReportingTestSuite {
 
     private static WebDriver driver;
 
+    public TestBatchAPI() {
+        super.setGroupName("selenium");
+    }
+
     @BeforeClass
     public static void classSetup() {
         driver = SeleniumUtils.createChromeDriver();
@@ -27,10 +31,6 @@ public final class TestBatchAPI extends ReportingTestSuite {
     @AfterClass
     public static void classTearDown() {
         driver.quit();
-    }
-
-    public TestBatchAPI() {
-        super.setGroupName("selenium");
     }
 
     @Test
