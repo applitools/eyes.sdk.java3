@@ -24,6 +24,7 @@ public class UniversalSdkNativeLoader {
   private static final String DEFAULT_SERVER_PORT = "21077";
   private static final String BINARY_SERVER_PATH = "APPLITOOLS_UNIVERSAL_PATH";
   private static final String TEMP_FOLDER_PATH = "java.io.tmpdir";
+  private static String APPLITOOLS_LOG_DIR = GeneralUtils.getEnvString("APPLITOOLS_LOG_DIR");
 
   public synchronized static void start() {
     try {
