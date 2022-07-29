@@ -39,7 +39,7 @@ before_script:
 jobs:
   include:
     - stage: Test
-    - name: Core
+      name: Core
       script:
         - echo $APPLITOOLS_REPORT_ID
         - chmod +x ./runTests.sh
