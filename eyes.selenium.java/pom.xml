@@ -9,14 +9,6 @@
 
     <description>Applitools Eyes SDK for Selenium Java WebDriver</description>
 
-    <properties>
-        <defaultSuiteFiles>
-            passedTestsSuite.xml
-        </defaultSuiteFiles>
-        <suiteFile>${defaultSuiteFiles}</suiteFile>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    </properties>
-
     <parent>
         <groupId>com.applitools</groupId>
         <artifactId>eyes-sdk-java5-parent</artifactId>
@@ -79,14 +71,8 @@
                 <artifactId>maven-surefire-plugin</artifactId>
                 <version>2.22.0</version>
                 <configuration>
-                    <properties>
-                        <property>
-                            <name>suitethreadpoolsize</name>
-                            <value>2</value>
-                        </property>
-                    </properties>
                     <suiteXmlFiles>
-                        <suiteXmlFile>${suiteFile}</suiteXmlFile>
+                        <suiteXmlFile>SpecificTestsSuite.xml</suiteXmlFile>
                     </suiteXmlFiles>
                     <useFile>false</useFile>
                     <trimStackTrace>false</trimStackTrace>

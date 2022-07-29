@@ -1,49 +1,104 @@
 package com.applitools.eyes.selenium;
 
 import com.applitools.eyes.*;
+import com.applitools.eyes.config.Configuration;
 import com.applitools.eyes.utils.CommunicationUtils;
 import com.applitools.eyes.utils.ReportingTestSuite;
 import com.applitools.eyes.utils.SeleniumUtils;
 import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.chrome.ChromeDriver;
 import org.testng.Assert;
+import org.testng.annotations.AfterClass;
+import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 import java.util.UUID;
 
 public final class TestBatchAPI extends ReportingTestSuite {
 
+    private static WebDriver driver;
+
     public TestBatchAPI() {
         super.setGroupName("selenium");
     }
 
+    @BeforeClass
+    public static void classSetup() {
+//        String chromeDriverPath = System.getenv("CHROME_DRIVER_PATH");
+//        if(chromeDriverPath == null) throw new EyesException("CHROME_DRIVER_PATH missing");
+//        System.setProperty("webdriver.chrome.driver", chromeDriverPath);
+//        driver = SeleniumUtils.createChromeDriver();
+        driver = new ChromeDriver();
+        driver.get("https://applitools.com/helloworld");
+    }
+
+    @AfterClass
+    public static void classTearDown() {
+        driver.quit();
+    }
+
     @Test
-    public void testCloseBatch() throws Exception {
+    public void testDontCloseBatches() {
+        String batchId = UUID.randomUUID().toString();
+
+        TestResultsSummary summary;
+
+        // First test, batch should not be closed.
+        BatchInfo batchInfo1 = new BatchInfo("DontCloseBatch Tests");
+        batchInfo1.setId(batchId);
+        summary = runSingleTest(driver, batchInfo1, "DontCloseBatches Test1", true);
+        Assert.assertEquals(summary.size(), 1);
+        String batchId1 = summary.getAllResults()[0].getTestResults().getBatchId();
+
+        // Second test, batch should not be closed (default).
+        BatchInfo batchInfo2 = new BatchInfo("If you see this - testDontCloseBatches failed");
+        batchInfo2.setId(batchId);
+        summary = runSingleTest(driver, batchInfo2, "DontCloseBatches Test2", null);
+        Assert.assertEquals(summary.size(), 1);
+        String batchId2 = summary.getAllResults()[0].getTestResults().getBatchId();
+
+        Assert.assertEquals(batchId1, batchId2, "First batch was closed!");
+
+    }
+
+    @Test
+    public void testCloseBatches() {
+        String batchId = UUID.randomUUID().toString();
+
+        TestResultsSummary summary;
+
+        // First test, batch should not be closed.
+        BatchInfo batchInfo1 = new BatchInfo("CloseBatch - Batch1/2");
+        batchInfo1.setId(batchId);
+        summary = runSingleTest(driver, batchInfo1, "DontCloseBatches Test1", false);
+        Assert.assertEquals(summary.size(), 1);
+        String batchId1 = summary.getAllResults()[0].getTestResults().getBatchId();
+
+        // Second test, batch should not be closed (default).
+        BatchInfo batchInfo2 = new BatchInfo("CloseBatch - Batch2/2");
+        batchInfo2.setId(batchId);
+        summary = runSingleTest(driver, batchInfo2, "DontCloseBatches Test2", null);
+        Assert.assertEquals(summary.size(), 1);
+        String batchId2 = summary.getAllResults()[0].getTestResults().getBatchId();
+
+        Assert.assertNotEquals(batchId1, batchId2, "First batch was not closed!");
+    }
+
+    public static TestResultsSummary runSingleTest(WebDriver driver, BatchInfo batchInfo, String testName,
+                                                   Boolean dontCloseBatches) {
         ClassicRunner runner = new ClassicRunner();
-        Eyes eyes = new Eyes(runner);
-        eyes.setLogHandler(new StdoutLogHandler());
-        BatchInfo batchInfo = new BatchInfo("Runner Testing");
-        batchInfo.setId(UUID.randomUUID().toString());
-        eyes.setBatch(batchInfo);
 
-        WebDriver driver = SeleniumUtils.createChromeDriver();
-        try {
-            driver.get("https://applitools.com/helloworld");
-
-            eyes.open(driver, "Applitools Eyes Java SDK", "Test Close Batch", new RectangleSize(1200, 800));
-
-            BatchInfo batchBeforeDelete = CommunicationUtils.getBatch(eyes.getLogger(), batchInfo.getId(), eyes.getServerUrl().toString(), eyes.getApiKey());
-
-            Assert.assertFalse(batchBeforeDelete.isCompleted());
-
-            eyes.closeAsync();
-        } finally {
-            driver.quit();
-            eyes.abortAsync();
-            runner.getAllTestResults(false);
-            eyes.getServerConnector().closeBatch(batchInfo.getId());
+        if (dontCloseBatches != null) {
+            runner.setDontCloseBatches(dontCloseBatches);
         }
 
-        // Getting 200 for the request is enough for the test
-        CommunicationUtils.getBatch(eyes.getLogger(), batchInfo.getId(), eyes.getServerUrl().toString(), eyes.getApiKey());
+        Eyes eyes1 = new Eyes(runner);
+        eyes1.setBatch(batchInfo);
+
+        eyes1.open(driver, "Applitools Eyes Java SDK", testName);
+        eyes1.closeAsync();
+
+        return runner.getAllTestResults(false);
+
     }
 }

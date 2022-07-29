@@ -176,6 +176,7 @@ public class BatchInfo {
         isCompleted = completed;
     }
 
+
     public BatchInfo addProperty(final String name, final String value) {
         properties.add(new HashMap<String, String>() {{put("name", name);put("value", value);}});
         return this;

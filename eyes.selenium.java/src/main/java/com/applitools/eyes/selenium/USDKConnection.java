@@ -152,12 +152,12 @@ public class USDKConnection {
 
                 @Override
                 public void onError(Throwable t) {
-                  throw new EyesException("Websocket communication error", t);
+                  throw new EyesException("Websocket communication error: " + t.getMessage(), t);
                 }
               }).build()).get();
 
     } catch (Exception e) {
-      throw new EyesException("Communication with server is failed", e);
+      throw new EyesException("Communication with server failed, reason: " + e.getMessage(), e);
     }
 
   }
