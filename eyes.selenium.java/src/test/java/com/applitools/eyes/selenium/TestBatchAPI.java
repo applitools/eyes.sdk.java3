@@ -24,6 +24,9 @@ public final class TestBatchAPI extends ReportingTestSuite {
 
     @BeforeClass
     public static void classSetup() {
+        String chromeDriverPath = System.getenv("CHROME_DRIVER_PATH");
+        if(chromeDriverPath == null) throw new EyesException("CHROME_DRIVER_PATH missing");
+        System.setProperty("webdriver.chrome.driver", chromeDriverPath);
         driver = SeleniumUtils.createChromeDriver();
         driver.get("https://applitools.com/helloworld");
     }
@@ -34,7 +37,7 @@ public final class TestBatchAPI extends ReportingTestSuite {
     }
 
     @Test
-    public void testDontCloseBatches() throws Exception {
+    public void testDontCloseBatches() {
         String batchId = UUID.randomUUID().toString();
 
         TestResultsSummary summary;
@@ -58,7 +61,7 @@ public final class TestBatchAPI extends ReportingTestSuite {
     }
 
     @Test
-    public void testCloseBatches() throws Exception {
+    public void testCloseBatches() {
         String batchId = UUID.randomUUID().toString();
 
         TestResultsSummary summary;
