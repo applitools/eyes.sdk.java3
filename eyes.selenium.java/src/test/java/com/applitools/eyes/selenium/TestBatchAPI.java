@@ -33,24 +33,6 @@ public final class TestBatchAPI extends ReportingTestSuite {
         super.setGroupName("selenium");
     }
 
-    public static TestResultsSummary runSingleTest(WebDriver driver, BatchInfo batchInfo, String testName,
-                                                   Boolean dontCloseBatches) {
-        ClassicRunner runner = new ClassicRunner();
-
-        if (dontCloseBatches != null) {
-            runner.setDontCloseBatches(dontCloseBatches);
-        }
-
-        Eyes eyes1 = new Eyes(runner);
-        eyes1.setBatch(batchInfo);
-
-        eyes1.open(driver, "Applitools Eyes Java SDK", testName);
-        eyes1.closeAsync();
-
-        return runner.getAllTestResults(false);
-
-    }
-
     @Test
     public void testDontCloseBatches() throws Exception {
         String batchId = UUID.randomUUID().toString();
@@ -96,5 +78,23 @@ public final class TestBatchAPI extends ReportingTestSuite {
         String batchId2 = summary.getAllResults()[0].getTestResults().getBatchId();
 
         Assert.assertNotEquals(batchId1, batchId2, "First batch was not closed!");
+    }
+
+    public static TestResultsSummary runSingleTest(WebDriver driver, BatchInfo batchInfo, String testName,
+                                                   Boolean dontCloseBatches) {
+        ClassicRunner runner = new ClassicRunner();
+
+        if (dontCloseBatches != null) {
+            runner.setDontCloseBatches(dontCloseBatches);
+        }
+
+        Eyes eyes1 = new Eyes(runner);
+        eyes1.setBatch(batchInfo);
+
+        eyes1.open(driver, "Applitools Eyes Java SDK", testName);
+        eyes1.closeAsync();
+
+        return runner.getAllTestResults(false);
+
     }
 }
