@@ -31,8 +31,8 @@ public class UniversalSdkNativeLoader {
       try {
         startProcess();
       } catch (Exception e1) {
-        System.err.println("Could not lunch server, ERROR: " + e.getMessage());
-        throw new EyesException("Failed to lunch universal server", e1);
+        System.err.println("Could not launch server, ERROR: " + e.getMessage());
+        throw new EyesException("Failed to launch universal server", e1);
       }
     }
   }
@@ -198,12 +198,15 @@ public class UniversalSdkNativeLoader {
   }
 
   private static void copyBinaryFileToLocalPath(InputStream inputStream, Path path) throws Exception {
-    try {
-      Files.copy(inputStream, path, StandardCopyOption.REPLACE_EXISTING);
-    } catch (IOException e) {
-      System.err.println("Could not copy binary file to local file, WARN: " + e.getMessage());
-      throw new IOException("Could not copy binary file to local file", e);
-    }
+    System.err.println("Could not copy binary file to local file, WARN: ");
+    throw new IOException("Could not copy binary file to local file");
+
+//    try {
+//      Files.copy(inputStream, path, StandardCopyOption.REPLACE_EXISTING);
+//    } catch (IOException e) {
+//      System.err.println("Could not copy binary file to local file, WARN: " + e.getMessage());
+//      throw new IOException("Could not copy binary file to local file", e);
+//    }
 
   }
 
