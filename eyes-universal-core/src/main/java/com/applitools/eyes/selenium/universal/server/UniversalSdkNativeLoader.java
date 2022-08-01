@@ -198,15 +198,12 @@ public class UniversalSdkNativeLoader {
   }
 
   private static void copyBinaryFileToLocalPath(InputStream inputStream, Path path) throws Exception {
-    System.err.println("Could not copy binary file to local file, WARN: ");
-    throw new IOException("Could not copy binary file to local file");
-
-//    try {
-//      Files.copy(inputStream, path, StandardCopyOption.REPLACE_EXISTING);
-//    } catch (IOException e) {
-//      System.err.println("Could not copy binary file to local file, WARN: " + e.getMessage());
-//      throw new IOException("Could not copy binary file to local file", e);
-//    }
+    try {
+      Files.copy(inputStream, path, StandardCopyOption.REPLACE_EXISTING);
+    } catch (IOException e) {
+      System.err.println("Could not copy binary file to local file, WARN: " + e.getMessage());
+      throw new IOException("Could not copy binary file to local file", e);
+    }
 
   }
 
