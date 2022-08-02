@@ -129,14 +129,8 @@ public class UniversalSdkNativeLoader {
 
   // ENHANCE
   private static void getFirstLineAsPort(BufferedReader reader)  throws Exception {
-    String temp;
-    String lastLine;
     try {
-      while ((temp = reader.readLine()) != null) {
-        lastLine = temp;
-        port = Integer.parseInt(lastLine);
-        break;
-      }
+      port = Integer.parseInt(reader.readLine());
       reader.close();
     } catch (Exception e) {
       System.err.println("Could not read first line as port, ERROR: " + e.getMessage());
