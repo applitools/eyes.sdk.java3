@@ -20,8 +20,8 @@ import com.applitools.utils.GeneralUtils;
  */
 public class UniversalSdkNativeLoader {
   private static Process nativeProcess = null;
-  private static String port;
-  private static final String DEFAULT_SERVER_PORT = "21077";
+  private static final Integer DEFAULT_SERVER_PORT = 21077;
+  private static Integer port = DEFAULT_SERVER_PORT;
   private static final String BINARY_SERVER_PATH = "APPLITOOLS_UNIVERSAL_PATH";
   private static final String TEMP_FOLDER_PATH = "java.io.tmpdir";
 
@@ -80,14 +80,13 @@ public class UniversalSdkNativeLoader {
       try {
         Files.copy(inputStream, path, StandardCopyOption.REPLACE_EXISTING);
         inputStream.close();
-
         setPosixPermissionsToPath(osVersion, path);
         nativeProcess = createProcess(path.toString());
-        readPortOfProcess(nativeProcess);
       } catch (Exception e) {
-        port = DEFAULT_SERVER_PORT;
+        System.err.println("Could not start server, error: " + e.getMessage());
+        throw new EyesException("Could not start server", e);
       }
-
+      readPortOfProcess(nativeProcess);
     }
 
   }
@@ -117,25 +116,27 @@ public class UniversalSdkNativeLoader {
     try (BufferedReader input = new BufferedReader(new
         InputStreamReader(process.getInputStream()))) {
       getFirstLineAsPort(input);
-    } catch (IOException e) {
+    } catch (Exception e) {
+      System.err.println("Cannot read server port, error: " + e.getMessage());
       e.printStackTrace();
+      throw new EyesException("Could not read server port", e);
     }
   }
 
   // ENHANCE
-  private static void getFirstLineAsPort(BufferedReader reader) throws IOException {
+  private static void getFirstLineAsPort(BufferedReader reader) throws Exception {
     String temp;
     String lastLine;
     while ((temp = reader.readLine()) != null) {
       lastLine = temp;
-      port = lastLine;
+      port =  Integer.parseInt(lastLine);
       break;
     }
 
     reader.close();
   }
 
-  public static String getPort() {
+  public static Integer getPort() {
     return port;
   }
 
