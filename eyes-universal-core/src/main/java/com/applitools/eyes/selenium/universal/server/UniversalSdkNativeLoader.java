@@ -78,7 +78,7 @@ public class UniversalSdkNativeLoader {
 
       try {
         copyBinaryFileToLocalPath(inputStream, path);
-      } catch (Exception e) {
+      } catch (IOException e) {
         // probably file in specified path is running, continue to start process
       }
 
@@ -190,7 +190,7 @@ public class UniversalSdkNativeLoader {
 
   }
 
-  private static void copyBinaryFileToLocalPath(InputStream inputStream, Path path) throws Exception {
+  private static void copyBinaryFileToLocalPath(InputStream inputStream, Path path) throws IOException {
     try {
       Files.copy(inputStream, path, StandardCopyOption.REPLACE_EXISTING);
     } catch (IOException e) {
