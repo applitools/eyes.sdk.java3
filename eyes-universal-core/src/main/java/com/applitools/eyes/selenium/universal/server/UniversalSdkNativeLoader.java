@@ -87,7 +87,6 @@ public class UniversalSdkNativeLoader {
       nativeProcess = createProcess(path.toString());
       readPortOfProcess(nativeProcess);
     }
-
   }
 
   // get an input stream from the resources folder
