@@ -1,3 +1,10 @@
+## [5.15.0] - 2022-08-02
+### Updated
+- Universal Core start flow. [Trello 2993](https://trello.com/c/ArmjDFta)
+### Fixed
+- Visibility of errors from universal core. [Trello 2994](https://trello.com/c/DcsV34dC)
+
+
 ## [5.14.0] - 2022-07-20
 ### Updated
 - Universal core version updared to 2.9.13.
