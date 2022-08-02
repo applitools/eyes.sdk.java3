@@ -20,8 +20,7 @@ import com.applitools.utils.GeneralUtils;
  */
 public class UniversalSdkNativeLoader {
   private static Process nativeProcess = null;
-  private static String port;
-  private static final String DEFAULT_SERVER_PORT = "21077";
+  private static Integer port;
   private static final String BINARY_SERVER_PATH = "APPLITOOLS_UNIVERSAL_PATH";
   private static final String TEMP_FOLDER_PATH = "java.io.tmpdir";
 
@@ -29,12 +28,11 @@ public class UniversalSdkNativeLoader {
     try {
       startProcess();
     } catch (Exception e) {
-      e.printStackTrace();
       try {
         startProcess();
       } catch (Exception e1) {
-        e1.printStackTrace();
-        throw new EyesException("Failed to start universal server", e1);
+        System.err.println("Could not launch server, ERROR: " + e.getMessage());
+        throw new EyesException("Failed to launch universal server", e1);
       }
     }
   }
@@ -45,7 +43,7 @@ public class UniversalSdkNativeLoader {
     }
   }
 
-  private static void startProcess() {
+  private static void startProcess() throws Exception {
     if (nativeProcess == null || !nativeProcess.isAlive()) {
       String osVersion = GeneralUtils.getPropertyString("os.name").toLowerCase();
       String os;
@@ -62,10 +60,6 @@ public class UniversalSdkNativeLoader {
         suffix = "linux";
       }
 
-      String pathInJar = getBinaryPath(os, suffix);
-      InputStream inputStream = getFileFromResourceAsStream(pathInJar);
-      String fileName = "eyes-universal-" + suffix;
-
       Path directoryPath;
 
       // first check with user defined
@@ -75,25 +69,23 @@ public class UniversalSdkNativeLoader {
         directoryPath = Paths.get(GeneralUtils.getPropertyString(TEMP_FOLDER_PATH));
       }
 
+      String fileName = "eyes-universal-" + suffix;
       Path path = Paths.get(directoryPath + File.separator + fileName);
 
-      try {
-        Files.copy(inputStream, path, StandardCopyOption.REPLACE_EXISTING);
-        inputStream.close();
 
-        setPosixPermissionsToPath(osVersion, path);
-        nativeProcess = createProcess(path.toString());
-        readPortOfProcess(nativeProcess);
-      } catch (Exception e) {
-        port = DEFAULT_SERVER_PORT;
-      }
+      String pathInJar = getBinaryPath(os, suffix);
+      InputStream inputStream = getFileFromResourceAsStream(pathInJar);
 
+      copyBinaryFileToLocalPath(inputStream, path);
+      inputStream.close();
+      setPosixPermissionsToPath(osVersion, path);
+      nativeProcess = createProcess(path.toString());
+      readPortOfProcess(nativeProcess);
     }
-
   }
 
   // get an input stream from the resources folder
-  private static InputStream getFileFromResourceAsStream(String fileName) {
+  private static InputStream getFileFromResourceAsStream(String fileName) throws Exception {
 
     // The class loader that loaded the class
     ClassLoader classLoader = UniversalSdkNativeLoader.class.getClassLoader();
@@ -101,41 +93,48 @@ public class UniversalSdkNativeLoader {
 
     // the stream holding the file content
     if (inputStream == null) {
-      throw new IllegalArgumentException("file not found! " + fileName);
+      System.err.println("Could not find binary file inside jar");
+      throw new Exception("binary file not found! " + fileName);
     } else {
       return inputStream;
     }
 
   }
 
-  private static Process createProcess(String executableName) throws IOException {
-    ProcessBuilder builder = new ProcessBuilder(executableName);
-    return builder.start();
+  private static Process createProcess(String executableName)  throws Exception {
+    try {
+      ProcessBuilder builder = new ProcessBuilder(executableName, "--fork");
+      return builder.start();
+    } catch (IOException e) {
+      System.err.println("Could not start process, ERROR: " + e.getMessage());
+      throw new Exception("Could not start process", e);
+    }
+
   }
 
-  public static void readPortOfProcess(Process process) {
+  public static void readPortOfProcess(Process process) throws Exception {
     try (BufferedReader input = new BufferedReader(new
         InputStreamReader(process.getInputStream()))) {
       getFirstLineAsPort(input);
-    } catch (IOException e) {
-      e.printStackTrace();
+    } catch (Exception e) {
+      System.err.println("Could not read server port, ERROR: " + e.getMessage());
+      throw new Exception("Could not read server port", e);
     }
   }
 
   // ENHANCE
-  private static void getFirstLineAsPort(BufferedReader reader) throws IOException {
-    String temp;
-    String lastLine;
-    while ((temp = reader.readLine()) != null) {
-      lastLine = temp;
-      port = lastLine;
-      break;
+  private static void getFirstLineAsPort(BufferedReader reader)  throws Exception {
+    try {
+      port = Integer.parseInt(reader.readLine());
+      reader.close();
+    } catch (Exception e) {
+      System.err.println("Could not read first line as port, ERROR: " + e.getMessage());
+      throw new Exception("Could not read first line as port", e);
     }
 
-    reader.close();
   }
 
-  public static String getPort() {
+  public static Integer getPort() {
     return port;
   }
 
@@ -157,25 +156,40 @@ public class UniversalSdkNativeLoader {
   }
 
   private static void setPosixPermissionsToPath(String osVersion, Path path) throws Exception {
-    if (!osVersion.contains("windows")) {
-      Set<PosixFilePermission> permissions = new HashSet<>();
 
-      /* -------------------------- OWNER Permissions ----------------------- */
-      permissions.add(PosixFilePermission.OWNER_READ);
-      permissions.add(PosixFilePermission.OWNER_WRITE);
-      permissions.add(PosixFilePermission.OWNER_EXECUTE);
+    try {
+      if (!osVersion.contains("windows")) {
+        Set<PosixFilePermission> permissions = new HashSet<>();
 
-      /* -------------------------- GROUP Permissions ----------------------- */
-      permissions.add(PosixFilePermission.GROUP_READ);
-      permissions.add(PosixFilePermission.GROUP_WRITE);
-      permissions.add(PosixFilePermission.GROUP_EXECUTE);
+        /* -------------------------- OWNER Permissions ----------------------- */
+        permissions.add(PosixFilePermission.OWNER_READ);
+        permissions.add(PosixFilePermission.OWNER_WRITE);
+        permissions.add(PosixFilePermission.OWNER_EXECUTE);
 
-      /* -------------------------- OTHERS Permissions ----------------------- */
-      permissions.add(PosixFilePermission.OTHERS_READ);
-      permissions.add(PosixFilePermission.OTHERS_WRITE);
-      permissions.add(PosixFilePermission.OTHERS_EXECUTE);
+        /* -------------------------- GROUP Permissions ----------------------- */
+        permissions.add(PosixFilePermission.GROUP_READ);
+        permissions.add(PosixFilePermission.GROUP_WRITE);
+        permissions.add(PosixFilePermission.GROUP_EXECUTE);
 
-      Files.setPosixFilePermissions(path, permissions);
+        /* -------------------------- OTHERS Permissions ----------------------- */
+        permissions.add(PosixFilePermission.OTHERS_READ);
+        permissions.add(PosixFilePermission.OTHERS_WRITE);
+        permissions.add(PosixFilePermission.OTHERS_EXECUTE);
+
+        Files.setPosixFilePermissions(path, permissions);
+      }
+    } catch (IOException e) {
+      System.err.println("Could not set posix file permissions, ERROR: " + e.getMessage());
+      throw new Exception("Could not set posix file permissions", e);
+    }
+
+  }
+
+  private static void copyBinaryFileToLocalPath(InputStream inputStream, Path path) {
+    try {
+      Files.copy(inputStream, path, StandardCopyOption.REPLACE_EXISTING);
+    } catch (IOException e) {
+      System.err.println("Could not copy binary file to local file, WARN: " + e.getMessage());
     }
   }
 

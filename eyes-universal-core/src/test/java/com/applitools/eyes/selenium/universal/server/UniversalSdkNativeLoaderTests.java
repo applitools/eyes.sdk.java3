@@ -16,7 +16,7 @@ public class UniversalSdkNativeLoaderTests {
                     .thenReturn("path");
             utilities.when(() -> GeneralUtils.getPropertyString("os.name")).thenReturn("macos");
             UniversalSdkNativeLoader.start();
-            assertEquals("21077", UniversalSdkNativeLoader.getPort());
+            assertEquals(21077, (int)UniversalSdkNativeLoader.getPort());
             assertEquals("path", GeneralUtils.getEnvString("APPLITOOLS_UNIVERSAL_PATH"));
         }
     }

@@ -269,7 +269,7 @@ public class TestSeleniumEyes extends ReportingTestSuite {
             utilities.when(GeneralUtils::getServerUrl).thenReturn(URI.create("http://locahost:8080"));
             Eyes eyes = new Eyes();
             eyes.open(new ChromeDriver(), "app name", "test name");
-            assertEquals("21077", UniversalSdkNativeLoader.getPort());
+            assertEquals(21077, (int) UniversalSdkNativeLoader.getPort());
             assertEquals("path", GeneralUtils.getEnvString("APPLITOOLS_UNIVERSAL_PATH"));
         }
     }
