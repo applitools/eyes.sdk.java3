@@ -222,6 +222,9 @@ public abstract class EyesRunner {
   }
 
   public void logSessionResultsAndThrowException(boolean throwEx, TestResults results) {
+    if (results == null) {
+      return;
+    }
     TestResultsStatus status = results.getStatus();
     String sessionResultsUrl = results.getUrl();
     String scenarioIdOrName = results.getName();
