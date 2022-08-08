@@ -12,4 +12,8 @@ public class DiffsFoundException extends TestFailedException {
                 appIdOrName,
                 testResults.getUrl()));
     }
+
+    public DiffsFoundException(String message) {
+        super(message);
+    }
 }

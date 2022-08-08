@@ -13,4 +13,8 @@ public class NewTestException extends TestFailedException {
                 appIdOrName,
                 testResults.getUrl()));
     }
+
+    public NewTestException(String message) {
+        super(message);
+    }
 }

@@ -17,6 +17,7 @@ import com.applitools.eyes.logging.Stage;
 import com.applitools.eyes.logging.Type;
 import com.applitools.eyes.selenium.CommandExecutor;
 import com.applitools.eyes.selenium.Reference;
+import com.applitools.eyes.selenium.universal.dto.TestResultContainerDto;
 import com.applitools.eyes.selenium.universal.dto.TestResultsSummaryDto;
 import com.applitools.eyes.selenium.universal.dto.response.CommandCloseResponseDto;
 import com.applitools.eyes.selenium.universal.mapper.TestResultsMapper;
@@ -79,6 +80,13 @@ public abstract class EyesRunner {
 
   public TestResultsSummary getAllTestResults(boolean shouldThrowException) {
     TestResultsSummaryDto dto = commandExecutor.closeManager(managerRef, shouldThrowException);
+    if (dto != null) {
+      List<TestResultContainerDto> results = dto.getResults();
+      for (TestResultContainerDto result : results) {
+        TestResults testResults = result.getTestResults();
+        logSessionResultsAndThrowException(shouldThrowException, testResults);
+      }
+    }
     return TestResultsSummaryMapper.fromDto(dto);
   }
 
