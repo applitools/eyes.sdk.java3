@@ -11,7 +11,7 @@ import org.testng.annotations.Test;
 public class CloseManagerTests {
 
     @Test(expectedExceptions = NewTestException.class)
-    public void should_ThrowNewTestException_When_CloseManagerWthNew() {
+    public void shouldThrowNewTestExceptionWhenCloseManagerWthNew() {
         ClassicRunner classicRunner = new ClassicRunner();
         Eyes eyes = new Eyes(classicRunner);
         eyes.setApiKey(System.getenv("APPLITOOLS_API_KEY"));

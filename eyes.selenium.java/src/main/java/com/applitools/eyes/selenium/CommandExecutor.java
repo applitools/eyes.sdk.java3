@@ -8,7 +8,6 @@ import java.util.UUID;
 import com.applitools.eyes.EyesException;
 import com.applitools.eyes.Region;
 import com.applitools.eyes.SyncTaskListener;
-import com.applitools.eyes.TestResults;
 import com.applitools.eyes.exceptions.DiffsFoundException;
 import com.applitools.eyes.exceptions.NewTestException;
 import com.applitools.eyes.exceptions.TestFailedException;
@@ -233,8 +232,7 @@ public class CommandExecutor {
     request.setPayload(new CommandCloseManagerRequestDto(managerRef, throwError));
     SyncTaskListener syncTaskListener = checkedCommand(request, true);
     ResponseDto<TestResultsSummaryDto> closeResponse = (ResponseDto<TestResultsSummaryDto>) syncTaskListener.get();
-    if (closeResponse != null) {
-      if (closeResponse.getPayload() != null) {
+    if (closeResponse != null && closeResponse.getPayload() != null) {
         if (closeResponse.getPayload().getError() != null) {
           ErrorDto error = closeResponse.getPayload().getError();
           String message = error.getMessage();
@@ -248,8 +246,6 @@ public class CommandExecutor {
         } else {
           return closeResponse.getPayload().getResult();
         }
-
-      }
     }
     return null;
   }
@@ -275,7 +271,8 @@ public class CommandExecutor {
         throw new TestFailedException(message);
       case "test new":
         throw new NewTestException(message);
-
+      default:
+        throw new UnsupportedOperationException("Unsupported exception type: " + reason);
     }
   }
 
