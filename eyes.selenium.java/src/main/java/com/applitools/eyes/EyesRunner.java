@@ -83,11 +83,13 @@ public abstract class EyesRunner {
     if (dto != null) {
       List<TestResultContainerDto> results = dto.getResults();
       for (TestResultContainerDto result : results) {
-        TestResults testResults = result.getTestResults();
-        if (testResults.getStatus() == null) {
-          testResults.setStatus(TestResultsStatus.Disabled);
+        if (result.getTestResults() != null) {
+          TestResults testResults = result.getTestResults();
+          if (testResults.getStatus() == null) {
+            testResults.setStatus(TestResultsStatus.Disabled);
+          }
+          logSessionResultsAndThrowException(shouldThrowException, testResults);
         }
-        logSessionResultsAndThrowException(shouldThrowException, testResults);
       }
     }
     return TestResultsSummaryMapper.fromDto(dto);
