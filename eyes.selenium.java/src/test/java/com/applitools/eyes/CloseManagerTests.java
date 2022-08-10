@@ -83,5 +83,4 @@ public class CloseManagerTests {
             driver.quit();
         }
     }
-
 }
