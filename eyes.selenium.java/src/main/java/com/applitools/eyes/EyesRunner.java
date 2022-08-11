@@ -80,18 +80,6 @@ public abstract class EyesRunner {
 
   public TestResultsSummary getAllTestResults(boolean shouldThrowException) {
     TestResultsSummaryDto dto = commandExecutor.closeManager(managerRef, shouldThrowException);
-    if (dto != null) {
-      List<TestResultContainerDto> results = dto.getResults();
-      for (TestResultContainerDto result : results) {
-        if (result.getTestResults() != null) {
-          TestResults testResults = result.getTestResults();
-          if (testResults.getStatus() == null) {
-            testResults.setStatus(TestResultsStatus.Disabled);
-          }
-          logSessionResultsAndThrowException(shouldThrowException, testResults);
-        }
-      }
-    }
     return TestResultsSummaryMapper.fromDto(dto);
   }
 
