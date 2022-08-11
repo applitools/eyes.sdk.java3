@@ -77,7 +77,6 @@ public class UniversalSdkNativeLoader {
       InputStream inputStream = getFileFromResourceAsStream(pathInJar);
 
       copyBinaryFileToLocalPath(inputStream, path);
-      inputStream.close();
       setPosixPermissionsToPath(osVersion, path);
       nativeProcess = createProcess(path.toString());
       readPortOfProcess(nativeProcess);
@@ -188,6 +187,7 @@ public class UniversalSdkNativeLoader {
   private static void copyBinaryFileToLocalPath(InputStream inputStream, Path path) {
     try {
       Files.copy(inputStream, path, StandardCopyOption.REPLACE_EXISTING);
+      inputStream.close();
     } catch (IOException e) {
       System.err.println("Could not copy binary file to local file, WARN: " + e.getMessage());
     }

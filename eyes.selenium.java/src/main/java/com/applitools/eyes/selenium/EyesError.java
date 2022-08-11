@@ -6,6 +6,7 @@ package com.applitools.eyes.selenium;
 public class EyesError {
   private String message;
   private String stack;
+  private String reason;
 
   public EyesError() {
   }
@@ -29,5 +30,13 @@ public class EyesError {
 
   public void setStack(String stack) {
     this.stack = stack;
+  }
+
+  public String getReason() {
+    return reason;
+  }
+
+  public void setReason(String reason) {
+    this.reason = reason;
   }
 }

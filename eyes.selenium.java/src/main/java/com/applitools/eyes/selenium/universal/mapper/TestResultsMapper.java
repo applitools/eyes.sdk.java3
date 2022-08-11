@@ -36,7 +36,7 @@ public class TestResultsMapper {
     testResults.setStartedAt(null);    // TODO: add startedAt parameter
     testResults.setDuration(response.getDuration());
     testResults.setStepsInfo(toStepInfoArray(response.getStepsInfo()));
-    testResults.setNew(response.getNew());
+    testResults.setNew(response.isNew());
     testResults.setDifferent(response.getDifferent());
     testResults.setAborted(response.getAborted());
     testResults.setUrl(response.getUrl());

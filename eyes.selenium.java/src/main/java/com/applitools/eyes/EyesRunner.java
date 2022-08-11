@@ -2,12 +2,8 @@ package com.applitools.eyes;
 
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 import com.applitools.connectivity.ServerConnector;
 import com.applitools.eyes.exceptions.DiffsFoundException;
@@ -18,8 +14,6 @@ import com.applitools.eyes.logging.Type;
 import com.applitools.eyes.selenium.CommandExecutor;
 import com.applitools.eyes.selenium.Reference;
 import com.applitools.eyes.selenium.universal.dto.TestResultsSummaryDto;
-import com.applitools.eyes.selenium.universal.dto.response.CommandCloseResponseDto;
-import com.applitools.eyes.selenium.universal.mapper.TestResultsMapper;
 import com.applitools.eyes.selenium.universal.mapper.TestResultsSummaryMapper;
 import com.applitools.eyes.selenium.universal.server.UniversalSdkNativeLoader;
 import com.applitools.utils.ClassVersionGetter;
@@ -214,6 +208,9 @@ public abstract class EyesRunner {
   }
 
   public void logSessionResultsAndThrowException(boolean throwEx, TestResults results) {
+    if (results == null) {
+      return;
+    }
     TestResultsStatus status = results.getStatus();
     String sessionResultsUrl = results.getUrl();
     String scenarioIdOrName = results.getName();

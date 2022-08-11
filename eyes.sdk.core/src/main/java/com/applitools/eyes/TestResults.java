@@ -25,7 +25,7 @@ public class TestResults {
     private int layoutMatches;
     private int noneMatches;
     private String url;
-    private boolean isNew;
+    private Boolean isNew;
     private TestResultsStatus status;
     private String name;
     private String secretToken;
@@ -272,7 +272,7 @@ public class TestResults {
      * @return Whether or not this is a new test.
      */
     @JsonGetter("isNew")
-    public boolean isNew() {
+    public Boolean isNew() {
         return isNew;
     }
 
@@ -393,7 +393,7 @@ public class TestResults {
      * @param isNew Whether or not this test has an existing baseline.
      */
     @JsonSetter("isNew")
-    public void setNew(boolean isNew) {
+    public void setNew(Boolean isNew) {
         this.isNew = isNew;
     }
 

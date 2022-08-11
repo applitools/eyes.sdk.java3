@@ -5,6 +5,8 @@ import java.util.List;
 import com.applitools.eyes.selenium.universal.dto.RectangleSizeDto;
 import com.applitools.eyes.selenium.universal.dto.SessionUrlsDto;
 import com.applitools.eyes.selenium.universal.dto.StepInfoDto;
+import com.fasterxml.jackson.annotation.JsonGetter;
+import com.fasterxml.jackson.annotation.JsonSetter;
 
 /**
  * command close response to
@@ -23,7 +25,7 @@ public class CommandCloseResponseDto {
   private RectangleSizeDto hostDisplaySize;
   private String startedAt;
   private Integer duration;
-  private boolean isNew;
+  private Boolean isNew;
   private boolean isDifferent;
   private boolean isAborted;
   private SessionUrlsDto appUrls;
@@ -147,10 +149,12 @@ public class CommandCloseResponseDto {
     this.duration = duration;
   }
 
-  public Boolean getNew() {
+  @JsonGetter("isNew")
+  public Boolean isNew() {
     return isNew;
   }
 
+  @JsonSetter("isNew")
   public void setNew(Boolean aNew) {
     isNew = aNew;
   }
