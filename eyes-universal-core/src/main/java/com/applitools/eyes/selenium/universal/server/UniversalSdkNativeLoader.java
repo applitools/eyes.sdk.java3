@@ -28,11 +28,19 @@ public class UniversalSdkNativeLoader {
     try {
       startProcess();
     } catch (Exception e) {
+      System.err.println("Could not launch server, WARN: " + e.getMessage());
       try {
+        Thread.sleep(2000);
         startProcess();
       } catch (Exception e1) {
-        System.err.println("Could not launch server, ERROR: " + e.getMessage());
-        throw new EyesException("Failed to launch universal server", e1);
+        System.err.println("Could not launch server, WARN: " + e1.getMessage());
+        try {
+          Thread.sleep(2000);
+          startProcess();
+        } catch (Exception e2) {
+          System.err.println("Could not launch server, ERROR: " + e2.getMessage());
+          throw new EyesException("Failed to launch universal server", e2);
+        }
       }
     }
   }
@@ -77,6 +85,7 @@ public class UniversalSdkNativeLoader {
       InputStream inputStream = getFileFromResourceAsStream(pathInJar);
 
       copyBinaryFileToLocalPath(inputStream, path);
+      inputStream.close();
       setPosixPermissionsToPath(osVersion, path);
       nativeProcess = createProcess(path.toString());
       readPortOfProcess(nativeProcess);
@@ -187,9 +196,8 @@ public class UniversalSdkNativeLoader {
   private static void copyBinaryFileToLocalPath(InputStream inputStream, Path path) {
     try {
       Files.copy(inputStream, path, StandardCopyOption.REPLACE_EXISTING);
-      inputStream.close();
     } catch (IOException e) {
-      System.err.println("Could not copy binary file to local file, WARN: " + e.getMessage());
+      System.err.println("Could not copy binary file to " + path +   ", Error: " + e.getMessage());
     }
   }
 
