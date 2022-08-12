@@ -1,3 +1,8 @@
+## [5.15.1] - 2022-08-12
+### Fixed
+- Exception types. [Trello 3008](https://trello.com/c/4DwPh2fj)
+- Handle "reason" parameter to handle exception types
+
 ## [5.15.0] - 2022-08-02
 ### Updated
 - Universal Core start flow. [Trello 2993](https://trello.com/c/ArmjDFta)
