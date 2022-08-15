@@ -28,19 +28,11 @@ public class UniversalSdkNativeLoader {
     try {
       startProcess();
     } catch (Exception e) {
-      System.err.println("Could not launch server, WARN: " + e.getMessage());
       try {
-        Thread.sleep(2000);
         startProcess();
       } catch (Exception e1) {
-        System.err.println("Could not launch server, WARN: " + e1.getMessage());
-        try {
-          Thread.sleep(2000);
-          startProcess();
-        } catch (Exception e2) {
-          System.err.println("Could not launch server, ERROR: " + e2.getMessage());
-          throw new EyesException("Failed to launch universal server", e2);
-        }
+        System.err.println("Could not launch server, ERROR: " + e.getMessage());
+        throw new EyesException("Failed to launch universal server", e1);
       }
     }
   }
@@ -87,7 +79,19 @@ public class UniversalSdkNativeLoader {
       copyBinaryFileToLocalPath(inputStream, path);
       inputStream.close();
       setPosixPermissionsToPath(osVersion, path);
-      nativeProcess = createProcess(path.toString());
+      try {
+        nativeProcess = createProcess(path.toString());
+      } catch (IOException e) {
+        System.err.println("Could not create process, WARN: " + e.getMessage());
+        try {
+          Thread.sleep(3000);
+          nativeProcess = createProcess(path.toString());
+        } catch (IOException e1) {
+          System.err.println("Could not create process, WARN: " + e.getMessage());
+          Thread.sleep(3000);
+          nativeProcess = createProcess(path.toString());
+        }
+      }
       readPortOfProcess(nativeProcess);
     }
   }
@@ -109,13 +113,13 @@ public class UniversalSdkNativeLoader {
 
   }
 
-  private static Process createProcess(String executableName)  throws Exception {
+  private static Process createProcess(String executableName)  throws IOException {
     try {
       ProcessBuilder builder = new ProcessBuilder(executableName, "--fork");
       return builder.start();
     } catch (IOException e) {
       System.err.println("Could not start process, ERROR: " + e.getMessage());
-      throw new Exception("Could not start process", e);
+      throw new IOException("Could not start process", e);
     }
 
   }
