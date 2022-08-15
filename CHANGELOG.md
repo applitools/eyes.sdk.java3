@@ -1,3 +1,9 @@
+## [5.15.x] - 2022-08-15
+### Fixed
+- Text file busy. [Trello 2993](https://trello.com/c/ArmjDFta/)
+- Retry creation of process 3 times if got Text file busy exception
+
+
 ## [5.15.1] - 2022-08-12
 ### Fixed
 - Exception types. [Trello 3008](https://trello.com/c/4DwPh2fj)
