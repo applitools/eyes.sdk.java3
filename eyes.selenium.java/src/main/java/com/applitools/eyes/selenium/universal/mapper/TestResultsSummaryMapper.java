@@ -54,11 +54,11 @@ public class TestResultsSummaryMapper {
           }
         }
         // exception
-        Error throwable = null;
+        Throwable throwable = null;
         if (containerDto.getException() != null ) {
           EyesError eyesError = containerDto.getException();
           throwable = getExceptionBasedOnReason(eyesError.getReason(), eyesError.getInfo() == null ?
-                  null : eyesError.getInfo().getTestResult());
+                  null : eyesError.getInfo().getTestResult(), eyesError.getMessage(), eyesError.getStack());
           if (shouldThrowException) {
             throw new Error(throwable);
           }
@@ -72,12 +72,13 @@ public class TestResultsSummaryMapper {
         dto.getFailed(), dto.getExceptions(), dto.getMismatches(), dto.getMissing(), dto.getMatches());
   }
 
-  private static Error getExceptionBasedOnReason(String reason, TestResults testResults) {
+  private static Throwable getExceptionBasedOnReason(String reason, TestResults testResults, String message,
+                                                     String stack) {
     String scenarioIdOrName;
     String appIdOrName;
 
     if (reason == null || reason.isEmpty()) {
-      throw new EyesException("Test failed with empty reason");
+      return new EyesException("Message: " +  message + ", Stack: " +  stack);
     }
 
     if (testResults == null) {

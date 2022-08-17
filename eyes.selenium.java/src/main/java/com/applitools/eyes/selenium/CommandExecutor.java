@@ -243,7 +243,7 @@ public class CommandExecutor {
             throwExceptionBasedOnReason(error.getReason(), error.getInfo() == null ?
                     null : error.getInfo().getTestResult());
           } else {
-            throw new EyesException(error.getStack());
+            throw new EyesException("Message: " +  error.getMessage() + ", Stack: " +  error.getStack());
           }
         } else {
           return closeResponse.getPayload().getResult();
