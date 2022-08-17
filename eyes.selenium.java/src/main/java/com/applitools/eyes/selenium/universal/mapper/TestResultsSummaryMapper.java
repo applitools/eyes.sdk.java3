@@ -3,7 +3,9 @@ package com.applitools.eyes.selenium.universal.mapper;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.applitools.eyes.EyesException;
 import com.applitools.eyes.TestResultContainer;
+import com.applitools.eyes.TestResults;
 import com.applitools.eyes.TestResultsSummary;
 import com.applitools.eyes.exceptions.DiffsFoundException;
 import com.applitools.eyes.exceptions.NewTestException;
@@ -52,13 +54,15 @@ public class TestResultsSummaryMapper {
           }
         }
         // exception
-        Exception exception = null;
-        if (containerDto.getException() != null && shouldThrowException) {
+        Throwable throwable = null;
+        if (containerDto.getException() != null ) {
           EyesError eyesError = containerDto.getException();
-          Throwable throwable = returnErrorBasedOnReason(eyesError.getReason(), eyesError.getMessage());
-          throw new Error(throwable);
+          throwable = getExceptionBasedOnReason(eyesError.getReason(), eyesError.getInfo().getTestResult());
+          if (shouldThrowException) {
+            throw new Error(throwable);
+          }
         }
-        TestResultContainer container = new TestResultContainer(containerDto.getTestResults(), renderBrowserInfo, exception);
+        TestResultContainer container = new TestResultContainer(containerDto.getTestResults(), renderBrowserInfo, throwable);
         containerList.add(container);
       }
     }
@@ -67,22 +71,32 @@ public class TestResultsSummaryMapper {
         dto.getFailed(), dto.getExceptions(), dto.getMismatches(), dto.getMissing(), dto.getMatches());
   }
 
-  private static Throwable returnErrorBasedOnReason(String reason, String message) {
+  private static Throwable getExceptionBasedOnReason(String reason, TestResults testResults) {
+    String scenarioIdOrName;
+    String appIdOrName;
+
     if (reason == null || reason.isEmpty()) {
-      return null;
+      return new EyesException("Test failed with empty reason");
+    }
+
+    if (testResults == null) {
+      scenarioIdOrName = "(no test results)";
+      appIdOrName = "";
+    } else {
+      scenarioIdOrName = testResults.getName();
+      appIdOrName = testResults.getAppName();
     }
 
     switch (reason) {
       case "test different" :
-        return new DiffsFoundException(message);
+        return new DiffsFoundException(testResults, scenarioIdOrName, appIdOrName);
       case "test failed":
-        return new TestFailedException(message);
+        return new TestFailedException(testResults, scenarioIdOrName, appIdOrName);
       case "test new":
-        return new NewTestException(message);
+        return new NewTestException(testResults, scenarioIdOrName, appIdOrName);
       default:
         throw new UnsupportedOperationException("Unsupported exception type: " + reason);
     }
-
   }
 
 }
