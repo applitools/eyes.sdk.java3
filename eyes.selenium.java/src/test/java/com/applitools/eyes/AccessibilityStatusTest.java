@@ -16,7 +16,7 @@ import java.util.concurrent.TimeUnit;
 public class AccessibilityStatusTest {
 
     @Test
-    public void logIntoBankAccount() {
+    public void testAccessibilityStatus() {
         String apiKey = System.getenv("APPLITOOLS_API_KEY");
         boolean headless = Boolean.parseBoolean(System.getenv().getOrDefault("HEADLESS", "true"));
         ClassicRunner runner = new ClassicRunner();
