@@ -23,7 +23,7 @@ import com.applitools.eyes.visualgrid.model.RenderBrowserInfo;
  */
 public class TestResultsSummaryMapper {
 
-  public static TestResultsSummary fromDto(TestResultsSummaryDto dto) {
+  public static TestResultsSummary fromDto(TestResultsSummaryDto dto, boolean shouldThrowException) {
     if (dto == null) {
       return null;
     }
@@ -53,7 +53,7 @@ public class TestResultsSummaryMapper {
         }
         // exception
         Exception exception = null;
-        if (containerDto.getException() != null) {
+        if (containerDto.getException() != null && shouldThrowException) {
           EyesError eyesError = containerDto.getException();
           Throwable throwable = returnErrorBasedOnReason(eyesError.getReason(), eyesError.getMessage());
           throw new Error(throwable);
