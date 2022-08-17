@@ -42,6 +42,8 @@ public class AccessibilityStatusTest {
 
         TestResults chaseResult = eyes.close();
         Assert.assertNotNull(chaseResult.getAccessibilityStatus().getStatus());
+        Assert.assertNotNull(chaseResult.getAccessibilityStatus().getLevel());
+        Assert.assertNotNull(chaseResult.getAccessibilityStatus().getVersion());
     }
 
 }
