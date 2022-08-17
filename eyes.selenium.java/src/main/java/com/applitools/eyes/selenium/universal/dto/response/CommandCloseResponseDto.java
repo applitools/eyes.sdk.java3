@@ -2,6 +2,7 @@ package com.applitools.eyes.selenium.universal.dto.response;
 
 import java.util.List;
 
+import com.applitools.eyes.SessionAccessibilityStatus;
 import com.applitools.eyes.selenium.universal.dto.RectangleSizeDto;
 import com.applitools.eyes.selenium.universal.dto.SessionUrlsDto;
 import com.applitools.eyes.selenium.universal.dto.StepInfoDto;
@@ -41,6 +42,7 @@ public class CommandCloseResponseDto {
   private int layoutMatches;
   private int noneMatches;
   private String url;
+  private SessionAccessibilityStatus accessibilityStatus;
 
   public CommandCloseResponseDto() {
   }
@@ -277,5 +279,13 @@ public class CommandCloseResponseDto {
 
   public void setUrl(String url) {
     this.url = url;
+  }
+
+  public SessionAccessibilityStatus getAccessibilityStatus() {
+    return accessibilityStatus;
+  }
+
+  public void setAccessibilityStatus(SessionAccessibilityStatus accessibilityStatus) {
+    this.accessibilityStatus = accessibilityStatus;
   }
 }

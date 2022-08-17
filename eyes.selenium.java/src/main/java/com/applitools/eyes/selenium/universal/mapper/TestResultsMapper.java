@@ -66,6 +66,7 @@ public class TestResultsMapper {
     testResults.setContentMatches(response.getContentMatches());
     testResults.setLayoutMatches(response.getLayoutMatches());
     testResults.setNoneMatches(response.getNoneMatches());
+    testResults.setAccessibilityStatus(response.getAccessibilityStatus());
     return testResults;
   }
   
