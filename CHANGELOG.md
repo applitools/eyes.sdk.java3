@@ -1,5 +1,11 @@
 ## [5.15.2] - 2022-08-15
 ### Fixed
+- Exception types. [Trello 3008](https://trello.com/c/4DwPh2fj)
+- AccessibilityStatus missing. [Trello 3015](https://trello.com/c/SsOQuO1Z)
+
+
+## [5.15.2] - 2022-08-15
+### Fixed
 - Text file busy. [Trello 2993](https://trello.com/c/ArmjDFta/)
 - Retry creation of process 3 times if got Text file busy exception
 
