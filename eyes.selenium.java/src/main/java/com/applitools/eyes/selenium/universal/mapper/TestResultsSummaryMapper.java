@@ -3,9 +3,15 @@ package com.applitools.eyes.selenium.universal.mapper;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.applitools.eyes.EyesException;
 import com.applitools.eyes.TestResultContainer;
+import com.applitools.eyes.TestResults;
 import com.applitools.eyes.TestResultsSummary;
+import com.applitools.eyes.exceptions.DiffsFoundException;
+import com.applitools.eyes.exceptions.NewTestException;
+import com.applitools.eyes.exceptions.TestFailedException;
 import com.applitools.eyes.selenium.BrowserType;
+import com.applitools.eyes.selenium.EyesError;
 import com.applitools.eyes.selenium.universal.dto.BrowserInfoDto;
 import com.applitools.eyes.selenium.universal.dto.TestResultContainerDto;
 import com.applitools.eyes.selenium.universal.dto.TestResultsSummaryDto;
@@ -19,7 +25,7 @@ import com.applitools.eyes.visualgrid.model.RenderBrowserInfo;
  */
 public class TestResultsSummaryMapper {
 
-  public static TestResultsSummary fromDto(TestResultsSummaryDto dto) {
+  public static TestResultsSummary fromDto(TestResultsSummaryDto dto, boolean shouldThrowException) {
     if (dto == null) {
       return null;
     }
@@ -48,12 +54,16 @@ public class TestResultsSummaryMapper {
           }
         }
         // exception
-        Exception exception = null;
-        if (containerDto.getException() != null) {
-          Exception stack = new Exception(containerDto.getException().getStack());
-          exception = new Exception(containerDto.getException().getMessage(), stack);
+        Throwable throwable = null;
+        if (containerDto.getException() != null ) {
+          EyesError eyesError = containerDto.getException();
+          throwable = getExceptionBasedOnReason(eyesError.getReason(), eyesError.getInfo() == null ?
+                  null : eyesError.getInfo().getTestResult(), eyesError.getMessage(), eyesError.getStack());
+          if (shouldThrowException) {
+            throw new Error(throwable);
+          }
         }
-        TestResultContainer container = new TestResultContainer(containerDto.getTestResults(), renderBrowserInfo, exception);
+        TestResultContainer container = new TestResultContainer(containerDto.getTestResults(), renderBrowserInfo, throwable);
         containerList.add(container);
       }
     }
@@ -62,5 +72,33 @@ public class TestResultsSummaryMapper {
         dto.getFailed(), dto.getExceptions(), dto.getMismatches(), dto.getMissing(), dto.getMatches());
   }
 
+  private static Throwable getExceptionBasedOnReason(String reason, TestResults testResults, String message,
+                                                     String stack) {
+    String scenarioIdOrName;
+    String appIdOrName;
+
+    if (reason == null || reason.isEmpty()) {
+      return new EyesException("Message: " +  message + ", Stack: " +  stack);
+    }
+
+    if (testResults == null) {
+      scenarioIdOrName = "(no test results)";
+      appIdOrName = "";
+    } else {
+      scenarioIdOrName = testResults.getName();
+      appIdOrName = testResults.getAppName();
+    }
+
+    switch (reason) {
+      case "test different" :
+        return new DiffsFoundException(testResults, scenarioIdOrName, appIdOrName);
+      case "test failed":
+        return new TestFailedException(testResults, scenarioIdOrName, appIdOrName);
+      case "test new":
+        return new NewTestException(testResults, scenarioIdOrName, appIdOrName);
+      default:
+        throw new UnsupportedOperationException("Unsupported exception type: " + reason);
+    }
+  }
 
 }

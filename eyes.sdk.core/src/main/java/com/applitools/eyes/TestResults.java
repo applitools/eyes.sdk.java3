@@ -47,6 +47,7 @@ public class TestResults {
     private StepInfo[] stepsInfo;
     private ServerConnector serverConnector;
     private SessionAccessibilityStatus accessibilityStatus;
+    private String userTestId;
 
     public StepInfo[] getStepsInfo() {
         return stepsInfo;
@@ -415,6 +416,14 @@ public class TestResults {
 
     public SessionAccessibilityStatus getAccessibilityStatus() {
         return accessibilityStatus;
+    }
+
+    public String getUserTestId() {
+        return userTestId;
+    }
+
+    public void setUserTestId(String userTestId) {
+        this.userTestId = userTestId;
     }
 
     public void delete() {

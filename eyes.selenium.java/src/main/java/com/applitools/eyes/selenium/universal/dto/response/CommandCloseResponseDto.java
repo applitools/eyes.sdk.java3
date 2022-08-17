@@ -2,6 +2,7 @@ package com.applitools.eyes.selenium.universal.dto.response;
 
 import java.util.List;
 
+import com.applitools.eyes.SessionAccessibilityStatus;
 import com.applitools.eyes.selenium.universal.dto.RectangleSizeDto;
 import com.applitools.eyes.selenium.universal.dto.SessionUrlsDto;
 import com.applitools.eyes.selenium.universal.dto.StepInfoDto;
@@ -12,6 +13,7 @@ import com.fasterxml.jackson.annotation.JsonSetter;
  * command close response to
  */
 public class CommandCloseResponseDto {
+  private String userTestId;
   private String id;
   private String name;
   private String secretToken;
@@ -41,6 +43,7 @@ public class CommandCloseResponseDto {
   private int layoutMatches;
   private int noneMatches;
   private String url;
+  private SessionAccessibilityStatus accessibilityStatus;
 
   public CommandCloseResponseDto() {
   }
@@ -159,18 +162,22 @@ public class CommandCloseResponseDto {
     isNew = aNew;
   }
 
+  @JsonGetter("isDifferent")
   public Boolean getDifferent() {
     return isDifferent;
   }
 
+  @JsonSetter("isDifferent")
   public void setDifferent(Boolean different) {
     isDifferent = different;
   }
 
+  @JsonGetter("isAborted")
   public Boolean getAborted() {
     return isAborted;
   }
 
+  @JsonSetter("isAborted")
   public void setAborted(Boolean aborted) {
     isAborted = aborted;
   }
@@ -277,5 +284,21 @@ public class CommandCloseResponseDto {
 
   public void setUrl(String url) {
     this.url = url;
+  }
+
+  public SessionAccessibilityStatus getAccessibilityStatus() {
+    return accessibilityStatus;
+  }
+
+  public void setAccessibilityStatus(SessionAccessibilityStatus accessibilityStatus) {
+    this.accessibilityStatus = accessibilityStatus;
+  }
+
+  public String getUserTestId() {
+    return userTestId;
+  }
+
+  public void setUserTestId(String userTestId) {
+    this.userTestId = userTestId;
   }
 }

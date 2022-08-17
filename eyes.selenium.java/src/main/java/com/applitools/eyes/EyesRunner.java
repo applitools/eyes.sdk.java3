@@ -73,7 +73,7 @@ public abstract class EyesRunner {
 
   public TestResultsSummary getAllTestResults(boolean shouldThrowException) {
     TestResultsSummaryDto dto = commandExecutor.closeManager(managerRef, shouldThrowException);
-    return TestResultsSummaryMapper.fromDto(dto);
+    return TestResultsSummaryMapper.fromDto(dto, shouldThrowException);
   }
 
   private void deleteAllBatches() {

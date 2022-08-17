@@ -1,5 +1,7 @@
 package com.applitools.eyes.selenium;
 
+import com.applitools.eyes.selenium.universal.dto.InfoDto;
+
 /**
  * Eyes Error
  */
@@ -7,6 +9,7 @@ public class EyesError {
   private String message;
   private String stack;
   private String reason;
+  private InfoDto info;
 
   public EyesError() {
   }
@@ -38,5 +41,13 @@ public class EyesError {
 
   public void setReason(String reason) {
     this.reason = reason;
+  }
+
+  public InfoDto getInfo() {
+    return info;
+  }
+
+  public void setInfo(InfoDto info) {
+    this.info = info;
   }
 }
