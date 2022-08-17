@@ -5,7 +5,11 @@ import java.util.List;
 
 import com.applitools.eyes.TestResultContainer;
 import com.applitools.eyes.TestResultsSummary;
+import com.applitools.eyes.exceptions.DiffsFoundException;
+import com.applitools.eyes.exceptions.NewTestException;
+import com.applitools.eyes.exceptions.TestFailedException;
 import com.applitools.eyes.selenium.BrowserType;
+import com.applitools.eyes.selenium.EyesError;
 import com.applitools.eyes.selenium.universal.dto.BrowserInfoDto;
 import com.applitools.eyes.selenium.universal.dto.TestResultContainerDto;
 import com.applitools.eyes.selenium.universal.dto.TestResultsSummaryDto;
@@ -50,8 +54,9 @@ public class TestResultsSummaryMapper {
         // exception
         Exception exception = null;
         if (containerDto.getException() != null) {
-          Exception stack = new Exception(containerDto.getException().getStack());
-          exception = new Exception(containerDto.getException().getMessage(), stack);
+          EyesError eyesError = containerDto.getException();
+          Throwable throwable = returnErrorBasedOnReason(eyesError.getReason(), eyesError.getMessage());
+          throw new Error(throwable);
         }
         TestResultContainer container = new TestResultContainer(containerDto.getTestResults(), renderBrowserInfo, exception);
         containerList.add(container);
@@ -62,5 +67,22 @@ public class TestResultsSummaryMapper {
         dto.getFailed(), dto.getExceptions(), dto.getMismatches(), dto.getMissing(), dto.getMatches());
   }
 
+  private static Throwable returnErrorBasedOnReason(String reason, String message) {
+    if (reason == null || reason.isEmpty()) {
+      return null;
+    }
+
+    switch (reason) {
+      case "test different" :
+        return new DiffsFoundException(message);
+      case "test failed":
+        return new TestFailedException(message);
+      case "test new":
+        return new NewTestException(message);
+      default:
+        throw new UnsupportedOperationException("Unsupported exception type: " + reason);
+    }
+
+  }
 
 }

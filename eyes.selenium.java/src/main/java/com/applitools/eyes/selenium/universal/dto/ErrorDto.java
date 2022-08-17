@@ -7,6 +7,7 @@ public class ErrorDto {
   private String message;
   private String stack;
   private String reason;
+  private InfoDto info;
 
   public String getMessage() {
     return message;
@@ -30,6 +31,14 @@ public class ErrorDto {
 
   public void setReason(String reason) {
     this.reason = reason;
+  }
+
+  public InfoDto getInfo() {
+    return info;
+  }
+
+  public void setInfo(InfoDto info) {
+    this.info = info;
   }
 
   @Override

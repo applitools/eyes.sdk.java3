@@ -10,6 +10,7 @@ public class TestResultContainerDto {
   private TestResults testResults;
   private EyesError exception;
   private BrowserInfoDto browserInfo;
+  private String userTestId;
 
   public TestResultContainerDto() {
   }
@@ -42,5 +43,13 @@ public class TestResultContainerDto {
 
   public void setBrowserInfo(BrowserInfoDto browserInfo) {
     this.browserInfo = browserInfo;
+  }
+
+  public String getUserTestId() {
+    return userTestId;
+  }
+
+  public void setUserTestId(String userTestId) {
+    this.userTestId = userTestId;
   }
 }

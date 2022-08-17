@@ -8,6 +8,7 @@ import java.util.UUID;
 import com.applitools.eyes.EyesException;
 import com.applitools.eyes.Region;
 import com.applitools.eyes.SyncTaskListener;
+import com.applitools.eyes.TestResults;
 import com.applitools.eyes.exceptions.DiffsFoundException;
 import com.applitools.eyes.exceptions.NewTestException;
 import com.applitools.eyes.exceptions.TestFailedException;
@@ -239,7 +240,7 @@ public class CommandExecutor {
           if (message != null && message.contains("stale element reference")) {
             throw new StaleElementReferenceException(message);
           } else if (error.getReason() != null) {
-            throwExceptionBasedOnReason(error.getReason(), error.getMessage());
+            throwExceptionBasedOnReason(error.getReason(), error.getInfo().getTestResult());
           } else {
             throw new EyesException(error.getStack());
           }
@@ -260,17 +261,23 @@ public class CommandExecutor {
     return null;
   }
 
-  private static void throwExceptionBasedOnReason(String reason, String message) {
+  private static void throwExceptionBasedOnReason(String reason, TestResults testResults) {
+    if (testResults == null) {
+      return;
+    }
+
     if (reason == null || reason.isEmpty()) {
       return;
     }
+    String scenarioIdOrName = testResults.getName();
+    String appIdOrName = testResults.getAppName();
     switch (reason) {
       case "test different" :
-        throw new DiffsFoundException(message);
+        throw new DiffsFoundException(testResults, scenarioIdOrName, appIdOrName);
       case "test failed":
-        throw new TestFailedException(message);
+        throw new TestFailedException(testResults, scenarioIdOrName, appIdOrName);
       case "test new":
-        throw new NewTestException(message);
+        throw new NewTestException(testResults, scenarioIdOrName, appIdOrName);
       default:
         throw new UnsupportedOperationException("Unsupported exception type: " + reason);
     }
