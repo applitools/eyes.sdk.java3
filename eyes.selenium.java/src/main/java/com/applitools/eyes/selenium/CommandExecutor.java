@@ -240,7 +240,8 @@ public class CommandExecutor {
           if (message != null && message.contains("stale element reference")) {
             throw new StaleElementReferenceException(message);
           } else if (error.getReason() != null) {
-            throwExceptionBasedOnReason(error.getReason(), error.getInfo().getTestResult());
+            throwExceptionBasedOnReason(error.getReason(), error.getInfo() == null ?
+                    null : error.getInfo().getTestResult());
           } else {
             throw new EyesException(error.getStack());
           }
@@ -262,15 +263,21 @@ public class CommandExecutor {
   }
 
   private static void throwExceptionBasedOnReason(String reason, TestResults testResults) {
-    if (testResults == null) {
-      return;
-    }
+    String scenarioIdOrName;
+    String appIdOrName;
 
     if (reason == null || reason.isEmpty()) {
       return;
     }
-    String scenarioIdOrName = testResults.getName();
-    String appIdOrName = testResults.getAppName();
+
+    if (testResults == null) {
+      scenarioIdOrName = "(no test results)";
+      appIdOrName = "";
+    } else {
+      scenarioIdOrName = testResults.getName();
+      appIdOrName = testResults.getAppName();
+    }
+
     switch (reason) {
       case "test different" :
         throw new DiffsFoundException(testResults, scenarioIdOrName, appIdOrName);
