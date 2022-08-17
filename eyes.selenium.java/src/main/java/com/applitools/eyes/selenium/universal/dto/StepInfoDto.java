@@ -1,7 +1,9 @@
 package com.applitools.eyes.selenium.universal.dto;
 
 
+import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonSetter;
 
 /**
  * step info dto
@@ -93,10 +95,12 @@ public class StepInfoDto {
     this.name = name;
   }
 
+  @JsonGetter("isDifferent")
   public Boolean getDifferent() {
     return isDifferent;
   }
 
+  @JsonSetter("isDifferent")
   public void setDifferent(Boolean different) {
     isDifferent = different;
   }

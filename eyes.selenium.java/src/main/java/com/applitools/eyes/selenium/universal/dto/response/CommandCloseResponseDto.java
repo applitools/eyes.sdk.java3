@@ -13,6 +13,7 @@ import com.fasterxml.jackson.annotation.JsonSetter;
  * command close response to
  */
 public class CommandCloseResponseDto {
+  private String userTestId;
   private String id;
   private String name;
   private String secretToken;
@@ -161,18 +162,22 @@ public class CommandCloseResponseDto {
     isNew = aNew;
   }
 
+  @JsonGetter("isDifferent")
   public Boolean getDifferent() {
     return isDifferent;
   }
 
+  @JsonSetter("isDifferent")
   public void setDifferent(Boolean different) {
     isDifferent = different;
   }
 
+  @JsonGetter("isAborted")
   public Boolean getAborted() {
     return isAborted;
   }
 
+  @JsonSetter("isAborted")
   public void setAborted(Boolean aborted) {
     isAborted = aborted;
   }
@@ -287,5 +292,13 @@ public class CommandCloseResponseDto {
 
   public void setAccessibilityStatus(SessionAccessibilityStatus accessibilityStatus) {
     this.accessibilityStatus = accessibilityStatus;
+  }
+
+  public String getUserTestId() {
+    return userTestId;
+  }
+
+  public void setUserTestId(String userTestId) {
+    this.userTestId = userTestId;
   }
 }
