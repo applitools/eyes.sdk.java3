@@ -18,6 +18,7 @@ public abstract class IOSTestSetup extends TestSetup {
         capabilities.setCapability("automationName", "XCUITest");
         capabilities.setCapability("newCommandTimeout", 300);
         capabilities.setCapability("fullReset", false);
+        capabilities.setCapability("processArguments", "{\"args\": [], \"env\": {\"DYLD_INSERT_LIBRARIES\": \"@executable_path/Frameworks/UFG_lib.xcframework/ios-arm64/UFG_lib.framework/UFG_lib\"}}");
     }
 
     @Override
@@ -27,7 +28,7 @@ public abstract class IOSTestSetup extends TestSetup {
 
     @Override
     protected void setAppCapability() {
-        capabilities.setCapability("app", "app_ios");
+        capabilities.setCapability("app", "app_ios_test");
     }
 
     @Override
