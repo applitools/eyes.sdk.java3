@@ -19,4 +19,8 @@ jobs:
         with:
           java-version: ${{ matrix.java-version }}
           distribution: "temurin"
-      - run: java -version
+      - run: |
+         echo $APPLITOOLS_REPORT_ID   
+         chmod +x ./runTests.sh
+         ./runTests.sh "selenium4"
+      
