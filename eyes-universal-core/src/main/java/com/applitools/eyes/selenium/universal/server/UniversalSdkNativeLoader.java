@@ -115,7 +115,7 @@ public class UniversalSdkNativeLoader {
 
   private static Process createProcess(String executableName)  throws IOException {
     try {
-      return new ProcessBuilder(executableName, "--shutdown-mode")
+      return new ProcessBuilder(executableName, "--shutdown-mode", "stdin")
               .redirectError(ProcessBuilder.Redirect.INHERIT).start();
     } catch (IOException e) {
       System.err.println("Could not start process, ERROR: " + e.getMessage());
