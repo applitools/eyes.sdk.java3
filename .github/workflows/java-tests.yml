@@ -20,6 +20,10 @@ jobs:
           java-version: ${{ matrix.java-version }}
           distribution: "temurin"
       - run: |
+          pushd eyes.ufg.java/src/main/resources
+          npm install
+          popd
+          mvn install -DskipTests
           echo -e "\n\nmachine github.com\n  login $GH_TOKEN\n" >~/.netrc
           echo $APPLITOOLS_REPORT_ID
           chmod +x ./runTests.sh
