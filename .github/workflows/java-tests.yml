@@ -12,6 +12,8 @@ jobs:
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v3
+        with:
+          submodules: "recursive"
       - uses: actions/setup-node@v3
         with:
           node-version: 16
@@ -20,7 +22,6 @@ jobs:
           java-version: ${{ matrix.java-version }}
           distribution: "temurin"
       - run: |
-          git submodule update --init --recursive
           pushd eyes.ufg.java/src/main/resources
           npm install
           popd
