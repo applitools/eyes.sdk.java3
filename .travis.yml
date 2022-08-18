@@ -122,7 +122,7 @@ jobs:
       if: type != cron
       script:
         - echo $APPLITOOLS_REPORT_ID
-        - sh upload_app.sh "https://applitools.jfrog.io/artifactory/Examples/IOSTestApp/1.6/ipa/IOSTestApp.ipa" "app_ios"
+        - sh upload_app.sh "https://applitools.jfrog.io/artifactory/Examples/IOSTestApp/1.10/ipa/IOSTestApp.ipa" "app_ios_test"
         - sed -i 's/androidTestSuite.xml/iosTestSuite.xml/g' $TRAVIS_BUILD_DIR/eyes.appium.java/pom.xml;
         - chmod +x ./runTests.sh
         - ./runTests.sh "eyes.appium.java"
