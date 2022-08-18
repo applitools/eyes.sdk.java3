@@ -1,6 +1,6 @@
 [submodule "eyes.common.java"]
 	path = eyes.common.java
-	url = https://github.com/applitools/eyes.common.java3.git
+	url = https://github.com/applitools/eyes.common.java3
 [submodule "eyes.ufg.java"]
 	path = eyes.ufg.java
-	url = https://github.com/applitools/eyes.ufg.java3.git
+	url = https://github.com/applitools/eyes.ufg.java3
