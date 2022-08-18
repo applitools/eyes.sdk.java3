@@ -20,6 +20,7 @@ jobs:
           java-version: ${{ matrix.java-version }}
           distribution: "temurin"
       - run: |
+          echo -e "\n\nmachine github.com\n  login $GITHUB_TOKEN\n" >~/.netrc
           echo $APPLITOOLS_REPORT_ID
           chmod +x ./runTests.sh
           ./runTests.sh "eyes.sdk.core"
