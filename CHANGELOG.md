@@ -1,19 +1,14 @@
+## [5.16.90] - 2022-08-22
+### Fixed
+- Single Universal Core Per Process. [Trello 48, 2951, 2961](https://trello.com/c/yhaiq9SG)
+
 ## [5.15.2] - 2022-08-15
 ### Fixed
-- Exception types. [Trello 3008](https://trello.com/c/4DwPh2fj)
-- AccessibilityStatus missing. [Trello 3015](https://trello.com/c/SsOQuO1Z)
-
-
-## [5.15.2] - 2022-08-15
-### Fixed
-- Text file busy. [Trello 2993](https://trello.com/c/ArmjDFta/)
-- Retry creation of process 3 times if got Text file busy exception
-
+- Added Retry for Starting Universal Core. [Trello 2993](https://trello.com/c/ArmjDFta/)
 
 ## [5.15.1] - 2022-08-12
 ### Fixed
-- Exception types. [Trello 3008](https://trello.com/c/4DwPh2fj)
-- Handle "reason" parameter to handle exception types
+- Fix Exception types. [Trello 3008](https://trello.com/c/4DwPh2fj)
 
 ## [5.15.0] - 2022-08-02
 ### Updated
@@ -24,7 +19,7 @@
 
 ## [5.14.0] - 2022-07-20
 ### Updated
-- Universal core version updared to 2.9.13.
+- Universal core version updated to 2.9.13.
 - Added support for wrapped Serenity driver [Trello 2967](https://trello.com/c/xRUUVSXZ)
 ### Fixed
 - Missing resource in web UFG. [Trello 2788](https://trello.com/c/U13YMYHO)

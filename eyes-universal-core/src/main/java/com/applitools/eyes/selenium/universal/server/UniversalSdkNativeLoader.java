@@ -115,8 +115,8 @@ public class UniversalSdkNativeLoader {
 
   private static Process createProcess(String executableName)  throws IOException {
     try {
-      ProcessBuilder builder = new ProcessBuilder(executableName, "--fork");
-      return builder.start();
+      return new ProcessBuilder(executableName, "--no-singleton", "--shutdown-mode", "stdin")
+              .redirectError(ProcessBuilder.Redirect.INHERIT).start();
     } catch (IOException e) {
       System.err.println("Could not start process, ERROR: " + e.getMessage());
       throw new IOException("Could not start process", e);
