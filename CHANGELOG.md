@@ -1,4 +1,8 @@
-## [5.16.90] - 2022-08-22
+## [5.16.0] - 2022-08-24
+### Fixed
+- Layout breakpoints viewport set. [Trello 3002](https://trello.com/c/p77C3eTL)
+
+## [5.16.0] - 2022-08-22
 ### Fixed
 - Single Universal Core Per Process. [Trello 48, 2951, 2961](https://trello.com/c/yhaiq9SG)
 
