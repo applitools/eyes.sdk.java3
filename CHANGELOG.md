@@ -1,3 +1,7 @@
+## [5.16.1] - 2022-08-29
+### Fixed
+- allowInvisibleElements breaks xpath. [Trello 3020](https://trello.com/c/9L9JC09L)
+
 ## [5.16.0] - 2022-08-24
 ### Fixed
 - Layout breakpoints viewport set. [Trello 3002](https://trello.com/c/p77C3eTL)
