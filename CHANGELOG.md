@@ -1,4 +1,4 @@
-## [5.16.1] - 2022-08-29
+## [5.17.0] - 2022-08-29
 ### Fixed
 - allowInvisibleElements breaks xpath. [Trello 3020](https://trello.com/c/9L9JC09L)
 
