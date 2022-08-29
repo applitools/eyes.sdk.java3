@@ -1,4 +1,4 @@
-## [5.16.0] - 2022-08-24
+## [5.17.0] - 2022-08-24
 ### Fixed
 - Layout breakpoints viewport set. [Trello 3002](https://trello.com/c/p77C3eTL)
 
