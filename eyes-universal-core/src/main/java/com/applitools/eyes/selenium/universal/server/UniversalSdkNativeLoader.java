@@ -24,6 +24,7 @@ public class UniversalSdkNativeLoader {
   private static final String TEMP_FOLDER_PATH = "java.io.tmpdir";
   private static final long MAX_ACTION_WAIT_SECONDS = 90;
   private static final long SLEEP_BETWEEN_ACTION_CHECK_MS = 3000;
+  private static final String ALPINE_PATH = "/etc/alpine-release/";
 
   public synchronized static void start() {
     try {
@@ -55,6 +56,9 @@ public class UniversalSdkNativeLoader {
       } else if (osVersion.contains("mac")) {
         os = "mac-x64";
         suffix = "macos";
+      } else if (osVersion.contains("linux") && Files.exists(Paths.get(ALPINE_PATH))) {
+        os = "linux-x64";
+        suffix = "alpine";
       } else {
         os = "linux-x64";
         suffix = "linux";
