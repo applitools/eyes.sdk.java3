@@ -1,3 +1,7 @@
+## [vNext] - 2022-09-01
+### Fixed
+- Use correct binary for alpine docker image [Trello 2961](https://trello.com/c/DAo9uo8r)
+
 ## [5.17.0] - 2022-08-24
 ### Fixed
 - Layout breakpoints viewport set. [Trello 3002](https://trello.com/c/p77C3eTL)
