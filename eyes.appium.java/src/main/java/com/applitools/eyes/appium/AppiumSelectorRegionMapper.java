@@ -17,7 +17,6 @@ public class AppiumSelectorRegionMapper {
     String selector = GeneralUtils.getLastWordOfStringWithRegex(by.toString(), ":");
     selectorRegionDto.setSelector(selector);
 
-    System.out.println("by: " + by);
     if (by instanceof AppiumBy.ById) {
       selectorRegionDto.setType("id");
     } else if (by instanceof AppiumBy.ByXPath) {
