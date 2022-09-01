@@ -6,6 +6,7 @@ import com.applitools.eyes.metadata.ImageMatchSettings;
 import com.applitools.eyes.metadata.SessionResults;
 import com.applitools.eyes.config.Configuration;
 import com.applitools.eyes.utils.TestUtils;
+import io.appium.java_client.AppiumBy;
 import org.openqa.selenium.By;
 import org.testng.Assert;
 import org.testng.annotations.Test;
@@ -29,7 +30,8 @@ public class AndroidAccessibilityTest extends AndroidTestSetup {
         configuration.setAccessibilityValidation(new AccessibilitySettings(AccessibilityLevel.AA, AccessibilityGuidelinesVersion.WCAG_2_0));
 
         eyes.open(driver, configuration);
-        driver.findElementById("btn_edit_text").click();
+        //driver.findElementById("btn_edit_text").click();
+        driver.findElement(AppiumBy.id("btn_edit_text")).click();
         eyes.check("Launcher screen", Target.window().accessibility(By.xpath("//*[@text='First Edit Text']"), AccessibilityRegionType.GraphicalObject));
         TestResults results = eyes.close(false);
 

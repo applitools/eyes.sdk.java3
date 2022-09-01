@@ -13,6 +13,6 @@ public class SamsungGalaxyS8 extends AbstractNativeBuilder implements NativeBuil
     public WebDriver build(String app, String orientation, boolean legacy) throws MalformedURLException {
         Capabilities caps = getSamsungGalaxyS8(legacy);
         caps = prepareCaps(caps, app, orientation, legacy);
-        return new AndroidDriver<>(new URL(SELENIUM.SAUCE.url), caps);
+        return new AndroidDriver(new URL(SELENIUM.SAUCE.url), caps);
     }
 }

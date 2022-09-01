@@ -15,7 +15,9 @@ public class SelectorRegionMapper {
     }
 
     SelectorRegionDto selectorRegionDto = new SelectorRegionDto();
+    System.out.println("toString: " + by);
     String selector = GeneralUtils.getLastWordOfStringWithRegex(by.toString(), ":");
+    System.out.println("selector: " + selector);
     selectorRegionDto.setSelector(selector);
     if (by instanceof By.ById) {
       selectorRegionDto.setType("css selector");

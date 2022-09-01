@@ -11,6 +11,7 @@ public class ElementSelector implements PathNodeValue {
   private String selector;
 
   public ElementSelector(By by) {
+    System.out.println("toString: " + by);
     String selector = GeneralUtils.getLastWordOfStringWithRegex(by.toString(), ":");
     this.selector = selector;
     if (by instanceof By.ById) {
