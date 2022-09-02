@@ -26,7 +26,6 @@ public class AppiumSelectorRegionMapper {
     } else if (by instanceof AppiumBy.ByPartialLinkText) {
       selectorRegionDto.setType("partial link text");
     } else if (by instanceof AppiumBy.ByName) {
-      // AppiumBy
       selectorRegionDto.setType("name");
     } else if (by instanceof AppiumBy.ByTagName) {
       selectorRegionDto.setType("tag name");
