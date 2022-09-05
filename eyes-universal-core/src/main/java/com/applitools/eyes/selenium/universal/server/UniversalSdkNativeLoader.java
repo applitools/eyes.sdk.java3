@@ -5,14 +5,13 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.nio.file.StandardCopyOption;
+import java.nio.file.*;
 import java.nio.file.attribute.PosixFilePermission;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 import com.applitools.eyes.EyesException;
+import com.applitools.eyes.EyesRunnable;
 import com.applitools.utils.GeneralUtils;
 
 /**
@@ -23,28 +22,29 @@ public class UniversalSdkNativeLoader {
   private static Integer port;
   private static final String BINARY_SERVER_PATH = "APPLITOOLS_UNIVERSAL_PATH";
   private static final String TEMP_FOLDER_PATH = "java.io.tmpdir";
+  private static final long MAX_ACTION_WAIT_SECONDS = 120;
+  private static final long SLEEP_BETWEEN_ACTION_CHECK_MS = 3000;
 
   public synchronized static void start() {
     try {
       startProcess();
     } catch (Exception e) {
-      try {
-        startProcess();
-      } catch (Exception e1) {
-        System.err.println("Could not launch server, ERROR: " + e.getMessage());
-        throw new EyesException("Failed to launch universal server", e1);
-      }
+      String errorMessage = GeneralUtils.createErrorMessageFromExceptionWithText(e, "Could not launch server!");
+      System.err.println(errorMessage);
+      throw new EyesException(errorMessage, e);
     }
   }
 
-  public static void stopProcess() {
-    if (nativeProcess != null && nativeProcess.isAlive()) {
-      nativeProcess.destroy();
-    }
-  }
+//  public static void stopProcess() {
+//    if (nativeProcess != null && nativeProcess.isAlive()) {
+//      nativeProcess.destroy();
+//    }
+//  }
 
   private static void startProcess() throws Exception {
     if (nativeProcess == null || !nativeProcess.isAlive()) {
+
+      // Get the OS we're running on.
       String osVersion = GeneralUtils.getPropertyString("os.name").toLowerCase();
       String os;
       String suffix;
@@ -60,40 +60,67 @@ public class UniversalSdkNativeLoader {
         suffix = "linux";
       }
 
-      Path directoryPath;
-
-      // first check with user defined
-      if (GeneralUtils.getEnvString(BINARY_SERVER_PATH) != null) {
-        directoryPath = Paths.get(GeneralUtils.getEnvString(BINARY_SERVER_PATH));
-      } else {
-        directoryPath = Paths.get(GeneralUtils.getPropertyString(TEMP_FOLDER_PATH));
-      }
+      // Set the target path for the server
+      String userSetPath = GeneralUtils.getEnvString(BINARY_SERVER_PATH); // might not exist
+      Path directoryPath =
+          userSetPath == null ? Paths.get(GeneralUtils.getPropertyString(TEMP_FOLDER_PATH)) : Paths.get(userSetPath);
 
       String fileName = "eyes-universal-" + suffix;
-      Path path = Paths.get(directoryPath + File.separator + fileName);
+      Path serverTargetPath = Paths.get(directoryPath + File.separator + fileName);
 
-
+      // Read the server bytes from SDK resources, and write it to the target path
       String pathInJar = getBinaryPath(os, suffix);
-      InputStream inputStream = getFileFromResourceAsStream(pathInJar);
+      try (InputStream serverBinaryAsStream = getFileFromResourceAsStream(pathInJar)) {
+        copyBinaryFileToLocalPath(serverBinaryAsStream, serverTargetPath);
+      }
 
-      copyBinaryFileToLocalPath(inputStream, path);
-      inputStream.close();
-      setPosixPermissionsToPath(osVersion, path);
-      try {
-        nativeProcess = createProcess(path.toString());
-      } catch (IOException e) {
-        System.err.println("Could not create process, WARN: " + e.getMessage());
+      // Set the permissions on the binary
+      setAndVerifyPosixPermissionsForUniversalCore(osVersion, serverTargetPath);
+
+      createProcessAndReadPort(serverTargetPath.toString());
+    }
+  }
+
+  private static void createProcessAndReadPort(String executablePath) {
+
+    GeneralUtils.tryRunTaskWithRetry(new EyesRunnable() {
+      @Override
+      public void run() {
         try {
-          Thread.sleep(3000);
-          nativeProcess = createProcess(path.toString());
-        } catch (IOException e1) {
-          System.err.println("Could not create process, WARN: " + e.getMessage());
-          Thread.sleep(3000);
-          nativeProcess = createProcess(path.toString());
+          nativeProcess = new ProcessBuilder(executablePath, "--port 0" ,"--no-singleton","--shutdown-mode", "stdin").start();
+        } catch (Exception e) {
+          String errorMessage = GeneralUtils.createErrorMessageFromExceptionWithText(e, "Failed to start universal core!");
+          System.err.println(errorMessage);
+          throw new EyesException(errorMessage, e);
         }
       }
-      readPortOfProcess(nativeProcess);
-    }
+    }, MAX_ACTION_WAIT_SECONDS, SLEEP_BETWEEN_ACTION_CHECK_MS, "Timed out trying to start universal core!");
+
+
+    GeneralUtils.tryRunTaskWithRetry(new EyesRunnable() {
+      @Override
+      public void run() throws EyesException {
+        String inputLineFromServer="";
+
+        try (InputStream childOutputStream = nativeProcess.getInputStream()) {
+
+          BufferedReader reader = new BufferedReader(new InputStreamReader(childOutputStream));
+          inputLineFromServer = reader.readLine();
+          port = Integer.parseInt(inputLineFromServer);
+
+        } catch (IOException e) {
+          String errorMessage = GeneralUtils.createErrorMessageFromExceptionWithText(e,
+                  "Failed to get core's input stream!");
+          System.err.println(errorMessage);
+          throw new EyesException(errorMessage, e);
+        } catch (NumberFormatException nfe) {
+          String errorMessage = GeneralUtils.createErrorMessageFromExceptionWithText(nfe,
+                  "Got a non-integer as port! Text: '" + inputLineFromServer + "'");
+          System.err.println(errorMessage);
+          throw new EyesException(errorMessage, nfe);
+        }
+      }
+    }, MAX_ACTION_WAIT_SECONDS, SLEEP_BETWEEN_ACTION_CHECK_MS, "Timed out trying to read port from core!");
   }
 
   // get an input stream from the resources folder
@@ -105,56 +132,24 @@ public class UniversalSdkNativeLoader {
 
     // the stream holding the file content
     if (inputStream == null) {
-      System.err.println("Could not find binary file inside jar");
-      throw new Exception("binary file not found! " + fileName);
-    } else {
-      return inputStream;
+      String errorMessage = "Could not find the universal core inside the SDK jar! Filename searched: " + fileName;
+      throw new EyesException(errorMessage);
     }
 
+    return inputStream;
   }
 
-  private static Process createProcess(String executableName)  throws IOException {
-    try {
-      return new ProcessBuilder(executableName, "--no-singleton", "--shutdown-mode", "stdin")
-              .redirectError(ProcessBuilder.Redirect.INHERIT).start();
-    } catch (IOException e) {
-      System.err.println("Could not start process, ERROR: " + e.getMessage());
-      throw new IOException("Could not start process", e);
-    }
 
-  }
-
-  public static void readPortOfProcess(Process process) throws Exception {
-    try (BufferedReader input = new BufferedReader(new
-        InputStreamReader(process.getInputStream()))) {
-      getFirstLineAsPort(input);
-    } catch (Exception e) {
-      System.err.println("Could not read server port, ERROR: " + e.getMessage());
-      throw new Exception("Could not read server port", e);
-    }
-  }
-
-  // ENHANCE
-  private static void getFirstLineAsPort(BufferedReader reader)  throws Exception {
-    try {
-      port = Integer.parseInt(reader.readLine());
-      reader.close();
-    } catch (Exception e) {
-      System.err.println("Could not read first line as port, ERROR: " + e.getMessage());
-      throw new Exception("Could not read first line as port", e);
-    }
-
-  }
 
   public static Integer getPort() {
     return port;
   }
 
-  private static void assignHookToStopProcess() {
-    Runtime.getRuntime().addShutdownHook(
-        new Thread(UniversalSdkNativeLoader::stopProcess)
-    );
-  }
+//  private static void assignHookToStopProcess() {
+//    Runtime.getRuntime().addShutdownHook(
+//        new Thread(UniversalSdkNativeLoader::stopProcess)
+//    );
+//  }
 
   private static String getBinaryPath(String os, String suffix) {
     return "runtimes" +
@@ -167,41 +162,67 @@ public class UniversalSdkNativeLoader {
         suffix;
   }
 
-  private static void setPosixPermissionsToPath(String osVersion, Path path) throws Exception {
+  private static void setAndVerifyPosixPermissionsForUniversalCore(String osVersion, Path path) throws Exception {
+
+    // We don't set POSIX on Windows
+    if (osVersion.contains("windows")) {
+      return;
+    }
+
+    Set<PosixFilePermission> permissions = new HashSet<>();
+
+    /* -------------------------- OWNER Permissions ----------------------- */
+    permissions.add(PosixFilePermission.OWNER_READ);
+    permissions.add(PosixFilePermission.OWNER_WRITE);
+    permissions.add(PosixFilePermission.OWNER_EXECUTE);
+
+    /* -------------------------- GROUP Permissions ----------------------- */
+    permissions.add(PosixFilePermission.GROUP_READ);
+    permissions.add(PosixFilePermission.GROUP_WRITE);
+    permissions.add(PosixFilePermission.GROUP_EXECUTE);
+
+    /* -------------------------- OTHERS Permissions ----------------------- */
+    permissions.add(PosixFilePermission.OTHERS_READ);
+    permissions.add(PosixFilePermission.OTHERS_WRITE);
+    permissions.add(PosixFilePermission.OTHERS_EXECUTE);
 
     try {
-      if (!osVersion.contains("windows")) {
-        Set<PosixFilePermission> permissions = new HashSet<>();
-
-        /* -------------------------- OWNER Permissions ----------------------- */
-        permissions.add(PosixFilePermission.OWNER_READ);
-        permissions.add(PosixFilePermission.OWNER_WRITE);
-        permissions.add(PosixFilePermission.OWNER_EXECUTE);
-
-        /* -------------------------- GROUP Permissions ----------------------- */
-        permissions.add(PosixFilePermission.GROUP_READ);
-        permissions.add(PosixFilePermission.GROUP_WRITE);
-        permissions.add(PosixFilePermission.GROUP_EXECUTE);
-
-        /* -------------------------- OTHERS Permissions ----------------------- */
-        permissions.add(PosixFilePermission.OTHERS_READ);
-        permissions.add(PosixFilePermission.OTHERS_WRITE);
-        permissions.add(PosixFilePermission.OTHERS_EXECUTE);
-
-        Files.setPosixFilePermissions(path, permissions);
-      }
-    } catch (IOException e) {
-      System.err.println("Could not set posix file permissions, ERROR: " + e.getMessage());
-      throw new Exception("Could not set posix file permissions", e);
+      Files.setPosixFilePermissions(path, permissions);
+    } catch (Exception e) {
+      String errorMessage = GeneralUtils.createErrorMessageFromExceptionWithText(e,
+              "Could not set permissions on the universal core file!");
+      System.err.println(errorMessage);
+      throw new EyesException(errorMessage, e);
     }
+
+    // Verify that the permissions were set. If the OS is overloaded, this might take a while.
+    GeneralUtils.tryRunTaskWithRetry(new EyesRunnable() {
+      @Override
+      public void run() throws EyesException {
+        Set<PosixFilePermission> retrievedPermissions = null;
+        try {
+          retrievedPermissions = Files.getPosixFilePermissions(path, LinkOption.NOFOLLOW_LINKS);
+        } catch (IOException e) {
+          // TODO Add STDERR
+          throw new EyesException("Got IOException trying to read universal core permissions!", e);
+        }
+
+        if (!(retrievedPermissions.containsAll(permissions))) {
+          // TODO Add STDERR
+          throw new EyesException("Permissions for universal core were not yet set correctly! Current permissions: " + Arrays.toString(retrievedPermissions.toArray()));
+        }
+      }
+    }, MAX_ACTION_WAIT_SECONDS, SLEEP_BETWEEN_ACTION_CHECK_MS,
+            "Timed out waiting for permissions to be set for universal core!");
 
   }
 
   private static void copyBinaryFileToLocalPath(InputStream inputStream, Path path) {
     try {
       Files.copy(inputStream, path, StandardCopyOption.REPLACE_EXISTING);
-    } catch (IOException e) {
-      System.err.println("Could not copy binary file to " + path +   ", Error: " + e.getMessage());
+      // TODO Add success log
+    } catch (IOException e) { // Might actually be a common, non-error, situation - the server might already be running.
+      System.err.println("Could not copy universal core to " + path +   ", Error: " + e.getMessage());
     }
   }
 
