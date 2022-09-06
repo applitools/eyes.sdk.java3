@@ -110,7 +110,18 @@ public class UniversalSdkNativeLoader {
       public void run() throws EyesException {
         String inputLineFromServer="";
 
-        try (InputStream childOutputStream = nativeProcess.getInputStream()) {
+        try {
+          // IMPORTANT: Do NOT close this stream, you might cause the child process to get stuck, and
+          // you will NOT be able to re-open it for retry.
+          InputStream childOutputStream = nativeProcess.getInputStream();
+
+          // We need to check for this instead of just reading the bytes, as reading will BLOCK, and
+          // if this is a retry, and the server will not output anything, we'll be stuck forever.
+          if (childOutputStream.available() == 0) {
+            String errorMessage = "server did not yet output the port number..";
+            System.out.println(errorMessage);
+            throw new EyesException(errorMessage);
+          }
 
           BufferedReader reader = new BufferedReader(new InputStreamReader(childOutputStream));
           inputLineFromServer = reader.readLine();
