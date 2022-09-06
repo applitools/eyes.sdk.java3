@@ -204,7 +204,7 @@ public class UniversalSdkNativeLoader {
       public void run() throws EyesException {
         try {
           Files.setPosixFilePermissions(path, permissions);
-          System.out.println("'Set core permissions' ended. Now verifying if the permissions are correct...");
+          System.out.println("'Set core permissions' ended. Now verifying the permissions...");
         } catch (Exception e) {
           String errorMessage = GeneralUtils.createErrorMessageFromExceptionWithText(e,
                   "Could not set permissions on the universal core file!");
