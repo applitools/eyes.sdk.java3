@@ -95,6 +95,7 @@ public class UniversalSdkNativeLoader {
           System.out.println(errorMessage);
           throw new EyesException(errorMessage, e);
         }
+        System.out.println("Universal Core start returned ok.");
       }
 
       @Override
