@@ -22,7 +22,7 @@ public class UniversalSdkNativeLoader {
   private static Integer port;
   private static final String BINARY_SERVER_PATH = "APPLITOOLS_UNIVERSAL_PATH";
   private static final String TEMP_FOLDER_PATH = "java.io.tmpdir";
-  private static final long MAX_ACTION_WAIT_SECONDS = 10;
+  private static final long MAX_ACTION_WAIT_SECONDS = 90;
   private static final long SLEEP_BETWEEN_ACTION_CHECK_MS = 3000;
 
   public synchronized static void start() {
