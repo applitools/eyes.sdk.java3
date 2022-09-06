@@ -29,7 +29,7 @@
             <exclusions>
                 <exclusion>
                     <groupId>com.applitools</groupId>
-                    <artifactId>eyes-connectivity-java5-REPLACEMENT</artifactId>
+                    <artifactId>eyes-connectivity-java5-jersey2x</artifactId>
                 </exclusion>
             </exclusions>
         </dependency>

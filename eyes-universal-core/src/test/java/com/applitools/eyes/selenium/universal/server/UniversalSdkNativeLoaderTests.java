@@ -1,23 +1,31 @@
 package com.applitools.eyes.selenium.universal.server;
 
+import com.applitools.eyes.EyesException;
 import com.applitools.utils.GeneralUtils;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentMatchers;
 import org.mockito.MockedStatic;
 import org.mockito.Mockito;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 public class UniversalSdkNativeLoaderTests {
 
     @Test
     public void testUniversalSdkPath() {
-        try (MockedStatic<GeneralUtils> utilities = Mockito.mockStatic(GeneralUtils.class)) {
+        try (MockedStatic<GeneralUtils> utilities = Mockito.mockStatic(GeneralUtils.class, Mockito.CALLS_REAL_METHODS)) {
             utilities.when(() -> GeneralUtils.getEnvString("APPLITOOLS_UNIVERSAL_PATH"))
-                    .thenReturn("path");
+                    .thenReturn("/Users/danielputerman/test/jpmc-universal");
             utilities.when(() -> GeneralUtils.getPropertyString("os.name")).thenReturn("macos");
             UniversalSdkNativeLoader.start();
-            assertEquals(21077, (int)UniversalSdkNativeLoader.getPort());
-            assertEquals("path", GeneralUtils.getEnvString("APPLITOOLS_UNIVERSAL_PATH"));
+            Assertions.assertTrue(Files.exists(Paths.get(GeneralUtils.getEnvString("APPLITOOLS_UNIVERSAL_PATH"))));
         }
     }
 
