@@ -115,6 +115,7 @@ public class UniversalSdkNativeLoader {
           BufferedReader reader = new BufferedReader(new InputStreamReader(childOutputStream));
           inputLineFromServer = reader.readLine();
           port = Integer.parseInt(inputLineFromServer);
+          System.out.println("Port read and parsed okay: " + port);
         } catch (IOException e) {
           String errorMessage = GeneralUtils.createErrorMessageFromExceptionWithText(e,
                   "Failed to get core's input stream!");
