@@ -85,6 +85,7 @@ public class Configuration implements IConfiguration {
     private Boolean useCeilForViewportSize;
     private Integer waitBeforeCapture;
     private WebDriverProxySettings webdriverProxySettings;
+    private ContentInset contentInset;
 
     public Configuration(Configuration other) {
         this.branchName = other.getBranchName();
@@ -147,6 +148,7 @@ public class Configuration implements IConfiguration {
         WebDriverProxySettings wdProxySettings = other.getWebDriverProxy();
         String wdProxyUrl = wdProxySettings != null ? wdProxySettings.getProxyUrl() : null;
         this.webdriverProxySettings = new WebDriverProxySettings(wdProxyUrl);
+        this.contentInset = other.getContentInset();
     }
 
     public Configuration() {
@@ -1000,5 +1002,13 @@ public class Configuration implements IConfiguration {
     public Configuration setWebDriverProxy(WebDriverProxySettings proxySettings) {
         this.webdriverProxySettings = proxySettings;
         return this;
+    }
+
+    public ContentInset getContentInset() {
+        return contentInset;
+    }
+
+    public void setContentInset(ContentInset contentInset) {
+        this.contentInset = contentInset;
     }
 }
