@@ -7,7 +7,6 @@ import com.applitools.eyes.fluent.ICheckSettingsInternal;
 import com.applitools.eyes.positioning.PositionProvider;
 import com.applitools.eyes.selenium.CheckState;
 import com.applitools.eyes.selenium.EyesSeleniumUtils;
-import com.applitools.eyes.selenium.LazyLoadOptions;
 import com.applitools.eyes.selenium.TargetPathLocator;
 import com.applitools.eyes.selenium.positioning.CssTranslatePositionProvider;
 import com.applitools.eyes.selenium.wrappers.EyesSeleniumDriver;
@@ -47,7 +46,6 @@ public class SeleniumCheckSettings extends CheckSettings implements ISeleniumChe
     private Boolean isDefaultLayoutBreakpointsSet;
     private final List<Integer> layoutBreakpoints = new ArrayList<>();
     private String pageId;
-    private LazyLoadOptions lazyLoadOptions;
 
     public SeleniumCheckSettings() {
     }
@@ -101,7 +99,7 @@ public class SeleniumCheckSettings extends CheckSettings implements ISeleniumChe
         clone.isDefaultLayoutBreakpointsSet = this.isDefaultLayoutBreakpointsSet;
         clone.layoutBreakpoints.addAll(this.layoutBreakpoints);
         clone.pageId = this.pageId;
-        clone.lazyLoadOptions = this.lazyLoadOptions;
+//        clone.lazyLoadOptions = this.lazyLoadOptions;
         return clone;
     }
 
@@ -862,21 +860,19 @@ public class SeleniumCheckSettings extends CheckSettings implements ISeleniumChe
         return this.pageId;
     }
 
-
+    @Override
     public SeleniumCheckSettings lazyLoad() {
-        SeleniumCheckSettings clone = this.clone();
-        clone.lazyLoadOptions = new LazyLoadOptions();
-        return clone;
+        return (SeleniumCheckSettings) super.lazyLoad();
     }
 
+    @Override
     public SeleniumCheckSettings lazyLoad(LazyLoadOptions lazyLoadOptions) {
-        SeleniumCheckSettings clone = this.clone();
-        clone.lazyLoadOptions = lazyLoadOptions;
-        return clone;
+        return (SeleniumCheckSettings) super.lazyLoad(lazyLoadOptions);
     }
 
+    @Override
     public LazyLoadOptions getLazyLoadOptions() {
-        return this.lazyLoadOptions;
+        return super.getLazyLoadOptions();
     }
 
     public TargetPathLocator getTargetPathLocator() {
