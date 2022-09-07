@@ -3,9 +3,7 @@ package com.applitools.eyes.selenium.universal.dto;
 import java.util.List;
 import java.util.Map;
 
-import com.applitools.eyes.TargetPath;
-import com.applitools.eyes.selenium.LazyLoadOptions;
-import com.applitools.eyes.selenium.TargetPathLocator;
+import com.applitools.eyes.LazyLoadOptions;
 import com.fasterxml.jackson.annotation.JsonInclude;
 
 
