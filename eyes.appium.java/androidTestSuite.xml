@@ -35,6 +35,8 @@
             </class>
             <class name="com.applitools.eyes.appium.LazyLoadOptionsTest"/>
             <class name="com.applitools.eyes.appium.android.AndroidLazyLoadTest"/>
+            <class name="com.applitools.eyes.appium.TestContentInset"/>
+            <class name="com.applitools.eyes.appium.android.AndroidContentInsetTest"/>
         </classes>
     </test>
 </suite>
