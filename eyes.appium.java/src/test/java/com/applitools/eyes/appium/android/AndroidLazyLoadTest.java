@@ -2,12 +2,16 @@ package com.applitools.eyes.appium.android;
 
 import com.applitools.eyes.LazyLoadOptions;
 import com.applitools.eyes.appium.Target;
+import io.appium.java_client.TouchAction;
 import io.appium.java_client.android.AndroidDriver;
+import io.appium.java_client.touch.WaitOptions;
+import io.appium.java_client.touch.offset.PointOption;
 import org.openqa.selenium.remote.DesiredCapabilities;
 import org.testng.annotations.Test;
 
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.time.Duration;
 
 public class AndroidLazyLoadTest extends AndroidTestSetup {
 
@@ -23,7 +27,7 @@ public class AndroidLazyLoadTest extends AndroidTestSetup {
         capabilities.setCapability("platformVersion","11.0");
         capabilities.setCapability("platformName", "Android");
         capabilities.setCapability("automationName", "UiAutomator2");
-        capabilities.setCapability("app", "https://applitools.jfrog.io/artifactory/Examples/androidx/1.3.6/app_androidx.apk");
+        capabilities.setCapability("app", "https://applitools.jfrog.io/artifactory/Examples/androidx/helper_lib/1.8.4/app-androidx-debug.apk");
         capabilities.setCapability("newCommandTimeout", 2000);
 
         driver = new AndroidDriver<>(new URL(SL_URL), capabilities);
@@ -31,25 +35,40 @@ public class AndroidLazyLoadTest extends AndroidTestSetup {
 
     @Test
     public void testLazyLoad() {
-
+        eyes.setForceFullPageScreenshot(true);
         eyes.open(driver, getApplicationName(), "Check LazyLoad");
-        eyes.check(Target.window().lazyLoad());
+        scrollAndClickBtn();
+        eyes.check(Target.window().lazyLoad().withName("lazyLoad"));
         eyes.close();
+
     }
 
     @Test
     public void testLazyLoadWithDefaultOptions() {
-
+        eyes.setForceFullPageScreenshot(true);
         eyes.open(driver, getApplicationName(), "Check LazyLoad LazyLoadOptions");
-        eyes.check(Target.window().lazyLoad(new LazyLoadOptions()));
+        scrollAndClickBtn();
+        eyes.check(Target.window().lazyLoad(new LazyLoadOptions()).withName("lazyLoad"));
         eyes.close();
     }
 
     @Test
     public void testLazyLoadWithCustomOptions() {
-
+        eyes.setForceFullPageScreenshot(true);
         eyes.open(driver, getApplicationName(), "Check LazyLoad Custom LazyLoadOptions");
-        eyes.check(Target.window().lazyLoad(new LazyLoadOptions().pageHeight(111).scrollLength(100).waitingTime(1000)));
+        scrollAndClickBtn();
+        eyes.check(Target.window().lazyLoad(new LazyLoadOptions().pageHeight(111)
+                        .scrollLength(100).waitingTime(1000)).withName("lazyLoad"));
         eyes.close();
+    }
+
+    public void scrollAndClickBtn() {
+        TouchAction scrollAction = new TouchAction(driver);
+
+        scrollAction.press(new PointOption().withCoordinates(5, 1000)).waitAction(new WaitOptions().withDuration(Duration.ofMillis(1500)));
+        scrollAction.moveTo(new PointOption().withCoordinates(5, 100));
+        scrollAction.cancel();
+        driver.performTouchAction(scrollAction);
+        driver.findElementById("btn_large_recyclerView_activity").click();
     }
 }
