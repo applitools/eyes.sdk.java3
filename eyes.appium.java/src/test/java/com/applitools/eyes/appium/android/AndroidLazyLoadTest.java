@@ -11,8 +11,8 @@ import java.net.URL;
 
 public class AndroidLazyLoadTest extends AndroidTestSetup {
 
-    public static final String USERNAME = System.getenv("APPLITOOLS_SAUCE_LABS_USER");
-    public static final String ACCESS_KEY = System.getenv("APPLITOOLS_SAUCE_LABS_KEY");
+    public static final String USERNAME = "applitools-dev";
+    public static final String ACCESS_KEY = "7f853c17-24c9-4d8f-a679-9cfde5b43951";
     public static final String SL_URL = "https://"+USERNAME+":" + ACCESS_KEY + "@ondemand.saucelabs.com:443/wd/hub";
 
     @Override
