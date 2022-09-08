@@ -33,6 +33,8 @@
                     <include name="test" />
                 </methods>
             </class>
+            <class name="com.applitools.eyes.appium.LazyLoadOptionsTest"/>
+            <class name="com.applitools.eyes.appium.android.AndroidLazyLoadTest"/>
         </classes>
     </test>
 </suite>
