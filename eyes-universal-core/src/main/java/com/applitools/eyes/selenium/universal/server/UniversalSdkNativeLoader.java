@@ -23,7 +23,7 @@ public class UniversalSdkNativeLoader {
   private static Integer port;
   private static final String BINARY_SERVER_PATH = "APPLITOOLS_UNIVERSAL_PATH";
   private static final String TEMP_FOLDER_PATH = "java.io.tmpdir";
-  private static final String ALPINE_PATH = "/etc/alpine-release/";
+  private static final String ALPINE_PATH = "/etc/alpine-release";
 
   public synchronized static void start() {
     try {
