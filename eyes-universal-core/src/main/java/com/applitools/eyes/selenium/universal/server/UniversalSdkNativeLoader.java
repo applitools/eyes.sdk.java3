@@ -24,7 +24,7 @@ public class UniversalSdkNativeLoader {
   private static final String TEMP_FOLDER_PATH = "java.io.tmpdir";
   private static final long MAX_ACTION_WAIT_SECONDS = 90;
   private static final long SLEEP_BETWEEN_ACTION_CHECK_MS = 3000;
-  private static final String ALPINE_PATH = "/etc/alpine-release/";
+  private static final String ALPINE_PATH = "/etc/alpine-release";
 
   public synchronized static void start() {
     try {
