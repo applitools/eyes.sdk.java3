@@ -1,11 +1,12 @@
-## [5.20.0] - 2022-09-07
+## [5.20.0] - 2022-09-08
 ### Updated
 - Use correct binary for alpine docker image [Trello 2961](https://trello.com/c/DAo9uo8r)
+- Added Appium lazyLoad checkSetting [Trello 2834](https://trello.com/c/MvCP3cer)
 
 ## [5.18.0] - 2022-09-05
 ### Updated
 - Updated Android 12 NMG support. [Trello 3002](https://trello.com/c/p77C3eTL)
-- Adde iOS NML support in universal core. 
+- Add iOS NML support in universal core. 
 
 ## [5.17.0] - 2022-08-24
 ### Fixed
