@@ -1,3 +1,7 @@
+## [5.20.0] - 2022-09-09
+### Updated
+- Add support for AppiumBy selector. [Trello 3022](https://trello.com/c/VpnV7BBN/)
+
 ## [5.19.0] - 2022-09-06
 ### Updated
 - Making Universal Core start process robust. [Trello 2993, 3023](https://trello.com/c/ArmjDFta/)
