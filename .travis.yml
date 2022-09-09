@@ -131,13 +131,12 @@ jobs:
         - COMMITTER_EMAIL="$(git log -1 $TRAVIS_COMMIT --pretty="%cE")"
         - echo $COMMITTER_EMAIL
         - SDK_VERSION=$(echo $TRAVIS_TAG | sed 's/[^.0-9]*//g')
-        - if [[ $ALLOWED_RELEASE_COMMITERS =~ $COMMITTER_EMAIL ]]; then
-          echo "DEPLOY";
-          chmod +x ./extractChangeLog.sh;
-          TMP_CHANGELOG=$(./extractChangeLog.sh "$SDK_VERSION" "CHANGELOG.md");
-          CHANGELOG=$([ -z "$TMP_CHANGELOG" ] && echo "There is no change log for version $SDK_VERSION"; echo "$TMP_CHANGELOG");
-          echo $CHANGELOG;
-          chmod +x ./sendMail.sh;
-          TEST_COVERAGE_GAP=$(cat testCoverageGap.txt);
-          ./sendMail.sh "$SDK" "$TRAVIS_TAG" "$CHANGELOG" "$TEST_COVERAGE_GAP";
-          fi
+        - echo "DEPLOY";
+        - chmod +x ./extractChangeLog.sh;
+        - TMP_CHANGELOG=$(./extractChangeLog.sh "$SDK_VERSION" "CHANGELOG.md");
+        - CHANGELOG=$([ -z "$TMP_CHANGELOG" ] && echo "There is no change log for version $SDK_VERSION"; echo "$TMP_CHANGELOG");
+        - echo $CHANGELOG;
+        - chmod +x ./sendMail.sh;
+        - TEST_COVERAGE_GAP=$(cat testCoverageGap.txt);
+        - ./sendMail.sh "$SDK" "$TRAVIS_TAG" "$CHANGELOG" "$TEST_COVERAGE_GAP";
+        - fi
