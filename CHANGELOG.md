@@ -1,12 +1,12 @@
+<<<<<<< HEAD
 ## [vNext] - 2022-09-09
 ### Updated
 - Add support for AppiumBy selector. [Trello 3022](https://trello.com/c/VpnV7BBN/)
 - Making Universal Core start process robust. [Trello 2993, 3023](https://trello.com/c/ArmjDFta/)
 
-## [5.20.0] - 2022-09-08
+## [5.21.0] - 2022-09-09
 ### Updated
 - Use correct binary for alpine docker image [Trello 2961](https://trello.com/c/DAo9uo8r)
-- Added Appium lazyLoad checkSetting [Trello 2834](https://trello.com/c/MvCP3cer)
 
 ## [5.18.0] - 2022-09-05
 ### Updated
