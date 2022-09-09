@@ -7,24 +7,24 @@ import com.applitools.eyes.selenium.wrappers.EyesSeleniumDriver;
 import com.applitools.eyes.triggers.MouseAction;
 import com.applitools.utils.ArgumentGuard;
 import org.openqa.selenium.interactions.Coordinates;
-import org.openqa.selenium.interactions.Mouse;
+//import org.openqa.selenium.interactions.Mouse;
 
 /**
  * A wrapper class for Selenium's Mouse class. It adds saving of mouse events
  * so they can be sent to the agent later on.
  */
-public class EyesMouse implements Mouse {
+public class EyesMouse {
 
     private final EyesSeleniumDriver eyesDriver;
-    private final Mouse mouse;
+    //private final Mouse mouse;
     private Location mouseLocation;
 
-    public EyesMouse(EyesSeleniumDriver eyesDriver, Mouse mouse) {
+    public EyesMouse(EyesSeleniumDriver eyesDriver) {
         ArgumentGuard.notNull(eyesDriver, "eyesDriver");
-        ArgumentGuard.notNull(mouse, "mouse");
+        //ArgumentGuard.notNull(mouse, "mouse");
 
         this.eyesDriver = eyesDriver;
-        this.mouse = mouse;
+        //this.mouse = mouse;
         this.mouseLocation = new Location(0, 0);
     }
 
@@ -43,25 +43,25 @@ public class EyesMouse implements Mouse {
     public void click(Coordinates where) {
         moveIfNeeded(where);
         addMouseTrigger(MouseAction.Click);
-        mouse.click(where);
+        //mouse.click(where);
     }
 
     public void doubleClick(Coordinates where) {
         moveIfNeeded(where);
         addMouseTrigger(MouseAction.DoubleClick);
-        mouse.doubleClick(where);
+        //mouse.doubleClick(where);
     }
 
     public void mouseDown(Coordinates where) {
         moveIfNeeded(where);
         addMouseTrigger(MouseAction.Down);
-        mouse.mouseDown(where);
+        //mouse.mouseDown(where);
     }
 
     public void mouseUp(Coordinates where) {
         moveIfNeeded(where);
         addMouseTrigger(MouseAction.Up);
-        mouse.mouseUp(where);
+        //mouse.mouseUp(where);
     }
 
     public void mouseMove(Coordinates where) {
@@ -73,7 +73,7 @@ public class EyesMouse implements Mouse {
             addMouseTrigger(MouseAction.Move);
         }
 
-        mouse.mouseMove(where);
+        //mouse.mouseMove(where);
     }
 
     public void mouseMove(Coordinates where, long xOffset, long yOffset) {
@@ -99,13 +99,13 @@ public class EyesMouse implements Mouse {
 
         addMouseTrigger(MouseAction.Move);
 
-        mouse.mouseMove(where, xOffset, yOffset);
+        //mouse.mouseMove(where, xOffset, yOffset);
     }
 
     public void contextClick(Coordinates where) {
         moveIfNeeded(where);
         addMouseTrigger(MouseAction.RightClick);
-        mouse.contextClick(where);
+        //mouse.contextClick(where);
     }
 
     protected void addMouseTrigger(MouseAction action) {

@@ -2,6 +2,7 @@ package com.applitools.eyes.appium;
 
 import com.applitools.eyes.selenium.universal.dto.SelectorRegionDto;
 import com.applitools.utils.GeneralUtils;
+import io.appium.java_client.AppiumBy;
 import io.appium.java_client.MobileBy;
 import org.openqa.selenium.By;
 
@@ -15,39 +16,40 @@ public class AppiumSelectorRegionMapper {
     SelectorRegionDto selectorRegionDto = new SelectorRegionDto();
     String selector = GeneralUtils.getLastWordOfStringWithRegex(by.toString(), ":");
     selectorRegionDto.setSelector(selector);
-    if (by instanceof MobileBy.ById) {
+
+    if (by instanceof AppiumBy.ById) {
       selectorRegionDto.setType("id");
-    } else if (by instanceof MobileBy.ByXPath) {
+    } else if (by instanceof AppiumBy.ByXPath) {
       selectorRegionDto.setType("xpath");
-    } else if (by instanceof MobileBy.ByLinkText) {
+    } else if (by instanceof AppiumBy.ByLinkText) {
       selectorRegionDto.setType("link text");
-    } else if (by instanceof MobileBy.ByPartialLinkText) {
+    } else if (by instanceof AppiumBy.ByPartialLinkText) {
       selectorRegionDto.setType("partial link text");
-    } else if (by instanceof MobileBy.ByName) {
+    } else if (by instanceof AppiumBy.ByName) {
       selectorRegionDto.setType("name");
-    } else if (by instanceof MobileBy.ByTagName) {
+    } else if (by instanceof AppiumBy.ByTagName) {
       selectorRegionDto.setType("tag name");
-    } else if (by instanceof MobileBy.ByClassName) {
+    } else if (by instanceof AppiumBy.ByClassName) {
       selectorRegionDto.setType("class name");
-    } else if (by instanceof MobileBy.ByCssSelector) {
+    } else if (by instanceof AppiumBy.ByCssSelector) {
       selectorRegionDto.setType("css selector");
-    } else if (by instanceof MobileBy.ByAccessibilityId) {
+    } else if (by instanceof AppiumBy.ByAccessibilityId) {
       selectorRegionDto.setType("accessibility id");
-    } else if (by instanceof MobileBy.ByAndroidUIAutomator) {
+    } else if (by instanceof AppiumBy.ByAndroidUIAutomator) {
       selectorRegionDto.setType("-android uiautomator");
-    } else if (by instanceof MobileBy.ByAndroidViewTag) {
+    } else if (by instanceof AppiumBy.ByAndroidViewTag) {
       selectorRegionDto.setType("-android viewtag");
     } else if (by instanceof MobileBy.ByWindowsAutomation) {
       selectorRegionDto.setType("-windows uiautomation");
     } else if ("ByIosUIAutomation".equals(by.getClass().getSimpleName())) {
       selectorRegionDto.setType("-ios uiautomation");
-    } else if (by instanceof MobileBy.ByIosNsPredicate) {
+    } else if (by instanceof AppiumBy.ByIosNsPredicate) {
       selectorRegionDto.setType("-ios predicate string");
-    } else if (by instanceof MobileBy.ByIosClassChain) {
+    } else if (by instanceof AppiumBy.ByIosClassChain) {
       selectorRegionDto.setType("-ios class chain");
-    } else if (by instanceof MobileBy.ByImage) {
+    } else if (by instanceof AppiumBy.ByImage) {
       selectorRegionDto.setType("-image");
-    } else if (by instanceof MobileBy.ByCustom) {
+    } else if (by instanceof AppiumBy.ByCustom) {
       selectorRegionDto.setType("-custom");
     }
     return selectorRegionDto;

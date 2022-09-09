@@ -1,6 +1,7 @@
 package com.applitools.eyes.appium.android;
 
 import com.applitools.eyes.appium.Target;
+import io.appium.java_client.AppiumBy;
 import io.appium.java_client.TouchAction;
 import io.appium.java_client.touch.WaitOptions;
 import io.appium.java_client.touch.offset.PointOption;
@@ -20,13 +21,14 @@ public class AndroidScrollViewTest extends AndroidTestSetup {
         eyes.open(driver, getApplicationName(), "Check ScrollView");
 
         // Scroll down
-        TouchAction scrollAction = new TouchAction(driver);
-        scrollAction.press(new PointOption().withCoordinates(5, 1700)).waitAction(new WaitOptions().withDuration(Duration.ofMillis(1500)));
-        scrollAction.moveTo(new PointOption().withCoordinates(5, 100));
-        scrollAction.cancel();
-        driver.performTouchAction(scrollAction);
+//        TouchAction scrollAction = new TouchAction(driver);
+//        scrollAction.press(new PointOption().withCoordinates(5, 1700)).waitAction(new WaitOptions().withDuration(Duration.ofMillis(1500)));
+//        scrollAction.moveTo(new PointOption().withCoordinates(5, 100));
+//        scrollAction.cancel();
+//        driver.performTouchAction(scrollAction);
 
-        driver.findElementById("btn_scroll_view_footer_header").click();
+       // driver.findElementById("btn_scroll_view_footer_header").click();
+        driver.findElement(AppiumBy.id("btn_scroll_view_footer_header")).click();
 
         eyes.check(Target.window().fully().withName("Fullpage"));
 

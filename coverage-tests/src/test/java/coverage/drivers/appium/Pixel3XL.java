@@ -14,6 +14,6 @@ public class Pixel3XL extends AbstractNativeBuilder implements NativeBuilder {
     public WebDriver build(String app, String orientation, boolean legacy) throws MalformedURLException {
         Capabilities caps = getPixel3XL(legacy);
         caps = prepareCaps(caps, app, orientation, legacy);
-        return new AndroidDriver<>(new URL(SELENIUM.SAUCE.url), caps);
+        return new AndroidDriver(new URL(SELENIUM.SAUCE.url), caps);
     }
 }

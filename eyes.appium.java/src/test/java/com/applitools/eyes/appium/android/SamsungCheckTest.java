@@ -2,6 +2,7 @@ package com.applitools.eyes.appium.android;
 
 import com.applitools.eyes.appium.Target;
 import com.applitools.eyes.config.Configuration;
+import io.appium.java_client.AppiumBy;
 import org.testng.annotations.Test;
 
 public class SamsungCheckTest extends AndroidTestSetup {
@@ -19,7 +20,8 @@ public class SamsungCheckTest extends AndroidTestSetup {
         configuration.setTestName("Samsung Test");
 
         eyes.open(driver, configuration);
-        driver.findElementById("btn_fragment_dialog").click();
+        //driver.findElementById("btn_fragment_dialog").click();
+        driver.findElement(AppiumBy.id("btn_fragment_dialog")).click();
         eyes.check(Target.window());
 
         eyes.close(false);

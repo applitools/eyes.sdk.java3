@@ -20,7 +20,8 @@ public abstract class AndroidTestSetup extends TestSetup {
 
     @Override
     protected void initDriver() throws MalformedURLException {
-        driver = new AndroidDriver<>(new URL(appiumServerUrl), capabilities);
+        driver = new AndroidDriver(new URL(appiumServerUrl), capabilities);
+
     }
 
     @Override

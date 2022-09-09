@@ -46,10 +46,10 @@ public class AndroidVisualLocatorsTest extends AndroidTestSetup {
             Location clickLocation = new Location(listViewLocator.getLeft() + listViewLocator.getWidth() / 2,
                     listViewLocator.getTop() + listViewLocator.getHeight() / 2);
 
-            TouchAction actionPress = new TouchAction(driver);
-            actionPress.press(PointOption.point(clickLocation.getX(), clickLocation.getY())).waitAction(WaitOptions.waitOptions(Duration.ofMillis(500)));
-            actionPress.release();
-            driver.performTouchAction(actionPress);
+//            TouchAction actionPress = new TouchAction(driver);
+//            actionPress.press(PointOption.point(clickLocation.getX(), clickLocation.getY())).waitAction(WaitOptions.waitOptions(Duration.ofMillis(500)));
+//            actionPress.release();
+//            driver.performTouchAction(actionPress);
 
             Thread.sleep(3000);
 

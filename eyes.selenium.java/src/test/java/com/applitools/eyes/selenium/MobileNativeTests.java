@@ -6,11 +6,12 @@ import com.applitools.eyes.selenium.fluent.Target;
 import com.applitools.eyes.utils.ReportingTestSuite;
 import com.applitools.eyes.utils.SeleniumTestUtils;
 import io.appium.java_client.MobileBy;
-import io.appium.java_client.MobileElement;
+//import io.appium.java_client.MobileElement;
 import io.appium.java_client.android.AndroidDriver;
-import io.appium.java_client.android.AndroidElement;
+//import io.appium.java_client.android.AndroidElement;
 import io.appium.java_client.ios.IOSDriver;
 import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
 import org.openqa.selenium.remote.DesiredCapabilities;
 import org.testng.Assert;
 import org.testng.annotations.Test;
@@ -86,13 +87,13 @@ public class MobileNativeTests extends ReportingTestSuite {
 
         Eyes eyes = initEyes(capabilities);
 
-        AndroidDriver<AndroidElement> driver = new AndroidDriver<>(new URL(SAUCE_SELENIUM_URL), capabilities);
+        AndroidDriver driver = new AndroidDriver(new URL(SAUCE_SELENIUM_URL), capabilities);
 
         try {
             eyes.open(driver, "Mobile Native Tests", "Android Native App 2");
             Thread.sleep(10000);
 
-            MobileElement scrollableElement = driver.findElement(MobileBy.AndroidUIAutomator("new UiSelector().scrollable(true)"));
+            WebElement scrollableElement = driver.findElement(MobileBy.AndroidUIAutomator("new UiSelector().scrollable(true)"));
 
             eyes.check("Main window with ignore", Target.region(scrollableElement).ignore(scrollableElement));
             eyes.close(false);

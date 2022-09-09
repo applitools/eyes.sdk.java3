@@ -1,6 +1,7 @@
 package com.applitools.eyes.appium;
 
 import com.applitools.eyes.StdoutLogHandler;
+import io.appium.java_client.AppiumBy;
 import io.appium.java_client.MobileBy;
 import io.appium.java_client.android.AndroidDriver;
 import org.openqa.selenium.remote.DesiredCapabilities;
@@ -29,7 +30,8 @@ public class ScrollRootElementTest {
         eyes.setLogHandler(new StdoutLogHandler(true));
         try {
             eyes.open(driver,"Android Test","ScrollRootElement test");
-            driver.findElementById("btn_recycler_view_in_scroll_view_activity").click();
+            //driver.findElementById("btn_recycler_view_in_scroll_view_activity").click();
+            driver.findElement(AppiumBy.id("btn_recycler_view_in_scroll_view_activity")).click();
             Thread.sleep(1000);
             eyes.check(Target.window().scrollRootElement(MobileBy.id("recyclerView")).fully().timeout(0));
             eyes.close();

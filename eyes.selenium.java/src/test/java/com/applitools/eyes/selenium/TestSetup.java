@@ -202,7 +202,7 @@ public abstract class TestSetup extends ReportingTestSuite implements ITest {
 
         //IWebDriver webDriver = new RemoteWebDriver(new Uri("http://localhost:4444/wd/hub"), capabilities_);
 
-        SeleniumTestUtils.setupLogging(eyes, testName + "_" + options.getPlatform());
+        SeleniumTestUtils.setupLogging(eyes, testName + "_" + options.getPlatformName());
 
         beforeOpen(eyes);
 

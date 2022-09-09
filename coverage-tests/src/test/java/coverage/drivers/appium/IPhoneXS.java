@@ -16,6 +16,6 @@ public class IPhoneXS extends AbstractNativeBuilder implements NativeBuilder {
     public WebDriver build(String app, String orientation, boolean legacy) throws MalformedURLException {
         Capabilities caps = getIphoneXS(legacy);
         caps = prepareCaps(caps, app, orientation, legacy);
-        return new IOSDriver<>(new URL(SELENIUM.SAUCE.url), caps);
+        return new IOSDriver(new URL(SELENIUM.SAUCE.url), caps);
     }
 }
