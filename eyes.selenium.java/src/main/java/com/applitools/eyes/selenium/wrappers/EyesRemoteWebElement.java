@@ -695,7 +695,7 @@ public class EyesRemoteWebElement extends RemoteWebElement {
             } catch (Exception ignored) {
             }
             if (platform == Platform.ANY) {
-                platform = driver.getRemoteWebDriver().getCapabilities().getPlatform();
+                //platform = driver.getRemoteWebDriver().getCapabilities().getPlatform();
             }
             if (platform.equals(Platform.IOS) || platform.equals(Platform.ANDROID)) {
                 RemoteExecuteMethod executeMethod = new RemoteExecuteMethod(driver.getRemoteWebDriver());

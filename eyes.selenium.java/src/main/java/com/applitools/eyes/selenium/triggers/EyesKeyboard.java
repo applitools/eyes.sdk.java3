@@ -8,7 +8,7 @@ import com.applitools.eyes.Region;
 import com.applitools.eyes.selenium.wrappers.EyesRemoteWebElement;
 import com.applitools.eyes.selenium.wrappers.EyesSeleniumDriver;
 import com.applitools.utils.ArgumentGuard;
-import org.openqa.selenium.interactions.Keyboard;
+//import org.openqa.selenium.interactions.Keyboard;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.remote.RemoteWebElement;
 
@@ -16,21 +16,20 @@ import org.openqa.selenium.remote.RemoteWebElement;
  * A wrapper class for Selenium's Keyboard interface, so we can record keyboard
  * events.
  */
-public class EyesKeyboard implements Keyboard {
+public class EyesKeyboard  {
 
     private final Logger logger;
     private final EyesSeleniumDriver eyesDriver;
-    private final Keyboard keyboard;
+    //private final Keyboard keyboard;
 
-    public EyesKeyboard(Logger logger, EyesSeleniumDriver eyesDriver,
-                        Keyboard keyboard) {
+    public EyesKeyboard(Logger logger, EyesSeleniumDriver eyesDriver) {
         ArgumentGuard.notNull(logger, "logger");
         ArgumentGuard.notNull(eyesDriver, "eyesDriver");
-        ArgumentGuard.notNull(keyboard, "keyboard");
+        //ArgumentGuard.notNull(keyboard, "keyboard");
 
         this.logger = logger;
         this.eyesDriver = eyesDriver;
-        this.keyboard = keyboard;
+        //this.keyboard = keyboard;
     }
 
     public void sendKeys(CharSequence... charSequences) {
@@ -51,14 +50,14 @@ public class EyesKeyboard implements Keyboard {
             eyesDriver.getEyes().addTextTrigger(control, text);
         }
 
-        keyboard.sendKeys(charSequences);
+        //keyboard.sendKeys(charSequences);
     }
 
     public void pressKey(CharSequence keyToPress) {
-        keyboard.pressKey(keyToPress);
+        //keyboard.pressKey(keyToPress);
     }
 
     public void releaseKey(CharSequence keyToRelease) {
-        keyboard.releaseKey(keyToRelease);
+        //keyboard.releaseKey(keyToRelease);
     }
 }

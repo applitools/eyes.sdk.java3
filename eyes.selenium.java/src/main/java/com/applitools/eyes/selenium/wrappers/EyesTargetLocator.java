@@ -22,7 +22,7 @@ import java.util.List;
  * Wraps a target locator so we can keep track of which frames have been
  * switched to.
  */
-public class EyesTargetLocator implements WebDriver.TargetLocator {
+public abstract class EyesTargetLocator implements WebDriver.TargetLocator {
 
     private final Logger logger;
     private final EyesSeleniumDriver driver;

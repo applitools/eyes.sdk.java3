@@ -26,11 +26,11 @@ import java.util.*;
  * Used so we'll be able to return the users an object with the same
  * functionality as {@link org.openqa.selenium.remote.RemoteWebDriver}.
  */
-public class EyesSeleniumDriver extends EyesWebDriver implements HasInputDevices, HasTouchScreen, IEyesJsExecutor {
+public class EyesSeleniumDriver extends EyesWebDriver implements IEyesJsExecutor {
 
     private final SeleniumEyes eyes;
     private final RemoteWebDriver driver;
-    private final TouchScreen touch;
+    //private final TouchScreen touch;
     private final Map<String, WebElement> elementsIds;
     private final FrameChain frameChain;
 
@@ -100,12 +100,12 @@ public class EyesSeleniumDriver extends EyesWebDriver implements HasInputDevices
         } catch (Exception e) {
             // If an exception occurred, we simply won't instantiate "touch".
         }
-        if (null != executeMethod) {
-            touch = new EyesTouchScreen(this,
-                    new RemoteTouchScreen(executeMethod));
-        } else {
-            touch = null;
-        }
+//        if (null != executeMethod) {
+//            touch = new EyesTouchScreen(this,
+//                    null); //new RemoteTouchScreen(executeMethod)
+//        } else {
+//            touch = null;
+//        }
     }
 
     public SeleniumEyes getEyes() {
@@ -117,9 +117,9 @@ public class EyesSeleniumDriver extends EyesWebDriver implements HasInputDevices
         return driver;
     }
 
-    public TouchScreen getTouch() {
-        return touch;
-    }
+//    public TouchScreen getTouch() {
+//        return touch;
+//    }
 
     /**
      *
@@ -138,19 +138,20 @@ public class EyesSeleniumDriver extends EyesWebDriver implements HasInputDevices
 
     public void get(String s) {
         frameChain.clear();
-        driver.get(s);
+//        driver.get(s);
     }
 
     public String getCurrentUrl() {
-        return driver.getCurrentUrl();
+        return null;
     }
 
     public String getTitle() {
-        return driver.getTitle();
+        return null;
     }
 
     public List<WebElement> findElements(By by) {
-        List<WebElement> foundWebElementsList = driver.findElements(by);
+        List<WebElement> foundWebElementsList = null;
+                //driver.findElements(by);
 
         // This list will contain the found elements wrapped with our class.
         List<WebElement> resultElementsList =
@@ -184,7 +185,8 @@ public class EyesSeleniumDriver extends EyesWebDriver implements HasInputDevices
     }
 
     public WebElement findElement(By by) {
-        WebElement webElement = driver.findElement(by);
+        WebElement webElement = null;
+                //driver.findElement(by);
         if ((webElement instanceof RemoteWebElement) && !(webElement instanceof EyesRemoteWebElement)) {
             webElement = new EyesRemoteWebElement(logger, this, webElement);
 
@@ -210,44 +212,44 @@ public class EyesSeleniumDriver extends EyesWebDriver implements HasInputDevices
     }
 
     public String getPageSource() {
-        return driver.getPageSource();
+        return null;
     }
 
     public void close() {
-        driver.close();
+        //driver.close();
     }
 
     public void quit() {
-        driver.quit();
+        //driver.quit();
     }
 
     public Set<String> getWindowHandles() {
-        return driver.getWindowHandles();
+        return null;
     }
 
     public String getWindowHandle() {
-        return driver.getWindowHandle();
+        return null;
     }
 
     public TargetLocator switchTo() {
-        return new EyesTargetLocator(this, logger, driver.switchTo());
+        return null;
     }
 
     public Navigation navigate() {
-        return driver.navigate();
+        return null;
     }
 
     public Options manage() {
-        return driver.manage();
+        return null;
     }
 
-    public Mouse getMouse() {
-        return new EyesMouse(this, driver.getMouse());
-    }
-
-    public Keyboard getKeyboard() {
-        return new EyesKeyboard(logger, this, driver.getKeyboard());
-    }
+//    public Mouse getMouse() {
+//        return null;
+//    }
+//
+//    public Keyboard getKeyboard() {
+//        return null;
+//    }
 
     public WebElement findElementByClassName(String className) {
         return findElement(By.className(className));
@@ -314,16 +316,16 @@ public class EyesSeleniumDriver extends EyesWebDriver implements HasInputDevices
     }
 
     public Capabilities getCapabilities() {
-        return driver.getCapabilities();
+        return null;
     }
 
     public Object executeScript(String script, Object... args) {
 
         // Appium commands are sometimes sent as Javascript
         if (AppiumJsCommandExtractor.isAppiumJsCommand(script)) {
-            Trigger trigger =
-                    AppiumJsCommandExtractor.extractTrigger(elementsIds,
-                            driver.manage().window().getSize(), script, args);
+            Trigger trigger = null;
+//                    AppiumJsCommandExtractor.extractTrigger(elementsIds,
+//                            driver.manage().window().getSize(), script, args);
 
             if (trigger != null) {
                 // TODO - Daniel, additional types of triggers
@@ -335,7 +337,8 @@ public class EyesSeleniumDriver extends EyesWebDriver implements HasInputDevices
         }
 
         @SuppressWarnings("UnnecessaryLocalVariable")
-        Object result = driver.executeScript(script, args);
+        Object result = null;
+                //driver.executeScript(script, args);
         return result;
     }
 
@@ -343,9 +346,9 @@ public class EyesSeleniumDriver extends EyesWebDriver implements HasInputDevices
 
         // Appium commands are sometimes sent as Javascript
         if (AppiumJsCommandExtractor.isAppiumJsCommand(script)) {
-            Trigger trigger =
-                    AppiumJsCommandExtractor.extractTrigger(elementsIds,
-                            driver.manage().window().getSize(), script, args);
+            Trigger trigger = null;
+//                    AppiumJsCommandExtractor.extractTrigger(elementsIds,
+//                            driver.manage().window().getSize(), script, args);
 
             if (trigger != null) {
                 // TODO - Daniel, additional type of triggers
@@ -357,7 +360,8 @@ public class EyesSeleniumDriver extends EyesWebDriver implements HasInputDevices
             }
         }
 
-        return driver.executeAsyncScript(script, args);
+        return null;
+                //driver.executeAsyncScript(script, args);
     }
 
     /**
@@ -408,7 +412,8 @@ public class EyesSeleniumDriver extends EyesWebDriver implements HasInputDevices
     public <X> X getScreenshotAs(OutputType<X> xOutputType)
             throws WebDriverException {
         // Get the image as base64.
-        String screenshot64 = driver.getScreenshotAs(OutputType.BASE64);
+        String screenshot64 = null;
+                //driver.getScreenshotAs(OutputType.BASE64);
         BufferedImage screenshot = ImageUtils.imageFromBase64(screenshot64);
         screenshot = normalizeRotation(logger, driver, screenshot, rotation);
 
@@ -421,7 +426,7 @@ public class EyesSeleniumDriver extends EyesWebDriver implements HasInputDevices
         String userAgent = null;
         try {
             if (!EyesDriverUtils.isMobileDevice(driver)) {
-                userAgent = (String) this.driver.executeScript("return navigator.userAgent");
+                userAgent = null;
             }
         } catch (Exception e) {
             GeneralUtils.logExceptionStackTrace(logger, Stage.GENERAL, e);
@@ -433,7 +438,7 @@ public class EyesSeleniumDriver extends EyesWebDriver implements HasInputDevices
 
     public long getInnerWidth() {
         if (!EyesDriverUtils.isMobileDevice(driver)) {
-            return (long) this.driver.executeScript("return window.innerWidth");
+            return 0; //(long) //this.driver.executeScript("return window.innerWidth");
         } else {
             return 0;
         }
