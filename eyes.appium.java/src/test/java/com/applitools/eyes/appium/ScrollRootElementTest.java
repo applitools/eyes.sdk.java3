@@ -23,7 +23,7 @@ public class ScrollRootElementTest {
         caps.setCapability("platformVersion","11.0");
         caps.setCapability("platformName", "Android");
         caps.setCapability("automationName", "UiAutomator2");
-        caps.setCapability("app", "https://applitools.jfrog.io/artifactory/Examples/androidx/1.3.6/app_androidx.apk");
+        caps.setCapability("app", "https://applitools.jfrog.io/artifactory/Examples/androidx/helper_lib/1.8.4/app-androidx-debug.apk");
         caps.setCapability("newCommandTimeout", 2000);
         AndroidDriver driver = new AndroidDriver(new URL(URL0), caps);
         Eyes eyes = new Eyes();
