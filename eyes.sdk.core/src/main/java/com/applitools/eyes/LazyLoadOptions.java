@@ -1,7 +1,7 @@
 package com.applitools.eyes;
 
 /**
- * lazy load options
+ * lazy load options.
  */
 public class LazyLoadOptions {
     private Integer scrollLength;
