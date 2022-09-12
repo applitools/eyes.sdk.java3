@@ -37,8 +37,9 @@ public class AndroidLazyLoadTest extends AndroidTestSetup {
     public void testLazyLoad() {
         eyes.open(driver, getApplicationName(), "Check LazyLoad");
         scrollAndClickBtn();
-        LazyLoadOptions lazyLoadOptions = new LazyLoadOptions().pageHeight(30000).waitingTime(3500);
-        eyes.check(Target.window().fully().waitBeforeCapture(3500).lazyLoad(lazyLoadOptions).withName("lazyLoad"));
+        int waitTime = 5000;
+        LazyLoadOptions lazyLoadOptions = new LazyLoadOptions().pageHeight(30000).waitingTime(waitTime);
+        eyes.check(Target.window().fully().waitBeforeCapture(waitTime).lazyLoad(lazyLoadOptions).withName("lazyLoad"));
         eyes.close();
 
     }
