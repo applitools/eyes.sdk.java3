@@ -1,8 +1,11 @@
-<<<<<<< HEAD
 ## [vNext] - 2022-09-09
 ### Updated
 - Add support for AppiumBy selector. [Trello 3022](https://trello.com/c/VpnV7BBN/)
 - Making Universal Core start process robust. [Trello 2993, 3023](https://trello.com/c/ArmjDFta/)
+
+## [5.22.0] - 2022-09-09
+### Updated
+- Added Appium lazyLoad checkSetting [Trello 2834](https://trello.com/c/MvCP3cer)
 
 ## [5.21.0] - 2022-09-09
 ### Updated
