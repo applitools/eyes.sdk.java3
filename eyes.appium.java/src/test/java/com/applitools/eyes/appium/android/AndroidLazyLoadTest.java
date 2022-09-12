@@ -35,10 +35,10 @@ public class AndroidLazyLoadTest extends AndroidTestSetup {
 
     @Test
     public void testLazyLoad() {
-        eyes.setForceFullPageScreenshot(true);
         eyes.open(driver, getApplicationName(), "Check LazyLoad");
         scrollAndClickBtn();
-        eyes.check(Target.window().lazyLoad().withName("lazyLoad"));
+        LazyLoadOptions lazyLoadOptions = new LazyLoadOptions().pageHeight(30000).waitingTime(3500);
+        eyes.check(Target.window().fully().lazyLoad(lazyLoadOptions).withName("lazyLoad"));
         eyes.close();
 
     }

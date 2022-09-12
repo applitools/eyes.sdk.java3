@@ -99,7 +99,6 @@ public class SeleniumCheckSettings extends CheckSettings implements ISeleniumChe
         clone.isDefaultLayoutBreakpointsSet = this.isDefaultLayoutBreakpointsSet;
         clone.layoutBreakpoints.addAll(this.layoutBreakpoints);
         clone.pageId = this.pageId;
-//        clone.lazyLoadOptions = this.lazyLoadOptions;
         return clone;
     }
 
