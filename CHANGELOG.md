@@ -1,7 +1,10 @@
+## [5.22.0] - 2022-09-09
+### Updated
+- Added Appium lazyLoad checkSetting [Trello 2834](https://trello.com/c/MvCP3cer)
+
 ## [5.21.0] - 2022-09-09
 ### Updated
 - Use correct binary for alpine docker image [Trello 2961](https://trello.com/c/DAo9uo8r)
-- Added Appium lazyLoad checkSetting [Trello 2834](https://trello.com/c/MvCP3cer)
 
 ## [5.18.0] - 2022-09-05
 ### Updated
