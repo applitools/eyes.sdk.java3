@@ -1,4 +1,4 @@
-## [vNext] - 2022-09-28
+## [vNext] - 2022-09-29
 ### Updated
 - Added iPhone 14 & iPhone 14 Pro Max to UFG iOS devices [Trello 73](https://trello.com/c/M1YiwtHb)
 
