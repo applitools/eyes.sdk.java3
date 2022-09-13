@@ -9,7 +9,7 @@ if [ "$?" -ne 0 ]; then
 
 fi
 
-#export UFG_ON_EG=true
+export UFG_ON_EG=true
 yarn generate
 if [ "$?" -ne 0 ]; then
     ((RESULT+=1))
