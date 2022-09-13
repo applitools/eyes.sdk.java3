@@ -23,7 +23,7 @@ public class AndroidContentInsetTest extends AndroidTestSetup {
         capabilities.setCapability("platformVersion","11.0");
         capabilities.setCapability("platformName", "Android");
         capabilities.setCapability("automationName", "UiAutomator2");
-        capabilities.setCapability("app", "https://applitools.jfrog.io/artifactory/Examples/androidx/1.3.6/app_androidx.apk");
+        capabilities.setCapability("app", "https://applitools.jfrog.io/artifactory/Examples/androidx/helper_lib/1.8.4/app-androidx-debug.apk");
         capabilities.setCapability("newCommandTimeout", 2000);
 
         driver = new AndroidDriver<>(new URL(URL), capabilities);

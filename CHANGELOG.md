@@ -1,4 +1,8 @@
-## [5.20.0] - 2022-09-07
+## [5.22.0] - 2022-09-14
+### Fixed
+- Missing ContentInset Configuration API [Trello 2981](https://trello.com/c/i0vUcO3P)
+
+## [5.21.0] - 2022-09-07
 ### Updated
 - Use correct binary for alpine docker image [Trello 2961](https://trello.com/c/DAo9uo8r)
 
