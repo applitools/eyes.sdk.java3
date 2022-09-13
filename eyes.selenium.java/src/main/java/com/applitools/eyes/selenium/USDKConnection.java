@@ -170,7 +170,7 @@ public class USDKConnection {
     }
 
     RequestDto<?> request = (RequestDto<?>) command;
-
+    System.out.println("REQUEST: " + objectMapper.writeValueAsString(request));
     SyncTaskListener<ResponseDto<?>> syncTaskListener = new SyncTaskListener<>(logger, request.getKey());
     map.put(request.getKey(), syncTaskListener);
     webSocket.sendTextFrame(objectMapper.writeValueAsString(request));
