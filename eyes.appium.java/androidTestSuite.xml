@@ -28,15 +28,12 @@
 <!--    </test>-->
     <test name="TestEyes">
         <classes>
-            <class name="com.applitools.eyes.appium.ScrollRootElementTest">
-                <methods>
-                    <include name="test" />
-                </methods>
-            </class>
+            <class name="com.applitools.eyes.appium.ScrollRootElementTest"/>
             <class name="com.applitools.eyes.appium.LazyLoadOptionsTest"/>
             <class name="com.applitools.eyes.appium.android.AndroidLazyLoadTest"/>
             <class name="com.applitools.eyes.appium.TestContentInset"/>
             <class name="com.applitools.eyes.appium.android.AndroidContentInsetTest"/>
+
         </classes>
     </test>
 </suite>
