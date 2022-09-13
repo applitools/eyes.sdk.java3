@@ -34,17 +34,9 @@
                 </methods>
             </class>
 
-            <class name="com.applitools.eyes.appium.TestContentInset">
-                <methods>
-                    <include name="test" />
-                </methods>
-            </class>
+            <class name="com.applitools.eyes.appium.TestContentInset"/>
+            <class name="com.applitools.eyes.appium.android.AndroidContentInsetTest"/>
 
-            <class name="com.applitools.eyes.appium.android.AndroidContentInsetTest">
-                <methods>
-                    <include name="test" />
-                </methods>
-            </class>
         </classes>
     </test>
 </suite>
