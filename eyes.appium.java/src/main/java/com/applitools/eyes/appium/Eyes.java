@@ -25,25 +25,25 @@ public class Eyes implements IEyesBase {
 
     public static enum LocalDeviceMode {
         ANDROID,
-        IOS_DEFAULT,
+        IOS_BUILT_IN, // If you statically linked the NMG lib to your app, use this.
         IOS_INSTRUMENTED_SIMULATOR,
         IOS_INSTRUMENTED_REAL_DEVICE;
     }
 
-    public static void setNMLCapabilities(DesiredCapabilities caps, LocalDeviceMode mode) {
-        setNMLCapabilities(caps, mode, null, null, null);
+    public static void setNMGCapabilities(DesiredCapabilities caps, LocalDeviceMode mode) {
+        setNMGCapabilities(caps, mode, null, null, null);
     }
 
-    public static void setNMLCapabilities(DesiredCapabilities caps, LocalDeviceMode mode, String apiKey) {
-        setNMLCapabilities(caps, mode, apiKey, null, null);
+    public static void setNMGCapabilities(DesiredCapabilities caps, LocalDeviceMode mode, String apiKey) {
+        setNMGCapabilities(caps, mode, apiKey, null, null);
     }
 
-    public static void setNMLCapabilities(DesiredCapabilities caps, LocalDeviceMode mode, String apiKey, String eyesServerUrl) {
-        setNMLCapabilities(caps, mode, apiKey, eyesServerUrl, null);
+    public static void setNMGCapabilities(DesiredCapabilities caps, LocalDeviceMode mode, String apiKey, String eyesServerUrl) {
+        setNMGCapabilities(caps, mode, apiKey, eyesServerUrl, null);
     }
 
-    public static void setNMLCapabilities(DesiredCapabilities caps, LocalDeviceMode mode, String apiKey,
-                                             String eyesServerUrl, ProxySettings proxySettings) {
+    public static void setNMGCapabilities(DesiredCapabilities caps, LocalDeviceMode mode, String apiKey,
+                                          String eyesServerUrl, ProxySettings proxySettings) {
         String capValue = "";
         String capKey = "";
         String capValueSuffix = "";
@@ -53,7 +53,7 @@ public class Eyes implements IEyesBase {
                 capValue = "--es APPLITOOLS \'{" + "\"NML_API_KEY\":\"" + apiKey + "\",";
                 capValueSuffix = "}\'";
                 break;
-            case IOS_DEFAULT:
+            case IOS_BUILT_IN:
                 capKey = "processArguments";
                 capValue = "{\"args\": [], \"env\":";
                 break;
