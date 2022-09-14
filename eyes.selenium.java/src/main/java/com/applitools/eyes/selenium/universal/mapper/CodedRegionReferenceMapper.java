@@ -26,18 +26,21 @@ public class CodedRegionReferenceMapper {
             codedRegionReference.setRegion(region);
             codedRegionReference.setRegionId(simpleRegionByRectangle.getRegion().getRegionId());
             // set padding here
+            codedRegionReference.setPadding(simpleRegionByRectangle.getPadding());
         } else if (getSimpleRegion instanceof SimpleRegionByElement) {
             SimpleRegionByElement simpleRegionByElement = (SimpleRegionByElement) getSimpleRegion;
             TRegion region = ElementRegionMapper.toElementRegionDto(simpleRegionByElement.getElement());
             codedRegionReference.setRegion(region);
             codedRegionReference.setRegionId(simpleRegionByElement.getRegionId());
             // set padding here
+            codedRegionReference.setPadding(simpleRegionByElement.getPadding());
         } else if (getSimpleRegion instanceof SimpleRegionBySelector) {
             SimpleRegionBySelector simpleRegionBySelector = (SimpleRegionBySelector) getSimpleRegion;
             TRegion region = SelectorRegionMapper.toSelectorRegionDto(simpleRegionBySelector.getSelector());
             codedRegionReference.setRegion(region);
             codedRegionReference.setRegionId(simpleRegionBySelector.getRegionId());
             // set padding here
+            codedRegionReference.setPadding(simpleRegionBySelector.getPadding());
         }
 
         return codedRegionReference;
