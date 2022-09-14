@@ -77,8 +77,8 @@ public class Eyes implements IEyesBase {
         // Take the API key from the environment if it's not explicitly given.
         if (apiKey == null) {
             apiKey = System.getenv("APPLITOOLS_API_KEY");
-            if (apiKey == null) {
-                throw new EyesException("No API key was given, and none was found in APPLITOOLS_API_KEY env variable.");
+            if (apiKey == null || apiKey.equalsIgnoreCase("")) {
+                throw new EyesException("No API key was not given, or is an empty string.");
             }
         }
         capValue += "\"NML_API_KEY\":\"" + apiKey + "\",";
