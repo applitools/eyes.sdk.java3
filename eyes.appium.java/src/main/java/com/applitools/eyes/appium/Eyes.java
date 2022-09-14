@@ -23,47 +23,47 @@ import java.util.*;
 public class Eyes implements IEyesBase {
     private com.applitools.eyes.selenium.Eyes originEyes;
 
-    public static enum LocalDeviceMode {
-        ANDROID,
-        IOS_BUILT_IN, // If you statically linked the NMG lib to your app, use this.
-        IOS_INSTRUMENTED_SIMULATOR,
-        IOS_INSTRUMENTED_REAL_DEVICE;
+    public static enum ApplitoolsLibMode {
+        ANDROID_APP,
+        IOS_APP_BUILT_IN, // If you statically linked the NMG lib to your app, use this.
+        IOS_APP_INSTRUMENTED_SIMULATOR,
+        IOS_APP_INSTRUMENTED_REAL_DEVICE;
     }
 
-    public static void setNMGCapabilities(DesiredCapabilities caps, LocalDeviceMode mode) {
+    public static void setNMGCapabilities(DesiredCapabilities caps, ApplitoolsLibMode mode) {
         setNMGCapabilities(caps, mode, null, null, null);
     }
 
-    public static void setNMGCapabilities(DesiredCapabilities caps, LocalDeviceMode mode, String apiKey) {
+    public static void setNMGCapabilities(DesiredCapabilities caps, ApplitoolsLibMode mode, String apiKey) {
         setNMGCapabilities(caps, mode, apiKey, null, null);
     }
 
-    public static void setNMGCapabilities(DesiredCapabilities caps, LocalDeviceMode mode, String apiKey, String eyesServerUrl) {
+    public static void setNMGCapabilities(DesiredCapabilities caps, ApplitoolsLibMode mode, String apiKey, String eyesServerUrl) {
         setNMGCapabilities(caps, mode, apiKey, eyesServerUrl, null);
     }
 
-    public static void setNMGCapabilities(DesiredCapabilities caps, LocalDeviceMode mode, String apiKey,
+    public static void setNMGCapabilities(DesiredCapabilities caps, ApplitoolsLibMode mode, String apiKey,
                                           String eyesServerUrl, ProxySettings proxySettings) {
         String capValue = "";
         String capKey = "";
         String capValueSuffix = "";
         switch (mode) {
-            case ANDROID:
+            case ANDROID_APP:
                 capKey = "optionalIntentArguments";
                 capValue = "--es APPLITOOLS \'{" + "\"NML_API_KEY\":\"" + apiKey + "\",";
                 capValueSuffix = "}\'";
                 break;
-            case IOS_BUILT_IN:
+            case IOS_APP_BUILT_IN:
                 capKey = "processArguments";
                 capValue = "{\"args\": [], \"env\":";
                 break;
-            case IOS_INSTRUMENTED_REAL_DEVICE:
+            case IOS_APP_INSTRUMENTED_REAL_DEVICE:
                 capKey = "processArguments";
                 capValue = "{\"args\": [], \"env\":"
                         + "{\"DYLD_INSERT_LIBRARIES\": \"@executable_path/Frameworks/UFG_lib.xcframework/ios-arm64/UFG_lib.framework/UFG_lib\",";
                 capValueSuffix = "}";
                 break;
-            case IOS_INSTRUMENTED_SIMULATOR:
+            case IOS_APP_INSTRUMENTED_SIMULATOR:
                 capKey = "processArguments";
                 capValue = "{\"args\": [], \"env\":"
                         + "{\"DYLD_INSERT_LIBRARIES\": \"@executable_path/Frameworks/UFG_lib.xcframework/ios-arm64_x86_64-simulator/UFG_lib.framework/UFG_lib\",";
