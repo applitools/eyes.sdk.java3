@@ -30,19 +30,19 @@ public class Eyes implements IEyesBase {
         IOS_INSTRUMENTED_REAL_DEVICE;
     }
 
-    public static DesiredCapabilities setNMLCapabilities(DesiredCapabilities caps, LocalDeviceMode mode) {
-        return setNMLCapabilities(caps, mode, null, null, null);
+    public static void setNMLCapabilities(DesiredCapabilities caps, LocalDeviceMode mode) {
+        setNMLCapabilities(caps, mode, null, null, null);
     }
 
-    public static DesiredCapabilities setNMLCapabilities(DesiredCapabilities caps, LocalDeviceMode mode, String apiKey) {
-        return setNMLCapabilities(caps, mode, apiKey, null, null);
+    public static void setNMLCapabilities(DesiredCapabilities caps, LocalDeviceMode mode, String apiKey) {
+        setNMLCapabilities(caps, mode, apiKey, null, null);
     }
 
-    public static DesiredCapabilities setNMLCapabilities(DesiredCapabilities caps, LocalDeviceMode mode, String apiKey, String eyesServerUrl) {
-        return setNMLCapabilities(caps, mode, apiKey, eyesServerUrl, null);
+    public static void setNMLCapabilities(DesiredCapabilities caps, LocalDeviceMode mode, String apiKey, String eyesServerUrl) {
+        setNMLCapabilities(caps, mode, apiKey, eyesServerUrl, null);
     }
 
-    public static DesiredCapabilities setNMLCapabilities(DesiredCapabilities caps, LocalDeviceMode mode, String apiKey,
+    public static void setNMLCapabilities(DesiredCapabilities caps, LocalDeviceMode mode, String apiKey,
                                              String eyesServerUrl, ProxySettings proxySettings) {
         String capValue = "";
         String capKey = "";
@@ -94,7 +94,6 @@ public class Eyes implements IEyesBase {
         capValue += capValueSuffix;
 
         caps.setCapability(capKey, capValue);
-        return caps;
     }
 
     /**
