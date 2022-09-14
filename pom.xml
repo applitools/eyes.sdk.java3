@@ -6,7 +6,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.applitools</groupId>
     <artifactId>eyes-sdk-java5-parent</artifactId>
-    <version>5.20.0</version>
+    <version>5.22.0</version>
     <packaging>pom</packaging>
     <name>eyes-sdk-java5-parent</name>
     <url>http://www.applitools.com</url>
