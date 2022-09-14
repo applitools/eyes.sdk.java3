@@ -9,13 +9,11 @@ import com.applitools.eyes.locators.TextRegion;
 import com.applitools.eyes.locators.TextRegionSettings;
 import com.applitools.eyes.locators.VisualLocatorSettings;
 import com.applitools.eyes.positioning.PositionProvider;
-import com.applitools.eyes.selenium.*;
 import com.applitools.eyes.selenium.positioning.ImageRotation;
 import com.applitools.eyes.selenium.universal.dto.CheckSettingsDto;
 import com.applitools.utils.*;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.openqa.selenium.*;
+import org.openqa.selenium.remote.DesiredCapabilities;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -24,6 +22,80 @@ import java.util.*;
 
 public class Eyes implements IEyesBase {
     private com.applitools.eyes.selenium.Eyes originEyes;
+
+    public static enum LocalDeviceMode {
+        ANDROID,
+        IOS_DEFAULT,
+        IOS_INSTRUMENTED_SIMULATOR,
+        IOS_INSTRUMENTED_REAL_DEVICE;
+    }
+
+    public static DesiredCapabilities setNMLCapabilities(DesiredCapabilities caps, LocalDeviceMode mode) {
+        return setNMLCapabilities(caps, mode, null, null, null);
+    }
+
+    public static DesiredCapabilities setNMLCapabilities(DesiredCapabilities caps, LocalDeviceMode mode, String apiKey) {
+        return setNMLCapabilities(caps, mode, apiKey, null, null);
+    }
+
+    public static DesiredCapabilities setNMLCapabilities(DesiredCapabilities caps, LocalDeviceMode mode, String apiKey, String eyesServerUrl) {
+        return setNMLCapabilities(caps, mode, apiKey, eyesServerUrl, null);
+    }
+
+    public static DesiredCapabilities setNMLCapabilities(DesiredCapabilities caps, LocalDeviceMode mode, String apiKey,
+                                             String eyesServerUrl, ProxySettings proxySettings) {
+        String capValue = "";
+        String capKey = "";
+        String capValueSuffix = "";
+        switch (mode) {
+            case ANDROID:
+                capKey = "optionalIntentArguments";
+                capValue = "--es APPLITOOLS \'{" + "\"NML_API_KEY\":\"" + apiKey + "\",";
+                capValueSuffix = "}\'";
+                break;
+            case IOS_DEFAULT:
+                capKey = "processArguments";
+                capValue = "{\"args\": [], \"env\":";
+                break;
+            case IOS_INSTRUMENTED_REAL_DEVICE:
+                capKey = "processArguments";
+                capValue = "{\"args\": [], \"env\":"
+                        + "{\"DYLD_INSERT_LIBRARIES\": \"@executable_path/Frameworks/UFG_lib.xcframework/ios-arm64/UFG_lib.framework/UFG_lib\",";
+                capValueSuffix = "}";
+                break;
+            case IOS_INSTRUMENTED_SIMULATOR:
+                capKey = "processArguments";
+                capValue = "{\"args\": [], \"env\":"
+                        + "{\"DYLD_INSERT_LIBRARIES\": \"@executable_path/Frameworks/UFG_lib.xcframework/ios-arm64_x86_64-simulator/UFG_lib.framework/UFG_lib\",";
+                capValueSuffix = "}";
+                break;
+            default:
+                throw new EyesException("Got invalid local device mode for setting capabilities: " + mode);
+
+        }
+
+        // Take the API key from the environment if it's not explicitly given.
+        if (apiKey == null) {
+            apiKey = System.getenv("APPLITOOLS_API_KEY");
+            if (apiKey == null) {
+                throw new EyesException("No API key was given, and none was found in APPLITOOLS_API_KEY env variable.");
+            }
+        }
+        capValue += "\"NML_API_KEY\":\"" + apiKey + "\",";
+
+        if (eyesServerUrl != null) {
+            capValue += "\"NML_SERVER_URL\":\"" + eyesServerUrl + "\",";
+        }
+
+        if (proxySettings != null) {
+            capValue += "\"NML_PROXY_URL\":\"" + proxySettings + "\",";
+        }
+
+        capValue += capValueSuffix;
+
+        caps.setCapability(capKey, capValue);
+        return caps;
+    }
 
     /**
      * Instantiates a new Eyes.
