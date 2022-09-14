@@ -83,6 +83,11 @@ public class Eyes implements IEyesBase {
         }
         capValue += "\"NML_API_KEY\":\"" + apiKey + "\",";
 
+        // Check for the server URL in the env variable. (might still be null and this is fine.
+        if (eyesServerUrl == null) {
+            eyesServerUrl = System.getenv("APPLITOOLS_SERVER_URL");
+        }
+
         if (eyesServerUrl != null) {
             capValue += "\"NML_SERVER_URL\":\"" + eyesServerUrl + "\",";
         }
