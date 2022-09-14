@@ -23,13 +23,6 @@ import java.util.*;
 public class Eyes implements IEyesBase {
     private com.applitools.eyes.selenium.Eyes originEyes;
 
-    public static enum ApplitoolsLibMode {
-        ANDROID_APP,
-        IOS_APP_BUILT_IN, // If you statically linked the NMG lib to your app, use this.
-        IOS_APP_INSTRUMENTED_SIMULATOR,
-        IOS_APP_INSTRUMENTED_REAL_DEVICE;
-    }
-
     public static void setNMGCapabilities(DesiredCapabilities caps, ApplitoolsLibMode mode) {
         setNMGCapabilities(caps, mode, null, null, null);
     }
