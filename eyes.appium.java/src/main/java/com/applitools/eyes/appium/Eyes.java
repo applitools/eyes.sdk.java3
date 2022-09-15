@@ -23,49 +23,32 @@ import java.util.*;
 public class Eyes implements IEyesBase {
     private com.applitools.eyes.selenium.Eyes originEyes;
 
-    public static void setNMGCapabilities(DesiredCapabilities caps, ApplitoolsLibMode mode) {
-        setNMGCapabilities(caps, mode, null, null, null);
+    public static void setNMGCapabilities(DesiredCapabilities caps) {
+        setNMGCapabilities(caps, null, null, null);
     }
 
-    public static void setNMGCapabilities(DesiredCapabilities caps, ApplitoolsLibMode mode, String apiKey) {
-        setNMGCapabilities(caps, mode, apiKey, null, null);
+    public static void setNMGCapabilities(DesiredCapabilities caps, String apiKey) {
+        setNMGCapabilities(caps, apiKey, null, null);
     }
 
-    public static void setNMGCapabilities(DesiredCapabilities caps, ApplitoolsLibMode mode, String apiKey, String eyesServerUrl) {
-        setNMGCapabilities(caps, mode, apiKey, eyesServerUrl, null);
+    public static void setNMGCapabilities(DesiredCapabilities caps, String apiKey, String eyesServerUrl) {
+        setNMGCapabilities(caps, apiKey, eyesServerUrl, null);
     }
 
-    public static void setNMGCapabilities(DesiredCapabilities caps, ApplitoolsLibMode mode, String apiKey,
+    public static void setNMGCapabilities(DesiredCapabilities caps, String apiKey,
                                           String eyesServerUrl, ProxySettings proxySettings) {
-        String capValue = "";
-        String capKey = "";
-        String capValueSuffix = "";
-        switch (mode) {
-            case ANDROID_APP:
-                capKey = "optionalIntentArguments";
-                capValue = "--es APPLITOOLS \'{" + "\"NML_API_KEY\":\"" + apiKey + "\",";
-                capValueSuffix = "}\'";
-                break;
-            case IOS_APP_BUILT_IN:
-                capKey = "processArguments";
-                capValue = "{\"args\": [], \"env\":";
-                break;
-            case IOS_APP_INSTRUMENTED_REAL_DEVICE:
-                capKey = "processArguments";
-                capValue = "{\"args\": [], \"env\":"
-                        + "{\"DYLD_INSERT_LIBRARIES\": \"@executable_path/Frameworks/UFG_lib.xcframework/ios-arm64/UFG_lib.framework/UFG_lib\",";
-                capValueSuffix = "}";
-                break;
-            case IOS_APP_INSTRUMENTED_SIMULATOR:
-                capKey = "processArguments";
-                capValue = "{\"args\": [], \"env\":"
-                        + "{\"DYLD_INSERT_LIBRARIES\": \"@executable_path/Frameworks/UFG_lib.xcframework/ios-arm64_x86_64-simulator/UFG_lib.framework/UFG_lib\",";
-                capValueSuffix = "}";
-                break;
-            default:
-                throw new EyesException("Got invalid local device mode for setting capabilities: " + mode);
 
-        }
+        String iosCapsKey = "processArguments";
+        String iosCapValue = "{\"args\": [], \"env\":"
+                + "{\"DYLD_INSERT_LIBRARIES\": \"@executable_path/Frameworks/UFG_lib.xcframework/ios-arm64/UFG_lib.framework/UFG_lib"
+                + ":"
+                + "@executable_path/Frameworks/UFG_lib.xcframework/ios-arm64_x86_64-simulator/UFG_lib.framework/UFG_lib\"";
+
+        String iosCapValueSuffix = "}}";
+
+        String androidCapKey = "optionalIntentArguments";
+        String androidCapValue = "--es APPLITOOLS \'{";
+        String androidCapValueSuffix = "}\'";
 
         // Take the API key from the environment if it's not explicitly given.
         if (apiKey == null) {
@@ -74,7 +57,9 @@ public class Eyes implements IEyesBase {
                 throw new EyesException("No API key was not given, or is an empty string.");
             }
         }
-        capValue += "\"NML_API_KEY\":\"" + apiKey + "\",";
+
+        androidCapValue += "\"NML_API_KEY\":\"" + apiKey + "\",";
+        iosCapValue += "\"NML_API_KEY\":\"" + apiKey + "\",";
 
         // Check for the server URL in the env variable. (might still be null and this is fine.
         if (eyesServerUrl == null) {
@@ -82,16 +67,20 @@ public class Eyes implements IEyesBase {
         }
 
         if (eyesServerUrl != null) {
-            capValue += "\"NML_SERVER_URL\":\"" + eyesServerUrl + "\",";
+            androidCapValue += "\"NML_SERVER_URL\":\"" + eyesServerUrl + "\",";
+            iosCapValue += "\"NML_SERVER_URL\":\"" + eyesServerUrl + "\",";
         }
 
         if (proxySettings != null) {
-            capValue += "\"NML_PROXY_URL\":\"" + proxySettings + "\",";
+            androidCapValue += "\"NML_PROXY_URL\":\"" + proxySettings + "\",";
+            iosCapValue += "\"NML_PROXY_URL\":\"" + proxySettings + "\",";
         }
 
-        capValue += capValueSuffix;
+        androidCapValue += androidCapValueSuffix;
+        iosCapValue += iosCapValueSuffix;
 
-        caps.setCapability(capKey, capValue);
+        caps.setCapability(androidCapKey, androidCapValue);
+        caps.setCapability(iosCapsKey, iosCapValue);
     }
 
     /**

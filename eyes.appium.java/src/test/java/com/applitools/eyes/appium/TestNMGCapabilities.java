@@ -1,6 +1,5 @@
 package com.applitools.eyes.appium;
 
-import com.applitools.eyes.ApplitoolsLibMode;
 import com.applitools.eyes.ProxySettings;
 import org.openqa.selenium.remote.DesiredCapabilities;
 import org.testng.Assert;
@@ -10,66 +9,36 @@ public class TestNMGCapabilities {
     private final String API_KEY = "asd123";
     private final String SERVER_URL = "https://eyesapi.applitools.com";
     private final ProxySettings proxySettings = new ProxySettings("http://127.0.0.1", 8888);
+    private final String LIBRARY_PATH = "@executable_path/Frameworks/UFG_lib.xcframework/ios-arm64/UFG_lib.framework/UFG_lib:@executable_path/Frameworks/UFG_lib.xcframework/ios-arm64_x86_64-simulator/UFG_lib.framework/UFG_lib";
 
     @Test
-    public void testAndroidLibMode() {
+    public void testAndroidNMGCaps() {
         DesiredCapabilities caps = getCaps();
 
-        Eyes.setNMGCapabilities(caps, ApplitoolsLibMode.ANDROID_APP, API_KEY, SERVER_URL, proxySettings);
+        Eyes.setNMGCapabilities(caps, API_KEY, SERVER_URL, proxySettings);
 
-        String args = (String) caps.getCapability("optionalIntentArguments");
-        Assert.assertNotNull(args);
+        String androidArgs = (String) caps.getCapability("optionalIntentArguments");
+        Assert.assertNotNull(androidArgs);
 
-        String[] intentArguments = args.split(" ", 3);
-        Assert.assertEquals(intentArguments[0], "--es");
-        Assert.assertEquals(intentArguments[1], "APPLITOOLS");
-        Assert.assertEquals(intentArguments[2], String.format("\\'{\\\"NML_API_KEY\\\":\\\"%s\\\",\\\"NML_SERVER_URL\\\":\\\"%s\\\",\\\"NML_PROXY_URL\\\":\\\"%s\\\",}\\'", API_KEY, SERVER_URL, proxySettings));
+        String[] androidIntentArguments = androidArgs.split(" ", 3);
+        Assert.assertEquals(androidIntentArguments[0], "--es");
+        Assert.assertEquals(androidIntentArguments[1], "APPLITOOLS");
+        Assert.assertEquals(androidIntentArguments[2], String.format("\\'{\\\"NML_API_KEY\\\":\\\"%s\\\",\\\"NML_SERVER_URL\\\":\\\"%s\\\",\\\"NML_PROXY_URL\\\":\\\"%s\\\",}\\'", API_KEY, SERVER_URL, proxySettings));
     }
 
     @Test
-    public void testIosBuiltInLibMode() {
+    public void testIosNMGCaps() {
         DesiredCapabilities caps = getCaps();
 
-        Eyes.setNMGCapabilities(caps, ApplitoolsLibMode.IOS_APP_BUILT_IN, API_KEY, SERVER_URL, proxySettings);
+        Eyes.setNMGCapabilities(caps, API_KEY, SERVER_URL, proxySettings);
 
-        String args = (String) caps.getCapability("processArguments");
-        Assert.assertNotNull(args);
-        String[] intentArguments = args.split(" ", 3);
-        Assert.assertEquals(intentArguments[0], "{\\\"args\\\":");
-        Assert.assertEquals(intentArguments[1], "[],");
-        Assert.assertEquals(intentArguments[2], String.format("\\\"env\\\":{\\\"NML_API_KEY\\\":\\\"%s\\\",\\\"NML_SERVER_URL\\\":\\\"%s\\\",\\\"NML_PROXY_URL\\\":\\\"%s\\\",}", API_KEY, SERVER_URL, proxySettings));
-    }
+        String iosArgs = (String) caps.getCapability("processArguments");
+        Assert.assertNotNull(iosArgs);
 
-    @Test
-    public void testIosInstrumentedRealDeviceLibMode() {
-        DesiredCapabilities caps = getCaps();
-        String REAL_DEVICE_PATH = "@executable_path/Frameworks/UFG_lib.xcframework/ios-arm64/UFG_lib.framework/UFG_lib";
-
-        Eyes.setNMGCapabilities(caps, ApplitoolsLibMode.IOS_APP_INSTRUMENTED_REAL_DEVICE, API_KEY, SERVER_URL, proxySettings);
-
-        String args = (String) caps.getCapability("processArguments");
-        Assert.assertNotNull(args);
-
-        String[] intentArguments = args.split(" ", 3);
-        Assert.assertEquals(intentArguments[0], "{\\\"args\\\":");
-        Assert.assertEquals(intentArguments[1], "[],");
-        Assert.assertEquals(intentArguments[2], String.format("\\\"env\\\":{\\\"DYLD_INSERT_LIBRARIES\\\":\\\"%s\\\",\\\"NML_API_KEY\\\":\\\"%s\\\",\\\"NML_SERVER_URL\\\":\\\"%s\\\",\\\"NML_PROXY_URL\\\":\\\"%s\\\",}", REAL_DEVICE_PATH, API_KEY, SERVER_URL, proxySettings));
-    }
-
-    @Test
-    public void testIosInstrumentedSimulatorLibMode() {
-        DesiredCapabilities caps = getCaps();
-        String SIMULATOR_PATH = "@executable_path/Frameworks/UFG_lib.xcframework/ios-arm64_x86_64-simulator/UFG_lib";
-
-        Eyes.setNMGCapabilities(caps, ApplitoolsLibMode.IOS_APP_INSTRUMENTED_SIMULATOR, API_KEY, SERVER_URL, proxySettings);
-
-        String args = (String) caps.getCapability("processArguments");
-        Assert.assertNotNull(args);
-
-        String[] intentArguments = args.split(" ", 3);
-        Assert.assertEquals(intentArguments[0], "{\\\"args\\\":");
-        Assert.assertEquals(intentArguments[1], "[],");
-        Assert.assertEquals(intentArguments[2], String.format("\\\"env\\\":{\\\"DYLD_INSERT_LIBRARIES\\\":\\\"%s\\\",\\\"NML_API_KEY\\\":\\\"%s\\\",\\\"NML_SERVER_URL\\\":\\\"%s\\\",\\\"NML_PROXY_URL\\\":\\\"%s\\\",}", SIMULATOR_PATH, API_KEY, SERVER_URL, proxySettings));
+        String[] iosIntentArguments = iosArgs.split(" ", 3);
+        Assert.assertEquals(iosIntentArguments[0], "{\\\"args\\\":");
+        Assert.assertEquals(iosIntentArguments[1], "[],");
+        Assert.assertEquals(iosIntentArguments[2], String.format("\\\"env\\\":{\\\"DYLD_INSERT_LIBRARIES\\\":\\\"%s\\\",\\\"NML_API_KEY\\\":\\\"%s\\\",\\\"NML_SERVER_URL\\\":\\\"%s\\\",\\\"NML_PROXY_URL\\\":\\\"%s\\\",}}", LIBRARY_PATH, API_KEY, SERVER_URL, proxySettings));
     }
 
     private DesiredCapabilities getCaps() {
