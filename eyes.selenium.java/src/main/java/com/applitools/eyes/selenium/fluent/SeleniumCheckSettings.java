@@ -243,6 +243,13 @@ public class SeleniumCheckSettings extends CheckSettings implements ISeleniumChe
         return clone;
     }
 
+    public SeleniumCheckSettings ignore(By selector, Padding padding) {
+        SeleniumCheckSettings clone = this.clone();
+//        clone.ignore_(new SimpleRegionBySelector(selector, new Borders(leftPadding, topPadding, rightPadding, bottomPadding)));
+        clone.ignore_(new SimpleRegionBySelector(selector, padding));
+        return clone;
+    }
+
     public SeleniumCheckSettings ignore(By selector, int leftPadding, int topPadding, int rightPadding, int bottomPadding, String regionId) {
         SeleniumCheckSettings clone = this.clone();
 //        clone.ignore_(new SimpleRegionBySelector(selector, new Borders(leftPadding, topPadding, rightPadding, bottomPadding)).regionId(regionId));
