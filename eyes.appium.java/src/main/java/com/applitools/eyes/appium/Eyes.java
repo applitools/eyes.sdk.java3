@@ -40,9 +40,9 @@ public class Eyes implements IEyesBase {
 
         String iosCapsKey = "processArguments";
         String iosCapValue = "{\"args\": [], \"env\":"
-                + "{\"DYLD_INSERT_LIBRARIES\": \"@executable_path/Frameworks/UFG_lib.xcframework/ios-arm64/UFG_lib.framework/UFG_lib"
+                + "{\"DYLD_INSERT_LIBRARIES\":\"@executable_path/Frameworks/UFG_lib.xcframework/ios-arm64/UFG_lib.framework/UFG_lib"
                 + ":"
-                + "@executable_path/Frameworks/UFG_lib.xcframework/ios-arm64_x86_64-simulator/UFG_lib.framework/UFG_lib\"";
+                + "@executable_path/Frameworks/UFG_lib.xcframework/ios-arm64_x86_64-simulator/UFG_lib.framework/UFG_lib\",";
 
         String iosCapValueSuffix = "}}";
 
