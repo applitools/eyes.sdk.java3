@@ -42,7 +42,7 @@ public class Eyes implements IEyesBase {
         String iosCapValue = "{\"args\": [], \"env\":"
                 + "{\"DYLD_INSERT_LIBRARIES\":\"@executable_path/Frameworks/UFG_lib.xcframework/ios-arm64/UFG_lib.framework/UFG_lib"
                 + ":"
-                + "@executable_path/Frameworks/UFG_lib.xcframework/ios-arm64_x86_64-simulator/UFG_lib.framework/UFG_lib\",";
+                + "@executable_path/Frameworks/UFG_lib.xcframework/ios-arm64_x86_64-simulator/UFG_lib.framework/UFG_lib\"";
 
         String iosCapValueSuffix = "}}";
 
@@ -58,8 +58,8 @@ public class Eyes implements IEyesBase {
             }
         }
 
-        androidCapValue += "\"NML_API_KEY\":\"" + apiKey + "\",";
-        iosCapValue += "\"NML_API_KEY\":\"" + apiKey + "\",";
+        androidCapValue += "\"NML_API_KEY\":\"" + apiKey + "\"";
+        iosCapValue += ",\"NML_API_KEY\":\"" + apiKey + "\"";
 
         // Check for the server URL in the env variable. (might still be null and this is fine.
         if (eyesServerUrl == null) {
@@ -67,8 +67,8 @@ public class Eyes implements IEyesBase {
         }
 
         if (eyesServerUrl != null && !eyesServerUrl.equalsIgnoreCase("")) {
-            androidCapValue += "\"NML_SERVER_URL\":\"" + eyesServerUrl + "\",";
-            iosCapValue += "\"NML_SERVER_URL\":\"" + eyesServerUrl + "\",";
+            androidCapValue += ",\"NML_SERVER_URL\":\"" + eyesServerUrl + "\"";
+            iosCapValue += ",\"NML_SERVER_URL\":\"" + eyesServerUrl + "\"";
         }
 
         if (proxySettings == null) {
@@ -79,8 +79,8 @@ public class Eyes implements IEyesBase {
         }
 
         if (proxySettings != null) {
-            androidCapValue += "\"NML_PROXY_URL\":\"" + proxySettings + "\",";
-            iosCapValue += "\"NML_PROXY_URL\":\"" + proxySettings + "\",";
+            androidCapValue += ",\"NML_PROXY_URL\":\"" + proxySettings + "\"";
+            iosCapValue += ",\"NML_PROXY_URL\":\"" + proxySettings + "\"";
         }
 
         androidCapValue += androidCapValueSuffix;

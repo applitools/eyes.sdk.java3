@@ -29,7 +29,7 @@ public class TestNMGCapabilities {
         String[] androidIntentArguments = androidArgs.split(" ", 3);
         Assert.assertEquals(androidIntentArguments[0], "--es");
         Assert.assertEquals(androidIntentArguments[1], "APPLITOOLS");
-        Assert.assertEquals(androidIntentArguments[2], String.format("'{\"NML_API_KEY\":\"%s\",\"NML_SERVER_URL\":\"%s\",\"NML_PROXY_URL\":\"%s\",}'", API_KEY, SERVER_URL, proxySettings));
+        Assert.assertEquals(androidIntentArguments[2], String.format("'{\"NML_API_KEY\":\"%s\",\"NML_SERVER_URL\":\"%s\",\"NML_PROXY_URL\":\"%s\"}'", API_KEY, SERVER_URL, proxySettings));
     }
 
     @Test
@@ -44,7 +44,7 @@ public class TestNMGCapabilities {
         String[] iosIntentArguments = iosArgs.split(" ", 3);
         Assert.assertEquals(iosIntentArguments[0], "{\"args\":");
         Assert.assertEquals(iosIntentArguments[1], "[],");
-        Assert.assertEquals(iosIntentArguments[2], String.format("\"env\":{\"DYLD_INSERT_LIBRARIES\":\"%s\",\"NML_API_KEY\":\"%s\",\"NML_SERVER_URL\":\"%s\",\"NML_PROXY_URL\":\"%s\",}}", LIBRARY_PATH, API_KEY, SERVER_URL, proxySettings));
+        Assert.assertEquals(iosIntentArguments[2], String.format("\"env\":{\"DYLD_INSERT_LIBRARIES\":\"%s\",\"NML_API_KEY\":\"%s\",\"NML_SERVER_URL\":\"%s\",\"NML_PROXY_URL\":\"%s\"}}", LIBRARY_PATH, API_KEY, SERVER_URL, proxySettings));
     }
 
     @Test
@@ -68,7 +68,7 @@ public class TestNMGCapabilities {
             String[] androidIntentArguments = androidArgs.split(" ", 3);
             Assert.assertEquals(androidIntentArguments[0], "--es");
             Assert.assertEquals(androidIntentArguments[1], "APPLITOOLS");
-            Assert.assertEquals(androidIntentArguments[2], String.format("'{\"NML_API_KEY\":\"%s\",\"NML_SERVER_URL\":\"%s\",\"NML_PROXY_URL\":\"%s\",}'", FAKE_API_KEY, FAKE_SERVER_URL, FAKE_PROXY_URI));
+            Assert.assertEquals(androidIntentArguments[2], String.format("'{\"NML_API_KEY\":\"%s\",\"NML_SERVER_URL\":\"%s\",\"NML_PROXY_URL\":\"%s\"}'", FAKE_API_KEY, FAKE_SERVER_URL, FAKE_PROXY_URI));
         }
     }
 
