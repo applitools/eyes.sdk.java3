@@ -1,3 +1,7 @@
+## [5.23.0] - 2022-09-16
+### Added
+- SetNMGCapabilities convenience for NML communication [Trello 2983](https://trello.com/c/DKnYOU5W)
+
 ## [5.22.0] - 2022-09-14
 ### Fixed
 - Missing ContentInset Configuration API [Trello 2981](https://trello.com/c/i0vUcO3P)
