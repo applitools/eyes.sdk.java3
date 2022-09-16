@@ -1,14 +1,14 @@
 ## [5.23.0] - 2022-09-16
 ### Added
-- SetNMGCapabilities convenience for NML communication [Trello 2983](https://trello.com/c/DKnYOU5W)
+- NMG communication revamp. [Trello 2983](https://trello.com/c/DKnYOU5W)
 
 ## [5.22.0] - 2022-09-14
 ### Fixed
-- Missing ContentInset Configuration API [Trello 2981](https://trello.com/c/i0vUcO3P)
+- Missing ContentInset Configuration API. [Trello 2981](https://trello.com/c/i0vUcO3P)
 
 ## [5.21.0] - 2022-09-07
 ### Updated
-- Use correct binary for alpine docker image [Trello 2961](https://trello.com/c/DAo9uo8r)
+- Use correct binary for alpine docker image. [Trello 2961](https://trello.com/c/DAo9uo8r)
 
 ## [5.18.0] - 2022-09-05
 ### Updated
