@@ -54,7 +54,7 @@ public class Eyes implements IEyesBase {
         if (apiKey == null) {
             apiKey = System.getenv("APPLITOOLS_API_KEY");
             if (apiKey == null || apiKey.equalsIgnoreCase("")) {
-                throw new EyesException("No API key was not given, or is an empty string.");
+                throw new EyesException("No API key was given, or is an empty string.");
             }
         }
 
