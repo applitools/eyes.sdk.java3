@@ -52,7 +52,7 @@ public class Eyes implements IEyesBase {
 
         // Take the API key from the environment if it's not explicitly given.
         if (apiKey == null) {
-            apiKey = System.getenv("APPLITOOLS_API_KEY");
+            apiKey = GeneralUtils.getEnvString(("APPLITOOLS_API_KEY"));
             if (apiKey == null || apiKey.equalsIgnoreCase("")) {
                 throw new EyesException("No API key was given, or is an empty string.");
             }
@@ -63,12 +63,19 @@ public class Eyes implements IEyesBase {
 
         // Check for the server URL in the env variable. (might still be null and this is fine.
         if (eyesServerUrl == null) {
-            eyesServerUrl = System.getenv("APPLITOOLS_SERVER_URL");
+            eyesServerUrl = GeneralUtils.getEnvString(("APPLITOOLS_SERVER_URL"));
         }
 
-        if (eyesServerUrl != null) {
+        if (eyesServerUrl != null && !eyesServerUrl.equalsIgnoreCase("")) {
             androidCapValue += "\"NML_SERVER_URL\":\"" + eyesServerUrl + "\",";
             iosCapValue += "\"NML_SERVER_URL\":\"" + eyesServerUrl + "\",";
+        }
+
+        if (proxySettings == null) {
+            String proxyFromEnv = GeneralUtils.getEnvString("APPLITOOLS_HTTP_PROXY");
+            if (proxyFromEnv != null && !proxyFromEnv.equalsIgnoreCase("")) {
+                proxySettings = new ProxySettings(proxyFromEnv);
+            }
         }
 
         if (proxySettings != null) {

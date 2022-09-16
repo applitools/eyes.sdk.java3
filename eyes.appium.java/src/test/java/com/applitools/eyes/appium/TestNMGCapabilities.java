@@ -1,9 +1,15 @@
 package com.applitools.eyes.appium;
 
+import com.applitools.eyes.AbstractProxySettings;
 import com.applitools.eyes.ProxySettings;
+import com.applitools.utils.GeneralUtils;
+import org.mockito.MockSettings;
 import org.openqa.selenium.remote.DesiredCapabilities;
+import org.powermock.api.mockito.PowerMockito;
 import org.testng.Assert;
 import org.testng.annotations.Test;
+
+import static org.mockito.Mockito.*;
 
 public class TestNMGCapabilities {
     private final String API_KEY = "asd123";
@@ -40,6 +46,33 @@ public class TestNMGCapabilities {
         Assert.assertEquals(iosIntentArguments[1], "[],");
         Assert.assertEquals(iosIntentArguments[2], String.format("\"env\":{\"DYLD_INSERT_LIBRARIES\":\"%s\",\"NML_API_KEY\":\"%s\",\"NML_SERVER_URL\":\"%s\",\"NML_PROXY_URL\":\"%s\",}}", LIBRARY_PATH, API_KEY, SERVER_URL, proxySettings));
     }
+
+    @Test
+    public void testDefaultsFromEnv() {
+        DesiredCapabilities caps = getCaps();
+
+        final String FAKE_API_KEY = "MY_API_KEY_123";
+        final String FAKE_SERVER_URL = "applitools-server!";
+        final String FAKE_PROXY_URI = "user:pass@myproxy.applitools.com";
+
+        try (org.mockito.MockedStatic<GeneralUtils> utilities = mockStatic(GeneralUtils.class, CALLS_REAL_METHODS)) {
+            utilities.when(() -> GeneralUtils.getEnvString("APPLITOOLS_API_KEY")).thenReturn(FAKE_API_KEY);
+            utilities.when(() -> GeneralUtils.getEnvString("APPLITOOLS_SERVER_URL")).thenReturn(FAKE_SERVER_URL);
+            utilities.when(() -> GeneralUtils.getEnvString("APPLITOOLS_HTTP_PROXY")).thenReturn(FAKE_PROXY_URI);
+
+            Eyes.setNMGCapabilities(caps);
+
+            String androidArgs = (String) caps.getCapability("optionalIntentArguments");
+            Assert.assertNotNull(androidArgs);
+
+            String[] androidIntentArguments = androidArgs.split(" ", 3);
+            Assert.assertEquals(androidIntentArguments[0], "--es");
+            Assert.assertEquals(androidIntentArguments[1], "APPLITOOLS");
+            Assert.assertEquals(androidIntentArguments[2], String.format("'{\"NML_API_KEY\":\"%s\",\"NML_SERVER_URL\":\"%s\",\"NML_PROXY_URL\":\"%s\",}'", FAKE_API_KEY, FAKE_SERVER_URL, FAKE_PROXY_URI));
+        }
+    }
+
+
 
     private DesiredCapabilities getCaps() {
         DesiredCapabilities caps = new DesiredCapabilities();
