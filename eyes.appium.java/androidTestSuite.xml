@@ -33,6 +33,7 @@
             <class name="com.applitools.eyes.appium.android.AndroidLazyLoadTest"/>
             <class name="com.applitools.eyes.appium.TestContentInset"/>
             <class name="com.applitools.eyes.appium.android.AndroidContentInsetTest"/>
+            <class name="com.applitools.eyes.appium.TestCodedRegionPadding"/>
 
         </classes>
     </test>
