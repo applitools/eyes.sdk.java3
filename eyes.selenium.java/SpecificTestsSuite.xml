@@ -1,10 +1,11 @@
 <!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd" >
 
-<suite name="Java Specific Tests" verbose="1" parallel="tests" thread-count="15">
-    <test name="TestBatchAPI" parallel="methods">
+<!--<suite name="Java Specific Tests" verbose="1" parallel="tests" thread-count="15">-->
+<suite name="Java Specific Tests" verbose="1">
+    <test name="TestEyes">
         <classes>
-            <class name="com.applitools.eyes.selenium.TestBatchAPI">
-            </class>
+<!--            <class name="com.applitools.eyes.selenium.TestBatchAPI">-->
+<!--            </class>-->
             <class name="com.applitools.eyes.TestPadding"/>
             <class name="com.applitools.eyes.selenium.TestCodedRegionPadding"/>
         </classes>
