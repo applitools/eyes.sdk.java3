@@ -2,6 +2,7 @@ package com.applitools.eyes.selenium;
 
 import com.applitools.eyes.Padding;
 import com.applitools.eyes.RectangleSize;
+import com.applitools.eyes.Region;
 import com.applitools.eyes.TestResults;
 import com.applitools.eyes.metadata.SessionResults;
 import com.applitools.eyes.selenium.fluent.Target;
@@ -10,8 +11,10 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.testng.Assert;
+import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
+
 
 public class TestCodedRegionPadding {
 
@@ -21,44 +24,61 @@ public class TestCodedRegionPadding {
     @BeforeMethod
     public void setup() {
         eyes = new Eyes();
+        eyes.setApiKey(System.getenv("APPLITOOLS_API_KEY"));
         driver = new ChromeDriver();
         driver.get("https://applitools.github.io/demo/TestPages/PaddedBody/region-padding.html");
     }
 
-    @Test
-    public void testIgnorePadding() {
-        eyes.open(driver, "Test Regions Padding", "TestRegionsPadding", new RectangleSize(1100, 700));
-        eyes.check(Target.window().ignore(By.cssSelector("#ignoreRegions"), new Padding(20)).fully());
-        eyes.check(Target.window().ignore(By.cssSelector("#ignoreRegions"), 10, 10, 10, 10).fully());
-        final TestResults result = eyes.close(false);
-        final SessionResults info = getTestInfo(result);
+    @AfterMethod
+    public void teardown() {
+        driver.quit();
+        eyes.abortIfNotClosed();
     }
 
     @Test
-    public void testLayoutPadding() {
-        eyes.open(driver, "Test Regions Padding", "TestRegionsPadding", new RectangleSize(1100, 700));
-//        eyes.check(Target.window().layout(By.cssSelector("#ignoreRegions"), new Padding(20)).fully());
-        eyes.check(Target.window().layout(By.cssSelector("#ignoreRegions"), 10, 10, 10, 10).fully());
+    public void testRegionPaddingNew() {
+        eyes.open(driver, "Test Regions Padding", "Test Regions Padding", new RectangleSize(1100, 700));
+        eyes.check(Target.window()
+                .ignore(By.cssSelector("#ignoreRegions"), new Padding(20))
+                .layout(By.cssSelector("#layoutRegions"), new Padding().setTop(20).setRight(20))
+                .content(By.cssSelector("#contentRegions"), new Padding().setLeft(20).setRight(20))
+                .strict(By.cssSelector("#strictRegions"), new Padding().setBottom(20))
+                .fully());
         final TestResults result = eyes.close(false);
         final SessionResults info = getTestInfo(result);
+
+        Region ignoreRegion = info.getActualAppOutput()[0].getImageMatchSettings().getIgnore()[0];
+        Region layoutRegion = info.getActualAppOutput()[0].getImageMatchSettings().getLayout()[0];
+        Region contentRegion = info.getActualAppOutput()[0].getImageMatchSettings().getContent()[0];
+        Region strictRegion = info.getActualAppOutput()[0].getImageMatchSettings().getStrict()[0];
+
+        Assert.assertEquals(ignoreRegion, new Region(131, 88, 838, 110), "ignore");
+        Assert.assertEquals(layoutRegion, new Region(151, 238, 818, 90), "layout");
+        Assert.assertEquals(contentRegion, new Region(131, 408, 838, 70), "content");
+        Assert.assertEquals(strictRegion, new Region(151, 558, 798, 548), "strict");
     }
 
     @Test
-    public void testContentPadding() {
-        eyes.open(driver, "Test Regions Padding", "TestRegionsPadding", new RectangleSize(1100, 700));
-//        eyes.check(Target.window().content(By.cssSelector("#ignoreRegions"), new Padding(20)).fully());
-        eyes.check(Target.window().content(By.cssSelector("#ignoreRegions"), 10, 10, 10, 10).fully());
+    public void testRegionPaddingLegacy() {
+        eyes.open(driver, "Test Regions Padding", "Test Regions Padding Legacy", new RectangleSize(1100, 700));
+        eyes.check(Target.window()
+                .ignore(By.cssSelector("#ignoreRegions"), 20, 20, 20, 20)
+                .layout(By.cssSelector("#layoutRegions"), 0, 20, 20, 0)
+                .content(By.cssSelector("#contentRegions"), 20, 0, 20, 0)
+                .strict(By.cssSelector("#strictRegions"), 0, 0, 0, 20)
+                .fully());
         final TestResults result = eyes.close(false);
         final SessionResults info = getTestInfo(result);
-    }
 
-    @Test
-    public void testStrictPadding() {
-        eyes.open(driver, "Test Regions Padding", "TestRegionsPadding", new RectangleSize(1100, 700));
-//        eyes.check(Target.window().strict(By.cssSelector("#ignoreRegions"), new Padding(20)).fully());
-        eyes.check(Target.window().strict(By.cssSelector("#ignoreRegions"), 10, 10, 10, 10).fully());
-        final TestResults result = eyes.close(false);
-        final SessionResults info = getTestInfo(result);
+        Region ignoreRegion = info.getActualAppOutput()[0].getImageMatchSettings().getIgnore()[0];
+        Region layoutRegion = info.getActualAppOutput()[0].getImageMatchSettings().getLayout()[0];
+        Region contentRegion = info.getActualAppOutput()[0].getImageMatchSettings().getContent()[0];
+        Region strictRegion = info.getActualAppOutput()[0].getImageMatchSettings().getStrict()[0];
+
+        Assert.assertEquals(ignoreRegion, new Region(131, 88, 838, 110), "ignore");
+        Assert.assertEquals(layoutRegion, new Region(151, 238, 818, 90), "layout");
+        Assert.assertEquals(contentRegion, new Region(131, 408, 838, 70), "content");
+        Assert.assertEquals(strictRegion, new Region(151, 558, 798, 548), "strict");
     }
 
     private SessionResults getTestInfo(TestResults results) {
@@ -72,3 +92,4 @@ public class TestCodedRegionPadding {
         return sessionResults;
     }
 }
+
