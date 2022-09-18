@@ -1,9 +1,6 @@
 package com.applitools.eyes.selenium;
 
-import com.applitools.eyes.Padding;
-import com.applitools.eyes.RectangleSize;
-import com.applitools.eyes.Region;
-import com.applitools.eyes.TestResults;
+import com.applitools.eyes.*;
 import com.applitools.eyes.metadata.SessionResults;
 import com.applitools.eyes.selenium.fluent.Target;
 import com.applitools.eyes.utils.TestUtils;
@@ -27,7 +24,10 @@ public class TestCodedRegionPadding {
         eyes = new Eyes();
         eyes.setApiKey(System.getenv("APPLITOOLS_API_KEY"));
 
-        System.setProperty("webdriver.chrome.driver", "/home/travis/build/chromedriver");
+        String chromeDriverPath = System.getenv("CHROME_DRIVER_PATH");
+        if(chromeDriverPath == null) throw new EyesException("CHROME_DRIVER_PATH missing");
+        System.setProperty("webdriver.chrome.driver", chromeDriverPath);
+
         ChromeOptions options = new ChromeOptions();
         options.addArguments("--disable-extensions"); // disabling extensions
         options.addArguments("--disable-gpu"); // applicable to windows os only
