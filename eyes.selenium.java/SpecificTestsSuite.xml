@@ -5,6 +5,8 @@
         <classes>
             <class name="com.applitools.eyes.selenium.TestBatchAPI">
             </class>
+            <class name="com.applitools.eyes.TestPadding"/>
+            <class name="com.applitools.eyes.selenium.TestCodedRegionPadding"/>
         </classes>
     </test>
 </suite>
