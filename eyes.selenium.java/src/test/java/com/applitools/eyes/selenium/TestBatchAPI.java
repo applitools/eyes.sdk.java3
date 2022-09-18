@@ -27,7 +27,7 @@ public final class TestBatchAPI extends ReportingTestSuite {
 //        String chromeDriverPath = System.getenv("CHROME_DRIVER_PATH");
 //        if(chromeDriverPath == null) throw new EyesException("CHROME_DRIVER_PATH missing");
 //        System.setProperty("webdriver.chrome.driver", chromeDriverPath);
-//        driver = SeleniumUtils.createChromeDriver();
+        System.setProperty("webdriver.chrome.driver", "/home/travis/build/chromedriver");
         driver = new ChromeDriver();
         driver.get("https://applitools.com/helloworld");
     }
