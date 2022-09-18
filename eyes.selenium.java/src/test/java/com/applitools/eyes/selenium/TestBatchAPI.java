@@ -7,6 +7,7 @@ import com.applitools.eyes.utils.ReportingTestSuite;
 import com.applitools.eyes.utils.SeleniumUtils;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
+import org.openqa.selenium.chrome.ChromeOptions;
 import org.testng.Assert;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
@@ -28,7 +29,12 @@ public final class TestBatchAPI extends ReportingTestSuite {
 //        if(chromeDriverPath == null) throw new EyesException("CHROME_DRIVER_PATH missing");
 //        System.setProperty("webdriver.chrome.driver", chromeDriverPath);
         System.setProperty("webdriver.chrome.driver", "/home/travis/build/chromedriver");
-        driver = new ChromeDriver();
+        ChromeOptions options = new ChromeOptions();
+        options.addArguments("--disable-extensions"); // disabling extensions
+        options.addArguments("--disable-gpu"); // applicable to windows os only
+        options.addArguments("--disable-dev-shm-usage"); // overcome limited resource problems
+        options.addArguments("--no-sandbox"); // Bypass OS security model
+        driver = new ChromeDriver(options);
         driver.get("https://applitools.com/helloworld");
     }
 
