@@ -43,7 +43,7 @@ public class TestCodedRegionPadding {
         capabilities.setCapability("app", "https://applitools.jfrog.io/artifactory/Examples/androidx/helper_lib/1.8.5/app-androidx-debug.apk");
         capabilities.setCapability("newCommandTimeout", 2000);
 
-        driver = new AndroidDriver<>(new URL("http://0.0.0.0:4723/wd/hub"), capabilities);
+        driver = new AndroidDriver<>(new URL(URL), capabilities);
     }
 
     @AfterMethod
@@ -63,7 +63,7 @@ public class TestCodedRegionPadding {
         WebElement item2 = driver.findElement(MobileBy.id("id_4"));
         WebElement item3 = driver.findElement(MobileBy.id("id_6"));
         WebElement item4 = driver.findElement(MobileBy.id("id_8"));
-//        eyes.check(Target.region())
+
         eyes.check(Target.window()
                 .ignore(item1, new Padding().setBottom(20))
                 .layout(item2, new Padding(20))
@@ -77,15 +77,10 @@ public class TestCodedRegionPadding {
         Region layoutRegion = info.getActualAppOutput()[0].getImageMatchSettings().getLayout()[0];
         Region contentRegion = info.getActualAppOutput()[0].getImageMatchSettings().getContent()[0];
         Region strictRegion = info.getActualAppOutput()[0].getImageMatchSettings().getStrict()[0];
-//
-        System.out.println(ignoreRegion);
-        System.out.println(layoutRegion);
-        System.out.println(contentRegion);
-        System.out.println(strictRegion);
-//
+
         Assert.assertEquals(ignoreRegion, new Region(16, 68, 361, 52), "ignore");
         Assert.assertEquals(layoutRegion, new Region(0, 151, 401, 72), "layout");
-        Assert.assertEquals(contentRegion, new Region(10, 274, 381, 32), "content");
+        Assert.assertEquals(contentRegion, new Region(6, 274, 381, 32), "content");
         Assert.assertEquals(strictRegion, new Region(16, 377, 361, 72), "strict");
     }
 
