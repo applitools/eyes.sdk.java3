@@ -25,6 +25,8 @@ public class TestCodedRegionPadding {
     public void setup() {
         eyes = new Eyes();
         eyes.setApiKey(System.getenv("APPLITOOLS_API_KEY"));
+
+        System.setProperty("webdriver.chrome.driver", "/home/travis/build/chromedriver");
         driver = new ChromeDriver();
         driver.get("https://applitools.github.io/demo/TestPages/PaddedBody/region-padding.html");
     }
