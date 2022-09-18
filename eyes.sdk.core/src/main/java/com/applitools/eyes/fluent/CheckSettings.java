@@ -137,16 +137,6 @@ public class CheckSettings implements ICheckSettings, ICheckSettingsInternal {
     /**
      * {@inheritDoc}
      */
-    public ICheckSettings ignore(Region region, Padding padding) {
-        CheckSettings clone = clone();
-        region.addPadding(padding);
-        clone.ignore_(region);
-        return clone;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public ICheckSettings layout(Region region, Region... regions) {
         CheckSettings clone = clone();
