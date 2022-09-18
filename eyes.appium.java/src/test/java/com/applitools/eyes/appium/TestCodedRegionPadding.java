@@ -19,8 +19,8 @@ import java.net.URL;
 
 public class TestCodedRegionPadding {
 
-    public static final String USERNAME = "applitools-dev";
-    public static final String ACCESS_KEY = "7f853c17-24c9-4d8f-a679-9cfde5b43951";
+    public static final String USERNAME = System.getenv("SAUCE_USERNAME");
+    public static final String ACCESS_KEY = System.getenv("SAUCE_ACCESS_KEY");
     public static final String URL = "https://"+USERNAME+":" + ACCESS_KEY + "@ondemand.saucelabs.com:443/wd/hub";
 
     private Eyes eyes;
