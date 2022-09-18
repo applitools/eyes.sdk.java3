@@ -62,6 +62,8 @@ jobs:
       if: type != cron
       script:
         - echo $APPLITOOLS_REPORT_ID
+        - chmod +x ./initChromeDriver.sh && ./initChromeDriver.sh
+        - env webdriver.chrome.driver=/home/travis/build/
         - chmod +x ./runTests.sh
         - ./runTests.sh "eyes.selenium.java"
 #    - name: Selenium
