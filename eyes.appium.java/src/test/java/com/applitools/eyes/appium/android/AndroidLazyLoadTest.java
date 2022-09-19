@@ -6,7 +6,10 @@ import io.appium.java_client.TouchAction;
 import io.appium.java_client.android.AndroidDriver;
 import io.appium.java_client.touch.WaitOptions;
 import io.appium.java_client.touch.offset.PointOption;
+import org.openqa.selenium.By;
+import org.openqa.selenium.WebElement;
 import org.openqa.selenium.remote.DesiredCapabilities;
+import org.testng.Assert;
 import org.testng.annotations.Test;
 
 import java.net.MalformedURLException;
@@ -15,9 +18,10 @@ import java.time.Duration;
 
 public class AndroidLazyLoadTest extends AndroidTestSetup {
 
-    public static final String USERNAME = "applitools-dev";
-    public static final String ACCESS_KEY = "7f853c17-24c9-4d8f-a679-9cfde5b43951";
+    public static final String USERNAME = System.getenv("SAUCE_USERNAME");
+    public static final String ACCESS_KEY = System.getenv("SAUCE_ACCESS_KEY");
     public static final String SL_URL = "https://"+USERNAME+":" + ACCESS_KEY + "@ondemand.saucelabs.com:443/wd/hub";
+    public static final int PIXEL_5_OFFSET = 13049;
 
     @Override
     protected void initDriver() throws MalformedURLException {
@@ -27,21 +31,47 @@ public class AndroidLazyLoadTest extends AndroidTestSetup {
         capabilities.setCapability("platformVersion","11.0");
         capabilities.setCapability("platformName", "Android");
         capabilities.setCapability("automationName", "UiAutomator2");
-        capabilities.setCapability("app", "https://applitools.jfrog.io/artifactory/Examples/androidx/helper_lib/1.8.4/app-androidx-debug.apk");
+        capabilities.setCapability("app", "https://applitools.jfrog.io/artifactory/Examples/androidx/helper_lib/1.8.6/app-androidx-debug.apk");
+        capabilities.setCapability("noReset", false);
+        capabilities.setCapability("fullReset", true);
         capabilities.setCapability("newCommandTimeout", 2000);
 
         driver = new AndroidDriver<>(new URL(SL_URL), capabilities);
     }
 
     @Test
+    public void testHelperLibOffsetCalculation() throws InterruptedException {
+        scrollAndClickBtn();
+        String fieldCommand = "offset_async;recycler_view;0;0;0;5000";
+
+        WebElement edt = null;
+        for (int i = 0; i < 3; i++) {
+            try {
+                Thread.sleep(50);
+                edt = driver.findElement(By.xpath("//*[@content-desc=\"EyesAppiumHelperEDT\"]"));
+                break;
+            } catch (Exception e) {
+                if(++i >= 3)
+                    throw e;
+            }
+        }
+
+        edt.sendKeys(fieldCommand);
+        edt.click();
+
+        do { Thread.sleep(1000); }
+        while (edt.getText().equals("WAIT"));
+
+        String value = edt.getText().split(";", 2)[0];
+        Assert.assertEquals(Integer.parseInt(value), PIXEL_5_OFFSET);
+    }
+
+    @Test
     public void testLazyLoad() {
         eyes.open(driver, getApplicationName(), "Check LazyLoad");
-        scrollAndClickBtn();
-        int waitTime = 5000;
-        LazyLoadOptions lazyLoadOptions = new LazyLoadOptions().pageHeight(30000).waitingTime(waitTime);
-        eyes.check(Target.window().fully().waitBeforeCapture(waitTime).lazyLoad(lazyLoadOptions).withName("lazyLoad"));
+        LazyLoadOptions lazyLoadOptions = new LazyLoadOptions().waitingTime(-PIXEL_5_OFFSET);
+        eyes.check(Target.window().fully().waitBeforeCapture(5000).lazyLoad(lazyLoadOptions).withName("lazyLoad"));
         eyes.close();
-
     }
 
     public void scrollAndClickBtn() {
