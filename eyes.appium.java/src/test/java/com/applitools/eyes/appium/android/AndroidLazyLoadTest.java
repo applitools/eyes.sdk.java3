@@ -83,4 +83,5 @@ public class AndroidLazyLoadTest extends AndroidTestSetup {
         driver.performTouchAction(scrollAction);
         driver.findElementById("btn_large_recyclerView_activity").click();
     }
+
 }
