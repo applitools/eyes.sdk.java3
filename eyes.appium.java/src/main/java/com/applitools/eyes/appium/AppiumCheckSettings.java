@@ -84,6 +84,15 @@ public class AppiumCheckSettings extends CheckSettings implements ImplicitInitia
         return clone;
     }
 
+    public AppiumCheckSettings layout(By regionSelector, By... regionSelectors) {
+        AppiumCheckSettings clone = this.clone();
+        clone.layout_(new SimpleRegionBySelector(regionSelector));
+        for (By selector : regionSelectors) {
+            clone.layout_(new SimpleRegionBySelector(selector));
+        }
+
+        return clone;
+    }
     public AppiumCheckSettings layout(WebElement[] elements) {
         AppiumCheckSettings clone = this.clone();
         for (WebElement e : elements) {
@@ -101,6 +110,15 @@ public class AppiumCheckSettings extends CheckSettings implements ImplicitInitia
         return clone;
     }
 
+    public AppiumCheckSettings ignore(By regionSelector, By... regionSelectors) {
+        AppiumCheckSettings clone = this.clone();
+        clone.ignore_(new SimpleRegionBySelector(regionSelector));
+        for (By selector : regionSelectors) {
+            clone.ignore_(new SimpleRegionBySelector(selector));
+        }
+
+        return clone;
+    }
     public AppiumCheckSettings ignore(WebElement element, WebElement... elements) {
         AppiumCheckSettings clone = this.clone();
         clone.ignore_(new SimpleRegionByElement(element));
@@ -115,6 +133,16 @@ public class AppiumCheckSettings extends CheckSettings implements ImplicitInitia
         for (WebElement e : elements) {
             clone.ignore_(new SimpleRegionByElement(e));
         }
+        return clone;
+    }
+
+    public AppiumCheckSettings strict(By regionSelector, By... regionSelectors) {
+        AppiumCheckSettings clone = this.clone();
+        clone.strict_(new SimpleRegionBySelector(regionSelector));
+        for (By selector : regionSelectors) {
+            clone.strict_(new SimpleRegionBySelector(selector));
+        }
+
         return clone;
     }
 
@@ -135,6 +163,15 @@ public class AppiumCheckSettings extends CheckSettings implements ImplicitInitia
         return clone;
     }
 
+    public AppiumCheckSettings content(By regionSelector, By... regionSelectors) {
+        AppiumCheckSettings clone = this.clone();
+        clone.content_(new SimpleRegionBySelector(regionSelector));
+        for (By selector : regionSelectors) {
+            clone.content_(new SimpleRegionBySelector(selector));
+        }
+
+        return clone;
+    }
     public AppiumCheckSettings content(WebElement element, WebElement... elements) {
         AppiumCheckSettings clone = this.clone();
         clone.content_(new SimpleRegionByElement(element));
@@ -149,6 +186,12 @@ public class AppiumCheckSettings extends CheckSettings implements ImplicitInitia
         for (WebElement e : elements) {
             clone.content_(new SimpleRegionByElement(e));
         }
+        return clone;
+    }
+
+    public AppiumCheckSettings floating(By regionSelector, int maxUpOffset, int maxDownOffset, int maxLeftOffset, int maxRightOffset) {
+        AppiumCheckSettings clone = this.clone();
+        clone.floating(new FloatingRegionBySelector(regionSelector, maxUpOffset, maxDownOffset, maxLeftOffset, maxRightOffset));
         return clone;
     }
 

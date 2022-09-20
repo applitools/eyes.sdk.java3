@@ -37,13 +37,13 @@ public class AppiumCheckSettingsMapper {
         checkSettingsDto.setIgnoreDisplacements(appiumCheckSettings.isIgnoreDisplacements());
         checkSettingsDto.setAccessibilitySettings(null);
 
-        checkSettingsDto.setIgnoreRegions(CodedRegionReferenceMapper
+        checkSettingsDto.setIgnoreRegions(AppiumCodedRegionReferenceMapper
                 .toCodedRegionReferenceList(Arrays.asList(appiumCheckSettings.getIgnoreRegions())));
-        checkSettingsDto.setLayoutRegions(CodedRegionReferenceMapper
+        checkSettingsDto.setLayoutRegions(AppiumCodedRegionReferenceMapper
                 .toCodedRegionReferenceList(Arrays.asList(appiumCheckSettings.getLayoutRegions())));
-        checkSettingsDto.setStrictRegions(CodedRegionReferenceMapper
+        checkSettingsDto.setStrictRegions(AppiumCodedRegionReferenceMapper
                 .toCodedRegionReferenceList(Arrays.asList(appiumCheckSettings.getStrictRegions())));
-        checkSettingsDto.setContentRegions(CodedRegionReferenceMapper
+        checkSettingsDto.setContentRegions(AppiumCodedRegionReferenceMapper
                 .toCodedRegionReferenceList(Arrays.asList(appiumCheckSettings.getContentRegions())));
 
         checkSettingsDto.setFloatingRegions(TFloatingRegionMapper.toTFloatingRegionDtoList(Arrays.asList(appiumCheckSettings.getFloatingRegions())));

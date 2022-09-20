@@ -49,8 +49,8 @@ public class CodedRegionReferenceMapper {
         }
 
         return getSimpleRegionList
-                .stream().
-                filter(Objects::nonNull)
+                .stream()
+                .filter(Objects::nonNull)
                 .map(CodedRegionReferenceMapper::toCodedRegionReference)
                 .collect(Collectors.toList());
     }
