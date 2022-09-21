@@ -117,24 +117,24 @@ public class AndroidAppiumBySelectorTest {
     }
 
     @Test
-    public void testIgnoreLayoutSelectors() {
+    public void testLayoutSelectors() {
         System.out.println("All selectors test");
-        eyes.open(driver, "My Android App", "Android AppiumBy - Ignore Layout Selectors");
-        eyes.check("ID", Target.window().layout(AppiumBy.id("id_element"))
+        eyes.open(driver, "My Android App", "Android AppiumBy - Layout Selectors");
+        eyes.check("ID", Target.window().fully(false).layout(AppiumBy.id("id_element"))
                 .layout(AppiumBy.xpath("//android.widget.TextView[@text=\"ID element\"]"))
                 .layout(AppiumBy.accessibilityId("Accessibility ID - Content Description"))
                 .layout(AppiumBy.className("android.widget.ImageView")));
 
         // WebView related tests
-        driver.context("WEBVIEW_com.applitools.selectors"); // set context to WEBVIEW_1
-
-        try {
-            eyes.check("Link Text", Target.window().layout(AppiumBy.partialLinkText("Wikipedia"))
-                            //.layout(AppiumBy.linkText("HTML - Wikipedia"))
-                    );
-        } finally {
-            driver.context("NATIVE_APP");
-        }
+//        driver.context("WEBVIEW_com.applitools.selectors"); // set context to WEBVIEW_1
+//
+//        try {
+//            eyes.check("Link Text", Target.window().layout(AppiumBy.partialLinkText("Wikipedia"))
+//                            //.layout(AppiumBy.linkText("HTML - Wikipedia"))
+//                    );
+//        } finally {
+//            driver.context("NATIVE_APP");
+//        }
         eyes.close();
     }
 
@@ -148,15 +148,15 @@ public class AndroidAppiumBySelectorTest {
                 .floating(AppiumBy.className("android.widget.ImageView"), 1, 1,1,1));
 
         // WebView related tests
-        driver.context("WEBVIEW_com.applitools.selectors"); // set context to WEBVIEW_1
-
-        try {
-            eyes.check("Link Text", Target.window().floating(AppiumBy.partialLinkText("Wikipedia"), 1, 1,1,1)
-                    //.floating(AppiumBy.linkText("HTML - Wikipedia"), 1, 1,1,1)
-            );
-        } finally {
-            driver.context("NATIVE_APP");
-        }
+//        driver.context("WEBVIEW_com.applitools.selectors"); // set context to WEBVIEW_1
+//
+//        try {
+//            eyes.check("Link Text", Target.window().floating(AppiumBy.partialLinkText("Wikipedia"), 1, 1,1,1)
+//                    //.floating(AppiumBy.linkText("HTML - Wikipedia"), 1, 1,1,1)
+//            );
+//        } finally {
+//            driver.context("NATIVE_APP");
+//        }
         eyes.close();
     }
 
