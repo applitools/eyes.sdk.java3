@@ -14,7 +14,7 @@ public class IgnoreRegionWithByTest {
     public static final String URL0 = "https://"+USERNAME+":" + ACCESS_KEY + "@ondemand.saucelabs.com:443/wd/hub";
 
     @Test
-    public void test() throws InterruptedException, MalformedURLException {
+    public void region() throws InterruptedException, MalformedURLException {
         DesiredCapabilities caps = new DesiredCapabilities();
         caps.setCapability("deviceName","iPhone XS Simulator");
         caps.setCapability("deviceOrientation", "portrait");
