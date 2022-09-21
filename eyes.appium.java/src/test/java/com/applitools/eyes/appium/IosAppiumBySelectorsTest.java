@@ -54,63 +54,115 @@ public class IosAppiumBySelectorsTest {
     }
 
     @Test
-    public void byId() {
-        driver.findElement(AppiumBy.id("Collection view")).click();
-    }
+    public void testCheckRegion() {
+        System.out.println("All selectors test");
+        eyes.open(driver, "My iOS App", "iOS AppiumBy - Check Region Selectors");
+        eyes.check("ID", Target.region(AppiumBy.id("Collection view")));
+        eyes.check("XPATH", Target.region(AppiumBy.xpath("//XCUIElementTypeStaticText[@name=\"Collection view\"]")));
+        eyes.check("Accessibility ID", Target.region(AppiumBy.accessibilityId("Collection view")));
+        eyes.check("Class Name", Target.region(AppiumBy.className("XCUIElementTypeButton")));
+        eyes.check("Name", Target.region(AppiumBy.name("Collection view")));
+        eyes.check("NS Predicate", Target.region(AppiumBy.iOSNsPredicateString("wdVisible==1")));
+        eyes.check("ClassChain", Target.region(AppiumBy.iOSClassChain("**/XCUIElementTypeStaticText[`label == \"Collection view\"`]")));
 
-    @Test
-    public void byXPath() {
-        driver.findElement(AppiumBy.xpath("//XCUIElementTypeStaticText[@name=\"Collection view\"]")).click();
-    }
 
-    @Test
-    public void byLinkText() {
-        //driver.findElement(AppiumBy.linkText("")).click();
-        // TODO Locator Strategy 'link text' is not supported for this session
-    }
+        // WebView related tests
+//        driver.context("WEBVIEW_com.applitools.selectors"); // set context to WEBVIEW_1
+//
+//        try {
+////            eyes.check("Link Text", Target.region(AppiumBy.linkText("HTML - Wikipedia")));
+//            eyes.check("partial link text", Target.region(AppiumBy.partialLinkText("Wikipedia")));
+//        } finally {
+//            driver.context("NATIVE_APP");
+//        }
 
-    @Test
-    public void byPartialLinkText() {
-        //driver.findElement(AppiumBy.partialLinkText("name=Collect")).click();
-        // TODO Locator Strategy 'partial link text' is not supported for this session
-    }
-
-    @Test
-    public void byName() {
-        driver.findElement(AppiumBy.name("Collection view")).click();
-    }
-
-    @Test
-    public void byTagName() {
-        //driver.findElement(AppiumBy.tagName("Collection view"));
-        //  TODO Locator Strategy 'tag name' is not supported for this session
+        eyes.close();
     }
 
 
     @Test
-    public void byClassName() {
-        driver.findElement(AppiumBy.className("XCUIElementTypeButton")).click();
+    public void testFloatingSelectors() {
+        System.out.println("All selectors test");
+        eyes.open(driver, "My Android App", "Android AppiumBy - Floating Selectors");
+        eyes.check("ID", Target.window().floating(AppiumBy.id("Collection view"), 1, 1,1,1)
+                .floating(AppiumBy.xpath("//XCUIElementTypeStaticText[@name=\"Collection view\"]"), 1, 1,1,1)
+                .floating(AppiumBy.accessibilityId("Collection view"), 1, 1,1,1)
+                .floating(AppiumBy.className("XCUIElementTypeButton"), 1, 1,1,1)
+                .floating(AppiumBy.iOSNsPredicateString("wdVisible==1"), 1, 1,1,1)
+                .floating(AppiumBy.iOSClassChain("**/XCUIElementTypeStaticText[`label == \"Collection view\"`]"), 1, 1,1,1)
+                .floating(AppiumBy.name("Collection view"), 1, 1,1,1));
+
+        // WebView related tests
+//        driver.context("WEBVIEW_com.applitools.selectors"); // set context to WEBVIEW_1
+//
+//        try {
+//            eyes.check("Link Text", Target.window().floating(AppiumBy.partialLinkText("Wikipedia"), 1, 1,1,1)
+//                    //.floating(AppiumBy.linkText("HTML - Wikipedia"), 1, 1,1,1)
+//            );
+//        } finally {
+//            driver.context("NATIVE_APP");
+//        }
+        eyes.close();
     }
 
-    @Test
-    public void byCssSelector() {
-        //driver.findElement(AppiumBy.cssSelector("")).click(); // TODO
-    }
-
-    @Test
-    public void byAccessibilityId() {
-        driver.findElement(AppiumBy.accessibilityId("Collection view")).click();
-    }
-
-    @Test
-    public void byPredicateString() {
-        driver.findElement(AppiumBy.iOSNsPredicateString("wdVisible==1"));
-    }
-
-    @Test
-    public void byClassChain() {
-        driver.findElement(AppiumBy.iOSClassChain("**/XCUIElementTypeStaticText[`label == \"Collection view\"`]")).click();
-    }
+//    @Test
+//    public void byId() {
+//        driver.findElement(AppiumBy.id("Collection view")).click();
+//    }
+//
+//    @Test
+//    public void byXPath() {
+//        driver.findElement(AppiumBy.xpath("//XCUIElementTypeStaticText[@name=\"Collection view\"]")).click();
+//    }
+//
+//    @Test
+//    public void byLinkText() {
+//        //driver.findElement(AppiumBy.linkText("")).click();
+//        // TODO Locator Strategy 'link text' is not supported for this session
+//    }
+//
+//    @Test
+//    public void byPartialLinkText() {
+//        //driver.findElement(AppiumBy.partialLinkText("name=Collect")).click();
+//        // TODO Locator Strategy 'partial link text' is not supported for this session
+//    }
+//
+//    @Test
+//    public void byName() {
+//        driver.findElement(AppiumBy.name("Collection view")).click();
+//    }
+//
+//    @Test
+//    public void byTagName() {
+//        //driver.findElement(AppiumBy.tagName("Collection view"));
+//        //  TODO Locator Strategy 'tag name' is not supported for this session
+//    }
+//
+//
+//    @Test
+//    public void byClassName() {
+//        driver.findElement(AppiumBy.className("XCUIElementTypeButton")).click();
+//    }
+//
+//    @Test
+//    public void byCssSelector() {
+//        //driver.findElement(AppiumBy.cssSelector("")).click(); // TODO
+//    }
+//
+//    @Test
+//    public void byAccessibilityId() {
+//        driver.findElement(AppiumBy.accessibilityId("Collection view")).click();
+//    }
+//
+//    @Test
+//    public void byPredicateString() {
+//        driver.findElement(AppiumBy.iOSNsPredicateString("wdVisible==1"));
+//    }
+//
+//    @Test
+//    public void byClassChain() {
+//        driver.findElement(AppiumBy.iOSClassChain("**/XCUIElementTypeStaticText[`label == \"Collection view\"`]")).click();
+//    }
 
 
 }
