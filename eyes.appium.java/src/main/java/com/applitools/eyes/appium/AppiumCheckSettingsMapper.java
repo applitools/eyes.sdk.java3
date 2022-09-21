@@ -46,7 +46,7 @@ public class AppiumCheckSettingsMapper {
         checkSettingsDto.setContentRegions(AppiumCodedRegionReferenceMapper
                 .toCodedRegionReferenceList(Arrays.asList(appiumCheckSettings.getContentRegions())));
 
-        checkSettingsDto.setFloatingRegions(TFloatingRegionMapper.toTFloatingRegionDtoList(Arrays.asList(appiumCheckSettings.getFloatingRegions())));
+        checkSettingsDto.setFloatingRegions(AppiumTFloatingRegionMapper.toTFloatingRegionDtoList(Arrays.asList(appiumCheckSettings.getFloatingRegions())));
 
         checkSettingsDto.setAccessibilityRegions(TAccessibilityRegionMapper.toTAccessibilityRegionDtoList(Arrays.asList(appiumCheckSettings.getAccessibilityRegions())));
         checkSettingsDto.setPageId(appiumCheckSettings.getPageId());
