@@ -1,6 +1,14 @@
-## [5.20.0] - 2022-09-09
+## [5.25.0] - 2022-21-09
+### Updated
+- Add support for AppiumBy selector for Accessibility. [Trello 3022](https://trello.com/c/VpnV7BBN/)
+
+## [5.24.0] - 2022-21-09
 ### Updated
 - Add support for AppiumBy selector. [Trello 3022](https://trello.com/c/VpnV7BBN/)
+
+## [5.20.0] - 2022-09-09
+### Added
+- Initial support for AppiumBy selector. [Trello 3022](https://trello.com/c/VpnV7BBN/)
 
 ## [5.19.0] - 2022-09-06
 ### Updated
