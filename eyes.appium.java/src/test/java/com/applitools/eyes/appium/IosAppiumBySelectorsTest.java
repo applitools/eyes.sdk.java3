@@ -1,5 +1,6 @@
 package com.applitools.eyes.appium;
 
+import com.applitools.eyes.AccessibilityRegionType;
 import io.appium.java_client.AppiumBy;
 import io.appium.java_client.ios.IOSDriver;
 import org.openqa.selenium.remote.DesiredCapabilities;
@@ -142,6 +143,31 @@ public class IosAppiumBySelectorsTest {
                 .floating(AppiumBy.iOSNsPredicateString("wdVisible==1"), 1, 1,1,1)
                 .floating(AppiumBy.iOSClassChain("**/XCUIElementTypeStaticText[`label == \"Collection view\"`]"), 1, 1,1,1)
                 .floating(AppiumBy.name("Collection view"), 1, 1,1,1));
+
+        // WebView related tests
+//        driver.context("WEBVIEW_com.applitools.selectors"); // set context to WEBVIEW_1
+//
+//        try {
+//            eyes.check("Link Text", Target.window().floating(AppiumBy.partialLinkText("Wikipedia"), 1, 1,1,1)
+//                    //.floating(AppiumBy.linkText("HTML - Wikipedia"), 1, 1,1,1)
+//            );
+//        } finally {
+//            driver.context("NATIVE_APP");
+//        }
+        eyes.close();
+    }
+
+    @Test
+    public void testAccessibilitySelectors() {
+        System.out.println("All selectors test");
+        eyes.open(driver, "My Android App", "Android AppiumBy - Accessibility Selectors");
+        eyes.check("ID", Target.window().accessibility(AppiumBy.id("Collection view"), AccessibilityRegionType.IgnoreContrast)
+                .accessibility(AppiumBy.xpath("//XCUIElementTypeStaticText[@name=\"Collection view\"]"), AccessibilityRegionType.IgnoreContrast)
+                .accessibility(AppiumBy.accessibilityId("Collection view"), AccessibilityRegionType.IgnoreContrast)
+                .accessibility(AppiumBy.className("XCUIElementTypeButton"), AccessibilityRegionType.IgnoreContrast)
+                .accessibility(AppiumBy.iOSNsPredicateString("wdVisible==1"), AccessibilityRegionType.IgnoreContrast)
+                .accessibility(AppiumBy.iOSClassChain("**/XCUIElementTypeStaticText[`label == \"Collection view\"`]"), AccessibilityRegionType.IgnoreContrast)
+                .accessibility(AppiumBy.name("Collection view"), AccessibilityRegionType.IgnoreContrast));
 
         // WebView related tests
 //        driver.context("WEBVIEW_com.applitools.selectors"); // set context to WEBVIEW_1
