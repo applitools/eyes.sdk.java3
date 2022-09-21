@@ -75,6 +75,6 @@ public class AppiumTFloatingRegionMapper {
             return null;
         }
 
-        return getFloatingRegionList.stream().map(TFloatingRegionMapper::toTFloatingRegionDto).collect(Collectors.toList());
+        return getFloatingRegionList.stream().map(AppiumTFloatingRegionMapper::toTFloatingRegionDto).collect(Collectors.toList());
     }
 }
