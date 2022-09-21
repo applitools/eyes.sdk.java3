@@ -81,6 +81,57 @@ public class IosAppiumBySelectorsTest {
 
 
     @Test
+    public void testIgnoreRegionSelectors() {
+        System.out.println("Selectors Ignore Regions test");
+        eyes.open(driver, "My iOS App", "iOS AppiumBy - Ignore Region Selectors");
+        eyes.check("Ignore regions", Target.window().ignore(AppiumBy.id("Collection view"))
+                .ignore(AppiumBy.xpath("//XCUIElementTypeStaticText[@name=\"Collection view\"]"))
+                .ignore(AppiumBy.accessibilityId("Collection view"))
+                .ignore(AppiumBy.className("XCUIElementTypeButton"))
+                .ignore(AppiumBy.iOSNsPredicateString("wdVisible==1"))
+                .ignore(AppiumBy.iOSClassChain("**/XCUIElementTypeStaticText[`label == \"Collection view\"`]"))
+                .ignore(AppiumBy.name("Collection view")));
+
+        // WebView related tests
+//        driver.context("WEBVIEW_com.applitools.selectors"); // set context to WEBVIEW_1
+//
+//        try {
+//            eyes.check("Link Text", Target.window().ignore(AppiumBy.partialLinkText("Wikipedia"))
+//                    //.ignore(AppiumBy.linkText("HTML - Wikipedia"))
+//            );
+//        } finally {
+//            driver.context("NATIVE_APP");
+//        }
+        eyes.close();
+    }
+
+    @Test
+    public void testLayoutSelectors() {
+        System.out.println("Selectors layout test");
+        eyes.open(driver, "My iOS App", "iOS AppiumBy - Layout Selectors");
+        eyes.check("Layout regions", Target.window().layout(AppiumBy.id("Collection view"))
+                .layout(AppiumBy.xpath("//XCUIElementTypeStaticText[@name=\"Collection view\"]"))
+                .layout(AppiumBy.accessibilityId("Collection view"))
+                .layout(AppiumBy.className("XCUIElementTypeButton"))
+                .layout(AppiumBy.iOSNsPredicateString("wdVisible==1"))
+                .layout(AppiumBy.iOSClassChain("**/XCUIElementTypeStaticText[`label == \"Collection view\"`]"))
+                .layout(AppiumBy.name("Collection view")));
+
+        // WebView related tests
+//        driver.context("WEBVIEW_com.applitools.selectors"); // set context to WEBVIEW_1
+//
+//        try {
+//            eyes.check("Link Text", Target.window().layout(AppiumBy.partialLinkText("Wikipedia"))
+//                            //.layout(AppiumBy.linkText("HTML - Wikipedia"))
+//                    );
+//        } finally {
+//            driver.context("NATIVE_APP");
+//        }
+        eyes.close();
+    }
+
+
+    @Test
     public void testFloatingSelectors() {
         System.out.println("All selectors test");
         eyes.open(driver, "My Android App", "Android AppiumBy - Floating Selectors");
