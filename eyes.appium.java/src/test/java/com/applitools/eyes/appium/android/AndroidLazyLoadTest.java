@@ -22,6 +22,7 @@ public class AndroidLazyLoadTest extends AndroidTestSetup {
     public static final String ACCESS_KEY = System.getenv("SAUCE_ACCESS_KEY");
     public static final String SL_URL = "https://"+USERNAME+":" + ACCESS_KEY + "@ondemand.saucelabs.com:443/wd/hub";
     public static final int PIXEL_5_OFFSET = 13049;
+    public static final int PIXEL_3XL_OFFSET = 13601;
 
     @Override
     protected void initDriver() throws MalformedURLException {
@@ -70,7 +71,7 @@ public class AndroidLazyLoadTest extends AndroidTestSetup {
     public void testLazyLoad() {
         eyes.open(driver, getApplicationName(), "Check LazyLoad");
         LazyLoadOptions lazyLoadOptions = new LazyLoadOptions().waitingTime(-PIXEL_5_OFFSET);
-        eyes.check(Target.window().fully().waitBeforeCapture(5000).lazyLoad(lazyLoadOptions).withName("lazyLoad"));
+        eyes.check(Target.window().fully().lazyLoad(lazyLoadOptions).withName("lazyLoad"));
         eyes.close();
     }
 
