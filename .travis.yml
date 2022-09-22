@@ -58,28 +58,19 @@ jobs:
         - echo $APPLITOOLS_REPORT_ID
         - chmod +x ./runTests.sh
         - ./runTests.sh "selenium4"
-#    - name: Selenium Specific
-#      if: type != cron
-#      script:
-#        - echo $APPLITOOLS_REPORT_ID
-#        - chmod +x ./runTests.sh
-#        - ./runTests.sh "eyes.selenium.java"
-#    - name: Selenium
-#      script:
-#        - echo $APPLITOOLS_REPORT_ID
-#        - google-chrome --version
-#        - chromium-browser --version
-#        - chmod +x ./initChromeDriver.sh && ./initChromeDriver.sh
-#        - env webdriver.chrome.driver=/home/travis/build/
-#        - echo $TRAVIS_EVENT_TYPE
-#        - echo $TRAVIS_BRANCH
-#        - if [[ "$TRAVIS_EVENT_TYPE" == "cron" && "$TRAVIS_BRANCH" == "master" ]]; then
-#          sed -i 's/passedTestsSuite.xml/devTestsSuite.xml/g' $TRAVIS_BUILD_DIR/eyes.selenium.java/pom.xml;
-#          fi
-#        - chmod +x ./runConnectivityTests.sh
-#        - ./runConnectivityTests.sh
-#        - chmod +x ./runTests.sh
-#        - ./runTests.sh "eyes.selenium.java"
+    - name: Selenium Specific
+        addons:
+          apt:
+            packages:
+              - dpkg # this is required for fixing Travis' invalid chrome version issue
+          chrome: stable
+        if: type != cron
+        script:
+          - echo $APPLITOOLS_REPORT_ID
+          - chmod +x ./initChromeDriver.sh && ./initChromeDriver.sh
+          - export CHROME_DRIVER_PATH=/home/travis/build/chromedriver
+          - chmod +x ./runTests.sh
+          - ./runTests.sh "eyes.selenium.java"
 #    - name: Selenium Mobile
 #      if: type != cron
 #      script:
