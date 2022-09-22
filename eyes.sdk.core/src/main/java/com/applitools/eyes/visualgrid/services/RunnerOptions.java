@@ -1,13 +1,9 @@
 package com.applitools.eyes.visualgrid.services;
 
 import com.applitools.eyes.AbstractProxySettings;
+import com.applitools.eyes.AutProxyMode;
 
 public class RunnerOptions {
-
-    public enum AutProxyMode {
-        BLOCK,
-        ALLOW
-    }
 
     private Integer testConcurrency = null;
     private String apiKey = null;

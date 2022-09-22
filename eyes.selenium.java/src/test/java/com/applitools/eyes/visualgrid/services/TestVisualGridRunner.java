@@ -404,11 +404,11 @@ public class TestVisualGridRunner {
         Assert.assertNull(visualGridRunner.eyesServiceRunner.getDefaultResourcesProxy());
         Assert.assertNull(visualGridRunner.eyesServiceRunner.getCustomResourcesProxy());
 
-        visualGridRunner = new VisualGridRunner(new RunnerOptions().autProxy(p1, new String[]{"google"}, RunnerOptions.AutProxyMode.ALLOW));
+        visualGridRunner = new VisualGridRunner(new RunnerOptions().autProxy(p1, new String[]{"google"}, AutProxyMode.ALLOW));
         Assert.assertNull(visualGridRunner.eyesServiceRunner.getDefaultResourcesProxy());
         Assert.assertEquals(visualGridRunner.eyesServiceRunner.getCustomResourcesProxy(), p1);
 
-        visualGridRunner = new VisualGridRunner(new RunnerOptions().autProxy(p1, new String[]{"google"}, RunnerOptions.AutProxyMode.BLOCK));
+        visualGridRunner = new VisualGridRunner(new RunnerOptions().autProxy(p1, new String[]{"google"}, AutProxyMode.BLOCK));
         Assert.assertEquals(visualGridRunner.eyesServiceRunner.getDefaultResourcesProxy(), p1);
         Assert.assertNull(visualGridRunner.eyesServiceRunner.getCustomResourcesProxy());
 
@@ -456,7 +456,7 @@ public class TestVisualGridRunner {
         Assert.assertNull(visualGridRunner.eyesServiceRunner.getDefaultResourcesProxy());
         Assert.assertEquals(visualGridRunner.eyesServiceRunner.getCustomResourcesProxy(), p2);
 
-        visualGridRunner = new VisualGridRunner(new RunnerOptions().autProxy(p2, new String[]{"google"}, RunnerOptions.AutProxyMode.BLOCK));
+        visualGridRunner = new VisualGridRunner(new RunnerOptions().autProxy(p2, new String[]{"google"}, AutProxyMode.BLOCK));
         eyes = new Eyes(visualGridRunner);
         eyes.setServerConnector(new MockServerConnector());
         eyes.setProxy(p1);

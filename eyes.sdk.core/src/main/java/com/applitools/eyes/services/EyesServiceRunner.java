@@ -7,7 +7,6 @@ import com.applitools.eyes.logging.Stage;
 import com.applitools.eyes.visualgrid.model.*;
 import com.applitools.eyes.visualgrid.services.CheckTask;
 import com.applitools.eyes.visualgrid.services.IEyes;
-import com.applitools.eyes.visualgrid.services.RunnerOptions;
 import com.applitools.eyes.visualgrid.services.VisualGridRunningTest;
 import com.applitools.utils.ClassVersionGetter;
 import com.applitools.utils.GeneralUtils;
@@ -59,8 +58,8 @@ public class EyesServiceRunner extends Thread {
         resourceCollectionService.setDebugResourceWriter(debugResourceWriter);
     }
 
-    public void setAutProxy(AbstractProxySettings proxy, String[] autProxyDomains, RunnerOptions.AutProxyMode mode) {
-        boolean isWhiteList = mode == null || mode.equals(RunnerOptions.AutProxyMode.ALLOW);
+    public void setAutProxy(AbstractProxySettings proxy, String[] autProxyDomains, AutProxyMode mode) {
+        boolean isWhiteList = mode == null || mode.equals(AutProxyMode.ALLOW);
         resourceCollectionService.setAutProxy(proxy, autProxyDomains, isWhiteList);
     }
 
