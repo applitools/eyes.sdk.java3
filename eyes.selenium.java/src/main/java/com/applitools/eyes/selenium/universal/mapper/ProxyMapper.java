@@ -1,6 +1,8 @@
 package com.applitools.eyes.selenium.universal.mapper;
 
+import com.applitools.eyes.AbstractAutProxySettings;
 import com.applitools.eyes.AbstractProxySettings;
+import com.applitools.eyes.selenium.universal.dto.AutProxyDto;
 import com.applitools.eyes.selenium.universal.dto.ProxyDto;
 
 /**
@@ -19,5 +21,17 @@ public class ProxyMapper {
     proxyDto.setPassword(abstractProxySettings.getPassword());
     proxyDto.setIsHttpOnly(true);
     return proxyDto;
+  }
+
+  public static AutProxyDto toAutProxyDto(AbstractAutProxySettings abstractAutProxySettings) {
+    if (abstractAutProxySettings == null) {
+      return null;
+    }
+
+    AutProxyDto autProxyDto = new AutProxyDto();
+    autProxyDto.setProxy(toProxyDto(abstractAutProxySettings.getProxy()));
+    autProxyDto.setDomains(abstractAutProxySettings.getDomains());
+    autProxyDto.setAutProxyMode(abstractAutProxySettings.getAutProxyMode());
+    return autProxyDto;
   }
 }
