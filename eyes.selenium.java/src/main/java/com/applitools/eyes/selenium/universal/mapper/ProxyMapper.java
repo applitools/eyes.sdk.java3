@@ -31,7 +31,8 @@ public class ProxyMapper {
     AutProxyDto autProxyDto = new AutProxyDto();
     autProxyDto.setProxy(toProxyDto(abstractAutProxySettings.getProxy()));
     autProxyDto.setDomains(abstractAutProxySettings.getDomains());
-    autProxyDto.setAutProxyMode(abstractAutProxySettings.getAutProxyMode());
+    autProxyDto.setAutProxyMode(abstractAutProxySettings.getAutProxyMode() == null ?
+            null : abstractAutProxySettings.getAutProxyMode().getName());
     return autProxyDto;
   }
 }
