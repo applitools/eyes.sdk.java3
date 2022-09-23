@@ -6,18 +6,18 @@ package com.applitools.eyes;
 public class LazyLoadOptions {
     private Integer scrollLength;
     private Integer waitingTime;
-    private Integer pageHeight;
+    private Integer maxAmountToScroll;
 
     public LazyLoadOptions() {
         this.scrollLength = 300;
         this.waitingTime = 2000;
-        this.pageHeight = 15000;
+        this.maxAmountToScroll = 15000;
     }
 
     public LazyLoadOptions(Integer scrollLength, Integer waitingTime, Integer pageHeight) {
         this.scrollLength = scrollLength;
         this.waitingTime = waitingTime;
-        this.pageHeight = pageHeight;
+        this.maxAmountToScroll = pageHeight;
     }
 
     @Override
@@ -25,7 +25,7 @@ public class LazyLoadOptions {
         LazyLoadOptions clone = new LazyLoadOptions();
         clone.scrollLength = this.scrollLength;
         clone.waitingTime = this.waitingTime;
-        clone.pageHeight = this.pageHeight;
+        clone.maxAmountToScroll = this.maxAmountToScroll;
         return clone;
     }
 
@@ -50,12 +50,12 @@ public class LazyLoadOptions {
     }
 
     public Integer getPageHeight() {
-        return pageHeight;
+        return maxAmountToScroll;
     }
 
     public LazyLoadOptions pageHeight(Integer pageHeight) {
         LazyLoadOptions clone = this.clone();
-        clone.pageHeight = pageHeight;
+        clone.maxAmountToScroll = pageHeight;
         return clone;
     }
 }

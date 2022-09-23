@@ -3,7 +3,6 @@ package com.applitools.eyes.selenium;
 
 import com.applitools.eyes.LazyLoadOptions;
 import com.applitools.eyes.selenium.fluent.SeleniumCheckSettings;
-import com.applitools.eyes.selenium.fluent.Target;
 import org.junit.Test;
 import org.testng.Assert;
 
