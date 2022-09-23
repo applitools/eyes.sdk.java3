@@ -1,7 +1,6 @@
 package com.applitools.eyes.appium;
 
 import com.applitools.eyes.LazyLoadOptions;
-import com.applitools.eyes.selenium.fluent.SeleniumCheckSettings;
 import org.junit.Test;
 import org.testng.Assert;
 
