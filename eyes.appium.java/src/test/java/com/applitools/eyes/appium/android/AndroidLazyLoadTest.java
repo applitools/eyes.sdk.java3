@@ -64,11 +64,15 @@ public class AndroidLazyLoadTest extends AndroidTestSetup {
         while (edt.getText().equals("WAIT"));
 
         String value = edt.getText().split(";", 2)[0];
+        driver.navigate().back();
+
         Assert.assertEquals(Integer.parseInt(value), PIXEL_5_OFFSET);
+
     }
 
     @Test
     public void testLazyLoad() {
+        scrollAndClickBtn();
         eyes.open(driver, getApplicationName(), "Check LazyLoad");
         LazyLoadOptions lazyLoadOptions = new LazyLoadOptions().waitingTime(-PIXEL_5_OFFSET);
         eyes.check(Target.window().fully().lazyLoad(lazyLoadOptions).withName("lazyLoad"));
