@@ -49,13 +49,13 @@ public class LazyLoadOptions {
         return clone;
     }
 
-    public Integer getPageHeight() {
+    public Integer getMaxAmountToScroll() {
         return maxAmountToScroll;
     }
 
-    public LazyLoadOptions pageHeight(Integer pageHeight) {
+    public LazyLoadOptions maxAmountToScroll(Integer maxAmountToScroll) {
         LazyLoadOptions clone = this.clone();
-        clone.maxAmountToScroll = pageHeight;
+        clone.maxAmountToScroll = maxAmountToScroll;
         return clone;
     }
 }
