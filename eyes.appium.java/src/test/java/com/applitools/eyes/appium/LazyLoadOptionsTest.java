@@ -10,18 +10,18 @@ public class LazyLoadOptionsTest {
     public void should_ReturnDefault_When_Initialized() {
         AppiumCheckSettings sc = new AppiumCheckSettings();
         sc = sc.lazyLoad();
-        Assert.assertEquals(300,(int) sc.getLazyLoadOptions().getScrollLength());
-        Assert.assertEquals(2000,(int) sc.getLazyLoadOptions().getWaitingTime());
-        Assert.assertEquals(15000,(int) sc.getLazyLoadOptions().getPageHeight());
+        Assert.assertEquals((int) sc.getLazyLoadOptions().getScrollLength(), 300);
+        Assert.assertEquals((int) sc.getLazyLoadOptions().getWaitingTime(), 2000);
+        Assert.assertEquals((int) sc.getLazyLoadOptions().getMaxAmountToScroll(), 15000);
     }
 
     @Test
     public void should_ReturnAssigned_When_Called() {
         AppiumCheckSettings sc = new AppiumCheckSettings();
-        sc = sc.lazyLoad(new LazyLoadOptions().pageHeight(111).scrollLength(100).waitingTime(1000));
-        Assert.assertEquals(100,(int) sc.getLazyLoadOptions().getScrollLength());
-        Assert.assertEquals(1000,(int) sc.getLazyLoadOptions().getWaitingTime());
-        Assert.assertEquals(111,(int) sc.getLazyLoadOptions().getPageHeight());
+        sc = sc.lazyLoad(new LazyLoadOptions().maxAmountToScroll(111).scrollLength(100).waitingTime(1000));
+        Assert.assertEquals((int) sc.getLazyLoadOptions().getScrollLength(), 100);
+        Assert.assertEquals((int) sc.getLazyLoadOptions().getWaitingTime(), 1000);
+        Assert.assertEquals((int) sc.getLazyLoadOptions().getMaxAmountToScroll(), 111);
 
     }
 
