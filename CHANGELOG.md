@@ -1,6 +1,14 @@
-## [5.22.0] - 2022-09-09
+## [5.26.0] - 2022-09-09
 ### Updated
-- Added Appium lazyLoad checkSetting [Trello 2834](https://trello.com/c/MvCP3cer)
+- Added Appium Lazy Load support [Trello 2834](https://trello.com/c/MvCP3cer)
+
+## [5.23.0] - 2022-09-16
+### Added
+- NMG communication revamp. [Trello 2983](https://trello.com/c/DKnYOU5W)
+
+## [5.22.0] - 2022-09-14
+### Fixed
+- Missing ContentInset Configuration API. [Trello 2981](https://trello.com/c/i0vUcO3P)
 
 ## [5.21.0] - 2022-09-09
 ### Updated
