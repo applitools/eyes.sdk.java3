@@ -50,6 +50,7 @@ public class AppiumCheckSettingsMapper {
 
         checkSettingsDto.setAccessibilityRegions(TAccessibilityRegionMapper.toTAccessibilityRegionDtoList(Arrays.asList(appiumCheckSettings.getAccessibilityRegions())));
         checkSettingsDto.setPageId(appiumCheckSettings.getPageId());
+        checkSettingsDto.setLazyLoad(appiumCheckSettings.getLazyLoadOptions());
 
         // ScreenshotSettings
         checkSettingsDto.setRegion(TRegionMapper.toTRegionFromCheckSettings(checkSettings));

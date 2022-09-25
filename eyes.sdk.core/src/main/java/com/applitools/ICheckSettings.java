@@ -1,6 +1,7 @@
 package com.applitools;
 
 import com.applitools.eyes.AccessibilityRegionType;
+import com.applitools.eyes.LazyLoadOptions;
 import com.applitools.eyes.MatchLevel;
 import com.applitools.eyes.Region;
 import com.applitools.eyes.visualgrid.model.VisualGridOption;
@@ -190,4 +191,17 @@ public interface ICheckSettings {
      * @return An updated clone of this settings object.
      */
     ICheckSettings waitBeforeCapture(Integer milliSec);
+
+    /**
+     * to handle lazy load will scroll before capturing
+     * @return An updated clone of this settings object.
+     */
+    ICheckSettings lazyLoad();
+
+    /**
+     * to handle lazy load will scroll before capturing
+     * @param lazyLoadOptions lazy load options
+     * @return An updated clone of this settings object.
+     */
+    ICheckSettings lazyLoad(LazyLoadOptions lazyLoadOptions);
 }

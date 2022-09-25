@@ -1,6 +1,7 @@
 package com.applitools.eyes.appium;
 
 import com.applitools.eyes.AccessibilityRegionType;
+import com.applitools.eyes.LazyLoadOptions;
 import com.applitools.eyes.Logger;
 import com.applitools.eyes.Region;
 import com.applitools.eyes.selenium.fluent.*;
@@ -285,5 +286,20 @@ public class AppiumCheckSettings extends CheckSettings implements ImplicitInitia
 
     public String getPageId() {
         return this.pageId;
+    }
+
+    @Override
+    public AppiumCheckSettings lazyLoad() {
+        return (AppiumCheckSettings) super.lazyLoad();
+    }
+
+    @Override
+    public AppiumCheckSettings lazyLoad(LazyLoadOptions lazyLoadOptions) {
+        return (AppiumCheckSettings) super.lazyLoad(lazyLoadOptions);
+    }
+
+    @Override
+    public LazyLoadOptions getLazyLoadOptions() {
+        return super.getLazyLoadOptions();
     }
 }

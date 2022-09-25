@@ -23,6 +23,7 @@ public class UniversalSdkNativeLoader {
   private static Integer port;
   private static final String BINARY_SERVER_PATH = "APPLITOOLS_UNIVERSAL_PATH";
   private static final String TEMP_FOLDER_PATH = "java.io.tmpdir";
+  private static final String ALPINE_PATH = "/etc/alpine-release";
 
   public synchronized static void start() {
     try {
@@ -55,6 +56,9 @@ public class UniversalSdkNativeLoader {
       } else if (osVersion.contains("mac")) {
         os = "mac-x64";
         suffix = "macos";
+      } else if (osVersion.contains("linux") && Files.exists(Paths.get(ALPINE_PATH))) {
+        os = "linux-x64";
+        suffix = "alpine";
       } else {
         os = "linux-x64";
         suffix = "linux";

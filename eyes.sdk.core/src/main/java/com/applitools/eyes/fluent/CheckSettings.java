@@ -39,6 +39,7 @@ public class CheckSettings implements ICheckSettings, ICheckSettingsInternal {
     private String variationGroupId = null;
     private Boolean disableBrowserFetching;
     private Integer waitBeforeCapture;
+    private LazyLoadOptions lazyLoadOptions;
 
     protected CheckSettings() { }
 
@@ -469,6 +470,7 @@ public class CheckSettings implements ICheckSettings, ICheckSettingsInternal {
         clone.variationGroupId = this.variationGroupId;
         clone.disableBrowserFetching = this.disableBrowserFetching;
         clone.waitBeforeCapture = this.waitBeforeCapture;
+        clone.lazyLoadOptions = this.lazyLoadOptions;
     }
 
     public void setStitchContent(boolean stitchContent) {
@@ -622,5 +624,21 @@ public class CheckSettings implements ICheckSettings, ICheckSettingsInternal {
 
     public Integer getWaitBeforeCapture() {
         return waitBeforeCapture;
+    }
+
+    public ICheckSettings lazyLoad() {
+        CheckSettings clone = this.clone();
+        clone.lazyLoadOptions = new LazyLoadOptions();
+        return clone;
+    }
+
+    public ICheckSettings lazyLoad(LazyLoadOptions lazyLoadOptions) {
+        CheckSettings clone = this.clone();
+        clone.lazyLoadOptions = lazyLoadOptions;
+        return clone;
+    }
+
+    public LazyLoadOptions getLazyLoadOptions() {
+        return this.lazyLoadOptions;
     }
 }
