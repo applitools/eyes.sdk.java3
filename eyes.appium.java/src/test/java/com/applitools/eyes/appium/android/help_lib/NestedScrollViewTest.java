@@ -2,14 +2,14 @@ package com.applitools.eyes.appium.android.help_lib;
 
 import org.testng.annotations.Test;
 
-public class ListViewTests extends BaseHelperTest{
+public class NestedScrollViewTest extends BaseHelperTest{
     @Override
     protected MainMenuButton getMainMenuButton() {
-        return MainMenuButton.btn_list_view_activity;
+        return MainMenuButton.btn_nested_scroll_view_activity;
     }
 
     @Test
     public void testScrollViewMonitor() throws Exception {
-        super.testScrollViewMonitor("list_view",250,0,2000);
+        super.testScrollViewMonitor("nested_scroll_view",1000,100,500);
     }
 }

@@ -19,10 +19,13 @@ public abstract class BaseHelperTest extends HelpLibTestSetup{
 
         Thread.sleep(200);
 
+        int startScrollPoint = 500;
+        int endScrollPoint = startScrollPoint + offsetToScroll;
+
         for(int i = 0; i < 2;i++) {
-            new TouchAction((MobileDriver) driver).press(new PointOption().withCoordinates(500, 1000))
-                    .waitAction(new WaitOptions().withDuration(Duration.ofSeconds(calculateMotionSpeed(pixelsPerSecond,500))))
-                    .moveTo(new PointOption().withCoordinates(500, 500))
+            new TouchAction((MobileDriver) driver).press(new PointOption().withCoordinates(500,endScrollPoint ))
+                    .waitAction(new WaitOptions().withDuration(Duration.ofSeconds(calculateMotionSpeed(pixelsPerSecond,startScrollPoint,endScrollPoint))))
+                    .moveTo(new PointOption().withCoordinates(500, startScrollPoint))
                     .release()
                     .perform();
         }
@@ -30,9 +33,9 @@ public abstract class BaseHelperTest extends HelpLibTestSetup{
         Thread.sleep(500);
 
         for(int i = 0; i < 2;i++) {
-            new TouchAction((MobileDriver) driver).press(new PointOption().withCoordinates(500, 500))
-                    .waitAction(new WaitOptions().withDuration(Duration.ofSeconds(calculateMotionSpeed(pixelsPerSecond,500))))
-                    .moveTo(new PointOption().withCoordinates(500, 1000))
+            new TouchAction((MobileDriver) driver).press(new PointOption().withCoordinates(500, startScrollPoint))
+                    .waitAction(new WaitOptions().withDuration(Duration.ofSeconds(calculateMotionSpeed(pixelsPerSecond,startScrollPoint,endScrollPoint))))
+                    .moveTo(new PointOption().withCoordinates(500, endScrollPoint))
                     .release()
                     .perform();
         }
@@ -56,7 +59,7 @@ public abstract class BaseHelperTest extends HelpLibTestSetup{
 
 
 
-        Assert.assertEquals(0,Integer.parseInt(value));
+        Assert.assertEquals(initialOffset,Integer.parseInt(value));
 
     }
 }
