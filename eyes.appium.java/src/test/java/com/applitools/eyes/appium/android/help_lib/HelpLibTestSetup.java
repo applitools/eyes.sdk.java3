@@ -20,6 +20,8 @@ public abstract class HelpLibTestSetup extends AndroidTestSetup {
     private final String SOUSE_LABS_ACCESS_KEY = "7f853c17-24c9-4d8f-a679-9cfde5b43951";
     private final String APPIUM_SOUSE_LABS_URL = "https://"+SOUSE_LABS_USERNAME+":" + SOUSE_LABS_ACCESS_KEY + "@ondemand.saucelabs.com:443/wd/hub";
     private final String APPIUM_LOCAL_URL = "http://localhost:4723/wd/hub";
+
+    private final boolean IS_LOCAL_TEST = true;
     public enum MainMenuButton{
         btn_camera_view_activity,
         btn_list_view_activity,
@@ -95,7 +97,7 @@ public abstract class HelpLibTestSetup extends AndroidTestSetup {
     }
 
     protected boolean isLocalTest(){
-        return true;
+        return IS_LOCAL_TEST;
     }
     protected String getAppiumUrl(){
         return isLocalTest() ? APPIUM_LOCAL_URL : APPIUM_SOUSE_LABS_URL;
@@ -105,6 +107,14 @@ public abstract class HelpLibTestSetup extends AndroidTestSetup {
     protected void initDriver() throws MalformedURLException {
         appiumServerUrl = getAppiumUrl();
         super.initDriver();
+    }
+
+
+    public static int calculateMotionSpeed(int pixelPerSecond, int startPoint, int endPoint){
+        return calculateMotionSpeed(pixelPerSecond,endPoint-startPoint);
+    }
+    public static int calculateMotionSpeed(int pixelPerSecond, int delta){
+        return Math.abs(delta)/pixelPerSecond;
     }
 
     protected WebElement findEyesAppiumHelperEDT() {
@@ -121,22 +131,33 @@ public abstract class HelpLibTestSetup extends AndroidTestSetup {
         }
         return edt;
     }
-    protected void sendEDTCommand(String command){
+
+    protected void sendEDTCommand(String command) {
         WebElement edt = findEyesAppiumHelperEDT();
+        edt.clear();
         edt.sendKeys(command);
         edt.click();
     }
 
-    protected String getEDTValue() throws InterruptedException{
-        WebElement edt = findEyesAppiumHelperEDT();
-        do{
-            Thread.sleep(500);
-        }while (edt.getText().equals("WAIT"));
-        return edt.getText();
+    protected String getEDTValue(){
+        try {
+            WebElement edt = findEyesAppiumHelperEDT();
+            do {
+                Thread.sleep(500);
+            } while (edt.getText().equals("WAIT"));
+            return edt.getText();
+        }catch (InterruptedException e){
+            throw new RuntimeException("getEDTValue failed: ", e);
+        }
     }
     protected void clearEDT(){
         WebElement edt = findEyesAppiumHelperEDT();
         edt.clear();
+    }
+    protected void validateNoError(){
+        String value = getEDTValue();
+        if(value.startsWith("error;"))
+            throw new RuntimeException("EDT error raw:" + value);
     }
 
     protected abstract MainMenuButton getMainMenuButton();
@@ -153,8 +174,8 @@ public abstract class HelpLibTestSetup extends AndroidTestSetup {
                     throw new RuntimeException("Unable to find element with id: " + menuBtn);
                 TouchAction scrollAction = new TouchAction(driver);
 
-                scrollAction.press(new PointOption().withCoordinates(5, 1000))
-                        .waitAction(new WaitOptions().withDuration(Duration.ofMillis(500)))
+                scrollAction.press(new PointOption().withCoordinates(5, 1500))
+                        .waitAction(new WaitOptions().withDuration(Duration.ofSeconds(calculateMotionSpeed(1000,1400))))
                         .moveTo(new PointOption().withCoordinates(5, 100))
                         .release()
                         .perform();

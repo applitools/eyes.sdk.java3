@@ -9,7 +9,7 @@ import org.testng.annotations.Test;
 
 import java.time.Duration;
 
-public class LargeRecyclerViewTests extends HelpLibTestSetup {
+public class LargeRecyclerViewTests extends BaseHelperTest {
 
 
     @Override
@@ -28,49 +28,7 @@ public class LargeRecyclerViewTests extends HelpLibTestSetup {
 
     @Test
     public void testScrollViewMonitor() throws Exception {
-        int initialOffset = 0;//2620;
-        int offsetToScroll = 1000;
-
-        sendEDTCommand("register_scrollable;recycler_view;" + initialOffset + ";0;0;0");
-
-        Thread.sleep(200);
-
-        for(int i = 0; i < 2;i++) {
-            new TouchAction((MobileDriver) driver).press(new PointOption().withCoordinates(500, 1000))
-                    .waitAction(new WaitOptions().withDuration(Duration.ofMillis(5000)))
-                    .moveTo(new PointOption().withCoordinates(500, 500))
-                    .release()
-                    .perform();
-        }
-
-        Thread.sleep(500);
-
-        for(int i = 0; i < 2;i++) {
-            new TouchAction((MobileDriver) driver).press(new PointOption().withCoordinates(500, 500))
-                    .waitAction(new WaitOptions().withDuration(Duration.ofMillis(5000)))
-                    .moveTo(new PointOption().withCoordinates(500, 1000))
-                    .release()
-                    .perform();
-        }
-
-
-
-//        for(int i = 0 ; i < 1; i++)
-//            driver.findElement(MobileBy.AndroidUIAutomator("new UiScrollable(new UiSelector().resourceIdMatches(\"com.applitools.app_androidx:id/recycler_view\").scrollable(true)).scrollForward(1000)"));
-//        for(int i = 0 ; i < 1; i++)
-//            driver.findElement(MobileBy.AndroidUIAutomator("new UiScrollable(new UiSelector().resourceIdMatches(\"com.applitools.app_androidx:id/recycler_view\").scrollable(true)).scrollBackward(1000)"));
-
-
-
-//        Thread.sleep(500);
-        sendEDTCommand("get_scrolled_offset;recycler_view;0;0;0;0");
-
-        String value = getEDTValue();
-        sendEDTCommand("unregister_scrollable;recycler_view;0;0;0;0");
-
-
-
-        Assert.assertEquals(0,Integer.parseInt(value));
+        super.testScrollViewMonitor("recycler_view",200,0,0);
 
     }
 }
