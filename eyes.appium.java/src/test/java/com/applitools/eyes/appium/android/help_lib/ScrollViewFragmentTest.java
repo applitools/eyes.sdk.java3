@@ -2,10 +2,10 @@ package com.applitools.eyes.appium.android.help_lib;
 
 import org.testng.annotations.Test;
 
-public class NestedScrollViewTest extends BaseHelperTest{
+public class ScrollViewFragmentTest extends BaseHelperTest{
     @Override
     protected MainMenuButton getMainMenuButton() {
-        return MainMenuButton.btn_nested_scroll_view_activity;
+        return MainMenuButton.btn_two_fragments_activity;
     }
 
     @Test
