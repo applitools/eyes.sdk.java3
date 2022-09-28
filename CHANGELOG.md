@@ -1,3 +1,7 @@
+## [vNext] - 2022-09-28
+### Updated
+- Added iPhone 14 & iPhone 14 Pro Max to UFG iOS devices [Trello 73](https://trello.com/c/M1YiwtHb)
+
 ## [5.26.0] - 2022-09-09
 ### Updated
 - Added Appium Lazy Load support [Trello 2834](https://trello.com/c/MvCP3cer)
