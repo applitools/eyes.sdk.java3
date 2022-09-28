@@ -28,7 +28,7 @@ public class LargeRecyclerViewTests extends BaseHelperTest {
 
     @Test
     public void testScrollViewMonitor() throws Exception {
-        super.testScrollViewMonitor("recycler_view",200,0,0);
+        super.testScrollViewMonitor("recycler_view",200,0,1000);
 
     }
 }

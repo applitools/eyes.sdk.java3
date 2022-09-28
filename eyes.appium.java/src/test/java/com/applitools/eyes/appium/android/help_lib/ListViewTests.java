@@ -10,6 +10,6 @@ public class ListViewTests extends BaseHelperTest{
 
     @Test
     public void testScrollViewMonitor() throws Exception {
-        super.testScrollViewMonitor("list_view",250,0,2000);
+        super.testScrollViewMonitor("list_view",250,0,1000);
     }
 }

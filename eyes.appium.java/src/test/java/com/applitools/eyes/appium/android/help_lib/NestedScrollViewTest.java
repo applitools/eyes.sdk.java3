@@ -10,6 +10,6 @@ public class NestedScrollViewTest extends BaseHelperTest{
 
     @Test
     public void testScrollViewMonitor() throws Exception {
-        super.testScrollViewMonitor("nested_scroll_view",1000,100,500);
+        super.testScrollViewMonitor("nested_scroll_view",500,100,500);
     }
 }
