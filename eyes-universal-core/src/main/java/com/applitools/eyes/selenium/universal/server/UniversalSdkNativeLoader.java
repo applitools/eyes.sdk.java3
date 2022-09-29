@@ -12,6 +12,11 @@ import java.util.HashSet;
 import java.util.Set;
 import com.applitools.eyes.EyesException;
 import com.applitools.eyes.EyesRunnable;
+import com.applitools.eyes.LogHandler;
+import com.applitools.eyes.Logger;
+import com.applitools.eyes.logging.Stage;
+import com.applitools.eyes.logging.TraceLevel;
+import com.applitools.eyes.logging.Type;
 import com.applitools.utils.GeneralUtils;
 
 /**
@@ -24,13 +29,15 @@ public class UniversalSdkNativeLoader {
   private static final String TEMP_FOLDER_PATH = "java.io.tmpdir";
   private static final long MAX_ACTION_WAIT_SECONDS = 90;
   private static final long SLEEP_BETWEEN_ACTION_CHECK_MS = 3000;
+  private static Logger logger;
 
-  public synchronized static void start() {
+  public synchronized static void start(LogHandler logHandler) {
     try {
+      logger = new Logger(logHandler);
       copyAndStartUniversalCore();
     } catch (Exception e) {
       String errorMessage = GeneralUtils.createErrorMessageFromExceptionWithText(e, "Could not launch server!");
-      System.out.println(errorMessage);
+      logger.log(TraceLevel.Error, (String) null, Stage.GENERAL, Type.REQUEST_FAILED, errorMessage);
       throw new EyesException(errorMessage, e);
     }
   }
@@ -60,12 +67,12 @@ public class UniversalSdkNativeLoader {
         suffix = "linux";
       }
 
-      System.out.println("Identified OS: " + os);
+      logger.log(TraceLevel.Info, (String) null, null, null, "Identified OS: " + os);
 
       // Set the target path for the server
       String userSetPath = GeneralUtils.getEnvString(BINARY_SERVER_PATH); // might not exist
       Path directoryPath =
-          userSetPath == null ? Paths.get(GeneralUtils.getPropertyString(TEMP_FOLDER_PATH)) : Paths.get(userSetPath);
+              userSetPath == null ? Paths.get(GeneralUtils.getPropertyString(TEMP_FOLDER_PATH)) : Paths.get(userSetPath);
 
       String serverFilename = "eyes-universal-" + suffix;
 
@@ -92,17 +99,19 @@ public class UniversalSdkNativeLoader {
           nativeProcess = new ProcessBuilder(executablePath, "--port 0" ,"--no-singleton","--shutdown-mode", "stdin").start();
         } catch (Exception e) {
           String errorMessage = GeneralUtils.createErrorMessageFromExceptionWithText(e, "Failed to start universal core!");
-          System.out.println(errorMessage);
+
+          logger.log(TraceLevel.Info, (String) null, null, null, errorMessage);
           throw new EyesException(errorMessage, e);
         }
-        System.out.println("Universal Core start returned ok.");
+
+        logger.log(TraceLevel.Info, (String) null, null, null, "Universal Core start returned ok.");
       }
 
       @Override
       public String getName() {
         return "Start universal core";
       }
-    }, MAX_ACTION_WAIT_SECONDS, SLEEP_BETWEEN_ACTION_CHECK_MS, "Timed out trying to start universal core!");
+    }, MAX_ACTION_WAIT_SECONDS, SLEEP_BETWEEN_ACTION_CHECK_MS, "Timed out trying to start universal core!", logger.getLogHandler());
 
 
     GeneralUtils.tryRunTaskWithRetry(new EyesRunnable() {
@@ -119,23 +128,23 @@ public class UniversalSdkNativeLoader {
           // if this is a retry, and the server will not output anything, we'll be stuck forever.
           if (childOutputStream.available() == 0) {
             String errorMessage = "server did not yet output the port number..";
-            System.out.println(errorMessage);
+            logger.log(TraceLevel.Info, (String) null, null, null, errorMessage);
             throw new EyesException(errorMessage);
           }
 
           BufferedReader reader = new BufferedReader(new InputStreamReader(childOutputStream));
           inputLineFromServer = reader.readLine();
           port = Integer.parseInt(inputLineFromServer);
-          System.out.println("Port read and parsed okay: " + port);
+          logger.log(TraceLevel.Info, (String) null, null, null, "Port read and parsed okay: " + port);
         } catch (IOException e) {
           String errorMessage = GeneralUtils.createErrorMessageFromExceptionWithText(e,
                   "Failed to get core's input stream!");
-          System.out.println(errorMessage);
+          logger.log(TraceLevel.Info, (String) null, null, null, errorMessage);
           throw new EyesException(errorMessage, e);
         } catch (NumberFormatException nfe) {
           String errorMessage = GeneralUtils.createErrorMessageFromExceptionWithText(nfe,
                   "Got a non-integer as port! Text: '" + inputLineFromServer + "'");
-          System.out.println(errorMessage);
+          logger.log(TraceLevel.Info, (String) null, null, null, errorMessage);
           throw new EyesException(errorMessage, nfe);
         }
       }
@@ -144,7 +153,7 @@ public class UniversalSdkNativeLoader {
       public String getName() {
         return "Read universal core port";
       }
-    }, MAX_ACTION_WAIT_SECONDS, SLEEP_BETWEEN_ACTION_CHECK_MS, "Timed out trying to read port from core!");
+    }, MAX_ACTION_WAIT_SECONDS, SLEEP_BETWEEN_ACTION_CHECK_MS, "Timed out trying to read port from core!", logger.getLogHandler());
   }
 
   // get an input stream from the resources folder
@@ -177,13 +186,13 @@ public class UniversalSdkNativeLoader {
 
   private static String getBinaryPath(String os, String suffix) {
     return "runtimes" +
-        "/" +
-        os +
-        "/" +
-        "native" +
-        "/" +
-        "eyes-universal-" +
-        suffix;
+            "/" +
+            os +
+            "/" +
+            "native" +
+            "/" +
+            "eyes-universal-" +
+            suffix;
   }
 
   private static void setAndVerifyPosixPermissionsForUniversalCore(String osVersion, Path path) throws Exception {
@@ -211,81 +220,81 @@ public class UniversalSdkNativeLoader {
     permissions.add(PosixFilePermission.OTHERS_EXECUTE);
 
     GeneralUtils.tryRunTaskWithRetry(new EyesRunnable() {
-      @Override
-      public void run() throws EyesException {
-        try {
-          Files.setPosixFilePermissions(path, permissions);
-          System.out.println("'Set core permissions' ended. Now verifying the permissions...");
-        } catch (Exception e) {
-          String errorMessage = GeneralUtils.createErrorMessageFromExceptionWithText(e,
-                  "Could not set permissions on the universal core file!");
-          System.out.println(errorMessage);
-          throw new EyesException(errorMessage, e);
-        }
-      }
+                                       @Override
+                                       public void run() throws EyesException {
+                                         try {
+                                           Files.setPosixFilePermissions(path, permissions);
+                                           logger.log(TraceLevel.Info, (String) null, null, null, "'Set core permissions' ended. Now verifying the permissions...");
+                                         } catch (Exception e) {
+                                           String errorMessage = GeneralUtils.createErrorMessageFromExceptionWithText(e,
+                                                   "Could not set permissions on the universal core file!");
+                                           logger.log(TraceLevel.Info, (String) null, null, null, errorMessage);
+                                           throw new EyesException(errorMessage, e);
+                                         }
+                                       }
 
-      @Override
-      public String getName() {
-        return "Set core permissions";
-      }
-    }, MAX_ACTION_WAIT_SECONDS, SLEEP_BETWEEN_ACTION_CHECK_MS,
-            "Timed out waiting for permissions to be set for universal core!");
+                                       @Override
+                                       public String getName() {
+                                         return "Set core permissions";
+                                       }
+                                     }, MAX_ACTION_WAIT_SECONDS, SLEEP_BETWEEN_ACTION_CHECK_MS,
+            "Timed out waiting for permissions to be set for universal core!", logger.getLogHandler());
 
     // Verify that the permissions were set. If the OS is overloaded, this might take a while.
     GeneralUtils.tryRunTaskWithRetry(new EyesRunnable() {
-      @Override
-      public void run() throws EyesException {
-        Set<PosixFilePermission> retrievedPermissions = null;
-        try {
-          retrievedPermissions = Files.getPosixFilePermissions(path, LinkOption.NOFOLLOW_LINKS);
-        } catch (IOException e) {
-          String errMsg = GeneralUtils.createErrorMessageFromExceptionWithText(e, 
-                  "Got IOException trying to read universal core permissions!");
-          System.out.println(errMsg);
-          throw new EyesException(errMsg, e);
-        }
+                                       @Override
+                                       public void run() throws EyesException {
+                                         Set<PosixFilePermission> retrievedPermissions;
+                                         try {
+                                           retrievedPermissions = Files.getPosixFilePermissions(path, LinkOption.NOFOLLOW_LINKS);
+                                         } catch (IOException e) {
+                                           String errMsg = GeneralUtils.createErrorMessageFromExceptionWithText(e,
+                                                   "Got IOException trying to read universal core permissions!");
+                                           logger.log(TraceLevel.Info, (String) null, null, null, errMsg);
+                                           throw new EyesException(errMsg, e);
+                                         }
 
-        if (!(retrievedPermissions.containsAll(permissions))) {
-          String errMsg = "Permissions for universal core were not yet set correctly! Current permissions: " + Arrays.toString(retrievedPermissions.toArray());
-          System.out.println(errMsg);
-          throw new EyesException(errMsg);
-        }
-        System.out.println("Core permissions verified.");
-      }
+                                         if (!(retrievedPermissions.containsAll(permissions))) {
+                                           String errMsg = "Permissions for universal core were not yet set correctly! Current permissions: " + Arrays.toString(retrievedPermissions.toArray());
+                                           logger.log(TraceLevel.Info, (String) null, null, null, errMsg);
+                                           throw new EyesException(errMsg);
+                                         }
+                                         logger.log(TraceLevel.Info, (String) null, null, null, "Core permissions verified.");
+                                       }
 
-     @Override
-     public String getName() {
-       return "Verify core permissions";
-     }
-    }, MAX_ACTION_WAIT_SECONDS, SLEEP_BETWEEN_ACTION_CHECK_MS,
-            "Timed out waiting for permissions to be set for universal core!");
+                                       @Override
+                                       public String getName() {
+                                         return "Verify core permissions";
+                                       }
+                                     }, MAX_ACTION_WAIT_SECONDS, SLEEP_BETWEEN_ACTION_CHECK_MS,
+            "Timed out waiting for permissions to be set for universal core!", logger.getLogHandler());
 
   }
 
   private static Path copyBinaryFileToLocalPath(InputStream inputStream, Path directoryPath, String filename) {
     Path serverTargetPath = Paths.get(directoryPath + File.separator + filename);
 
-      // If the required path does not exist, create it.
-      if (!Files.exists(directoryPath)) {
-        System.out.println("The path '" + directoryPath + "' for the universal core does not exist. Creating the directory structure...");
-        try {
-          Files.createDirectories(directoryPath);
-        } catch (Exception e) {
-          String errMsg = GeneralUtils.createErrorMessageFromExceptionWithText(e,
-                  "Could not create the directory structure '" + directoryPath +   "'!");
-          System.out.println(errMsg);
-          throw new EyesException(errMsg, e);
-        }
-        System.out.println("Directory structure created.");
+    // If the required path does not exist, create it.
+    if (!Files.exists(directoryPath)) {
+      logger.log(TraceLevel.Info, (String) null, null, null, "The path '" + directoryPath + "' for the universal core does not exist. Creating the directory structure...");
+      try {
+        Files.createDirectories(directoryPath);
+      } catch (Exception e) {
+        String errMsg = GeneralUtils.createErrorMessageFromExceptionWithText(e,
+                "Could not create the directory structure '" + directoryPath +   "'!");
+        logger.log(TraceLevel.Error, (String) null, null, null, errMsg);
+        throw new EyesException(errMsg, e);
       }
+      logger.log(TraceLevel.Info, (String) null, null, null, "Directory structure created.");
+    }
 
     try {
       Files.copy(inputStream, serverTargetPath, StandardCopyOption.REPLACE_EXISTING);
-      System.out.println("Successfully copied the universal core to path: '" + serverTargetPath + "'");
+      logger.log(TraceLevel.Info, (String) null, null, null, "Successfully copied the universal core to path: '" + serverTargetPath + "'");
     } catch (Exception e) { // Might actually be a common, non-error, situation - the server might already be running.
       String errMsg = GeneralUtils.createErrorMessageFromExceptionWithText(e,
               "Could not copy universal core to '" + serverTargetPath +   "' (can happen if server is already running)");
-      System.out.println(errMsg);
+      logger.log(TraceLevel.Error, (String) null, null, null, errMsg);
     }
 
     return serverTargetPath;

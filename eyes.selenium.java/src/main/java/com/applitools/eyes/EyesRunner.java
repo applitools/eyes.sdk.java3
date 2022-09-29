@@ -4,6 +4,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 import com.applitools.connectivity.ServerConnector;
 import com.applitools.eyes.exceptions.DiffsFoundException;
@@ -44,18 +45,22 @@ public abstract class EyesRunner {
    * used for instantiating Classic Runner
    */
   public EyesRunner() {
-    runServer(BASE_AGENT_ID, VERSION);
+    runServer(BASE_AGENT_ID, VERSION, null);
   }
 
   /**
    * used for instantiating Classic Runner
    */
   public EyesRunner(String baseAgentId, String version) {
-    runServer(baseAgentId, version);
+    runServer(baseAgentId, version, null);
   }
 
-  protected void runServer(String baseAgentId, String version){
-    UniversalSdkNativeLoader.start();
+  public EyesRunner(String baseAgentId, String version, LogHandler logHandler) {
+    runServer(baseAgentId, version, logHandler);
+  }
+
+  protected void runServer(String baseAgentId, String version, LogHandler logHandler) {
+    UniversalSdkNativeLoader.start(Optional.ofNullable(logHandler).orElse(new NullLogHandler()));
     commandExecutor = CommandExecutor.getInstance(baseAgentId, version);
   }
 
