@@ -1,7 +1,10 @@
 package com.applitools.eyes.appium;
 
 import com.applitools.eyes.selenium.ClassicRunner;
+import com.applitools.eyes.visualgrid.services.RunnerOptions;
 import com.applitools.utils.ClassVersionGetter;
+
+import java.util.Optional;
 
 public class AppiumRunner extends ClassicRunner {
     /**
@@ -18,7 +21,13 @@ public class AppiumRunner extends ClassicRunner {
      * used for instantiating Appium Runner
      */
     public AppiumRunner() {
-        super(BASE_AGENT_ID, VERSION);
+        super(BASE_AGENT_ID, VERSION, null);
+    }
+
+    public AppiumRunner(RunnerOptions runnerOptions) {
+        super(BASE_AGENT_ID, VERSION, Optional.ofNullable(runnerOptions)
+                .map(RunnerOptions::getLogHandler)
+                .orElse(null));
     }
 
 }

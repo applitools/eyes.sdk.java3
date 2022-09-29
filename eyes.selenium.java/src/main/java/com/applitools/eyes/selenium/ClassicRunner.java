@@ -2,20 +2,12 @@ package com.applitools.eyes.selenium;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import com.applitools.connectivity.ServerConnector;
-import com.applitools.eyes.EyesException;
+import com.applitools.eyes.*;
 
-import com.applitools.eyes.EyesRunner;
-import com.applitools.eyes.MatchResult;
-import com.applitools.eyes.MatchWindowData;
-import com.applitools.eyes.RunningSession;
-import com.applitools.eyes.SessionStartInfo;
-import com.applitools.eyes.SessionStopInfo;
-import com.applitools.eyes.SyncTaskListener;
-import com.applitools.eyes.TestResultContainer;
-import com.applitools.eyes.TestResults;
-import com.applitools.eyes.TestResultsSummary;
+import com.applitools.eyes.visualgrid.services.RunnerOptions;
 import com.applitools.utils.ClassVersionGetter;
 
 
@@ -37,11 +29,17 @@ public class ClassicRunner extends EyesRunner {
 
 
   public ClassicRunner() {
-    this(BASE_AGENT_ID, VERSION);
+    this(BASE_AGENT_ID, VERSION, null);
   }
 
-  protected ClassicRunner(String baseAgentId, String version) {
-    super(baseAgentId, version);
+  public ClassicRunner(RunnerOptions runnerOptions) {
+    this(BASE_AGENT_ID, VERSION, Optional.ofNullable(runnerOptions)
+            .map(RunnerOptions::getLogHandler)
+            .orElse(null));
+  }
+
+  protected ClassicRunner(String baseAgentId, String version, LogHandler logHandler) {
+    super(baseAgentId, version, logHandler);
     managerRef = commandExecutor.coreMakeManager(ManagerType.CLASSIC.value, null, null);
   }
 

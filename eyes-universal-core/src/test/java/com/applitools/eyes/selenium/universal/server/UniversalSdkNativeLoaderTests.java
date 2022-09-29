@@ -24,7 +24,7 @@ public class UniversalSdkNativeLoaderTests {
             utilities.when(() -> GeneralUtils.getEnvString("APPLITOOLS_UNIVERSAL_PATH"))
                     .thenReturn("/Users/danielputerman/test/jpmc-universal");
             utilities.when(() -> GeneralUtils.getPropertyString("os.name")).thenReturn("macos");
-            UniversalSdkNativeLoader.start();
+            UniversalSdkNativeLoader.start(null);
             Assertions.assertTrue(Files.exists(Paths.get(GeneralUtils.getEnvString("APPLITOOLS_UNIVERSAL_PATH"))));
         }
     }
