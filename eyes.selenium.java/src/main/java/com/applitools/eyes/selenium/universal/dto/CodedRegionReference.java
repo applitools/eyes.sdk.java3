@@ -7,7 +7,6 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 public class CodedRegionReference {
     private TRegion region;
     private String regionId;
-    // padding will be here
     private Padding padding;
 
     public TRegion getRegion() {
