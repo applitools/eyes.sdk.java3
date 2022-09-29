@@ -1,6 +1,8 @@
 ## [vNext] - 2022-09-29
 ### Updated
 - Added iPhone 14 & iPhone 14 Pro Max to UFG iOS devices [Trello 73](https://trello.com/c/M1YiwtHb)
+- Added Selenium Coded Regions Padding support [Trello 42](https://trello.com/c/PYKqJLbg)
+- Update Universal binaries to 2.15.0 [Trello 3035](https://trello.com/c/kWgtcLkT)
 
 ## [5.26.0] - 2022-09-09
 ### Updated
