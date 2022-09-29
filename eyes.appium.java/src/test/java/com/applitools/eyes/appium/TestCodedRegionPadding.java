@@ -65,10 +65,10 @@ public class TestCodedRegionPadding {
         WebElement item4 = driver.findElement(MobileBy.id("id_8"));
 
         eyes.check(Target.window()
-                .ignore(item1, new Padding().setBottom(20))
-                .layout(item2, new Padding(20))
-                .content(item3, new Padding().setLeft(10).setRight(10))
-                .strict(item4, new Padding().setBottom(40))
+//                .ignore(item1, new Padding().setBottom(20))
+//                .layout(item2, new Padding(20))
+//                .content(item3, new Padding().setLeft(10).setRight(10))
+//                .strict(item4, new Padding().setBottom(40))
                 .fully(false));
         final TestResults result = eyes.close(false);
         final SessionResults info = getTestInfo(result);
