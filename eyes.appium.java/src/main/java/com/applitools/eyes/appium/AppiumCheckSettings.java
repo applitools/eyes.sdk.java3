@@ -103,17 +103,17 @@ public class AppiumCheckSettings extends CheckSettings implements ImplicitInitia
         return clone;
     }
 
-    /**
-     * add one layout region with padding.
-     * @param element WebElement to match using the Layout method.
-     * @param padding Padding to add around the layout region.
-     * @return An updated clone of this settings object.
-     */
-    public AppiumCheckSettings layout(WebElement element, Padding padding) {
-        AppiumCheckSettings clone = this.clone();
-        clone.layout_(new SimpleRegionByElement(element, padding));
-        return clone;
-    }
+//    /**
+//     * add one layout region with padding.
+//     * @param element WebElement to match using the Layout method.
+//     * @param padding Padding to add around the layout region.
+//     * @return An updated clone of this settings object.
+//     */
+//    public AppiumCheckSettings layout(WebElement element, Padding padding) {
+//        AppiumCheckSettings clone = this.clone();
+//        clone.layout_(new SimpleRegionByElement(element, padding));
+//        return clone;
+//    }
 
     public AppiumCheckSettings ignore(WebElement element, WebElement... elements) {
         AppiumCheckSettings clone = this.clone();
@@ -132,17 +132,17 @@ public class AppiumCheckSettings extends CheckSettings implements ImplicitInitia
         return clone;
     }
 
-    /**
-     * add one ignore region with padding
-     * @param element WebElement to ignore when validating the screenshot.
-     * @param padding Padding to add around the ignore region
-     * @return An updated clone of this settings object.
-     */
-    public AppiumCheckSettings ignore(WebElement element, Padding padding) {
-        AppiumCheckSettings clone = this.clone();
-        clone.ignore_(new SimpleRegionByElement(element, padding));
-        return clone;
-    }
+//    /**
+//     * add one ignore region with padding
+//     * @param element WebElement to ignore when validating the screenshot.
+//     * @param padding Padding to add around the ignore region
+//     * @return An updated clone of this settings object.
+//     */
+//    public AppiumCheckSettings ignore(WebElement element, Padding padding) {
+//        AppiumCheckSettings clone = this.clone();
+//        clone.ignore_(new SimpleRegionByElement(element, padding));
+//        return clone;
+//    }
 
     public AppiumCheckSettings strict(WebElement element, WebElement... elements) {
         AppiumCheckSettings clone = this.clone();
@@ -161,17 +161,17 @@ public class AppiumCheckSettings extends CheckSettings implements ImplicitInitia
         return clone;
     }
 
-    /**
-     * add one strict region with padding.
-     * @param element WebElement to match using the Strict method.
-     * @param padding Padding to add around the strict region.
-     * @return An updated clone of this settings object.
-     */
-    public AppiumCheckSettings strict(WebElement element, Padding padding) {
-        AppiumCheckSettings clone = this.clone();
-        clone.strict_(new SimpleRegionByElement(element, padding));
-        return clone;
-    }
+//    /**
+//     * add one strict region with padding.
+//     * @param element WebElement to match using the Strict method.
+//     * @param padding Padding to add around the strict region.
+//     * @return An updated clone of this settings object.
+//     */
+//    public AppiumCheckSettings strict(WebElement element, Padding padding) {
+//        AppiumCheckSettings clone = this.clone();
+//        clone.strict_(new SimpleRegionByElement(element, padding));
+//        return clone;
+//    }
 
     public AppiumCheckSettings content(WebElement element, WebElement... elements) {
         AppiumCheckSettings clone = this.clone();
@@ -190,17 +190,17 @@ public class AppiumCheckSettings extends CheckSettings implements ImplicitInitia
         return clone;
     }
 
-    /**
-     * add one content region with padding.
-     * @param element WebElement to match using the Content method.
-     * @param padding Padding to add around the content region.
-     * @return An updated clone of this settings object.
-     */
-    public AppiumCheckSettings content(WebElement element, Padding padding) {
-        AppiumCheckSettings clone = this.clone();
-        clone.content_(new SimpleRegionByElement(element, padding));
-        return clone;
-    }
+//    /**
+//     * add one content region with padding.
+//     * @param element WebElement to match using the Content method.
+//     * @param padding Padding to add around the content region.
+//     * @return An updated clone of this settings object.
+//     */
+//    public AppiumCheckSettings content(WebElement element, Padding padding) {
+//        AppiumCheckSettings clone = this.clone();
+//        clone.content_(new SimpleRegionByElement(element, padding));
+//        return clone;
+//    }
 
     public AppiumCheckSettings floating(WebElement element, int maxUpOffset, int maxDownOffset, int maxLeftOffset, int maxRightOffset) {
         AppiumCheckSettings clone = this.clone();
