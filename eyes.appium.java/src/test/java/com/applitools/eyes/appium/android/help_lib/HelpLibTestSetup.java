@@ -86,8 +86,9 @@ public abstract class HelpLibTestSetup extends AndroidTestSetup {
     }
     @Override
     protected void setAppCapability() {
-        capabilities.setCapability("app", "https://applitools.jfrog.io/artifactory/Examples/androidx/helper_lib/" +
-                getApplicationVersion() + "/app-androidx-debug.apk");
+        capabilities.setCapability("app", "https://applitools.jfrog.io/artifactory/Examples/androidx/helper_lib/"
+                + (isLegacy() ? "legacy/" : "")
+                + getApplicationVersion() + "/app-androidx-debug.apk");
     }
 
 
@@ -98,6 +99,10 @@ public abstract class HelpLibTestSetup extends AndroidTestSetup {
 
     protected boolean isLocalTest(){
         return IS_LOCAL_TEST;
+    }
+
+    protected boolean isLegacy(){
+        return true;
     }
     protected String getAppiumUrl(){
         return isLocalTest() ? APPIUM_LOCAL_URL : APPIUM_SOUSE_LABS_URL;
