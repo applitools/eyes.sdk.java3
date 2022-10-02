@@ -30,6 +30,11 @@ public enum MatchLevel {
     CONTENT("Content"),
 
     /**
+     * Images have the same outline.
+     */
+    IGNORE_COLORS("IgnoreColors"),
+
+    /**
      * Images are nearly identical.
      */
     STRICT("Strict"),

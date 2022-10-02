@@ -1,3 +1,8 @@
+## [vNextNext] - 2022-10-02
+### Added
+- Added WebView support to the Fluent API [Trello 72](https://trello.com/c/uEWiEF5s)
+- Deprecate Content MatchLevel in favor of IgnoreColors [Trello 74](https://trello.com/c/hDmn5WOD)
+
 ## [vNext] - 2022-09-29
 ### Updated
 - Added iPhone 14 & iPhone 14 Pro Max to UFG iOS devices [Trello 73](https://trello.com/c/M1YiwtHb)
