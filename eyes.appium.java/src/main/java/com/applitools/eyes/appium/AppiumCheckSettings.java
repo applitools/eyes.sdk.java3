@@ -379,7 +379,7 @@ public class AppiumCheckSettings extends CheckSettings implements ImplicitInitia
         return this.isDefaultWebview;
     }
 
-    public Object getWebview() {
+    public String getWebview() {
         return this.webview;
     }
 }

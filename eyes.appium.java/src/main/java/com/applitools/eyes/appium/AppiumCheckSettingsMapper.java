@@ -51,7 +51,8 @@ public class AppiumCheckSettingsMapper {
         checkSettingsDto.setAccessibilityRegions(TAccessibilityRegionMapper.toTAccessibilityRegionDtoList(Arrays.asList(appiumCheckSettings.getAccessibilityRegions())));
         checkSettingsDto.setPageId(appiumCheckSettings.getPageId());
         checkSettingsDto.setLazyLoad(appiumCheckSettings.getLazyLoadOptions());
-        checkSettingsDto.setWebview(appiumCheckSettings.getWebview() == null? appiumCheckSettings.getIsDefaultWebview() == null? appiumCheckSettings.getIsDefaultWebview() : appiumCheckSettings.getWebview() : null);
+        checkSettingsDto.setWebview(appiumCheckSettings.getIsDefaultWebview() == null ? null :
+                appiumCheckSettings.getWebview() != null ? appiumCheckSettings.getWebview() : appiumCheckSettings.getIsDefaultWebview());
 
         // ScreenshotSettings
         checkSettingsDto.setRegion(TRegionMapper.toTRegionFromCheckSettings(checkSettings));
