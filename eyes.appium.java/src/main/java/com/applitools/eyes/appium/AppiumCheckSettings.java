@@ -375,7 +375,7 @@ public class AppiumCheckSettings extends CheckSettings implements ImplicitInitia
         return super.getLazyLoadOptions();
     }
 
-    public boolean getIsDefaultWebview() {
+    public Boolean getIsDefaultWebview() {
         return this.isDefaultWebview;
     }
 
