@@ -49,6 +49,7 @@ public class CheckSettingsDto {
   private Boolean fully;
   private String pageId;
   private LazyLoadOptions lazyLoad;
+  private Object webview;
 
   public String getName() {
     return name;
@@ -291,4 +292,8 @@ public class CheckSettingsDto {
   public void setWaitBeforeCapture(Integer waitBeforeCapture) {
     this.waitBeforeCapture = waitBeforeCapture;
   }
+
+  public Object getWebview() { return webview; }
+
+  public void setWebview(Object webview) { this.webview = webview; }
 }
