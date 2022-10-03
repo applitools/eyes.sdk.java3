@@ -19,6 +19,7 @@ import com.applitools.eyes.selenium.universal.mapper.*;
 import com.applitools.eyes.triggers.MouseAction;
 import com.applitools.eyes.visualgrid.model.IDebugResourceWriter;
 import com.applitools.eyes.visualgrid.model.RenderingInfo;
+import com.applitools.eyes.visualgrid.services.VisualGridRunner;
 import com.applitools.utils.ArgumentGuard;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
@@ -119,6 +120,12 @@ public class Eyes implements IEyesBase {
 
         if (viewportSize != null && !viewportSize.isEmpty()) {
             configurationProvider.get().setViewportSize(new RectangleSize(viewportSize));
+        }
+
+        if (runner instanceof VisualGridRunner) {
+            AutProxySettings autProxy = ((VisualGridRunner) runner).getAutProxy();
+            if (autProxy != null)
+                configurationProvider.get().setAutProxy(autProxy);
         }
 
         ConfigurationDto configurationDto = ConfigurationMapper
