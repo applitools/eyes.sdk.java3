@@ -2,6 +2,7 @@ package com.applitools.eyes.visualgrid.services;
 
 import com.applitools.eyes.AbstractProxySettings;
 import com.applitools.eyes.AutProxyMode;
+import com.applitools.eyes.AutProxySettings;
 
 public class RunnerOptions {
 
@@ -9,11 +10,7 @@ public class RunnerOptions {
     private String apiKey = null;
     private String serverUrl = null;
     private AbstractProxySettings proxy = null;
-
-    private boolean isAutProxySet = false;
-    private AbstractProxySettings autProxy = null;
-    private String[] autProxyDomains = null;
-    private AutProxyMode autProxyMode;
+    private AutProxySettings autProxy = null;
 
     public RunnerOptions testConcurrency(int testConcurrency) {
         this.testConcurrency = testConcurrency;
@@ -57,8 +54,7 @@ public class RunnerOptions {
      * If AUT proxy is set to null, there will be no proxy for those specific requests.
      */
     public RunnerOptions autProxy(AbstractProxySettings autProxy) {
-        isAutProxySet = true;
-        this.autProxy = autProxy;
+        this.autProxy = new AutProxySettings(autProxy, null, null);
         return this;
     }
 
@@ -78,26 +74,21 @@ public class RunnerOptions {
      * If AUT proxy is set to null, the behavior will be the same as {@link #autProxy(AbstractProxySettings)}
      */
     public RunnerOptions autProxy(AbstractProxySettings autProxy, String[] domains, AutProxyMode mode) {
-        isAutProxySet = true;
-        this.autProxy = autProxy;
-        this.autProxyDomains = domains;
-        this.autProxyMode = mode;
+        this.autProxy = new AutProxySettings(autProxy, domains, mode);
         return this;
     }
 
-    public AbstractProxySettings getAutProxy() {
+    public AutProxySettings getAutProxy() {
         return autProxy;
     }
 
+    public void setAutProxy(AutProxySettings autProxy) { this.autProxy = autProxy; }
+
     public String[] getAutProxyDomains() {
-        return autProxyDomains;
+        return this.autProxy == null? null : this.autProxy.getDomains();
     }
 
     public AutProxyMode getAutProxyMode() {
-        return autProxyMode;
-    }
-
-    public boolean isAutProxySet() {
-        return isAutProxySet;
+        return this.autProxy == null? null : this.autProxy.getAutProxyMode();
     }
 }
