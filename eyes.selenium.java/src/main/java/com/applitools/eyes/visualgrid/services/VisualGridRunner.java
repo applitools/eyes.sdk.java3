@@ -248,7 +248,6 @@ public class VisualGridRunner extends EyesRunner {
     public void setProxy(AbstractProxySettings proxySettings) {
         if (proxySettings != null)
             this.runnerOptions = this.runnerOptions.proxy(proxySettings);
-            this.runnerOptions = this.runnerOptions.autProxy(new AutProxySettings(proxySettings, null, null));
     }
 
     public void setAutProxy(AutProxySettings autProxy) {
