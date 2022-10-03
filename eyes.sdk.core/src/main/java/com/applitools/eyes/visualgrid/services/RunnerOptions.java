@@ -78,17 +78,12 @@ public class RunnerOptions {
         return this;
     }
 
+    public RunnerOptions autProxy(AutProxySettings autProxy) {
+        this.autProxy = autProxy;
+        return this;
+    }
+
     public AutProxySettings getAutProxy() {
         return autProxy;
-    }
-
-    public void setAutProxy(AutProxySettings autProxy) { this.autProxy = autProxy; }
-
-    public String[] getAutProxyDomains() {
-        return this.autProxy == null? null : this.autProxy.getDomains();
-    }
-
-    public AutProxyMode getAutProxyMode() {
-        return this.autProxy == null? null : this.autProxy.getAutProxyMode();
     }
 }
