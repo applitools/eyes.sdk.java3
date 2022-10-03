@@ -12,7 +12,7 @@
     <parent>
         <artifactId>eyes-sdk-java5-parent</artifactId>
         <groupId>com.applitools</groupId>
-        <version>5.20.0</version>
+        <version>5.0.5_27_0</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
 
@@ -20,12 +20,12 @@
         <dependency>
             <groupId>com.applitools</groupId>
             <artifactId>eyes-sdk-core-java5</artifactId>
-            <version>5.20.0</version>
+            <version>5.0.5_27_0</version>
         </dependency>
         <dependency>
             <groupId>com.applitools</groupId>
             <artifactId>eyes-sdk-core-java5</artifactId>
-            <version>5.20.0</version>
+            <version>5.0.5_27_0</version>
             <type>test-jar</type>
             <scope>test</scope>
         </dependency>
