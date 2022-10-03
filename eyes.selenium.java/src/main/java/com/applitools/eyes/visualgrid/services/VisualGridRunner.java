@@ -247,10 +247,18 @@ public class VisualGridRunner extends EyesRunner {
 
     public void setProxy(AbstractProxySettings proxySettings) {
         if (proxySettings != null)
-            this.runnerOptions.setAutProxy(new AutProxySettings(proxySettings, null, null));
+            this.runnerOptions = this.runnerOptions.proxy(proxySettings);
+            this.runnerOptions = this.runnerOptions.autProxy(new AutProxySettings(proxySettings, null, null));
+    }
+
+    public void setAutProxy(AutProxySettings autProxy) {
+        this.runnerOptions = this.runnerOptions.autProxy(autProxy);
     }
 
     public AutProxySettings getAutProxy() { return this.runnerOptions.getAutProxy(); }
+
+    @Override
+    public AbstractProxySettings getProxy() { return this.runnerOptions.getProxy(); }
 
     public String getConcurrencyLog() throws JsonProcessingException {
         if (wasConcurrencyLogSent) {
