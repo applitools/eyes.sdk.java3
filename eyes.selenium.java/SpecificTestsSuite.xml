@@ -8,6 +8,7 @@
             <class name="com.applitools.eyes.AutProxyTest"/>
             <class name="com.applitools.eyes.TestPadding"/>
             <class name="com.applitools.eyes.selenium.TestCodedRegionPadding"/>
+            <class name="com.applitools.eyes.TestMatchLevel"/>
         </classes>
     </test>
 </suite>
