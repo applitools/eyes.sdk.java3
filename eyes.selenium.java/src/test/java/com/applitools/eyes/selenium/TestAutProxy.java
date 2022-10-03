@@ -10,16 +10,14 @@ import com.applitools.eyes.visualgrid.services.RunnerOptions;
 import com.applitools.eyes.visualgrid.services.VisualGridRunner;
 import org.openqa.selenium.WebDriver;
 import org.testng.Assert;
-import org.testng.annotations.AfterMethod;
-import org.testng.annotations.BeforeMethod;
-import org.testng.annotations.Test;
+import org.testng.annotations.*;
 
 public class TestAutProxy {
 
     private WebDriver driver;
     private VisualGridRunner runner;
 
-    @BeforeMethod
+    @BeforeTest
     public void setup() {
         String chromeDriverPath = System.getenv("CHROME_DRIVER_PATH");
         if(chromeDriverPath == null) throw new EyesException("CHROME_DRIVER_PATH missing");
@@ -28,7 +26,7 @@ public class TestAutProxy {
         driver = SeleniumUtils.createChromeDriver();
     }
 
-    @AfterMethod
+    @AfterTest
     public void teardown() {
         if (driver != null)
             driver.quit();
