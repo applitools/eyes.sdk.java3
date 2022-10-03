@@ -1,7 +1,7 @@
 package com.applitools.eyes.selenium.universal.mapper;
 
-import com.applitools.eyes.AbstractAutProxySettings;
 import com.applitools.eyes.AbstractProxySettings;
+import com.applitools.eyes.AutProxySettings;
 import com.applitools.eyes.selenium.universal.dto.AutProxyDto;
 import com.applitools.eyes.selenium.universal.dto.ProxyDto;
 
@@ -23,7 +23,7 @@ public class ProxyMapper {
     return proxyDto;
   }
 
-  public static AutProxyDto toAutProxyDto(AbstractAutProxySettings abstractAutProxySettings) {
+  public static AutProxyDto toAutProxyDto(AutProxySettings abstractAutProxySettings) {
     if (abstractAutProxySettings == null) {
       return null;
     }

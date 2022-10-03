@@ -45,7 +45,7 @@ public class Configuration implements IConfiguration {
     private String apiKey;
     private String serverUrl = "https://eyes.applitools.com/";
     private AbstractProxySettings proxy;
-    private AbstractAutProxySettings autProxy;
+    private AutProxySettings autProxy;
     private FailureReports failureReports;
     private AccessibilitySettings accessibilitySettings;
     private Boolean enablePatterns;
@@ -1004,11 +1004,11 @@ public class Configuration implements IConfiguration {
         return this;
     }
 
-    public void setAutProxy(AbstractAutProxySettings autProxy) {
+    public void setAutProxy(AutProxySettings autProxy) {
         this.autProxy = autProxy;
     }
 
-    public AbstractAutProxySettings getAutProxy() {
+    public AutProxySettings getAutProxy() {
         return autProxy;
     }
 }
