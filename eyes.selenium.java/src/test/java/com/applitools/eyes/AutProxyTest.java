@@ -11,18 +11,18 @@ public class AutProxyTest {
 
 
     @Test
-    public void shouldNotBeNullWhenSetInVisualGridRunnerProxy() {
+    public void shouldBeNullWhenProxySetInVisualGridRunnerProxy() {
         ProxySettings proxySettings = new ProxySettings("http://127.0.0.1", 8080);
         VisualGridRunner visualGridRunner = new VisualGridRunner();
         visualGridRunner.setProxy(proxySettings);
 
         Assert.assertNotNull(visualGridRunner.getProxy());
-        Assert.assertNotNull(visualGridRunner.getAutProxy());
+        Assert.assertNull(visualGridRunner.getAutProxy());
 
         Eyes eyes = new Eyes(visualGridRunner);
 
-        Assert.assertNotNull(eyes.getConfiguration().getAutProxy());
         Assert.assertNotNull(eyes.getConfiguration().getProxy());
+        Assert.assertNull(eyes.getConfiguration().getAutProxy());
     }
 
     @Test
@@ -46,43 +46,17 @@ public class AutProxyTest {
 
         ProxySettings proxySettings = new ProxySettings("http://127.0.0.1", 8080);
         runnerOptions = new RunnerOptions().autProxy(proxySettings);
+        
         Assert.assertNull(runnerOptions.getProxy());
-        Assert.assertNull(runnerOptions.getAutProxy().getDomains());
-        Assert.assertNull(runnerOptions.getAutProxy().getAutProxyMode());
+        Assert.assertNotNull(runnerOptions.getAutProxy());
+        Assert.assertEquals(runnerOptions.getAutProxy().getUri(), proxySettings.getUri());
+        Assert.assertEquals(runnerOptions.getAutProxy().getUsername(), proxySettings.getUsername());
+        Assert.assertEquals(runnerOptions.getAutProxy().getPassword(), proxySettings.getPassword());
+        Assert.assertEquals(runnerOptions.getAutProxy().getPort(), proxySettings.getPort());
 
         runnerOptions = new RunnerOptions().proxy(proxySettings);
         Assert.assertNotNull(runnerOptions.getProxy());
         Assert.assertNull(runnerOptions.getAutProxy());
-    }
-
-    @Test
-    public void testVisualGridRunnerAutProxy() {
-        ProxySettings proxySettings = new ProxySettings("http://127.0.0.1", 8080);
-        VisualGridRunner runner = new VisualGridRunner();
-        runner.setProxy(proxySettings);
-
-        AutProxySettings autProxy = runner.getAutProxy();
-        Assert.assertNull(autProxy.getAutProxyMode());
-        Assert.assertNull(autProxy.getDomains());
-        Assert.assertEquals(autProxy.getProxy(), proxySettings);
-
-        runner = new VisualGridRunner("autProxy");
-        runner.setProxy(proxySettings);
-        Assert.assertNull(autProxy.getAutProxyMode());
-        Assert.assertNull(autProxy.getDomains());
-        Assert.assertEquals(autProxy.getProxy(), proxySettings);
-
-        runner = new VisualGridRunner(5);
-        runner.setProxy(proxySettings);
-        Assert.assertNull(autProxy.getAutProxyMode());
-        Assert.assertNull(autProxy.getDomains());
-        Assert.assertEquals(autProxy.getProxy(), proxySettings);
-
-        runner = new VisualGridRunner(5, "autProxy");
-        runner.setProxy(proxySettings);
-        Assert.assertNull(autProxy.getAutProxyMode());
-        Assert.assertNull(autProxy.getDomains());
-        Assert.assertEquals(autProxy.getProxy(), proxySettings);
     }
 
     @Test
@@ -92,14 +66,22 @@ public class AutProxyTest {
         VisualGridRunner runner = new VisualGridRunner(options);
 
         AutProxySettings autProxy = options.getAutProxy();
+        Assert.assertNotNull(autProxy);
         Assert.assertNull(autProxy.getAutProxyMode());
         Assert.assertNull(autProxy.getDomains());
-        Assert.assertEquals(autProxy.getProxy(), proxySettings);
+        Assert.assertEquals(autProxy.getUri(), proxySettings.getUri());
+        Assert.assertEquals(autProxy.getUsername(), proxySettings.getUsername());
+        Assert.assertEquals(autProxy.getPassword(), proxySettings.getPassword());
+        Assert.assertEquals(autProxy.getPort(), proxySettings.getPort());
 
         autProxy = runner.getAutProxy();
+        Assert.assertNotNull(autProxy);
         Assert.assertNull(autProxy.getAutProxyMode());
         Assert.assertNull(autProxy.getDomains());
-        Assert.assertEquals(autProxy.getProxy(), proxySettings);
+        Assert.assertEquals(autProxy.getUri(), proxySettings.getUri());
+        Assert.assertEquals(autProxy.getUsername(), proxySettings.getUsername());
+        Assert.assertEquals(autProxy.getPassword(), proxySettings.getPassword());
+        Assert.assertEquals(autProxy.getPort(), proxySettings.getPort());
     }
 
     @Test
@@ -110,14 +92,22 @@ public class AutProxyTest {
         VisualGridRunner runner = new VisualGridRunner(options);
 
         AutProxySettings autProxy = options.getAutProxy();
+        Assert.assertNotNull(autProxy);
         Assert.assertEquals(autProxy.getAutProxyMode(), AutProxyMode.ALLOW);
         Assert.assertEquals(autProxy.getDomains(), domains);
-        Assert.assertEquals(autProxy.getProxy(), proxySettings);
+        Assert.assertEquals(autProxy.getUri(), proxySettings.getUri());
+        Assert.assertEquals(autProxy.getUsername(), proxySettings.getUsername());
+        Assert.assertEquals(autProxy.getPassword(), proxySettings.getPassword());
+        Assert.assertEquals(autProxy.getPort(), proxySettings.getPort());
 
         autProxy = runner.getAutProxy();
+        Assert.assertNotNull(autProxy);
         Assert.assertEquals(autProxy.getAutProxyMode(), AutProxyMode.ALLOW);
         Assert.assertEquals(autProxy.getDomains(), domains);
-        Assert.assertEquals(autProxy.getProxy(), proxySettings);
+        Assert.assertEquals(autProxy.getUri(), proxySettings.getUri());
+        Assert.assertEquals(autProxy.getUsername(), proxySettings.getUsername());
+        Assert.assertEquals(autProxy.getPassword(), proxySettings.getPassword());
+        Assert.assertEquals(autProxy.getPort(), proxySettings.getPort());
     }
 
     @Test
@@ -131,12 +121,18 @@ public class AutProxyTest {
         AutProxySettings autProxy = options.getAutProxy();
         Assert.assertEquals(autProxy.getAutProxyMode(), proxyMode);
         Assert.assertEquals(autProxy.getDomains(), domains);
-        Assert.assertEquals(autProxy.getProxy(), proxySettings);
+        Assert.assertEquals(autProxy.getUri(), proxySettings.getUri());
+        Assert.assertEquals(autProxy.getUsername(), proxySettings.getUsername());
+        Assert.assertEquals(autProxy.getPassword(), proxySettings.getPassword());
+        Assert.assertEquals(autProxy.getPort(), proxySettings.getPort());
 
         autProxy = runner.getAutProxy();
         Assert.assertEquals(autProxy.getAutProxyMode(), proxyMode);
         Assert.assertEquals(autProxy.getDomains(), domains);
-        Assert.assertEquals(autProxy.getProxy(), proxySettings);
+        Assert.assertEquals(autProxy.getUri(), proxySettings.getUri());
+        Assert.assertEquals(autProxy.getUsername(), proxySettings.getUsername());
+        Assert.assertEquals(autProxy.getPassword(), proxySettings.getPassword());
+        Assert.assertEquals(autProxy.getPort(), proxySettings.getPort());
     }
 
     @Test
@@ -150,12 +146,18 @@ public class AutProxyTest {
         AutProxySettings autProxy = options.getAutProxy();
         Assert.assertEquals(autProxy.getAutProxyMode(), proxyMode);
         Assert.assertEquals(autProxy.getDomains(), domains);
-        Assert.assertEquals(autProxy.getProxy(), proxySettings);
+        Assert.assertEquals(autProxy.getUri(), proxySettings.getUri());
+        Assert.assertEquals(autProxy.getUsername(), proxySettings.getUsername());
+        Assert.assertEquals(autProxy.getPassword(), proxySettings.getPassword());
+        Assert.assertEquals(autProxy.getPort(), proxySettings.getPort());
 
         autProxy = runner.getAutProxy();
         Assert.assertEquals(autProxy.getAutProxyMode(), proxyMode);
         Assert.assertEquals(autProxy.getDomains(), domains);
-        Assert.assertEquals(autProxy.getProxy(), proxySettings);
+        Assert.assertEquals(autProxy.getUri(), proxySettings.getUri());
+        Assert.assertEquals(autProxy.getUsername(), proxySettings.getUsername());
+        Assert.assertEquals(autProxy.getPassword(), proxySettings.getPassword());
+        Assert.assertEquals(autProxy.getPort(), proxySettings.getPort());
     }
 
     @Test
@@ -163,9 +165,12 @@ public class AutProxyTest {
         ProxySettings proxySettings = new ProxySettings("http://127.0.0.1", 8080);
         AutProxySettings autProxySettings = new AutProxySettings(proxySettings);
 
-        Assert.assertEquals(autProxySettings.getProxy(), proxySettings);
         Assert.assertNull(autProxySettings.getDomains());
         Assert.assertNull(autProxySettings.getAutProxyMode());
+        Assert.assertEquals(autProxySettings.getUri(), proxySettings.getUri());
+        Assert.assertEquals(autProxySettings.getUsername(), proxySettings.getUsername());
+        Assert.assertEquals(autProxySettings.getPassword(), proxySettings.getPassword());
+        Assert.assertEquals(autProxySettings.getPort(), proxySettings.getPort());
     }
 
     @Test
@@ -174,9 +179,12 @@ public class AutProxyTest {
         String[] domains = new String[]{"a.com", "b.com"};
         AutProxySettings autProxySettings = new AutProxySettings(proxySettings, domains);
 
-        Assert.assertEquals(autProxySettings.getProxy(), proxySettings);
         Assert.assertEquals(autProxySettings.getDomains(), domains);
         Assert.assertEquals(autProxySettings.getAutProxyMode(), AutProxyMode.ALLOW);
+        Assert.assertEquals(autProxySettings.getUri(), proxySettings.getUri());
+        Assert.assertEquals(autProxySettings.getUsername(), proxySettings.getUsername());
+        Assert.assertEquals(autProxySettings.getPassword(), proxySettings.getPassword());
+        Assert.assertEquals(autProxySettings.getPort(), proxySettings.getPort());
     }
 
     @Test
@@ -186,9 +194,12 @@ public class AutProxyTest {
         AutProxyMode proxyMode = AutProxyMode.ALLOW;
         AutProxySettings autProxySettings = new AutProxySettings(proxySettings, domains, proxyMode);
 
-        Assert.assertEquals(autProxySettings.getProxy(), proxySettings);
         Assert.assertEquals(autProxySettings.getDomains(), domains);
         Assert.assertEquals(autProxySettings.getAutProxyMode(), proxyMode);
+        Assert.assertEquals(autProxySettings.getUri(), proxySettings.getUri());
+        Assert.assertEquals(autProxySettings.getUsername(), proxySettings.getUsername());
+        Assert.assertEquals(autProxySettings.getPassword(), proxySettings.getPassword());
+        Assert.assertEquals(autProxySettings.getPort(), proxySettings.getPort());
     }
 
     @Test
@@ -198,48 +209,37 @@ public class AutProxyTest {
         AutProxyMode proxyMode = AutProxyMode.BLOCK;
         AutProxySettings autProxySettings = new AutProxySettings(proxySettings, domains, proxyMode);
 
-        Assert.assertEquals(autProxySettings.getProxy(), proxySettings);
         Assert.assertEquals(autProxySettings.getDomains(), domains);
         Assert.assertEquals(autProxySettings.getAutProxyMode(), proxyMode);
+        Assert.assertEquals(autProxySettings.getUri(), proxySettings.getUri());
+        Assert.assertEquals(autProxySettings.getUsername(), proxySettings.getUsername());
+        Assert.assertEquals(autProxySettings.getPassword(), proxySettings.getPassword());
+        Assert.assertEquals(autProxySettings.getPort(), proxySettings.getPort());
     }
 
     @Test
     public void testAutProxyFromConfiguration() {
         Configuration configuration = new Configuration();
-        AutProxySettings autProxySettings = new AutProxySettings(new ProxySettings("http://127.0.0.1", 8080));
+        ProxySettings proxySettings = new ProxySettings("http://127.0.0.1", 8080);
+        AutProxySettings autProxySettings = new AutProxySettings(proxySettings);
 
         configuration.setAutProxy(autProxySettings);
         Assert.assertNull(configuration.getProxy());
         Assert.assertEquals(configuration.getAutProxy(), autProxySettings);
+        Assert.assertEquals(autProxySettings.getUri(), proxySettings.getUri());
+        Assert.assertEquals(autProxySettings.getUsername(), proxySettings.getUsername());
+        Assert.assertEquals(autProxySettings.getPassword(), proxySettings.getPassword());
+        Assert.assertEquals(autProxySettings.getPort(), proxySettings.getPort());
 
         configuration = new Configuration();
-        ProxySettings proxySettings = new ProxySettings("http://127.0.0.1", 8080);
+        proxySettings = new ProxySettings("http://127.0.0.1", 8080);
 
         configuration.setProxy(proxySettings);
         Assert.assertNull(configuration.getAutProxy());
         Assert.assertEquals(configuration.getProxy(), proxySettings);
-    }
-
-    @Test
-    public void shouldAssignConfigurationWhenSetInVisualGridRunner() {
-        ProxySettings proxySettings = new ProxySettings("http://127.0.0.1", 8080);
-        VisualGridRunner visualGridRunner = new VisualGridRunner();
-        visualGridRunner.setProxy(proxySettings); // should set both proxy and autProxy
-
-        Assert.assertEquals(visualGridRunner.getProxy(), proxySettings);
-        Assert.assertNotNull(visualGridRunner.getAutProxy());
-
-        Eyes eyes = new Eyes(visualGridRunner);
-
-        Configuration configuration = eyes.getConfiguration();
-        ProxySettings proxySettings2 = new ProxySettings("http://127.0.0.2", 8080);
-        AutProxySettings autProxySettings = configuration.getAutProxy();
-        AutProxySettings autProxySettings2 = new AutProxySettings(proxySettings2);
-
-        configuration.setAutProxy(autProxySettings2); // should change to second set autProxy
-        eyes.setConfiguration(configuration);
-
-        Assert.assertEquals(eyes.getConfiguration().getAutProxy(), autProxySettings2);
-        Assert.assertNotEquals(autProxySettings, autProxySettings2);
+        Assert.assertEquals(autProxySettings.getUri(), proxySettings.getUri());
+        Assert.assertEquals(autProxySettings.getUsername(), proxySettings.getUsername());
+        Assert.assertEquals(autProxySettings.getPassword(), proxySettings.getPassword());
+        Assert.assertEquals(autProxySettings.getPort(), proxySettings.getPort());
     }
 }

@@ -1,37 +1,25 @@
 package com.applitools.eyes.selenium;
 
-import com.applitools.eyes.AutProxyMode;
-import com.applitools.eyes.AutProxySettings;
 import com.applitools.eyes.EyesException;
 import com.applitools.eyes.ProxySettings;
-import com.applitools.eyes.exceptions.DiffsFoundException;
 import com.applitools.eyes.selenium.fluent.Target;
 import com.applitools.eyes.utils.SeleniumUtils;
 import com.applitools.eyes.visualgrid.services.RunnerOptions;
 import com.applitools.eyes.visualgrid.services.VisualGridRunner;
 import org.openqa.selenium.WebDriver;
 import org.testng.Assert;
-import org.testng.annotations.*;
+import org.testng.annotations.BeforeTest;
+import org.testng.annotations.Test;
 
 import java.io.IOException;
 
 public class TestAutProxy {
-
-    private WebDriver driver;
 
     @BeforeTest
     public void setup() {
         String chromeDriverPath = System.getenv("CHROME_DRIVER_PATH");
         if(chromeDriverPath == null) throw new EyesException("CHROME_DRIVER_PATH missing");
         System.setProperty("webdriver.chrome.driver", chromeDriverPath);
-
-        driver = SeleniumUtils.createChromeDriver();
-    }
-
-    @AfterTest
-    public void teardown() {
-        if (driver != null)
-            driver.quit();
     }
 
     private void startProxyDocker() throws IOException, InterruptedException {
@@ -47,42 +35,18 @@ public class TestAutProxy {
     }
 
     @Test
-    public void shouldWorkThenFailWithAutProxy() throws IOException, InterruptedException {
-        networkFailWithProxy();
+    public void shouldWorkThenFailWithAutProxy() {
         networkAndCheckPassWithAutProxy();
-        CheckFailWithoutAutProxy();
     }
 
-    private void networkFailWithProxy() throws IOException, InterruptedException {
-        stopAllDockers();
+    private void networkAndCheckPassWithAutProxy() {
         WebDriver driver = SeleniumUtils.createChromeDriver();
-        boolean isOpenFailed = false;
-        try {
-            VisualGridRunner visualGridRunner = new VisualGridRunner(new RunnerOptions());
-            Eyes eyes = new Eyes(visualGridRunner);
-
-            eyes.setProxy(new ProxySettings("http://127.0.0.1", 8080));
-            eyes.open(driver, "ProxyTest", "proxy test");
-        } catch (Exception e){
-            isOpenFailed = true;
-        } finally {
-            driver.quit();
-        }
-        Assert.assertTrue(isOpenFailed);
-    }
-
-    private void networkAndCheckPassWithAutProxy() throws IOException, InterruptedException {
-        stopAllDockers();
-        startProxyDocker();
-        WebDriver driver = SeleniumUtils.createChromeDriver();
-        AutProxySettings autProxySettings = new AutProxySettings(new ProxySettings("http://127.0.0.1", 8080),
-                new String[]{"applitools.github.io", "github.com"}, AutProxyMode.BLOCK);
         try {
 
-            VisualGridRunner visualGridRunner = new VisualGridRunner(new RunnerOptions().autProxy(autProxySettings));
+            VisualGridRunner visualGridRunner = new VisualGridRunner(new RunnerOptions().autProxy(new ProxySettings("http://127.0.0.1", 9999)));
             Eyes eyes = new Eyes(visualGridRunner);
-
-            driver.get("https://applitools.github.io/demo/TestPages/PaddedBody/region-padding.html");
+            eyes.setConfiguration(eyes.getConfiguration().setDisableBrowserFetching(true));
+            driver.get("https://applitools.com");
 
             eyes.open(driver, "AutProxyTest", "aut proxy test");
             Assert.assertTrue(eyes.getIsOpen());
@@ -91,31 +55,5 @@ public class TestAutProxy {
         } finally {
             driver.quit();
         }
-    }
-
-    private void CheckFailWithoutAutProxy() throws IOException, InterruptedException {
-        stopAllDockers();
-        WebDriver driver = SeleniumUtils.createChromeDriver();
-        boolean isFailed = false;
-        try {
-
-            VisualGridRunner visualGridRunner = new VisualGridRunner(new RunnerOptions());
-            Eyes eyes = new Eyes(visualGridRunner);
-
-            driver.get("https://applitools.github.io/demo/TestPages/PaddedBody/region-padding.html");
-
-            eyes.open(driver, "AutProxyTest", "aut proxy test");
-            Assert.assertTrue(eyes.getIsOpen());
-            eyes.check(Target.window());
-            eyes.close();
-        } catch (DiffsFoundException e) {
-            System.out.println(e.getMessage());
-            isFailed = true;
-        }
-        finally {
-            driver.quit();
-        }
-
-        Assert.assertTrue(isFailed);
     }
 }

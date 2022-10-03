@@ -4,7 +4,6 @@
     <test name="TestBatchAPI" parallel="methods">
         <classes>
 <!--            <class name="com.applitools.eyes.selenium.TestBatchAPI"/>-->
-            <class name="com.applitools.eyes.selenium.TestAutProxy"/>
             <class name="com.applitools.eyes.AutProxyTest"/>
         </classes>
     </test>
