@@ -27,7 +27,14 @@ public enum MatchLevel {
     /**
      * Images have the same outline.
      */
+    @Deprecated
     CONTENT("Content"),
+
+    /**
+     * Images have the same outline.
+     * Formerly known as Content.
+     */
+    IGNORE_COLORS("IgnoreColors"),
 
     /**
      * Images are nearly identical.
@@ -43,6 +50,9 @@ public enum MatchLevel {
 
     MatchLevel(String name) {
         this.name = name;
+
+        if (name.equals("Content"))
+            System.out.println("The \"Content\" match level value has been deprecated, use \"IgnoreColors\" instead.");
     }
 
     public String getName() {
