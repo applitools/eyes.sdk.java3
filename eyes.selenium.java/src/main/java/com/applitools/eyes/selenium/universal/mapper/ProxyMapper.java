@@ -23,16 +23,19 @@ public class ProxyMapper {
     return proxyDto;
   }
 
-  public static AutProxyDto toAutProxyDto(AutProxySettings abstractAutProxySettings) {
-    if (abstractAutProxySettings == null) {
+  public static AutProxyDto toAutProxyDto(AutProxySettings autProxySettings) {
+    if (autProxySettings == null) {
       return null;
     }
 
     AutProxyDto autProxyDto = new AutProxyDto();
-    autProxyDto.setProxy(toProxyDto(abstractAutProxySettings.getProxy()));
-    autProxyDto.setDomains(abstractAutProxySettings.getDomains());
-    autProxyDto.setAutProxyMode(abstractAutProxySettings.getAutProxyMode() == null ?
-            null : abstractAutProxySettings.getAutProxyMode().getName());
+    autProxyDto.setUrl(autProxySettings.getUri());
+    autProxyDto.setUsername(autProxySettings.getUsername());
+    autProxyDto.setPassword(autProxySettings.getPassword());
+    autProxyDto.setIsHttpOnly(true);
+    autProxyDto.setDomains(autProxySettings.getDomains());
+    autProxyDto.setAutProxyMode(autProxySettings.getAutProxyMode() == null ?
+            null : autProxySettings.getAutProxyMode().getName());
     return autProxyDto;
   }
 }

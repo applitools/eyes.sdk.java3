@@ -1,21 +1,15 @@
 package com.applitools.eyes.selenium.universal.dto;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+
 /**
  * abstract autProxy settings dto
  */
-public class AutProxyDto {
+@JsonInclude(JsonInclude.Include.NON_NULL)
+public class AutProxyDto extends ProxyDto {
 
-    private ProxyDto proxyDto;
     private String[] domains;
     private String proxyMode;
-
-    public void setProxy(ProxyDto proxyDto) {
-        this.proxyDto = proxyDto;
-    }
-
-    public ProxyDto getProxy() {
-        return this.proxyDto;
-    }
 
     public void setDomains(String[] domains) { this.domains = domains; }
 
