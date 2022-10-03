@@ -6,6 +6,8 @@ import com.applitools.eyes.EyesException;
 import com.applitools.eyes.ProxySettings;
 import com.applitools.eyes.config.Configuration;
 import com.applitools.eyes.utils.SeleniumUtils;
+import com.applitools.eyes.visualgrid.services.RunnerOptions;
+import com.applitools.eyes.visualgrid.services.VisualGridRunner;
 import org.openqa.selenium.WebDriver;
 import org.testng.Assert;
 import org.testng.annotations.AfterMethod;
@@ -15,6 +17,7 @@ import org.testng.annotations.Test;
 public class TestAutProxy {
 
     private WebDriver driver;
+    private VisualGridRunner runner;
 
     @BeforeMethod
     public void setup() {
@@ -33,7 +36,8 @@ public class TestAutProxy {
 
     @Test
     private void shouldSucceedWithAutProxy() {
-        Eyes eyes = new Eyes();
+        runner = new VisualGridRunner();
+        Eyes eyes = new Eyes(runner);
 
         try {
 
@@ -52,7 +56,8 @@ public class TestAutProxy {
 
     @Test
     private void shouldSucceedWithAutProxyWithDomains() {
-        Eyes eyes = new Eyes();
+        runner = new VisualGridRunner();
+        Eyes eyes = new Eyes(runner);
         try {
 
             Configuration configuration = new Configuration();
@@ -72,7 +77,8 @@ public class TestAutProxy {
 
     @Test
     private void shouldSucceedWithAutProxyWithDomainsAndAutModeAllow() {
-        Eyes eyes = new Eyes();
+        runner = new VisualGridRunner();
+        Eyes eyes = new Eyes(runner);
         try {
 
             Configuration configuration = new Configuration();
@@ -92,7 +98,8 @@ public class TestAutProxy {
 
     @Test
     private void shouldSucceedWithAutProxyWithDomainsAndAutModeBlock() {
-        Eyes eyes = new Eyes();
+        runner = new VisualGridRunner();
+        Eyes eyes = new Eyes(runner);
         try {
 
             Configuration configuration = new Configuration();
@@ -103,6 +110,69 @@ public class TestAutProxy {
 
             driver.get("https://www.google.com");
             eyes.open(driver, "AutProxyTest", "autProxy with domains and block mode test");
+            Assert.assertTrue(eyes.getIsOpen());
+            eyes.close();
+        } finally {
+            eyes.abortIfNotClosed();
+        }
+    }
+
+    @Test
+    private void shouldSucceedWithRunnerAutProxy() {
+        runner = new VisualGridRunner();
+        runner.setProxy(new ProxySettings("http://127.0.0.1", 8080));
+        Eyes eyes = new Eyes(runner);
+
+        try {
+
+            eyes.open(driver, "AutProxyTest", "autProxy test");
+            Assert.assertTrue(eyes.getIsOpen());
+            eyes.close();
+        } finally {
+            eyes.abortIfNotClosed();
+        }
+    }
+
+    @Test
+    private void shouldSucceedWithRunnerAutProxyWithDomains() {
+        RunnerOptions options = new RunnerOptions().autProxy(new ProxySettings("http://127.0.0.1", 8080),
+                new String[]{"google.com"});
+        runner = new VisualGridRunner(options);
+        Eyes eyes = new Eyes(runner);
+        try {
+
+            eyes.open(driver, "AutProxyTest", "autProxy test");
+            Assert.assertTrue(eyes.getIsOpen());
+            eyes.close();
+        } finally {
+            eyes.abortIfNotClosed();
+        }
+    }
+
+    @Test
+    private void shouldSucceedWithRunnerAutProxyWithDomainsAndAutModeAllow() {
+        RunnerOptions options = new RunnerOptions().autProxy(new ProxySettings("http://127.0.0.1", 8080),
+                new String[]{"google.com"}, AutProxyMode.ALLOW);
+        runner = new VisualGridRunner(options);
+        Eyes eyes = new Eyes(runner);
+        try {
+
+            eyes.open(driver, "AutProxyTest", "autProxy test");
+            Assert.assertTrue(eyes.getIsOpen());
+            eyes.close();
+        } finally {
+            eyes.abortIfNotClosed();
+        }
+    }
+
+    @Test
+    private void shouldSucceedWithRunnerAutProxyWithDomainsAndAutModeBlock() {
+        RunnerOptions options = new RunnerOptions().autProxy(new ProxySettings("http://127.0.0.1", 8080),
+                new String[]{"google.com"}, AutProxyMode.ALLOW);
+        Eyes eyes = new Eyes(runner);
+        try {
+
+            eyes.open(driver, "AutProxyTest", "autProxy test");
             Assert.assertTrue(eyes.getIsOpen());
             eyes.close();
         } finally {
