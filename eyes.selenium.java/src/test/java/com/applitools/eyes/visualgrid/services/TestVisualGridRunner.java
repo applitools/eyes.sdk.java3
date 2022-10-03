@@ -386,7 +386,7 @@ public class TestVisualGridRunner {
         Assert.assertEquals(visualGridRunner.eyesServiceRunner.getDefaultResourcesProxy(), p2);
         Assert.assertNull(visualGridRunner.eyesServiceRunner.getCustomResourcesProxy());
 
-        visualGridRunner = new VisualGridRunner(new RunnerOptions().proxy(p1).autProxy(null));
+        visualGridRunner = new VisualGridRunner(new RunnerOptions().proxy(p1).autProxy((AutProxySettings) null));
         Assert.assertEquals(visualGridRunner.getProxy(), p1);
         Assert.assertNull(visualGridRunner.eyesServiceRunner.getDefaultResourcesProxy());
         Assert.assertNull(visualGridRunner.eyesServiceRunner.getCustomResourcesProxy());
@@ -438,7 +438,7 @@ public class TestVisualGridRunner {
         Assert.assertEquals(visualGridRunner.eyesServiceRunner.getDefaultResourcesProxy(), p2);
         Assert.assertNull(visualGridRunner.eyesServiceRunner.getCustomResourcesProxy());
 
-        visualGridRunner = new VisualGridRunner(new RunnerOptions().autProxy(null));
+        visualGridRunner = new VisualGridRunner(new RunnerOptions().autProxy((AutProxySettings) null));
         eyes = new Eyes(visualGridRunner);
         eyes.setServerConnector(new MockServerConnector());
         eyes.setProxy(p1);
