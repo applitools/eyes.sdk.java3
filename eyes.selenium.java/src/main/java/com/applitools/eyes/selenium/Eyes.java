@@ -75,6 +75,17 @@ public class Eyes implements IEyesBase {
     public Eyes(EyesRunner runner0) {
         this.runner = runner0 == null ? new ClassicRunner() : runner0;
         commandExecutor = runner.getCommandExecutor();
+
+        if (runner instanceof VisualGridRunner) {
+            AutProxySettings autProxy = ((VisualGridRunner) runner).getAutProxy();
+            AbstractProxySettings proxySettings = runner.getProxy();
+            if (autProxy != null)
+                configurationProvider.get().setAutProxy(autProxy);
+            if (proxySettings != null)
+                configurationProvider.get().setProxy(proxySettings);
+
+        }
+
     }
 
 
@@ -120,12 +131,6 @@ public class Eyes implements IEyesBase {
 
         if (viewportSize != null && !viewportSize.isEmpty()) {
             configurationProvider.get().setViewportSize(new RectangleSize(viewportSize));
-        }
-
-        if (runner instanceof VisualGridRunner) {
-            AutProxySettings autProxy = ((VisualGridRunner) runner).getAutProxy();
-            if (autProxy != null)
-                configurationProvider.get().setAutProxy(autProxy);
         }
 
         ConfigurationDto configurationDto = ConfigurationMapper
