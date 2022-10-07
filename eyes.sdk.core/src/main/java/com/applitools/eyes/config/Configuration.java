@@ -1004,8 +1004,9 @@ public class Configuration implements IConfiguration {
         return this;
     }
 
-    public void setAutProxy(AutProxySettings autProxy) {
+    public Configuration setAutProxy(AutProxySettings autProxy) {
         this.autProxy = autProxy;
+        return this;
     }
 
     public AutProxySettings getAutProxy() {
