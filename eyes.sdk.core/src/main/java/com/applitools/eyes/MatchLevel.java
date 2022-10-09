@@ -48,14 +48,12 @@ public enum MatchLevel {
 
     private final String name;
 
-    MatchLevel(String name) {
-        this.name = name;
-
-        if (name.equals("Content"))
-            System.out.println("The \"Content\" match level value has been deprecated, use \"IgnoreColors\" instead.");
-    }
+    MatchLevel(String name) { this.name = name; }
 
     public String getName() {
+        if (name.equals("Content"))
+            System.out.println("The \"Content\" match level value has been deprecated, use \"IgnoreColors\" instead.");
+
         return name;
     }
 
