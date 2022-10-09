@@ -66,7 +66,7 @@ public class Configuration implements IConfiguration {
     //Rendering Configuration
     private Boolean isRenderingConfig;
 
-    private List<RenderBrowserInfo> browsersInfo = new ArrayList<>();;
+    private List<RenderBrowserInfo> browsersInfo = new ArrayList<>();
 
     private Set<Feature> features = new HashSet<>();
 
@@ -1008,7 +1008,8 @@ public class Configuration implements IConfiguration {
         return contentInset;
     }
 
-    public void setContentInset(ContentInset contentInset) {
+    public Configuration setContentInset(ContentInset contentInset) {
         this.contentInset = contentInset;
+        return this;
     }
 }
