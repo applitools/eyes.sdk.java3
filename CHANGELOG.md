@@ -1,3 +1,8 @@
+## [5.29.0] - 2022-10-10
+### Updated
+- Blank missed frames src in ufg.
+- Fix an issue when ufg related requests were not sent through the proxy. [Trello 3022](https://trello.com/c/VpnV7BBN/)
+
 ## [5.20.0] - 2022-09-09
 ### Updated
 - Add support for AppiumBy selector. [Trello 3022](https://trello.com/c/VpnV7BBN/)
