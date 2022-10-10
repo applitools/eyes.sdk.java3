@@ -19,6 +19,7 @@ import com.applitools.eyes.selenium.universal.mapper.*;
 import com.applitools.eyes.triggers.MouseAction;
 import com.applitools.eyes.visualgrid.model.IDebugResourceWriter;
 import com.applitools.eyes.visualgrid.model.RenderingInfo;
+import com.applitools.eyes.visualgrid.services.VisualGridRunner;
 import com.applitools.utils.ArgumentGuard;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
@@ -74,6 +75,17 @@ public class Eyes implements IEyesBase {
     public Eyes(EyesRunner runner0) {
         this.runner = runner0 == null ? new ClassicRunner() : runner0;
         commandExecutor = runner.getCommandExecutor();
+
+        if (runner instanceof VisualGridRunner) {
+            AutProxySettings autProxy = ((VisualGridRunner) runner).getAutProxy();
+            AbstractProxySettings proxySettings = runner.getProxy();
+            if (autProxy != null)
+                configurationProvider.get().setAutProxy(autProxy);
+            if (proxySettings != null)
+                configurationProvider.get().setProxy(proxySettings);
+
+        }
+
     }
 
 

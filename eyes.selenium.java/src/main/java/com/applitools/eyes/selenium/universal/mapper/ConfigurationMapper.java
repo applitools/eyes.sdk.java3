@@ -27,6 +27,7 @@ public class ConfigurationMapper {
     dto.setApiKey(config.getApiKey());
     dto.setServerUrl(config.getServerUrl() == null ? null : config.getServerUrl().toString());
     dto.setProxy(ProxyMapper.toProxyDto(config.getProxy()));
+    dto.setAutProxy(ProxyMapper.toAutProxyDto(config.getAutProxy()));
     dto.setDisabled(config.getIsDisabled());
     dto.setConnectionTimeout(null);
     dto.setRemoveSession(null);

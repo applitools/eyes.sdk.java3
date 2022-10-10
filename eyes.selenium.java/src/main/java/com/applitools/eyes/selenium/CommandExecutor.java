@@ -266,7 +266,7 @@ public class CommandExecutor {
     String scenarioIdOrName;
     String appIdOrName;
 
-    if (reason == null || reason.isEmpty()) {
+    if (reason == null || reason.isEmpty() || reason.equals("internal")) {
       return;
     }
 
