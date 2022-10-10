@@ -1,3 +1,8 @@
+## [5.28.0] - 2022-10-10
+### Updated
+- Added Selenium Coded Regions Padding support [Trello 42](https://trello.com/c/PYKqJLbg)
+- Update Universal binaries to 2.16.3 [Trello 3035](https://trello.com/c/kWgtcLkT)
+
 ## [5.26.0] - 2022-09-09
 ### Updated
 - Added Appium Lazy Load support [Trello 2834](https://trello.com/c/MvCP3cer)
