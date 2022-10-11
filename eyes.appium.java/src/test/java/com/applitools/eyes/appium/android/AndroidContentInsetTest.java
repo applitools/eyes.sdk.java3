@@ -26,7 +26,7 @@ public class AndroidContentInsetTest extends AndroidTestSetup {
         capabilities.setCapability("app", "https://applitools.jfrog.io/artifactory/Examples/androidx/helper_lib/1.8.4/app-androidx-debug.apk");
         capabilities.setCapability("newCommandTimeout", 2000);
 
-        driver = new AndroidDriver<>(new URL(SL_URL), capabilities);
+        driver = new AndroidDriver(new URL(SL_URL), capabilities);
     }
 
     @Test

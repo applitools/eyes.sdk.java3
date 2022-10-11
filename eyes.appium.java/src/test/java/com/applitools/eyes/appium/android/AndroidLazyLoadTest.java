@@ -2,12 +2,12 @@ package com.applitools.eyes.appium.android;
 
 import com.applitools.eyes.LazyLoadOptions;
 import com.applitools.eyes.appium.Target;
-import io.appium.java_client.TouchAction;
+import io.appium.java_client.AppiumBy;
 import io.appium.java_client.android.AndroidDriver;
-import io.appium.java_client.touch.WaitOptions;
-import io.appium.java_client.touch.offset.PointOption;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.interactions.PointerInput;
+import org.openqa.selenium.interactions.Sequence;
 import org.openqa.selenium.remote.DesiredCapabilities;
 import org.testng.Assert;
 import org.testng.annotations.Test;
@@ -15,6 +15,7 @@ import org.testng.annotations.Test;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.time.Duration;
+import java.util.Arrays;
 
 public class AndroidLazyLoadTest extends AndroidTestSetup {
 
@@ -37,12 +38,12 @@ public class AndroidLazyLoadTest extends AndroidTestSetup {
         capabilities.setCapability("fullReset", true);
         capabilities.setCapability("newCommandTimeout", 2000);
 
-        driver = new AndroidDriver<>(new URL(SL_URL), capabilities);
+        driver = new AndroidDriver(new URL(SL_URL), capabilities);
     }
 
     @Test
     public void testHelperLibOffsetCalculation() throws InterruptedException {
-        scrollAndClickBtn();
+        gestureScrollAndClick();
         String fieldCommand = "offset_async;recycler_view;0;0;0;5000";
 
         WebElement edt = null;
@@ -72,21 +73,32 @@ public class AndroidLazyLoadTest extends AndroidTestSetup {
 
     @Test
     public void testLazyLoad() {
-        scrollAndClickBtn();
+        gestureScrollAndClick();
         eyes.open(driver, getApplicationName(), "Check LazyLoad");
         LazyLoadOptions lazyLoadOptions = new LazyLoadOptions().waitingTime(-PIXEL_5_OFFSET);
         eyes.check(Target.window().fully().lazyLoad(lazyLoadOptions).withName("lazyLoad"));
         eyes.close();
     }
 
-    public void scrollAndClickBtn() {
-        TouchAction scrollAction = new TouchAction(driver);
+    private void gestureScrollAndClick() {
+        // create new pointer action
+        PointerInput finger = new PointerInput(PointerInput.Kind.TOUCH, "finger");
+        // create new sequence of actions
+        Sequence dragNDrop = new Sequence(finger, 1);
 
-        scrollAction.press(new PointOption().withCoordinates(5, 1000)).waitAction(new WaitOptions().withDuration(Duration.ofMillis(1500)));
-        scrollAction.moveTo(new PointOption().withCoordinates(5, 100));
-        scrollAction.cancel();
-        driver.performTouchAction(scrollAction);
-        driver.findElementById("btn_large_recyclerView_activity").click();
+        // add pointer movement
+        dragNDrop.addAction(finger.createPointerMove(Duration.ofMillis(0),
+                PointerInput.Origin.viewport(), 5, 1000));
+        // pointer down - left click
+        dragNDrop.addAction(finger.createPointerDown(PointerInput.MouseButton.LEFT.asArg()));
+        // add pointer movement
+        dragNDrop.addAction(finger.createPointerMove(Duration.ofMillis(700),
+                PointerInput.Origin.viewport(),5, 100));
+        // pointer up - release left click
+        dragNDrop.addAction(finger.createPointerUp(PointerInput.MouseButton.LEFT.asArg()));
+        driver.perform(Arrays.asList(dragNDrop));
+
+        driver.findElement(AppiumBy.id("btn_large_recyclerView_activity")).click();
     }
 
 }

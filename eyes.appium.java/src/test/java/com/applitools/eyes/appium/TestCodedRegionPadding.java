@@ -5,6 +5,7 @@ import com.applitools.eyes.Region;
 import com.applitools.eyes.TestResults;
 import com.applitools.eyes.metadata.SessionResults;
 import com.applitools.eyes.utils.TestUtils;
+import io.appium.java_client.AppiumBy;
 import io.appium.java_client.MobileBy;
 import io.appium.java_client.android.AndroidDriver;
 import org.openqa.selenium.WebElement;
@@ -43,7 +44,7 @@ public class TestCodedRegionPadding {
         capabilities.setCapability("app", "https://applitools.jfrog.io/artifactory/Examples/androidx/helper_lib/1.8.5/app-androidx-debug.apk");
         capabilities.setCapability("newCommandTimeout", 2000);
 
-        driver = new AndroidDriver<>(new URL(URL), capabilities);
+        driver = new AndroidDriver(new URL(URL), capabilities);
     }
 
     @AfterMethod
@@ -57,12 +58,12 @@ public class TestCodedRegionPadding {
     public void testRegionPadding() throws InterruptedException {
         eyes.open(driver, "Java Appium - Android", "Test Regions Padding");
 
-        driver.findElementById("btn_two_fragments_activity").click();
+        driver.findElement(AppiumBy.id("btn_two_fragments_activity")).click();
         Thread.sleep(1000);
-        WebElement item1 = driver.findElement(MobileBy.id("id_2"));
-        WebElement item2 = driver.findElement(MobileBy.id("id_4"));
-        WebElement item3 = driver.findElement(MobileBy.id("id_6"));
-        WebElement item4 = driver.findElement(MobileBy.id("id_8"));
+        WebElement item1 = driver.findElement(AppiumBy.id("id_2"));
+        WebElement item2 = driver.findElement(AppiumBy.id("id_4"));
+        WebElement item3 = driver.findElement(AppiumBy.id("id_6"));
+        WebElement item4 = driver.findElement(AppiumBy.id("id_8"));
 
         eyes.check(Target.window()
 //                .ignore(item1, new Padding().setBottom(20))
