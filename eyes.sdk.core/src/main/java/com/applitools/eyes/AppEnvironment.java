@@ -4,29 +4,47 @@ package com.applitools.eyes;
  * The environment in which the application under test is executing.
  */
 public class AppEnvironment {
-    private String inferred;
+
+    /**
+     * the OS name.
+     * former "hostOs".
+     */
     private String os;
-    private String hostingApp;
-    private RectangleSize displaySize;
-    private String deviceInfo;
+
+    /**
+     * the OS info.
+     * former "hostOsInfo".
+     */
     private String osInfo;
+
+    /**
+     * the hosting app name.
+     * former "hostApp".
+     */
+    private String hostingApp;
+
+    /**
+     * the hosting app info.
+     * former "hostAppInfo".
+     */
     private String hostingAppInfo;
+
+    /**
+     * the device name.
+     * former "deviceInfo".
+     */
+    private String deviceName;
+
+    /**
+     * the viewport size.
+     */
+    private RectangleSize viewportSize;
 
     /**
      * Creates a new AppEnvironment instance.
      */
     public AppEnvironment() {
     }
-
-    /**
-     * Creates a new AppEnvironment instance.
-     *
-     * @param inferred the inferred environment information.
-     */
-    public AppEnvironment(String inferred) {
-        this.inferred = inferred;
-    }
-
 
     /**
      * Creates a new AppEnvironment instance.
@@ -47,36 +65,18 @@ public class AppEnvironment {
      *
      * @param os             the OS hosting the application under test or {@code null} if                    unknown.
      * @param hostingApp     the application hosting the application under test or {@code null}                    if unknown.
-     * @param displaySize    the display size of the application or {@code null} if unknown.
-     * @param deviceInfo     specifies
+     * @param viewportSize    the display size of the application or {@code null} if unknown.
+     * @param deviceName     specifies
      * @param osInfo         the os info
      * @param hostingAppInfo the hosting app info
      */
-    public AppEnvironment(String os, String hostingApp, RectangleSize displaySize, String deviceInfo, String osInfo, String hostingAppInfo) {
+    public AppEnvironment(String os, String hostingApp, RectangleSize viewportSize, String deviceName, String osInfo, String hostingAppInfo) {
         this.os = os;
         this.hostingApp = hostingApp;
-        this.displaySize = displaySize;
-        this.deviceInfo = deviceInfo;
+        this.viewportSize = viewportSize;
+        this.deviceName = deviceName;
         this.osInfo = osInfo;
         this.hostingAppInfo = hostingAppInfo;
-    }
-
-    /**
-     * Gets inferred.
-     *
-     * @return the information inferred from the execution environment or {@code null} if no information could be inferred.
-     */
-    public String getInferred() {
-        return inferred;
-    }
-
-    /**
-     * Sets inferred.
-     *
-     * @param inferred -  the inferred environment information.
-     */
-    public void setInferred(String inferred) {
-        this.inferred = inferred;
     }
 
     /**
@@ -122,7 +122,7 @@ public class AppEnvironment {
      * @return the display size of the application or {@code null} if unknown.
      */
     public RectangleSize getDisplaySize() {
-        return displaySize;
+        return viewportSize;
     }
 
     /**
@@ -131,14 +131,14 @@ public class AppEnvironment {
      * @param size -  the display size of the application or {@code null} if unknown.
      */
     public void setDisplaySize(RectangleSize size) {
-        this.displaySize = size;
+        this.viewportSize = size;
     }
 
     @Override
     public String toString() {
         return "[os = " + (os == null ? "?" : "'" + os + "'") + " hostingApp = "
                 + (hostingApp == null ? "?" : "'" + hostingApp + "'")
-                + " displaySize = " + displaySize + "]";
+                + " displaySize = " + viewportSize + "]";
     }
 
     /**
@@ -147,7 +147,7 @@ public class AppEnvironment {
      * @return the device info
      */
     public String getDeviceInfo() {
-        return deviceInfo;
+        return deviceName;
     }
 
     /**
@@ -156,7 +156,7 @@ public class AppEnvironment {
      * @param deviceInfo the device info
      */
     public void setDeviceInfo(String deviceInfo) {
-        this.deviceInfo =  deviceInfo != null  ? deviceInfo : "Desktop";
+        this.deviceName =  deviceInfo != null  ? deviceInfo : "Desktop";
     }
 
     /**

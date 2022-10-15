@@ -1103,7 +1103,7 @@ public abstract class EyesBase implements IEyesBase {
             appEnv.setDeviceInfo(getConfigurationInstance().getDeviceInfo());
         }
 
-        appEnv.setInferred(getInferredEnvironment());
+//        appEnv.setInferred(getInferredEnvironment());
         appEnv.setDisplaySize(getConfigurationInstance().getViewportSize());
         return appEnv;
     }
