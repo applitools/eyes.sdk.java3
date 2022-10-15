@@ -14,18 +14,24 @@ public class OpenEyes {
   private Reference manager;
 
   /**
-   * reference to the driver that will be used by the server in order to perform automation
+   * the driver target
    */
-  private DriverDto driver;
+  private DriverTargetDto target;
+
+  /**
+   * the OpenSettings object that will be associated with a new eyes object
+   */
+  private OpenSettingsDto settings;
 
   /**
    * configuration object that will be associated with a new eyes object, it could be overridden later
    */
   private ConfigurationDto config;
 
-  public OpenEyes(Reference manager, DriverDto driver, ConfigurationDto config) {
+  public OpenEyes(Reference manager, DriverTargetDto target, OpenSettingsDto settings, ConfigurationDto config) {
     this.manager = manager;
-    this.driver = driver;
+    this.target = target;
+    this.settings = settings;
     this.config = config;
   }
 
@@ -37,13 +43,17 @@ public class OpenEyes {
     this.manager = manager;
   }
 
-  public DriverDto getDriver() {
-    return driver;
+  public DriverTargetDto getTarget() {
+    return target;
   }
 
-  public void setDriver(DriverDto driver) {
-    this.driver = driver;
+  public void setTarget(DriverTargetDto target) {
+    this.target = target;
   }
+
+  public OpenSettingsDto getSettings() { return settings; }
+
+  public void setSettings(OpenSettingsDto settings) { this.settings = settings; }
 
   public ConfigurationDto getConfig() {
     return config;
@@ -57,7 +67,8 @@ public class OpenEyes {
   public String toString() {
     return "OpenEyes{" +
         "manager=" + manager +
-        ", driver=" + driver +
+        ", target=" + target +
+        ", settings=" + settings +
         ", config=" + config +
         '}';
   }
