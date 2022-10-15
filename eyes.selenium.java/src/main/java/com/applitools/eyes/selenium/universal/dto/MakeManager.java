@@ -19,14 +19,20 @@ public class MakeManager {
   private Integer concurrency;
 
   /**
-   * isLegacy
+   * legacy concurrency
    */
-  private Boolean isLegacy;
+  private Integer legacyConcurrency;
 
-  public MakeManager(String type, Integer concurrency, Boolean legacy) {
+  /**
+   * agent ID
+   */
+  private String agentId;
+
+  public MakeManager(String type, Integer concurrency, Integer legacyConcurrency, String agentId) {
     this.type = type;
     this.concurrency = concurrency;
-    this.isLegacy = legacy;
+    this.legacyConcurrency = legacyConcurrency;
+    this.agentId = agentId;
   }
 
   public String getType() {
@@ -45,12 +51,20 @@ public class MakeManager {
     this.concurrency = concurrency;
   }
 
-  public Boolean getIsLegacy() {
-    return isLegacy;
+  public Integer getLegacyConcurrency() {
+    return legacyConcurrency;
   }
 
-  public void setIsLegacy(Boolean isLegacy) {
-    this.isLegacy = isLegacy;
+  public void setLegacyConcurrency(Integer legacyConcurrency) {
+    this.legacyConcurrency = legacyConcurrency;
+  }
+
+  public String getAgentId() {
+    return agentId;
+  }
+
+  public void setAgentId(String agentId) {
+    this.agentId = agentId;
   }
 
   @Override
@@ -58,7 +72,8 @@ public class MakeManager {
     return "MakeManager{" +
         "type='" + type + '\'' +
         ", concurrency=" + concurrency +
-        ", isLegacy=" + isLegacy +
+        ", legacyConcurrency=" + legacyConcurrency +
+        ", agentId=" + agentId +
         '}';
   }
 }
