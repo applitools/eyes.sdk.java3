@@ -5,7 +5,7 @@ import com.applitools.eyes.selenium.Reference;
 /**
  * extract text regions dto
  */
-public class ExtractTextRegionsDto {
+public class LocateTextDto {
 
   /**
    * reference received from "Core.openEyes" command
@@ -13,20 +13,25 @@ public class ExtractTextRegionsDto {
   private Reference eyes;
 
   /**
+   * the target
+   */
+  private ITargetDto target;
+
+  /**
    * ocr search settings
    */
   private OCRSearchSettingsDto settings;
-
 
   /**
    * configuration object that will be associated with a new eyes object, it could be overridden later
    */
   private ConfigurationDto config;
 
-  public ExtractTextRegionsDto(Reference eyes, OCRSearchSettingsDto settings, ConfigurationDto config) {
+  public LocateTextDto(Reference eyes, ITargetDto target, OCRSearchSettingsDto settings, ConfigurationDto config) {
     this.eyes = eyes;
     this.settings = settings;
     this.config = config;
+    this.target = target;
   }
 
   public ConfigurationDto getConfig() {
