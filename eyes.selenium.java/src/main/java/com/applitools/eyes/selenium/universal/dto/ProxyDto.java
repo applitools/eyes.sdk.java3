@@ -10,7 +10,6 @@ public class ProxyDto {
   private String url;
   private String username;
   private String password;
-  private Boolean isHttpOnly;
 
   public String getUrl() {
     return url;
@@ -34,13 +33,5 @@ public class ProxyDto {
 
   public void setPassword(String password) {
     this.password = password;
-  }
-
-  public Boolean getIsHttpOnly() {
-    return isHttpOnly;
-  }
-
-  public void setIsHttpOnly(Boolean isHttpOnly) {
-    this.isHttpOnly = isHttpOnly;
   }
 }

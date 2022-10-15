@@ -19,7 +19,6 @@ public class ProxyMapper {
     proxyDto.setUrl(abstractProxySettings.getUri());
     proxyDto.setUsername(abstractProxySettings.getUsername());
     proxyDto.setPassword(abstractProxySettings.getPassword());
-    proxyDto.setIsHttpOnly(true);
     return proxyDto;
   }
 
@@ -32,7 +31,6 @@ public class ProxyMapper {
     autProxyDto.setUrl(autProxySettings.getUri());
     autProxyDto.setUsername(autProxySettings.getUsername());
     autProxyDto.setPassword(autProxySettings.getPassword());
-    autProxyDto.setIsHttpOnly(true);
     autProxyDto.setDomains(autProxySettings.getDomains());
     autProxyDto.setAutProxyMode(autProxySettings.getAutProxyMode() == null ?
             null : autProxySettings.getAutProxyMode().getName());
