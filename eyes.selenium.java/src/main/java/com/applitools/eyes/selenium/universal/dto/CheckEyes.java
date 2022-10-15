@@ -12,6 +12,8 @@ public class CheckEyes {
    */
   private Reference eyes;
 
+  private ITargetDto target;
+
   /**
    * check settings
    */
@@ -22,8 +24,9 @@ public class CheckEyes {
    */
   private ConfigurationDto config;
 
-  public CheckEyes(Reference eyes, CheckSettingsDto settings, ConfigurationDto config) {
+  public CheckEyes(Reference eyes, ITargetDto target, CheckSettingsDto settings, ConfigurationDto config) {
     this.eyes = eyes;
+    this.target = target;
     this.settings = settings;
     this.config = config;
   }
@@ -51,4 +54,8 @@ public class CheckEyes {
   public void setConfig(ConfigurationDto config) {
     this.config = config;
   }
+
+  public ITargetDto getTarget() { return target; }
+
+  public void setTarget(ITargetDto target) { this.target = target; }
 }

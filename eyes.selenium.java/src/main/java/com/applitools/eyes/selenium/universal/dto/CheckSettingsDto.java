@@ -12,122 +12,122 @@ import com.fasterxml.jackson.annotation.JsonInclude;
  */
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class CheckSettingsDto {
-  // CheckSettings
-  private String name;
-  private Boolean disableBrowserFetching;
-  private Object layoutBreakpoints;
-  private Map<String, Object> visualGridOptions;
-  private Map<String, String> hooks;
 
-  private String renderId;
-  private String variationGroupId;
-  private Integer timeout;
+  // screenshot
+  private TRegion region;
+  private Object frames;
+  private Boolean fully;
+  private TRegion scrollRootElement;
+  private String stitchMode; // "CSS" | "Scroll"
+  private Boolean hideScrollBars;
+  private Boolean hideCaret;
+  private Integer overlap;
   private Integer waitBeforeCapture;
-
-  // MatchSettings
-  private ExactMatchSettingsDto exact;
-  private String matchLevel;
-  private Boolean sendDom;
-  private Boolean useDom;
-  private Boolean enablePatterns;
-  private Boolean ignoreCaret;
+  private LazyLoadOptions lazyLoad;
   private Boolean ignoreDisplacements;
-  private AccessibilitySettingsDto accessibilitySettings;
+  private NormalizationDto normalization;
+  private Map<String, String> debugImages;
 
+  // check
+  private String name;
+  private String pageId;
   private List<CodedRegionReference> ignoreRegions;
   private List<CodedRegionReference> layoutRegions;
   private List<CodedRegionReference> strictRegions;
   private List<CodedRegionReference> contentRegions;
-
   private Object floatingRegions;
   private Object accessibilityRegions;
+  private AccessibilitySettingsDto accessibilitySettings;
+  private String matchLevel;
+  private Integer retryTimeout;
+  private Boolean sendDom;
+  private Boolean useDom;
+  private Boolean enablePatterns;
+  private Boolean ignoreCaret;
+  private Map<String, Object> ufgOptions;
+  private Object layoutBreakpoints;
+  private Boolean disableBrowserFetching;
+  private AutProxyDto autProxy;
+  private Map<String, String> hooks;
 
-  // ScreenshotSettings
-  private TRegion region;
-  private Object frames;
-  private TRegion scrollRootElement;
-  private Boolean fully;
-  private String pageId;
-  private LazyLoadOptions lazyLoad;
-
-  public String getName() {
-    return name;
+  public TRegion getRegion() {
+    return region;
   }
 
-  public void setName(String name) {
-    this.name = name;
+  public void setRegion(TRegion region) {
+    this.region = region;
   }
 
-  public Object getLayoutBreakpoints() {
-    return layoutBreakpoints;
+  public Object getFrames() {
+    return frames;
   }
 
-  public void setLayoutBreakpoints(Object layoutBreakpoints) {
-    this.layoutBreakpoints = layoutBreakpoints;
+  public void setFrames(Object frames) {
+    this.frames = frames;
   }
 
-  public Map<String, String> getHooks() {
-    return hooks;
+  public Boolean getFully() {
+    return fully;
   }
 
-  public void setHooks(Map<String, String> hooks) {
-    this.hooks = hooks;
+  public void setFully(Boolean fully) {
+    this.fully = fully;
   }
 
-  public String getVariationGroupId() {
-    return variationGroupId;
+  public TRegion getScrollRootElement() {
+    return scrollRootElement;
   }
 
-  public void setVariationGroupId(String variationGroupId) {
-    this.variationGroupId = variationGroupId;
+  public void setScrollRootElement(TRegion scrollRootElement) {
+    this.scrollRootElement = scrollRootElement;
   }
 
-  public Integer getTimeout() {
-    return timeout;
+  public String getStitchMode() {
+    return stitchMode;
   }
 
-  public void setTimeout(Integer timeout) {
-    this.timeout = timeout;
+  public void setStitchMode(String stitchMode) {
+    this.stitchMode = stitchMode;
   }
 
-  public String getMatchLevel() {
-    return matchLevel;
+  public Boolean getHideScrollBars() {
+    return hideScrollBars;
   }
 
-  public void setMatchLevel(String matchLevel) {
-    this.matchLevel = matchLevel;
+  public void setHideScrollBars(Boolean hideScrollBars) {
+    this.hideScrollBars = hideScrollBars;
   }
 
-  public Boolean getSendDom() {
-    return sendDom;
+  public Boolean getHideCaret() {
+    return hideCaret;
   }
 
-  public void setSendDom(Boolean sendDom) {
-    this.sendDom = sendDom;
+  public void setHideCaret(Boolean hideCaret) {
+    this.hideCaret = hideCaret;
   }
 
-  public Boolean getUseDom() {
-    return useDom;
+  public Integer getOverlap() {
+    return overlap;
   }
 
-  public void setUseDom(Boolean useDom) {
-    this.useDom = useDom;
+  public void setOverlap(Integer overlap) {
+    this.overlap = overlap;
   }
 
-  public Boolean getEnablePatterns() {
-    return enablePatterns;
+  public Integer getWaitBeforeCapture() {
+    return waitBeforeCapture;
   }
 
-  public void setEnablePatterns(Boolean enablePatterns) {
-    this.enablePatterns = enablePatterns;
+  public void setWaitBeforeCapture(Integer waitBeforeCapture) {
+    this.waitBeforeCapture = waitBeforeCapture;
   }
 
-  public Boolean getIgnoreCaret() {
-    return ignoreCaret;
+  public LazyLoadOptions getLazyLoad() {
+    return lazyLoad;
   }
 
-  public void setIgnoreCaret(Boolean ignoreCaret) {
-    this.ignoreCaret = ignoreCaret;
+  public void setLazyLoad(LazyLoadOptions lazyLoad) {
+    this.lazyLoad = lazyLoad;
   }
 
   public Boolean getIgnoreDisplacements() {
@@ -138,45 +138,36 @@ public class CheckSettingsDto {
     this.ignoreDisplacements = ignoreDisplacements;
   }
 
-  public Boolean getDisableBrowserFetching() {
-    return disableBrowserFetching;
+  public NormalizationDto getNormalization() {
+    return normalization;
   }
 
-  public void setDisableBrowserFetching(Boolean disableBrowserFetching) {
-    this.disableBrowserFetching = disableBrowserFetching;
+  public void setNormalization(NormalizationDto normalization) {
+    this.normalization = normalization;
   }
 
-  public String getRenderId() {
-    return renderId;
+  public Map<String, String> getDebugImages() {
+    return debugImages;
   }
 
-  public void setRenderId(String renderId) {
-    this.renderId = renderId;
+  public void setDebugImages(Map<String, String> debugImages) {
+    this.debugImages = debugImages;
   }
 
-
-  public Boolean getFully() {
-    return fully;
+  public String getName() {
+    return name;
   }
 
-  public void setFully(Boolean fully) {
-    this.fully = fully;
+  public void setName(String name) {
+    this.name = name;
   }
 
-  public ExactMatchSettingsDto getExact() {
-    return exact;
+  public String getPageId() {
+    return pageId;
   }
 
-  public void setExact(ExactMatchSettingsDto exact) {
-    this.exact = exact;
-  }
-
-  public AccessibilitySettingsDto getAccessibilitySettings() {
-    return accessibilitySettings;
-  }
-
-  public void setAccessibilitySettings(AccessibilitySettingsDto accessibilitySettings) {
-    this.accessibilitySettings = accessibilitySettings;
+  public void setPageId(String pageId) {
+    this.pageId = pageId;
   }
 
   public List<CodedRegionReference> getIgnoreRegions() {
@@ -211,43 +202,6 @@ public class CheckSettingsDto {
     this.contentRegions = contentRegions;
   }
 
-  public Object getFrames() {
-    return frames;
-  }
-
-  public void setFrames(List<ContextReferenceDto> frames) {
-    this.frames = frames;
-  }
-
-
-  public void setAccessibilityRegions(List<TAccessibilityRegion> accessibilityRegions) {
-    this.accessibilityRegions = accessibilityRegions;
-  }
-
-  public TRegion getRegion() {
-    return region;
-  }
-
-  public void setRegion(TRegion region) {
-    this.region = region;
-  }
-
-  public TRegion getScrollRootElement() {
-    return scrollRootElement;
-  }
-
-  public void setScrollRootElement(TRegion scrollRootElement) {
-    this.scrollRootElement = scrollRootElement;
-  }
-
-  public Map<String, Object> getVisualGridOptions() {
-    return visualGridOptions;
-  }
-
-  public void setVisualGridOptions(Map<String, Object> visualGridOptions) {
-    this.visualGridOptions = visualGridOptions;
-  }
-
   public Object getFloatingRegions() {
     return floatingRegions;
   }
@@ -264,31 +218,99 @@ public class CheckSettingsDto {
     this.accessibilityRegions = accessibilityRegions;
   }
 
-  public void setFrames(Object frames) {
-    this.frames = frames;
+  public AccessibilitySettingsDto getAccessibilitySettings() {
+    return accessibilitySettings;
   }
 
-  public String getPageId() {
-    return pageId;
+  public void setAccessibilitySettings(AccessibilitySettingsDto accessibilitySettings) {
+    this.accessibilitySettings = accessibilitySettings;
   }
 
-  public void setPageId(String pageId) {
-    this.pageId = pageId;
+  public String getMatchLevel() {
+    return matchLevel;
   }
 
-  public LazyLoadOptions getLazyLoad() {
-    return lazyLoad;
+  public void setMatchLevel(String matchLevel) {
+    this.matchLevel = matchLevel;
   }
 
-  public void setLazyLoad(LazyLoadOptions lazyLoad) {
-    this.lazyLoad = lazyLoad;
+  public Integer getRetryTimeout() {
+    return retryTimeout;
   }
 
-  public Integer getWaitBeforeCapture() {
-    return waitBeforeCapture;
+  public void setRetryTimeout(Integer retryTimeout) {
+    this.retryTimeout = retryTimeout;
   }
 
-  public void setWaitBeforeCapture(Integer waitBeforeCapture) {
-    this.waitBeforeCapture = waitBeforeCapture;
+  public Boolean getSendDom() {
+    return sendDom;
+  }
+
+  public void setSendDom(Boolean sendDom) {
+    this.sendDom = sendDom;
+  }
+
+  public Boolean getUseDom() {
+    return useDom;
+  }
+
+  public void setUseDom(Boolean useDom) {
+    this.useDom = useDom;
+  }
+
+  public Boolean getEnablePatterns() {
+    return enablePatterns;
+  }
+
+  public void setEnablePatterns(Boolean enablePatterns) {
+    this.enablePatterns = enablePatterns;
+  }
+
+  public Boolean getIgnoreCaret() {
+    return ignoreCaret;
+  }
+
+  public void setIgnoreCaret(Boolean ignoreCaret) {
+    this.ignoreCaret = ignoreCaret;
+  }
+
+  public Map<String, Object> getUfgOptions() {
+    return ufgOptions;
+  }
+
+  public void setUfgOptions(Map<String, Object> ufgOptions) {
+    this.ufgOptions = ufgOptions;
+  }
+
+  public Object getLayoutBreakpoints() {
+    return layoutBreakpoints;
+  }
+
+  public void setLayoutBreakpoints(Object layoutBreakpoints) {
+    this.layoutBreakpoints = layoutBreakpoints;
+  }
+
+  public Boolean getDisableBrowserFetching() {
+    return disableBrowserFetching;
+  }
+
+  public void setDisableBrowserFetching(Boolean disableBrowserFetching) {
+    this.disableBrowserFetching = disableBrowserFetching;
+  }
+
+  public AutProxyDto getAutProxy() {
+    return autProxy;
+  }
+
+  public void setAutProxy(AutProxyDto autProxy) {
+    this.autProxy = autProxy;
+  }
+
+  public Map<String, String> getHooks() {
+    return hooks;
+  }
+
+  public void setHooks(Map<String, String> hooks) {
+    this.hooks = hooks;
   }
 }
