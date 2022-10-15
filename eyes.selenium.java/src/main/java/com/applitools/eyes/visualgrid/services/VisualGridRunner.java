@@ -85,7 +85,8 @@ public class VisualGridRunner extends EyesRunner {
         super(BASE_AGENT_ID, VERSION);
         this.testConcurrency = new TestConcurrency();
         this.runnerOptions = new RunnerOptions().testConcurrency(testConcurrency.actualConcurrency);
-        managerRef = commandExecutor.coreMakeManager(ManagerType.VISUAL_GRID.value, testConcurrency.actualConcurrency, testConcurrency.isLegacy);
+        //TODO - verify if actualConcurrency is the right argument for "legacyConcurrency"
+        managerRef = commandExecutor.coreMakeManager(ManagerType.VISUAL_GRID.value, testConcurrency.actualConcurrency, testConcurrency.actualConcurrency, BASE_AGENT_ID);
     }
 
     public VisualGridRunner(int testConcurrency) {
@@ -96,7 +97,8 @@ public class VisualGridRunner extends EyesRunner {
         super(BASE_AGENT_ID, VERSION);
         this.testConcurrency = new TestConcurrency(testConcurrency0, true);
         this.runnerOptions = new RunnerOptions().testConcurrency(testConcurrency.actualConcurrency);
-        managerRef = commandExecutor.coreMakeManager(ManagerType.VISUAL_GRID.value, testConcurrency.actualConcurrency, testConcurrency.isLegacy);
+        //TODO - verify if actualConcurrency is the right argument for "legacyConcurrency"
+        managerRef = commandExecutor.coreMakeManager(ManagerType.VISUAL_GRID.value, testConcurrency.actualConcurrency, testConcurrency.actualConcurrency, BASE_AGENT_ID);
     }
 
     public VisualGridRunner(RunnerOptions runnerOptions) {
@@ -109,21 +111,24 @@ public class VisualGridRunner extends EyesRunner {
         this.runnerOptions = runnerOptions;
         int testConcurrency0 = runnerOptions.getTestConcurrency() == null ? DEFAULT_CONCURRENCY : runnerOptions.getTestConcurrency();
         this.testConcurrency = new TestConcurrency(testConcurrency0, false);
-        managerRef = commandExecutor.coreMakeManager(ManagerType.VISUAL_GRID.value, testConcurrency.actualConcurrency, testConcurrency.isLegacy);
+        //TODO - verify if actualConcurrency is the right argument for "legacyConcurrency"
+        managerRef = commandExecutor.coreMakeManager(ManagerType.VISUAL_GRID.value, testConcurrency.actualConcurrency, testConcurrency.actualConcurrency, BASE_AGENT_ID);
     }
 
     protected VisualGridRunner(String baseAgentId, String version) {
         super(baseAgentId, version);
         this.testConcurrency = new TestConcurrency();
         this.runnerOptions = new RunnerOptions().testConcurrency(testConcurrency.actualConcurrency);
-        managerRef = commandExecutor.coreMakeManager(ManagerType.VISUAL_GRID.value, testConcurrency.actualConcurrency, testConcurrency.isLegacy);
+        //TODO - verify if actualConcurrency is the right argument for "legacyConcurrency"
+        managerRef = commandExecutor.coreMakeManager(ManagerType.VISUAL_GRID.value, testConcurrency.actualConcurrency, testConcurrency.actualConcurrency, BASE_AGENT_ID);
     }
 
     protected VisualGridRunner(int testConcurrency0, String baseAgentId, String version) {
         super(baseAgentId, version);
         this.testConcurrency = new TestConcurrency(testConcurrency0, true);
         this.runnerOptions = new RunnerOptions().testConcurrency(testConcurrency.actualConcurrency);
-        managerRef = commandExecutor.coreMakeManager(ManagerType.VISUAL_GRID.value, testConcurrency.actualConcurrency, testConcurrency.isLegacy);
+        //TODO - verify if actualConcurrency is the right argument for "legacyConcurrency"
+        managerRef = commandExecutor.coreMakeManager(ManagerType.VISUAL_GRID.value, testConcurrency.actualConcurrency, testConcurrency.actualConcurrency, BASE_AGENT_ID);
     }
 
     protected VisualGridRunner(RunnerOptions runnerOptions,  String baseAgentId, String version) {
@@ -132,7 +137,8 @@ public class VisualGridRunner extends EyesRunner {
         this.runnerOptions = runnerOptions;
         int testConcurrency0 = runnerOptions.getTestConcurrency() == null ? DEFAULT_CONCURRENCY : runnerOptions.getTestConcurrency();
         this.testConcurrency = new TestConcurrency(testConcurrency0, false);
-        managerRef = commandExecutor.coreMakeManager(ManagerType.VISUAL_GRID.value, testConcurrency.actualConcurrency, testConcurrency.isLegacy);
+        //TODO - verify if actualConcurrency is the right argument for "legacyConcurrency"
+        managerRef = commandExecutor.coreMakeManager(ManagerType.VISUAL_GRID.value, testConcurrency.actualConcurrency, testConcurrency.actualConcurrency, BASE_AGENT_ID);
     }
 
     private void init(String suiteName) {

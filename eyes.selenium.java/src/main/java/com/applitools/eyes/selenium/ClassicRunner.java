@@ -42,7 +42,8 @@ public class ClassicRunner extends EyesRunner {
 
   protected ClassicRunner(String baseAgentId, String version) {
     super(baseAgentId, version);
-    managerRef = commandExecutor.coreMakeManager(ManagerType.CLASSIC.value, null, null);
+    //TODO - check if baseAgentId is the correct agentId here
+    managerRef = commandExecutor.coreMakeManager(ManagerType.CLASSIC.value, null, null, baseAgentId);
   }
 
   @Override
