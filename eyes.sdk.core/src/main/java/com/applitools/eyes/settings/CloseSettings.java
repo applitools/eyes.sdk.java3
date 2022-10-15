@@ -1,5 +1,8 @@
 package com.applitools.eyes.settings;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class CloseSettings implements ICloseSettings {
 
     private Boolean throwErr;
