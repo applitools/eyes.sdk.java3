@@ -2,8 +2,10 @@ package com.applitools.eyes.selenium.universal.mapper;
 
 import java.lang.reflect.Field;
 
+import com.applitools.eyes.AbstractProxySettings;
 import com.applitools.eyes.EyesException;
 import com.applitools.eyes.selenium.universal.dto.DriverDto;
+import com.applitools.eyes.selenium.universal.dto.DriverTargetDto;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.remote.HttpCommandExecutor;
 import org.openqa.selenium.remote.RemoteWebDriver;
@@ -100,4 +102,19 @@ public class DriverMapper {
       throw  new Exception("Cannot extract remote url from webdriver");
   }
 
+    public static DriverTargetDto toDriverTargetDto(WebDriver driver, AbstractProxySettings proxySettings) {
+        if (driver == null) {
+            return null;
+        }
+
+        RemoteWebDriver remoteDriver = (RemoteWebDriver) driver;
+
+        DriverTargetDto driverTargetDto = new DriverTargetDto();
+        driverTargetDto.setSessionId(remoteDriver.getSessionId().toString());
+        driverTargetDto.setServerUrl(getRemoteServerUrl(remoteDriver));
+        driverTargetDto.setCapabilities(remoteDriver.getCapabilities().asMap());
+        driverTargetDto.setProxySettings(proxySettings);
+
+        return driverTargetDto;
+    }
 }
