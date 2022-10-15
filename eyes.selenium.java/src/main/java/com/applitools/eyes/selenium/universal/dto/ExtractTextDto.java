@@ -13,11 +13,15 @@ public class ExtractTextDto {
    */
   private Reference eyes;
 
+  /**
+   * the target
+   */
+  private ITargetDto target;
 
   /**
    * ocr extract settings
    */
-  private List<OCRExtractSettingsDto> regions;
+  private List<OCRExtractSettingsDto> settings;
 
 
   /**
@@ -25,10 +29,11 @@ public class ExtractTextDto {
    */
   private ConfigurationDto config;
 
-  public ExtractTextDto(Reference eyes, List<OCRExtractSettingsDto> regions, ConfigurationDto config) {
+  public ExtractTextDto(Reference eyes, ITargetDto target, List<OCRExtractSettingsDto> regions, ConfigurationDto config) {
     this.eyes = eyes;
-    this.regions = regions;
+    this.settings = regions;
     this.config = config;
+    this.target = target;
   }
 
   public Reference getEyes() {
@@ -39,12 +44,12 @@ public class ExtractTextDto {
     this.eyes = eyes;
   }
 
-  public List<OCRExtractSettingsDto> getRegions() {
-    return regions;
+  public List<OCRExtractSettingsDto> getSettings() {
+    return settings;
   }
 
-  public void setRegions(List<OCRExtractSettingsDto> regions) {
-    this.regions = regions;
+  public void setSettings(List<OCRExtractSettingsDto> settings) {
+    this.settings = settings;
   }
 
   public ConfigurationDto getConfig() {
@@ -55,4 +60,11 @@ public class ExtractTextDto {
     this.config = config;
   }
 
+  public ITargetDto getTarget() {
+    return target;
+  }
+
+  public void setTarget(ITargetDto target) {
+    this.target = target;
+  }
 }
