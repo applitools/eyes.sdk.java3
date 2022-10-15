@@ -1,9 +1,11 @@
 package com.applitools.eyes.selenium.universal.dto;
 
+import java.util.Arrays;
+
 /**
  * This event has to be sent in the first place just after a connection between Client and Server will be established.
  */
-public class MakeSdk {
+public class MakeCore {
   /**
    * name of the client sdk
    */
@@ -24,11 +26,17 @@ public class MakeSdk {
    */
   private String protocol;
 
-  public MakeSdk(String name, String version, String cwd, String protocol) {
+  /**
+   * ?
+   */
+  private String[] commands;
+
+  public MakeCore(String name, String version, String cwd, String protocol, String[] commands) {
     this.name = name;
     this.version = version;
     this.cwd = cwd;
     this.protocol = protocol;
+    this.commands = commands;
   }
 
   public String getName() {
@@ -63,6 +71,14 @@ public class MakeSdk {
     this.protocol = protocol;
   }
 
+  public String[] getCommands() {
+    return commands;
+  }
+
+  public void setCommands(String[] commands) {
+    this.commands = commands;
+  }
+
   @Override
   public String toString() {
     return "MakeSdk{" +
@@ -70,6 +86,7 @@ public class MakeSdk {
         ", version='" + version + '\'' +
         ", cwd='" + cwd + '\'' +
         ", protocol='" + protocol + '\'' +
+        ", commands='" + Arrays.toString(commands) + '\'' +
         '}';
   }
 }
