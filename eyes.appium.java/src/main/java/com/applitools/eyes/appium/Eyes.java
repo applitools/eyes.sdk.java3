@@ -9,18 +9,20 @@ import com.applitools.eyes.locators.TextRegion;
 import com.applitools.eyes.locators.TextRegionSettings;
 import com.applitools.eyes.locators.VisualLocatorSettings;
 import com.applitools.eyes.positioning.PositionProvider;
-import com.applitools.eyes.selenium.*;
 import com.applitools.eyes.selenium.positioning.ImageRotation;
 import com.applitools.eyes.selenium.universal.dto.CheckSettingsDto;
-import com.applitools.utils.*;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import org.openqa.selenium.*;
+import com.applitools.eyes.selenium.universal.dto.DriverTargetDto;
+import com.applitools.eyes.selenium.universal.mapper.DriverMapper;
+import com.applitools.utils.ArgumentGuard;
+import com.applitools.utils.GeneralUtils;
+import org.openqa.selenium.By;
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
 
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.URI;
-import java.util.*;
+import java.util.List;
+import java.util.Map;
 
 public class Eyes implements IEyesBase {
     private com.applitools.eyes.selenium.Eyes originEyes;
@@ -520,15 +522,16 @@ public class Eyes implements IEyesBase {
 
 
     public void check(ICheckSettings checkSettings) {
-        CheckSettingsDto checkSettingsDto = AppiumCheckSettingsMapper.toCheckSettingsDto(checkSettings);
-        this.checkDto(checkSettingsDto);
+        CheckSettingsDto checkSettingsDto = AppiumCheckSettingsMapper.toCheckSettingsDtoV3(checkSettings, configure());
+        DriverTargetDto driverTargetDto = DriverMapper.toDriverTargetDto(getDriver(), configure().getProxy());
+        this.checkDto(checkSettingsDto, driverTargetDto);
     }
 
-    private void checkDto(CheckSettingsDto checkSettingsDto) throws EyesException {
+    private void checkDto(CheckSettingsDto checkSettingsDto, DriverTargetDto driverTargetDto) throws EyesException {
         try {
-            Method checkDto = originEyes.getClass().getDeclaredMethod("checkDto", CheckSettingsDto.class);
+            Method checkDto = originEyes.getClass().getDeclaredMethod("checkDto", CheckSettingsDto.class, DriverTargetDto.class);
             checkDto.setAccessible(true);
-            checkDto.invoke(originEyes, checkSettingsDto);
+            checkDto.invoke(originEyes, checkSettingsDto, driverTargetDto);
         } catch (NoSuchMethodException | IllegalAccessException e) {
             System.out.println("Got a failure trying to activate checkDTO using reflection! Error " + e.getMessage());
             throw new EyesException("Got a failure trying to activate checkDTO using reflection! Error " + e.getMessage());
