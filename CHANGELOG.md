@@ -2,6 +2,8 @@
 ### Updated
 - Add support for AppiumBy selector. [Trello 3022](https://trello.com/c/VpnV7BBN/)
 - Making Universal Core start process robust. [Trello 2993, 3023](https://trello.com/c/ArmjDFta/)
+- Update Universal binaries to 2.16.4 [Trello 3018](https://trello.com/c/F8WkVwMw)
+- Update "selenium-java" dependency to 4.5.0 [Trello 3039](https://trello.com/c/fOjtcokN)
 
 ## [5.28.0] - 2022-10-10
 ### Updated
