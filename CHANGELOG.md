@@ -1,3 +1,7 @@
+## [vNext] - dNext
+### Updated
+- Update Universal binaries to 2.16.4 [Trello 3018](https://trello.com/c/F8WkVwMw)
+
 ## [5.28.0] - 2022-10-10
 ### Updated
 - Added Selenium Coded Regions Padding support [Trello 42](https://trello.com/c/PYKqJLbg)
