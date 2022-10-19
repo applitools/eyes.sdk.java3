@@ -7,8 +7,7 @@ import com.applitools.eyes.StdoutLogHandler;
 import com.applitools.eyes.utils.TestUtils;
 import com.applitools.utils.GeneralUtils;
 import io.appium.java_client.AppiumDriver;
-//import io.appium.java_client.MobileElement;
-//import io.appium.java_client.MobileElement;
+import org.openqa.selenium.MutableCapabilities;
 import org.openqa.selenium.remote.DesiredCapabilities;
 import org.testng.ITest;
 import org.testng.annotations.AfterClass;
@@ -18,13 +17,17 @@ import java.net.MalformedURLException;
 
 public abstract class TestSetup extends ReportingTestSuite implements ITest {
 
-    protected DesiredCapabilities capabilities;
-    //protected AppiumDriver<MobileElement> driver;
+    protected MutableCapabilities capabilities;
     protected AppiumDriver driver;
     protected Eyes eyes;
+
     // To run locally use http://127.0.0.1:4723/wd/hub
     protected String appiumServerUrl = "http://" + GeneralUtils.getEnvString("BROWSERSTACK_USERNAME") + ":" +
-        GeneralUtils.getEnvString("BROWSERSTACK_ACCESS_KEY") + "@hub-cloud.browserstack.com/wd/hub";
+            GeneralUtils.getEnvString("BROWSERSTACK_ACCESS_KEY") + "@hub-cloud.browserstack.com/wd/hub";
+
+    private final String USERNAME = GeneralUtils.getEnvString("SAUCE_USERNAME");
+    private final String ACCESS_KEY = GeneralUtils.getEnvString("SAUCE_ACCESS_KEY");
+    protected final String SL_URL = "https://"+USERNAME+":" + ACCESS_KEY + "@ondemand.us-west-1.saucelabs.com/wd/hub";
 
     @Override
     public String getTestName() {
