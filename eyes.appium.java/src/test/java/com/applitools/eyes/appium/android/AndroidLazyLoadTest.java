@@ -3,17 +3,13 @@ package com.applitools.eyes.appium.android;
 import com.applitools.eyes.LazyLoadOptions;
 import com.applitools.eyes.appium.Target;
 import io.appium.java_client.AppiumBy;
-import io.appium.java_client.android.AndroidDriver;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.PointerInput;
 import org.openqa.selenium.interactions.Sequence;
-import org.openqa.selenium.remote.DesiredCapabilities;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.time.Duration;
 import java.util.Arrays;
 
@@ -24,22 +20,6 @@ public class AndroidLazyLoadTest extends AndroidTestSetup {
     public static final String SL_URL = "https://"+USERNAME+":" + ACCESS_KEY + "@ondemand.saucelabs.com:443/wd/hub";
     public static final int PIXEL_5_OFFSET = 13049;
     public static final int PIXEL_3XL_OFFSET = 13601;
-
-    @Override
-    protected void initDriver() throws MalformedURLException {
-        capabilities = new DesiredCapabilities();
-        capabilities.setCapability("deviceName","Google Pixel 5 GoogleAPI Emulator");
-        capabilities.setCapability("deviceOrientation", "portrait");
-        capabilities.setCapability("platformVersion","11.0");
-        capabilities.setCapability("platformName", "Android");
-        capabilities.setCapability("automationName", "UiAutomator2");
-        capabilities.setCapability("app", "https://applitools.jfrog.io/artifactory/Examples/androidx/helper_lib/1.8.6/app-androidx-debug.apk");
-        capabilities.setCapability("noReset", false);
-        capabilities.setCapability("fullReset", true);
-        capabilities.setCapability("newCommandTimeout", 2000);
-
-        driver = new AndroidDriver(new URL(SL_URL), capabilities);
-    }
 
     @Test
     public void testHelperLibOffsetCalculation() throws InterruptedException {
