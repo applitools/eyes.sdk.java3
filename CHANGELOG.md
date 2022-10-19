@@ -1,3 +1,8 @@
+## [5.30.0] - 2022-10-19
+### Fixed
+- UFG tests aborts intermittently.
+- Fixed defaults for CloseBatch and DeleteTest.
+
 ## [5.29.0] - 2022-10-10
 ### Updated
 - Blank missed frames src in ufg.
