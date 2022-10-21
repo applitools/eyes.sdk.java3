@@ -26,7 +26,7 @@ public class CheckSettingsDto {
   private LazyLoadOptions lazyLoad;
   private Boolean ignoreDisplacements;
   private NormalizationDto normalization;
-  private Map<String, String> debugImages;
+  private DebugScreenshotHandlerDto debugImages;
 
   // check
   private String name;
@@ -49,6 +49,15 @@ public class CheckSettingsDto {
   private Boolean disableBrowserFetching;
   private AutProxyDto autProxy;
   private Map<String, String> hooks;
+  private List<IBrowsersInfo> renderers;
+
+  public CheckSettingsDto() {
+
+  }
+
+  public CheckSettingsDto(NormalizationDto normalization) {
+    this.normalization = normalization;
+  }
 
   public TRegion getRegion() {
     return region;
@@ -146,11 +155,11 @@ public class CheckSettingsDto {
     this.normalization = normalization;
   }
 
-  public Map<String, String> getDebugImages() {
+  public DebugScreenshotHandlerDto getDebugImages() {
     return debugImages;
   }
 
-  public void setDebugImages(Map<String, String> debugImages) {
+  public void setDebugImages(DebugScreenshotHandlerDto debugImages) {
     this.debugImages = debugImages;
   }
 
@@ -312,5 +321,13 @@ public class CheckSettingsDto {
 
   public void setHooks(Map<String, String> hooks) {
     this.hooks = hooks;
+  }
+
+  public List<IBrowsersInfo> getRenderers() {
+    return renderers;
+  }
+
+  public void setRenderers(List<IBrowsersInfo> renderers) {
+    this.renderers = renderers;
   }
 }
