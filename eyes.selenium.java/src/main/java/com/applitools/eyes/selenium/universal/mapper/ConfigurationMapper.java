@@ -4,10 +4,7 @@ import com.applitools.eyes.CutProvider;
 import com.applitools.eyes.FixedCutProvider;
 import com.applitools.eyes.config.Configuration;
 import com.applitools.eyes.config.ContentInset;
-import com.applitools.eyes.selenium.universal.dto.ConfigurationDto;
-import com.applitools.eyes.selenium.universal.dto.DebugScreenshotHandlerDto;
-import com.applitools.eyes.selenium.universal.dto.ImageCropRectDto;
-import com.applitools.eyes.selenium.universal.dto.ImageCropRegionDto;
+import com.applitools.eyes.selenium.universal.dto.*;
 
 
 /**
@@ -21,8 +18,13 @@ public class ConfigurationMapper {
     }
     ConfigurationDto dto = new ConfigurationDto();
 
+    dto.setOpen(new OpenSettingsDto());
+    dto.setScreenshot(new CheckSettingsDto(new NormalizationDto()));
+    dto.setCheck(new CheckSettingsDto());
+    dto.setClose(new CloseSettingsDto());
+
     // EyesBaseConfig
-    dto.setLogs(null);
+//    dto.setLogs(null);
     dto.setDebugScreenshots(new DebugScreenshotHandlerDto(config.getSaveDebugScreenshots(),
         config.getDebugScreenshotsPath(), config.getDebugScreenshotsPrefix()));
     dto.setAgentId(config.getAgentId());
@@ -30,10 +32,10 @@ public class ConfigurationMapper {
     dto.setServerUrl(config.getServerUrl() == null ? null : config.getServerUrl().toString());
     dto.setProxy(ProxyMapper.toProxyDto(config.getProxy()));
     dto.setAutProxy(ProxyMapper.toAutProxyDto(config.getAutProxy()));
-    dto.setDisabled(config.getIsDisabled());
+//    dto.setDisabled(config.getIsDisabled()); //removed
     dto.setConnectionTimeout(null);
     dto.setRemoveSession(null);
-    dto.setRemoteEvents(null);
+//    dto.setRemoteEvents(null);
 
     // EyesOpenConfig
     dto.setAppName(config.getAppName());
@@ -43,7 +45,7 @@ public class ConfigurationMapper {
     dto.setSessionType(config.getSessionType() == null ? null : config.getSessionType().name());
     dto.setProperties(CustomPropertyMapper.toCustomPropertyDtoList(config.getProperties()));
     dto.setBatch(BatchMapper.toBatchDto(config.getBatch()));
-    dto.setDefaultMatchSettings(MatchSettingsMapper.toMatchSettingsDto(config.getDefaultMatchSettings()));
+//    dto.setDefaultMatchSettings(MatchSettingsMapper.toMatchSettingsDto(config.getDefaultMatchSettings()));
     dto.setHostApp(config.getHostApp());
     dto.setHostOS(config.getHostOS());
     dto.setHostAppInfo(null);
@@ -68,7 +70,7 @@ public class ConfigurationMapper {
 
 
     // EyesClassicConfig<TElement, TSelector>
-    dto.setWaitBeforeScreenshots(config.getWaitBeforeScreenshots());
+//    dto.setWaitBeforeScreenshots(config.getWaitBeforeScreenshots());
     dto.setStitchMode(config.getStitchMode() == null ? null : config.getStitchMode().getName());
     dto.setHideScrollbars(config.getHideScrollbars());
     dto.setHideCaret(config.getHideCaret());
@@ -81,7 +83,7 @@ public class ConfigurationMapper {
     dto.setWaitBeforeCapture(config.getWaitBeforeCapture());
 
     // EyesUFGConfig
-    dto.setConcurrentSessions(null);
+//    dto.setConcurrentSessions(null);
     dto.setBrowsersInfo(RenderBrowserInfoMapper.toRenderBrowserInfoDtoList(config.getBrowsersInfo()));
     dto.setVisualGridOptions(VisualGridOptionMapper.toVisualGridOptionDtoList(config.getVisualGridOptions()));
     Object layoutBreakpoints = null;
@@ -95,7 +97,7 @@ public class ConfigurationMapper {
 
     dto.setLayoutBreakpoints(layoutBreakpoints);
     dto.setDisableBrowserFetching(config.isDisableBrowserFetching());
-    dto.setUseCeilForViewportSize(config.getUseCeilForViewportSize());
+//    dto.setUseCeilForViewportSize(config.getUseCeilForViewportSize());
 
     return dto;
   }

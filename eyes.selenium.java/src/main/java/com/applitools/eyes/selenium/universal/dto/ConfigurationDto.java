@@ -3,508 +3,599 @@ package com.applitools.eyes.selenium.universal.dto;
 import java.util.List;
 import java.util.Map;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
  * configuration
  */
 @JsonInclude(JsonInclude.Include.NON_NULL)
+@JsonIgnoreProperties({
+        "appName",
+        "testName",
+        "apiKey",
+        "sessionType",
+        "branchName",
+        "parentBranchName",
+        "baselineBranchName",
+        "agentId",
+        "environmentName",
+        "saveDiffs",
+        "batch",
+        "baselineEnvName",
+        "viewportSize",
+        "matchTimeout",
+        "hostApp",
+        "hostOs",
+        "deviceInfo",
+        "saveNewTests",
+        "saveFailedTests",
+        "stitchOverlap",
+        "sendDom",
+        "serverUrl",
+        "proxy",
+        "forceFullPageScreenshot",
+        "stitchMode",
+        "hideScrollBars",
+        "hideCaret",
+        "disableBrowserFetching",
+        "browsersInfo",
+        "debugScreenshots",
+        "disabled",
+        "connectionTimeout",
+        "removeSession",
+        "displayName",
+        "properties",
+        "hostAppInfo",
+        "compareWithParentBranch",
+        "ignoreBaseline",
+        "dontCloseBatches",
+        "scrollRootElement",
+        "cut",
+        "rotation",
+        "scaleRatio",
+        "layoutBreakpoints",
+        "visualGridOptions",
+        "waitBeforeCapture",
+        "autProxy",
+        "browsersInfo",
+})
 public class ConfigurationDto {
   // EyesBaseConfig
-  private Object logs;
-  private DebugScreenshotHandlerDto debugScreenshots;
-  private String agentId;
-  private String apiKey;
-  private String serverUrl;
-  private ProxyDto proxy;
-  private AutProxyDto autProxy;
-  private Boolean isDisabled;
-  private Integer connectionTimeout;
-  private Boolean removeSession;
-  private Object remoteEvents;
+//  private Object logs;
+//  private DebugScreenshotHandlerDto debugScreenshots;
+//  private String agentId;
+//  private String apiKey;
+//  private String serverUrl;
+//  private ProxyDto proxy;
+//  private AutProxyDto autProxy;
+//  private Boolean isDisabled;
+//  private Integer connectionTimeout;
+//  private Boolean removeSession;
+//  private Object remoteEvents;
+//
+//  // EyesOpenConfig
+//  private String appName;
+//  private String testName;
+//  private String displayName;
+//  private RectangleSizeDto viewportSize;
+//  private String sessionType;
+//  private List<CustomPropertyDto> properties;
+//  private BatchDto batch;
+//  private MatchSettingsDto defaultMatchSettings;
+//  private String hostApp;
+//  private String hostOS;
+//  private String hostAppInfo;
+//  private String hostOSInfo;
+//  private String deviceInfo;
+//  private String baselineEnvName;
+//  private String environmentName;
+//  private String branchName;
+//  private String parentBranchName;
+//  private String baselineBranchName;
+//  private Boolean compareWithParentBranch;
+//  private Boolean ignoreBaseline;
+//  private Boolean saveFailedTests;
+//  private Boolean saveNewTests;
+//  private Boolean saveDiffs;
+//  private Boolean dontCloseBatches;
+//
+//  // EyesCheckConfig
+//  private Boolean sendDom;
+//  private Integer matchTimeout;
+//  private Boolean forceFullPageScreenshot;
+//
+//  // EyesClassicConfig<TElement, TSelector>
+//  private Integer waitBeforeScreenshots;
+//  private String stitchMode; // 'CSS' | 'Scroll'
+//  private Boolean hideScrollbars;
+//  private Boolean hideCaret;
+//  private Integer stitchOverlap;
+//  private IScrollRootElement scrollRootElement; // TElement | TSelector
+//  private ICut cut;
+//  private Integer rotation;
+//  private Double scaleRatio;
+//  private Integer waitBeforeCapture;
+//
+//  // EyesUFGConfig
+//  private Integer concurrentSessions;
+//  private List<IBrowsersInfo> browsersInfo;
+//  private Map<String,Object> visualGridOptions;
+//  private Object layoutBreakpoints;
+//  private Boolean disableBrowserFetching;
+//  private Boolean useCeilForViewportSize;
 
-  // EyesOpenConfig
-  private String appName;
-  private String testName;
-  private String displayName;
-  private RectangleSizeDto viewportSize;
-  private String sessionType;
-  private List<CustomPropertyDto> properties;
-  private BatchDto batch;
-  private MatchSettingsDto defaultMatchSettings; // TODO defaultMatchSettings?: MatchSettings<Region>
-  private String hostApp;
-  private String hostOS;
-  private String hostAppInfo;
-  private String hostOSInfo;
-  private String deviceInfo;
-  private String baselineEnvName;
-  private String environmentName;
-  private String branchName;
-  private String parentBranchName;
-  private String baselineBranchName;
-  private Boolean compareWithParentBranch;
-  private Boolean ignoreBaseline;
-  private Boolean saveFailedTests;
-  private Boolean saveNewTests;
-  private Boolean saveDiffs;
-  private Boolean dontCloseBatches;
+  /**
+   * the open settings.
+   */
+  @JsonProperty("open")
+  private OpenSettingsDto open;
 
-  // EyesCheckConfig
-  private Boolean sendDom;
-  private Integer matchTimeout;
-  private Boolean forceFullPageScreenshot;
+  /**
+   * the screenshot settings (part of check settings).
+   */
+  @JsonProperty("screenshot")
+  private CheckSettingsDto screenshot;
 
-  // EyesClassicConfig<TElement, TSelector>
-  private Integer waitBeforeScreenshots;
-  private String stitchMode; // 'CSS' | 'Scroll'
-  private Boolean hideScrollbars;
-  private Boolean hideCaret;
-  private Integer stitchOverlap;
-  private IScrollRootElement scrollRootElement; // TElement | TSelector
-  private ICut cut;
-  private Integer rotation;
-  private Double scaleRatio;
-  private Integer waitBeforeCapture;
+  /**
+   * the check settings.
+   */
+  @JsonProperty("check")
+  private CheckSettingsDto check;
 
-  // EyesUFGConfig
-  private Integer concurrentSessions;
-  private List<IBrowsersInfo> browsersInfo;
-  private Map<String,Object> visualGridOptions;
-  private Object layoutBreakpoints;
-  private Boolean disableBrowserFetching;
-  private Boolean useCeilForViewportSize;
+  /**
+   * the close settings.
+   */
+  @JsonProperty("close")
+  private CloseSettingsDto close;
 
+  public void setOpen(OpenSettingsDto open) {
+    this.open = open;
+  }
+
+  public void setScreenshot(CheckSettingsDto screenshot) {
+    this.screenshot = screenshot;
+  }
+
+  public void setCheck(CheckSettingsDto check) {
+    this.check = check;
+  }
+
+  public void setClose(CloseSettingsDto close) {
+    this.close = close;
+  }
 
   public String getAppName() {
-    return appName;
+    return open.getAppName();
   }
 
   public void setAppName(String appName) {
-    this.appName = appName;
+    this.open.setAppName(appName);
   }
 
   public String getTestName() {
-    return testName;
+    return open.getTestName();
   }
 
   public void setTestName(String testName) {
-    this.testName = testName;
+    this.open.setTestName(testName);
   }
 
   public String getApiKey() {
-    return apiKey;
+    return open.getApiKey();
   }
 
   public void setApiKey(String apiKey) {
-    this.apiKey = apiKey;
+    this.open.setApiKey(apiKey);
   }
 
   public String getSessionType() {
-    return sessionType;
+    return open.getSessionType();
   }
 
   public void setSessionType(String sessionType) {
-    this.sessionType = sessionType;
+    this.open.setSessionType(sessionType);
   }
 
   public String getBranchName() {
-    return branchName;
+    return open.getBranchName();
   }
 
   public void setBranchName(String branchName) {
-    this.branchName = branchName;
+    this.open.setBranchName(branchName);
   }
 
   public String getParentBranchName() {
-    return parentBranchName;
+    return open.getParentBranchName();
   }
 
   public void setParentBranchName(String parentBranchName) {
-    this.parentBranchName = parentBranchName;
+    this.open.setParentBranchName(parentBranchName);
   }
 
   public String getBaselineBranchName() {
-    return baselineBranchName;
+    return open.getBaselineBranchName();
   }
 
   public void setBaselineBranchName(String baselineBranchName) {
-    this.baselineBranchName = baselineBranchName;
+    this.open.setBaselineBranchName(baselineBranchName);
   }
 
   public String getAgentId() {
-    return agentId;
+    return open.getAgentId();
   }
 
   public void setAgentId(String agentId) {
-    this.agentId = agentId;
+    this.open.setAgentId(agentId);
   }
 
   public String getEnvironmentName() {
-    return environmentName;
+    return open.getEnvironmentName();
   }
 
   public void setEnvironmentName(String environmentName) {
-    this.environmentName = environmentName;
+    this.open.setEnvironmentName(environmentName);
   }
 
   public Boolean getSaveDiffs() {
-    return saveDiffs;
+    return open.getSaveDiffs();
   }
 
   public void setSaveDiffs(Boolean saveDiffs) {
-    this.saveDiffs = saveDiffs;
+    this.open.setSaveDiffs(saveDiffs);
   }
 
   public BatchDto getBatch() {
-    return batch;
+    return open.getBatch();
   }
 
   public void setBatch(BatchDto batch) {
-    this.batch = batch;
+    this.open.setBatch(batch);
   }
 
   public String getBaselineEnvName() {
-    return baselineEnvName;
+    return open.getBaselineEnvName();
   }
 
   public void setBaselineEnvName(String baselineEnvName) {
-    this.baselineEnvName = baselineEnvName;
+    this.open.setBaselineEnvName(baselineEnvName);
   }
 
   public RectangleSizeDto getViewportSize() {
-    return viewportSize;
+    return open.getEnvironment().getViewportSize();
   }
 
   public void setViewportSize(RectangleSizeDto viewportSize) {
-    this.viewportSize = viewportSize;
+    this.open.getEnvironment().setViewportSize(viewportSize);
   }
 
-  public MatchSettingsDto getDefaultMatchSettings() {
-    return defaultMatchSettings;
-  }
+//  public MatchSettingsDto getDefaultMatchSettings() {
+//    return defaultMatchSettings;
+//  }
 
-  public void setDefaultMatchSettings(MatchSettingsDto defaultMatchSettings) {
-    this.defaultMatchSettings = defaultMatchSettings;
-  }
+//  public void setDefaultMatchSettings(MatchSettingsDto defaultMatchSettings) {
+//    this.defaultMatchSettings = defaultMatchSettings;
+//  }
 
   public Integer getMatchTimeout() {
-    return matchTimeout;
+    return this.check.getRetryTimeout();
   }
 
   public void setMatchTimeout(Integer matchTimeout) {
-    this.matchTimeout = matchTimeout;
+    this.check.setRetryTimeout(matchTimeout);
   }
 
   public String getHostApp() {
-    return hostApp;
+    return open.getEnvironment().getHostingApp();
   }
 
   public void setHostApp(String hostApp) {
-    this.hostApp = hostApp;
+    this.open.getEnvironment().setHostingApp(hostApp);
   }
 
   public String getHostOS() {
-    return hostOS;
+    return open.getEnvironment().getOs();
   }
 
   public void setHostOS(String hostOS) {
-    this.hostOS = hostOS;
+    this.open.getEnvironment().setOs(hostOS);
   }
 
   public String getDeviceInfo() {
-    return deviceInfo;
+    return open.getEnvironment().getDeviceName();
   }
 
   public void setDeviceInfo(String deviceInfo) {
-    this.deviceInfo = deviceInfo;
+    this.open.getEnvironment().setDeviceName(deviceInfo);
   }
 
   public Boolean getSaveNewTests() {
-    return saveNewTests;
+    return close.getUpdateBaselineIfNew();
   }
 
   public void setSaveNewTests(Boolean saveNewTests) {
-    this.saveNewTests = saveNewTests;
+    this.close.setUpdateBaselineIfNew(saveNewTests);
   }
 
   public Boolean getSaveFailedTests() {
-    return saveFailedTests;
+    return close.getUpdateBaselineIfDifferent();
   }
 
   public void setSaveFailedTests(Boolean saveFailedTests) {
-    this.saveFailedTests = saveFailedTests;
+    this.close.setUpdateBaselineIfDifferent(saveFailedTests);
   }
 
   public Integer getStitchOverlap() {
-    return stitchOverlap;
+    return screenshot.getOverlap();
   }
 
   public void setStitchOverlap(Integer stitchOverlap) {
-    this.stitchOverlap = stitchOverlap;
+    this.screenshot.setOverlap(stitchOverlap);
   }
 
   public Boolean getSendDom() {
-    return sendDom;
+    return check.getSendDom();
   }
 
   public void setSendDom(Boolean sendDom) {
-    this.sendDom = sendDom;
+    this.check.setSendDom(sendDom);
   }
 
   public String getServerUrl() {
-    return serverUrl;
+    return open.getServerUrl();
   }
 
   public void setServerUrl(String serverUrl) {
-    this.serverUrl = serverUrl;
+    this.open.setServerUrl(serverUrl);
   }
 
   public ProxyDto getProxy() {
-    return proxy;
+    return open.getProxy();
   }
 
   public void setProxy(ProxyDto proxy) {
-    this.proxy = proxy;
+    this.open.setProxy(proxy);
   }
 
   public Boolean getForceFullPageScreenshot() {
-    return forceFullPageScreenshot;
+    return screenshot.getFully();
   }
 
   public void setForceFullPageScreenshot(Boolean forceFullPageScreenshot) {
-    this.forceFullPageScreenshot = forceFullPageScreenshot;
+    this.screenshot.setFully(forceFullPageScreenshot);
   }
 
-  public Integer getWaitBeforeScreenshots() {
-    return waitBeforeScreenshots;
-  }
+//  public Integer getWaitBeforeScreenshots() {
+//    return waitBeforeScreenshots;
+//  }
 
-  public void setWaitBeforeScreenshots(Integer waitBeforeScreenshots) {
-    this.waitBeforeScreenshots = waitBeforeScreenshots;
-  }
+//  public void setWaitBeforeScreenshots(Integer waitBeforeScreenshots) {
+//    this.waitBeforeScreenshots = waitBeforeScreenshots;
+//  }
 
   public String getStitchMode() {
-    return stitchMode;
+    return screenshot.getStitchMode();
   }
 
   public void setStitchMode(String stitchMode) {
-    this.stitchMode = stitchMode;
+    this.screenshot.setStitchMode(stitchMode);
   }
 
   public Boolean getHideScrollbars() {
-    return hideScrollbars;
+    return screenshot.getHideScrollBars();
   }
 
   public void setHideScrollbars(Boolean hideScrollbars) {
-    this.hideScrollbars = hideScrollbars;
+    this.screenshot.setHideScrollBars(hideScrollbars);
   }
 
   public Boolean getHideCaret() {
-    return hideCaret;
+    return screenshot.getHideCaret();
   }
 
   public void setHideCaret(Boolean hideCaret) {
-    this.hideCaret = hideCaret;
+    this.screenshot.setHideCaret(hideCaret);
   }
 
 
   public Boolean getDisableBrowserFetching() {
-    return disableBrowserFetching;
+    return check.getDisableBrowserFetching();
   }
 
   public void setDisableBrowserFetching(Boolean disableBrowserFetching) {
-    this.disableBrowserFetching = disableBrowserFetching;
+    this.check.setDisableBrowserFetching(disableBrowserFetching);
   }
 
   public List<IBrowsersInfo> getBrowsersInfo() {
-    return browsersInfo;
+    return check.getRenderers();
   }
 
   public void setBrowsersInfo(List<IBrowsersInfo> browsersInfo) {
-    this.browsersInfo = browsersInfo;
+    this.check.setRenderers(browsersInfo);
   }
 
-  public Object getLogs() {
-    return logs;
-  }
+//  public Object getLogs() {
+//    return logs;
+//  }
 
-  public void setLogs(Object logs) {
-    this.logs = logs;
-  }
+//  public void setLogs(Object logs) {
+//    this.logs = logs;
+//  }
 
   public DebugScreenshotHandlerDto getDebugScreenshots() {
-    return debugScreenshots;
+    return screenshot.getDebugImages();
   }
 
   public void setDebugScreenshots(DebugScreenshotHandlerDto debugScreenshots) {
-    this.debugScreenshots = debugScreenshots;
+    this.screenshot.setDebugImages(debugScreenshots);
   }
 
   public Boolean getDisabled() {
-    return isDisabled;
+    return open.getDisabled();
   }
 
   public void setDisabled(Boolean disabled) {
-    isDisabled = disabled;
+    this.open.setDisabled(disabled);
   }
 
   public Integer getConnectionTimeout() {
-    return connectionTimeout;
+    return open.getConnectionTimeout();
   }
 
   public void setConnectionTimeout(Integer connectionTimeout) {
-    this.connectionTimeout = connectionTimeout;
+    this.open.setConnectionTimeout(connectionTimeout);
   }
 
   public Boolean getRemoveSession() {
-    return removeSession;
+    return open.getRemoveSession();
   }
 
   public void setRemoveSession(Boolean removeSession) {
-    this.removeSession = removeSession;
+    this.open.setRemoveSession(removeSession);
   }
 
-  public Object getRemoteEvents() {
-    return remoteEvents;
-  }
-
-  public void setRemoteEvents(Object remoteEvents) {
-    this.remoteEvents = remoteEvents;
-  }
+//  public Object getRemoteEvents() {
+//    return remoteEvents;
+//  }
+//
+//  public void setRemoteEvents(Object remoteEvents) {
+//    this.remoteEvents = remoteEvents;
+//  }
 
   public String getDisplayName() {
-    return displayName;
+    return open.getDisplayName();
   }
 
   public void setDisplayName(String displayName) {
-    this.displayName = displayName;
+    this.open.setDisplayName(displayName);
   }
 
   public List<CustomPropertyDto> getProperties() {
-    return properties;
+    return open.getProperties();
   }
 
   public void setProperties(List<CustomPropertyDto> properties) {
-    this.properties = properties;
+    this.open.setProperties(properties);
   }
 
   public String getHostAppInfo() {
-    return hostAppInfo;
+    return open.getEnvironment().getHostingAppInfo();
   }
 
   public void setHostAppInfo(String hostAppInfo) {
-    this.hostAppInfo = hostAppInfo;
+    this.open.getEnvironment().setHostingAppInfo(hostAppInfo);
   }
 
   public String getHostOSInfo() {
-    return hostOSInfo;
+    return open.getEnvironment().getOsInfo();
   }
 
   public void setHostOSInfo(String hostOSInfo) {
-    this.hostOSInfo = hostOSInfo;
+    this.open.getEnvironment().setOsInfo(hostOSInfo);
   }
 
   public Boolean getCompareWithParentBranch() {
-    return compareWithParentBranch;
+    return open.getCompareWithParentBranch();
   }
 
   public void setCompareWithParentBranch(Boolean compareWithParentBranch) {
-    this.compareWithParentBranch = compareWithParentBranch;
+    this.open.setCompareWithParentBranch(compareWithParentBranch);
   }
 
   public Boolean getIgnoreBaseline() {
-    return ignoreBaseline;
+    return open.getIgnoreBaseline();
   }
 
   public void setIgnoreBaseline(Boolean ignoreBaseline) {
-    this.ignoreBaseline = ignoreBaseline;
+    this.open.setIgnoreBaseline(ignoreBaseline);
   }
 
   public Boolean getDontCloseBatches() {
-    return dontCloseBatches;
+    return open.getKeepBatchOpen();
   }
 
   public void setDontCloseBatches(Boolean dontCloseBatches) {
-    this.dontCloseBatches = dontCloseBatches;
+    this.open.setKeepBatchOpen(dontCloseBatches);
   }
 
-  public IScrollRootElement getScrollRootElement() {
-    return scrollRootElement;
+  public TRegion getScrollRootElement() {
+    return screenshot.getScrollRootElement();
   }
 
-  public void setScrollRootElement(IScrollRootElement scrollRootElement) {
-    this.scrollRootElement = scrollRootElement;
+  public void setScrollRootElement(TRegion scrollRootElement) {
+    this.screenshot.setScrollRootElement(scrollRootElement);
   }
 
   public ICut getCut() {
-    return cut;
+    return screenshot.getNormalization().getCut();
   }
 
   public void setCut(ICut cut) {
-    this.cut = cut;
+    this.screenshot.getNormalization().setCut(cut);
   }
 
   public Integer getRotation() {
-    return rotation;
+    return screenshot.getNormalization().getRotation();
   }
 
   public void setRotation(Integer rotation) {
-    this.rotation = rotation;
+    this.screenshot.getNormalization().setRotation(rotation);
   }
 
   public Double getScaleRatio() {
-    return scaleRatio;
+    return screenshot.getNormalization().getScaleRatio();
   }
 
   public void setScaleRatio(Double scaleRatio) {
-    this.scaleRatio = scaleRatio;
+    this.screenshot.getNormalization().setScaleRatio(scaleRatio);
   }
 
-  public Integer getConcurrentSessions() {
-    return concurrentSessions;
-  }
+//  public Integer getConcurrentSessions() {
+//    return concurrentSessions;
+//  }
 
-  public void setConcurrentSessions(Integer concurrentSessions) {
-    this.concurrentSessions = concurrentSessions;
-  }
+//  public void setConcurrentSessions(Integer concurrentSessions) {
+//    this.concurrentSessions = concurrentSessions;
+//  }
 
   public Object getLayoutBreakpoints() {
-    return layoutBreakpoints;
+    return check.getLayoutBreakpoints();
   }
 
   public void setLayoutBreakpoints(Object layoutBreakpoints) {
-    this.layoutBreakpoints = layoutBreakpoints;
+    this.check.setLayoutBreakpoints(layoutBreakpoints);
   }
 
   public Map<String, Object> getVisualGridOptions() {
-    return visualGridOptions;
+    return check.getUfgOptions();
   }
 
   public void setVisualGridOptions(Map<String, Object> visualGridOptions) {
-    this.visualGridOptions = visualGridOptions;
+    this.check.setUfgOptions(visualGridOptions);
   }
 
-  public Boolean getUseCeilForViewportSize() {
-    return useCeilForViewportSize;
-  }
+//  public Boolean getUseCeilForViewportSize() {
+//    return useCeilForViewportSize;
+//  }
 
-  public void setUseCeilForViewportSize(Boolean useCeilForViewportSize) {
-    this.useCeilForViewportSize = useCeilForViewportSize;
-  }
+//  public void setUseCeilForViewportSize(Boolean useCeilForViewportSize) {
+//    this.useCeilForViewportSize = useCeilForViewportSize;
+//  }
 
   public Integer getWaitBeforeCapture() {
-    return waitBeforeCapture;
+    return screenshot.getWaitBeforeCapture();
   }
 
   public void setWaitBeforeCapture(Integer waitBeforeCapture) {
-    this.waitBeforeCapture = waitBeforeCapture;
+    this.screenshot.setWaitBeforeCapture(waitBeforeCapture);
   }
 
   public AutProxyDto getAutProxy() {
-    return autProxy;
+    return check.getAutProxy();
   }
 
   public void setAutProxy(AutProxyDto autProxy) {
-    this.autProxy = autProxy;
+    this.check.setAutProxy(autProxy);
   }
 }
