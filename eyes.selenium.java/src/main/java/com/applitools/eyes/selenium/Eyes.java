@@ -501,7 +501,7 @@ public class Eyes implements IEyesBase {
             checkSettings = checkSettings.withName(tag);
         }
 //        CheckSettingsDto checkSettingsDto = CheckSettingsMapper.toCheckSettingsDto(checkSettings);
-        CheckSettingsDto checkSettingsDto = CheckSettingsMapper.toCheckSettingsDtoV3(checkSettings, getConfiguration());
+        CheckSettingsDto checkSettingsDto = CheckSettingsMapper.toCheckSettingsDtoV3(checkSettings, configure());
         DriverTargetDto driverTargetDto = DriverMapper.toDriverTargetDto(getDriver(), getProxy());
         checkDto(checkSettingsDto, driverTargetDto);
     }
@@ -549,35 +549,35 @@ public class Eyes implements IEyesBase {
         return testResults.get(0);
     }
 
-    /**
-     * Check and Close test results.
-     * @param target the target.
-     * @param checkSettingsDto the check settings.
-     * @param closeSettingsDto the close settings.
-     * @param shouldThrowException should throw exception if visual differences were found.
-     * @return
-     */
-    private TestResults checkAndCloseDto(ITargetDto target, CheckSettingsDto checkSettingsDto,
-                                         CloseSettingsDto closeSettingsDto, Boolean shouldThrowException) {
-        if (getIsDisabled()) {
-            return null;
-        }
-
-        if (!getIsOpen()) {
-            throw new EyesException("Eyes not open");
-        }
-
-        ConfigurationDto configurationDto = ConfigurationMapper
-                .toConfigurationDto(configuration, runner.isDontCloseBatches());
-
-        List<CommandCloseResponseDto> closeResponse = commandExecutor.eyesCheckAndClose(eyesRef, target,
-                checkSettingsDto, closeSettingsDto, configurationDto);
-        this.eyesRef = null;
-        isClosed = true;
-        List<TestResults> testResults = TestResultsMapper.toTestResultsList(closeResponse);
-        testResults.forEach(testResults1 -> runner.logSessionResultsAndThrowException(shouldThrowException, testResults1));
-        return testResults.get(0);
-    }
+//    /**
+//     * Check and Close test results.
+//     * @param target the target.
+//     * @param checkSettingsDto the check settings.
+//     * @param closeSettingsDto the close settings.
+//     * @param shouldThrowException should throw exception if visual differences were found.
+//     * @return
+//     */
+//    private TestResults checkAndCloseDto(ITargetDto target, CheckSettingsDto checkSettingsDto,
+//                                         CloseSettingsDto closeSettingsDto, Boolean shouldThrowException) {
+//        if (getIsDisabled()) {
+//            return null;
+//        }
+//
+//        if (!getIsOpen()) {
+//            throw new EyesException("Eyes not open");
+//        }
+//
+//        ConfigurationDto configurationDto = ConfigurationMapper
+//                .toConfigurationDto(configuration, runner.isDontCloseBatches());
+//
+//        List<CommandCloseResponseDto> closeResponse = commandExecutor.eyesCheckAndClose(eyesRef, target,
+//                checkSettingsDto, closeSettingsDto, configurationDto);
+//        this.eyesRef = null;
+//        isClosed = true;
+//        List<TestResults> testResults = TestResultsMapper.toTestResultsList(closeResponse);
+//        testResults.forEach(testResults1 -> runner.logSessionResultsAndThrowException(shouldThrowException, testResults1));
+//        return testResults.get(0);
+//    }
 
     /**
      * Manually set the scale ratio for the images being validated.
@@ -1958,9 +1958,16 @@ public class Eyes implements IEyesBase {
 
         ConfigurationDto configurationDto = ConfigurationMapper
                 .toConfigurationDto(configuration, runner.isDontCloseBatches());
-        return commandExecutor.locate(eyesRef, visualLocatorSettingsDto, configurationDto);
+        DriverTargetDto target = DriverMapper.toDriverTargetDto(getDriver(), getProxy());
+
+        return this.locateDto(target, visualLocatorSettingsDto, configurationDto);
     }
 
+    private Map<String, List<Region>> locateDto(ITargetDto target, VisualLocatorSettingsDto settings, ConfigurationDto config) {
+        return commandExecutor.locate(target, settings, config);
+    }
+
+    // in v3 this was changed to 'locateText'.
     public Map<String, List<TextRegion>> extractTextRegions(TextRegionSettings textRegionSettings) {
         OCRSearchSettingsDto ocrSearchSettingsDto = OCRSearchSettingsMapper.toOCRSearchSettingsDto(textRegionSettings);
         ConfigurationDto configurationDto = ConfigurationMapper
