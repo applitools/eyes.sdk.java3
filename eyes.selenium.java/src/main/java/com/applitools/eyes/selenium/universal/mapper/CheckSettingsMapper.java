@@ -1,7 +1,7 @@
 package com.applitools.eyes.selenium.universal.mapper;
 
 import com.applitools.ICheckSettings;
-import com.applitools.eyes.selenium.Configuration;
+import com.applitools.eyes.config.Configuration;
 import com.applitools.eyes.selenium.fluent.SeleniumCheckSettings;
 import com.applitools.eyes.selenium.universal.dto.CheckSettingsDto;
 
