@@ -12,6 +12,7 @@ import com.applitools.eyes.positioning.PositionProvider;
 import com.applitools.eyes.selenium.positioning.ImageRotation;
 import com.applitools.eyes.selenium.universal.dto.CheckSettingsDto;
 import com.applitools.eyes.selenium.universal.dto.DriverTargetDto;
+import com.applitools.eyes.selenium.universal.dto.ITargetDto;
 import com.applitools.eyes.selenium.universal.mapper.DriverMapper;
 import com.applitools.utils.ArgumentGuard;
 import com.applitools.utils.GeneralUtils;
@@ -529,7 +530,7 @@ public class Eyes implements IEyesBase {
 
     private void checkDto(CheckSettingsDto checkSettingsDto, DriverTargetDto driverTargetDto) throws EyesException {
         try {
-            Method checkDto = originEyes.getClass().getDeclaredMethod("checkDto", CheckSettingsDto.class, DriverTargetDto.class);
+            Method checkDto = originEyes.getClass().getDeclaredMethod("checkDto", CheckSettingsDto.class, ITargetDto.class);
             checkDto.setAccessible(true);
             checkDto.invoke(originEyes, checkSettingsDto, driverTargetDto);
         } catch (NoSuchMethodException | IllegalAccessException e) {
