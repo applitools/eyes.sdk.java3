@@ -36,7 +36,7 @@ public class TestResultsSummaryMapper {
     if (containerDtoList != null && !containerDtoList.isEmpty()) {
       for (TestResultContainerDto containerDto : containerDtoList) {
         // browserInfo
-        BrowserInfoDto browserInfoDto = containerDto.getBrowserInfo();
+        BrowserInfoDto browserInfoDto = containerDto.getRenderer();
         RenderBrowserInfo renderBrowserInfo = null;
         if (browserInfoDto != null) {
           if (browserInfoDto.getChromeEmulationInfo() != null) {
@@ -55,15 +55,15 @@ public class TestResultsSummaryMapper {
         }
         // exception
         Throwable throwable = null;
-        if (containerDto.getException() != null ) {
-          EyesError eyesError = containerDto.getException();
+        if (containerDto.getError() != null ) {
+          EyesError eyesError = containerDto.getError();
           throwable = getExceptionBasedOnReason(eyesError.getReason(), eyesError.getInfo() == null ?
                   null : eyesError.getInfo().getTestResult(), eyesError.getMessage(), eyesError.getStack());
           if (shouldThrowException) {
             throw new Error(throwable);
           }
         }
-        TestResultContainer container = new TestResultContainer(containerDto.getTestResults(), renderBrowserInfo, throwable);
+        TestResultContainer container = new TestResultContainer(containerDto.getResults(), renderBrowserInfo, throwable);
         containerList.add(container);
       }
     }

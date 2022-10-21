@@ -2,47 +2,50 @@ package com.applitools.eyes.selenium.universal.dto;
 
 import com.applitools.eyes.TestResults;
 import com.applitools.eyes.selenium.EyesError;
+import com.fasterxml.jackson.annotation.JsonInclude;
 
 /**
  * Test result container dto
  */
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class TestResultContainerDto {
-  private TestResults testResults;
-  private EyesError exception;
-  private BrowserInfoDto browserInfo;
+  private TestResults result;
+  private EyesError error;
+  private BrowserInfoDto renderer;
   private String userTestId;
 
   public TestResultContainerDto() {
   }
 
-  public TestResultContainerDto(TestResults testResults, EyesError exception, BrowserInfoDto browserInfo) {
-    this.testResults = testResults;
-    this.exception = exception;
-    this.browserInfo = browserInfo;
+  public TestResultContainerDto(TestResults results, EyesError error, BrowserInfoDto renderer, String userTestId) {
+    this.result = results;
+    this.error = error;
+    this.renderer = renderer;
+    this.userTestId = userTestId;
   }
 
-  public TestResults getTestResults() {
-    return testResults;
+  public TestResults getResults() {
+    return result;
   }
 
-  public void setTestResults(TestResults testResults) {
-    this.testResults = testResults;
+  public void setResults(TestResults results) {
+    this.result = results;
   }
 
-  public EyesError getException() {
-    return exception;
+  public EyesError getError() {
+    return error;
   }
 
-  public void setException(EyesError exception) {
-    this.exception = exception;
+  public void setError(EyesError error) {
+    this.error = error;
   }
 
-  public BrowserInfoDto getBrowserInfo() {
-    return browserInfo;
+  public BrowserInfoDto getRenderer() {
+    return renderer;
   }
 
-  public void setBrowserInfo(BrowserInfoDto browserInfo) {
-    this.browserInfo = browserInfo;
+  public void setRenderer(BrowserInfoDto renderer) {
+    this.renderer = renderer;
   }
 
   public String getUserTestId() {
