@@ -1,13 +1,17 @@
 package com.applitools.eyes.selenium.universal.dto;
 
-import com.applitools.eyes.*;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonInclude;
 
 import java.util.List;
 
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class OpenSettingsDto {
+    @JsonIgnore
+    private Boolean isDisabled;
     private String serverUrl;
     private String apiKey;
-    private AbstractProxySettings proxySettings;
+    private ProxyDto proxy;
     private String appName;
     private Integer connectionTimeout;
     private Boolean removeSession;
@@ -15,12 +19,12 @@ public class OpenSettingsDto {
     private String testName;
     private String displayName;
     private String userTestId;
-    private SessionType sessionType;
-    private List<PropertyData> properties;
-    private BatchInfo batch;
+    private String sessionType;
+    private List<CustomPropertyDto> properties;
+    private BatchDto batch;
     private Boolean keepBatchOpen;
     private String environmentName;
-    private AppEnvironment environment;
+    private AppEnvironmentDto environment;
     private String branchName;
     private String parentBranchName;
     private String baselineEnvName;
@@ -31,6 +35,18 @@ public class OpenSettingsDto {
     private Boolean saveDiffs;
     private Integer abortIdleTestTimeout;
 
+    public OpenSettingsDto() {
+        environment = new AppEnvironmentDto();
+    }
+
+    public Boolean getDisabled() {
+        return isDisabled;
+    }
+
+    public void setDisabled(Boolean isDisabled) {
+        this.isDisabled = isDisabled;
+    }
+
     public String getServerUrl() { return serverUrl; }
 
     public void setServerUrl(String serverUrl) { this.serverUrl = serverUrl; }
@@ -39,9 +55,9 @@ public class OpenSettingsDto {
 
     public void setApiKey(String apiKey) { this.apiKey = apiKey; }
 
-    public AbstractProxySettings getProxySettings() { return proxySettings; }
+    public ProxyDto getProxy() { return proxy; }
 
-    public void setProxy(AbstractProxySettings proxySettings) { this.proxySettings = proxySettings; }
+    public void setProxy(ProxyDto proxySettings) { this.proxy = proxySettings; }
 
     public String getAppName() { return appName; }
 
@@ -71,17 +87,17 @@ public class OpenSettingsDto {
 
     public void setUserTestId(String userTestId) { this.userTestId = userTestId; }
 
-    public SessionType getSessionType() { return sessionType; }
+    public String getSessionType() { return sessionType; }
 
-    public void setSessionType(SessionType sessionType) { this.sessionType = sessionType; }
+    public void setSessionType(String sessionType) { this.sessionType = sessionType; }
 
-    public List<PropertyData> getProperties() { return properties; }
+    public List<CustomPropertyDto> getProperties() { return properties; }
 
-    public void setProperties(List<PropertyData> properties) { this.properties = properties; }
+    public void setProperties(List<CustomPropertyDto> properties) { this.properties = properties; }
 
-    public BatchInfo getBatch() { return batch; }
+    public BatchDto getBatch() { return batch; }
 
-    public void setBatch(BatchInfo batch) { this.batch = batch; }
+    public void setBatch(BatchDto batch) { this.batch = batch; }
 
     public Boolean getKeepBatchOpen() { return keepBatchOpen; }
 
@@ -91,9 +107,9 @@ public class OpenSettingsDto {
 
     public void setEnvironmentName(String environmentName) { this.environmentName = environmentName; }
 
-    public AppEnvironment getEnvironment() { return environment; }
+    public AppEnvironmentDto getEnvironment() { return environment; }
 
-    public void setEnvironment(AppEnvironment environment) { this.environment = environment; }
+    public void setEnvironment(AppEnvironmentDto environment) { this.environment = environment; }
 
     public String getBranchName() { return branchName; }
 
