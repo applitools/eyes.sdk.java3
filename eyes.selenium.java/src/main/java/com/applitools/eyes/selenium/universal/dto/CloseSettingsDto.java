@@ -1,5 +1,8 @@
 package com.applitools.eyes.selenium.universal.dto;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class CloseSettingsDto {
 
     private Boolean throwErr;
