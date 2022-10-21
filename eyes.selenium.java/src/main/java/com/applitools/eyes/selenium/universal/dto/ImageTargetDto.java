@@ -2,10 +2,12 @@ package com.applitools.eyes.selenium.universal.dto;
 
 import com.applitools.eyes.Location;
 import com.applitools.eyes.RectangleSize;
+import com.fasterxml.jackson.annotation.JsonInclude;
 
 /**
  * the image target.
  */
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class ImageTargetDto implements ITargetDto {
 
     private String image;
