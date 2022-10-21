@@ -57,4 +57,12 @@ public class LocateTextDto {
   public void setSettings(OCRSearchSettingsDto settings) {
     this.settings = settings;
   }
+
+  public ITargetDto getTarget() {
+    return target;
+  }
+
+  public void setTarget(ITargetDto target) {
+    this.target = target;
+  }
 }

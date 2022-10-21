@@ -104,12 +104,11 @@ public class CommandExecutor {
     }
   }
 
-  //TODO change locate to v3
-  public Map<String, List<Region>> locate(Reference eyesRef, VisualLocatorSettingsDto locatorSettingsDto, ConfigurationDto config) {
+  public Map<String, List<Region>> locate(ITargetDto target, VisualLocatorSettingsDto locatorSettingsDto, ConfigurationDto config) {
     RequestDto<LocateDto> request = new RequestDto<>();
-    request.setName("Eyes.locate");
+    request.setName("Core.locate");
     request.setKey(UUID.randomUUID().toString());
-    request.setPayload(new LocateDto(eyesRef, locatorSettingsDto, config));
+    request.setPayload(new LocateDto(target, locatorSettingsDto, config));
     SyncTaskListener syncTaskListener = checkedCommand(request, true);
     ResponseDto<Map<String, List<Region>>> locateResponse = (ResponseDto<Map<String, List<Region>>>) syncTaskListener.get();
     if (locateResponse != null && locateResponse.getPayload().getError() != null) {
@@ -122,6 +121,7 @@ public class CommandExecutor {
     return locateResponse.getPayload().getResult();
   }
 
+  // former extractTextRegions
   public Map<String, List<TextRegion>> locateText(Reference eyesRef, ITargetDto target, OCRSearchSettingsDto searchSettingsDto, ConfigurationDto config) {
     RequestDto<LocateTextDto> request = new RequestDto<>();
     request.setName("Eyes.locateText");

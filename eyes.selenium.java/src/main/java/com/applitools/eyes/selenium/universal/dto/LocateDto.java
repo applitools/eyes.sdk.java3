@@ -6,11 +6,8 @@ import com.applitools.eyes.selenium.Reference;
  * used to perform a locate action
  */
 public class LocateDto {
-  /**
-   * reference received from "Core.openEyes" command
-   */
-  private Reference eyes;
 
+  private ITargetDto target;
 
   /**
    * visual locator settings
@@ -23,18 +20,18 @@ public class LocateDto {
    */
   private ConfigurationDto config;
 
-  public LocateDto(Reference eyes, VisualLocatorSettingsDto settings, ConfigurationDto config) {
-    this.eyes = eyes;
+  public LocateDto(ITargetDto target, VisualLocatorSettingsDto settings, ConfigurationDto config) {
+    this.target = target;
     this.settings = settings;
     this.config = config;
   }
 
-  public Reference getEyes() {
-    return eyes;
+  public ITargetDto getTarget() {
+    return target;
   }
 
-  public void setEyes(Reference eyes) {
-    this.eyes = eyes;
+  public void setTarget(ITargetDto target) {
+    this.target = target;
   }
 
   public VisualLocatorSettingsDto getSettings() {
