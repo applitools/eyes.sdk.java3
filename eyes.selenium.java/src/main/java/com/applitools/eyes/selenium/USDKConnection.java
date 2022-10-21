@@ -80,7 +80,7 @@ public class USDKConnection {
                     }
                   } else if(payload.contains("Eyes.check")) {
                     try {
-                      ResponseDto<MatchResultDto> checkResponse = objectMapper.readValue(payload, new TypeReference<ResponseDto<MatchResultDto>>() {});
+                      ResponseDto<List<MatchResultDto>> checkResponse = objectMapper.readValue(payload, new TypeReference<ResponseDto<List<MatchResultDto>>>() {});
                       SyncTaskListener<ResponseDto<?>> syncTaskLister = map.get(checkResponse.getKey());
                       syncTaskLister.onComplete(checkResponse);
                       map.remove(checkResponse.getKey());
