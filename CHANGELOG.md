@@ -1,7 +1,11 @@
 ## [5.30.0] - 2022-10-19
 ### Fixed
 - UFG tests aborts intermittently.
-- Fixed defaults for CloseBatch and DeleteTest.
+- CloseBatch and DeleteTest issues.
+- extractText issue.
+### Updated
+- Drop support for Android 9 and Android 10 specific devices.
+- (Internal) Mark target element with data-applitools-scroll for DOM.
 
 ## [5.29.0] - 2022-10-10
 ### Updated
