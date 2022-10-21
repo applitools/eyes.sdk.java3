@@ -1,8 +1,11 @@
 package com.applitools.eyes.selenium.universal.dto;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+
 /**
  * Those historically were in config
  */
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class NormalizationDto {
 
     /**
