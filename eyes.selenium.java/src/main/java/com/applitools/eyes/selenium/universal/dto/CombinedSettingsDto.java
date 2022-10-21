@@ -1,7 +1,6 @@
 package com.applitools.eyes.selenium.universal.dto;
 
-import com.applitools.eyes.*;
-import com.applitools.eyes.selenium.StitchMode;
+import com.applitools.eyes.LazyLoadOptions;
 import com.fasterxml.jackson.annotation.JsonInclude;
 
 import java.util.List;
@@ -15,7 +14,7 @@ public class CombinedSettingsDto {
     private Boolean isDisabled;
     private String serverUrl;
     private String apiKey;
-    private AbstractProxySettings proxy;
+    private ProxyDto proxy;
     private String appName;
     private Integer connectionTimeout;
     private Boolean removeSession;
@@ -23,12 +22,12 @@ public class CombinedSettingsDto {
     private String testName;
     private String displayName;
     private String userTestId;
-    private SessionType sessionType;
-    private List<PropertyData> properties;
-    private BatchInfo batch;
+    private String sessionType;
+    private List<CustomPropertyDto> properties;
+    private BatchDto batch;
     private Boolean keepBatchOpen;
     private String environmentName;
-    private AppEnvironment environment;
+    private AppEnvironmentDto environment;
     private String branchName;
     private String parentBranchName;
     private String baselineEnvName;
@@ -110,11 +109,11 @@ public class CombinedSettingsDto {
         this.apiKey = apiKey;
     }
 
-    public AbstractProxySettings getProxy() {
+    public ProxyDto getProxy() {
         return proxy;
     }
 
-    public void setProxy(AbstractProxySettings proxy) {
+    public void setProxy(ProxyDto proxy) {
         this.proxy = proxy;
     }
 
@@ -174,27 +173,27 @@ public class CombinedSettingsDto {
         this.userTestId = userTestId;
     }
 
-    public SessionType getSessionType() {
+    public String getSessionType() {
         return sessionType;
     }
 
-    public void setSessionType(SessionType sessionType) {
+    public void setSessionType(String sessionType) {
         this.sessionType = sessionType;
     }
 
-    public List<PropertyData> getProperties() {
+    public List<CustomPropertyDto> getProperties() {
         return properties;
     }
 
-    public void setProperties(List<PropertyData> properties) {
+    public void setProperties(List<CustomPropertyDto> properties) {
         this.properties = properties;
     }
 
-    public BatchInfo getBatch() {
+    public BatchDto getBatch() {
         return batch;
     }
 
-    public void setBatch(BatchInfo batch) {
+    public void setBatch(BatchDto batch) {
         this.batch = batch;
     }
 
@@ -214,11 +213,11 @@ public class CombinedSettingsDto {
         this.environmentName = environmentName;
     }
 
-    public AppEnvironment getEnvironment() {
+    public AppEnvironmentDto getEnvironment() {
         return environment;
     }
 
-    public void setEnvironment(AppEnvironment environment) {
+    public void setEnvironment(AppEnvironmentDto environment) {
         this.environment = environment;
     }
 
