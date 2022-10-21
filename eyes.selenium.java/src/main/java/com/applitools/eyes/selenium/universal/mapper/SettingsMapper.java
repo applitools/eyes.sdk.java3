@@ -1,6 +1,5 @@
 package com.applitools.eyes.selenium.universal.mapper;
 
-import com.applitools.eyes.AppEnvironment;
 import com.applitools.eyes.CutProvider;
 import com.applitools.eyes.FixedCutProvider;
 import com.applitools.eyes.config.Configuration;
@@ -17,21 +16,27 @@ public class SettingsMapper {
 
         dto.setServerUrl(config.getServerUrl().toString());
         dto.setApiKey(config.getApiKey());
-        dto.setProxy(config.getProxy());
-        dto.setConnectionTimeout(config.getConnectionTimeout());
-        dto.setRemoveSession(config.getRemoveSession());
+        dto.setProxy(ProxyMapper.toProxyDto(config.getProxy()));
+        dto.setConnectionTimeout(null); //TODO - why is this null?
+        dto.setRemoveSession(null); //TODO - why is this null?
         dto.setAgentId(config.getAgentId());
         dto.setAppName(config.getAppName());
         dto.setTestName(config.getTestName());
-        dto.setDisplayName(config.getDisplayName());
-        dto.setUserTestId(config.getUserTestId());
-        dto.setSessionType(config.getSessionType());
-        dto.setProperties(config.getProperties());
-        dto.setBatch(config.getBatch());
+        dto.setDisplayName(null);
+        dto.setUserTestId(null);
+        dto.setSessionType(config.getSessionType() == null ? null : config.getSessionType().name());
+        dto.setProperties(CustomPropertyMapper.toCustomPropertyDtoList(config.getProperties()));
+        dto.setBatch(BatchMapper.toBatchDto(config.getBatch()));
         dto.setKeepBatchOpen(keepBatchOpen);
         dto.setEnvironmentName(config.getEnvironmentName());
-        dto.setEnvironment(new AppEnvironment(config.getHostOS(), config.getHostApp(), config.getViewportSize(),
-                config.getDeviceInfo(), config.getOsInfo(), config.getHostingAppInfo()));
+        dto.setEnvironment(AppEnvironmentMapper.toAppEnvironmentMapper(
+                config.getHostOS(),
+                config.getHostApp(),
+                config.getViewportSize(),
+                null,
+                null,
+                null));
+
         dto.setBranchName(config.getBranchName());
         dto.setParentBranchName(config.getParentBranchName());
         dto.setBaselineEnvName(config.getBaselineEnvName());
