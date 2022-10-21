@@ -42,7 +42,7 @@ public class Configuration implements IConfiguration {
     private Boolean saveFailedTests;
     private Integer stitchOverlap;
     private Boolean isSendDom;
-    private String apiKey;
+    private String apiKey = GeneralUtils.getEnvString("APPLITOOLS_API_KEY");
     private String serverUrl = "https://eyes.applitools.com/";
     private AbstractProxySettings proxy;
     private AutProxySettings autProxy;
