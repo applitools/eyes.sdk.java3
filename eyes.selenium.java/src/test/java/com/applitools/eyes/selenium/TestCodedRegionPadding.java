@@ -38,7 +38,8 @@ public class TestCodedRegionPadding {
 
     @AfterMethod
     public void teardown() {
-        driver.quit();
+        if (driver != null)
+            driver.quit();
         eyes.abortIfNotClosed();
     }
 
