@@ -109,7 +109,7 @@ public class CheckSettingsMapper {
             .toCodedRegionReferenceList(Arrays.asList(seleniumCheckSettings.getContentRegions())));
     checkSettingsDto.setFloatingRegions(TFloatingRegionMapper.toTFloatingRegionDtoList(Arrays.asList(seleniumCheckSettings.getFloatingRegions())));
     checkSettingsDto.setAccessibilityRegions(TAccessibilityRegionMapper.toTAccessibilityRegionDtoList(Arrays.asList(seleniumCheckSettings.getAccessibilityRegions())));
-    checkSettingsDto.setAccessibilitySettings(null); //TODO why I am null?
+    checkSettingsDto.setAccessibilitySettings(AccessibilitySettingsMapper.toAccessibilitySettingsDto(((SeleniumCheckSettings) checkSettings).getAccessibilityValidation()));
     checkSettingsDto.setMatchLevel(seleniumCheckSettings.getMatchLevel() == null ? null : seleniumCheckSettings.getMatchLevel().getName());
     checkSettingsDto.setRetryTimeout(config.getMatchTimeout()); //I'm NEW - former matchTimeout
     checkSettingsDto.setSendDom(seleniumCheckSettings.isSendDom());
