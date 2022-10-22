@@ -106,6 +106,7 @@
         <module>eyes.appium.java</module>
         <module>eyes-universal-core</module>
         <module>selenium4</module>
+        <module>eyes.images.java</module>
     </modules>
 
     <distributionManagement>
