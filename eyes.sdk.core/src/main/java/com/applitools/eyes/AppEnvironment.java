@@ -1,9 +1,22 @@
 package com.applitools.eyes;
 
+import com.fasterxml.jackson.annotation.JsonPropertyOrder;
+
 /**
  * The environment in which the application under test is executing.
  */
+@JsonPropertyOrder({
+        "inferred",
+        "os",
+        "hostingApp",
+        "displaySize",
+        "deviceInfo",
+        "osInfo",
+        "hostingAppInfo",
+})
 public class AppEnvironment {
+
+    private String inferred;
 
     /**
      * the OS name.
@@ -38,12 +51,21 @@ public class AppEnvironment {
     /**
      * the viewport size.
      */
-    private RectangleSize viewportSize;
+    private RectangleSize displaySize;
 
     /**
      * Creates a new AppEnvironment instance.
      */
     public AppEnvironment() {
+    }
+
+    /**
+     * Creates a new AppEnvironment instance.
+     *
+     * @param inferred the inferred environment information.
+     */
+    public AppEnvironment(String inferred) {
+        this.inferred = inferred;
     }
 
     /**
@@ -65,18 +87,36 @@ public class AppEnvironment {
      *
      * @param os             the OS hosting the application under test or {@code null} if                    unknown.
      * @param hostingApp     the application hosting the application under test or {@code null}                    if unknown.
-     * @param viewportSize    the display size of the application or {@code null} if unknown.
+     * @param displaySize    the display size of the application or {@code null} if unknown.
      * @param deviceName     specifies
      * @param osInfo         the os info
      * @param hostingAppInfo the hosting app info
      */
-    public AppEnvironment(String os, String hostingApp, RectangleSize viewportSize, String deviceName, String osInfo, String hostingAppInfo) {
+    public AppEnvironment(String os, String hostingApp, RectangleSize displaySize, String deviceName, String osInfo, String hostingAppInfo) {
         this.os = os;
         this.hostingApp = hostingApp;
-        this.viewportSize = viewportSize;
+        this.displaySize = displaySize;
         this.deviceName = deviceName;
         this.osInfo = osInfo;
         this.hostingAppInfo = hostingAppInfo;
+    }
+
+    /**
+     * Gets inferred.
+     *
+     * @return the information inferred from the execution environment or {@code null} if no information could be inferred.
+     */
+    public String getInferred() {
+        return inferred;
+    }
+
+    /**
+     * Sets inferred.
+     *
+     * @param inferred -  the inferred environment information.
+     */
+    public void setInferred(String inferred) {
+        this.inferred = inferred;
     }
 
     /**
@@ -122,7 +162,7 @@ public class AppEnvironment {
      * @return the display size of the application or {@code null} if unknown.
      */
     public RectangleSize getDisplaySize() {
-        return viewportSize;
+        return displaySize;
     }
 
     /**
@@ -131,14 +171,14 @@ public class AppEnvironment {
      * @param size -  the display size of the application or {@code null} if unknown.
      */
     public void setDisplaySize(RectangleSize size) {
-        this.viewportSize = size;
+        this.displaySize = size;
     }
 
     @Override
     public String toString() {
         return "[os = " + (os == null ? "?" : "'" + os + "'") + " hostingApp = "
                 + (hostingApp == null ? "?" : "'" + hostingApp + "'")
-                + " displaySize = " + viewportSize + "]";
+                + " displaySize = " + displaySize + "]";
     }
 
     /**
