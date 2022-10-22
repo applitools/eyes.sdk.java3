@@ -60,7 +60,8 @@ public abstract class TestSetup extends ReportingTestSuite implements ITest {
     @AfterClass
     public void afterClass() {
         // Close the app.
-        driver.quit();
+        if (driver != null)
+            driver.quit();
 
         // If the test was aborted before eyes.close was called, ends the test as aborted.
         eyes.abortIfNotClosed();
