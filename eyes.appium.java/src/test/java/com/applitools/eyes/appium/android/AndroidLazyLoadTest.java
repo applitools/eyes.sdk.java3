@@ -15,9 +15,6 @@ import java.util.Arrays;
 
 public class AndroidLazyLoadTest extends AndroidTestSetup {
 
-    public static final String USERNAME = System.getenv("SAUCE_USERNAME");
-    public static final String ACCESS_KEY = System.getenv("SAUCE_ACCESS_KEY");
-    public static final String SL_URL = "https://"+USERNAME+":" + ACCESS_KEY + "@ondemand.saucelabs.com:443/wd/hub";
     public static final int PIXEL_5_OFFSET = 13049;
     public static final int PIXEL_3XL_OFFSET = 13601;
 
