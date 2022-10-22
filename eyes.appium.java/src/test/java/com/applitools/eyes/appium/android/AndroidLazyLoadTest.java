@@ -8,6 +8,7 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.PointerInput;
 import org.openqa.selenium.interactions.Sequence;
 import org.testng.Assert;
+import org.testng.annotations.AfterTest;
 import org.testng.annotations.Test;
 
 import java.time.Duration;
@@ -18,6 +19,10 @@ public class AndroidLazyLoadTest extends AndroidTestSetup {
     public static final int PIXEL_5_OFFSET = 13049;
     public static final int PIXEL_3XL_OFFSET = 13601;
 
+    @AfterTest(alwaysRun = true)
+    public void after(){
+        if (driver != null) driver.quit();
+    }
 
     @Test
     public void testHelperLibOffsetCalculation() throws InterruptedException {

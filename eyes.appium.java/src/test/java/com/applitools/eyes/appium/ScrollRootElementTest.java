@@ -2,10 +2,15 @@ package com.applitools.eyes.appium;
 
 import com.applitools.eyes.appium.android.AndroidTestSetup;
 import io.appium.java_client.AppiumBy;
-import io.appium.java_client.MobileBy;
+import org.testng.annotations.AfterMethod;
 import org.testng.annotations.Test;
 
 public class ScrollRootElementTest extends AndroidTestSetup {
+
+    @AfterMethod(alwaysRun = true)
+    public void after(){
+        if (driver != null) driver.quit();
+    }
 
     @Test
     public void testScrollRootElement() throws InterruptedException {
