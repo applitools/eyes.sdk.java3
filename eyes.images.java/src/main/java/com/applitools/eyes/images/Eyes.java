@@ -838,10 +838,6 @@ public class Eyes implements IEyesBase {
         configure().setCutProvider(unscaledFixedCutProvider);
     }
 
-//    public void setDebugScreenshotsPrefix(String prefix) {
-//        this.originEyes.setDebugScreenshotsPrefix(prefix);
-//    }
-
     /**
      * Sets debug screenshots path.
      * @param pathToSave Path where you want to save the debug screenshots.
