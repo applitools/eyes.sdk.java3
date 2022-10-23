@@ -25,6 +25,7 @@ public class AndroidLazyLoadTest extends AndroidTestSetup {
     public static final int PIXEL_5_OFFSET = 13049;
     public static final int PIXEL_3XL_OFFSET = 13601;
 
+
     @Override
     protected void initDriver() throws MalformedURLException {
         capabilities = new DesiredCapabilities();
