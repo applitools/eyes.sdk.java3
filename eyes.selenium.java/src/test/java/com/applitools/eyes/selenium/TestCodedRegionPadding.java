@@ -13,11 +13,31 @@ import org.openqa.selenium.net.PortProber;
 import org.testng.Assert;
 import org.testng.annotations.*;
 
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+
 
 public class TestCodedRegionPadding {
 
     private Eyes eyes;
     private WebDriver driver;
+
+    public void testPortProberWithReflection() throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
+        /**
+         * int seedPort = createAcceptablePort();
+         * int suggestedPort = checkPortIsFree(seedPort);
+         */
+        Method createAcceptablePort = PortProber.class.getDeclaredMethod("createAcceptablePort");
+        Method checkPortIsFree = PortProber.class.getDeclaredMethod("checkPortIsFree", int.class);
+
+        createAcceptablePort.setAccessible(true);
+        checkPortIsFree.setAccessible(true);
+
+        int seedPort = (int) createAcceptablePort.invoke(PortProber.class);
+        int port = (int) checkPortIsFree.invoke(PortProber.class, seedPort);
+
+        System.out.println("PortProber port: " + port);
+    }
 
     @BeforeTest
     public void setup() {
@@ -27,6 +47,13 @@ public class TestCodedRegionPadding {
         String chromeDriverPath = System.getenv("CHROME_DRIVER_PATH");
         if(chromeDriverPath == null) throw new EyesException("CHROME_DRIVER_PATH missing");
         System.setProperty("webdriver.chrome.driver", chromeDriverPath);
+
+        try {
+            System.out.println("trying to find a port using PortProber");
+            testPortProberWithReflection();
+        } catch (NoSuchMethodException | InvocationTargetException | IllegalAccessException e) {
+            e.printStackTrace();
+        }
 
         int port = PortProber.findFreePort();
         System.out.println("f: padding, port: " + port);
