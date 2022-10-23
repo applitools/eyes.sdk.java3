@@ -27,6 +27,7 @@ public class TestCodedRegionPadding {
          * int seedPort = createAcceptablePort();
          * int suggestedPort = checkPortIsFree(seedPort);
          */
+        System.out.println(System.getenv("SE_DOCKER"));
         Method createAcceptablePort = PortProber.class.getDeclaredMethod("createAcceptablePort");
         Method checkPortIsFree = PortProber.class.getDeclaredMethod("checkPortIsFree", int.class);
 
