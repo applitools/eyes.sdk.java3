@@ -23,7 +23,7 @@ public class TestCodedRegionPadding {
     private WebDriver driver;
 
     public void testPortProberWithReflection() throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
-        /**
+        /*
          * int seedPort = createAcceptablePort();
          * int suggestedPort = checkPortIsFree(seedPort);
          */
@@ -36,6 +36,7 @@ public class TestCodedRegionPadding {
         int seedPort = (int) createAcceptablePort.invoke(PortProber.class);
         int port = (int) checkPortIsFree.invoke(PortProber.class, seedPort);
 
+        System.out.println("PortProber seedPort: " + seedPort);
         System.out.println("PortProber port: " + port);
     }
 
@@ -49,10 +50,15 @@ public class TestCodedRegionPadding {
         System.setProperty("webdriver.chrome.driver", chromeDriverPath);
 
         try {
-            System.out.println("trying to find a port using PortProber");
+            System.out.println("trying to find a port using PortProber..");
             testPortProberWithReflection();
         } catch (NoSuchMethodException | InvocationTargetException | IllegalAccessException e) {
-            e.printStackTrace();
+            try {
+                System.out.println("trying second time..");
+                testPortProberWithReflection();
+            } catch (NoSuchMethodException | InvocationTargetException | IllegalAccessException e2) {
+                System.out.println("failed twice to find a port");
+            }
         }
 
         int port = PortProber.findFreePort();
