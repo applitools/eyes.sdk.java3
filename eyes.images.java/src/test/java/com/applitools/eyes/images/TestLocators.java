@@ -1,5 +1,7 @@
 package com.applitools.eyes.images;
 
+import com.applitools.eyes.CoordinatesType;
+import com.applitools.eyes.Region;
 import com.applitools.eyes.locators.TextRegion;
 import com.applitools.eyes.locators.TextRegionSettings;
 import com.applitools.eyes.locators.VisualLocatorSettings;
@@ -15,17 +17,22 @@ public class TestLocators extends TestSetup {
 
     private final String EXTRACT_TEST_IMAGE = "src/main/resources/extractText.png";
 
-    @Test(timeOut = 60000)
+    @Test
     public void testLocate() {
+        eyes.open(getApplicationName(), "Locate");
         BufferedImage image = ImageUtils.imageFromFile(EXTRACT_TEST_IMAGE);
 
-        eyes.setAppName(getApplicationName());
-        eyes.locate(new VisualLocatorSettings().name("test").image(image));
+        Map<String, List<Region>> res = eyes.locate(new VisualLocatorSettings().name("the").image(image));
+        List<Region> regions = res.get("the");
+        Assert.assertEquals(regions.size(), 1);
+        Region region = regions.get(0);
+        Assert.assertEquals(region, new Region(69, 8, 31, 22, CoordinatesType.SCREENSHOT_AS_IS));
+        eyes.close();
     }
 
     @Test
     public void testLocateText() {
-        eyes.open(getApplicationName(), "TestLocators");
+        eyes.open(getApplicationName(), "LocateText");
         BufferedImage image = ImageUtils.imageFromFile(EXTRACT_TEST_IMAGE);
 
         Map<String, List<TextRegion>> textRegions = eyes.extractTextRegions(new TextRegionSettings(".+").image(image));
@@ -39,7 +46,7 @@ public class TestLocators extends TestSetup {
 
     @Test
     public void testExtractText() {
-        eyes.open(getApplicationName(), "TestLocators");
+        eyes.open(getApplicationName(), "ExtractText");
         BufferedImage image = ImageUtils.imageFromFile(EXTRACT_TEST_IMAGE);
         List<String> result = eyes.extractText(new OcrRegion(image));
         Assert.assertEquals(result.size(), 1);

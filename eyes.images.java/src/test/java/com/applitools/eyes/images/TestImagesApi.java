@@ -1,8 +1,11 @@
 package com.applitools.eyes.images;
 
+import com.applitools.eyes.EyesRunner;
 import com.applitools.eyes.Region;
+import com.applitools.eyes.TestResultsSummary;
 import com.applitools.eyes.UnscaledFixedCutProvider;
 import com.applitools.utils.ImageUtils;
+import org.testng.Assert;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.Test;
 
@@ -83,5 +86,49 @@ public class TestImagesApi extends TestSetup {
         eyes.setImageCut(new UnscaledFixedCutProvider(200, 100, 100, 50));
         eyes.check("TestCheckImage_Fluent", Target.image(TEST_IMAGE));
         eyes.close();
+    }
+
+    @Test
+    public void TestCheckImage_Fluent_LazyLoad() {
+        eyes.open(getApplicationName(), "CheckFluentLazyLoad");
+        eyes.check("TestCheckImage_Fluent", Target.image(TEST_IMAGE).lazyLoad());
+        eyes.close();
+    }
+
+//    @Test
+//    public void TestCheckImage_Fluent_DebugScreenshots() {
+//        eyes.setDebugScreenshotsPath("./");
+//        eyes.open(getApplicationName(), "CheckFluentDebugScreenshots");
+//        eyes.check("TestCheckImage_Fluent", Target.image(TEST_IMAGE).lazyLoad());
+//        eyes.close();
+//    }
+
+    @Test
+    public void TestCheckImage_Fluent_EnablePatterns() {
+        eyes.open(getApplicationName(), "CheckFluentEnablePatterns");
+        eyes.check("TestCheckImage_Fluent", Target.image(TEST_IMAGE).enablePatterns());
+        eyes.close();
+    }
+
+    @Test
+    public void TestCheckImage_Fluent_Layout() {
+        eyes.open(getApplicationName(), "CheckFluentLayout");
+        eyes.check("TestCheckImage_Fluent", Target.image(TEST_IMAGE).layout());
+        eyes.close();
+    }
+
+    @Test
+    public void TestCheckImage_Fluent_CloseAsync_GetAllTestResults() {
+        EyesRunner runner = new ImageRunner();
+        Eyes eyes1 = new Eyes(runner);
+
+        eyes1.open(getApplicationName(), "GetAllTestResults");
+        eyes1.check("TestCheckImage_Fluent", Target.image(TEST_IMAGE).layout());
+        eyes1.closeAsync();
+
+        TestResultsSummary result = runner.getAllTestResults(false);
+        Assert.assertNotNull(result);
+
+        System.out.println(result);
     }
 }
