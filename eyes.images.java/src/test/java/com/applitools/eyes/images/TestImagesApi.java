@@ -4,6 +4,7 @@ import com.applitools.eyes.EyesRunner;
 import com.applitools.eyes.Region;
 import com.applitools.eyes.TestResultsSummary;
 import com.applitools.eyes.UnscaledFixedCutProvider;
+import com.applitools.eyes.images.utils.TestSetup;
 import com.applitools.utils.ImageUtils;
 import org.testng.Assert;
 import org.testng.annotations.AfterMethod;

@@ -2,9 +2,9 @@ package com.applitools.eyes.appium;
 
 import com.applitools.ICheckSettings;
 import com.applitools.eyes.config.Configuration;
-import com.applitools.eyes.selenium.universal.dto.CheckSettingsDto;
-import com.applitools.eyes.selenium.universal.mapper.ProxyMapper;
-import com.applitools.eyes.selenium.universal.mapper.VisualGridOptionMapper;
+import com.applitools.eyes.universal.dto.CheckSettingsDto;
+import com.applitools.eyes.universal.mapper.ProxyMapper;
+import com.applitools.eyes.universal.mapper.VisualGridOptionMapper;
 
 import java.util.Arrays;
 
@@ -52,12 +52,12 @@ public class AppiumCheckSettingsMapper {
         checkSettingsDto.setLazyLoad(appiumCheckSettings.getLazyLoadOptions());
 
         // ScreenshotSettings
-        checkSettingsDto.setRegion(TRegionMapper.toTRegionFromCheckSettings(checkSettings));
+        checkSettingsDto.setRegion(AppiumTRegionMapper.toTRegionFromCheckSettings(checkSettings));
 
         checkSettingsDto.setFully(appiumCheckSettings.getStitchContent());
 
         checkSettingsDto.
-                setScrollRootElement(TRegionMapper.toTRegionDtoFromScrolls(appiumCheckSettings
+                setScrollRootElement(AppiumTRegionMapper.toTRegionDtoFromScrolls(appiumCheckSettings
                                 .getScrollRootElementSelector(), appiumCheckSettings.getScrollRootElement()));
 
         return checkSettingsDto;
@@ -71,10 +71,10 @@ public class AppiumCheckSettingsMapper {
         CheckSettingsDto checkSettingsDto = new CheckSettingsDto();
 
         // CheckSettings
-        checkSettingsDto.setRegion(com.applitools.eyes.selenium.universal.mapper.TRegionMapper.toTRegionFromCheckSettings(checkSettings));
+        checkSettingsDto.setRegion(AppiumTRegionMapper.toTRegionFromCheckSettings(checkSettings));
 //        checkSettingsDto.setFrames(ContextReferenceMapper.toContextReferenceDtoList(appiumCheckSettings.getFrameChain()));
         checkSettingsDto.setFully(appiumCheckSettings.getStitchContent());
-        checkSettingsDto.setScrollRootElement(TRegionMapper.toTRegionDtoFromScrolls(appiumCheckSettings
+        checkSettingsDto.setScrollRootElement(AppiumTRegionMapper.toTRegionDtoFromScrolls(appiumCheckSettings
                 .getScrollRootElementSelector(), appiumCheckSettings.getScrollRootElement()));
         checkSettingsDto.setStitchMode(config.getStitchMode() == null ? null : config.getStitchMode().getName());
         checkSettingsDto.setHideScrollBars(config.getHideScrollbars());

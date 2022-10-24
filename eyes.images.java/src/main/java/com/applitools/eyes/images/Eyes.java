@@ -5,19 +5,23 @@ import com.applitools.ICheckSettingsInternal;
 import com.applitools.eyes.*;
 import com.applitools.eyes.capture.ScreenshotProvider;
 import com.applitools.eyes.config.Configuration;
+import com.applitools.eyes.images.universal.mapper.ImageOCRExtractSettingsDtoMapper;
+import com.applitools.eyes.images.universal.mapper.ImageTargetMapper;
+import com.applitools.eyes.images.universal.mapper.ImagesCheckSettingsMapper;
 import com.applitools.eyes.locators.BaseOcrRegion;
 import com.applitools.eyes.locators.TextRegion;
 import com.applitools.eyes.locators.TextRegionSettings;
 import com.applitools.eyes.locators.VisualLocatorSettings;
-import com.applitools.eyes.selenium.universal.dto.*;
-import com.applitools.eyes.selenium.universal.mapper.*;
+import com.applitools.eyes.universal.CommandExecutor;
+import com.applitools.eyes.universal.Reference;
+import com.applitools.eyes.universal.dto.*;
+import com.applitools.eyes.universal.dto.response.CommandCloseResponseDto;
+import com.applitools.eyes.universal.mapper.*;
 import com.applitools.utils.ArgumentGuard;
 import com.applitools.utils.ClassVersionGetter;
-import com.applitools.utils.GeneralUtils;
 import com.applitools.utils.ImageUtils;
 
 import java.awt.image.BufferedImage;
-import java.lang.reflect.Method;
 import java.net.URI;
 import java.util.Arrays;
 import java.util.List;
@@ -25,15 +29,47 @@ import java.util.Map;
 
 public class Eyes implements IEyesBase {
 
-    private com.applitools.eyes.selenium.Eyes originEyes;
+    /**
+     * the title of the test, determined by the tag of the check.
+     */
     private String title;
+
+    /**
+     * the runner.
+     */
+    private EyesRunner runner;
+
+    /**
+     * the command executor to execute the commands.
+     */
+    private CommandExecutor commandExecutor;
+
+    /**
+     * the configuration that will be used in eyes related requestes.
+     */
+    private Configuration configuration = new Configuration();
+
+    /**
+     * this reference has to be used in eyes related requests (Eyes.check, Eyes.locate, Eyes.extractTextRegions, Eyes.extractText, Eyes.close, Eyes.abort)
+     */
+    private Reference eyesRef;
+
+    /**
+     * inferred. backward compatibility.
+     */
     private String inferred;
+
+    /**
+     * is eyes closed, used to check abort after close.
+     */
+    private boolean isClosed;
+
 
     /**
      * Instantiates a new Eyes.
      */
     public Eyes() {
-        this.originEyes = new com.applitools.eyes.selenium.Eyes(new ImageRunner());
+        this(new ImageRunner());
     }
 
     /**
@@ -41,7 +77,8 @@ public class Eyes implements IEyesBase {
      * @param runner0 the runner
      */
     public Eyes(EyesRunner runner0) {
-        this.originEyes = new com.applitools.eyes.selenium.Eyes(runner0);
+        this.runner = runner0 == null ? new ImageRunner() : runner0;
+        commandExecutor = runner.getCommandExecutor();
     }
 
     /**
@@ -60,7 +97,20 @@ public class Eyes implements IEyesBase {
      *                   {@code null} will automatically grab the resolution from the image.
      */
     public void open(String appName, String testName, RectangleSize viewportSize) {
-        this.originEyes.open(appName, testName, viewportSize);
+        if (getIsDisabled()) {
+            return;
+        }
+
+        configuration.setAppName(appName).setTestName(testName);
+        if (viewportSize != null && !viewportSize.isEmpty()) {
+            configuration.setViewportSize(new RectangleSize(viewportSize));
+        }
+
+        ConfigurationDto configurationDto = ConfigurationMapper
+                .toConfigurationDto(configuration, runner.isDontCloseBatches());
+        OpenSettingsDto settingsDto = SettingsMapper.toOpenSettingsDto(configuration, runner.isDontCloseBatches());
+
+        eyesRef = commandExecutor.managerOpenEyes(runner.getManagerRef(), null, settingsDto, configurationDto);
     }
 
     /**
@@ -70,7 +120,7 @@ public class Eyes implements IEyesBase {
      * @see #open(String, String, RectangleSize)
      */
     public void open(String appName, String testName) {
-        this.originEyes.open(appName, testName);
+        open(appName, testName, null);
     }
 
     /**
@@ -78,7 +128,9 @@ public class Eyes implements IEyesBase {
      * @param checkSettings Multiple <code>ICheckSettings</code> object representing different regions in the viewport.
      */
     public void check(ICheckSettings... checkSettings) {
-        this.originEyes.check(checkSettings);
+        for (ICheckSettings checkSettings1 : checkSettings) {
+            check(checkSettings1);
+        }
     }
 
     /**
@@ -88,7 +140,7 @@ public class Eyes implements IEyesBase {
      */
     public void check(String tag, ICheckSettings checkSettings) {
         title = (tag != null) ? tag : "";
-        this.check(checkSettings.withName(tag));
+        check(checkSettings.withName(tag));
     }
 
     /**
@@ -102,11 +154,11 @@ public class Eyes implements IEyesBase {
         CheckSettingsDto checkSettingsDto = ImagesCheckSettingsMapper.toCheckSettingsDto(imagesCheckTarget, configure());
         ImageTargetDto imageTargetDto = ImageTargetMapper.toImageTargetDto(imagesCheckTarget);
 
-        this.checkDto(checkSettingsDto, imageTargetDto);
+        checkDto(checkSettingsDto, imageTargetDto);
     }
 
     public List<String> extractText(BaseOcrRegion... ocrRegions) {
-        List<OCRExtractSettingsDto> ocrExtractSettingsDtoList = OCRExtractSettingsDtoMapper
+        List<OCRExtractSettingsDto> ocrExtractSettingsDtoList = ImageOCRExtractSettingsDtoMapper
                 .toOCRExtractSettingsDtoList(Arrays.asList(ocrRegions));
         ConfigurationDto configurationDto = ConfigurationMapper
                 .toConfigurationDto(configure(), false);
@@ -141,7 +193,7 @@ public class Eyes implements IEyesBase {
                 .toConfigurationDto(configure(), false);
         ImageTargetDto target = ImageTargetMapper.toImageTargetDto(visualLocatorSettings);
 
-        return this.locateDto(target, visualLocatorSettingsDto, configurationDto);
+        return locateDto(target, visualLocatorSettingsDto, configurationDto);
     }
 
     /**
@@ -151,7 +203,7 @@ public class Eyes implements IEyesBase {
      * @return The test results.
      */
     public TestResults close() {
-        return originEyes.close();
+        return close(true);
     }
 
     /**
@@ -161,7 +213,24 @@ public class Eyes implements IEyesBase {
      * @return the test results
      */
     public TestResults close(boolean shouldThrowException) {
-        return originEyes.close(shouldThrowException);
+        if (getIsDisabled()) {
+            return null;
+        }
+
+        if (!getIsOpen()) {
+            throw new EyesException("Eyes not open");
+        }
+
+        ConfigurationDto configurationDto = ConfigurationMapper
+                .toConfigurationDto(configuration, runner.isDontCloseBatches());
+        CloseSettingsDto settings = SettingsMapper.toCloseSettingsDto(getConfiguration(), shouldThrowException);
+
+        List<CommandCloseResponseDto> closeResponse = commandExecutor.close(eyesRef, settings, configurationDto, true);
+        this.eyesRef = null;
+        isClosed = true;
+        List<TestResults> testResults = TestResultsMapper.toTestResultsList(closeResponse);
+        testResults.forEach(testResults1 -> runner.logSessionResultsAndThrowException(shouldThrowException, testResults1));
+        return testResults.get(0);
     }
 
     /**
@@ -195,7 +264,7 @@ public class Eyes implements IEyesBase {
     public void checkImage(BufferedImage image, String tag){
         ArgumentGuard.notNull(image, "image");
         title = (tag != null) ? tag : "";
-        this.check(Target.image(image).withName(tag));
+        check(Target.image(image).withName(tag));
     }
 
     /**
@@ -252,7 +321,7 @@ public class Eyes implements IEyesBase {
                 configure(), region);
         ImageTargetDto imageTargetDto = ImageTargetMapper.toImageTargetDto(image, tag);
 
-        this.checkDto(checkSettingsDto, imageTargetDto);
+        checkDto(checkSettingsDto, imageTargetDto);
     }
 
     /**
@@ -265,7 +334,7 @@ public class Eyes implements IEyesBase {
     }
 
     private Configuration configure() {
-        return this.originEyes.configure();
+        return this.configuration;
     }
 
     // backward compatibility
@@ -749,11 +818,24 @@ public class Eyes implements IEyesBase {
         setHostApp(hostApp);
     }
 
-    public void setConfiguration(Configuration config) {
-        originEyes.setConfiguration(config);
+    public void setConfiguration(Configuration configuration) {
+        ArgumentGuard.notNull(configuration, "configuration");
+        String apiKey = configuration.getApiKey();
+        if (apiKey != null) {
+            this.setApiKey(apiKey);
+        }
+        URI serverUrl = configuration.getServerUrl();
+        if (serverUrl != null) {
+            this.setServerUrl(serverUrl.toString());
+        }
+        AbstractProxySettings proxy = configuration.getProxy();
+        if (proxy != null) {
+            this.setProxy(proxy);
+        }
+        this.configuration = new Configuration(configuration);
     }
 
-    public Configuration getConfiguration() { return new Configuration(configure()); }
+    public Configuration getConfiguration() { return new Configuration(configuration); }
 
     public Configuration getConfigurationInstance() { return configure(); }
 
@@ -788,9 +870,12 @@ public class Eyes implements IEyesBase {
         return configure().getAgentId();
     }
 
-    @Override
+    /**
+     * Gets is open.
+     * @return Whether a session is open.
+     */
     public boolean getIsOpen() {
-        return this.originEyes.getIsOpen();
+        return eyesRef != null;
     }
 
     @Override
@@ -800,12 +885,12 @@ public class Eyes implements IEyesBase {
 
     @Override
     public LogHandler getLogHandler() {
-        return this.originEyes.getLogHandler();
+        return new NullLogHandler();
     }
 
     @Override
     public Logger getLogger() {
-        return this.originEyes.getLogger();
+        return new Logger();
     }
 
     @Override
@@ -820,22 +905,51 @@ public class Eyes implements IEyesBase {
 
     @Override
     public TestResults abortIfNotClosed() {
-        return this.originEyes.abort();
+        return abort();
     }
 
     @Override
     public void closeAsync() {
-        this.originEyes.closeAsync();
+        if (Boolean.TRUE.equals(getIsDisabled())) {
+            return;
+        }
+
+        if (!getIsOpen()) {
+            throw new EyesException("Eyes not open");
+        }
+
+        ConfigurationDto configurationDto = ConfigurationMapper
+                .toConfigurationDto(configuration, runner.isDontCloseBatches());
+        CloseSettingsDto settings = SettingsMapper.toCloseSettingsDto(getConfiguration(), false);
+
+        List<CommandCloseResponseDto> closeResponse = commandExecutor.close(eyesRef, settings, configurationDto, false);
+        this.eyesRef = null;
+        isClosed = true;
+        if (closeResponse != null) {
+            List<TestResults> testResults = TestResultsMapper.toTestResultsList(closeResponse);
+            testResults.forEach(testResults1 -> runner.logSessionResultsAndThrowException(false, testResults1));
+        }
     }
 
     @Override
     public void abortAsync() {
-        this.originEyes.abortAsync();
+        if (!isClosed && getIsOpen()) {
+            commandExecutor.abort(eyesRef, false);
+            this.eyesRef = null;
+        }
     }
 
     @Override
     public TestResults abort() {
-        return this.originEyes.abort();
+        if (!isClosed && getIsOpen()) {
+            List<CommandCloseResponseDto> abortResponse = commandExecutor.abort(eyesRef, true);
+            List<TestResults> testResults = TestResultsMapper.toTestResultsList(abortResponse);
+            this.eyesRef = null;
+            if (testResults != null) {
+                return testResults.isEmpty() ? null : testResults.get(0);
+            }
+        }
+        return null;
     }
 
     public void setImageCut(UnscaledFixedCutProvider unscaledFixedCutProvider) {
@@ -847,7 +961,7 @@ public class Eyes implements IEyesBase {
      * @param pathToSave Path where you want to save the debug screenshots.
      */
     public void setDebugScreenshotsPath(String pathToSave) {
-        this.originEyes.setDebugScreenshotsPath(pathToSave);
+        configure().setDebugScreenshotsPath(pathToSave);
     }
 
     /**
@@ -863,7 +977,7 @@ public class Eyes implements IEyesBase {
      * @param prefix The prefix for the screenshots' names.
      */
     public void setDebugScreenshotsPrefix(String prefix) {
-        this.originEyes.setDebugScreenshotsPrefix(prefix);
+        configure().setDebugScreenshotsPrefix(prefix);
     }
 
     /**
@@ -875,77 +989,35 @@ public class Eyes implements IEyesBase {
     }
 
     private void checkDto(CheckSettingsDto checkSettingsDto, ImageTargetDto imageTargetDto) throws EyesException {
-        try {
-            Method checkDto = originEyes.getClass().getDeclaredMethod("checkDto", CheckSettingsDto.class, ITargetDto.class);
-            checkDto.setAccessible(true);
-            checkDto.invoke(originEyes, checkSettingsDto, imageTargetDto);
-        } catch (NoSuchMethodException | IllegalAccessException e) {
-            System.out.println("Got a failure trying to activate checkDTO using reflection! Error " + e.getMessage());
-            throw new EyesException("Got a failure trying to activate checkDTO using reflection! Error " + e.getMessage());
-        } catch (Exception e) {
-            String errorMessage = GeneralUtils.createErrorMessageFromExceptionWithText(e, "Got a failure trying to perform a 'check'!");
-            System.out.println(errorMessage);
-            throw new EyesException(errorMessage, e);
+        if (getIsDisabled()) {
+            return;
         }
+
+        if (!getIsOpen()) {
+            this.abort();
+            throw new EyesException("you must call open() before checking");
+        }
+
+        ArgumentGuard.notNull(checkSettingsDto, "checkSettings");
+
+        ConfigurationDto configurationDto = ConfigurationMapper
+                .toConfigurationDto(configuration, runner.isDontCloseBatches());
+        commandExecutor.eyesCheck(eyesRef, imageTargetDto, checkSettingsDto, configurationDto);
     }
 
-    private TestResults checkAndCloseDto(ImageTargetDto imageTargetDto, CheckSettingsDto checkSettingsDto, CloseSettingsDto closeSettingsDto, Boolean shouldThrowException) {
-        try {
-            Method checkAndCloseDto = originEyes.getClass().getDeclaredMethod("checkAndCloseDto", ITargetDto.class, CheckSettingsDto.class, CloseSettingsDto.class, Boolean.class);
-            checkAndCloseDto.setAccessible(true);
-            return (TestResults) checkAndCloseDto.invoke(originEyes, imageTargetDto, checkSettingsDto, closeSettingsDto, shouldThrowException);
-        } catch (NoSuchMethodException | IllegalAccessException e) {
-            System.out.println("Got a failure trying to activate checkAndCloseDto using reflection! Error " + e.getMessage());
-            throw new EyesException("Got a failure trying to activate checkAndCloseDto using reflection! Error " + e.getMessage());
-        } catch (Exception e) {
-            String errorMessage = GeneralUtils.createErrorMessageFromExceptionWithText(e, "Got a failure trying to perform a 'checkAndClose'!");
-            System.out.println(errorMessage);
-            throw new EyesException(errorMessage, e);
-        }
-    }
+//    private TestResults checkAndCloseDto(ImageTargetDto imageTargetDto, CheckSettingsDto checkSettingsDto, CloseSettingsDto closeSettingsDto, Boolean shouldThrowException) {
+//        return commandExecutor.eyesCheckAndClose(eyesRef, imageTargetDto, checkSettingsDto, closeSettingsDto, configuration, shouldThrowException)
+//    }
 
     private List<String> extractTextDto(ITargetDto target, List<OCRExtractSettingsDto> settings, ConfigurationDto config) throws EyesException {
-        try {
-            Method extractTextDto = originEyes.getClass().getDeclaredMethod("extractTextDto", ITargetDto.class, List.class, ConfigurationDto.class);
-            extractTextDto.setAccessible(true);
-            return (List<String>) extractTextDto.invoke(originEyes, target, settings, config);
-        } catch (NoSuchMethodException | IllegalAccessException e) {
-            System.out.println("Got a failure trying to activate extractTextDto using reflection! Error " + e.getMessage());
-            throw new EyesException("Got a failure trying to activate extractTextDto using reflection! Error " + e.getMessage());
-        } catch (Exception e) {
-            String errorMessage = GeneralUtils.createErrorMessageFromExceptionWithText(e, "Got a failure trying to perform a 'check'!");
-            System.out.println(errorMessage);
-            throw new EyesException(errorMessage, e);
-        }
+        return commandExecutor.extractText(eyesRef, target, settings, config);
     }
 
     private Map<String, List<TextRegion>> locateTextDto(ITargetDto target, OCRSearchSettingsDto settings, ConfigurationDto config) {
-        try {
-            Method locateTextDto = originEyes.getClass().getDeclaredMethod("locateTextDto", ITargetDto.class, OCRSearchSettingsDto.class, ConfigurationDto.class);
-            locateTextDto.setAccessible(true);
-            return (Map<String, List<TextRegion>>) locateTextDto.invoke(originEyes, target, settings, config);
-        } catch (NoSuchMethodException | IllegalAccessException e) {
-            System.out.println("Got a failure trying to activate locateTextDto using reflection! Error " + e.getMessage());
-            throw new EyesException("Got a failure trying to activate locateTextDto using reflection! Error " + e.getMessage());
-        } catch (Exception e) {
-            String errorMessage = GeneralUtils.createErrorMessageFromExceptionWithText(e, "Got a failure trying to perform a 'check'!");
-            System.out.println(errorMessage);
-            throw new EyesException(errorMessage, e);
-        }
+        return commandExecutor.locateText(eyesRef, target, settings, config);
     }
 
     private Map<String, List<Region>> locateDto(ImageTargetDto target, VisualLocatorSettingsDto settings, ConfigurationDto config) {
-        try {
-            Method locateTextDto = originEyes.getClass().getDeclaredMethod("locateDto", ITargetDto.class, VisualLocatorSettingsDto.class, ConfigurationDto.class);
-            locateTextDto.setAccessible(true);
-            return (Map<String, List<Region>>) locateTextDto.invoke(originEyes, target, settings, config);
-        } catch (NoSuchMethodException | IllegalAccessException e) {
-            System.out.println("Got a failure trying to activate locateTextDto using reflection! Error " + e.getMessage());
-            throw new EyesException("Got a failure trying to activate locateTextDto using reflection! Error " + e.getMessage());
-        } catch (Exception e) {
-            String errorMessage = GeneralUtils.createErrorMessageFromExceptionWithText(e, "Got a failure trying to perform a 'check'!");
-            System.out.println(errorMessage);
-            throw new EyesException(errorMessage, e);
-        }
+        return commandExecutor.locate(target, settings, config);
     }
 }

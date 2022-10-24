@@ -1,6 +1,6 @@
 package com.applitools.eyes.selenium.universal.mapper;
 
-import com.applitools.eyes.selenium.universal.dto.SelectorRegionDto;
+import com.applitools.eyes.universal.dto.SelectorRegionDto;
 import com.applitools.utils.GeneralUtils;
 import org.openqa.selenium.By;
 

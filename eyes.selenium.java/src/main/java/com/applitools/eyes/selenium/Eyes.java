@@ -13,13 +13,20 @@ import com.applitools.eyes.selenium.fluent.SeleniumCheckSettings;
 import com.applitools.eyes.selenium.fluent.Target;
 import com.applitools.eyes.selenium.frames.FrameChain;
 import com.applitools.eyes.selenium.positioning.ImageRotation;
-import com.applitools.eyes.selenium.universal.dto.*;
-import com.applitools.eyes.selenium.universal.dto.response.CommandCloseResponseDto;
-import com.applitools.eyes.selenium.universal.mapper.*;
+import com.applitools.eyes.selenium.universal.dto.DriverTargetDto;
+import com.applitools.eyes.selenium.universal.mapper.CheckSettingsMapper;
+import com.applitools.eyes.selenium.universal.mapper.DriverMapper;
+import com.applitools.eyes.selenium.universal.mapper.OCRExtractSettingsDtoMapper;
+import com.applitools.eyes.universal.mapper.OCRSearchSettingsMapper;
+import com.applitools.eyes.universal.CommandExecutor;
+import com.applitools.eyes.universal.Reference;
+import com.applitools.eyes.universal.dto.*;
+import com.applitools.eyes.universal.dto.response.CommandCloseResponseDto;
 import com.applitools.eyes.triggers.MouseAction;
 import com.applitools.eyes.visualgrid.model.IDebugResourceWriter;
 import com.applitools.eyes.visualgrid.model.RenderingInfo;
 import com.applitools.eyes.visualgrid.services.VisualGridRunner;
+import com.applitools.eyes.universal.mapper.*;
 import com.applitools.utils.ArgumentGuard;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
@@ -39,7 +46,7 @@ public class Eyes implements IEyesBase {
     private static final int USE_DEFAULT_MATCH_TIMEOUT = -1;
 
     private boolean isVisualGridEyes = false;
-    private com.applitools.eyes.EyesRunner runner;
+    private EyesRunner runner;
     private Configuration configuration = new Configuration();
     private ImageRotation rotation;
     private WebDriver driver;
@@ -172,7 +179,7 @@ public class Eyes implements IEyesBase {
                 .toConfigurationDto(configuration, runner.isDontCloseBatches());
         OpenSettingsDto settingsDto = SettingsMapper.toOpenSettingsDto(configuration, runner.isDontCloseBatches());
 
-        eyesRef = commandExecutor.managerOpenEyes(runner.getManagerRef(), driverTargetDto, settingsDto, configurationDto);
+        eyesRef = commandExecutor.managerOpenEyes(runner.getManagerRef(), (ITargetDto) driverTargetDto, settingsDto, configurationDto);
         this.driver = driver;
         return driver;
     }
@@ -506,7 +513,7 @@ public class Eyes implements IEyesBase {
         checkDto(checkSettingsDto, driverTargetDto);
     }
 
-    private void checkDto(CheckSettingsDto checkSettingsDto, ITargetDto target) {
+    private void checkDto(CheckSettingsDto checkSettingsDto, DriverTargetDto target) {
         if (this.getIsDisabled()) {
             return;
         }
@@ -520,7 +527,7 @@ public class Eyes implements IEyesBase {
 
         ConfigurationDto configurationDto = ConfigurationMapper
                 .toConfigurationDto(configuration, runner.isDontCloseBatches());
-        commandExecutor.eyesCheck(eyesRef, target, checkSettingsDto, configurationDto);
+        commandExecutor.eyesCheck(eyesRef, (ITargetDto) target, checkSettingsDto, configurationDto);
     }
     /**
      * Close test results.
@@ -1256,8 +1263,8 @@ public class Eyes implements IEyesBase {
      * @return The viewport size of the current context.
      */
     public static RectangleSize getViewportSize(WebDriver driver) {
-        DriverDto driverDto = DriverMapper.toDriverDto(driver, null);
-        RectangleSizeDto rectangleSizeDto = CommandExecutor.getViewportSize(driverDto);
+        DriverTargetDto driverTargetDto = DriverMapper.toDriverTargetDto(driver, null);
+        RectangleSizeDto rectangleSizeDto = CommandExecutor.getViewportSize(driverTargetDto);
         return RectangleSizeMapper.toRectangleSize(rectangleSizeDto);
     }
 
@@ -1315,7 +1322,8 @@ public class Eyes implements IEyesBase {
     /**
      * Sets the time to wait just before taking a screenshot (e.g., to allow
      * positioning to stabilize when performing a full page stitching).
-     * @param waitBeforeScreenshots The time to wait (Milliseconds). Values                              smaller or equal to 0, will cause the                              default value to be used.
+     * @param waitBeforeScreenshots The time to wait (Milliseconds). Values smaller or equal to 0, will cause the
+     * default value to be used.
      */
     public void setWaitBeforeScreenshots(int waitBeforeScreenshots) {
         this.configuration.setWaitBeforeScreenshots(waitBeforeScreenshots);

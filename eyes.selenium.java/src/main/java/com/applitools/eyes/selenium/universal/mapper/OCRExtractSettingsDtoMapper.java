@@ -5,7 +5,8 @@ import java.util.stream.Collectors;
 
 import com.applitools.eyes.locators.BaseOcrRegion;
 import com.applitools.eyes.locators.OcrRegion;
-import com.applitools.eyes.selenium.universal.dto.OCRExtractSettingsDto;
+import com.applitools.eyes.universal.dto.OCRExtractSettingsDto;
+import com.applitools.eyes.universal.mapper.RectangleRegionMapper;
 
 /**
  * OCRExtractSettingsDtoMapper

@@ -1,6 +1,7 @@
 package com.applitools.eyes.selenium.universal.dto;
 
 import com.applitools.eyes.AbstractProxySettings;
+import com.applitools.eyes.universal.dto.ITargetDto;
 
 import java.util.Map;
 

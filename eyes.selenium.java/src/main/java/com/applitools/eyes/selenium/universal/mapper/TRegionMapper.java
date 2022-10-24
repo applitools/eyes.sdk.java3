@@ -12,7 +12,8 @@ import com.applitools.eyes.selenium.TargetPathLocator;
 import com.applitools.eyes.selenium.fluent.SeleniumCheckSettings;
 import com.applitools.eyes.selenium.fluent.SimpleRegionByElement;
 import com.applitools.eyes.selenium.fluent.SimpleRegionBySelector;
-import com.applitools.eyes.selenium.universal.dto.TRegion;
+import com.applitools.eyes.universal.dto.TRegion;
+import com.applitools.eyes.universal.mapper.RectangleRegionMapper;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 

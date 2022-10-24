@@ -9,11 +9,8 @@ import com.applitools.eyes.selenium.fluent.AccessibilityRegionByElement;
 import com.applitools.eyes.selenium.fluent.AccessibilityRegionBySelector;
 import com.applitools.eyes.selenium.universal.dto.ElementAccessibilityRegionDto;
 import com.applitools.eyes.selenium.universal.dto.ElementRegionDto;
-import com.applitools.eyes.selenium.universal.dto.RectangleAccessibilityRegionDto;
-import com.applitools.eyes.selenium.universal.dto.RectangleRegionDto;
-import com.applitools.eyes.selenium.universal.dto.SelectorAccessibilityRegionDto;
-import com.applitools.eyes.selenium.universal.dto.SelectorRegionDto;
-import com.applitools.eyes.selenium.universal.dto.TAccessibilityRegion;
+import com.applitools.eyes.universal.dto.*;
+import com.applitools.eyes.universal.mapper.RectangleRegionMapper;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 

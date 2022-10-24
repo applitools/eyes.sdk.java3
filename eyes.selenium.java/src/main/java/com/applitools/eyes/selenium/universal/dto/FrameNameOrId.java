@@ -1,5 +1,6 @@
 package com.applitools.eyes.selenium.universal.dto;
 
+import com.applitools.eyes.universal.dto.IFrame;
 import com.fasterxml.jackson.annotation.JsonInclude;
 
 /**

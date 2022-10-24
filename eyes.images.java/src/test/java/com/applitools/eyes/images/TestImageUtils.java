@@ -1,7 +1,7 @@
 package com.applitools.eyes.images;
 
 import com.applitools.eyes.Region;
-import com.applitools.eyes.utils.ReportingTestSuite;
+import com.applitools.eyes.images.utils.ReportingTestSuite;
 import com.applitools.utils.ImageUtils;
 import org.testng.Assert;
 import org.testng.annotations.Test;

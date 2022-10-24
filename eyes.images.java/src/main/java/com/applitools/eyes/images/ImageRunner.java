@@ -1,9 +1,10 @@
 package com.applitools.eyes.images;
 
-import com.applitools.eyes.selenium.ClassicRunner;
+import com.applitools.eyes.EyesRunner;
+import com.applitools.eyes.TestResultsSummary;
 import com.applitools.utils.ClassVersionGetter;
 
-public class ImageRunner extends ClassicRunner {
+public class ImageRunner extends EyesRunner {
     /**
      * name of the client sdk
      */
@@ -15,9 +16,20 @@ public class ImageRunner extends ClassicRunner {
     protected static String VERSION = ClassVersionGetter.CURRENT_VERSION;
 
     /**
-     * used for instantiating Appium Runner
+     * used for instantiating Image Runner
      */
     public ImageRunner() {
-        super(BASE_AGENT_ID, VERSION);
+        this(BASE_AGENT_ID, VERSION);
+    }
+
+    public ImageRunner(String baseAgentId, String version) {
+        super(baseAgentId, version);
+        //TODO - check if baseAgentId is the correct agentId here
+        managerRef = commandExecutor.coreMakeManager("classic", null, null, baseAgentId);
+    }
+
+    @Override
+    public TestResultsSummary getAllTestResultsImpl(boolean shouldThrowException) {
+        return null;
     }
 }

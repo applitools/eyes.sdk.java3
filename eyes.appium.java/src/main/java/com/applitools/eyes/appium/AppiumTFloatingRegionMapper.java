@@ -4,12 +4,11 @@ import com.applitools.eyes.fluent.FloatingRegionByRectangle;
 import com.applitools.eyes.fluent.GetFloatingRegion;
 import com.applitools.eyes.selenium.fluent.FloatingRegionByElement;
 import com.applitools.eyes.selenium.fluent.FloatingRegionBySelector;
-import com.applitools.eyes.selenium.universal.dto.*;
+import com.applitools.eyes.selenium.universal.dto.ElementFloatingRegionDto;
+import com.applitools.eyes.selenium.universal.dto.ElementRegionDto;
+import com.applitools.eyes.universal.dto.*;
 import com.applitools.eyes.selenium.universal.mapper.ElementRegionMapper;
-import com.applitools.eyes.selenium.universal.mapper.RectangleRegionMapper;
-import com.applitools.eyes.selenium.universal.mapper.SelectorRegionMapper;
-import com.applitools.eyes.selenium.universal.mapper.TFloatingRegionMapper;
-
+import com.applitools.eyes.universal.mapper.RectangleRegionMapper;
 import java.util.List;
 import java.util.stream.Collectors;
 

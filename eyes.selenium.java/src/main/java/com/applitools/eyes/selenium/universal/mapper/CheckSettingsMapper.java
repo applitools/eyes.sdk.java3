@@ -3,12 +3,15 @@ package com.applitools.eyes.selenium.universal.mapper;
 import com.applitools.ICheckSettings;
 import com.applitools.eyes.config.Configuration;
 import com.applitools.eyes.selenium.fluent.SeleniumCheckSettings;
-import com.applitools.eyes.selenium.universal.dto.CheckSettingsDto;
+import com.applitools.eyes.universal.dto.CheckSettingsDto;
+import com.applitools.eyes.universal.mapper.AccessibilitySettingsMapper;
+import com.applitools.eyes.universal.mapper.ProxyMapper;
+import com.applitools.eyes.universal.mapper.VisualGridOptionMapper;
 
 import java.util.Arrays;
 
-import static com.applitools.eyes.selenium.universal.mapper.SettingsMapper.toImageCropRect;
-import static com.applitools.eyes.selenium.universal.mapper.SettingsMapper.toNormalizationDto;
+import static com.applitools.eyes.universal.mapper.SettingsMapper.toImageCropRect;
+import static com.applitools.eyes.universal.mapper.SettingsMapper.toNormalizationDto;
 
 /**
  * check settings mapper

@@ -5,6 +5,7 @@ import com.applitools.eyes.GetAccessibilityRegion;
 import com.applitools.eyes.selenium.fluent.AccessibilityRegionByElement;
 import com.applitools.eyes.selenium.fluent.AccessibilityRegionBySelector;
 import com.applitools.eyes.selenium.universal.dto.AccessibilityRegionDto;
+import com.applitools.eyes.universal.mapper.RegionMapper;
 
 /**
  * accessibility region mapper

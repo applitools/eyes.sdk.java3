@@ -1,5 +1,7 @@
 package com.applitools.eyes.selenium.universal.dto;
 
+import com.applitools.eyes.universal.dto.IosDeviceInfoDto;
+import com.applitools.eyes.universal.dto.RectangleSizeDto;
 import com.fasterxml.jackson.annotation.JsonInclude;
 
 /**

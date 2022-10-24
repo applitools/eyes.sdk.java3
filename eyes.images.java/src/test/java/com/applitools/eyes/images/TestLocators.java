@@ -2,6 +2,7 @@ package com.applitools.eyes.images;
 
 import com.applitools.eyes.CoordinatesType;
 import com.applitools.eyes.Region;
+import com.applitools.eyes.images.utils.TestSetup;
 import com.applitools.eyes.locators.TextRegion;
 import com.applitools.eyes.locators.TextRegionSettings;
 import com.applitools.eyes.locators.VisualLocatorSettings;

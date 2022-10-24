@@ -2,6 +2,7 @@ package com.applitools.eyes.selenium.universal.dto;
 
 import com.applitools.eyes.serializers.BySerializer;
 import com.applitools.eyes.serializers.WebElementSerializer;
+import com.applitools.eyes.universal.dto.RegionDto;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import org.openqa.selenium.By;
