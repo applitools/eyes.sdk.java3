@@ -87,7 +87,7 @@ public class USDKConnection {
                     } catch (Exception e) {
                       e.printStackTrace();
                     }
-                  } else if (payload.contains("Eyes.locate")) {
+                  } else if (payload.contains("Core.locate")) {
                     try {
                       ResponseDto<Map<String, List<Region>>> locateResponse = objectMapper
                           .readValue(payload, new TypeReference<ResponseDto<Map<String, List<Region>>>>() {});
@@ -107,7 +107,7 @@ public class USDKConnection {
                     } catch (Exception e) {
                       e.printStackTrace();
                     }
-                  } else if (payload.contains("Eyes.extractTextRegions")) {
+                  } else if (payload.contains("Eyes.locateText")) {
                     try {
                       ResponseDto<Map<String, List<TextRegion>>> extractTextRegionsResponse = objectMapper
                           .readValue(payload, new TypeReference<ResponseDto<Map<String, List<TextRegion>>>>() {});
