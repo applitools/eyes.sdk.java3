@@ -128,7 +128,11 @@ public class Eyes implements IEyesBase {
 
     public Map<String, List<Region>> locate(VisualLocatorSettings visualLocatorSettings) {
         ArgumentGuard.notNull(visualLocatorSettings, "visualLocatorSettings");
-        ArgumentGuard.notNull(configure().getAppName(), "appName must be set when using locate but found");
+
+        if (!getIsOpen()) {
+            this.abort();
+            throw new EyesException("you must call open() before locate");
+        }
 
         VisualLocatorSettingsDto visualLocatorSettingsDto = VisualLocatorSettingsMapper
                 .toVisualLocatorSettingsDto(visualLocatorSettings);

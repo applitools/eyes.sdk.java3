@@ -1956,6 +1956,11 @@ public class Eyes implements IEyesBase {
         VisualLocatorSettingsDto visualLocatorSettingsDto = VisualLocatorSettingsMapper
             .toVisualLocatorSettingsDto(visualLocatorSettings);
 
+        if (!getIsOpen()) {
+            this.abort();
+            throw new EyesException("you must call open() before locate");
+        }
+
         ConfigurationDto configurationDto = ConfigurationMapper
                 .toConfigurationDto(configuration, runner.isDontCloseBatches());
         DriverTargetDto target = DriverMapper.toDriverTargetDto(getDriver(), getProxy());
