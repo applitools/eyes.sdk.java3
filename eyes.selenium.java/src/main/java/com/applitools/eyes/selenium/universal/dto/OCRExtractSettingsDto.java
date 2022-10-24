@@ -7,17 +7,17 @@ import com.fasterxml.jackson.annotation.JsonInclude;
  */
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class OCRExtractSettingsDto {
-  private TRegion target;
+  private TRegion region;
   private String hint;
   private Float minMatch;
   private String language;
 
-  public TRegion getTarget() {
-    return target;
+  public TRegion getRegion() {
+    return region;
   }
 
-  public void setTarget(TRegion target) {
-    this.target = target;
+  public void setRegion(TRegion region) {
+    this.region = region;
   }
 
   public String getHint() {

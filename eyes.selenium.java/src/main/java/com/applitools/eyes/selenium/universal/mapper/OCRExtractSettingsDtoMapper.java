@@ -22,11 +22,11 @@ public class OCRExtractSettingsDtoMapper {
 
     OCRExtractSettingsDto ocrExtractSettingsDto = new OCRExtractSettingsDto();
     if (ocrRegion.getSelector() != null) {
-      ocrExtractSettingsDto.setTarget(SelectorRegionMapper.toSelectorRegionDto(ocrRegion.getSelector()));
+      ocrExtractSettingsDto.setRegion(SelectorRegionMapper.toSelectorRegionDto(ocrRegion.getSelector()));
     } else if (ocrRegion.getElement() != null) {
-      ocrExtractSettingsDto.setTarget(ElementRegionMapper.toElementRegionDto(ocrRegion.getElement()));
+      ocrExtractSettingsDto.setRegion(ElementRegionMapper.toElementRegionDto(ocrRegion.getElement()));
     } else if (ocrRegion.getRegion() != null) {
-      ocrExtractSettingsDto.setTarget(RectangleRegionMapper.toRectangleRegionDto(ocrRegion.getRegion()));
+      ocrExtractSettingsDto.setRegion(RectangleRegionMapper.toRectangleRegionDto(ocrRegion.getRegion()));
     }
 
     ocrExtractSettingsDto.setHint(ocrRegion.getHint());
