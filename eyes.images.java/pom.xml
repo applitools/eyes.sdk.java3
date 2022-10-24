@@ -17,18 +17,23 @@
     </parent>
 
     <dependencies>
-        <dependency>
-            <groupId>com.applitools</groupId>
-            <artifactId>eyes-selenium-java5</artifactId>
-            <version>5.28.0</version>
-        </dependency>
+<!--        <dependency>-->
+<!--            <groupId>com.applitools</groupId>-->
+<!--            <artifactId>eyes-selenium-java5</artifactId>-->
+<!--            <version>5.28.0</version>-->
+<!--        </dependency>-->
         <dependency>
             <groupId>com.applitools</groupId>
             <artifactId>eyes-sdk-core-java5</artifactId>
             <version>5.28.0</version>
-            <type>test-jar</type>
-            <scope>test</scope>
+<!--            <type>test-jar</type>-->
+<!--            <scope>test</scope>-->
         </dependency>
+            <dependency>
+                <groupId>com.applitools</groupId>
+                <artifactId>eyes-universal-core</artifactId>
+                <version>5.28.0</version>
+            </dependency>
     </dependencies>
 
     <build>
