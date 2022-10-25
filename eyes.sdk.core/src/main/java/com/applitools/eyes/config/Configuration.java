@@ -15,6 +15,7 @@ import java.util.*;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class Configuration implements IConfiguration {
     private static final int DEFAULT_WAIT_BEFORE_SCREENSHOTS = 100;
+    private static final int DEFAULT_MATCH_TIMEOUT = 2000; // Milliseconds;
 
     private String branchName = GeneralUtils.getEnvString("APPLITOOLS_BRANCH");
 
@@ -31,7 +32,7 @@ public class Configuration implements IConfiguration {
     protected RectangleSize viewportSize;
     protected Boolean ignoreDisplacements;
     protected ImageMatchSettings defaultMatchSettings = new ImageMatchSettings();
-    private Integer matchTimeout;
+    private Integer matchTimeout = DEFAULT_MATCH_TIMEOUT;
     private String hostApp;
     private String hostOS;
     private String deviceInfo;
