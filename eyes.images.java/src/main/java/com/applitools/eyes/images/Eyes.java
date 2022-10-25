@@ -157,6 +157,11 @@ public class Eyes implements IEyesBase {
         checkDto(checkSettingsDto, imageTargetDto);
     }
 
+    /**
+     * Extract text.
+     * @param ocrRegions
+     * @return
+     */
     public List<String> extractText(BaseOcrRegion... ocrRegions) {
         List<OCRExtractSettingsDto> ocrExtractSettingsDtoList = ImageOCRExtractSettingsDtoMapper
                 .toOCRExtractSettingsDtoList(Arrays.asList(ocrRegions));
@@ -168,7 +173,11 @@ public class Eyes implements IEyesBase {
         return extractTextDto(target, ocrExtractSettingsDtoList, configurationDto);
     }
 
-    // renamed to locateText
+    /**
+     * Locate text. Formerly known as extractTextRegions
+     * @param image the image from which the location of the text will be extracted.
+     * @return mapping of the located text regions.
+     */
     public Map<String, List<TextRegion>> extractTextRegions(TextRegionSettings image) {
         OCRSearchSettingsDto ocrSearchSettingsDto = OCRSearchSettingsMapper.toOCRSearchSettingsDto(image);
         ConfigurationDto configurationDto = ConfigurationMapper
@@ -178,6 +187,11 @@ public class Eyes implements IEyesBase {
         return locateTextDto(target, ocrSearchSettingsDto, configurationDto);
     }
 
+    /**
+     * Locate.
+     * @param visualLocatorSettings the locator settings.
+     * @return mapping of the region locations.
+     */
     public Map<String, List<Region>> locate(VisualLocatorSettings visualLocatorSettings) {
         ArgumentGuard.notNull(visualLocatorSettings, "visualLocatorSettings");
 
