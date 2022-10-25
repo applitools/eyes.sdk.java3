@@ -22,11 +22,11 @@
             <artifactId>eyes-sdk-core-java5</artifactId>
             <version>5.28.0</version>
         </dependency>
-            <dependency>
-                <groupId>com.applitools</groupId>
-                <artifactId>eyes-universal-core</artifactId>
-                <version>5.28.0</version>
-            </dependency>
+<!--            <dependency>-->
+<!--                <groupId>com.applitools</groupId>-->
+<!--                <artifactId>eyes-universal-core</artifactId>-->
+<!--                <version>5.28.0</version>-->
+<!--            </dependency>-->
     </dependencies>
 
     <build>
