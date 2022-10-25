@@ -22,6 +22,9 @@ public class ImageRunner extends EyesRunner {
         this(BASE_AGENT_ID, VERSION);
     }
 
+    /**
+     * used for instantiating Image Runner
+     */
     public ImageRunner(String baseAgentId, String version) {
         super(baseAgentId, version);
         //TODO - check if baseAgentId is the correct agentId here
