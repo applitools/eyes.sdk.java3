@@ -14,4 +14,6 @@ public class Target {
     public static ICheckSettings image(String path) {
         return image(ImageUtils.imageFromFile(path));
     }
+
+    public static ICheckSettings image(byte[] imageBytes) { return image(ImageUtils.imageFromBytes(imageBytes)); }
 }
