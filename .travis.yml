@@ -72,6 +72,12 @@ jobs:
         - export CHROME_DRIVER_PATH=/home/travis/build/chromedriver
         - chmod +x ./runTests.sh
         - ./runTests.sh "eyes.selenium.java"
+    - name: Images
+      if: type != cron
+      script:
+        - echo $APPLITOOLS_REPORT_ID
+        - chmod +x ./runTests.sh
+        - ./runTests.sh "eyes.images.java"
 #    - name: Selenium
 #      script:
 #        - echo $APPLITOOLS_REPORT_ID
