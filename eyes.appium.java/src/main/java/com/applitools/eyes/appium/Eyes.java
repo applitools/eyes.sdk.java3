@@ -530,7 +530,7 @@ public class Eyes implements IEyesBase {
 
     private void checkDto(CheckSettingsDto checkSettingsDto, DriverTargetDto driverTargetDto) throws EyesException {
         try {
-            Method checkDto = originEyes.getClass().getDeclaredMethod("checkDto", CheckSettingsDto.class, ITargetDto.class);
+            Method checkDto = originEyes.getClass().getDeclaredMethod("checkDto", CheckSettingsDto.class, DriverTargetDto.class);
             checkDto.setAccessible(true);
             checkDto.invoke(originEyes, checkSettingsDto, driverTargetDto);
         } catch (NoSuchMethodException | IllegalAccessException e) {
