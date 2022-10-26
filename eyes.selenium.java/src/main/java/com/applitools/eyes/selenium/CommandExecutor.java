@@ -35,7 +35,6 @@ public class CommandExecutor {
         }
       }
     }
-    System.out.println("getting CE instance: " + instance);
     return instance;
   }
 
@@ -54,7 +53,6 @@ public class CommandExecutor {
   }
 
   public Reference coreMakeManager(String type, Integer concurrency, Boolean isLegacy) {
-    System.out.println("CoreMakeManager");
     RequestDto<MakeManager> request = new RequestDto<>();
     request.setName("Core.makeManager");
     request.setKey(UUID.randomUUID().toString());
