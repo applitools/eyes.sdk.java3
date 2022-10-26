@@ -45,7 +45,7 @@ public class TestProxy extends ReportingTestSuite {
         System.setProperty("webdriver.chrome.driver", chromeDriverPath);
 
         driver = SeleniumUtils.createChromeDriver(new ChromeOptions().setHeadless(true));
-        proxySettings = new ProxySettings("http://127.0.0.1", 8080);
+        proxySettings = new ProxySettings("http://127.0.0.1", 8080, "username", "password");
         autProxySettings = new AutProxySettings(proxySettings);
 
         stopServer = UniversalSdkNativeLoader.class.getDeclaredMethod("destroyProcess");
@@ -126,6 +126,8 @@ public class TestProxy extends ReportingTestSuite {
 
         Assert.assertNotNull(debugEyes.getConfig());
         Assert.assertEquals(debugEyes.getConfig().getProxy().getUrl(), proxySettings.getUri());
+        Assert.assertEquals(debugEyes.getConfig().getProxy().getUsername(), proxySettings.getUsername());
+        Assert.assertEquals(debugEyes.getConfig().getProxy().getPassword(), proxySettings.getPassword());
     }
 
     @Test
@@ -146,6 +148,8 @@ public class TestProxy extends ReportingTestSuite {
 
         Assert.assertNotNull(debugEyes.getConfig());
         Assert.assertEquals(debugEyes.getConfig().getProxy().getUrl(), proxySettings.getUri());
+        Assert.assertEquals(debugEyes.getConfig().getProxy().getUsername(), proxySettings.getUsername());
+        Assert.assertEquals(debugEyes.getConfig().getProxy().getPassword(), proxySettings.getPassword());
     }
 
     @Test
@@ -167,6 +171,8 @@ public class TestProxy extends ReportingTestSuite {
         Assert.assertNotNull(debugEyes.getConfig());
         Assert.assertNull(debugEyes.getConfig().getProxy());
         Assert.assertEquals(debugEyes.getConfig().getAutProxy().getUrl(), autProxySettings.getUri());
+        Assert.assertEquals(debugEyes.getConfig().getAutProxy().getUsername(), autProxySettings.getUsername());
+        Assert.assertEquals(debugEyes.getConfig().getAutProxy().getPassword(), autProxySettings.getPassword());
     }
 
     @Test
@@ -189,6 +195,10 @@ public class TestProxy extends ReportingTestSuite {
         Assert.assertNotNull(debugEyes.getConfig());
         Assert.assertEquals(debugEyes.getConfig().getProxy().getUrl(), proxySettings.getUri());
         Assert.assertEquals(debugEyes.getConfig().getAutProxy().getUrl(), autProxySettings.getUri());
+        Assert.assertEquals(debugEyes.getConfig().getProxy().getUsername(), proxySettings.getUsername());
+        Assert.assertEquals(debugEyes.getConfig().getProxy().getPassword(), proxySettings.getPassword());
+        Assert.assertEquals(debugEyes.getConfig().getAutProxy().getUsername(), autProxySettings.getUsername());
+        Assert.assertEquals(debugEyes.getConfig().getAutProxy().getPassword(), autProxySettings.getPassword());
     }
 
     @Test
