@@ -5,6 +5,7 @@
         <classes>
 <!--            <class name="com.applitools.eyes.selenium.TestBatchAPI"/>-->
             <class name="com.applitools.eyes.AutProxyTest"/>
+            <class name="com.applitools.eyes.selenium.TestProxy"/>
         </classes>
     </test>
 </suite>
