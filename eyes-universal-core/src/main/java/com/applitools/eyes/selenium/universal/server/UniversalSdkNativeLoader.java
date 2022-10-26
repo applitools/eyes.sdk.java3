@@ -42,6 +42,23 @@ public class UniversalSdkNativeLoader {
 //    }
 //  }
 
+  /**
+   * for internal use only.
+   */
+  private static void destroyProcess() {
+    if (nativeProcess.isAlive() && nativeProcess != null) {
+      try {
+        nativeProcess.destroy();
+        nativeProcess = null;
+      }
+      catch (Exception e) {
+        String errorMessage = GeneralUtils.createErrorMessageFromExceptionWithText(e, "Could not destroy server!");
+        System.out.println(errorMessage);
+        throw new EyesException(errorMessage, e);
+      }
+    }
+  }
+
   private static void copyAndStartUniversalCore() throws Exception {
     if (nativeProcess == null) {
 
