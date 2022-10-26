@@ -11,8 +11,11 @@ import com.applitools.eyes.utils.ReportingTestSuite;
 import com.applitools.eyes.utils.SeleniumUtils;
 import com.applitools.eyes.visualgrid.services.VisualGridRunner;
 import com.applitools.utils.GeneralUtils;
+import org.openqa.selenium.Platform;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
+import org.openqa.selenium.remote.DesiredCapabilities;
+import org.openqa.selenium.remote.RemoteWebDriver;
 import org.testng.Assert;
 import org.testng.annotations.*;
 
@@ -21,6 +24,8 @@ import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
+import java.net.MalformedURLException;
+import java.net.URL;
 
 public class TestProxy extends ReportingTestSuite {
 
@@ -103,7 +108,6 @@ public class TestProxy extends ReportingTestSuite {
         Assert.assertNull(CommandExecutor.getDebugHistory());
     }
 
-//    @Test(dependsOnMethods = {"shouldBeNullWhenDebugIsOff"})
     @Test
     public void testUniversalProxyWithVisualGridRunner() throws IllegalAccessException {
         debug.set(this, "true");
@@ -165,26 +169,57 @@ public class TestProxy extends ReportingTestSuite {
         Assert.assertEquals(debugEyes.getConfig().getAutProxy().getUrl(), autProxySettings.getUri());
     }
 
-//    @Test
-//    public void testUniversalWebDriverProxyWithVisualGridRunner() throws IllegalAccessException {
-//        debug.set(this, "true");
-//
-//        VisualGridRunner runner = new VisualGridRunner();
-//        eyes = new Eyes(runner);
-//
-//        eyes.setConfiguration(eyes.getConfiguration()
-//                .setWebDriverProxy(new WebDriverProxySettings("http://127.0.0.1:8080"))
-//        );
-//
-//        eyes.open(driver, "ProxyTest", "autProxyTestVisualGridRunner");
-//
-//        DebugHistoryDto history = CommandExecutor.getDebugHistory();
-//        DebugEyesDto debugEyes = history.getManagers().get(0).getEyes().get(0);
-//
-//        Assert.assertNotNull(debugEyes.getConfig());
-//        Assert.assertNull(debugEyes.getConfig().getProxy());
-//        Assert.assertEquals(debugEyes.getConfig().getAutProxy().getUrl(), autProxySettings.getUri());
-//    }
+    @Test
+    public void testUniversalProxyAndAutProxyWithVisualGridRunner() throws IllegalAccessException {
+        debug.set(this, "true");
+
+        VisualGridRunner runner = new VisualGridRunner();
+        eyes = new Eyes(runner);
+
+        eyes.setConfiguration(eyes.getConfiguration()
+                .setProxy(proxySettings)
+                .setAutProxy(autProxySettings)
+        );
+
+        eyes.open(driver, "ProxyTest", "proxyAndAutProxyTestVisualGridRunner");
+
+        DebugHistoryDto history = CommandExecutor.getDebugHistory();
+        DebugEyesDto debugEyes = history.getManagers().get(0).getEyes().get(0);
+
+        Assert.assertNotNull(debugEyes.getConfig());
+        Assert.assertEquals(debugEyes.getConfig().getProxy().getUrl(), proxySettings.getUri());
+        Assert.assertEquals(debugEyes.getConfig().getAutProxy().getUrl(), autProxySettings.getUri());
+    }
+
+    @Test
+    public void testUniversalWebDriverProxyWithVisualGridRunner() throws IllegalAccessException, MalformedURLException {
+        debug.set(this, "true");
+
+        final String USERNAME = GeneralUtils.getEnvString("SAUCE_USERNAME");
+        final String ACCESS_KEY = GeneralUtils.getEnvString("SAUCE_ACCESS_KEY");
+        final String SL_URL = "https://"+USERNAME+":" + ACCESS_KEY + "@ondemand.us-west-1.saucelabs.com/wd/hub";
+
+        DesiredCapabilities caps = new DesiredCapabilities("chrome", "", Platform.ANY);
+
+        WebDriver driver = new RemoteWebDriver(new URL(SL_URL), caps);
+        VisualGridRunner runner = new VisualGridRunner();
+        eyes = new Eyes(runner);
+
+        eyes.setConfiguration(eyes.getConfiguration()
+                .setWebDriverProxy(new WebDriverProxySettings("http://127.0.0.1:8080"))
+        );
+
+        eyes.open(driver, "ProxyTest", "autProxyTestVisualGridRunner");
+        driver.quit();
+
+        DebugHistoryDto history = CommandExecutor.getDebugHistory();
+        DebugEyesDto debugEyes = history.getManagers().get(0).getEyes().get(0);
+
+        Assert.assertNotNull(debugEyes.getConfig());
+        Assert.assertNull(debugEyes.getConfig().getProxy());
+        Assert.assertNull(debugEyes.getConfig().getAutProxy());
+        Assert.assertEquals(debugEyes.getDriver().getProxyUrl(), "http://127.0.0.1:8080");
+    }
 
     private void startProxyDocker() throws IOException, InterruptedException {
         Process stopDocker = Runtime.getRuntime().exec(new String[]{"bash","-c","docker run -d --name='tinyproxy' -p 8080:8888 dannydirect/tinyproxy:latest ANY"});
