@@ -72,7 +72,10 @@ public class USDKConnection {
                     } catch (Exception e) {
                       e.printStackTrace();
                     }
-                  } else if(payload.contains("Eyes.check") && !payload.contains("Debug.getHistory")) {
+                  }
+                  // "Debug.getHistory" could contain "Eyes.check" inside since it is a command of eyes.
+                  // getHistory is used in proxy tests.
+                  else if(payload.contains("Eyes.check") && !payload.contains("Debug.getHistory")) {
                     try {
                       ResponseDto<MatchResultDto> checkResponse = objectMapper.readValue(payload, new TypeReference<ResponseDto<MatchResultDto>>() {});
                       SyncTaskListener<ResponseDto<?>> syncTaskLister = map.get(checkResponse.getKey());
