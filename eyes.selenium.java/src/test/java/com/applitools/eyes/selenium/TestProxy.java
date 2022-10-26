@@ -73,6 +73,7 @@ public class TestProxy extends ReportingTestSuite {
 
     @BeforeMethod
     public void beforeEach() {
+        System.out.println("beforeEach");
         try {
             instance.set(this, null);
         } catch (IllegalAccessException e) {
@@ -84,6 +85,7 @@ public class TestProxy extends ReportingTestSuite {
 
     @AfterMethod
     public void afterEach() {
+        System.out.println("afterEach");
         if (eyes != null)
             eyes.abort();
 
