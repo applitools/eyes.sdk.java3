@@ -28,7 +28,7 @@ public class TestProxy extends ReportingTestSuite {
     private AutProxySettings autProxySettings;
 
     @BeforeTest
-    public void setup() {
+    public void setup() throws IOException, InterruptedException {
         String chromeDriverPath = System.getenv("CHROME_DRIVER_PATH");
         if(chromeDriverPath == null) throw new EyesException("CHROME_DRIVER_PATH missing");
         System.setProperty("webdriver.chrome.driver", chromeDriverPath);
@@ -36,12 +36,17 @@ public class TestProxy extends ReportingTestSuite {
         driver = SeleniumUtils.createChromeDriver(new ChromeOptions().setHeadless(true));
         proxySettings = new ProxySettings("http://127.0.0.1", 8080);
         autProxySettings = new AutProxySettings(proxySettings);
+
+        stopAllDockers();
+        startProxyDocker();
     }
 
     @AfterTest
-    public void teardown() {
+    public void teardown() throws IOException, InterruptedException {
         if (driver != null)
             driver.quit();
+
+        stopAllDockers();
     }
 
 // this test is passing when running it alone.
@@ -145,13 +150,11 @@ public class TestProxy extends ReportingTestSuite {
         }
     }
 
-    // not in use
     private void startProxyDocker() throws IOException, InterruptedException {
         Process stopDocker = Runtime.getRuntime().exec(new String[]{"bash","-c","docker run -d --name='tinyproxy' -p 8080:8888 dannydirect/tinyproxy:latest ANY"});
         stopDocker.waitFor();
     }
 
-    // not in use
     private void stopAllDockers() throws IOException, InterruptedException {
         Process stopDocker = Runtime.getRuntime().exec(new String[]{"bash","-c","docker stop $(docker ps -a -q)"});
         stopDocker.waitFor();
