@@ -19,6 +19,11 @@ public class DebugEyesDto {
      */
     private ConfigurationDto config;
 
+    /**
+     * the driver.
+     */
+    private DebugDriverDto driver;
+
     public Reference getManager() {
         return manager;
     }
@@ -31,12 +36,17 @@ public class DebugEyesDto {
         return config;
     }
 
+    public DebugDriverDto getDriver() {
+        return driver;
+    }
+
     @Override
     public String toString() {
         return "DebugEyesDto{" +
                 "manager=" + manager +
                 ", eyes=" + eyes +
                 ", config=" + config +
+                ", driver=" + driver +
                 '}';
     }
 }
