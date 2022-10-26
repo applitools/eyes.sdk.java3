@@ -252,6 +252,19 @@ public class CommandExecutor {
     return null;
   }
 
+  /**
+   * for internal use only.
+   * @return debug history.
+   */
+  public static DebugHistoryDto getDebugHistory() {
+    RequestDto request = new RequestDto<>();
+    request.setName("Debug.getHistory");
+    request.setKey(UUID.randomUUID().toString());
+    SyncTaskListener syncTaskListener = checkedCommand(request, true);
+    ResponseDto<DebugHistoryDto> getDebugHistory = (ResponseDto<DebugHistoryDto>) syncTaskListener.get();
+    return getDebugHistory.getPayload().getResult();
+  }
+
 
   public static SyncTaskListener checkedCommand(Command command, boolean waitResult) {
     try {

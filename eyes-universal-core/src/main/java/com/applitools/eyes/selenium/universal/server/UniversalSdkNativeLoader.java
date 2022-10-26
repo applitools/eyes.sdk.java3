@@ -29,6 +29,7 @@ public class UniversalSdkNativeLoader {
   private static final String ALPINE_PATH = "/etc/alpine-release";
   private static Logger logger = new Logger();
   private static final TraceLevel INFO_LOG_LEVEL = TraceLevel.Info;
+  private static final String UNIVERSAL_DEBUG = GeneralUtils.getEnvString("APPLITOOLS_UNIVERSAL_DEBUG");
 
   public synchronized static void start() {
     try {
@@ -45,6 +46,24 @@ public class UniversalSdkNativeLoader {
 //      nativeProcess.destroy();
 //    }
 //  }
+
+  /**
+   * for internal use only.
+   */
+  private static void destroyProcess() {
+    if (nativeProcess.isAlive() && nativeProcess != null) {
+      try {
+        nativeProcess.destroy();
+        nativeProcess.waitFor();
+        nativeProcess = null;
+      }
+      catch (Exception e) {
+        String errorMessage = GeneralUtils.createErrorMessageFromExceptionWithText(e, "Could not destroy server!");
+        logger.log(TraceLevel.Error, Stage.GENERAL, errorMessage);
+        throw new EyesException(errorMessage, e);
+      }
+    }
+  }
 
   private static void copyAndStartUniversalCore() throws Exception {
     if (nativeProcess == null) {
@@ -93,25 +112,45 @@ public class UniversalSdkNativeLoader {
 
   private static void createProcessAndReadPort(String executablePath) {
 
-    GeneralUtils.tryRunTaskWithRetry(new EyesRunnable() {
-      @Override
-      public void run() {
-        try {
-          nativeProcess = new ProcessBuilder(executablePath, "--port 0" ,"--no-singleton","--shutdown-mode", "stdin").start();
-        } catch (Exception e) {
-          String errorMessage = GeneralUtils.createErrorMessageFromExceptionWithText(e, "Failed to start universal core!");
-          logger.log(INFO_LOG_LEVEL, Stage.GENERAL, errorMessage);
-          throw new EyesException(errorMessage, e);
+    if (Boolean.parseBoolean(UNIVERSAL_DEBUG)) {
+      GeneralUtils.tryRunTaskWithRetry(new EyesRunnable() {
+        @Override
+        public void run() {
+          try {
+            nativeProcess = new ProcessBuilder(executablePath, "--port 0", "--no-singleton", "--shutdown-mode", "--debug", "stdin").start();
+          } catch (Exception e) {
+            String errorMessage = GeneralUtils.createErrorMessageFromExceptionWithText(e, "Failed to start universal core!");
+            logger.log(INFO_LOG_LEVEL, Stage.GENERAL, errorMessage);
+            throw new EyesException(errorMessage, e);
+          }
+          logger.log(INFO_LOG_LEVEL, Stage.GENERAL, "Universal Core (debug) start returned ok.");
         }
-        logger.log(INFO_LOG_LEVEL, Stage.GENERAL, "Universal Core start returned ok.");
-      }
 
-      @Override
-      public String getName() {
-        return "Start universal core";
-      }
-    }, MAX_ACTION_WAIT_SECONDS, SLEEP_BETWEEN_ACTION_CHECK_MS, "Timed out trying to start universal core!", logger);
+        @Override
+        public String getName() {
+          return "Start universal core";
+        }
+      }, MAX_ACTION_WAIT_SECONDS, SLEEP_BETWEEN_ACTION_CHECK_MS, "Timed out trying to start universal core!", logger);
+    } else {
+      GeneralUtils.tryRunTaskWithRetry(new EyesRunnable() {
+        @Override
+        public void run() {
+          try {
+            nativeProcess = new ProcessBuilder(executablePath, "--port 0", "--no-singleton", "--shutdown-mode", "stdin").start();
+          } catch (Exception e) {
+            String errorMessage = GeneralUtils.createErrorMessageFromExceptionWithText(e, "Failed to start universal core!");
+            logger.log(INFO_LOG_LEVEL, Stage.GENERAL, errorMessage);
+            throw new EyesException(errorMessage, e);
+          }
+          logger.log(INFO_LOG_LEVEL, Stage.GENERAL, "Universal Core start returned ok.");
+        }
 
+        @Override
+        public String getName() {
+          return "Start universal core";
+        }
+      }, MAX_ACTION_WAIT_SECONDS, SLEEP_BETWEEN_ACTION_CHECK_MS, "Timed out trying to start universal core!", logger);
+    }
 
     GeneralUtils.tryRunTaskWithRetry(new EyesRunnable() {
       @Override
