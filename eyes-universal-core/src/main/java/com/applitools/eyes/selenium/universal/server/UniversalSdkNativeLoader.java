@@ -24,6 +24,7 @@ public class UniversalSdkNativeLoader {
   private static final String TEMP_FOLDER_PATH = "java.io.tmpdir";
   private static final long MAX_ACTION_WAIT_SECONDS = 90;
   private static final long SLEEP_BETWEEN_ACTION_CHECK_MS = 3000;
+  private static final String UNIVERSAL_DEBUG = GeneralUtils.getEnvString("APPLITOOLS_UNIVERSAL_DEBUG");
 
   public synchronized static void start() {
     try {
@@ -84,31 +85,51 @@ public class UniversalSdkNativeLoader {
   }
 
   private static void createProcessAndReadPort(String executablePath) {
-
-    GeneralUtils.tryRunTaskWithRetry(new EyesRunnable() {
-      @Override
-      public void run() {
-        try {
-          nativeProcess = new ProcessBuilder(executablePath, "--port 0" ,"--no-singleton","--shutdown-mode", "stdin").start();
-        } catch (Exception e) {
-          String errorMessage = GeneralUtils.createErrorMessageFromExceptionWithText(e, "Failed to start universal core!");
-          System.out.println(errorMessage);
-          throw new EyesException(errorMessage, e);
+    if (Boolean.parseBoolean(UNIVERSAL_DEBUG)) {
+      GeneralUtils.tryRunTaskWithRetry(new EyesRunnable() {
+        @Override
+        public void run() {
+          try {
+            nativeProcess = new ProcessBuilder(executablePath, "--port 0", "--no-singleton", "--shutdown-mode", "--debug", "stdin").start();
+          } catch (Exception e) {
+            String errorMessage = GeneralUtils.createErrorMessageFromExceptionWithText(e, "Failed to start universal core!");
+            System.out.println(errorMessage);
+            throw new EyesException(errorMessage, e);
+          }
+          System.out.println("Universal Core (debug) start returned ok.");
         }
-        System.out.println("Universal Core start returned ok.");
-      }
 
-      @Override
-      public String getName() {
-        return "Start universal core";
-      }
-    }, MAX_ACTION_WAIT_SECONDS, SLEEP_BETWEEN_ACTION_CHECK_MS, "Timed out trying to start universal core!");
+        @Override
+        public String getName() {
+          return "Start universal core";
+        }
+      }, MAX_ACTION_WAIT_SECONDS, SLEEP_BETWEEN_ACTION_CHECK_MS, "Timed out trying to start universal core!");
 
+    } else {
+      GeneralUtils.tryRunTaskWithRetry(new EyesRunnable() {
+        @Override
+        public void run() {
+          try {
+            nativeProcess = new ProcessBuilder(executablePath, "--port 0", "--no-singleton", "--shutdown-mode", "stdin").start();
+          } catch (Exception e) {
+            String errorMessage = GeneralUtils.createErrorMessageFromExceptionWithText(e, "Failed to start universal core!");
+            System.out.println(errorMessage);
+            throw new EyesException(errorMessage, e);
+          }
+          System.out.println("Universal Core start returned ok.");
+        }
 
+        @Override
+        public String getName() {
+          return "Start universal core";
+        }
+      }, MAX_ACTION_WAIT_SECONDS, SLEEP_BETWEEN_ACTION_CHECK_MS, "Timed out trying to start universal core!");
+
+    }
     GeneralUtils.tryRunTaskWithRetry(new EyesRunnable() {
       @Override
       public void run() throws EyesException {
-        String inputLineFromServer="";
+        String inputLineFromServer = "";
 
         try {
           // IMPORTANT: Do NOT close this stream, you might cause the child process to get stuck, and
