@@ -54,6 +54,7 @@ public class UniversalSdkNativeLoader {
     if (nativeProcess.isAlive() && nativeProcess != null) {
       try {
         nativeProcess.destroy();
+        nativeProcess.waitFor();
         nativeProcess = null;
       }
       catch (Exception e) {
