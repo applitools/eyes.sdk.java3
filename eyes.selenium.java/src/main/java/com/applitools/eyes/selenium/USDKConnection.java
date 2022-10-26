@@ -9,13 +9,7 @@ import com.applitools.eyes.Logger;
 import com.applitools.eyes.Region;
 import com.applitools.eyes.SyncTaskListener;
 import com.applitools.eyes.locators.TextRegion;
-import com.applitools.eyes.selenium.universal.dto.Command;
-import com.applitools.eyes.selenium.universal.dto.EventDto;
-import com.applitools.eyes.selenium.universal.dto.MatchResultDto;
-import com.applitools.eyes.selenium.universal.dto.RectangleSizeDto;
-import com.applitools.eyes.selenium.universal.dto.RequestDto;
-import com.applitools.eyes.selenium.universal.dto.ResponseDto;
-import com.applitools.eyes.selenium.universal.dto.TestResultsSummaryDto;
+import com.applitools.eyes.selenium.universal.dto.*;
 import com.applitools.eyes.selenium.universal.dto.response.CommandCloseResponseDto;
 import com.applitools.eyes.selenium.universal.server.UniversalSdkNativeLoader;
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -78,7 +72,7 @@ public class USDKConnection {
                     } catch (Exception e) {
                       e.printStackTrace();
                     }
-                  } else if(payload.contains("Eyes.check")) {
+                  } else if(payload.contains("Eyes.check") && !payload.contains("Debug.getHistory")) {
                     try {
                       ResponseDto<MatchResultDto> checkResponse = objectMapper.readValue(payload, new TypeReference<ResponseDto<MatchResultDto>>() {});
                       SyncTaskListener<ResponseDto<?>> syncTaskLister = map.get(checkResponse.getKey());
@@ -147,6 +141,17 @@ public class USDKConnection {
                       e.printStackTrace();
                     }
 
+                  } else if (payload.contains("Debug.getHistory")) {
+                    try {
+                      ResponseDto<DebugHistoryDto> debugHistoryResponse = objectMapper.readValue(payload,
+                              new TypeReference<ResponseDto<DebugHistoryDto>>() {});
+
+                      SyncTaskListener<ResponseDto<?>> syncTaskListener = map.get(debugHistoryResponse.getKey());
+                      syncTaskListener.onComplete(debugHistoryResponse);
+                      map.remove(debugHistoryResponse.getKey());
+                    } catch (Exception e) {
+                      e.printStackTrace();
+                    }
                   }
                 }
 
