@@ -207,7 +207,7 @@ public class TestProxy extends ReportingTestSuite {
 
         final String USERNAME = GeneralUtils.getEnvString("SAUCE_USERNAME");
         final String ACCESS_KEY = GeneralUtils.getEnvString("SAUCE_ACCESS_KEY");
-        final String SL_URL = "https://"+USERNAME+":" + ACCESS_KEY + "@ondemand.us-west-1.saucelabs.com/wd/hub";
+        final String SL_URL = "https://"+USERNAME+":" + ACCESS_KEY + "@ondemand.us-west-1.saucelabs.com:443/wd/hub";
 
         DesiredCapabilities caps = new DesiredCapabilities("chrome", "", Platform.ANY);
 
