@@ -3,23 +3,26 @@ package com.applitools.eyes.selenium;
 import com.applitools.eyes.AutProxySettings;
 import com.applitools.eyes.EyesException;
 import com.applitools.eyes.ProxySettings;
-import com.applitools.eyes.selenium.fluent.Target;
 import com.applitools.eyes.selenium.universal.dto.DebugEyesDto;
 import com.applitools.eyes.selenium.universal.dto.DebugHistoryDto;
+import com.applitools.eyes.selenium.universal.server.UniversalSdkNativeLoader;
 import com.applitools.eyes.utils.ReportingTestSuite;
 import com.applitools.eyes.utils.SeleniumUtils;
 import com.applitools.eyes.visualgrid.services.VisualGridRunner;
 import com.applitools.utils.GeneralUtils;
-import org.mockito.MockedStatic;
-import org.mockito.Mockito;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
 import org.testng.Assert;
+import org.testng.annotations.AfterMethod;
 import org.testng.annotations.AfterTest;
 import org.testng.annotations.BeforeTest;
 import org.testng.annotations.Test;
 
 import java.io.IOException;
+import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 
 public class TestProxy extends ReportingTestSuite {
 
@@ -27,8 +30,12 @@ public class TestProxy extends ReportingTestSuite {
     private ProxySettings proxySettings;
     private AutProxySettings autProxySettings;
 
+    private Method stopServer;
+    private Field instance;
+    private Field debug;
+
     @BeforeTest
-    public void setup() throws IOException, InterruptedException {
+    public void setup() throws IOException, InterruptedException, NoSuchMethodException, NoSuchFieldException, IllegalAccessException {
         String chromeDriverPath = System.getenv("CHROME_DRIVER_PATH");
         if(chromeDriverPath == null) throw new EyesException("CHROME_DRIVER_PATH missing");
         System.setProperty("webdriver.chrome.driver", chromeDriverPath);
@@ -37,117 +44,112 @@ public class TestProxy extends ReportingTestSuite {
         proxySettings = new ProxySettings("http://127.0.0.1", 8080);
         autProxySettings = new AutProxySettings(proxySettings);
 
+        stopServer = UniversalSdkNativeLoader.class.getDeclaredMethod("destroyProcess");
+        stopServer.setAccessible(true);
+
+        instance = CommandExecutor.class.getDeclaredField("instance");
+        instance.setAccessible(true);
+
+        debug = UniversalSdkNativeLoader.class.getDeclaredField("UNIVERSAL_DEBUG");
+        debug.setAccessible(true);
+        Field modifiersField = Field.class.getDeclaredField("modifiers");
+        modifiersField.setAccessible(true);
+        modifiersField.setInt(debug, debug.getModifiers() & ~Modifier.FINAL);
+
         stopAllDockers();
         startProxyDocker();
     }
 
     @AfterTest
-    public void teardown() throws IOException, InterruptedException {
+    public void teardown() throws IOException, InterruptedException, IllegalAccessException {
         if (driver != null)
             driver.quit();
 
         stopAllDockers();
+
+        stopServer.setAccessible(false);
+        instance.setAccessible(false);
+        debug.set(this, null);
     }
 
-// this test is passing when running it alone.
-// if the test runs in the suite - the universal will start without debug mode and
-// rest of the tests would fail.
-//    @Test
-//    public void shouldBeNullWhenDebugIsOff() {
-//        VisualGridRunner runner = new VisualGridRunner();
-//        runner.getAllTestResults(false);
-//        Assert.assertNull(CommandExecutor.getDebugHistory());
-//    }
+    @AfterMethod
+    public void afterEach() {
+        try {
+            stopServer.invoke(UniversalSdkNativeLoader.class);
+            instance.set(this, null);
+        } catch (IllegalAccessException | InvocationTargetException e) {
+            String errorMessage = GeneralUtils.createErrorMessageFromExceptionWithText(e, "Failed to destroy process / reset CE instance");
+            System.out.println(errorMessage);
+            throw new EyesException(errorMessage, e);
+        }
+    }
 
     @Test
-    public void testUniversalProxyWithVisualGridRunner() {
-
-        try (MockedStatic<GeneralUtils> utilities = Mockito.mockStatic(GeneralUtils.class, Mockito.CALLS_REAL_METHODS)) {
-            utilities.when(() -> GeneralUtils.getEnvString("APPLITOOLS_UNIVERSAL_DEBUG"))
-                    .thenReturn("true");
-
-            VisualGridRunner runner = new VisualGridRunner();
-            Eyes eyes = new Eyes(runner);
-
-            eyes.setConfiguration(eyes.getConfiguration()
-                    .setProxy(proxySettings)
-            );
-
-            eyes.open(driver, "ProxyTest", "proxyTestVisualGridRunner");
-            driver.get("https://applitools.com");
-
-            eyes.check(Target.window().fully(false));
-            eyes.close(false);
-
-            runner.getAllTestResults(false);
-
-            DebugHistoryDto history = CommandExecutor.getDebugHistory();
-            DebugEyesDto debugEyes = history.getManagers().get(0).getEyes().get(0);
-
-            Assert.assertNotNull(debugEyes.getConfig());
-            Assert.assertEquals(debugEyes.getConfig().getProxy().getUrl(), proxySettings.getUri());
-        }
+    public void shouldBeNullWhenDebugIsOff() {
+        new VisualGridRunner();
+        Assert.assertNull(CommandExecutor.getDebugHistory());
     }
 
-    @Test(dependsOnMethods = {"testUniversalProxyWithVisualGridRunner"})
-    public void testUniversalProxyWithClassicRunner() {
+//    @Test(dependsOnMethods = {"shouldBeNullWhenDebugIsOff"})
+    @Test
+    public void testUniversalProxyWithVisualGridRunner() throws IllegalAccessException {
+        debug.set(this, "true");
 
-        try (MockedStatic<GeneralUtils> utilities = Mockito.mockStatic(GeneralUtils.class, Mockito.CALLS_REAL_METHODS)) {
-            utilities.when(() -> GeneralUtils.getEnvString("APPLITOOLS_UNIVERSAL_DEBUG"))
-                    .thenReturn("true");
+        VisualGridRunner runner = new VisualGridRunner();
+        Eyes eyes = new Eyes(runner);
 
-            ClassicRunner runner = new ClassicRunner();
-            Eyes eyes = new Eyes(runner);
+        eyes.setConfiguration(eyes.getConfiguration()
+                .setProxy(proxySettings)
+        );
 
-            eyes.setConfiguration(eyes.getConfiguration()
-                    .setProxy(proxySettings)
-            );
+        eyes.open(driver, "ProxyTest", "proxyTestVisualGridRunner");
 
-            eyes.open(driver, "ProxyTest", "proxyTestClassicRunner");
-            driver.get("https://applitools.com");
+        DebugHistoryDto history = CommandExecutor.getDebugHistory();
+        DebugEyesDto debugEyes = history.getManagers().get(0).getEyes().get(0);
 
-            eyes.check(Target.window().fully(false));
-            eyes.close(false);
-
-            runner.getAllTestResults(false);
-
-            DebugHistoryDto history = CommandExecutor.getDebugHistory();
-            DebugEyesDto debugEyes = history.getManagers().get(1).getEyes().get(0);
-
-            Assert.assertNotNull(debugEyes.getConfig());
-            Assert.assertEquals(debugEyes.getConfig().getProxy().getUrl(), proxySettings.getUri());
-        }
+        Assert.assertNotNull(debugEyes.getConfig());
+        Assert.assertEquals(debugEyes.getConfig().getProxy().getUrl(), proxySettings.getUri());
     }
 
-    @Test(dependsOnMethods = {"testUniversalProxyWithClassicRunner"})
-    public void testUniversalAutProxyWithVisualGridRunner() {
+    @Test
+    public void testUniversalProxyWithClassicRunner() throws IllegalAccessException {
+        debug.set(this, "true");
 
-        try (MockedStatic<GeneralUtils> utilities = Mockito.mockStatic(GeneralUtils.class, Mockito.CALLS_REAL_METHODS)) {
-            utilities.when(() -> GeneralUtils.getEnvString("APPLITOOLS_UNIVERSAL_DEBUG"))
-                    .thenReturn("true");
+        ClassicRunner runner = new ClassicRunner();
+        Eyes eyes = new Eyes(runner);
 
-            VisualGridRunner runner = new VisualGridRunner();
-            Eyes eyes = new Eyes(runner);
+        eyes.setConfiguration(eyes.getConfiguration()
+                .setProxy(proxySettings)
+        );
 
-            eyes.setConfiguration(eyes.getConfiguration()
-                    .setAutProxy(autProxySettings)
-            );
+        eyes.open(driver, "ProxyTest", "proxyTestClassicRunner");
 
-            eyes.open(driver, "ProxyTest", "autProxyTestVisualGridRunner");
-            driver.get("https://applitools.com");
+        DebugHistoryDto history = CommandExecutor.getDebugHistory();
+        DebugEyesDto debugEyes = history.getManagers().get(0).getEyes().get(0);
 
-            eyes.check(Target.window().fully(false));
-            eyes.close(false);
+        Assert.assertNotNull(debugEyes.getConfig());
+        Assert.assertEquals(debugEyes.getConfig().getProxy().getUrl(), proxySettings.getUri());
+    }
 
-            runner.getAllTestResults(false);
+    @Test
+    public void testUniversalAutProxyWithVisualGridRunner() throws IllegalAccessException {
+        debug.set(this, "true");
 
-            DebugHistoryDto history = CommandExecutor.getDebugHistory();
-            DebugEyesDto debugEyes = history.getManagers().get(2).getEyes().get(0);
+        VisualGridRunner runner = new VisualGridRunner();
+        Eyes eyes = new Eyes(runner);
 
-            Assert.assertNotNull(debugEyes.getConfig());
-            Assert.assertNull(debugEyes.getConfig().getProxy());
-            Assert.assertEquals(debugEyes.getConfig().getAutProxy().getUrl(), autProxySettings.getUri());
-        }
+        eyes.setConfiguration(eyes.getConfiguration()
+                .setAutProxy(autProxySettings)
+        );
+
+        eyes.open(driver, "ProxyTest", "autProxyTestVisualGridRunner");
+
+        DebugHistoryDto history = CommandExecutor.getDebugHistory();
+        DebugEyesDto debugEyes = history.getManagers().get(0).getEyes().get(0);
+
+        Assert.assertNotNull(debugEyes.getConfig());
+        Assert.assertNull(debugEyes.getConfig().getProxy());
+        Assert.assertEquals(debugEyes.getConfig().getAutProxy().getUrl(), autProxySettings.getUri());
     }
 
     private void startProxyDocker() throws IOException, InterruptedException {
