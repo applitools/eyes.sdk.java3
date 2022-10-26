@@ -1,6 +1,7 @@
 package com.applitools.eyes.selenium;
 
 import com.applitools.eyes.AutProxySettings;
+import com.applitools.eyes.EyesException;
 import com.applitools.eyes.ProxySettings;
 import com.applitools.eyes.selenium.fluent.Target;
 import com.applitools.eyes.selenium.universal.dto.DebugEyesDto;
@@ -28,6 +29,10 @@ public class TestProxy extends ReportingTestSuite {
 
     @BeforeTest
     public void setup() {
+        String chromeDriverPath = System.getenv("CHROME_DRIVER_PATH");
+        if(chromeDriverPath == null) throw new EyesException("CHROME_DRIVER_PATH missing");
+        System.setProperty("webdriver.chrome.driver", chromeDriverPath);
+
         driver = SeleniumUtils.createChromeDriver(new ChromeOptions().setHeadless(true));
         proxySettings = new ProxySettings("http://127.0.0.1", 8080);
         autProxySettings = new AutProxySettings(proxySettings);
