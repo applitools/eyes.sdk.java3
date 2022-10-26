@@ -68,7 +68,7 @@ public class TestProxy extends ReportingTestSuite {
 
         stopServer.setAccessible(false);
         instance.setAccessible(false);
-        debug.set(this, null);
+        debug.set(this, "false");
     }
 
     @BeforeMethod
