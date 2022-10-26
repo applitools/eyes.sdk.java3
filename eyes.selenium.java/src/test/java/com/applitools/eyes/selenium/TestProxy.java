@@ -3,6 +3,7 @@ package com.applitools.eyes.selenium;
 import com.applitools.eyes.AutProxySettings;
 import com.applitools.eyes.EyesException;
 import com.applitools.eyes.ProxySettings;
+import com.applitools.eyes.WebDriverProxySettings;
 import com.applitools.eyes.selenium.universal.dto.DebugEyesDto;
 import com.applitools.eyes.selenium.universal.dto.DebugHistoryDto;
 import com.applitools.eyes.selenium.universal.server.UniversalSdkNativeLoader;
@@ -13,10 +14,7 @@ import com.applitools.utils.GeneralUtils;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
 import org.testng.Assert;
-import org.testng.annotations.AfterMethod;
-import org.testng.annotations.AfterTest;
-import org.testng.annotations.BeforeTest;
-import org.testng.annotations.Test;
+import org.testng.annotations.*;
 
 import java.io.IOException;
 import java.lang.reflect.Field;
@@ -26,6 +24,7 @@ import java.lang.reflect.Modifier;
 
 public class TestProxy extends ReportingTestSuite {
 
+    private Eyes eyes;
     private WebDriver driver;
     private ProxySettings proxySettings;
     private AutProxySettings autProxySettings;
@@ -72,8 +71,22 @@ public class TestProxy extends ReportingTestSuite {
         debug.set(this, null);
     }
 
+    @BeforeMethod
+    public void beforeEach() {
+        try {
+            instance.set(this, null);
+        } catch (IllegalAccessException e) {
+            String errorMessage = GeneralUtils.createErrorMessageFromExceptionWithText(e, "Failed to destroy process / reset CE instance");
+            System.out.println(errorMessage);
+            throw new EyesException(errorMessage, e);
+        }
+    }
+
     @AfterMethod
     public void afterEach() {
+        if (eyes != null)
+            eyes.abort();
+
         try {
             stopServer.invoke(UniversalSdkNativeLoader.class);
             instance.set(this, null);
@@ -96,7 +109,7 @@ public class TestProxy extends ReportingTestSuite {
         debug.set(this, "true");
 
         VisualGridRunner runner = new VisualGridRunner();
-        Eyes eyes = new Eyes(runner);
+        eyes = new Eyes(runner);
 
         eyes.setConfiguration(eyes.getConfiguration()
                 .setProxy(proxySettings)
@@ -116,7 +129,7 @@ public class TestProxy extends ReportingTestSuite {
         debug.set(this, "true");
 
         ClassicRunner runner = new ClassicRunner();
-        Eyes eyes = new Eyes(runner);
+        eyes = new Eyes(runner);
 
         eyes.setConfiguration(eyes.getConfiguration()
                 .setProxy(proxySettings)
@@ -136,7 +149,7 @@ public class TestProxy extends ReportingTestSuite {
         debug.set(this, "true");
 
         VisualGridRunner runner = new VisualGridRunner();
-        Eyes eyes = new Eyes(runner);
+        eyes = new Eyes(runner);
 
         eyes.setConfiguration(eyes.getConfiguration()
                 .setAutProxy(autProxySettings)
@@ -151,6 +164,27 @@ public class TestProxy extends ReportingTestSuite {
         Assert.assertNull(debugEyes.getConfig().getProxy());
         Assert.assertEquals(debugEyes.getConfig().getAutProxy().getUrl(), autProxySettings.getUri());
     }
+
+//    @Test
+//    public void testUniversalWebDriverProxyWithVisualGridRunner() throws IllegalAccessException {
+//        debug.set(this, "true");
+//
+//        VisualGridRunner runner = new VisualGridRunner();
+//        eyes = new Eyes(runner);
+//
+//        eyes.setConfiguration(eyes.getConfiguration()
+//                .setWebDriverProxy(new WebDriverProxySettings("http://127.0.0.1:8080"))
+//        );
+//
+//        eyes.open(driver, "ProxyTest", "autProxyTestVisualGridRunner");
+//
+//        DebugHistoryDto history = CommandExecutor.getDebugHistory();
+//        DebugEyesDto debugEyes = history.getManagers().get(0).getEyes().get(0);
+//
+//        Assert.assertNotNull(debugEyes.getConfig());
+//        Assert.assertNull(debugEyes.getConfig().getProxy());
+//        Assert.assertEquals(debugEyes.getConfig().getAutProxy().getUrl(), autProxySettings.getUri());
+//    }
 
     private void startProxyDocker() throws IOException, InterruptedException {
         Process stopDocker = Runtime.getRuntime().exec(new String[]{"bash","-c","docker run -d --name='tinyproxy' -p 8080:8888 dannydirect/tinyproxy:latest ANY"});
