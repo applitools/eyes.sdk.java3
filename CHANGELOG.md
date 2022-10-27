@@ -1,3 +1,8 @@
+## [5.31.0] - 2022-10-19
+### Fixed
+- Fixed proxy issue with resource (screenshot/dom) uploading.
+- Fixed error during command response logging
+
 ## [5.30.0] - 2022-10-19
 ### Fixed
 - UFG tests aborts intermittently.
