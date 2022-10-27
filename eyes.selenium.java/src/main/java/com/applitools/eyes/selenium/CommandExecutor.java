@@ -14,10 +14,7 @@ import com.applitools.eyes.exceptions.NewTestException;
 import com.applitools.eyes.exceptions.TestFailedException;
 import com.applitools.eyes.locators.TextRegion;
 import com.applitools.eyes.selenium.universal.dto.*;
-import com.applitools.eyes.selenium.universal.dto.request.CommandCloseAllEyesRequestDto;
-import com.applitools.eyes.selenium.universal.dto.request.CommandCloseManagerRequestDto;
-import com.applitools.eyes.selenium.universal.dto.request.CommandCloseRequestDto;
-import com.applitools.eyes.selenium.universal.dto.request.CommandGetViewportSizeRequestDto;
+import com.applitools.eyes.selenium.universal.dto.request.*;
 import com.applitools.eyes.selenium.universal.dto.response.CommandCloseResponseDto;
 import com.applitools.utils.GeneralUtils;
 import org.openqa.selenium.StaleElementReferenceException;
@@ -252,6 +249,14 @@ public class CommandExecutor {
     return null;
   }
 
+  public static DebugHistoryDto getDebugHistory() {
+    RequestDto request = new RequestDto<>();
+    request.setName("Debug.getHistory");
+    request.setKey(UUID.randomUUID().toString());
+    SyncTaskListener syncTaskListener = checkedCommand(request, true);
+    ResponseDto<DebugHistoryDto> getDebugHistory = (ResponseDto<DebugHistoryDto>) syncTaskListener.get();
+    return getDebugHistory.getPayload().getResult();
+  }
 
   public static SyncTaskListener checkedCommand(Command command, boolean waitResult) {
     try {

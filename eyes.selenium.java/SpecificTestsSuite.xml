@@ -1,7 +1,12 @@
 <!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd" >
 
-<suite name="Java Specific Tests" verbose="1" parallel="tests" thread-count="15">
-    <test name="TestBatchAPI" parallel="methods">
+<suite name="Java Specific Tests" verbose="1" parallel="classes" thread-count="15">
+    <test name="TestProxy" parallel="classes">
+        <classes>
+            <class name="com.applitools.eyes.selenium.TestProxy"/>
+        </classes>
+    </test>
+    <test name="TestEyes" parallel="classes">
         <classes>
 <!--            <class name="com.applitools.eyes.selenium.TestBatchAPI"/>-->
             <class name="com.applitools.eyes.AutProxyTest"/>
