@@ -87,6 +87,7 @@ public class TestImagesApi extends TestSetup {
         eyes.setImageCut(new UnscaledFixedCutProvider(200, 100, 100, 50));
         eyes.check("TestCheckImage_Fluent", Target.image(TEST_IMAGE));
         eyes.close();
+        eyes.setImageCut(null);
     }
 
     @Test
