@@ -16,6 +16,7 @@ import com.applitools.eyes.SyncTaskListener;
 import com.applitools.eyes.TestResultContainer;
 import com.applitools.eyes.TestResults;
 import com.applitools.eyes.TestResultsSummary;
+import com.applitools.eyes.exceptions.StaleElementReferenceException;
 import com.applitools.utils.ClassVersionGetter;
 
 
@@ -44,6 +45,11 @@ public class ClassicRunner extends EyesRunner {
     super(baseAgentId, version);
     //TODO - check if baseAgentId is the correct agentId here
     managerRef = commandExecutor.coreMakeManager(ManagerType.CLASSIC.value, null, null, baseAgentId);
+  }
+
+  @Override
+  public StaleElementReferenceException getStaleElementException() {
+    return new com.applitools.eyes.selenium.exceptions.StaleElementReferenceException();
   }
 
   @Override

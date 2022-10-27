@@ -26,21 +26,23 @@ public class CommandExecutor {
 
   private static USDKConnection connection;
   private static volatile CommandExecutor instance;
+  private static StaleElementReferenceException staleElementReferenceException;
 
-  public static CommandExecutor getInstance(String name, String version) {
+  public static CommandExecutor getInstance(String name, String version, StaleElementReferenceException e) {
     if (instance == null) {
       synchronized (CommandExecutor.class) {
         if (instance == null) {
-          instance = new CommandExecutor(name, version);
+          instance = new CommandExecutor(name, version, e);
         }
       }
     }
     return instance;
   }
 
-  private CommandExecutor(String name, String version) {
+  private CommandExecutor(String name, String version, StaleElementReferenceException e) {
     connection = new USDKConnection();
     connection.init();
+    staleElementReferenceException = e;
     //TODO - commands arguments probably shouldn't be null
     makeCore(name, version, GeneralUtils.getPropertyString("user.dir"), "webdriver", null);
   }
@@ -63,7 +65,7 @@ public class CommandExecutor {
     if (response != null && response.getPayload().getError() != null) {
       String message = response.getPayload().getError().getMessage();
       if (message != null && message.contains("stale element reference")) {
-        throw new StaleElementReferenceException(message);
+        staleElementReferenceException.throwException(message);
       }
       throw new EyesException(message);
     }
@@ -81,7 +83,7 @@ public class CommandExecutor {
     if (referenceResponseDto != null && referenceResponseDto.getPayload().getError() != null) {
       String message = referenceResponseDto.getPayload().getError().getMessage();
       if (message != null && message.contains("stale element reference")) {
-        throw new StaleElementReferenceException(message);
+        staleElementReferenceException.throwException(message);
       }
       throw new EyesException(message);
     }
@@ -98,7 +100,7 @@ public class CommandExecutor {
     if (responseDto != null && responseDto.getPayload().getError() != null) {
       String message = responseDto.getPayload().getError().getMessage();
       if (message != null && message.contains("stale element reference")) {
-        throw new StaleElementReferenceException(message);
+        staleElementReferenceException.throwException(message);
       }
       throw new EyesException(message);
     }
@@ -114,7 +116,7 @@ public class CommandExecutor {
     if (locateResponse != null && locateResponse.getPayload().getError() != null) {
       String message = locateResponse.getPayload().getError().getMessage();
       if (message != null && message.contains("stale element reference")) {
-        throw new StaleElementReferenceException(message);
+        staleElementReferenceException.throwException(message);
       }
       throw new EyesException(message);
     }
@@ -132,7 +134,7 @@ public class CommandExecutor {
     if (locateTextResponse != null && locateTextResponse.getPayload().getError() != null) {
       String message = locateTextResponse.getPayload().getError().getMessage();
       if (message != null && message.contains("stale element reference")) {
-        throw new StaleElementReferenceException(message);
+        staleElementReferenceException.throwException(message);
       }
       throw new EyesException(message);
     }
@@ -150,7 +152,7 @@ public class CommandExecutor {
     if (responseDto != null && responseDto.getPayload().getError() != null) {
       String message = responseDto.getPayload().getError().getMessage();
       if (message != null && message.contains("stale element reference")) {
-        throw new StaleElementReferenceException(message);
+        staleElementReferenceException.throwException(message);
       }
       throw new EyesException(message);
     }
@@ -167,7 +169,7 @@ public class CommandExecutor {
     if (closeResponse != null && closeResponse.getPayload().getError() != null) {
       String message = closeResponse.getPayload().getError().getMessage();
       if (message != null && message.contains("stale element reference")) {
-        throw new StaleElementReferenceException(message);
+        staleElementReferenceException.throwException(message);
       }
       throw new EyesException(message);
     }
@@ -188,7 +190,7 @@ public class CommandExecutor {
     if (closeResponse != null && closeResponse.getPayload() != null && closeResponse.getPayload().getError() != null) {
       String message = closeResponse.getPayload().getError().getMessage();
       if (message != null && message.contains("stale element reference")) {
-        throw new StaleElementReferenceException(message);
+        staleElementReferenceException.throwException(message);
       }
       throw new EyesException(message);
     }
@@ -209,7 +211,7 @@ public class CommandExecutor {
     if (closeResponse != null && closeResponse.getPayload().getError() != null) {
       String message = closeResponse.getPayload().getError().getMessage();
       if (message != null && message.contains("stale element reference")) {
-        throw new StaleElementReferenceException(message);
+        staleElementReferenceException.throwException(message);
       }
       throw new EyesException(message);
     }
@@ -236,7 +238,7 @@ public class CommandExecutor {
     if (closeResponse != null && closeResponse.getPayload().getError() != null) {
       String message = closeResponse.getPayload().getError().getMessage();
       if (message != null && message.contains("stale element reference")) {
-        throw new StaleElementReferenceException(message);
+        staleElementReferenceException.throwException(message);
       }
       throw new EyesException(message);
     }
@@ -255,7 +257,7 @@ public class CommandExecutor {
           ErrorDto error = closeResponse.getPayload().getError();
           String message = error.getMessage();
           if (message != null && message.contains("stale element reference")) {
-            throw new StaleElementReferenceException(message);
+            staleElementReferenceException.throwException(message);
           } else if (error.getReason() != null) {
             throwExceptionBasedOnReason(error.getReason(), error.getInfo() == null ?
                     null : error.getInfo().getTestResult());
@@ -306,5 +308,4 @@ public class CommandExecutor {
         throw new UnsupportedOperationException("Unsupported exception type: " + reason);
     }
   }
-
 }

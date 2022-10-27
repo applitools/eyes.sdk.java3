@@ -13,6 +13,7 @@ import com.applitools.eyes.*;
 import com.applitools.eyes.logging.Stage;
 import com.applitools.eyes.logging.TraceLevel;
 import com.applitools.eyes.selenium.ManagerType;
+import com.applitools.eyes.selenium.exceptions.StaleElementReferenceException;
 import com.applitools.eyes.services.EyesServiceRunner;
 import com.applitools.eyes.visualgrid.model.FrameData;
 import com.applitools.eyes.visualgrid.model.IDebugResourceWriter;
@@ -121,6 +122,11 @@ public class VisualGridRunner extends EyesRunner {
         this.runnerOptions = new RunnerOptions().testConcurrency(testConcurrency.actualConcurrency);
         //TODO - verify if actualConcurrency is the right argument for "legacyConcurrency"
         managerRef = commandExecutor.coreMakeManager(ManagerType.VISUAL_GRID.value, testConcurrency.actualConcurrency, testConcurrency.actualConcurrency, BASE_AGENT_ID);
+    }
+
+    @Override
+    public com.applitools.eyes.exceptions.StaleElementReferenceException getStaleElementException() {
+        return new StaleElementReferenceException();
     }
 
     protected VisualGridRunner(int testConcurrency0, String baseAgentId, String version) {

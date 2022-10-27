@@ -8,6 +8,7 @@ import java.util.Map;
 import com.applitools.connectivity.ServerConnector;
 import com.applitools.eyes.exceptions.DiffsFoundException;
 import com.applitools.eyes.exceptions.NewTestException;
+import com.applitools.eyes.exceptions.StaleElementReferenceException;
 import com.applitools.eyes.exceptions.TestFailedException;
 import com.applitools.eyes.logging.Stage;
 import com.applitools.eyes.logging.Type;
@@ -56,8 +57,10 @@ public abstract class EyesRunner {
 
   protected void runServer(String baseAgentId, String version){
     UniversalSdkNativeLoader.start();
-    commandExecutor = CommandExecutor.getInstance(baseAgentId, version);
+    commandExecutor = CommandExecutor.getInstance(baseAgentId, version, getStaleElementException());
   }
+
+  public abstract StaleElementReferenceException getStaleElementException();
 
   private Boolean dontCloseBatches;
 
