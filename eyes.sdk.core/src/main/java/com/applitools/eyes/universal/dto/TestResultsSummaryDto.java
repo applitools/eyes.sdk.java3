@@ -6,7 +6,7 @@ import java.util.List;
  * Test results summary dto
  */
 public class TestResultsSummaryDto {
-  private List<TestResultContainerDto> results;
+  private List<TestResultContainerDto> result;
   private Integer passed;
   private Integer unresolved;
   private Integer failed;
@@ -18,12 +18,12 @@ public class TestResultsSummaryDto {
   public TestResultsSummaryDto() {
   }
 
-  public List<TestResultContainerDto> getResults() {
-    return results;
+  public List<TestResultContainerDto> getResult() {
+    return result;
   }
 
-  public void setResults(List<TestResultContainerDto> results) {
-    this.results = results;
+  public void setResult(List<TestResultContainerDto> result) {
+    this.result = result;
   }
 
   public Integer getPassed() {

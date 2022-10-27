@@ -26,7 +26,7 @@ public class TestResultsSummaryMapper {
       return null;
     }
 
-    List<TestResultContainerDto> containerDtoList = dto.getResults();
+    List<TestResultContainerDto> containerDtoList = dto.getResult();
     List<TestResultContainer> containerList = new ArrayList<>();
 
     if (containerDtoList != null && !containerDtoList.isEmpty()) {
