@@ -1,9 +1,6 @@
 package com.applitools.eyes.exceptions;
 
-public class StaleElementReferenceException extends RuntimeException {
-    private static final String SUPPORT_URL = "https://selenium.dev/exceptions/#stale_element_reference";
+public abstract class StaleElementReferenceException {
 
-    public StaleElementReferenceException(String message) {
-        super(message);
-    }
+    public abstract void throwException(String message);
 }
