@@ -45,7 +45,7 @@ public class ConfigurationMapper {
     dto.setSessionType(config.getSessionType() == null ? null : config.getSessionType().name());
     dto.setProperties(CustomPropertyMapper.toCustomPropertyDtoList(config.getProperties()));
     dto.setBatch(BatchMapper.toBatchDto(config.getBatch()));
-//    dto.setDefaultMatchSettings(MatchSettingsMapper.toMatchSettingsDto(config.getDefaultMatchSettings()));
+    dto.setDefaultMatchSettings(MatchSettingsMapper.toMatchSettingsDto(config.getDefaultMatchSettings()));
     dto.setHostApp(config.getHostApp());
     dto.setHostOS(config.getHostOS());
     dto.setHostAppInfo(null);

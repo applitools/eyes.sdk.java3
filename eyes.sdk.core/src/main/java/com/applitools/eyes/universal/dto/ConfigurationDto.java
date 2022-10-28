@@ -3,6 +3,7 @@ package com.applitools.eyes.universal.dto;
 import java.util.List;
 import java.util.Map;
 
+import com.applitools.eyes.universal.mapper.CoreCodedRegionReferenceMapper;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -60,6 +61,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
         "waitBeforeCapture",
         "autProxy",
         "browsersInfo",
+        "defaultMatchSettings",
 })
 public class ConfigurationDto {
   // EyesBaseConfig
@@ -270,13 +272,34 @@ public class ConfigurationDto {
     this.open.getEnvironment().setViewportSize(viewportSize);
   }
 
-//  public MatchSettingsDto getDefaultMatchSettings() {
-//    return defaultMatchSettings;
-//  }
+  public void setDefaultMatchSettings(MatchSettingsDto defaultMatchSettings) {
+    if (defaultMatchSettings == null)
+      return;
 
-//  public void setDefaultMatchSettings(MatchSettingsDto defaultMatchSettings) {
-//    this.defaultMatchSettings = defaultMatchSettings;
-//  }
+    this.check.setAccessibilitySettings(defaultMatchSettings.getAccessibilitySettings());
+    this.check.setMatchLevel(defaultMatchSettings.getMatchLevel());
+    this.check.setSendDom(defaultMatchSettings.getSendDom());
+    this.check.setUseDom(defaultMatchSettings.getUseDom());
+//    defaultMatchSettings.getExact();
+    this.check.setEnablePatterns(defaultMatchSettings.getEnablePatterns());
+    this.check.setIgnoreCaret(defaultMatchSettings.getIgnoreCaret());
+    this.check.setIgnoreDisplacements(defaultMatchSettings.getIgnoreDisplacements());
+
+    this.check.setAccessibilityRegions(defaultMatchSettings.getAccessibilityRegions());
+    this.check.setFloatingRegions(defaultMatchSettings.getFloatingRegions());
+    this.check.setContentRegions(CoreCodedRegionReferenceMapper.toCodedRegionReferenceList(
+            defaultMatchSettings.getContentRegions()
+    ));
+    this.check.setLayoutRegions(CoreCodedRegionReferenceMapper.toCodedRegionReferenceList(
+            defaultMatchSettings.getLayoutRegions()
+    ));
+    this.check.setIgnoreRegions(CoreCodedRegionReferenceMapper.toCodedRegionReferenceList(
+            defaultMatchSettings.getIgnoreRegions()
+    ));
+    this.check.setStrictRegions(CoreCodedRegionReferenceMapper.toCodedRegionReferenceList(
+            defaultMatchSettings.getIgnoreRegions()
+    ));
+  }
 
   public Integer getMatchTimeout() {
     return this.check.getRetryTimeout();
