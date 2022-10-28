@@ -1,9 +1,6 @@
 package com.applitools.eyes.images;
 
-import com.applitools.eyes.BatchInfo;
-import com.applitools.eyes.EyesRunner;
-import com.applitools.eyes.TestResults;
-import com.applitools.eyes.TestResultsSummary;
+import com.applitools.eyes.*;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
@@ -38,10 +35,10 @@ public class ImagesDemo {
 
     @Test
     public void testCheckSettings() throws IOException {
-        eyes.open("Eyes Images SDK", "CheckSettings with BufferedImage");
-
-        // Load page image and validate
         BufferedImage img = ImageIO.read(new URL("https://applitools.github.io/upload/appium.png"));
+
+        eyes.open("Eyes Images SDK", "CheckSettings with BufferedImage",
+                new RectangleSize(img.getWidth(), img.getHeight()));
 
         eyes.check(Target.image(img).withName("test"));
         TestResults results = eyes.close();

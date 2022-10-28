@@ -1,6 +1,7 @@
 package com.applitools.eyes.images;
 
 import com.applitools.eyes.CoordinatesType;
+import com.applitools.eyes.RectangleSize;
 import com.applitools.eyes.Region;
 import com.applitools.eyes.images.utils.TestSetup;
 import com.applitools.eyes.locators.TextRegion;
@@ -20,8 +21,8 @@ public class TestLocators extends TestSetup {
 
     @Test
     public void testLocate() {
-        eyes.open(getApplicationName(), "Locate");
         BufferedImage image = ImageUtils.imageFromFile(EXTRACT_TEST_IMAGE);
+        eyes.open(getApplicationName(), "Locate", new RectangleSize(image.getWidth(), image.getHeight()));
 
         Map<String, List<Region>> res = eyes.locate(new VisualLocatorSettings().name("the").image(image));
         List<Region> regions = res.get("the");
@@ -33,8 +34,8 @@ public class TestLocators extends TestSetup {
 
     @Test
     public void testLocateText() {
-        eyes.open(getApplicationName(), "LocateText");
         BufferedImage image = ImageUtils.imageFromFile(EXTRACT_TEST_IMAGE);
+        eyes.open(getApplicationName(), "LocateText", new RectangleSize(image.getWidth(), image.getHeight()));
 
         Map<String, List<TextRegion>> textRegions = eyes.extractTextRegions(new TextRegionSettings(".+").image(image));
         Assert.assertEquals(textRegions.size(), 1);
@@ -47,8 +48,8 @@ public class TestLocators extends TestSetup {
 
     @Test
     public void testExtractText() {
-        eyes.open(getApplicationName(), "ExtractText");
         BufferedImage image = ImageUtils.imageFromFile(EXTRACT_TEST_IMAGE);
+        eyes.open(getApplicationName(), "ExtractText", new RectangleSize(image.getWidth(), image.getHeight()));
         List<String> result = eyes.extractText(new OcrRegion(image));
         Assert.assertEquals(result.size(), 1);
         Assert.assertEquals(result.get(0), "This is the navigation bar");

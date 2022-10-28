@@ -114,16 +114,6 @@ public class Eyes implements IEyesBase {
     }
 
     /**
-     * Starts a new test without setting the viewport size of the AUT.
-     * @param appName  The name of the application under test.
-     * @param testName The test name.
-     * @see #open(String, String, RectangleSize)
-     */
-    public void open(String appName, String testName) {
-        open(appName, testName, null);
-    }
-
-    /**
      * Takes multiple screenshots at once (given all <code>ICheckSettings</code> objects are on the same level).
      * @param checkSettings Multiple <code>ICheckSettings</code> object representing different regions in the viewport.
      */
