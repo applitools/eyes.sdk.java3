@@ -8,7 +8,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class AccessibilitySettingsDto {
   private String level; // 'AA' | 'AAA'
-  private String guidelinesVersion; // 'WCAG_2_0' | 'WCAG_2_1'
+  private String version; // 'WCAG_2_0' | 'WCAG_2_1'
 
   public String getLevel() {
     return level;
@@ -18,11 +18,11 @@ public class AccessibilitySettingsDto {
     this.level = level;
   }
 
-  public String getGuidelinesVersion() {
-    return guidelinesVersion;
+  public String getVersion() {
+    return version;
   }
 
-  public void setGuidelinesVersion(String version) {
-    this.guidelinesVersion = version;
+  public void setVersion(String version) {
+    this.version = version;
   }
 }

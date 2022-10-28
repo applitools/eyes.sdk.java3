@@ -15,7 +15,7 @@ public class AccessibilitySettingsMapper {
 
     AccessibilitySettingsDto accessibilitySettingsDto = new AccessibilitySettingsDto();
     accessibilitySettingsDto.setLevel(accessibilitySettings.getLevel().name());
-    accessibilitySettingsDto.setGuidelinesVersion(accessibilitySettings.getGuidelinesVersion().name());
+    accessibilitySettingsDto.setVersion(accessibilitySettings.getGuidelinesVersion().name());
     return accessibilitySettingsDto;
   }
 }
