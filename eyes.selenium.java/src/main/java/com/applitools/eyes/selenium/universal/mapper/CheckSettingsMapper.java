@@ -4,6 +4,7 @@ import com.applitools.ICheckSettings;
 import com.applitools.eyes.config.Configuration;
 import com.applitools.eyes.selenium.fluent.SeleniumCheckSettings;
 import com.applitools.eyes.universal.dto.CheckSettingsDto;
+import com.applitools.eyes.universal.dto.DebugScreenshotHandlerDto;
 import com.applitools.eyes.universal.mapper.AccessibilitySettingsMapper;
 import com.applitools.eyes.universal.mapper.ProxyMapper;
 import com.applitools.eyes.universal.mapper.VisualGridOptionMapper;
@@ -99,7 +100,8 @@ public class CheckSettingsMapper {
     checkSettingsDto.setIgnoreDisplacements(seleniumCheckSettings.isIgnoreDisplacements());
     checkSettingsDto.setNormalization(toNormalizationDto(
             toImageCropRect(config.getCutProvider(), config.getContentInset()), config.getRotation(), config.getScaleRatio()));
-    checkSettingsDto.setDebugImages(null); //TODO I'm NEW
+    checkSettingsDto.setDebugImages(new DebugScreenshotHandlerDto(config.getSaveDebugScreenshots(),
+            config.getDebugScreenshotsPath(), config.getDebugScreenshotsPrefix()));
     checkSettingsDto.setName(seleniumCheckSettings.getName());
     checkSettingsDto.setPageId(seleniumCheckSettings.getPageId());
     checkSettingsDto.setIgnoreRegions(CodedRegionReferenceMapper
@@ -126,6 +128,7 @@ public class CheckSettingsMapper {
     checkSettingsDto.setDisableBrowserFetching(seleniumCheckSettings.isDisableBrowserFetching());
     checkSettingsDto.setAutProxy(ProxyMapper.toAutProxyDto(config.getAutProxy()));
     checkSettingsDto.setHooks(seleniumCheckSettings.getScriptHooks());
+    checkSettingsDto.setUserCommandId(seleniumCheckSettings.getVariationGroupId());
 
 
     return checkSettingsDto;

@@ -50,6 +50,7 @@ public class CheckSettingsDto {
   private AutProxyDto autProxy;
   private Map<String, String> hooks;
   private List<IBrowsersInfo> renderers;
+  private String userCommandId;
 
   public CheckSettingsDto() {
 
@@ -329,5 +330,13 @@ public class CheckSettingsDto {
 
   public void setRenderers(List<IBrowsersInfo> renderers) {
     this.renderers = renderers;
+  }
+
+  public void setUserCommandId(String userCommandId) {
+    this.userCommandId = userCommandId;
+  }
+
+  public String getUserCommandId() {
+    return userCommandId;
   }
 }
