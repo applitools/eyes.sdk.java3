@@ -1,7 +1,7 @@
 <!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd" >
 
 <suite name="Images Tests" verbose="1">
-    <test name="TestEyesImages">
+    <test name="TestEyesImages" parallel="classes">
         <classes>
 <!--            <class name="com.applitools.eyes.images.ImagesDemo"/>-->
             <class name="com.applitools.eyes.images.TestConfiguration"/>
