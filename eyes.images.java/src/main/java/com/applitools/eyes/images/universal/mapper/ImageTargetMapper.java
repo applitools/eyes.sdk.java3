@@ -23,8 +23,8 @@ public class ImageTargetMapper {
         imageTargetDto.setName(tag);
         imageTargetDto.setSource(image.getSource().toString());
         imageTargetDto.setDom(null); //TODO
-        imageTargetDto.setLocationInViewport(new Location());
-        imageTargetDto.setLocationInView(new Location());
+        imageTargetDto.setLocationInViewport(null);
+        imageTargetDto.setLocationInView(null);
         imageTargetDto.setFullViewSize(ViewportSizeMapper.toViewportSizeDto(
                 new RectangleSize(image.getWidth(), image.getHeight())
         ));
