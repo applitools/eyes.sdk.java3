@@ -1,6 +1,7 @@
 package com.applitools.eyes.images;
 
 import com.applitools.ICheckSettings;
+import com.applitools.eyes.Region;
 import com.applitools.utils.ImageUtils;
 
 import java.awt.image.BufferedImage;
@@ -22,5 +23,9 @@ public class Target {
 
     public static ICheckSettings image(URL url) {
         return image(ImageUtils.imageFromUrl(url));
+    }
+
+    public static ICheckSettings region(BufferedImage image, Region region) {
+        return new ImagesCheckSettings(image, region);
     }
 }

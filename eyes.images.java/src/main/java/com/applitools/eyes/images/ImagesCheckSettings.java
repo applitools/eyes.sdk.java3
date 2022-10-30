@@ -1,5 +1,6 @@
 package com.applitools.eyes.images;
 
+import com.applitools.eyes.Region;
 import com.applitools.eyes.fluent.CheckSettings;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
@@ -12,6 +13,11 @@ public class ImagesCheckSettings extends CheckSettings implements IImagesCheckTa
 
     public ImagesCheckSettings(BufferedImage image){
         this.image = image;
+    }
+
+    public ImagesCheckSettings(BufferedImage image, Region region){
+        this.image = image;
+        updateTargetRegion(region);
     }
 
     public BufferedImage getImage() {
