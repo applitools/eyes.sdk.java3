@@ -1,10 +1,12 @@
 package com.applitools.eyes.universal.dto;
 
 import com.applitools.eyes.universal.Reference;
+import com.fasterxml.jackson.annotation.JsonInclude;
 
 /**
  * create an eyes object
  */
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class OpenEyes {
 
   /**
