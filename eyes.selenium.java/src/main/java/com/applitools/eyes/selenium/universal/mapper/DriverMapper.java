@@ -113,7 +113,7 @@ public class DriverMapper {
         driverTargetDto.setSessionId(remoteDriver.getSessionId().toString());
         driverTargetDto.setServerUrl(getRemoteServerUrl(remoteDriver));
         driverTargetDto.setCapabilities(remoteDriver.getCapabilities().asMap());
-        driverTargetDto.setProxySettings(proxySettings);
+        driverTargetDto.setProxy(proxySettings);
 
         return driverTargetDto;
     }
