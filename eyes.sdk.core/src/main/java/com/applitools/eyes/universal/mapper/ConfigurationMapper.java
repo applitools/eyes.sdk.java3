@@ -72,7 +72,7 @@ public class ConfigurationMapper {
     // EyesClassicConfig<TElement, TSelector>
 //    dto.setWaitBeforeScreenshots(config.getWaitBeforeScreenshots());
     dto.setStitchMode(config.getStitchMode() == null ? null : config.getStitchMode().getName());
-    dto.setHideScrollbars(config.getHideScrollbars());
+    dto.setHideScrollBars(config.getHideScrollbars());
     dto.setHideCaret(config.getHideCaret());
     dto.setStitchOverlap(config.getStitchOverlap());
     dto.setScrollRootElement(null);

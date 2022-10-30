@@ -405,11 +405,11 @@ public class ConfigurationDto {
     this.screenshot.setStitchMode(stitchMode);
   }
 
-  public Boolean getHideScrollbars() {
+  public Boolean getHideScrollBars() {
     return screenshot.getHideScrollBars();
   }
 
-  public void setHideScrollbars(Boolean hideScrollBars) {
+  public void setHideScrollBars(Boolean hideScrollBars) {
     this.screenshot.setHideScrollBars(hideScrollBars);
   }
 
