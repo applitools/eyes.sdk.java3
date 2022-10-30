@@ -77,7 +77,7 @@ public class SettingsMapper {
         settings.setFully(checkSettings.getFully());
         settings.setScrollRootElement(checkSettings.getScrollRootElement());
         settings.setStitchMode(configurationDto.getStitchMode());
-        settings.setHideScrollBars(configurationDto.getHideScrollbars());
+        settings.setHideScrollBars(configurationDto.getHideScrollBars());
         settings.setHideCaret(configurationDto.getHideCaret());
         settings.setOverlap(configurationDto.getStitchOverlap());
         settings.setWaitBeforeCapture(checkSettings.getWaitBeforeCapture());
