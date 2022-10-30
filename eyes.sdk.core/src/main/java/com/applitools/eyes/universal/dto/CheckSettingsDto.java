@@ -19,7 +19,7 @@ public class CheckSettingsDto {
   private Boolean fully;
   private TRegion scrollRootElement;
   private String stitchMode; // "CSS" | "Scroll"
-  private Boolean hideScrollBars;
+  private Boolean hideScrollbars; // this is not camel case
   private Boolean hideCaret;
   private Integer overlap;
   private Integer waitBeforeCapture;
@@ -100,12 +100,12 @@ public class CheckSettingsDto {
     this.stitchMode = stitchMode;
   }
 
-  public Boolean getHideScrollBars() {
-    return hideScrollBars;
+  public Boolean getHideScrollbars() {
+    return hideScrollbars;
   }
 
-  public void setHideScrollBars(Boolean hideScrollBars) {
-    this.hideScrollBars = hideScrollBars;
+  public void setHideScrollbars(Boolean hideScrollbars) {
+    this.hideScrollbars = hideScrollbars;
   }
 
   public Boolean getHideCaret() {

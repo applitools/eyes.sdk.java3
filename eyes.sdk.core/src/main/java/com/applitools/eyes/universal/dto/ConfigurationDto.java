@@ -406,11 +406,11 @@ public class ConfigurationDto {
   }
 
   public Boolean getHideScrollBars() {
-    return screenshot.getHideScrollBars();
+    return screenshot.getHideScrollbars();
   }
 
   public void setHideScrollBars(Boolean hideScrollBars) {
-    this.screenshot.setHideScrollBars(hideScrollBars);
+    this.screenshot.setHideScrollbars(hideScrollBars);
   }
 
   public Boolean getHideCaret() {

@@ -34,7 +34,7 @@ public class ImagesCheckSettingsMapper {
         checkSettingsDto.setFully(imagesCheckSettings.getStitchContent());
         checkSettingsDto.setScrollRootElement(null);
         checkSettingsDto.setStitchMode(config.getStitchMode() == null ? null : config.getStitchMode().getName());
-        checkSettingsDto.setHideScrollBars(config.getHideScrollbars());
+        checkSettingsDto.setHideScrollbars(config.getHideScrollbars());
         checkSettingsDto.setHideCaret(config.getHideCaret());
         checkSettingsDto.setOverlap(config.getStitchOverlap());
         checkSettingsDto.setWaitBeforeCapture(imagesCheckSettings.getWaitBeforeCapture());

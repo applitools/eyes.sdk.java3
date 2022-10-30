@@ -92,7 +92,7 @@ public class CheckSettingsMapper {
     checkSettingsDto.setScrollRootElement(TRegionMapper.toTRegionDtoFromScrolls(seleniumCheckSettings.getScrollRootSelector(),
             seleniumCheckSettings.getScrollRootElement()));
     checkSettingsDto.setStitchMode(config.getStitchMode() == null ? null : config.getStitchMode().getName());
-    checkSettingsDto.setHideScrollBars(config.getHideScrollbars());
+    checkSettingsDto.setHideScrollbars(config.getHideScrollbars());
     checkSettingsDto.setHideCaret(config.getHideCaret());
     checkSettingsDto.setOverlap(config.getStitchOverlap());
     checkSettingsDto.setWaitBeforeCapture(seleniumCheckSettings.getWaitBeforeCapture());
