@@ -1,12 +1,10 @@
 package com.applitools.eyes.images;
 
 import com.applitools.eyes.*;
-import com.applitools.eyes.config.Configuration;
 import com.applitools.eyes.images.utils.TestSetup;
 import com.applitools.eyes.metadata.SessionResults;
 import com.applitools.utils.ImageUtils;
 import org.testng.Assert;
-import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 import java.awt.image.BufferedImage;
 import java.net.MalformedURLException;
@@ -45,10 +43,9 @@ public class TestImagesGeneric extends TestSetup {
 
     @Test
     public void testBitMapFromURL() throws MalformedURLException {
-        URL imageUrl = new URL(IMAGE_URL_BMP);
-        BufferedImage image = ImageUtils.imageFromUrl(imageUrl);
+        BufferedImage image = ImageUtils.imageFromUrl(new URL(IMAGE_URL_BMP));
         eyes.open(getApplicationName(), "TestBitMapFromURL", new RectangleSize(image.getWidth(), image.getHeight()));
-        eyes.check(Target.image(imageUrl));
+        eyes.check(Target.image(IMAGE_URL_BMP));
         eyes.close();
     }
 
@@ -70,10 +67,9 @@ public class TestImagesGeneric extends TestSetup {
 
     @Test
     public void testJPEGFromURL() throws MalformedURLException {
-        URL imageUrl = new URL(IMAGE_URL_JPEG);
-        BufferedImage image = ImageUtils.imageFromUrl(imageUrl);
+        BufferedImage image = ImageUtils.imageFromUrl(new URL(IMAGE_URL_JPEG));
         eyes.open(getApplicationName(), "TestJPEGFromURL", new RectangleSize(image.getWidth(), image.getHeight()));
-        eyes.check(Target.image(imageUrl));
+        eyes.check(Target.image(IMAGE_URL_JPEG));
         eyes.close();
     }
 
@@ -95,21 +91,21 @@ public class TestImagesGeneric extends TestSetup {
 
     @Test
     public void testPNGFromURL() throws MalformedURLException {
-        URL imageUrl = new URL(IMAGE_URL_PNG);
-        BufferedImage image = ImageUtils.imageFromUrl(imageUrl);
+        BufferedImage image = ImageUtils.imageFromUrl(new URL(IMAGE_URL_PNG));
         eyes.open(getApplicationName(), "TestPNGFromURL", new RectangleSize(image.getWidth(), image.getHeight()));
-        eyes.check(Target.image(imageUrl));
+        eyes.check(Target.image(IMAGE_URL_PNG));
         eyes.close();
     }
 
     // ------------------------------------------------------------------------------------------------------------
 
-    private final BufferedImage image = ImageUtils.imageFromFile(IMAGE_PATH_JPEG);
+    private final BufferedImage TEST_IMAGE = ImageUtils.imageFromFile(IMAGE_PATH_JPEG);
+    private final BufferedImage EXTRACT_TEXT_IMAGE = ImageUtils.imageFromFile("src/main/resources/extractText.png");
 
     @Test
     public void testIgnoreRegionsFluent() {
-        eyes.open(getApplicationName(), "TestIgnoreRegionFluent", new RectangleSize(image.getWidth(), image.getHeight()));
-        eyes.check(Target.image(image)
+        eyes.open(getApplicationName(), "TestIgnoreRegionFluent", new RectangleSize(TEST_IMAGE.getWidth(), TEST_IMAGE.getHeight()));
+        eyes.check(Target.image(TEST_IMAGE)
                 .ignore(new Region(10, 20, 30, 40))
         );
         eyes.close();
@@ -121,8 +117,8 @@ public class TestImagesGeneric extends TestSetup {
                 eyes.getConfiguration()
         );
 
-        eyes.open(getApplicationName(), "TestFloatingRegionFluent", new RectangleSize(image.getWidth(), image.getHeight()));
-        eyes.check(Target.image(image)
+        eyes.open(getApplicationName(), "TestFloatingRegionFluent", new RectangleSize(TEST_IMAGE.getWidth(), TEST_IMAGE.getHeight()));
+        eyes.check(Target.image(TEST_IMAGE)
                 .floating(5)
                 .floating(new Region(10, 20, 30, 40), 5, 10, 20, 15)
         );
@@ -131,8 +127,8 @@ public class TestImagesGeneric extends TestSetup {
 
     @Test
     public void testMatchLevelExactFluent() {
-        eyes.open(getApplicationName(), "TestMatchLevelExactFluent", new RectangleSize(image.getWidth(), image.getHeight()));
-        eyes.check(Target.image(image).matchLevel(MatchLevel.EXACT));
+        eyes.open(getApplicationName(), "TestMatchLevelExactFluent", new RectangleSize(TEST_IMAGE.getWidth(), TEST_IMAGE.getHeight()));
+        eyes.check(Target.image(TEST_IMAGE).matchLevel(MatchLevel.EXACT));
 
         TestResults result = eyes.close(false);
         SessionResults info = getTestInfo(result);
@@ -143,8 +139,8 @@ public class TestImagesGeneric extends TestSetup {
 
     @Test
     public void testMatchLevelIgnoreColorsFluent() {
-        eyes.open(getApplicationName(), "TestMatchLevelIgnoreColorsFluent", new RectangleSize(image.getWidth(), image.getHeight()));
-        eyes.check(Target.image(image).matchLevel(MatchLevel.IGNORE_COLORS));
+        eyes.open(getApplicationName(), "TestMatchLevelIgnoreColorsFluent", new RectangleSize(TEST_IMAGE.getWidth(), TEST_IMAGE.getHeight()));
+        eyes.check(Target.image(TEST_IMAGE).matchLevel(MatchLevel.IGNORE_COLORS));
 
         TestResults result = eyes.close(false);
         SessionResults info = getTestInfo(result);
@@ -155,8 +151,8 @@ public class TestImagesGeneric extends TestSetup {
 
     @Test
     public void testMatchLevelStrictFluent() {
-        eyes.open(getApplicationName(), "TestMatchLevelStrictFluent", new RectangleSize(image.getWidth(), image.getHeight()));
-        eyes.check(Target.image(image).matchLevel(MatchLevel.STRICT));
+        eyes.open(getApplicationName(), "TestMatchLevelStrictFluent", new RectangleSize(TEST_IMAGE.getWidth(), TEST_IMAGE.getHeight()));
+        eyes.check(Target.image(TEST_IMAGE).matchLevel(MatchLevel.STRICT));
 
         TestResults result = eyes.close(false);
         SessionResults info = getTestInfo(result);
@@ -167,8 +163,8 @@ public class TestImagesGeneric extends TestSetup {
 
     @Test
     public void testMatchLevelLayoutFluent() {
-        eyes.open(getApplicationName(), "TestMatchLevelLayoutFluent", new RectangleSize(image.getWidth(), image.getHeight()));
-        eyes.check(Target.image(image).matchLevel(MatchLevel.LAYOUT));
+        eyes.open(getApplicationName(), "TestMatchLevelLayoutFluent", new RectangleSize(TEST_IMAGE.getWidth(), TEST_IMAGE.getHeight()));
+        eyes.check(Target.image(TEST_IMAGE).matchLevel(MatchLevel.LAYOUT));
 
         TestResults result = eyes.close(false);
         SessionResults info = getTestInfo(result);
@@ -181,8 +177,8 @@ public class TestImagesGeneric extends TestSetup {
     public void testMatchLevelExactNonFluent() {
         eyes.setConfiguration(eyes.getConfiguration().setMatchLevel(MatchLevel.EXACT));
 
-        eyes.open(getApplicationName(), "TestMatchLevelExactNonFluent", new RectangleSize(image.getWidth(), image.getHeight()));
-        eyes.check(Target.image(image));
+        eyes.open(getApplicationName(), "TestMatchLevelExactNonFluent", new RectangleSize(TEST_IMAGE.getWidth(), TEST_IMAGE.getHeight()));
+        eyes.check(Target.image(TEST_IMAGE));
 
         TestResults result = eyes.close(false);
         SessionResults info = getTestInfo(result);
@@ -195,8 +191,8 @@ public class TestImagesGeneric extends TestSetup {
     public void testMatchLevelIgnoreColorsNonFluent() {
         eyes.setConfiguration(eyes.getConfiguration().setMatchLevel(MatchLevel.IGNORE_COLORS));
 
-        eyes.open(getApplicationName(), "TestMatchLevelIgnoreColorsNonFluent", new RectangleSize(image.getWidth(), image.getHeight()));
-        eyes.check(Target.image(image));
+        eyes.open(getApplicationName(), "TestMatchLevelIgnoreColorsNonFluent", new RectangleSize(TEST_IMAGE.getWidth(), TEST_IMAGE.getHeight()));
+        eyes.check(Target.image(TEST_IMAGE));
 
         TestResults result = eyes.close(false);
         SessionResults info = getTestInfo(result);
@@ -209,8 +205,8 @@ public class TestImagesGeneric extends TestSetup {
     public void testMatchLevelStrictNonFluent() {
         eyes.setConfiguration(eyes.getConfiguration().setMatchLevel(MatchLevel.STRICT));
 
-        eyes.open(getApplicationName(), "TestMatchLevelStrictNonFluent", new RectangleSize(image.getWidth(), image.getHeight()));
-        eyes.check(Target.image(image));
+        eyes.open(getApplicationName(), "TestMatchLevelStrictNonFluent", new RectangleSize(TEST_IMAGE.getWidth(), TEST_IMAGE.getHeight()));
+        eyes.check(Target.image(TEST_IMAGE));
 
         TestResults result = eyes.close(false);
         SessionResults info = getTestInfo(result);
@@ -223,8 +219,8 @@ public class TestImagesGeneric extends TestSetup {
     public void testMatchLevelLayoutNonFluent() {
         eyes.setConfiguration(eyes.getConfiguration().setMatchLevel(MatchLevel.LAYOUT));
 
-        eyes.open(getApplicationName(), "TestMatchLevelLayoutNonFluent", new RectangleSize(image.getWidth(), image.getHeight()));
-        eyes.check(Target.image(image));
+        eyes.open(getApplicationName(), "TestMatchLevelLayoutNonFluent", new RectangleSize(TEST_IMAGE.getWidth(), TEST_IMAGE.getHeight()));
+        eyes.check(Target.image(TEST_IMAGE));
 
         TestResults result = eyes.close(false);
         SessionResults info = getTestInfo(result);
@@ -234,10 +230,10 @@ public class TestImagesGeneric extends TestSetup {
     }
 
     @Test
-    public void testExactTextFluent() {
-        eyes.open(getApplicationName(), "TestExtractText", new RectangleSize(image.getWidth(), image.getHeight()));
+    public void testExtractText() {
+        eyes.open(getApplicationName(), "TestExtractText", new RectangleSize(TEST_IMAGE.getWidth(), TEST_IMAGE.getHeight()));
 
-        List<String> result = eyes.extractText(new OcrRegion(image));
+        List<String> result = eyes.extractText(new OcrRegion(EXTRACT_TEXT_IMAGE));
         eyes.close();
 
         Assert.assertEquals(result.size(), 1);
@@ -246,23 +242,23 @@ public class TestImagesGeneric extends TestSetup {
 
     @Test
     public void testIgnoreDisplacementsFluent() {
-        eyes.open(getApplicationName(), "TestIgnoreDisplacementsFluent", new RectangleSize(image.getWidth(), image.getHeight()));
-        eyes.check(Target.image(image).ignoreDisplacements());
+        eyes.open(getApplicationName(), "TestIgnoreDisplacementsFluent", new RectangleSize(TEST_IMAGE.getWidth(), TEST_IMAGE.getHeight()));
+        eyes.check(Target.image(TEST_IMAGE).ignoreDisplacements());
         eyes.close();
     }
 
     @Test
     public void testIgnoreDisplacementsNonFluent() {
         eyes.setConfiguration(eyes.getConfiguration().setIgnoreDisplacements(true));
-        eyes.open(getApplicationName(), "TestIgnoreDisplacementsNonFluent", new RectangleSize(image.getWidth(), image.getHeight()));
-        eyes.check(Target.image(image));
+        eyes.open(getApplicationName(), "TestIgnoreDisplacementsNonFluent", new RectangleSize(TEST_IMAGE.getWidth(), TEST_IMAGE.getHeight()));
+        eyes.check(Target.image(TEST_IMAGE));
         eyes.close();
     }
 
     @Test
     public void testCodedRegionsFluent() {
-        eyes.open(getApplicationName(), "TestCodedRegionsFluent", new RectangleSize(image.getWidth(), image.getHeight()));
-        eyes.check(Target.image(image)
+        eyes.open(getApplicationName(), "TestCodedRegionsFluent", new RectangleSize(TEST_IMAGE.getWidth(), TEST_IMAGE.getHeight()));
+        eyes.check(Target.image(TEST_IMAGE)
                 .ignore(new Region(10, 20, 30, 40))
                 .content(new Region(10, 20, 30, 40))
                 .strict(new Region(10, 20, 30, 40))
@@ -285,30 +281,30 @@ public class TestImagesGeneric extends TestSetup {
 
     @Test
     public void testEnablePatternsFluent() {
-        eyes.open(getApplicationName(), "TestEnablePatternsFluent", new RectangleSize(image.getWidth(), image.getHeight()));
-        eyes.check(Target.image(image).enablePatterns());
+        eyes.open(getApplicationName(), "TestEnablePatternsFluent", new RectangleSize(TEST_IMAGE.getWidth(), TEST_IMAGE.getHeight()));
+        eyes.check(Target.image(TEST_IMAGE).enablePatterns());
         eyes.close();
     }
 
     @Test
     public void testEnablePatternsNonFluent() {
         eyes.setConfiguration(eyes.getConfiguration().setEnablePatterns(true));
-        eyes.open(getApplicationName(), "TestEnablePatternsNonFluent", new RectangleSize(image.getWidth(), image.getHeight()));
-        eyes.check(Target.image(image));
+        eyes.open(getApplicationName(), "TestEnablePatternsNonFluent", new RectangleSize(TEST_IMAGE.getWidth(), TEST_IMAGE.getHeight()));
+        eyes.check(Target.image(TEST_IMAGE));
         eyes.close();
     }
 
     @Test
     public void testCheckRegionFluent() {
-        eyes.open(getApplicationName(), "TestCheckRegionFluent", new RectangleSize(image.getWidth(), image.getHeight()));
-        eyes.check(Target.region(image, new Region(50, 50, 50, 50)));
+        eyes.open(getApplicationName(), "TestCheckRegionFluent", new RectangleSize(TEST_IMAGE.getWidth(), TEST_IMAGE.getHeight()));
+        eyes.check(Target.region(TEST_IMAGE, new Region(50, 50, 50, 50)));
         eyes.close();
     }
 
     @Test
     public void testCheckRegionNonFluent() {
-        eyes.open(getApplicationName(), "TestCheckRegionNonFluent", new RectangleSize(image.getWidth(), image.getHeight()));
-        eyes.checkRegion(image, new Region(50, 50, 50, 50));
+        eyes.open(getApplicationName(), "TestCheckRegionNonFluent", new RectangleSize(TEST_IMAGE.getWidth(), TEST_IMAGE.getHeight()));
+        eyes.checkRegion(TEST_IMAGE, new Region(50, 50, 50, 50));
         eyes.close();
     }
 }
