@@ -1,10 +1,12 @@
 package com.applitools.eyes.images;
 
 import com.applitools.eyes.*;
+import com.applitools.eyes.config.Configuration;
 import com.applitools.eyes.images.utils.TestSetup;
 import com.applitools.eyes.metadata.SessionResults;
 import com.applitools.utils.ImageUtils;
 import org.testng.Assert;
+import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 import java.awt.image.BufferedImage;
 import java.net.MalformedURLException;
@@ -24,6 +26,11 @@ public class TestImagesGeneric extends TestSetup {
     private static final String IMAGE_PATH_JPEG = "src/main/resources/minions.jpeg";
     private static final String IMAGE_PATH_PNG = "src/main/resources/minions_png.png";
     private static final String IMAGE_PATH_BMP = "src/main/resources/minions_bitmap.bmp";
+
+    @BeforeMethod
+    public void beforeEach() {
+        eyes.setConfiguration(new Configuration());
+    }
 
     @Test
     public void testBitMapFromPath() {

@@ -1,6 +1,7 @@
 package com.applitools.eyes.images;
 
 import com.applitools.eyes.*;
+import com.applitools.eyes.config.Configuration;
 import com.applitools.eyes.images.utils.TestSetup;
 import com.applitools.utils.ImageUtils;
 import org.testng.Assert;
@@ -13,23 +14,13 @@ import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.net.URL;
 
-public class TestImagesApi {
+public class TestImagesApi extends TestSetup {
 
-    private Eyes eyes;
-    private static final String TEST_SUITE_NAME = "Eyes Image SDK";
     private final String TEST_IMAGE = "src/main/resources/minions.jpeg";
 
     @BeforeMethod
     public void beforeEach() {
-        eyes = new Eyes();
-        eyes.setApiKey(System.getenv("APPLITOOLS_API_KEY"));
-
-        eyes.setSaveNewTests(false);
-        eyes.setBatch(new BatchInfo(TEST_SUITE_NAME));
-
-        if (System.getenv("APPLITOOLS_USE_PROXY") != null) {
-            eyes.setProxy(new ProxySettings("http://127.0.0.1", 8888));
-        }
+        eyes.setConfiguration(new Configuration());
     }
 
     @AfterMethod
@@ -155,9 +146,5 @@ public class TestImagesApi {
         Assert.assertNotNull(result);
 
         System.out.println(result);
-    }
-
-    private String getApplicationName() {
-        return "Eyes Images SDK";
     }
 }
