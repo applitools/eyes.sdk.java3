@@ -17,6 +17,7 @@ public class ConfigurationDto {
   private String apiKey;
   private String serverUrl;
   private ProxyDto proxy;
+  private AutProxyDto autProxy;
   private Boolean isDisabled;
   private Integer connectionTimeout;
   private Boolean removeSession;
@@ -497,5 +498,13 @@ public class ConfigurationDto {
 
   public void setWaitBeforeCapture(Integer waitBeforeCapture) {
     this.waitBeforeCapture = waitBeforeCapture;
+  }
+
+  public AutProxyDto getAutProxy() {
+    return autProxy;
+  }
+
+  public void setAutProxy(AutProxyDto autProxy) {
+    this.autProxy = autProxy;
   }
 }

@@ -1,7 +1,9 @@
 package com.applitools.eyes.selenium.universal.mapper;
 
+import com.applitools.eyes.CutProvider;
 import com.applitools.eyes.FixedCutProvider;
 import com.applitools.eyes.config.Configuration;
+import com.applitools.eyes.config.ContentInset;
 import com.applitools.eyes.selenium.universal.dto.ConfigurationDto;
 import com.applitools.eyes.selenium.universal.dto.DebugScreenshotHandlerDto;
 import com.applitools.eyes.selenium.universal.dto.ImageCropRectDto;
@@ -27,6 +29,7 @@ public class ConfigurationMapper {
     dto.setApiKey(config.getApiKey());
     dto.setServerUrl(config.getServerUrl() == null ? null : config.getServerUrl().toString());
     dto.setProxy(ProxyMapper.toProxyDto(config.getProxy()));
+    dto.setAutProxy(ProxyMapper.toAutProxyDto(config.getAutProxy()));
     dto.setDisabled(config.getIsDisabled());
     dto.setConnectionTimeout(null);
     dto.setRemoveSession(null);
@@ -71,9 +74,8 @@ public class ConfigurationMapper {
     dto.setHideCaret(config.getHideCaret());
     dto.setStitchOverlap(config.getStitchOverlap());
     dto.setScrollRootElement(null);
-    FixedCutProvider cutProvider = (FixedCutProvider) config.getCutProvider();
-    dto.setCut(cutProvider == null ? null : new ImageCropRectDto(cutProvider.getHeader(), cutProvider.getRight(),
-        cutProvider.getFooter(), cutProvider.getLeft()));
+    dto.setCut(toImageCropRect(config.getCutProvider(), config.getContentInset()));
+
     dto.setRotation(config.getRotation());
     dto.setScaleRatio(config.getScaleRatio());
     dto.setWaitBeforeCapture(config.getWaitBeforeCapture());
@@ -96,5 +98,18 @@ public class ConfigurationMapper {
     dto.setUseCeilForViewportSize(config.getUseCeilForViewportSize());
 
     return dto;
+  }
+
+  private static ImageCropRectDto toImageCropRect(CutProvider cutProvider, ContentInset contentInset) {
+    ImageCropRectDto imageCropRectDto = null;
+
+    if (cutProvider != null) {
+      FixedCutProvider fixed = (FixedCutProvider) cutProvider;
+      imageCropRectDto = new ImageCropRectDto(fixed.getHeader(), fixed.getRight(), fixed.getFooter(), fixed.getLeft());
+    } else if (contentInset != null) {
+      imageCropRectDto =  new ImageCropRectDto(contentInset.getTop(), contentInset.getRight(), contentInset.getBottom(), contentInset.getLeft());
+    }
+
+    return imageCropRectDto;
   }
 }

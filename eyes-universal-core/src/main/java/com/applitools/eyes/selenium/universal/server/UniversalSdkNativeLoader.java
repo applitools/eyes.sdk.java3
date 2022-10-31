@@ -10,8 +10,10 @@ import java.nio.file.attribute.PosixFilePermission;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
-import com.applitools.eyes.EyesException;
-import com.applitools.eyes.EyesRunnable;
+
+import com.applitools.eyes.*;
+import com.applitools.eyes.logging.Stage;
+import com.applitools.eyes.logging.TraceLevel;
 import com.applitools.utils.GeneralUtils;
 
 /**
@@ -24,13 +26,17 @@ public class UniversalSdkNativeLoader {
   private static final String TEMP_FOLDER_PATH = "java.io.tmpdir";
   private static final long MAX_ACTION_WAIT_SECONDS = 90;
   private static final long SLEEP_BETWEEN_ACTION_CHECK_MS = 3000;
+  private static final String ALPINE_PATH = "/etc/alpine-release";
+  private static Logger logger = new Logger();
+  private static final TraceLevel INFO_LOG_LEVEL = TraceLevel.Info;
+  private static final String UNIVERSAL_DEBUG = GeneralUtils.getEnvString("APPLITOOLS_UNIVERSAL_DEBUG");
 
   public synchronized static void start() {
     try {
       copyAndStartUniversalCore();
     } catch (Exception e) {
       String errorMessage = GeneralUtils.createErrorMessageFromExceptionWithText(e, "Could not launch server!");
-      System.out.println(errorMessage);
+      logger.log(TraceLevel.Error, Stage.GENERAL, errorMessage);
       throw new EyesException(errorMessage, e);
     }
   }
@@ -40,6 +46,24 @@ public class UniversalSdkNativeLoader {
 //      nativeProcess.destroy();
 //    }
 //  }
+
+  /**
+   * for internal use only.
+   */
+  private static void destroyProcess() {
+    if (nativeProcess.isAlive() && nativeProcess != null) {
+      try {
+        nativeProcess.destroy();
+        nativeProcess.waitFor();
+        nativeProcess = null;
+      }
+      catch (Exception e) {
+        String errorMessage = GeneralUtils.createErrorMessageFromExceptionWithText(e, "Could not destroy server!");
+        logger.log(TraceLevel.Error, Stage.GENERAL, errorMessage);
+        throw new EyesException(errorMessage, e);
+      }
+    }
+  }
 
   private static void copyAndStartUniversalCore() throws Exception {
     if (nativeProcess == null) {
@@ -55,12 +79,15 @@ public class UniversalSdkNativeLoader {
       } else if (osVersion.contains("mac")) {
         os = "mac-x64";
         suffix = "macos";
+      } else if (osVersion.contains("linux") && Files.exists(Paths.get(ALPINE_PATH))) {
+        os = "linux-x64";
+        suffix = "alpine";
       } else {
         os = "linux-x64";
         suffix = "linux";
       }
 
-      System.out.println("Identified OS: " + os);
+      logger.log(INFO_LOG_LEVEL, Stage.GENERAL, String.format("Identifies OS: %s", os));
 
       // Set the target path for the server
       String userSetPath = GeneralUtils.getEnvString(BINARY_SERVER_PATH); // might not exist
@@ -85,25 +112,45 @@ public class UniversalSdkNativeLoader {
 
   private static void createProcessAndReadPort(String executablePath) {
 
-    GeneralUtils.tryRunTaskWithRetry(new EyesRunnable() {
-      @Override
-      public void run() {
-        try {
-          nativeProcess = new ProcessBuilder(executablePath, "--port 0" ,"--no-singleton","--shutdown-mode", "stdin").start();
-        } catch (Exception e) {
-          String errorMessage = GeneralUtils.createErrorMessageFromExceptionWithText(e, "Failed to start universal core!");
-          System.out.println(errorMessage);
-          throw new EyesException(errorMessage, e);
+    if (Boolean.parseBoolean(UNIVERSAL_DEBUG)) {
+      GeneralUtils.tryRunTaskWithRetry(new EyesRunnable() {
+        @Override
+        public void run() {
+          try {
+            nativeProcess = new ProcessBuilder(executablePath, "--port 0", "--no-singleton", "--shutdown-mode", "--debug", "stdin").start();
+          } catch (Exception e) {
+            String errorMessage = GeneralUtils.createErrorMessageFromExceptionWithText(e, "Failed to start universal core!");
+            logger.log(INFO_LOG_LEVEL, Stage.GENERAL, errorMessage);
+            throw new EyesException(errorMessage, e);
+          }
+          logger.log(INFO_LOG_LEVEL, Stage.GENERAL, "Universal Core (debug) start returned ok.");
         }
-        System.out.println("Universal Core start returned ok.");
-      }
 
-      @Override
-      public String getName() {
-        return "Start universal core";
-      }
-    }, MAX_ACTION_WAIT_SECONDS, SLEEP_BETWEEN_ACTION_CHECK_MS, "Timed out trying to start universal core!");
+        @Override
+        public String getName() {
+          return "Start universal core";
+        }
+      }, MAX_ACTION_WAIT_SECONDS, SLEEP_BETWEEN_ACTION_CHECK_MS, "Timed out trying to start universal core!", logger);
+    } else {
+      GeneralUtils.tryRunTaskWithRetry(new EyesRunnable() {
+        @Override
+        public void run() {
+          try {
+            nativeProcess = new ProcessBuilder(executablePath, "--port 0", "--no-singleton", "--shutdown-mode", "stdin").start();
+          } catch (Exception e) {
+            String errorMessage = GeneralUtils.createErrorMessageFromExceptionWithText(e, "Failed to start universal core!");
+            logger.log(INFO_LOG_LEVEL, Stage.GENERAL, errorMessage);
+            throw new EyesException(errorMessage, e);
+          }
+          logger.log(INFO_LOG_LEVEL, Stage.GENERAL, "Universal Core start returned ok.");
+        }
 
+        @Override
+        public String getName() {
+          return "Start universal core";
+        }
+      }, MAX_ACTION_WAIT_SECONDS, SLEEP_BETWEEN_ACTION_CHECK_MS, "Timed out trying to start universal core!", logger);
+    }
 
     GeneralUtils.tryRunTaskWithRetry(new EyesRunnable() {
       @Override
@@ -119,23 +166,23 @@ public class UniversalSdkNativeLoader {
           // if this is a retry, and the server will not output anything, we'll be stuck forever.
           if (childOutputStream.available() == 0) {
             String errorMessage = "server did not yet output the port number..";
-            System.out.println(errorMessage);
+            logger.log(TraceLevel.Error, Stage.GENERAL, errorMessage);
             throw new EyesException(errorMessage);
           }
 
           BufferedReader reader = new BufferedReader(new InputStreamReader(childOutputStream));
           inputLineFromServer = reader.readLine();
           port = Integer.parseInt(inputLineFromServer);
-          System.out.println("Port read and parsed okay: " + port);
+          logger.log(INFO_LOG_LEVEL, Stage.GENERAL, "Port read and parsed okay: " + port);
         } catch (IOException e) {
           String errorMessage = GeneralUtils.createErrorMessageFromExceptionWithText(e,
                   "Failed to get core's input stream!");
-          System.out.println(errorMessage);
+          logger.log(TraceLevel.Error, Stage.GENERAL, errorMessage);
           throw new EyesException(errorMessage, e);
         } catch (NumberFormatException nfe) {
           String errorMessage = GeneralUtils.createErrorMessageFromExceptionWithText(nfe,
                   "Got a non-integer as port! Text: '" + inputLineFromServer + "'");
-          System.out.println(errorMessage);
+          logger.log(TraceLevel.Error, Stage.GENERAL, errorMessage);
           throw new EyesException(errorMessage, nfe);
         }
       }
@@ -144,7 +191,7 @@ public class UniversalSdkNativeLoader {
       public String getName() {
         return "Read universal core port";
       }
-    }, MAX_ACTION_WAIT_SECONDS, SLEEP_BETWEEN_ACTION_CHECK_MS, "Timed out trying to read port from core!");
+    }, MAX_ACTION_WAIT_SECONDS, SLEEP_BETWEEN_ACTION_CHECK_MS, "Timed out trying to read port from core!", logger);
   }
 
   // get an input stream from the resources folder
@@ -215,11 +262,11 @@ public class UniversalSdkNativeLoader {
       public void run() throws EyesException {
         try {
           Files.setPosixFilePermissions(path, permissions);
-          System.out.println("'Set core permissions' ended. Now verifying the permissions...");
+          logger.log(INFO_LOG_LEVEL, Stage.GENERAL, "'Set core permissions' ended. Now verifying the permissions...");
         } catch (Exception e) {
           String errorMessage = GeneralUtils.createErrorMessageFromExceptionWithText(e,
                   "Could not set permissions on the universal core file!");
-          System.out.println(errorMessage);
+          logger.log(TraceLevel.Error, Stage.GENERAL, errorMessage);
           throw new EyesException(errorMessage, e);
         }
       }
@@ -229,7 +276,7 @@ public class UniversalSdkNativeLoader {
         return "Set core permissions";
       }
     }, MAX_ACTION_WAIT_SECONDS, SLEEP_BETWEEN_ACTION_CHECK_MS,
-            "Timed out waiting for permissions to be set for universal core!");
+            "Timed out waiting for permissions to be set for universal core!", logger);
 
     // Verify that the permissions were set. If the OS is overloaded, this might take a while.
     GeneralUtils.tryRunTaskWithRetry(new EyesRunnable() {
@@ -241,16 +288,16 @@ public class UniversalSdkNativeLoader {
         } catch (IOException e) {
           String errMsg = GeneralUtils.createErrorMessageFromExceptionWithText(e, 
                   "Got IOException trying to read universal core permissions!");
-          System.out.println(errMsg);
+          logger.log(TraceLevel.Error, Stage.GENERAL, errMsg);
           throw new EyesException(errMsg, e);
         }
 
         if (!(retrievedPermissions.containsAll(permissions))) {
           String errMsg = "Permissions for universal core were not yet set correctly! Current permissions: " + Arrays.toString(retrievedPermissions.toArray());
-          System.out.println(errMsg);
+          logger.log(TraceLevel.Error, Stage.GENERAL, errMsg);
           throw new EyesException(errMsg);
         }
-        System.out.println("Core permissions verified.");
+        logger.log(INFO_LOG_LEVEL, Stage.GENERAL, "Core permissions verified.");
       }
 
      @Override
@@ -258,7 +305,7 @@ public class UniversalSdkNativeLoader {
        return "Verify core permissions";
      }
     }, MAX_ACTION_WAIT_SECONDS, SLEEP_BETWEEN_ACTION_CHECK_MS,
-            "Timed out waiting for permissions to be set for universal core!");
+            "Timed out waiting for permissions to be set for universal core!", logger);
 
   }
 
@@ -267,27 +314,32 @@ public class UniversalSdkNativeLoader {
 
       // If the required path does not exist, create it.
       if (!Files.exists(directoryPath)) {
-        System.out.println("The path '" + directoryPath + "' for the universal core does not exist. Creating the directory structure...");
+        logger.log(INFO_LOG_LEVEL, Stage.GENERAL, "The path '" + directoryPath + "' for the universal core does not exist. Creating the directory structure...");
         try {
           Files.createDirectories(directoryPath);
         } catch (Exception e) {
           String errMsg = GeneralUtils.createErrorMessageFromExceptionWithText(e,
                   "Could not create the directory structure '" + directoryPath +   "'!");
-          System.out.println(errMsg);
+          logger.log(TraceLevel.Error, Stage.GENERAL, errMsg);
           throw new EyesException(errMsg, e);
         }
-        System.out.println("Directory structure created.");
+        logger.log(INFO_LOG_LEVEL, Stage.GENERAL, "Directory structure created.");
       }
 
     try {
       Files.copy(inputStream, serverTargetPath, StandardCopyOption.REPLACE_EXISTING);
-      System.out.println("Successfully copied the universal core to path: '" + serverTargetPath + "'");
+      logger.log(INFO_LOG_LEVEL, Stage.GENERAL, "Successfully copied the universal core to path: '" + serverTargetPath + "'");
     } catch (Exception e) { // Might actually be a common, non-error, situation - the server might already be running.
       String errMsg = GeneralUtils.createErrorMessageFromExceptionWithText(e,
               "Could not copy universal core to '" + serverTargetPath +   "' (can happen if server is already running)");
-      System.out.println(errMsg);
+      logger.log(TraceLevel.Error, Stage.GENERAL, errMsg);
     }
 
     return serverTargetPath;
   }
+
+  public static void setLogger(Logger logger1) {
+    logger = logger1;
+  }
+
 }

@@ -529,8 +529,13 @@ public class Eyes implements IEyesBase {
             Method checkDto = originEyes.getClass().getDeclaredMethod("checkDto", CheckSettingsDto.class);
             checkDto.setAccessible(true);
             checkDto.invoke(originEyes, checkSettingsDto);
-        } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
-            throw new EyesException(e.getMessage());
+        } catch (NoSuchMethodException | IllegalAccessException e) {
+            System.out.println("Got a failure trying to activate checkDTO using reflection! Error " + e.getMessage());
+            throw new EyesException("Got a failure trying to activate checkDTO using reflection! Error " + e.getMessage());
+        } catch (Exception e) {
+            String errorMessage = GeneralUtils.createErrorMessageFromExceptionWithText(e, "Got a failure trying to perform a 'check'!");
+            System.out.println(errorMessage);
+            throw new EyesException(errorMessage, e);
         }
     }
 
