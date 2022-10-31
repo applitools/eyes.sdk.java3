@@ -21,15 +21,10 @@ public class ImagesCheckSettingsMapper {
             return null;
         }
 
-        return toCheckSettingsDto(checkSettings, config, null);
-    }
-
-    public static CheckSettingsDto toCheckSettingsDto(ICheckSettings checkSettings, Configuration config, Region region) {
-
         ImagesCheckSettings imagesCheckSettings = (ImagesCheckSettings) checkSettings;
         CheckSettingsDto checkSettingsDto = new CheckSettingsDto();
 
-        checkSettingsDto.setRegion(toTRegionFromRegion(region));
+        checkSettingsDto.setRegion(toTRegionFromRegion(imagesCheckSettings.getTargetRegion()));
         checkSettingsDto.setFrames(null);
         checkSettingsDto.setFully(imagesCheckSettings.getStitchContent());
         checkSettingsDto.setScrollRootElement(null);

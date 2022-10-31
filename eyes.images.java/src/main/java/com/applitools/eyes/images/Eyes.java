@@ -321,8 +321,8 @@ public class Eyes implements IEyesBase {
         ArgumentGuard.notNull(region, "region");
 
         title = (tag != null) ? tag : "";
-        CheckSettingsDto checkSettingsDto = ImagesCheckSettingsMapper.toCheckSettingsDto(Target.image(image).withName(tag),
-                configure(), region);
+        CheckSettingsDto checkSettingsDto = ImagesCheckSettingsMapper.
+                toCheckSettingsDto(Target.region(image, region).withName(tag), configure());
         ImageTargetDto imageTargetDto = ImageTargetMapper.toImageTargetDto(image, tag);
 
         checkDto(checkSettingsDto, imageTargetDto);
