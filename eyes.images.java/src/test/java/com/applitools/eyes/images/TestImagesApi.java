@@ -18,11 +18,6 @@ public class TestImagesApi extends TestSetup {
 
     private final String TEST_IMAGE = "src/main/resources/minions.jpeg";
 
-    @BeforeMethod
-    public void beforeEach() {
-        eyes.setConfiguration(new Configuration());
-    }
-
     @AfterMethod
     public void tearDown() {
         eyes.abortIfNotClosed();

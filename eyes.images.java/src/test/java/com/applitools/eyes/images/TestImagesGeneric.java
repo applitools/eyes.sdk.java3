@@ -27,11 +27,6 @@ public class TestImagesGeneric extends TestSetup {
     private static final String IMAGE_PATH_PNG = "src/main/resources/minions_png.png";
     private static final String IMAGE_PATH_BMP = "src/main/resources/minions_bitmap.bmp";
 
-    @BeforeMethod
-    public void beforeEach() {
-        eyes.setConfiguration(new Configuration());
-    }
-
     @Test
     public void testBitMapFromPath() {
         BufferedImage image = ImageUtils.imageFromFile(IMAGE_PATH_BMP);

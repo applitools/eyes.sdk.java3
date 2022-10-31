@@ -3,6 +3,7 @@ package com.applitools.eyes.images.utils;
 import com.applitools.connectivity.RestClient;
 import com.applitools.connectivity.ServerConnector;
 import com.applitools.eyes.*;
+import com.applitools.eyes.config.Configuration;
 import com.applitools.eyes.images.Eyes;
 import com.applitools.eyes.metadata.SessionResults;
 import com.applitools.utils.ClassVersionGetter;
@@ -11,6 +12,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.testng.Assert;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
+import org.testng.annotations.BeforeMethod;
 
 import javax.ws.rs.HttpMethod;
 import javax.ws.rs.core.MediaType;
@@ -24,8 +26,9 @@ public class TestSetup {
 
     protected Eyes eyes;
     private static final String TEST_SUITE_NAME = "Eyes Image SDK";
+    protected static final BatchInfo batch = new BatchInfo(TEST_SUITE_NAME);
 
-    @BeforeClass
+    @BeforeMethod
     public void beforeClass() {
         eyes = new Eyes();
         eyes.setApiKey(System.getenv("APPLITOOLS_API_KEY"));
@@ -33,7 +36,7 @@ public class TestSetup {
         LogHandler logHandler = new StdoutLogHandler(verboseLogs);
         eyes.setLogHandler(logHandler);
         eyes.setSaveNewTests(false);
-        eyes.setBatch(new BatchInfo(TEST_SUITE_NAME));
+        eyes.setBatch(batch);
 
         if (System.getenv("APPLITOOLS_USE_PROXY") != null) {
             eyes.setProxy(new ProxySettings("http://127.0.0.1", 8888));
