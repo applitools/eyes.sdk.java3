@@ -2,17 +2,25 @@ package com.applitools.eyes.images;
 
 import com.applitools.eyes.Region;
 import com.applitools.eyes.fluent.CheckSettings;
-import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import java.awt.image.BufferedImage;
 
+@JsonIgnoreProperties({
+        "image",
+        "path",
+})
 public class ImagesCheckSettings extends CheckSettings implements IImagesCheckTarget {
 
-    @JsonIgnore
-    private final BufferedImage image;
+    private BufferedImage image;
+    private String path;
 
     public ImagesCheckSettings(BufferedImage image){
         this.image = image;
+    }
+
+    public ImagesCheckSettings(String path) {
+        this.path = path;
     }
 
     public ImagesCheckSettings(BufferedImage image, Region region){
@@ -24,10 +32,16 @@ public class ImagesCheckSettings extends CheckSettings implements IImagesCheckTa
         return image;
     }
 
+    public String getPath() {
+        return path;
+    }
+
     @Override
     public ImagesCheckSettings clone(){
         ImagesCheckSettings clone = new ImagesCheckSettings(this.image);
         super.populateClone(clone);
+        clone.image = this.image;
+        clone.path = this.path;
         return clone;
     }
 }
