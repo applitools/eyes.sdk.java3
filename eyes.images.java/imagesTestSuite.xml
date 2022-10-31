@@ -8,6 +8,7 @@
             <class name="com.applitools.eyes.images.TestImagesApi"/>
             <class name="com.applitools.eyes.images.TestImageUtils"/>
             <class name="com.applitools.eyes.images.TestLocators"/>
+            <class name="com.applitools.eyes.images.TestImagesGeneric"/>
         </classes>
     </test>
 </suite>
