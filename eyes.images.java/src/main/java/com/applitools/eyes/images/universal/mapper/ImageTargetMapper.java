@@ -40,15 +40,15 @@ public class ImageTargetMapper {
         ImagesCheckSettings imagesCheckSettings = (ImagesCheckSettings) checkSettings;
 
         ImageTargetDto imageTargetDto = new ImageTargetDto();
-        imageTargetDto.setImage(ImageUtils.base64FromImage(imagesCheckSettings.getImage()));
+        imageTargetDto.setImage(toImageFromCheckSettings(imagesCheckSettings));
         imageTargetDto.setName(imagesCheckSettings.getName());
-        imageTargetDto.setSource(imagesCheckSettings.getImage().getSource().toString());
+        imageTargetDto.setSource(imagesCheckSettings.getImage() != null? imagesCheckSettings.getImage().getSource().toString() : null);
         imageTargetDto.setDom(null); //TODO
-        imageTargetDto.setLocationInViewport(new Location());
-        imageTargetDto.setLocationInView(new Location());
-        imageTargetDto.setFullViewSize(ViewportSizeMapper.toViewportSizeDto(
-                new RectangleSize(imagesCheckSettings.getImage().getWidth(), imagesCheckSettings.getImage().getHeight())
-        ));
+        imageTargetDto.setLocationInViewport(null);
+        imageTargetDto.setLocationInView(null);
+        imageTargetDto.setFullViewSize(imagesCheckSettings.getImage() != null?
+                ViewportSizeMapper.toViewportSizeDto(
+                        new RectangleSize(imagesCheckSettings.getImage().getWidth(), imagesCheckSettings.getImage().getHeight())) : null);
 
         return imageTargetDto;
     }
@@ -61,14 +61,27 @@ public class ImageTargetMapper {
 
         imageTargetDto.setImage(ImageUtils.base64FromImage(visualLocatorSettings.getImage()));
         imageTargetDto.setName(null); //TODO
-        imageTargetDto.setSource(visualLocatorSettings.getImage().getSource().toString());
+        imageTargetDto.setSource(visualLocatorSettings.getImage() != null? visualLocatorSettings.getImage().getSource().toString() : null);
         imageTargetDto.setDom(null); //TODO
-        imageTargetDto.setLocationInViewport(new Location());
-        imageTargetDto.setLocationInView(new Location());
-        imageTargetDto.setFullViewSize(ViewportSizeMapper.toViewportSizeDto(
-                new RectangleSize(visualLocatorSettings.getImage().getWidth(), visualLocatorSettings.getImage().getHeight())
-        ));
+        imageTargetDto.setLocationInViewport(null);
+        imageTargetDto.setLocationInView(null);
+        imageTargetDto.setFullViewSize(visualLocatorSettings.getImage() != null?
+                ViewportSizeMapper.toViewportSizeDto(
+                        new RectangleSize(visualLocatorSettings.getImage().getWidth(), visualLocatorSettings.getImage().getHeight())) : null);
 
         return imageTargetDto;
+    }
+
+    private static String toImageFromCheckSettings(ImagesCheckSettings checkSettings) {
+        String image = null;
+
+        BufferedImage img = checkSettings.getImage();
+        if (img != null) {
+            image = ImageUtils.base64FromImage(img);
+        } else if (checkSettings.getPath() != null) {
+            image = checkSettings.getPath();
+        }
+
+        return image;
     }
 }
