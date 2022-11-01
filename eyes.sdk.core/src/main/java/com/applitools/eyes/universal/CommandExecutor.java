@@ -55,11 +55,12 @@ public class CommandExecutor {
     checkedCommand(request, false);
   }
 
+  // TODO - agentId is currently null because this will set the agentID incorrectly in the dashboard/logs
   public Reference coreMakeManager(String type, Integer concurrency, Integer legacyConcurrency, String agentId) {
     RequestDto<MakeManager> request = new RequestDto<>();
     request.setName("Core.makeManager");
     request.setKey(UUID.randomUUID().toString());
-    request.setPayload(new MakeManager(type, concurrency, legacyConcurrency, agentId));
+    request.setPayload(new MakeManager(type, concurrency, legacyConcurrency, null));
     SyncTaskListener syncTaskListener = checkedCommand(request, true);
     ResponseDto<Reference> response = (ResponseDto<Reference>) syncTaskListener.get();
     if (response != null && response.getPayload().getError() != null) {
