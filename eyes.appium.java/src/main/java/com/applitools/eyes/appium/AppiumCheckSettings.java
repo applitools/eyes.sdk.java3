@@ -33,6 +33,8 @@ public class AppiumCheckSettings extends CheckSettings implements ImplicitInitia
     private WebElement scrollRootElement;
     private Boolean captureStatusBar;
     private String pageId;
+    private Boolean isDefaultWebview;
+    private String webview;
 
     protected AppiumCheckSettings() {
         super();
@@ -48,6 +50,15 @@ public class AppiumCheckSettings extends CheckSettings implements ImplicitInitia
 
     protected AppiumCheckSettings(WebElement webElement) {
         this.targetElement = webElement;
+    }
+
+    protected AppiumCheckSettings(boolean isWebView) {
+        this.isDefaultWebview = isWebView;
+    }
+
+    protected AppiumCheckSettings(String webview) {
+        this.webview = webview;
+        this.isDefaultWebview = false;
     }
 
     @Override
@@ -81,6 +92,8 @@ public class AppiumCheckSettings extends CheckSettings implements ImplicitInitia
         clone.scrollRootElement = this.scrollRootElement;
         clone.captureStatusBar = this.captureStatusBar;
         clone.pageId = this.pageId;
+        clone.isDefaultWebview = this.isDefaultWebview;
+        clone.webview = this.webview;
         return clone;
     }
 
@@ -329,4 +342,13 @@ public class AppiumCheckSettings extends CheckSettings implements ImplicitInitia
     public String getPageId() {
         return this.pageId;
     }
+
+    public Boolean getIsDefaultWebview() {
+        return this.isDefaultWebview;
+    }
+
+    public String getWebview() {
+        return this.webview;
+    }
+
 }
