@@ -343,6 +343,26 @@ public class AppiumCheckSettings extends CheckSettings implements ImplicitInitia
         return this.pageId;
     }
 
+    public AppiumCheckSettings webview() {
+        AppiumCheckSettings clone = this.clone();
+        clone.isDefaultWebview = true;
+        return clone;
+    }
+
+    public AppiumCheckSettings webview(Boolean isWebView) {
+        AppiumCheckSettings clone = this.clone();
+        clone.isDefaultWebview = isWebView;
+        return clone;
+    }
+
+    public AppiumCheckSettings webview(String webView) {
+        AppiumCheckSettings clone = this.clone();
+        clone.isDefaultWebview = false;
+        clone.webview = webView;
+        return clone;
+    }
+
+
     public Boolean getIsDefaultWebview() {
         return this.isDefaultWebview;
     }
