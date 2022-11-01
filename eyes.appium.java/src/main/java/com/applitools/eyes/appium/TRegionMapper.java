@@ -5,7 +5,8 @@ import com.applitools.eyes.Region;
 import com.applitools.eyes.selenium.universal.dto.TRegion;
 import com.applitools.eyes.selenium.universal.mapper.ElementRegionMapper;
 import com.applitools.eyes.selenium.universal.mapper.RectangleRegionMapper;
-import com.applitools.eyes.selenium.universal.mapper.SelectorRegionMapper;
+import io.appium.java_client.pagefactory.bys.builder.ByAll;
+import io.appium.java_client.pagefactory.bys.builder.ByChained;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 
@@ -20,6 +21,10 @@ public class TRegionMapper extends com.applitools.eyes.selenium.universal.mapper
         By by = appiumCheckSettings.getTargetSelector();
 
         if (by != null) {
+            if (by instanceof ByAll)
+                return AppiumSelectorRegionMapper.toAppiumSelectorRegionDto((ByAll) by);
+            else if (by instanceof ByChained)
+                return AppiumSelectorRegionMapper.toAppiumSelectorRegionDto((ByChained) by);
             return AppiumSelectorRegionMapper.toAppiumSelectorRegionDto(by);
         }
 

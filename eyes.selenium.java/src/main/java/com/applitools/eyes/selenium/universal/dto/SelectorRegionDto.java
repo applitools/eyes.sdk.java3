@@ -10,6 +10,8 @@ public class SelectorRegionDto extends TRegion {
 
   private String selector;
   private String type;
+  private SelectorRegionDto fallback;
+  private SelectorRegionDto child;
 
   public String getType() {
     return type;
@@ -25,5 +27,21 @@ public class SelectorRegionDto extends TRegion {
 
   public void setSelector(String selector) {
     this.selector = selector;
+  }
+
+  public SelectorRegionDto getFallback() {
+    return fallback;
+  }
+
+  public void setFallback(SelectorRegionDto fallback) {
+    this.fallback = fallback;
+  }
+
+  public SelectorRegionDto getChild() {
+    return child;
+  }
+
+  public void setChild(SelectorRegionDto child) {
+    this.child = child;
   }
 }

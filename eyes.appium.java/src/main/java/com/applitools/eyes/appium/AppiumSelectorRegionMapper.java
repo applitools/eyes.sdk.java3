@@ -4,7 +4,12 @@ import com.applitools.eyes.selenium.universal.dto.SelectorRegionDto;
 import com.applitools.utils.GeneralUtils;
 import io.appium.java_client.AppiumBy;
 import io.appium.java_client.MobileBy;
+import io.appium.java_client.pagefactory.bys.builder.ByAll;
+import io.appium.java_client.pagefactory.bys.builder.ByChained;
 import org.openqa.selenium.By;
+
+import java.lang.reflect.Field;
+import java.util.List;
 
 public class AppiumSelectorRegionMapper {
 
@@ -56,4 +61,49 @@ public class AppiumSelectorRegionMapper {
 
   }
 
+  public static SelectorRegionDto toAppiumSelectorRegionDto(ByAll byAll) {
+    try {
+      Field bys_ = byAll.getClass().getDeclaredField("bys");
+      bys_.setAccessible(true);
+
+      List<By> bys = (List<By>) bys_.get(byAll);
+
+      SelectorRegionDto fallback = null;
+      SelectorRegionDto region = null;
+      for (int i = bys.size()-1; i >= 0; i--) {
+        region = AppiumSelectorRegionMapper.toAppiumSelectorRegionDto(bys.get(i));
+        region.setFallback(fallback);
+        fallback = region;
+      }
+
+      return region;
+    } catch (NoSuchFieldException | IllegalAccessException e) {
+      e.printStackTrace();
+    }
+
+    return null;
+  }
+
+  public static SelectorRegionDto toAppiumSelectorRegionDto(ByChained byChained) {
+    try {
+      Field bys_ = byChained.getClass().getDeclaredField("bys");
+      bys_.setAccessible(true);
+
+      By[] bys = (By[]) bys_.get(byChained);
+
+      SelectorRegionDto child = null;
+      SelectorRegionDto region = null;
+      for (int i = bys.length-1; i >= 0; i--) {
+        region = AppiumSelectorRegionMapper.toAppiumSelectorRegionDto(bys[i]);
+        region.setChild(child);
+        child = region;
+      }
+
+      return region;
+    } catch (NoSuchFieldException | IllegalAccessException e) {
+      e.printStackTrace();
+    }
+
+    return null;
+  }
 }
