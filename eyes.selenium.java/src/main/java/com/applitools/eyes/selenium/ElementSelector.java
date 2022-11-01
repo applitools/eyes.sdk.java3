@@ -1,14 +1,29 @@
 package com.applitools.eyes.selenium;
 
+import com.applitools.eyes.selenium.universal.dto.TargetPathLocatorDto;
 import com.applitools.utils.GeneralUtils;
 import org.openqa.selenium.By;
+import org.openqa.selenium.support.pagefactory.ByAll;
+import org.openqa.selenium.support.pagefactory.ByChained;
+
+import java.lang.reflect.Field;
 
 /**
  * element selector
  */
-public class ElementSelector implements PathNodeValue {
+public class ElementSelector extends TargetPathLocatorDto implements PathNodeValue {
   private String type;
   private String selector;
+  private ElementSelector fallback;
+  private ElementSelector child;
+
+  public ElementSelector(ByAll byAll) {
+    populateFromByAll(byAll);
+  }
+
+  public ElementSelector(ByChained byChained) {
+    populateFromByChained(byChained);
+  }
 
   public ElementSelector(By by) {
     String selector = GeneralUtils.getLastWordOfStringWithRegex(by.toString(), ":");
@@ -56,4 +71,59 @@ public class ElementSelector implements PathNodeValue {
     this.type = type;
   }
 
+  private void populateFromByAll(ByAll byAll) {
+    try {
+      Field bys_ = byAll.getClass().getDeclaredField("bys");
+      bys_.setAccessible(true);
+
+      By[] bys = (By[]) bys_.get(byAll);
+
+      ElementSelector fallback = null;
+      for (int i = bys.length-1; i >= 0; i--) {
+        ElementSelector region = new ElementSelector(bys[i]);
+        this.setSelector(region.getSelector());
+        this.setType(region.getType());
+        this.setFallback(fallback);
+        fallback = region;
+      }
+    } catch (NoSuchFieldException | IllegalAccessException e) {
+      e.printStackTrace();
+    }
+  }
+
+  public ElementSelector getFallback() {
+    return fallback;
+  }
+
+  public void setFallback(ElementSelector fallback) {
+    this.fallback = fallback;
+  }
+
+  private void populateFromByChained(ByChained byChained) {
+    try {
+      Field bys_ = byChained.getClass().getDeclaredField("bys");
+      bys_.setAccessible(true);
+
+      By[] bys = (By[]) bys_.get(byChained);
+
+      ElementSelector child = null;
+      for (int i = bys.length-1; i >= 0; i--) {
+        ElementSelector region = new ElementSelector(bys[i]);
+        this.setSelector(region.getSelector());
+        this.setType(region.getType());
+        this.setChild(child);
+        child = region;
+      }
+    } catch (NoSuchFieldException | IllegalAccessException e) {
+      e.printStackTrace();
+    }
+  }
+
+  public ElementSelector getChild() {
+    return child;
+  }
+
+  public void setChild(ElementSelector child) {
+    this.child = child;
+  }
 }

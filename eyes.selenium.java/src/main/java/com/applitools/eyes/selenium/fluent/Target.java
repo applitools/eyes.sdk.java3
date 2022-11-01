@@ -5,6 +5,8 @@ import com.applitools.eyes.TargetPath;
 import com.applitools.eyes.selenium.TargetPathLocator;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.pagefactory.ByAll;
+import org.openqa.selenium.support.pagefactory.ByChained;
 
 public class Target {
 
@@ -23,6 +25,16 @@ public class Target {
     // region locator
     public static SeleniumCheckSettings region(By by) {
         return new SeleniumCheckSettings(TargetPath.region(by));
+    }
+
+    // region locator
+    public static SeleniumCheckSettings region(ByAll byAll) {
+        return new SeleniumCheckSettings(TargetPath.region(byAll));
+    }
+
+    // region locator
+    public static SeleniumCheckSettings region(ByChained byChained) {
+        return new SeleniumCheckSettings(TargetPath.region(byChained));
     }
 
     // region locator

@@ -6,11 +6,21 @@ import com.applitools.eyes.selenium.RegionLocator;
 import com.applitools.eyes.selenium.ShadowDomLocator;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.pagefactory.ByAll;
+import org.openqa.selenium.support.pagefactory.ByChained;
 
 public class TargetPath {
 
   public static RegionLocator region(By by) {
     return new RegionLocator(null, new ElementSelector(by));
+  }
+
+  public static RegionLocator region(ByAll byAll) {
+    return new RegionLocator(null, new ElementSelector(byAll));
+  }
+
+  public static RegionLocator region(ByChained byChained) {
+    return new RegionLocator(null, new ElementSelector(byChained));
   }
 
   public static RegionLocator region(WebElement element) {
