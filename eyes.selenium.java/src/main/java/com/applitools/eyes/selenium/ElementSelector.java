@@ -1,5 +1,6 @@
 package com.applitools.eyes.selenium;
 
+import com.applitools.eyes.EyesException;
 import com.applitools.eyes.selenium.universal.dto.TargetPathLocatorDto;
 import com.applitools.utils.GeneralUtils;
 import org.openqa.selenium.By;
@@ -87,7 +88,8 @@ public class ElementSelector extends TargetPathLocatorDto implements PathNodeVal
         fallback = region;
       }
     } catch (NoSuchFieldException | IllegalAccessException e) {
-      e.printStackTrace();
+      System.out.println("Got a failure trying to find By[] using reflection! Error " + e.getMessage());
+      throw new EyesException("Got a failure trying to find By[] using reflection! Error " + e.getMessage());
     }
   }
 
@@ -115,7 +117,8 @@ public class ElementSelector extends TargetPathLocatorDto implements PathNodeVal
         child = region;
       }
     } catch (NoSuchFieldException | IllegalAccessException e) {
-      e.printStackTrace();
+      System.out.println("Got a failure trying to find By[] using reflection! Error " + e.getMessage());
+      throw new EyesException("Got a failure trying to find By[] using reflection! Error " + e.getMessage());
     }
   }
 

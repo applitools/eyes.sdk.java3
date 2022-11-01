@@ -1,5 +1,6 @@
 package com.applitools.eyes.appium;
 
+import com.applitools.eyes.EyesException;
 import com.applitools.eyes.selenium.universal.dto.SelectorRegionDto;
 import com.applitools.utils.GeneralUtils;
 import io.appium.java_client.AppiumBy;
@@ -78,10 +79,9 @@ public class AppiumSelectorRegionMapper {
 
       return region;
     } catch (NoSuchFieldException | IllegalAccessException e) {
-      e.printStackTrace();
+      System.out.println("Got a failure trying to find By[] using reflection! Error " + e.getMessage());
+      throw new EyesException("Got a failure trying to find By[] using reflection! Error " + e.getMessage());
     }
-
-    return null;
   }
 
   public static SelectorRegionDto toAppiumSelectorRegionDto(ByChained byChained) {
@@ -101,9 +101,8 @@ public class AppiumSelectorRegionMapper {
 
       return region;
     } catch (NoSuchFieldException | IllegalAccessException e) {
-      e.printStackTrace();
+      System.out.println("Got a failure trying to find By[] using reflection! Error " + e.getMessage());
+      throw new EyesException("Got a failure trying to find By[] using reflection! Error " + e.getMessage());
     }
-
-    return null;
   }
 }
