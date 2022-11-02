@@ -49,6 +49,8 @@ public class ImageMatchSettings {
     private AccessibilityRegionByRectangle[] accessibility = new AccessibilityRegionByRectangle[0];
     @JsonProperty("accessibilitySettings")
     private AccessibilitySettings accessibilitySettings;
+    @JsonProperty("enablePatterns")
+    private Boolean enablePatterns;
 
     @JsonProperty("matchLevel")
     public MatchLevel getMatchLevel() {
@@ -187,4 +189,13 @@ public class ImageMatchSettings {
         this.accessibility = accessibilityValidation;
     }
 
+    @JsonProperty("enablePatterns")
+    public Boolean getEnablePatterns() {
+        return enablePatterns;
+    }
+
+    @JsonProperty("enablePatterns")
+    public void setEnablePatterns(Boolean enablePatterns) {
+        this.enablePatterns = enablePatterns;
+    }
 }

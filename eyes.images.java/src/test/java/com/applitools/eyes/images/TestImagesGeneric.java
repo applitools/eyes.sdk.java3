@@ -17,11 +17,13 @@ import java.util.List;
  */
 public class TestImagesGeneric extends TestSetup {
 
-    private static final String IMAGE_URL_JPEG = "https://applitools.github.io/demo/images/image_1.jpg";
+    private static final String IMAGE_URL_JPG = "https://applitools.github.io/demo/images/image_1.jpg";
+    private static final String IMAGE_URL_JPEG = "https://applitools.github.io/demo/images/minions_jpeg.jpeg";
     private static final String IMAGE_URL_PNG = "https://applitools.github.io/upload/appium.png";
     private static final String IMAGE_URL_BMP = "https://applitools.github.io/demo/images/minions_bitmap.bmp";
 
-    private static final String IMAGE_PATH_JPEG = "src/main/resources/minions.jpeg";
+    private static final String IMAGE_PATH_JPEG = "src/main/resources/minions_jpeg.jpeg";
+    private static final String IMAGE_PATH_JPG = "";
     private static final String IMAGE_PATH_PNG = "src/main/resources/minions_png.png";
     private static final String IMAGE_PATH_BMP = "src/main/resources/minions_bitmap.bmp";
 
@@ -72,6 +74,30 @@ public class TestImagesGeneric extends TestSetup {
         eyes.check(Target.image(IMAGE_URL_JPEG));
         eyes.close();
     }
+
+//    @Test
+//    public void testJPGFromPath() {
+//        BufferedImage image = ImageUtils.imageFromFile(IMAGE_PATH_JPG);
+//        eyes.open(getApplicationName(), "TestJPGFromPath", new RectangleSize(image.getWidth(), image.getHeight()));
+//        eyes.check(Target.image(IMAGE_PATH_JPG));
+//        eyes.close();
+//    }
+//
+//    @Test
+//    public void testJPGFromBuffer() {
+//        BufferedImage image = ImageUtils.imageFromFile(IMAGE_PATH_JPG);
+//        eyes.open(getApplicationName(), "TestJPGFromBuffer", new RectangleSize(image.getWidth(), image.getHeight()));
+//        eyes.check(Target.image(image));
+//        eyes.close();
+//    }
+//
+//    @Test
+//    public void testJPGFromURL() throws MalformedURLException {
+//        BufferedImage image = ImageUtils.imageFromUrl(new URL(IMAGE_URL_JPG));
+//        eyes.open(getApplicationName(), "TestJPGFromURL", new RectangleSize(image.getWidth(), image.getHeight()));
+//        eyes.check(Target.image(IMAGE_URL_JPG));
+//        eyes.close();
+//    }
 
     @Test
     public void testPNGFromPath() {
@@ -244,7 +270,11 @@ public class TestImagesGeneric extends TestSetup {
     public void testIgnoreDisplacementsFluent() {
         eyes.open(getApplicationName(), "TestIgnoreDisplacementsFluent", new RectangleSize(TEST_IMAGE.getWidth(), TEST_IMAGE.getHeight()));
         eyes.check(Target.image(TEST_IMAGE).ignoreDisplacements());
-        eyes.close();
+
+        final TestResults result = eyes.close(false);
+        final SessionResults info = getTestInfo(result);
+
+        Assert.assertTrue(info.getActualAppOutput()[0].getImageMatchSettings().getIgnoreDisplacements());
     }
 
     @Test
@@ -252,7 +282,11 @@ public class TestImagesGeneric extends TestSetup {
         eyes.setConfiguration(eyes.getConfiguration().setIgnoreDisplacements(true));
         eyes.open(getApplicationName(), "TestIgnoreDisplacementsNonFluent", new RectangleSize(TEST_IMAGE.getWidth(), TEST_IMAGE.getHeight()));
         eyes.check(Target.image(TEST_IMAGE));
-        eyes.close();
+
+        final TestResults result = eyes.close(false);
+        final SessionResults info = getTestInfo(result);
+
+        Assert.assertTrue(info.getActualAppOutput()[0].getImageMatchSettings().getIgnoreDisplacements());
     }
 
     @Test
@@ -283,7 +317,11 @@ public class TestImagesGeneric extends TestSetup {
     public void testEnablePatternsFluent() {
         eyes.open(getApplicationName(), "TestEnablePatternsFluent", new RectangleSize(TEST_IMAGE.getWidth(), TEST_IMAGE.getHeight()));
         eyes.check(Target.image(TEST_IMAGE).enablePatterns());
-        eyes.close();
+
+        final TestResults result = eyes.close(false);
+        final SessionResults info = getTestInfo(result);
+
+        Assert.assertTrue(info.getActualAppOutput()[0].getImageMatchSettings().getEnablePatterns());
     }
 
     @Test
@@ -291,7 +329,11 @@ public class TestImagesGeneric extends TestSetup {
         eyes.setConfiguration(eyes.getConfiguration().setEnablePatterns(true));
         eyes.open(getApplicationName(), "TestEnablePatternsNonFluent", new RectangleSize(TEST_IMAGE.getWidth(), TEST_IMAGE.getHeight()));
         eyes.check(Target.image(TEST_IMAGE));
-        eyes.close();
+
+        final TestResults result = eyes.close(false);
+        final SessionResults info = getTestInfo(result);
+
+        Assert.assertTrue(info.getActualAppOutput()[0].getImageMatchSettings().getEnablePatterns());
     }
 
     @Test
