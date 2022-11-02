@@ -35,6 +35,8 @@ public class AppiumCheckSettings extends CheckSettings implements ImplicitInitia
     private WebElement scrollRootElement;
     private Boolean captureStatusBar;
     private String pageId;
+    private Boolean isDefaultWebview;
+    private String webview;
 
     protected AppiumCheckSettings() {
         super();
@@ -51,6 +53,16 @@ public class AppiumCheckSettings extends CheckSettings implements ImplicitInitia
     protected AppiumCheckSettings(WebElement webElement) {
         this.targetElement = webElement;
     }
+
+    protected AppiumCheckSettings(boolean isWebView) {
+        this.isDefaultWebview = isWebView;
+    }
+
+    protected AppiumCheckSettings(String webview) {
+        this.webview = webview;
+        this.isDefaultWebview = false;
+    }
+
 
     @Override
     public void init(Logger logger, EyesWebDriver driver) {
@@ -83,6 +95,8 @@ public class AppiumCheckSettings extends CheckSettings implements ImplicitInitia
         clone.scrollRootElement = this.scrollRootElement;
         clone.captureStatusBar = this.captureStatusBar;
         clone.pageId = this.pageId;
+        clone.isDefaultWebview = this.isDefaultWebview;
+        clone.webview = this.webview;
         return clone;
     }
 
@@ -394,5 +408,32 @@ public class AppiumCheckSettings extends CheckSettings implements ImplicitInitia
     @Override
     public LazyLoadOptions getLazyLoadOptions() {
         return super.getLazyLoadOptions();
+    }
+
+    public AppiumCheckSettings webview() {
+        AppiumCheckSettings clone = this.clone();
+        clone.isDefaultWebview = true;
+        return clone;
+    }
+
+    public AppiumCheckSettings webview(Boolean isWebView) {
+        AppiumCheckSettings clone = this.clone();
+        clone.isDefaultWebview = isWebView;
+        return clone;
+    }
+
+    public AppiumCheckSettings webview(String webView) {
+        AppiumCheckSettings clone = this.clone();
+        clone.isDefaultWebview = false;
+        clone.webview = webView;
+        return clone;
+    }
+
+    public Boolean getIsDefaultWebview() {
+        return this.isDefaultWebview;
+    }
+
+    public String getWebview() {
+        return this.webview;
     }
 }

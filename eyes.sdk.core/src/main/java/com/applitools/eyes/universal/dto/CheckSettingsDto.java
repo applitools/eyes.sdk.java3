@@ -16,6 +16,7 @@ public class CheckSettingsDto {
   // screenshot
   private TRegion region;
   private Object frames;
+  private Object webview;
   private Boolean fully;
   private TRegion scrollRootElement;
   private String stitchMode; // "CSS" | "Scroll"
@@ -339,4 +340,8 @@ public class CheckSettingsDto {
   public String getUserCommandId() {
     return userCommandId;
   }
+
+  public Object getWebview() { return webview; }
+
+  public void setWebview(Object webview) { this.webview = webview; }
 }
