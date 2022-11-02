@@ -86,6 +86,9 @@ public class AppiumCheckSettingsMapper {
         checkSettingsDto.setWaitBeforeCapture(appiumCheckSettings.getWaitBeforeCapture());
         checkSettingsDto.setLazyLoad(appiumCheckSettings.getLazyLoadOptions());
         checkSettingsDto.setIgnoreDisplacements(appiumCheckSettings.isIgnoreDisplacements());
+        checkSettingsDto.setWebview(appiumCheckSettings.getWebview() != null?
+                appiumCheckSettings.getWebview() : (appiumCheckSettings.getIsDefaultWebview() != null?
+                appiumCheckSettings.getIsDefaultWebview() : null));
 //    private Normalization normalization; //TODO I'm NEW
 
         checkSettingsDto.setDebugImages(null); //TODO I'm NEW
