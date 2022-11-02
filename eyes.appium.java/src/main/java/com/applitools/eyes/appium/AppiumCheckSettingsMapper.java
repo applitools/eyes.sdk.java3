@@ -54,8 +54,6 @@ public class AppiumCheckSettingsMapper {
         checkSettingsDto.setWebview(appiumCheckSettings.getWebview() != null?
                 appiumCheckSettings.getWebview() : (appiumCheckSettings.getIsDefaultWebview() != null?
                     appiumCheckSettings.getIsDefaultWebview() : null));
-//                appiumCheckSettings.getIsDefaultWebview() == null? appiumCheckSettings.getIsDefaultWebview() :
-//                        appiumCheckSettings.getWebview() : null);
 
         // ScreenshotSettings
         checkSettingsDto.setRegion(TRegionMapper.toTRegionFromCheckSettings(checkSettings));
