@@ -1,3 +1,7 @@
+## [5.33.0] - 2022-11-2
+### Added
+- setNMGCapabilities API.
+
 ## [5.32.0] - 2022-10-31
 ### Updated
 - Add support for AppiumBy selector. [Trello 3022](https://trello.com/c/VpnV7BBN/)

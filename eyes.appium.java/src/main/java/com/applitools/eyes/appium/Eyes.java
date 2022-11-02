@@ -16,6 +16,7 @@ import com.applitools.utils.*;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.openqa.selenium.*;
+import org.openqa.selenium.remote.DesiredCapabilities;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -24,6 +25,73 @@ import java.util.*;
 
 public class Eyes implements IEyesBase {
     private com.applitools.eyes.selenium.Eyes originEyes;
+
+    public static void setNMGCapabilities(DesiredCapabilities caps) {
+        setNMGCapabilities(caps, null, null, null);
+    }
+
+    public static void setNMGCapabilities(DesiredCapabilities caps, String apiKey) {
+        setNMGCapabilities(caps, apiKey, null, null);
+    }
+
+    public static void setNMGCapabilities(DesiredCapabilities caps, String apiKey, String eyesServerUrl) {
+        setNMGCapabilities(caps, apiKey, eyesServerUrl, null);
+    }
+
+    public static void setNMGCapabilities(DesiredCapabilities caps, String apiKey,
+                                          String eyesServerUrl, ProxySettings proxySettings) {
+
+        String iosCapsKey = "processArguments";
+        String iosCapValue = "{\"args\": [], \"env\":"
+                + "{\"DYLD_INSERT_LIBRARIES\":\"@executable_path/Frameworks/UFG_lib.xcframework/ios-arm64/UFG_lib.framework/UFG_lib"
+                + ":"
+                + "@executable_path/Frameworks/UFG_lib.xcframework/ios-arm64_x86_64-simulator/UFG_lib.framework/UFG_lib\"";
+
+        String iosCapValueSuffix = "}}";
+
+        String androidCapKey = "optionalIntentArguments";
+        String androidCapValue = "--es APPLITOOLS \'{";
+        String androidCapValueSuffix = "}\'";
+
+        // Take the API key from the environment if it's not explicitly given.
+        if (apiKey == null) {
+            apiKey = GeneralUtils.getEnvString(("APPLITOOLS_API_KEY"));
+            if (apiKey == null || apiKey.equalsIgnoreCase("")) {
+                throw new EyesException("No API key was given, or is an empty string.");
+            }
+        }
+
+        androidCapValue += "\"NML_API_KEY\":\"" + apiKey + "\"";
+        iosCapValue += ",\"NML_API_KEY\":\"" + apiKey + "\"";
+
+        // Check for the server URL in the env variable. (might still be null and this is fine.
+        if (eyesServerUrl == null) {
+            eyesServerUrl = GeneralUtils.getEnvString(("APPLITOOLS_SERVER_URL"));
+        }
+
+        if (eyesServerUrl != null && !eyesServerUrl.equalsIgnoreCase("")) {
+            androidCapValue += ",\"NML_SERVER_URL\":\"" + eyesServerUrl + "\"";
+            iosCapValue += ",\"NML_SERVER_URL\":\"" + eyesServerUrl + "\"";
+        }
+
+        if (proxySettings == null) {
+            String proxyFromEnv = GeneralUtils.getEnvString("APPLITOOLS_HTTP_PROXY");
+            if (proxyFromEnv != null && !proxyFromEnv.equalsIgnoreCase("")) {
+                proxySettings = new ProxySettings(proxyFromEnv);
+            }
+        }
+
+        if (proxySettings != null) {
+            androidCapValue += ",\"NML_PROXY_URL\":\"" + proxySettings + "\"";
+            iosCapValue += ",\"NML_PROXY_URL\":\"" + proxySettings + "\"";
+        }
+
+        androidCapValue += androidCapValueSuffix;
+        iosCapValue += iosCapValueSuffix;
+
+        caps.setCapability(androidCapKey, androidCapValue);
+        caps.setCapability(iosCapsKey, iosCapValue);
+    }
 
     /**
      * Instantiates a new Eyes.
