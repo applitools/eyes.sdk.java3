@@ -1,4 +1,16 @@
 ## [vNext] - dNext
+### Added
+- Images SDK eyes.images.java5
+
+### Breaking Changes
+- Images eyes.check no longer returns a boolean if there were diffs
+- Images eyes.open requires a viewport size set either from the configuration or from eyes.open
+
+## [5.33.0] - 2022-11-2
+### Added
+- setNMGCapabilities API.
+
+## [5.32.0] - 2022-10-31
 ### Updated
 - Add support for AppiumBy selector. [Trello 3022](https://trello.com/c/VpnV7BBN/)
 - Making Universal Core start process robust. [Trello 2993, 3023](https://trello.com/c/ArmjDFta/)
