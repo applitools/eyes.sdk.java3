@@ -16,7 +16,7 @@ import java.net.URL;
 
 public class TestImagesApi extends TestSetup {
 
-    private final String TEST_IMAGE = "src/main/resources/minions.jpeg";
+    private final String TEST_IMAGE = "src/main/resources/minions_jpeg.jpeg";
 
     @AfterMethod
     public void tearDown() {

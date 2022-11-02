@@ -10,7 +10,7 @@ import java.awt.image.BufferedImage;
 
 public class TestImageUtils extends ReportingTestSuite {
 
-    private final String TEST_IMAGE = "src/main/resources/minions.jpeg";
+    private final String TEST_IMAGE = "src/main/resources/minions_jpeg.jpeg";
 
     public TestImageUtils() {
         super.setGroupName("images");
