@@ -107,8 +107,7 @@ public class VisualGridRunner extends EyesRunner {
     }
 
     public VisualGridRunner(RunnerOptions runnerOptions, String suiteName) {
-        super(BASE_AGENT_ID, VERSION);
-        ArgumentGuard.notNull(runnerOptions, "runnerOptions");
+        super(BASE_AGENT_ID, VERSION, runnerOptions);
         this.runnerOptions = runnerOptions;
         int testConcurrency0 = runnerOptions.getTestConcurrency() == null ? DEFAULT_CONCURRENCY : runnerOptions.getTestConcurrency();
         this.testConcurrency = new TestConcurrency(testConcurrency0, false);

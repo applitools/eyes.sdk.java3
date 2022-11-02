@@ -1,8 +1,6 @@
 package com.applitools.eyes.visualgrid.services;
 
-import com.applitools.eyes.AbstractProxySettings;
-import com.applitools.eyes.AutProxyMode;
-import com.applitools.eyes.AutProxySettings;
+import com.applitools.eyes.*;
 
 public class RunnerOptions {
 
@@ -11,6 +9,7 @@ public class RunnerOptions {
     private String serverUrl = null;
     private AbstractProxySettings proxy = null;
     private AutProxySettings autProxy = null;
+    private LogHandler logHandler  = new NullLogHandler();
 
     public RunnerOptions testConcurrency(int testConcurrency) {
         this.testConcurrency = testConcurrency;
@@ -86,4 +85,12 @@ public class RunnerOptions {
     public AutProxySettings getAutProxy() {
         return autProxy;
     }
+
+    public RunnerOptions logHandler(LogHandler logHandler) {
+        this.logHandler = logHandler;
+        return this;
+    }
+
+    public LogHandler getLogHandler() { return logHandler; }
+
 }

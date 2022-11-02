@@ -17,6 +17,8 @@ import com.applitools.eyes.universal.Reference;
 import com.applitools.eyes.universal.dto.TestResultsSummaryDto;
 import com.applitools.eyes.universal.mapper.TestResultsSummaryMapper;
 import com.applitools.eyes.universal.server.UniversalSdkNativeLoader;
+import com.applitools.eyes.visualgrid.services.RunnerOptions;
+import com.applitools.utils.ArgumentGuard;
 import com.applitools.utils.ClassVersionGetter;
 import com.applitools.utils.GeneralUtils;
 import org.apache.commons.lang3.tuple.Pair;
@@ -45,6 +47,7 @@ public abstract class EyesRunner {
    * used for instantiating Classic Runner
    */
   public EyesRunner() {
+    setLogHandler(new NullLogHandler());
     runServer(BASE_AGENT_ID, VERSION);
   }
 
@@ -52,10 +55,22 @@ public abstract class EyesRunner {
    * used for instantiating Classic Runner
    */
   public EyesRunner(String baseAgentId, String version) {
+    setLogHandler(new NullLogHandler());
     runServer(baseAgentId, version);
   }
 
+  /**
+   * used for instantiating VisualGrid Runner
+   */
+  public EyesRunner(String baseAgentId, String version, RunnerOptions runnerOptions) {
+    ArgumentGuard.notNull(runnerOptions, "runnerOptions");
+    setLogHandler(runnerOptions.getLogHandler());
+    runServer(baseAgentId, version);
+  }
+
+
   protected void runServer(String baseAgentId, String version){
+    UniversalSdkNativeLoader.setLogger(getLogger());
     UniversalSdkNativeLoader.start();
     commandExecutor = CommandExecutor.getInstance(baseAgentId, version, getStaleElementException());
   }
