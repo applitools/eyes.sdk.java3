@@ -1,7 +1,7 @@
 package com.applitools.eyes.selenium.universal.dto;
 
-import com.applitools.eyes.AbstractProxySettings;
 import com.applitools.eyes.universal.dto.ITargetDto;
+import com.applitools.eyes.universal.dto.ProxyDto;
 import com.fasterxml.jackson.annotation.JsonInclude;
 
 import java.util.Map;
@@ -13,7 +13,7 @@ import java.util.Map;
 public class DriverTargetDto implements ITargetDto {
 
     private String serverUrl;
-    private AbstractProxySettings proxy;
+    private ProxyDto proxy;
     private String sessionId;
     private Map<String, Object> capabilities;
 
@@ -22,11 +22,11 @@ public class DriverTargetDto implements ITargetDto {
     public String getServerUrl() { return serverUrl; }
 
 
-    public AbstractProxySettings getProxy() {
+    public ProxyDto getProxy() {
         return proxy;
     }
 
-    public void setProxy(AbstractProxySettings proxy) {
+    public void setProxy(ProxyDto proxy) {
         this.proxy = proxy;
     }
 

@@ -11,9 +11,8 @@ import com.applitools.eyes.locators.VisualLocatorSettings;
 import com.applitools.eyes.positioning.PositionProvider;
 import com.applitools.eyes.selenium.positioning.ImageRotation;
 import com.applitools.eyes.selenium.universal.dto.DriverTargetDto;
-import com.applitools.eyes.universal.dto.CheckSettingsDto;
-import com.applitools.eyes.universal.dto.ITargetDto;
 import com.applitools.eyes.selenium.universal.mapper.DriverMapper;
+import com.applitools.eyes.universal.dto.CheckSettingsDto;
 import com.applitools.utils.ArgumentGuard;
 import com.applitools.utils.GeneralUtils;
 import org.openqa.selenium.By;
@@ -524,7 +523,7 @@ public class Eyes implements IEyesBase {
 
     public void check(ICheckSettings checkSettings) {
         CheckSettingsDto checkSettingsDto = AppiumCheckSettingsMapper.toCheckSettingsDtoV3(checkSettings, configure());
-        DriverTargetDto driverTargetDto = DriverMapper.toDriverTargetDto(getDriver(), configure().getProxy());
+        DriverTargetDto driverTargetDto = DriverMapper.toDriverTargetDto(getDriver(), configure().getWebDriverProxy());
         this.checkDto(checkSettingsDto, driverTargetDto);
     }
 

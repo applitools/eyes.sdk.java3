@@ -144,8 +144,9 @@ public class Eyes implements IEyesBase {
         ConfigurationDto configurationDto = ConfigurationMapper
                 .toConfigurationDto(configuration, runner.isDontCloseBatches());
         OpenSettingsDto settingsDto = SettingsMapper.toOpenSettingsDto(configuration, runner.isDontCloseBatches());
+        DriverTargetDto driverTargetDto = DriverMapper.toDriverTargetDto(getDriver(), configuration.getWebDriverProxy());
 
-        eyesRef = commandExecutor.managerOpenEyes(runner.getManagerRef(), null, settingsDto, configurationDto);
+        eyesRef = commandExecutor.managerOpenEyes(runner.getManagerRef(), driverTargetDto, settingsDto, configurationDto);
     }
 
     /**
@@ -162,12 +163,7 @@ public class Eyes implements IEyesBase {
             return driver;
         }
 
-//        WebDriverProxySettings wdProxy = configuration.getWebDriverProxy();
-//        String wdProxyUrl = wdProxy != null? wdProxy.getProxyUrl() : null;
-
-//        DriverDto driverDto = DriverMapper.toDriverDto(driver, wdProxyUrl);
-        AbstractProxySettings proxySettings = configurationProvider.get().getProxy();
-        DriverTargetDto driverTargetDto = DriverMapper.toDriverTargetDto(driver, proxySettings);
+        DriverTargetDto driverTargetDto = DriverMapper.toDriverTargetDto(driver, configuration.getWebDriverProxy());
 
         configurationProvider.get().setAppName(appName).setTestName(testName);
 
@@ -179,7 +175,7 @@ public class Eyes implements IEyesBase {
                 .toConfigurationDto(configuration, runner.isDontCloseBatches());
         OpenSettingsDto settingsDto = SettingsMapper.toOpenSettingsDto(configuration, runner.isDontCloseBatches());
 
-        eyesRef = commandExecutor.managerOpenEyes(runner.getManagerRef(), (ITargetDto) driverTargetDto, settingsDto, configurationDto);
+        eyesRef = commandExecutor.managerOpenEyes(runner.getManagerRef(), driverTargetDto, settingsDto, configurationDto);
         this.driver = driver;
         return driver;
     }
@@ -507,9 +503,9 @@ public class Eyes implements IEyesBase {
         if (tag != null) {
             checkSettings = checkSettings.withName(tag);
         }
-//        CheckSettingsDto checkSettingsDto = CheckSettingsMapper.toCheckSettingsDto(checkSettings);
+
         CheckSettingsDto checkSettingsDto = CheckSettingsMapper.toCheckSettingsDtoV3(checkSettings, configure());
-        DriverTargetDto driverTargetDto = DriverMapper.toDriverTargetDto(getDriver(), getProxy());
+        DriverTargetDto driverTargetDto = DriverMapper.toDriverTargetDto(getDriver(), configuration.getWebDriverProxy());
         checkDto(checkSettingsDto, driverTargetDto);
     }
 
@@ -527,7 +523,7 @@ public class Eyes implements IEyesBase {
 
         ConfigurationDto configurationDto = ConfigurationMapper
                 .toConfigurationDto(configuration, runner.isDontCloseBatches());
-        commandExecutor.eyesCheck(eyesRef, (ITargetDto) target, checkSettingsDto, configurationDto);
+        commandExecutor.eyesCheck(eyesRef, target, checkSettingsDto, configurationDto);
     }
     /**
      * Close test results.
@@ -1971,7 +1967,7 @@ public class Eyes implements IEyesBase {
 
         ConfigurationDto configurationDto = ConfigurationMapper
                 .toConfigurationDto(configuration, runner.isDontCloseBatches());
-        DriverTargetDto target = DriverMapper.toDriverTargetDto(getDriver(), getProxy());
+        DriverTargetDto target = DriverMapper.toDriverTargetDto(getDriver(), configuration.getWebDriverProxy());
 
         return this.locateDto(target, visualLocatorSettingsDto, configurationDto);
     }
@@ -1985,7 +1981,7 @@ public class Eyes implements IEyesBase {
         OCRSearchSettingsDto ocrSearchSettingsDto = OCRSearchSettingsMapper.toOCRSearchSettingsDto(textRegionSettings);
         ConfigurationDto configurationDto = ConfigurationMapper
                 .toConfigurationDto(configuration, runner.isDontCloseBatches());
-        ITargetDto target = DriverMapper.toDriverTargetDto(getDriver(), getProxy());
+        ITargetDto target = DriverMapper.toDriverTargetDto(getDriver(), configuration.getWebDriverProxy());
         return locateTextDto(target, ocrSearchSettingsDto, configurationDto);
     }
 
@@ -1998,7 +1994,7 @@ public class Eyes implements IEyesBase {
             .toOCRExtractSettingsDtoList(Arrays.asList(ocrRegions));
         ConfigurationDto configurationDto = ConfigurationMapper
                 .toConfigurationDto(configuration, runner.isDontCloseBatches());
-        DriverTargetDto target = DriverMapper.toDriverTargetDto(getDriver(), getProxy());
+        DriverTargetDto target = DriverMapper.toDriverTargetDto(getDriver(), configuration.getWebDriverProxy());
         return extractTextDto(target, ocrExtractSettingsDtoList, configurationDto);
 
     }
