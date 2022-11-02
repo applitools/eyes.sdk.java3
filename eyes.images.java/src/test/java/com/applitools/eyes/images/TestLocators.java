@@ -24,11 +24,12 @@ public class TestLocators extends TestSetup {
         BufferedImage image = ImageUtils.imageFromFile(EXTRACT_TEST_IMAGE);
         eyes.open(getApplicationName(), "Locate", new RectangleSize(image.getWidth(), image.getHeight()));
 
+        eyes.check(Target.image(image));
         Map<String, List<Region>> res = eyes.locate(new VisualLocatorSettings().name("the").image(image));
         List<Region> regions = res.get("the");
         Assert.assertEquals(regions.size(), 1);
         Region region = regions.get(0);
-        Assert.assertEquals(region, new Region(69, 8, 31, 22, CoordinatesType.SCREENSHOT_AS_IS));
+        Assert.assertEquals(region, new Region(69, 8, 31, 20, CoordinatesType.SCREENSHOT_AS_IS));
         eyes.close();
     }
 
