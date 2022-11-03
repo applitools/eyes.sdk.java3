@@ -145,10 +145,15 @@ public class TestImagesGeneric extends TestSetup {
 
         eyes.open(getApplicationName(), "TestFloatingRegionFluent", new RectangleSize(TEST_IMAGE.getWidth(), TEST_IMAGE.getHeight()));
         eyes.check(Target.image(TEST_IMAGE)
-                .floating(5)
                 .floating(new Region(10, 20, 30, 40), 5, 10, 20, 15)
         );
-        eyes.close();
+
+        final TestResults result = eyes.close(false);
+        final SessionResults info = getTestInfo(result);
+
+        FloatingMatchSettings[] floatingRegions = info.getActualAppOutput()[0].getImageMatchSettings().getFloating();
+
+        Assert.assertEquals(floatingRegions[0], new FloatingMatchSettings(10, 20, 30, 40, 5, 10, 20, 15));
     }
 
     @Test
