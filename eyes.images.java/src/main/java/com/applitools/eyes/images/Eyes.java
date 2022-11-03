@@ -233,6 +233,8 @@ public class Eyes implements IEyesBase {
         this.eyesRef = null;
         isClosed = true;
         List<TestResults> testResults = TestResultsMapper.toTestResultsList(closeResponse);
+        if (testResults == null)
+            return null;
         testResults.forEach(testResults1 -> runner.logSessionResultsAndThrowException(shouldThrowException, testResults1));
         return testResults.get(0);
     }
