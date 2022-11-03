@@ -95,7 +95,9 @@ public class AndroidTestByAll {
         eyes.close();
 
         driver.navigate().back();
+        Thread.sleep(1000);
         driver.findElement(AppiumBy.id("btn_view_shadow_activity")).click();
+        Thread.sleep(1000);
     }
 
     @Test
@@ -188,102 +190,104 @@ public class AndroidTestByAll {
         eyes.check(Target.region(byChained).fully(false));
         eyes.close();
     }
-
-    @Test
-    public void testAppiumByChainedScrollRootElement() throws InterruptedException {
-        driver.navigate().back();
-        Thread.sleep(1000);
-        eyes.open(driver,"Android Test","TestAppiumByChainedScrollRootElement");
-
-        ByChained byChained = new ByChained(
-                new By[]{
-                        AppiumBy.id("android:id/content"),
-                        AppiumBy.id("com.applitools.app_androidx:id/scrollView"),
-                        AppiumBy.id("recyclerView"),
-                }
-        );
-
-        driver.findElement(AppiumBy.id("btn_recycler_view_in_scroll_view_activity")).click();
-        Thread.sleep(1000);
-        eyes.check(Target.window().scrollRootElement(byChained).fully());
-        eyes.close();
-
-        driver.navigate().back();
-        driver.findElement(AppiumBy.id("btn_view_shadow_activity")).click();
-    }
-
-    @Test
-    public void testAppiumByChainedFloatingRegion() {
-        eyes.open(driver,"Android Test","TestAppiumByChainedFloatingRegion");
-
-        ByChained byChained = new ByChained(
-                new By[]{
-                        AppiumBy.id("android:id/content"),
-                        AppiumBy.id(target),
-                }
-        );
-
-        eyes.check(Target.window().floating(byChained, 5, 10, 15, 20).fully(false));
-
-        final TestResults result = eyes.close(false);
-        final SessionResults info = getTestInfo(result);
-
-        FloatingMatchSettings[] floatingRegions = info.getActualAppOutput()[0].getImageMatchSettings().getFloating();
-        Assert.assertEquals(floatingRegions[0], new FloatingMatchSettings(96, 66, 200, 300, 5, 10, 15, 20));
-    }
-
-    @Test
-    public void testAppiumByChainedAccessibilityRegion() {
-        eyes.open(driver,"Android Test","TestAppiumByChainedAccessibilityRegion");
-
-        ByChained byChained = new ByChained(
-                new By[]{
-                        AppiumBy.id("android:id/content"),
-                        AppiumBy.id(target),
-                }
-        );
-
-        eyes.check(Target.window().accessibility(byChained, AccessibilityRegionType.RegularText).fully(false));
-
-        final TestResults result = eyes.close(false);
-        final SessionResults info = getTestInfo(result);
-
-        AccessibilityRegionByRectangle[] accessibilityRegion = info.getActualAppOutput()[0].getImageMatchSettings().getAccessibility();
-        Assert.assertEquals(accessibilityRegion[0], new AccessibilityRegionByRectangle(96, 66, 200, 300, AccessibilityRegionType.RegularText));
-    }
-
-    @Test
-    public void testAppiumByChainedCodedRegions() {
-        eyes.open(driver,"Android Test","TestAppiumByChainedCodedRegions");
-
-        ByChained byChained = new ByChained(
-                new By[]{
-                        AppiumBy.id("android:id/content"),
-                        AppiumBy.id(target),
-                }
-        );
-
-        eyes.check(Target.window()
-                .ignore(byChained)
-                .layout(byChained)
-                .content(byChained)
-                .strict(byChained)
-                .fully(true)
-        );
-
-        final TestResults result = eyes.close(false);
-        final SessionResults info = getTestInfo(result);
-
-        Region ignoreRegion = info.getActualAppOutput()[0].getImageMatchSettings().getIgnore()[0];
-        Region layoutRegion = info.getActualAppOutput()[0].getImageMatchSettings().getLayout()[0];
-        Region contentRegion = info.getActualAppOutput()[0].getImageMatchSettings().getContent()[0];
-        Region strictRegion = info.getActualAppOutput()[0].getImageMatchSettings().getStrict()[0];
-
-        Assert.assertEquals(ignoreRegion, new Region(96, 66, 200, 300), "ignore");
-        Assert.assertEquals(layoutRegion, new Region(96, 66, 200, 300), "layout");
-        Assert.assertEquals(contentRegion, new Region(96, 66, 200, 300), "content");
-        Assert.assertEquals(strictRegion, new Region(96, 66, 200, 300), "strict");
-    }
+//
+//    @Test
+//    public void testAppiumByChainedScrollRootElement() throws InterruptedException {
+//        driver.navigate().back();
+//        Thread.sleep(1000);
+//        eyes.open(driver,"Android Test","TestAppiumByChainedScrollRootElement");
+//
+//        ByChained byChained = new ByChained(
+//                new By[]{
+//                        AppiumBy.id("android:id/content"),
+//                        AppiumBy.id("com.applitools.app_androidx:id/scrollView"),
+//                        AppiumBy.id("recyclerView"),
+//                }
+//        );
+//
+//        driver.findElement(AppiumBy.id("btn_recycler_view_in_scroll_view_activity")).click();
+//        Thread.sleep(1000);
+//        eyes.check(Target.window().scrollRootElement(byChained).fully());
+//        eyes.close();
+//
+//        driver.navigate().back();
+//        Thread.sleep(1000);
+//        driver.findElement(AppiumBy.id("btn_view_shadow_activity")).click();
+//        Thread.sleep(1000);
+//    }
+//
+//    @Test
+//    public void testAppiumByChainedFloatingRegion() {
+//        eyes.open(driver,"Android Test","TestAppiumByChainedFloatingRegion");
+//
+//        ByChained byChained = new ByChained(
+//                new By[]{
+//                        AppiumBy.id("android:id/content"),
+//                        AppiumBy.id(target),
+//                }
+//        );
+//
+//        eyes.check(Target.window().floating(byChained, 5, 10, 15, 20).fully(false));
+//
+//        final TestResults result = eyes.close(false);
+//        final SessionResults info = getTestInfo(result);
+//
+//        FloatingMatchSettings[] floatingRegions = info.getActualAppOutput()[0].getImageMatchSettings().getFloating();
+//        Assert.assertEquals(floatingRegions[0], new FloatingMatchSettings(96, 66, 200, 300, 5, 10, 15, 20));
+//    }
+//
+//    @Test
+//    public void testAppiumByChainedAccessibilityRegion() {
+//        eyes.open(driver,"Android Test","TestAppiumByChainedAccessibilityRegion");
+//
+//        ByChained byChained = new ByChained(
+//                new By[]{
+//                        AppiumBy.id("android:id/content"),
+//                        AppiumBy.id(target),
+//                }
+//        );
+//
+//        eyes.check(Target.window().accessibility(byChained, AccessibilityRegionType.RegularText).fully(false));
+//
+//        final TestResults result = eyes.close(false);
+//        final SessionResults info = getTestInfo(result);
+//
+//        AccessibilityRegionByRectangle[] accessibilityRegion = info.getActualAppOutput()[0].getImageMatchSettings().getAccessibility();
+//        Assert.assertEquals(accessibilityRegion[0], new AccessibilityRegionByRectangle(96, 66, 200, 300, AccessibilityRegionType.RegularText));
+//    }
+//
+//    @Test
+//    public void testAppiumByChainedCodedRegions() {
+//        eyes.open(driver,"Android Test","TestAppiumByChainedCodedRegions");
+//
+//        ByChained byChained = new ByChained(
+//                new By[]{
+//                        AppiumBy.id("android:id/content"),
+//                        AppiumBy.id(target),
+//                }
+//        );
+//
+//        eyes.check(Target.window()
+//                .ignore(byChained)
+//                .layout(byChained)
+//                .content(byChained)
+//                .strict(byChained)
+//                .fully(true)
+//        );
+//
+//        final TestResults result = eyes.close(false);
+//        final SessionResults info = getTestInfo(result);
+//
+//        Region ignoreRegion = info.getActualAppOutput()[0].getImageMatchSettings().getIgnore()[0];
+//        Region layoutRegion = info.getActualAppOutput()[0].getImageMatchSettings().getLayout()[0];
+//        Region contentRegion = info.getActualAppOutput()[0].getImageMatchSettings().getContent()[0];
+//        Region strictRegion = info.getActualAppOutput()[0].getImageMatchSettings().getStrict()[0];
+//
+//        Assert.assertEquals(ignoreRegion, new Region(96, 66, 200, 300), "ignore");
+//        Assert.assertEquals(layoutRegion, new Region(96, 66, 200, 300), "layout");
+//        Assert.assertEquals(contentRegion, new Region(96, 66, 200, 300), "content");
+//        Assert.assertEquals(strictRegion, new Region(96, 66, 200, 300), "strict");
+//    }
 
     private SessionResults getTestInfo(TestResults results) {
         SessionResults sessionResults = null;
