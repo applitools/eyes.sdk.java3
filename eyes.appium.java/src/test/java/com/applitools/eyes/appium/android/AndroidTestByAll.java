@@ -29,6 +29,8 @@ public class AndroidTestByAll {
     private AndroidDriver driver;
     private Eyes eyes;
 
+    private final String target = "com.applitools.app_androidx:id/layout";
+
     @BeforeTest
     public void before() throws MalformedURLException {
         DesiredCapabilities caps = new DesiredCapabilities();
@@ -40,7 +42,9 @@ public class AndroidTestByAll {
         caps.setCapability("app", "https://applitools.jfrog.io/artifactory/Examples/androidx/1.3.6/app_androidx.apk");
         caps.setCapability("newCommandTimeout", 2000);
 
-        driver = new AndroidDriver(new URL(SL_URL), caps);
+//        driver = new AndroidDriver(new URL(SL_URL), caps);
+        driver = new AndroidDriver(new URL("http://0.0.0.0:4723/wd/hub"), caps);
+        driver.findElement(AppiumBy.id("btn_view_shadow_activity")).click();
 
         eyes = new Eyes();
         eyes.setApiKey(GeneralUtils.getEnvString("APPLITOOLS_API_KEY"));
@@ -63,7 +67,7 @@ public class AndroidTestByAll {
         ByAll byAll = new ByAll(
                 new By[]{
                         AppiumBy.xpath("some_xpath"),
-                        AppiumBy.id("btn_recycler_view_in_scroll_view_activity"),
+                        AppiumBy.id(target),
                         AppiumBy.androidUIAutomator("new UiSelector().descriptionContains(\"some_description\")")
                 }
         );
@@ -73,19 +77,26 @@ public class AndroidTestByAll {
     }
 
     @Test
-    public void testAppiumByAllScrollRootElement() {
+    public void testAppiumByAllScrollRootElement() throws InterruptedException {
+        driver.navigate().back();
+        Thread.sleep(1000);
         eyes.open(driver,"Android Test","TestAppiumByAllScrollRootElement");
 
         ByAll byAll = new ByAll(
                 new By[]{
                         AppiumBy.xpath("some_xpath"),
-                        AppiumBy.id("btn_recycler_view_in_scroll_view_activity"),
+                        AppiumBy.id("recyclerView"),
                         AppiumBy.androidUIAutomator("new UiSelector().descriptionContains(\"some_description\")")
                 }
         );
 
-        eyes.check(Target.window().scrollRootElement(byAll).fully(false));
+        driver.findElement(AppiumBy.id("btn_recycler_view_in_scroll_view_activity")).click();
+        Thread.sleep(1000);
+        eyes.check(Target.window().scrollRootElement(byAll).fully());
         eyes.close();
+
+        driver.navigate().back();
+        driver.findElement(AppiumBy.id("btn_view_shadow_activity")).click();
     }
 
     @Test
@@ -95,7 +106,7 @@ public class AndroidTestByAll {
         ByAll byAll = new ByAll(
                 new By[]{
                         AppiumBy.xpath("some_xpath"),
-                        AppiumBy.id("btn_recycler_view_in_scroll_view_activity"),
+                        AppiumBy.id(target),
                         AppiumBy.androidUIAutomator("new UiSelector().descriptionContains(\"some_description\")")
                 }
         );
@@ -106,7 +117,7 @@ public class AndroidTestByAll {
         final SessionResults info = getTestInfo(result);
 
         FloatingMatchSettings[] floatingRegions = info.getActualAppOutput()[0].getImageMatchSettings().getFloating();
-        Assert.assertEquals(floatingRegions[0], new FloatingMatchSettings(16, 400, 361, 48, 5, 10, 15, 20));
+        Assert.assertEquals(floatingRegions[0], new FloatingMatchSettings(96, 66, 200, 300, 5, 10, 15, 20));
     }
 
     @Test
@@ -116,7 +127,7 @@ public class AndroidTestByAll {
         ByAll byAll = new ByAll(
                 new By[]{
                         AppiumBy.xpath("some_xpath"),
-                        AppiumBy.id("btn_recycler_view_in_scroll_view_activity"),
+                        AppiumBy.id(target),
                         AppiumBy.androidUIAutomator("new UiSelector().descriptionContains(\"some_description\")")
                 }
         );
@@ -127,7 +138,7 @@ public class AndroidTestByAll {
         final SessionResults info = getTestInfo(result);
 
         AccessibilityRegionByRectangle[] accessibilityRegion = info.getActualAppOutput()[0].getImageMatchSettings().getAccessibility();
-        Assert.assertEquals(accessibilityRegion[0], new AccessibilityRegionByRectangle(16, 400, 361, 48, AccessibilityRegionType.RegularText));
+        Assert.assertEquals(accessibilityRegion[0], new AccessibilityRegionByRectangle(96, 66, 200, 300, AccessibilityRegionType.RegularText));
     }
 
     @Test
@@ -137,7 +148,7 @@ public class AndroidTestByAll {
         ByAll byAll = new ByAll(
                 new By[]{
                         AppiumBy.xpath("some_xpath"),
-                        AppiumBy.id("btn_recycler_view_in_scroll_view_activity"),
+                        AppiumBy.id(target),
                         AppiumBy.androidUIAutomator("new UiSelector().descriptionContains(\"some_description\")")
                 }
         );
@@ -158,15 +169,10 @@ public class AndroidTestByAll {
         Region contentRegion = info.getActualAppOutput()[0].getImageMatchSettings().getContent()[0];
         Region strictRegion = info.getActualAppOutput()[0].getImageMatchSettings().getStrict()[0];
 
-        System.out.println(ignoreRegion);
-        System.out.println(layoutRegion);
-        System.out.println(contentRegion);
-        System.out.println(strictRegion);
-
-        Assert.assertEquals(ignoreRegion, new Region(16, 400, 361, 48), "ignore");
-        Assert.assertEquals(layoutRegion, new Region(16, 400, 361, 48), "layout");
-        Assert.assertEquals(contentRegion, new Region(16, 400, 361, 48), "content");
-        Assert.assertEquals(strictRegion, new Region(16, 400, 361, 48), "strict");
+        Assert.assertEquals(ignoreRegion, new Region(96, 66, 200, 300), "ignore");
+        Assert.assertEquals(layoutRegion, new Region(96, 66, 200, 300), "layout");
+        Assert.assertEquals(contentRegion, new Region(96, 66, 200, 300), "content");
+        Assert.assertEquals(strictRegion, new Region(96, 66, 200, 300), "strict");
     }
 
     @Test
@@ -176,7 +182,7 @@ public class AndroidTestByAll {
         ByChained byChained = new ByChained(
                 new By[]{
                         AppiumBy.id("android:id/content"),
-                        AppiumBy.id("com.applitools.app_androidx:id/btn_web_view_dialog_activity"),
+                        AppiumBy.id(target),
                 }
         );
 
@@ -185,18 +191,26 @@ public class AndroidTestByAll {
     }
 
     @Test
-    public void testAppiumByChainedScrollRootElement() {
+    public void testAppiumByChainedScrollRootElement() throws InterruptedException {
+        driver.navigate().back();
+        Thread.sleep(1000);
         eyes.open(driver,"Android Test","TestAppiumByChainedScrollRootElement");
 
         ByChained byChained = new ByChained(
                 new By[]{
                         AppiumBy.id("android:id/content"),
-                        AppiumBy.id("com.applitools.app_androidx:id/btn_web_view_dialog_activity"),
+                        AppiumBy.id("com.applitools.app_androidx:id/scrollView"),
+                        AppiumBy.id("recyclerView"),
                 }
         );
 
-        eyes.check(Target.window().scrollRootElement(byChained).fully(false));
+        driver.findElement(AppiumBy.id("btn_recycler_view_in_scroll_view_activity")).click();
+        Thread.sleep(1000);
+        eyes.check(Target.window().scrollRootElement(byChained).fully());
         eyes.close();
+
+        driver.navigate().back();
+        driver.findElement(AppiumBy.id("btn_view_shadow_activity")).click();
     }
 
     @Test
@@ -206,7 +220,7 @@ public class AndroidTestByAll {
         ByChained byChained = new ByChained(
                 new By[]{
                         AppiumBy.id("android:id/content"),
-                        AppiumBy.id("com.applitools.app_androidx:id/btn_web_view_dialog_activity"),
+                        AppiumBy.id(target),
                 }
         );
 
@@ -216,7 +230,7 @@ public class AndroidTestByAll {
         final SessionResults info = getTestInfo(result);
 
         FloatingMatchSettings[] floatingRegions = info.getActualAppOutput()[0].getImageMatchSettings().getFloating();
-        Assert.assertEquals(floatingRegions[0], new FloatingMatchSettings(16, 544, 361, 48, 5, 10, 15, 20));
+        Assert.assertEquals(floatingRegions[0], new FloatingMatchSettings(96, 66, 200, 300, 5, 10, 15, 20));
     }
 
     @Test
@@ -226,7 +240,7 @@ public class AndroidTestByAll {
         ByChained byChained = new ByChained(
                 new By[]{
                         AppiumBy.id("android:id/content"),
-                        AppiumBy.id("com.applitools.app_androidx:id/btn_web_view_dialog_activity"),
+                        AppiumBy.id(target),
                 }
         );
 
@@ -236,7 +250,7 @@ public class AndroidTestByAll {
         final SessionResults info = getTestInfo(result);
 
         AccessibilityRegionByRectangle[] accessibilityRegion = info.getActualAppOutput()[0].getImageMatchSettings().getAccessibility();
-        Assert.assertEquals(accessibilityRegion[0], new AccessibilityRegionByRectangle(16, 544, 361, 48, AccessibilityRegionType.RegularText));
+        Assert.assertEquals(accessibilityRegion[0], new AccessibilityRegionByRectangle(96, 66, 200, 300, AccessibilityRegionType.RegularText));
     }
 
     @Test
@@ -246,7 +260,7 @@ public class AndroidTestByAll {
         ByChained byChained = new ByChained(
                 new By[]{
                         AppiumBy.id("android:id/content"),
-                        AppiumBy.id("com.applitools.app_androidx:id/btn_web_view_dialog_activity"),
+                        AppiumBy.id(target),
                 }
         );
 
@@ -255,7 +269,7 @@ public class AndroidTestByAll {
                 .layout(byChained)
                 .content(byChained)
                 .strict(byChained)
-                .fully(false)
+                .fully(true)
         );
 
         final TestResults result = eyes.close(false);
@@ -266,10 +280,10 @@ public class AndroidTestByAll {
         Region contentRegion = info.getActualAppOutput()[0].getImageMatchSettings().getContent()[0];
         Region strictRegion = info.getActualAppOutput()[0].getImageMatchSettings().getStrict()[0];
 
-        Assert.assertEquals(ignoreRegion, new Region(16, 544, 361, 48), "ignore");
-        Assert.assertEquals(layoutRegion, new Region(16, 544, 361, 48), "layout");
-        Assert.assertEquals(contentRegion, new Region(16, 544, 361, 48), "content");
-        Assert.assertEquals(strictRegion, new Region(16, 544, 361, 48), "strict");
+        Assert.assertEquals(ignoreRegion, new Region(96, 66, 200, 300), "ignore");
+        Assert.assertEquals(layoutRegion, new Region(96, 66, 200, 300), "layout");
+        Assert.assertEquals(contentRegion, new Region(96, 66, 200, 300), "content");
+        Assert.assertEquals(strictRegion, new Region(96, 66, 200, 300), "strict");
     }
 
     private SessionResults getTestInfo(TestResults results) {

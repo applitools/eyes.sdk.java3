@@ -53,21 +53,27 @@ public class TestByAll {
                 By.xpath("//*[@id=\"overflowing-div-image\"]")
         );
 
-        eyes.check(Target.region(byAll));
+        eyes.check(Target.region(byAll).fully(false));
         eyes.close();
     }
 
     @Test
-    public void testSeleniumByAllScrollRootElement() {
+    public void testSeleniumByAllScrollRootElement() throws InterruptedException {
+        driver.get("https://applitools.github.io/demo/TestPages/ModalsPage/index.html");
+        driver.findElement(By.cssSelector("#open_scrollable_modal")).click();
+        Thread.sleep(1000);
+
         eyes.open(driver,"SeleniumByAll","TestSeleniumByAllScrollRootElement");
 
         ByAll byAll = new ByAll(
-                By.cssSelector("#overflowing-div-image"),
-                By.xpath("//*[@id=\"overflowing-div-image\"]")
+                By.cssSelector("#scrollable_modal"),
+                By.xpath("some_xpath")
         );
 
-        eyes.check(Target.window().scrollRootElement(byAll));
+        eyes.check(Target.window().scrollRootElement(byAll).fully(true));
         eyes.close();
+        driver.get("https://applitools.github.io/demo/TestPages/CorsTestPage/index.html");
+        Thread.sleep(1000);
     }
 
     @Test
@@ -79,7 +85,7 @@ public class TestByAll {
                 By.xpath("//*[@id=\"overflowing-div-image\"]")
         );
 
-        eyes.check(Target.window().floating(byAll, 5, 10, 15, 20));
+        eyes.check(Target.window().floating(byAll, 5, 10, 15, 20).fully(false));
 
         final TestResults result = eyes.close(false);
         final SessionResults info = getTestInfo(result);
@@ -98,14 +104,14 @@ public class TestByAll {
                 By.xpath("//*[@id=\"overflowing-div-image\"]")
         );
 
-        eyes.check(Target.window().accessibility(byAll, AccessibilityRegionType.RegularText));
+        eyes.check(Target.window().accessibility(byAll, AccessibilityRegionType.RegularText).fully(false));
 
         final TestResults result = eyes.close(false);
         final SessionResults info = getTestInfo(result);
 
         AccessibilityRegionByRectangle[] accessibilityRegion = info.getActualAppOutput()[0].getImageMatchSettings().getAccessibility();
 
-        Assert.assertEquals(accessibilityRegion[0], new AccessibilityRegionByRectangle(8, 284, 304, 184, AccessibilityRegionType.RegularText));
+        Assert.assertEquals(accessibilityRegion[0], new AccessibilityRegionByRectangle(8, 282, 304, 184, AccessibilityRegionType.RegularText));
     }
 
     @Test
@@ -122,6 +128,7 @@ public class TestByAll {
                 .layout(byAll)
                 .content(byAll)
                 .strict(byAll)
+                .fully(false)
         );
 
         final TestResults result = eyes.close(false);
@@ -147,21 +154,27 @@ public class TestByAll {
                 By.id("overflowing-div")
         );
 
-        eyes.check(Target.region(byChained));
+        eyes.check(Target.region(byChained).fully(false));
         eyes.close();
     }
 
     @Test
-    public void testSeleniumByChainedScrollRootElement() {
+    public void testSeleniumByChainedScrollRootElement() throws InterruptedException {
+        driver.get("https://applitools.github.io/demo/TestPages/ModalsPage/index.html");
+        driver.findElement(By.cssSelector("#open_scrollable_modal")).click();
+        Thread.sleep(1000);
+
         eyes.open(driver,"SeleniumByChained","TestSeleniumByChainedScrollRootElement");
 
         ByChained byChained = new ByChained(
                 By.cssSelector("body"),
-                By.id("overflowing-div")
+                By.cssSelector("#scrollable_modal")
         );
 
-        eyes.check(Target.window().scrollRootElement(byChained));
+        eyes.check(Target.window().scrollRootElement(byChained).fully(true));
         eyes.close();
+        driver.get("https://applitools.github.io/demo/TestPages/CorsTestPage/index.html");
+        Thread.sleep(1000);
     }
 
     @Test
@@ -173,7 +186,7 @@ public class TestByAll {
                 By.id("overflowing-div")
         );
 
-        eyes.check(Target.window().floating(byChained, 5, 10, 15, 20));
+        eyes.check(Target.window().floating(byChained, 5, 10, 15, 20).fully(false));
 
         final TestResults result = eyes.close(false);
         final SessionResults info = getTestInfo(result);
@@ -192,7 +205,7 @@ public class TestByAll {
                 By.id("overflowing-div")
         );
 
-        eyes.check(Target.window().accessibility(byChained, AccessibilityRegionType.RegularText));
+        eyes.check(Target.window().accessibility(byChained, AccessibilityRegionType.RegularText).fully(false));
 
         final TestResults result = eyes.close(false);
         final SessionResults info = getTestInfo(result);
@@ -216,6 +229,7 @@ public class TestByAll {
                 .layout(byChained)
                 .content(byChained)
                 .strict(byChained)
+                .fully(false)
         );
 
         final TestResults result = eyes.close(false);
