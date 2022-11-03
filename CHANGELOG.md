@@ -1,3 +1,9 @@
+## [5.34.0] - 2022-11-03
+### Fixed
+- Fixed handling context lists in Appium
+### Added
+- Added support for ByAll / ByChained selectors
+
 ## [5.31.0] - 2022-10-19
 ### Fixed
 - Fixed proxy issue with resource (screenshot/dom) uploading.
