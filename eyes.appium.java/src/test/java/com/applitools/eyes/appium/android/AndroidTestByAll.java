@@ -40,8 +40,7 @@ public class AndroidTestByAll {
         caps.setCapability("app", "https://applitools.jfrog.io/artifactory/Examples/androidx/1.3.6/app_androidx.apk");
         caps.setCapability("newCommandTimeout", 2000);
 
-//        driver = new AndroidDriver(new URL(SL_URL), caps);
-        driver = new AndroidDriver(new URL("http://0.0.0.0:4723/wd/hub"), caps);
+        driver = new AndroidDriver(new URL(SL_URL), caps);
 
         eyes = new Eyes();
         eyes.setApiKey(GeneralUtils.getEnvString("APPLITOOLS_API_KEY"));
