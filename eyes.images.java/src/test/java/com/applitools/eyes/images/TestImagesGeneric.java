@@ -354,4 +354,44 @@ public class TestImagesGeneric extends TestSetup {
         eyes.checkRegion(TEST_IMAGE, new Region(50, 50, 50, 50));
         eyes.close();
     }
+
+    @Test
+    public void shouldNotOpenEyesWithoutViewportSize() {
+        boolean isFailed = false;
+        try {
+            eyes.open(getApplicationName(), "ShouldNotOpenEyesWithoutViewportSize");
+        } catch (EyesException e) {
+            e.printStackTrace();
+            isFailed = true;
+        }
+
+        Assert.assertTrue(isFailed);
+    }
+
+    @Test
+    public void shouldOpenEyesWithViewportSizeFromConfiguration() {
+        boolean isFailed = false;
+        try {
+            eyes.setViewportSize(new RectangleSize(10, 10));
+            eyes.open(getApplicationName(), "ShouldOpenEyesWithViewportSizeFromConfiguration");
+            eyes.close();
+        } catch (EyesException e) {
+            e.printStackTrace();
+            isFailed = true;
+        }
+
+        Assert.assertFalse(isFailed);
+
+        try {
+            eyes.setConfiguration(eyes.getConfiguration()
+                    .setViewportSize(new RectangleSize(10, 10)));
+            eyes.open(getApplicationName(), "ShouldOpenEyesWithViewportSizeFromConfiguration");
+            eyes.close();
+        } catch (EyesException e) {
+            e.printStackTrace();
+            isFailed = true;
+        }
+
+        Assert.assertFalse(isFailed);
+    }
 }

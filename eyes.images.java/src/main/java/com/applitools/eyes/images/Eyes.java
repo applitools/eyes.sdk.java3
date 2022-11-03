@@ -19,6 +19,7 @@ import com.applitools.eyes.universal.dto.response.CommandCloseResponseDto;
 import com.applitools.eyes.universal.mapper.*;
 import com.applitools.utils.ArgumentGuard;
 import com.applitools.utils.ClassVersionGetter;
+import com.applitools.utils.GeneralUtils;
 import com.applitools.utils.ImageUtils;
 
 import java.awt.image.BufferedImage;
@@ -82,11 +83,12 @@ public class Eyes implements IEyesBase {
     }
 
     /**
-     * Get the base agent id.
-     * @return Base agent id.
+     * Starts a test.
+     * @param appName    The name of the application under test.
+     * @param testName   The test name.
      */
-    public String getBaseAgentId() {
-        return "eyes.images.java/" + ClassVersionGetter.CURRENT_VERSION;
+    public void open(String appName, String testName) {
+        open(appName, testName, null);
     }
 
     /**
@@ -104,6 +106,8 @@ public class Eyes implements IEyesBase {
         configuration.setAppName(appName).setTestName(testName);
         if (viewportSize != null && !viewportSize.isEmpty()) {
             configuration.setViewportSize(new RectangleSize(viewportSize));
+        } else if (configuration.getViewportSize() == null) {
+            throw new EyesException("Viewport size must be set using the configuration or using open(String, String, RectangleSize)");
         }
 
         ConfigurationDto configurationDto = ConfigurationMapper
@@ -343,16 +347,24 @@ public class Eyes implements IEyesBase {
         return this.configuration;
     }
 
+    /**
+     * Get the base agent id.
+     * @return Base agent id.
+     */
+    public String getBaseAgentId() {
+        return "eyes.images.java/" + ClassVersionGetter.CURRENT_VERSION;
+    }
+
     // backward compatibility
     protected ScreenshotProvider getScreenshotProvider() {
         return null;
     }
 
     // backward compatibility
+
     public String tryCaptureDom() {
         return null;
     }
-
 
     /**
      * {@inheritDoc}
