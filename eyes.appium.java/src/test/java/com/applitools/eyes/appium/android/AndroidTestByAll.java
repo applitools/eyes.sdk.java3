@@ -1,9 +1,10 @@
 package com.applitools.eyes.appium.android;
 
-import com.applitools.eyes.BatchInfo;
-import com.applitools.eyes.StdoutLogHandler;
+import com.applitools.eyes.*;
 import com.applitools.eyes.appium.Eyes;
 import com.applitools.eyes.appium.Target;
+import com.applitools.eyes.metadata.SessionResults;
+import com.applitools.eyes.utils.TestUtils;
 import com.applitools.utils.GeneralUtils;
 import io.appium.java_client.AppiumBy;
 import io.appium.java_client.android.AndroidDriver;
@@ -11,6 +12,7 @@ import io.appium.java_client.pagefactory.bys.builder.ByAll;
 import io.appium.java_client.pagefactory.bys.builder.ByChained;
 import org.openqa.selenium.By;
 import org.openqa.selenium.remote.DesiredCapabilities;
+import org.testng.Assert;
 import org.testng.annotations.AfterTest;
 import org.testng.annotations.BeforeTest;
 import org.testng.annotations.Test;
@@ -38,9 +40,11 @@ public class AndroidTestByAll {
         caps.setCapability("app", "https://applitools.jfrog.io/artifactory/Examples/androidx/1.3.6/app_androidx.apk");
         caps.setCapability("newCommandTimeout", 2000);
 
-        driver = new AndroidDriver(new URL(SL_URL), caps);
+//        driver = new AndroidDriver(new URL(SL_URL), caps);
+        driver = new AndroidDriver(new URL("http://0.0.0.0:4723/wd/hub"), caps);
 
         eyes = new Eyes();
+        eyes.setApiKey(GeneralUtils.getEnvString("APPLITOOLS_API_KEY"));
         eyes.setLogHandler(new StdoutLogHandler(true));
         eyes.setBatch(new BatchInfo("Android ByAll ByChained"));
     }
@@ -61,12 +65,109 @@ public class AndroidTestByAll {
                 new By[]{
                         AppiumBy.xpath("some_xpath"),
                         AppiumBy.id("btn_recycler_view_in_scroll_view_activity"),
-                        AppiumBy.androidUIAutomator("some_ui_automator_text")
+                        AppiumBy.androidUIAutomator("new UiSelector().descriptionContains(\"some_description\")")
                 }
         );
 
         eyes.check(Target.region(byAll).fully(false));
         eyes.close();
+    }
+
+    @Test
+    public void testAppiumByAllScrollRootElement() {
+        eyes.open(driver,"Android Test","TestAppiumByAllScrollRootElement");
+
+        ByAll byAll = new ByAll(
+                new By[]{
+                        AppiumBy.xpath("some_xpath"),
+                        AppiumBy.id("btn_recycler_view_in_scroll_view_activity"),
+                        AppiumBy.androidUIAutomator("new UiSelector().descriptionContains(\"some_description\")")
+                }
+        );
+
+        eyes.check(Target.window().scrollRootElement(byAll).fully(false));
+        eyes.close();
+    }
+
+    @Test
+    public void testAppiumByAllFloatingRegion() {
+        eyes.open(driver,"Android Test","TestAppiumByAllFloatingRegion");
+
+        ByAll byAll = new ByAll(
+                new By[]{
+                        AppiumBy.xpath("some_xpath"),
+                        AppiumBy.id("btn_recycler_view_in_scroll_view_activity"),
+                        AppiumBy.androidUIAutomator("new UiSelector().descriptionContains(\"some_description\")")
+                }
+        );
+
+        eyes.check(Target.window().floating(byAll, 5, 10, 15, 20).fully(false));
+
+        final TestResults result = eyes.close(false);
+        final SessionResults info = getTestInfo(result);
+
+        FloatingMatchSettings[] floatingRegions = info.getActualAppOutput()[0].getImageMatchSettings().getFloating();
+        Assert.assertEquals(floatingRegions[0], new FloatingMatchSettings(16, 400, 361, 48, 5, 10, 15, 20));
+    }
+
+    @Test
+    public void testAppiumByAllAccessibilityRegion() {
+        eyes.open(driver,"Android Test","TestAppiumByAllAccessibilityRegion");
+
+        ByAll byAll = new ByAll(
+                new By[]{
+                        AppiumBy.xpath("some_xpath"),
+                        AppiumBy.id("btn_recycler_view_in_scroll_view_activity"),
+                        AppiumBy.androidUIAutomator("new UiSelector().descriptionContains(\"some_description\")")
+                }
+        );
+
+        eyes.check(Target.window().accessibility(byAll, AccessibilityRegionType.RegularText).fully(false));
+
+        final TestResults result = eyes.close(false);
+        final SessionResults info = getTestInfo(result);
+
+        AccessibilityRegionByRectangle[] accessibilityRegion = info.getActualAppOutput()[0].getImageMatchSettings().getAccessibility();
+        Assert.assertEquals(accessibilityRegion[0], new AccessibilityRegionByRectangle(16, 400, 361, 48, AccessibilityRegionType.RegularText));
+    }
+
+    @Test
+    public void testAppiumByAllCodedRegions() {
+        eyes.open(driver,"Android Test","TestAppiumByAllCodedRegions");
+
+        ByAll byAll = new ByAll(
+                new By[]{
+                        AppiumBy.xpath("some_xpath"),
+                        AppiumBy.id("btn_recycler_view_in_scroll_view_activity"),
+                        AppiumBy.androidUIAutomator("new UiSelector().descriptionContains(\"some_description\")")
+                }
+        );
+
+        eyes.check(Target.window()
+                .ignore(byAll)
+                .layout(byAll)
+                .content(byAll)
+                .strict(byAll)
+                .fully(false)
+        );
+
+        final TestResults result = eyes.close(false);
+        final SessionResults info = getTestInfo(result);
+
+        Region ignoreRegion = info.getActualAppOutput()[0].getImageMatchSettings().getIgnore()[0];
+        Region layoutRegion = info.getActualAppOutput()[0].getImageMatchSettings().getLayout()[0];
+        Region contentRegion = info.getActualAppOutput()[0].getImageMatchSettings().getContent()[0];
+        Region strictRegion = info.getActualAppOutput()[0].getImageMatchSettings().getStrict()[0];
+
+        System.out.println(ignoreRegion);
+        System.out.println(layoutRegion);
+        System.out.println(contentRegion);
+        System.out.println(strictRegion);
+
+        Assert.assertEquals(ignoreRegion, new Region(16, 400, 361, 48), "ignore");
+        Assert.assertEquals(layoutRegion, new Region(16, 400, 361, 48), "layout");
+        Assert.assertEquals(contentRegion, new Region(16, 400, 361, 48), "content");
+        Assert.assertEquals(strictRegion, new Region(16, 400, 361, 48), "strict");
     }
 
     @Test
@@ -80,7 +181,106 @@ public class AndroidTestByAll {
                 }
         );
 
-        eyes.check(Target.region(byChained));
+        eyes.check(Target.region(byChained).fully(false));
         eyes.close();
+    }
+
+    @Test
+    public void testAppiumByChainedScrollRootElement() {
+        eyes.open(driver,"Android Test","TestAppiumByChainedScrollRootElement");
+
+        ByChained byChained = new ByChained(
+                new By[]{
+                        AppiumBy.id("android:id/content"),
+                        AppiumBy.id("com.applitools.app_androidx:id/btn_web_view_dialog_activity"),
+                }
+        );
+
+        eyes.check(Target.window().scrollRootElement(byChained).fully(false));
+        eyes.close();
+    }
+
+    @Test
+    public void testAppiumByChainedFloatingRegion() {
+        eyes.open(driver,"Android Test","TestAppiumByChainedFloatingRegion");
+
+        ByChained byChained = new ByChained(
+                new By[]{
+                        AppiumBy.id("android:id/content"),
+                        AppiumBy.id("com.applitools.app_androidx:id/btn_web_view_dialog_activity"),
+                }
+        );
+
+        eyes.check(Target.window().floating(byChained, 5, 10, 15, 20).fully(false));
+
+        final TestResults result = eyes.close(false);
+        final SessionResults info = getTestInfo(result);
+
+        FloatingMatchSettings[] floatingRegions = info.getActualAppOutput()[0].getImageMatchSettings().getFloating();
+        Assert.assertEquals(floatingRegions[0], new FloatingMatchSettings(16, 544, 361, 48, 5, 10, 15, 20));
+    }
+
+    @Test
+    public void testAppiumByChainedAccessibilityRegion() {
+        eyes.open(driver,"Android Test","TestAppiumByChainedAccessibilityRegion");
+
+        ByChained byChained = new ByChained(
+                new By[]{
+                        AppiumBy.id("android:id/content"),
+                        AppiumBy.id("com.applitools.app_androidx:id/btn_web_view_dialog_activity"),
+                }
+        );
+
+        eyes.check(Target.window().accessibility(byChained, AccessibilityRegionType.RegularText).fully(false));
+
+        final TestResults result = eyes.close(false);
+        final SessionResults info = getTestInfo(result);
+
+        AccessibilityRegionByRectangle[] accessibilityRegion = info.getActualAppOutput()[0].getImageMatchSettings().getAccessibility();
+        Assert.assertEquals(accessibilityRegion[0], new AccessibilityRegionByRectangle(16, 544, 361, 48, AccessibilityRegionType.RegularText));
+    }
+
+    @Test
+    public void testAppiumByChainedCodedRegions() {
+        eyes.open(driver,"Android Test","TestAppiumByChainedCodedRegions");
+
+        ByChained byChained = new ByChained(
+                new By[]{
+                        AppiumBy.id("android:id/content"),
+                        AppiumBy.id("com.applitools.app_androidx:id/btn_web_view_dialog_activity"),
+                }
+        );
+
+        eyes.check(Target.window()
+                .ignore(byChained)
+                .layout(byChained)
+                .content(byChained)
+                .strict(byChained)
+                .fully(false)
+        );
+
+        final TestResults result = eyes.close(false);
+        final SessionResults info = getTestInfo(result);
+
+        Region ignoreRegion = info.getActualAppOutput()[0].getImageMatchSettings().getIgnore()[0];
+        Region layoutRegion = info.getActualAppOutput()[0].getImageMatchSettings().getLayout()[0];
+        Region contentRegion = info.getActualAppOutput()[0].getImageMatchSettings().getContent()[0];
+        Region strictRegion = info.getActualAppOutput()[0].getImageMatchSettings().getStrict()[0];
+
+        Assert.assertEquals(ignoreRegion, new Region(16, 544, 361, 48), "ignore");
+        Assert.assertEquals(layoutRegion, new Region(16, 544, 361, 48), "layout");
+        Assert.assertEquals(contentRegion, new Region(16, 544, 361, 48), "content");
+        Assert.assertEquals(strictRegion, new Region(16, 544, 361, 48), "strict");
+    }
+
+    private SessionResults getTestInfo(TestResults results) {
+        SessionResults sessionResults = null;
+        try {
+            sessionResults = TestUtils.getSessionResults(eyes.getApiKey(), results);
+        } catch (Throwable e) {
+            e.printStackTrace();
+            Assert.fail("Exception appeared while getting session results");
+        }
+        return sessionResults;
     }
 }
