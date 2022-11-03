@@ -44,6 +44,11 @@ public class TRegionMapper extends com.applitools.eyes.selenium.universal.mapper
 
     public static TRegion toTRegionDtoFromScrolls(By selector, WebElement element) {
         if (selector != null) {
+            if (selector instanceof ByAll)
+                return AppiumSelectorRegionMapper.toAppiumSelectorRegionDto((ByAll) selector);
+            else if (selector instanceof ByChained)
+                return AppiumSelectorRegionMapper.toAppiumSelectorRegionDto((ByChained) selector);
+
             return AppiumSelectorRegionMapper.toAppiumSelectorRegionDto(selector);
         }
 

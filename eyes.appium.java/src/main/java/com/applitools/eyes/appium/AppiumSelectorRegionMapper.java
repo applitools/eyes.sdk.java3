@@ -72,7 +72,7 @@ public class AppiumSelectorRegionMapper {
       SelectorRegionDto fallback = null;
       SelectorRegionDto region = null;
       for (int i = bys.size()-1; i >= 0; i--) {
-        region = AppiumSelectorRegionMapper.toAppiumSelectorRegionDto(bys.get(i));
+        region = toAppiumSelectorRegionDto(bys.get(i));
         region.setFallback(fallback);
         fallback = region;
       }
@@ -94,7 +94,7 @@ public class AppiumSelectorRegionMapper {
       SelectorRegionDto child = null;
       SelectorRegionDto region = null;
       for (int i = bys.length-1; i >= 0; i--) {
-        region = AppiumSelectorRegionMapper.toAppiumSelectorRegionDto(bys[i]);
+        region = toAppiumSelectorRegionDto(bys[i]);
         region.setChild(child);
         child = region;
       }

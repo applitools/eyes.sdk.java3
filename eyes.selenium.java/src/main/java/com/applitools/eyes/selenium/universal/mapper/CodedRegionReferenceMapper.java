@@ -6,6 +6,9 @@ import com.applitools.eyes.selenium.fluent.SimpleRegionByElement;
 import com.applitools.eyes.selenium.fluent.SimpleRegionBySelector;
 import com.applitools.eyes.selenium.universal.dto.CodedRegionReference;
 import com.applitools.eyes.selenium.universal.dto.TRegion;
+import org.openqa.selenium.By;
+import org.openqa.selenium.support.pagefactory.ByAll;
+import org.openqa.selenium.support.pagefactory.ByChained;
 
 import java.util.List;
 import java.util.Objects;
@@ -34,7 +37,14 @@ public class CodedRegionReferenceMapper {
             // set padding here
         } else if (getSimpleRegion instanceof SimpleRegionBySelector) {
             SimpleRegionBySelector simpleRegionBySelector = (SimpleRegionBySelector) getSimpleRegion;
-            TRegion region = SelectorRegionMapper.toSelectorRegionDto(simpleRegionBySelector.getSelector());
+            By by = simpleRegionBySelector.getSelector();
+            TRegion region;
+            if (by instanceof ByAll)
+                region = SelectorRegionMapper.toSelectorRegionDto((ByAll) by);
+            else if (by instanceof ByChained)
+                region = SelectorRegionMapper.toSelectorRegionDto((ByChained) by);
+            else
+                region = SelectorRegionMapper.toSelectorRegionDto(simpleRegionBySelector.getSelector());
             codedRegionReference.setRegion(region);
             codedRegionReference.setRegionId(simpleRegionBySelector.getRegionId());
             // set padding here

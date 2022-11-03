@@ -15,6 +15,8 @@ import com.applitools.eyes.selenium.fluent.SimpleRegionBySelector;
 import com.applitools.eyes.selenium.universal.dto.TRegion;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.pagefactory.ByAll;
+import org.openqa.selenium.support.pagefactory.ByChained;
 
 /**
  * TRegion mapper
@@ -70,6 +72,10 @@ public class TRegionMapper {
 
   public static TRegion toTRegionDtoFromScrolls(By selector, WebElement element) {
     if (selector != null) {
+      if (selector instanceof ByAll)
+        return SelectorRegionMapper.toSelectorRegionDto((ByAll) selector);
+      else if (selector instanceof ByChained)
+        return SelectorRegionMapper.toSelectorRegionDto((ByChained) selector);
       return SelectorRegionMapper.toSelectorRegionDto(selector);
     }
 

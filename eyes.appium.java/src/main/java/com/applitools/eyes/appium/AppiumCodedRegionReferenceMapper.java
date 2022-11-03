@@ -8,6 +8,9 @@ import com.applitools.eyes.selenium.universal.dto.CodedRegionReference;
 import com.applitools.eyes.selenium.universal.dto.TRegion;
 import com.applitools.eyes.selenium.universal.mapper.ElementRegionMapper;
 import com.applitools.eyes.selenium.universal.mapper.RectangleRegionMapper;
+import io.appium.java_client.pagefactory.bys.builder.ByAll;
+import io.appium.java_client.pagefactory.bys.builder.ByChained;
+import org.openqa.selenium.By;
 
 import java.util.List;
 import java.util.Objects;
@@ -36,7 +39,14 @@ public class AppiumCodedRegionReferenceMapper {
             // set padding here
         } else if (getSimpleRegion instanceof SimpleRegionBySelector) {
             SimpleRegionBySelector simpleRegionBySelector = (SimpleRegionBySelector) getSimpleRegion;
-            TRegion region = AppiumSelectorRegionMapper.toAppiumSelectorRegionDto(simpleRegionBySelector.getSelector());
+            By by = simpleRegionBySelector.getSelector();
+            TRegion region;
+            if (by instanceof ByAll)
+                region = AppiumSelectorRegionMapper.toAppiumSelectorRegionDto((ByAll) by);
+            else if (by instanceof ByChained)
+                region = AppiumSelectorRegionMapper.toAppiumSelectorRegionDto((ByChained) by);
+            else
+                region = AppiumSelectorRegionMapper.toAppiumSelectorRegionDto(simpleRegionBySelector.getSelector());
             codedRegionReference.setRegion(region);
             codedRegionReference.setRegionId(simpleRegionBySelector.getRegionId());
             // set padding here
