@@ -20,6 +20,15 @@ public class SelectorRegionMapper {
       return null;
     }
 
+    if (by instanceof ByAll) {
+      return toSelectorRegionDto((ByAll) by);
+    } else if (by instanceof ByChained) {
+      return toSelectorRegionDto((ByChained) by);
+    }
+    return toDto(by);
+  }
+
+  private static SelectorRegionDto toDto(By by) {
     SelectorRegionDto selectorRegionDto = new SelectorRegionDto();
     String selector = GeneralUtils.getLastWordOfStringWithRegex(by.toString(), ":");
     selectorRegionDto.setSelector(selector);
@@ -57,7 +66,7 @@ public class SelectorRegionMapper {
       SelectorRegionDto fallback = null;
       SelectorRegionDto region = null;
       for (int i = bys.length-1; i >= 0; i--) {
-        region = toSelectorRegionDto(bys[i]);
+        region = toDto(bys[i]);
         region.setType(region.getType());
         region.setFallback(fallback);
         fallback = region;
@@ -80,7 +89,7 @@ public class SelectorRegionMapper {
       SelectorRegionDto child = null;
       SelectorRegionDto region;
       for (int i = bys.length-1; i >= 0; i--) {
-        region = toSelectorRegionDto(bys[i]);
+        region = toDto(bys[i]);
         region.setType(region.getType());
         region.setChild(child);
         child = region;

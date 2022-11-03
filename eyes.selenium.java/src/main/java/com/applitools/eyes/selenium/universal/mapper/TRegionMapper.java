@@ -72,10 +72,6 @@ public class TRegionMapper {
 
   public static TRegion toTRegionDtoFromScrolls(By selector, WebElement element) {
     if (selector != null) {
-      if (selector instanceof ByAll)
-        return SelectorRegionMapper.toSelectorRegionDto((ByAll) selector);
-      else if (selector instanceof ByChained)
-        return SelectorRegionMapper.toSelectorRegionDto((ByChained) selector);
       return SelectorRegionMapper.toSelectorRegionDto(selector);
     }
 

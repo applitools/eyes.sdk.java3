@@ -52,18 +52,7 @@ public class AppiumTFloatingRegionMapper {
             return elementFloatingRegionDto;
         } else if (getFloatingRegion instanceof FloatingRegionBySelector) {
             FloatingRegionBySelector floatingRegionBySelector = (FloatingRegionBySelector) getFloatingRegion;
-
-            SelectorRegionDto selectorRegionDto;
-            By by = floatingRegionBySelector.getSelector();
-            if (by instanceof ByAll)
-                selectorRegionDto = AppiumSelectorRegionMapper.toAppiumSelectorRegionDto((ByAll) by);
-            else if (by instanceof ByChained)
-                selectorRegionDto = AppiumSelectorRegionMapper.toAppiumSelectorRegionDto((ByChained) by);
-            else
-                selectorRegionDto = AppiumSelectorRegionMapper.toAppiumSelectorRegionDto(by);
-
-
-
+            SelectorRegionDto selectorRegionDto = AppiumSelectorRegionMapper.toAppiumSelectorRegionDto(floatingRegionBySelector.getSelector());
             SelectorFloatingRegionDto selectorFloatingRegionDto = new SelectorFloatingRegionDto();
             selectorFloatingRegionDto.setRegion(selectorRegionDto);
             selectorFloatingRegionDto.setMaxUpOffset(floatingRegionBySelector.getMaxUpOffset());

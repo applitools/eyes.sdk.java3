@@ -51,14 +51,7 @@ public class TAccessibilityRegionMapper {
       SelectorAccessibilityRegionDto selectorAccessibilityRegionDto = new SelectorAccessibilityRegionDto();
 
       By by = ((AccessibilityRegionBySelector) getAccessibilityRegion).getSelector();
-      SelectorRegionDto selectorRegionDto;
-      if (by instanceof ByAll)
-       selectorRegionDto = SelectorRegionMapper.toSelectorRegionDto((ByAll) by);
-      else if (by instanceof ByChained)
-        selectorRegionDto = SelectorRegionMapper.toSelectorRegionDto((ByChained) by);
-      else
-        selectorRegionDto = SelectorRegionMapper.toSelectorRegionDto(by);
-
+      SelectorRegionDto selectorRegionDto = SelectorRegionMapper.toSelectorRegionDto(by);
       selectorAccessibilityRegionDto.setRegion(selectorRegionDto);
 
       selectorAccessibilityRegionDto.setType(((AccessibilityRegionBySelector) getAccessibilityRegion).getAccessibilityRegionType().name());

@@ -15,13 +15,13 @@ public class TargetPath {
     return new RegionLocator(null, new ElementSelector(by));
   }
 
-  public static RegionLocator region(ByAll byAll) {
-    return new RegionLocator(null, new ElementSelector(byAll));
-  }
+//  public static RegionLocator region(ByAll byAll) {
+//    return new RegionLocator(null, new ElementSelector(byAll));
+//  }
 
-  public static RegionLocator region(ByChained byChained) {
-    return new RegionLocator(null, new ElementSelector(byChained));
-  }
+//  public static RegionLocator region(ByChained byChained) {
+//    return new RegionLocator(null, new ElementSelector(byChained));
+//  }
 
   public static RegionLocator region(WebElement element) {
     return new RegionLocator(null, new ElementReference(element));

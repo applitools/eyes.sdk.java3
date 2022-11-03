@@ -2,6 +2,7 @@ package com.applitools.eyes.selenium;
 
 import com.applitools.eyes.EyesException;
 import com.applitools.eyes.selenium.universal.dto.TargetPathLocatorDto;
+import com.applitools.eyes.selenium.universal.mapper.SelectorRegionMapper;
 import com.applitools.utils.GeneralUtils;
 import org.openqa.selenium.By;
 import org.openqa.selenium.support.pagefactory.ByAll;
@@ -18,42 +19,53 @@ public class ElementSelector extends TargetPathLocatorDto implements PathNodeVal
   private ElementSelector fallback;
   private ElementSelector child;
 
-  public ElementSelector(ByAll byAll) {
-    populateFromByAll(byAll);
-  }
-
-  public ElementSelector(ByChained byChained) {
-    populateFromByChained(byChained);
+  private ElementSelector() {
   }
 
   public ElementSelector(By by) {
-    String selector = GeneralUtils.getLastWordOfStringWithRegex(by.toString(), ":");
-    this.selector = selector;
-    if (by instanceof By.ById) {
-      this.type = "css selector";
-      this.selector = String.format("[id=\"%s\"]", selector);
-    } else if (by instanceof By.ByXPath) {
-      this.type = "xpath";
-    } else if (by instanceof By.ByLinkText) {
-      this.type = "link text";
-    } else if (by instanceof By.ByPartialLinkText) {
-      this.type = "partial link text";
-    } else if (by instanceof By.ByName) {
-      this.type = "css selector";
-      this.selector = String.format("[name=\"%s\"]", selector);
-    } else if (by instanceof By.ByTagName) {
-      this.type = "css selector";
-    } else if (by instanceof By.ByClassName) {
-      this.type = "css selector";
-      this.selector = ".".concat(selector);
-    } else if (by instanceof By.ByCssSelector){
-      this.type = "css selector";
+    if (by instanceof ByAll) {
+      populateFromByAll((ByAll) by);
+    } else if (by instanceof ByChained) {
+      populateFromByChained((ByChained) by);
+    } else {
+      ElementSelector clone = populateFromBy(by);
+      this.selector = clone.getSelector();
+      this.type = clone.getType();
     }
   }
 
   public ElementSelector(String selector) {
     this.type = "css selector";
     this.selector = selector;
+  }
+
+  private ElementSelector populateFromBy(By by) {
+    ElementSelector es = new ElementSelector();
+
+    String selector = GeneralUtils.getLastWordOfStringWithRegex(by.toString(), ":");
+    es.selector = selector;
+    if (by instanceof By.ById) {
+      es.type = "css selector";
+      es.selector = String.format("[id=\"%s\"]", selector);
+    } else if (by instanceof By.ByXPath) {
+      es.type = "xpath";
+    } else if (by instanceof By.ByLinkText) {
+      es.type = "link text";
+    } else if (by instanceof By.ByPartialLinkText) {
+      es.type = "partial link text";
+    } else if (by instanceof By.ByName) {
+      es.type = "css selector";
+      es.selector = String.format("[name=\"%s\"]", selector);
+    } else if (by instanceof By.ByTagName) {
+      es.type = "css selector";
+    } else if (by instanceof By.ByClassName) {
+      es.type = "css selector";
+      es.selector = ".".concat(selector);
+    } else if (by instanceof By.ByCssSelector){
+      es.type = "css selector";
+    }
+
+    return es;
   }
 
   public String getSelector() {

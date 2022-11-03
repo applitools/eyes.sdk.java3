@@ -27,15 +27,15 @@ public class Target {
         return new SeleniumCheckSettings(TargetPath.region(by));
     }
 
-    // region locator
-    public static SeleniumCheckSettings region(ByAll byAll) {
-        return new SeleniumCheckSettings(TargetPath.region(byAll));
-    }
-
-    // region locator
-    public static SeleniumCheckSettings region(ByChained byChained) {
-        return new SeleniumCheckSettings(TargetPath.region(byChained));
-    }
+//    // region locator
+//    public static SeleniumCheckSettings region(ByAll byAll) {
+//        return new SeleniumCheckSettings(TargetPath.region(byAll));
+//    }
+//
+//    // region locator
+//    public static SeleniumCheckSettings region(ByChained byChained) {
+//        return new SeleniumCheckSettings(TargetPath.region(byChained));
+//    }
 
     // region locator
     public static SeleniumCheckSettings region(WebElement webElement) {

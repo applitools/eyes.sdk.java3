@@ -42,18 +42,8 @@ public class AppiumTAccessibilityRegionMapper {
             return elementAccessibilityRegionDto;
         } else if (getAccessibilityRegion instanceof AccessibilityRegionBySelector) {
             SelectorAccessibilityRegionDto selectorAccessibilityRegionDto = new SelectorAccessibilityRegionDto();
-
             By by = ((AccessibilityRegionBySelector) getAccessibilityRegion).getSelector();
-            SelectorRegionDto selectorRegionDto;
-            if (by instanceof ByAll)
-                selectorRegionDto = AppiumSelectorRegionMapper.toAppiumSelectorRegionDto((ByAll) by);
-            else if (by instanceof ByChained)
-                selectorRegionDto = AppiumSelectorRegionMapper.toAppiumSelectorRegionDto((ByChained) by);
-            else
-                selectorRegionDto = AppiumSelectorRegionMapper.toAppiumSelectorRegionDto(by);
-
-            selectorAccessibilityRegionDto.setRegion(selectorRegionDto);
-
+            selectorAccessibilityRegionDto.setRegion(AppiumSelectorRegionMapper.toAppiumSelectorRegionDto(by));
             selectorAccessibilityRegionDto.setType(((AccessibilityRegionBySelector) getAccessibilityRegion).getAccessibilityRegionType().name());
             return selectorAccessibilityRegionDto;
         }

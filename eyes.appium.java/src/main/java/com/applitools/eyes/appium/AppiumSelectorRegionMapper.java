@@ -19,6 +19,15 @@ public class AppiumSelectorRegionMapper {
       return null;
     }
 
+    if (by instanceof ByAll) {
+      return toAppiumSelectorRegionDto((ByAll) by);
+    } else if (by instanceof ByChained) {
+      return toAppiumSelectorRegionDto((ByChained) by);
+    }
+    return toDto(by);
+  }
+
+  private static SelectorRegionDto toDto(By by) {
     SelectorRegionDto selectorRegionDto = new SelectorRegionDto();
     String selector = GeneralUtils.getLastWordOfStringWithRegex(by.toString(), ":");
     selectorRegionDto.setSelector(selector);
@@ -59,10 +68,9 @@ public class AppiumSelectorRegionMapper {
       selectorRegionDto.setType("-custom");
     }
     return selectorRegionDto;
-
   }
 
-  public static SelectorRegionDto toAppiumSelectorRegionDto(ByAll byAll) {
+  private static SelectorRegionDto toAppiumSelectorRegionDto(ByAll byAll) {
     try {
       Field bys_ = byAll.getClass().getDeclaredField("bys");
       bys_.setAccessible(true);
@@ -72,7 +80,7 @@ public class AppiumSelectorRegionMapper {
       SelectorRegionDto fallback = null;
       SelectorRegionDto region = null;
       for (int i = bys.size()-1; i >= 0; i--) {
-        region = toAppiumSelectorRegionDto(bys.get(i));
+        region = toDto(bys.get(i));
         region.setFallback(fallback);
         fallback = region;
       }
@@ -84,7 +92,7 @@ public class AppiumSelectorRegionMapper {
     }
   }
 
-  public static SelectorRegionDto toAppiumSelectorRegionDto(ByChained byChained) {
+  private static SelectorRegionDto toAppiumSelectorRegionDto(ByChained byChained) {
     try {
       Field bys_ = byChained.getClass().getDeclaredField("bys");
       bys_.setAccessible(true);
@@ -94,7 +102,7 @@ public class AppiumSelectorRegionMapper {
       SelectorRegionDto child = null;
       SelectorRegionDto region = null;
       for (int i = bys.length-1; i >= 0; i--) {
-        region = toAppiumSelectorRegionDto(bys[i]);
+        region = toDto(bys[i]);
         region.setChild(child);
         child = region;
       }

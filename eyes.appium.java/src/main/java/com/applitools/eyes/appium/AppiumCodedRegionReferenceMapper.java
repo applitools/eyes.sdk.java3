@@ -39,14 +39,7 @@ public class AppiumCodedRegionReferenceMapper {
             // set padding here
         } else if (getSimpleRegion instanceof SimpleRegionBySelector) {
             SimpleRegionBySelector simpleRegionBySelector = (SimpleRegionBySelector) getSimpleRegion;
-            By by = simpleRegionBySelector.getSelector();
-            TRegion region;
-            if (by instanceof ByAll)
-                region = AppiumSelectorRegionMapper.toAppiumSelectorRegionDto((ByAll) by);
-            else if (by instanceof ByChained)
-                region = AppiumSelectorRegionMapper.toAppiumSelectorRegionDto((ByChained) by);
-            else
-                region = AppiumSelectorRegionMapper.toAppiumSelectorRegionDto(simpleRegionBySelector.getSelector());
+            TRegion region = AppiumSelectorRegionMapper.toAppiumSelectorRegionDto(simpleRegionBySelector.getSelector());
             codedRegionReference.setRegion(region);
             codedRegionReference.setRegionId(simpleRegionBySelector.getRegionId());
             // set padding here

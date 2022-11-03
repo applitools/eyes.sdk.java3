@@ -54,14 +54,7 @@ public class TFloatingRegionMapper {
     } else if (getFloatingRegion instanceof FloatingRegionBySelector) {
       FloatingRegionBySelector floatingRegionBySelector = (FloatingRegionBySelector) getFloatingRegion;
 
-      SelectorRegionDto selectorRegionDto;
-      By by = floatingRegionBySelector.getSelector();
-      if (by instanceof ByAll)
-        selectorRegionDto = SelectorRegionMapper.toSelectorRegionDto((ByAll) by);
-      else if (by instanceof ByChained)
-        selectorRegionDto = SelectorRegionMapper.toSelectorRegionDto((ByChained) by);
-      else
-        selectorRegionDto = SelectorRegionMapper.toSelectorRegionDto(by);
+      SelectorRegionDto selectorRegionDto = SelectorRegionMapper.toSelectorRegionDto(floatingRegionBySelector.getSelector());
 
       SelectorFloatingRegionDto selectorFloatingRegionDto = new SelectorFloatingRegionDto();
       selectorFloatingRegionDto.setRegion(selectorRegionDto);

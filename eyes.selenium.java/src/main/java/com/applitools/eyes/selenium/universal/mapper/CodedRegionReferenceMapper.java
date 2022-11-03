@@ -37,14 +37,7 @@ public class CodedRegionReferenceMapper {
             // set padding here
         } else if (getSimpleRegion instanceof SimpleRegionBySelector) {
             SimpleRegionBySelector simpleRegionBySelector = (SimpleRegionBySelector) getSimpleRegion;
-            By by = simpleRegionBySelector.getSelector();
-            TRegion region;
-            if (by instanceof ByAll)
-                region = SelectorRegionMapper.toSelectorRegionDto((ByAll) by);
-            else if (by instanceof ByChained)
-                region = SelectorRegionMapper.toSelectorRegionDto((ByChained) by);
-            else
-                region = SelectorRegionMapper.toSelectorRegionDto(simpleRegionBySelector.getSelector());
+            TRegion region = SelectorRegionMapper.toSelectorRegionDto(simpleRegionBySelector.getSelector());
             codedRegionReference.setRegion(region);
             codedRegionReference.setRegionId(simpleRegionBySelector.getRegionId());
             // set padding here
