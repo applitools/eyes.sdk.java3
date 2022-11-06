@@ -3,7 +3,6 @@ package com.applitools.eyes.images.utils;
 import com.applitools.connectivity.RestClient;
 import com.applitools.connectivity.ServerConnector;
 import com.applitools.eyes.*;
-import com.applitools.eyes.config.Configuration;
 import com.applitools.eyes.images.Eyes;
 import com.applitools.eyes.metadata.SessionResults;
 import com.applitools.utils.ClassVersionGetter;
@@ -11,7 +10,6 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.testng.Assert;
 import org.testng.annotations.AfterClass;
-import org.testng.annotations.BeforeClass;
 import org.testng.annotations.BeforeMethod;
 
 import javax.ws.rs.HttpMethod;

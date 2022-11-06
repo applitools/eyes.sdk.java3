@@ -1,12 +1,10 @@
 package com.applitools.eyes.images;
 
 import com.applitools.eyes.*;
-import com.applitools.eyes.config.Configuration;
 import com.applitools.eyes.images.utils.TestSetup;
 import com.applitools.utils.ImageUtils;
 import org.testng.Assert;
 import org.testng.annotations.AfterMethod;
-import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
 import javax.imageio.ImageIO;

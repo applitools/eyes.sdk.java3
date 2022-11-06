@@ -1,20 +1,15 @@
 package com.applitools.eyes.images;
 
 import com.applitools.eyes.Region;
-import com.applitools.eyes.images.utils.ReportingTestSuite;
 import com.applitools.utils.ImageUtils;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
 import java.awt.image.BufferedImage;
 
-public class TestImageUtils extends ReportingTestSuite {
+public class TestImageUtils {
 
     private final String TEST_IMAGE = "src/main/resources/minions_jpeg.jpeg";
-
-    public TestImageUtils() {
-        super.setGroupName("images");
-    }
 
     @Test
     public void TestCropImage_Regular() {
