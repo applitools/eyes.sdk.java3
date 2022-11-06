@@ -69,10 +69,10 @@ public class ClassicRunner extends EyesRunner {
     this.allTestResult.add(testResult);
   }
 
-  @Override
-  public void setServerConnector(ServerConnector serverConnector) {
-    super.setServerConnector(serverConnector);
-  }
+//  @Override
+//  public void setServerConnector(ServerConnector serverConnector) {
+//    super.setServerConnector(serverConnector);
+//  }
 
   public RunningSession open(final String testId, SessionStartInfo sessionStartInfo) {
     final SyncTaskListener<RunningSession> listener = new SyncTaskListener<>(logger, String.format("openBase %s", sessionStartInfo));

@@ -148,14 +148,14 @@ public class VisualGridRunner extends EyesRunner {
 
     private void init(String suiteName) {
         this.suiteName = suiteName;
-        eyesServiceRunner = new EyesServiceRunner(logger, serverConnector, allEyes, testConcurrency.actualConcurrency, debugResourceWriter, resourcesCacheMap);
+//        eyesServiceRunner = new EyesServiceRunner(logger, serverConnector, allEyes, testConcurrency.actualConcurrency, debugResourceWriter, resourcesCacheMap);
         eyesServiceRunner.start();
     }
 
     public void open(IEyes eyes, List<VisualGridRunningTest> newTests) {
-        if (renderingInfo == null) {
-            renderingInfo = serverConnector.getRenderInfo();
-        }
+//        if (renderingInfo == null) {
+//            renderingInfo = serverConnector.getRenderInfo();
+//        }
 
         eyesServiceRunner.setRenderingInfo(renderingInfo);
         if (allEyes.isEmpty()) {
@@ -167,9 +167,9 @@ public class VisualGridRunner extends EyesRunner {
 
         try {
             String logMessage = getConcurrencyLog();
-            if (logMessage != null) {
-                NetworkLogHandler.sendSingleLog(serverConnector, TraceLevel.Notice, logMessage);
-            }
+//            if (logMessage != null) {
+//                NetworkLogHandler.sendSingleLog(serverConnector, TraceLevel.Notice, logMessage);
+//            }
         } catch (JsonProcessingException e) {
             GeneralUtils.logExceptionStackTrace(logger, Stage.OPEN, e);
         }
@@ -250,11 +250,11 @@ public class VisualGridRunner extends EyesRunner {
         this.logger = logger;
     }
 
-    @Override
-    public void setServerConnector(ServerConnector serverConnector) {
-        super.setServerConnector(serverConnector);
-        eyesServiceRunner.setServerConnector(serverConnector);
-    }
+//    @Override
+//    public void setServerConnector(ServerConnector serverConnector) {
+//        super.setServerConnector(serverConnector);
+//        eyesServiceRunner.setServerConnector(serverConnector);
+//    }
 
     public void setProxy(AbstractProxySettings proxySettings) {
         if (proxySettings != null)
