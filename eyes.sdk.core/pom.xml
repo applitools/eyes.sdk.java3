@@ -21,7 +21,6 @@
     </parent>
 
     <dependencies>
-<!--        should this actually be here? -->
         <dependency>
             <groupId>com.applitools</groupId>
             <artifactId>eyes-universal-core</artifactId>
