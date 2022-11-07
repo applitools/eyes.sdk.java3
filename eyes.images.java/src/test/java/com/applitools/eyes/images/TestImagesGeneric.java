@@ -149,11 +149,11 @@ public class TestImagesGeneric extends TestSetup {
         );
 
         final TestResults result = eyes.close(false);
-//        final SessionResults info = getTestInfo(result);
-//
-//        FloatingMatchSettings[] floatingRegions = info.getActualAppOutput()[0].getImageMatchSettings().getFloating();
-//
-//        Assert.assertEquals(floatingRegions[0], new FloatingMatchSettings(10, 20, 30, 40, 5, 10, 20, 15));
+        final SessionResults info = getTestInfo(result);
+
+        FloatingMatchSettings[] floatingRegions = info.getActualAppOutput()[0].getImageMatchSettings().getFloating();
+
+        Assert.assertEquals(floatingRegions[0], new FloatingMatchSettings(10, 20, 30, 40, 5, 10, 20, 15));
     }
 
     @Test
@@ -162,10 +162,10 @@ public class TestImagesGeneric extends TestSetup {
         eyes.check(Target.image(TEST_IMAGE).matchLevel(MatchLevel.EXACT));
 
         TestResults result = eyes.close(false);
-//        SessionResults info = getTestInfo(result);
-//        MatchLevel matchLevel = info.getActualAppOutput()[0].getImageMatchSettings().getMatchLevel();
-//
-//        Assert.assertEquals(matchLevel, MatchLevel.EXACT);
+        SessionResults info = getTestInfo(result);
+        MatchLevel matchLevel = info.getActualAppOutput()[0].getImageMatchSettings().getMatchLevel();
+
+        Assert.assertEquals(matchLevel, MatchLevel.EXACT);
     }
 
     @Test
@@ -174,10 +174,10 @@ public class TestImagesGeneric extends TestSetup {
         eyes.check(Target.image(TEST_IMAGE).matchLevel(MatchLevel.IGNORE_COLORS));
 
         TestResults result = eyes.close(false);
-//        SessionResults info = getTestInfo(result);
-//        MatchLevel matchLevel = info.getActualAppOutput()[0].getImageMatchSettings().getMatchLevel();
-//
-//        Assert.assertEquals(matchLevel, MatchLevel.CONTENT);
+        SessionResults info = getTestInfo(result);
+        MatchLevel matchLevel = info.getActualAppOutput()[0].getImageMatchSettings().getMatchLevel();
+
+        Assert.assertEquals(matchLevel, MatchLevel.CONTENT);
     }
 
     @Test
@@ -186,10 +186,10 @@ public class TestImagesGeneric extends TestSetup {
         eyes.check(Target.image(TEST_IMAGE).matchLevel(MatchLevel.STRICT));
 
         TestResults result = eyes.close(false);
-//        SessionResults info = getTestInfo(result);
-//        MatchLevel matchLevel = info.getActualAppOutput()[0].getImageMatchSettings().getMatchLevel();
-//
-//        Assert.assertEquals(matchLevel, MatchLevel.STRICT);
+        SessionResults info = getTestInfo(result);
+        MatchLevel matchLevel = info.getActualAppOutput()[0].getImageMatchSettings().getMatchLevel();
+
+        Assert.assertEquals(matchLevel, MatchLevel.STRICT);
     }
 
     @Test
@@ -198,10 +198,10 @@ public class TestImagesGeneric extends TestSetup {
         eyes.check(Target.image(TEST_IMAGE).matchLevel(MatchLevel.LAYOUT));
 
         TestResults result = eyes.close(false);
-//        SessionResults info = getTestInfo(result);
-//        MatchLevel matchLevel = info.getActualAppOutput()[0].getImageMatchSettings().getMatchLevel();
-//
-//        Assert.assertEquals(matchLevel, MatchLevel.LAYOUT2);
+        SessionResults info = getTestInfo(result);
+        MatchLevel matchLevel = info.getActualAppOutput()[0].getImageMatchSettings().getMatchLevel();
+
+        Assert.assertEquals(matchLevel, MatchLevel.LAYOUT2);
     }
 
     @Test
@@ -212,10 +212,10 @@ public class TestImagesGeneric extends TestSetup {
         eyes.check(Target.image(TEST_IMAGE));
 
         TestResults result = eyes.close(false);
-//        SessionResults info = getTestInfo(result);
-//        MatchLevel matchLevel = info.getActualAppOutput()[0].getImageMatchSettings().getMatchLevel();
-//
-//        Assert.assertEquals(matchLevel, MatchLevel.EXACT);
+        SessionResults info = getTestInfo(result);
+        MatchLevel matchLevel = info.getActualAppOutput()[0].getImageMatchSettings().getMatchLevel();
+
+        Assert.assertEquals(matchLevel, MatchLevel.EXACT);
     }
 
     @Test
@@ -226,10 +226,10 @@ public class TestImagesGeneric extends TestSetup {
         eyes.check(Target.image(TEST_IMAGE));
 
         TestResults result = eyes.close(false);
-//        SessionResults info = getTestInfo(result);
-//        MatchLevel matchLevel = info.getActualAppOutput()[0].getImageMatchSettings().getMatchLevel();
-//
-//        Assert.assertEquals(matchLevel, MatchLevel.CONTENT);
+        SessionResults info = getTestInfo(result);
+        MatchLevel matchLevel = info.getActualAppOutput()[0].getImageMatchSettings().getMatchLevel();
+
+        Assert.assertEquals(matchLevel, MatchLevel.CONTENT);
     }
 
     @Test
@@ -240,10 +240,10 @@ public class TestImagesGeneric extends TestSetup {
         eyes.check(Target.image(TEST_IMAGE));
 
         TestResults result = eyes.close(false);
-//        SessionResults info = getTestInfo(result);
-//        MatchLevel matchLevel = info.getActualAppOutput()[0].getImageMatchSettings().getMatchLevel();
-//
-//        Assert.assertEquals(matchLevel, MatchLevel.STRICT);
+        SessionResults info = getTestInfo(result);
+        MatchLevel matchLevel = info.getActualAppOutput()[0].getImageMatchSettings().getMatchLevel();
+
+        Assert.assertEquals(matchLevel, MatchLevel.STRICT);
     }
 
     @Test
@@ -254,10 +254,10 @@ public class TestImagesGeneric extends TestSetup {
         eyes.check(Target.image(TEST_IMAGE));
 
         TestResults result = eyes.close(false);
-//        SessionResults info = getTestInfo(result);
-//        MatchLevel matchLevel = info.getActualAppOutput()[0].getImageMatchSettings().getMatchLevel();
-//
-//        Assert.assertEquals(matchLevel, MatchLevel.LAYOUT2);
+        SessionResults info = getTestInfo(result);
+        MatchLevel matchLevel = info.getActualAppOutput()[0].getImageMatchSettings().getMatchLevel();
+
+        Assert.assertEquals(matchLevel, MatchLevel.LAYOUT2);
     }
 
     @Test
@@ -277,9 +277,9 @@ public class TestImagesGeneric extends TestSetup {
         eyes.check(Target.image(TEST_IMAGE).ignoreDisplacements());
 
         final TestResults result = eyes.close(false);
-//        final SessionResults info = getTestInfo(result);
-//
-//        Assert.assertTrue(info.getActualAppOutput()[0].getImageMatchSettings().getIgnoreDisplacements());
+        final SessionResults info = getTestInfo(result);
+
+        Assert.assertTrue(info.getActualAppOutput()[0].getImageMatchSettings().getIgnoreDisplacements());
     }
 
     @Test
@@ -289,9 +289,9 @@ public class TestImagesGeneric extends TestSetup {
         eyes.check(Target.image(TEST_IMAGE));
 
         final TestResults result = eyes.close(false);
-//        final SessionResults info = getTestInfo(result);
-//
-//        Assert.assertTrue(info.getActualAppOutput()[0].getImageMatchSettings().getIgnoreDisplacements());
+        final SessionResults info = getTestInfo(result);
+
+        Assert.assertTrue(info.getActualAppOutput()[0].getImageMatchSettings().getIgnoreDisplacements());
     }
 
     @Test
@@ -305,17 +305,17 @@ public class TestImagesGeneric extends TestSetup {
         );
 
         final TestResults result = eyes.close(false);
-//        final SessionResults info = getTestInfo(result);
-//
-//        Region ignoreRegion = info.getActualAppOutput()[0].getImageMatchSettings().getIgnore()[0];
-//        Region layoutRegion = info.getActualAppOutput()[0].getImageMatchSettings().getLayout()[0];
-//        Region contentRegion = info.getActualAppOutput()[0].getImageMatchSettings().getContent()[0];
-//        Region strictRegion = info.getActualAppOutput()[0].getImageMatchSettings().getStrict()[0];
-//
-//        Assert.assertEquals(ignoreRegion, new Region(10, 20, 30, 40), "ignore");
-//        Assert.assertEquals(layoutRegion, new Region(10, 20, 30, 40), "layout");
-//        Assert.assertEquals(contentRegion, new Region(10, 20, 30, 40), "content");
-//        Assert.assertEquals(strictRegion, new Region(10, 20, 30, 40), "strict");
+        final SessionResults info = getTestInfo(result);
+
+        Region ignoreRegion = info.getActualAppOutput()[0].getImageMatchSettings().getIgnore()[0];
+        Region layoutRegion = info.getActualAppOutput()[0].getImageMatchSettings().getLayout()[0];
+        Region contentRegion = info.getActualAppOutput()[0].getImageMatchSettings().getContent()[0];
+        Region strictRegion = info.getActualAppOutput()[0].getImageMatchSettings().getStrict()[0];
+
+        Assert.assertEquals(ignoreRegion, new Region(10, 20, 30, 40), "ignore");
+        Assert.assertEquals(layoutRegion, new Region(10, 20, 30, 40), "layout");
+        Assert.assertEquals(contentRegion, new Region(10, 20, 30, 40), "content");
+        Assert.assertEquals(strictRegion, new Region(10, 20, 30, 40), "strict");
     }
 
     @Test
@@ -324,9 +324,9 @@ public class TestImagesGeneric extends TestSetup {
         eyes.check(Target.image(TEST_IMAGE).enablePatterns());
 
         final TestResults result = eyes.close(false);
-//        final SessionResults info = getTestInfo(result);
+        final SessionResults info = getTestInfo(result);
 
-//        Assert.assertTrue(info.getActualAppOutput()[0].getImageMatchSettings().getEnablePatterns());
+        Assert.assertTrue(info.getActualAppOutput()[0].getImageMatchSettings().getEnablePatterns());
     }
 
     @Test
@@ -336,9 +336,9 @@ public class TestImagesGeneric extends TestSetup {
         eyes.check(Target.image(TEST_IMAGE));
 
         final TestResults result = eyes.close(false);
-//        final SessionResults info = getTestInfo(result);
-//
-//        Assert.assertTrue(info.getActualAppOutput()[0].getImageMatchSettings().getEnablePatterns());
+        final SessionResults info = getTestInfo(result);
+
+        Assert.assertTrue(info.getActualAppOutput()[0].getImageMatchSettings().getEnablePatterns());
     }
 
     @Test
