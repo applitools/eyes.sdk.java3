@@ -261,7 +261,7 @@ public class CommandExecutor {
             staleElementReferenceException.throwException(message);
           } else if (error.getReason() != null) {
             throwExceptionBasedOnReason(error.getReason(), error.getInfo() == null ?
-                    null : error.getInfo().getTestResult());
+                    null : error.getInfo().getResult());
           } else {
             throw new EyesException("Message: " +  error.getMessage() + ", Stack: " +  error.getStack());
           }

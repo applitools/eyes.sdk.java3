@@ -54,7 +54,7 @@ public class TestResultsSummaryMapper {
         if (containerDto.getError() != null ) {
           EyesError eyesError = containerDto.getError();
           throwable = getExceptionBasedOnReason(eyesError.getReason(), eyesError.getInfo() == null ?
-                  null : eyesError.getInfo().getTestResult(), eyesError.getMessage(), eyesError.getStack());
+                  null : eyesError.getInfo().getResult(), eyesError.getMessage(), eyesError.getStack());
           if (shouldThrowException) {
             throw new Error(throwable);
           }

@@ -5,13 +5,13 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class InfoDto {
-    private TestResults testResult;
+    private TestResults result;
 
-    public TestResults getTestResult() {
-        return testResult;
+    public TestResults getResult() {
+        return result;
     }
 
-    public void setTestResult(TestResults testResult) {
-        this.testResult = testResult;
+    public void setResult(TestResults result) {
+        this.result = result;
     }
 }
