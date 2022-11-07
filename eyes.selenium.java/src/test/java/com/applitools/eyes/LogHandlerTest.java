@@ -22,7 +22,7 @@ public class LogHandlerTest {
     public void shouldWriteUniversalCoreLogsToStdoutWithVisualGridRunnerOptions() {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         // Redirecting console output to a stream
-//        System.setOut(new PrintStream(baos));
+        System.setOut(new PrintStream(baos));
 
         RunnerOptions runnerOptions = new RunnerOptions().logHandler(new StdoutLogHandler(true));
 
