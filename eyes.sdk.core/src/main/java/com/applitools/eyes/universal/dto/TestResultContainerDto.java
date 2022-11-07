@@ -17,19 +17,19 @@ public class TestResultContainerDto {
   public TestResultContainerDto() {
   }
 
-  public TestResultContainerDto(TestResults results, EyesError error, BrowserInfoDto renderer, String userTestId) {
-    this.result = results;
+  public TestResultContainerDto(TestResults result, EyesError error, BrowserInfoDto renderer, String userTestId) {
+    this.result = result;
     this.error = error;
     this.renderer = renderer;
     this.userTestId = userTestId;
   }
 
-  public TestResults getResults() {
+  public TestResults getResult() {
     return result;
   }
 
-  public void setResults(TestResults results) {
-    this.result = results;
+  public void setResult(TestResults result) {
+    this.result = result;
   }
 
   public EyesError getError() {

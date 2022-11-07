@@ -26,7 +26,7 @@ public class TestResultsSummaryMapper {
       return null;
     }
 
-    List<TestResultContainerDto> containerDtoList = dto.getResult();
+    List<TestResultContainerDto> containerDtoList = dto.getResults();
     List<TestResultContainer> containerList = new ArrayList<>();
 
     if (containerDtoList != null && !containerDtoList.isEmpty()) {
@@ -59,7 +59,7 @@ public class TestResultsSummaryMapper {
             throw new Error(throwable);
           }
         }
-        TestResultContainer container = new TestResultContainer(containerDto.getResults(), renderBrowserInfo, throwable);
+        TestResultContainer container = new TestResultContainer(containerDto.getResult(), renderBrowserInfo, throwable);
         containerList.add(container);
       }
     }
