@@ -9,13 +9,7 @@ import com.applitools.eyes.Logger;
 import com.applitools.eyes.Region;
 import com.applitools.eyes.SyncTaskListener;
 import com.applitools.eyes.locators.TextRegion;
-import com.applitools.eyes.universal.dto.Command;
-import com.applitools.eyes.universal.dto.EventDto;
-import com.applitools.eyes.universal.dto.MatchResultDto;
-import com.applitools.eyes.universal.dto.RectangleSizeDto;
-import com.applitools.eyes.universal.dto.RequestDto;
-import com.applitools.eyes.universal.dto.ResponseDto;
-import com.applitools.eyes.universal.dto.TestResultsSummaryDto;
+import com.applitools.eyes.universal.dto.*;
 import com.applitools.eyes.universal.dto.response.CommandCloseResponseDto;
 import com.applitools.eyes.universal.server.UniversalSdkNativeLoader;
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -70,7 +64,8 @@ public class USDKConnection {
                 public void onTextFrame(String payload, boolean finalFragment, int rsv) {
                   if (payload.contains("Core.makeManager") || payload.contains("EyesManager.openEyes")) {
                     try {
-                      ResponseDto<Reference> referenceResponseDto = objectMapper.readValue(payload, new TypeReference<ResponseDto<Reference>>() {});
+                      ResponseDto<Reference> referenceResponseDto = objectMapper.readValue(payload, new TypeReference<ResponseDto<Reference>>() {
+                      });
 
                       SyncTaskListener<ResponseDto<?>> syncTaskLister = map.get(referenceResponseDto.getKey());
                       syncTaskLister.onComplete(referenceResponseDto);
@@ -78,9 +73,13 @@ public class USDKConnection {
                     } catch (Exception e) {
                       e.printStackTrace();
                     }
-                  } else if(payload.contains("Eyes.check")) {
+                  }
+                  // "Debug.getHistory" could contain "Eyes.check" inside since it is a command of eyes.
+                  // getHistory is used in proxy tests.
+                  else if(payload.contains("Eyes.check") && !payload.contains("Debug.getHistory")) {
                     try {
-                      ResponseDto<List<MatchResultDto>> checkResponse = objectMapper.readValue(payload, new TypeReference<ResponseDto<List<MatchResultDto>>>() {});
+                      ResponseDto<List<MatchResultDto>> checkResponse = objectMapper.readValue(payload, new TypeReference<ResponseDto<List<MatchResultDto>>>() {
+                      });
                       SyncTaskListener<ResponseDto<?>> syncTaskLister = map.get(checkResponse.getKey());
                       syncTaskLister.onComplete(checkResponse);
                       map.remove(checkResponse.getKey());
@@ -90,7 +89,8 @@ public class USDKConnection {
                   } else if (payload.contains("Core.locate")) {
                     try {
                       ResponseDto<Map<String, List<Region>>> locateResponse = objectMapper
-                          .readValue(payload, new TypeReference<ResponseDto<Map<String, List<Region>>>>() {});
+                              .readValue(payload, new TypeReference<ResponseDto<Map<String, List<Region>>>>() {
+                              });
                       SyncTaskListener<ResponseDto<?>> syncTaskLister = map.get(locateResponse.getKey());
                       syncTaskLister.onComplete(locateResponse);
                       map.remove(locateResponse.getKey());
@@ -100,7 +100,8 @@ public class USDKConnection {
                   } else if (payload.contains("Eyes.close") || payload.contains("Eyes.abort") || payload.contains("EyesManager.closeAllEyes")) {
                     try {
                       ResponseDto<List<CommandCloseResponseDto>> closeResponse = objectMapper.readValue(payload,
-                          new TypeReference<ResponseDto<List<CommandCloseResponseDto>>>() {});
+                              new TypeReference<ResponseDto<List<CommandCloseResponseDto>>>() {
+                              });
                       SyncTaskListener<ResponseDto<?>> syncTaskLister = map.get(closeResponse.getKey());
                       syncTaskLister.onComplete(closeResponse);
                       map.remove(closeResponse.getKey());
@@ -110,7 +111,8 @@ public class USDKConnection {
                   } else if (payload.contains("Eyes.locateText")) {
                     try {
                       ResponseDto<Map<String, List<TextRegion>>> extractTextRegionsResponse = objectMapper
-                          .readValue(payload, new TypeReference<ResponseDto<Map<String, List<TextRegion>>>>() {});
+                              .readValue(payload, new TypeReference<ResponseDto<Map<String, List<TextRegion>>>>() {
+                              });
                       SyncTaskListener<ResponseDto<?>> syncTaskLister = map.get(extractTextRegionsResponse.getKey());
                       syncTaskLister.onComplete(extractTextRegionsResponse);
                       map.remove(extractTextRegionsResponse.getKey());
@@ -119,7 +121,8 @@ public class USDKConnection {
                     }
                   } else if (payload.contains("Eyes.extractText")) {
                     try {
-                      ResponseDto<List<String>> responseDto = objectMapper.readValue(payload, new TypeReference<ResponseDto<List<String>>>() {});
+                      ResponseDto<List<String>> responseDto = objectMapper.readValue(payload, new TypeReference<ResponseDto<List<String>>>() {
+                      });
                       SyncTaskListener<ResponseDto<?>> syncTaskLister = map.get(responseDto.getKey());
                       syncTaskLister.onComplete(responseDto);
                       map.remove(responseDto.getKey());
@@ -139,7 +142,8 @@ public class USDKConnection {
                   } else if (payload.contains("EyesManager.closeManager")) {
                     try {
                       ResponseDto<TestResultsSummaryDto> closeManagerResponse = objectMapper.readValue(payload,
-                          new TypeReference<ResponseDto<TestResultsSummaryDto>>() {});
+                              new TypeReference<ResponseDto<TestResultsSummaryDto>>() {
+                              });
                       SyncTaskListener<ResponseDto<?>> syncTaskLister = map.get(closeManagerResponse.getKey());
                       syncTaskLister.onComplete(closeManagerResponse);
                       map.remove(closeManagerResponse.getKey());
@@ -147,6 +151,18 @@ public class USDKConnection {
                       e.printStackTrace();
                     }
 
+                  } else if (payload.contains("Debug.getHistory")) {
+                    try {
+                      ResponseDto<DebugHistoryDto> debugHistoryResponse = objectMapper.readValue(payload,
+                              new TypeReference<ResponseDto<DebugHistoryDto>>() {
+                              });
+
+                      SyncTaskListener<ResponseDto<?>> syncTaskListener = map.get(debugHistoryResponse.getKey());
+                      syncTaskListener.onComplete(debugHistoryResponse);
+                      map.remove(debugHistoryResponse.getKey());
+                    } catch (Exception e) {
+                      e.printStackTrace();
+                    }
                   }
                 }
 
