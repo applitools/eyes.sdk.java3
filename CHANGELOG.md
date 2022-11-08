@@ -1,4 +1,4 @@
-## [vNext] - dNext
+## [5.35.0] - 2022-11-8
 ### Added
 - Images SDK eyes.images.java5
 
