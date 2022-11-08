@@ -27,7 +27,7 @@ public abstract class TestSetup extends ReportingTestSuite implements ITest {
 
     private final String USERNAME = GeneralUtils.getEnvString("SAUCE_USERNAME");
     private final String ACCESS_KEY = GeneralUtils.getEnvString("SAUCE_ACCESS_KEY");
-    protected final String SL_URL = "https://"+USERNAME+":" + ACCESS_KEY + "@ondemand.us-west-1.saucelabs.com/wd/hub";
+    protected final String SL_URL = "https://"+USERNAME+":" + ACCESS_KEY + "@ondemand.us-west-1.saucelabs.com:443/wd/hub";
 
     @Override
     public String getTestName() {
