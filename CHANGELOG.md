@@ -3,8 +3,8 @@
 - Images SDK eyes.images.java5
 
 ### Breaking Changes
-- Images eyes.check no longer returns a boolean if there were diffs
-- Images eyes.open requires a viewport size set either from the configuration or from eyes.open
+- Images Eyes eyes.check no longer returns a boolean if there were diffs
+- Images Eyes eyes.open requires a viewport size set either from the configuration or from eyes.open
 
 ## [5.33.0] - 2022-11-2
 ### Added
