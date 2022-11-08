@@ -57,4 +57,5 @@ public class TestLocators extends TestSetup {
         Assert.assertEquals(result.get(0), "This is the navigation bar");
         eyes.close();
     }
+
 }
