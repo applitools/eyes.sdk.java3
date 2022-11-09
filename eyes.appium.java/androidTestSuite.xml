@@ -32,4 +32,9 @@
             <class name="com.applitools.eyes.appium.android.AndroidTestByAll"/>
         </classes>
     </test>
+    <test name="Unit" parallel="classes">
+        <classes>
+            <class name="com.applitools.eyes.appium.unit.TestAppiumCheckSettingsMapper"/>
+        </classes>
+    </test>
 </suite>
