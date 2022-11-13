@@ -100,7 +100,12 @@
 
     <test name="TestFluentApi">
         <parameter name="dont_run"
-                   value="TestCheckMany+VG,TestScrollbarsHiddenAndReturned_Fluent+VG,TestCheckWindowWithIgnoreBySelector_Fluent+VG"/>
+                   value="TestCheckMany+VG,TestScrollbarsHiddenAndReturned_Fluent+VG,TestCheckWindowWithIgnoreBySelector_Fluent+VG,
+                   TestCheckFullWindowWithMultipleIgnoreRegionsBySelector_Fluent+VG,
+                   TestCheckWindowWithIgnoreBySelector_Stretched_Fluent+VG,
+                   TestCheckWindowWithIgnoreBySelector_Centered_Fluent+VG,
+                   TestCheckWindowWithFloatingBySelector_Fluent+VG,
+                   TestCheckElementWithIgnoreRegionBySameElement_Fluent+VG"/>
         <classes>
             <class name="com.applitools.eyes.selenium.TestFluentApi">
                 <methods>
