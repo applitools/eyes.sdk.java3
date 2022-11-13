@@ -6,6 +6,9 @@ import com.applitools.eyes.selenium.fluent.SimpleRegionByElement;
 import com.applitools.eyes.selenium.fluent.SimpleRegionBySelector;
 import com.applitools.eyes.selenium.universal.dto.CodedRegionReference;
 import com.applitools.eyes.selenium.universal.dto.TRegion;
+import org.openqa.selenium.By;
+import org.openqa.selenium.support.pagefactory.ByAll;
+import org.openqa.selenium.support.pagefactory.ByChained;
 
 import java.util.List;
 import java.util.Objects;

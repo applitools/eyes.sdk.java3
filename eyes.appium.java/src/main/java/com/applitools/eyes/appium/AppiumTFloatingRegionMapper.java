@@ -7,8 +7,9 @@ import com.applitools.eyes.selenium.fluent.FloatingRegionBySelector;
 import com.applitools.eyes.selenium.universal.dto.*;
 import com.applitools.eyes.selenium.universal.mapper.ElementRegionMapper;
 import com.applitools.eyes.selenium.universal.mapper.RectangleRegionMapper;
-import com.applitools.eyes.selenium.universal.mapper.SelectorRegionMapper;
-import com.applitools.eyes.selenium.universal.mapper.TFloatingRegionMapper;
+import io.appium.java_client.pagefactory.bys.builder.ByAll;
+import io.appium.java_client.pagefactory.bys.builder.ByChained;
+import org.openqa.selenium.By;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -51,10 +52,7 @@ public class AppiumTFloatingRegionMapper {
             return elementFloatingRegionDto;
         } else if (getFloatingRegion instanceof FloatingRegionBySelector) {
             FloatingRegionBySelector floatingRegionBySelector = (FloatingRegionBySelector) getFloatingRegion;
-
-            SelectorRegionDto selectorRegionDto = AppiumSelectorRegionMapper
-                    .toAppiumSelectorRegionDto(floatingRegionBySelector.getSelector());
-
+            SelectorRegionDto selectorRegionDto = AppiumSelectorRegionMapper.toAppiumSelectorRegionDto(floatingRegionBySelector.getSelector());
             SelectorFloatingRegionDto selectorFloatingRegionDto = new SelectorFloatingRegionDto();
             selectorFloatingRegionDto.setRegion(selectorRegionDto);
             selectorFloatingRegionDto.setMaxUpOffset(floatingRegionBySelector.getMaxUpOffset());

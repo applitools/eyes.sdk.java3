@@ -8,6 +8,9 @@ import com.applitools.eyes.fluent.GetFloatingRegion;
 import com.applitools.eyes.selenium.fluent.FloatingRegionByElement;
 import com.applitools.eyes.selenium.fluent.FloatingRegionBySelector;
 import com.applitools.eyes.selenium.universal.dto.*;
+import org.openqa.selenium.By;
+import org.openqa.selenium.support.pagefactory.ByAll;
+import org.openqa.selenium.support.pagefactory.ByChained;
 
 /**
  * floating region mapper
@@ -51,8 +54,7 @@ public class TFloatingRegionMapper {
     } else if (getFloatingRegion instanceof FloatingRegionBySelector) {
       FloatingRegionBySelector floatingRegionBySelector = (FloatingRegionBySelector) getFloatingRegion;
 
-      SelectorRegionDto selectorRegionDto = SelectorRegionMapper
-              .toSelectorRegionDto(floatingRegionBySelector.getSelector());
+      SelectorRegionDto selectorRegionDto = SelectorRegionMapper.toSelectorRegionDto(floatingRegionBySelector.getSelector());
 
       SelectorFloatingRegionDto selectorFloatingRegionDto = new SelectorFloatingRegionDto();
       selectorFloatingRegionDto.setRegion(selectorRegionDto);

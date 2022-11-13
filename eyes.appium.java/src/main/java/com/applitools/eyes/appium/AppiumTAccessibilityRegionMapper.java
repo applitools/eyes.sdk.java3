@@ -7,7 +7,8 @@ import com.applitools.eyes.selenium.fluent.AccessibilityRegionBySelector;
 import com.applitools.eyes.selenium.universal.dto.*;
 import com.applitools.eyes.selenium.universal.mapper.ElementRegionMapper;
 import com.applitools.eyes.selenium.universal.mapper.RectangleRegionMapper;
-import com.applitools.eyes.selenium.universal.mapper.SelectorRegionMapper;
+import io.appium.java_client.pagefactory.bys.builder.ByAll;
+import io.appium.java_client.pagefactory.bys.builder.ByChained;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 
@@ -41,12 +42,8 @@ public class AppiumTAccessibilityRegionMapper {
             return elementAccessibilityRegionDto;
         } else if (getAccessibilityRegion instanceof AccessibilityRegionBySelector) {
             SelectorAccessibilityRegionDto selectorAccessibilityRegionDto = new SelectorAccessibilityRegionDto();
-
             By by = ((AccessibilityRegionBySelector) getAccessibilityRegion).getSelector();
-            SelectorRegionDto selectorRegionDto = AppiumSelectorRegionMapper.toAppiumSelectorRegionDto(by);
-
-            selectorAccessibilityRegionDto.setRegion(selectorRegionDto);
-
+            selectorAccessibilityRegionDto.setRegion(AppiumSelectorRegionMapper.toAppiumSelectorRegionDto(by));
             selectorAccessibilityRegionDto.setType(((AccessibilityRegionBySelector) getAccessibilityRegion).getAccessibilityRegionType().name());
             return selectorAccessibilityRegionDto;
         }

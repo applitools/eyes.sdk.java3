@@ -34,6 +34,8 @@ public class TargetPathLocatorMapper {
             if (value instanceof ElementSelector) {
                 currentDto.setType(((ElementSelector) value).getType());
                 currentDto.setSelector(((ElementSelector) value).getSelector());
+                currentDto.setFallback(((ElementSelector) value).getFallback());
+                currentDto.setChild(((ElementSelector) value).getChild());
             } else if (value instanceof ElementReference) {
                 ElementRegionDto erd = ElementRegionMapper.toElementRegionDto(((ElementReference) value).getElement());
                 currentDto.setElementId(erd.getElementId());

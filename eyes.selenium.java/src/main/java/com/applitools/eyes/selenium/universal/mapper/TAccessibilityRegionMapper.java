@@ -16,6 +16,8 @@ import com.applitools.eyes.selenium.universal.dto.SelectorRegionDto;
 import com.applitools.eyes.selenium.universal.dto.TAccessibilityRegion;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.pagefactory.ByAll;
+import org.openqa.selenium.support.pagefactory.ByChained;
 
 /**
  * accessibility region mapper
@@ -50,7 +52,6 @@ public class TAccessibilityRegionMapper {
 
       By by = ((AccessibilityRegionBySelector) getAccessibilityRegion).getSelector();
       SelectorRegionDto selectorRegionDto = SelectorRegionMapper.toSelectorRegionDto(by);
-
       selectorAccessibilityRegionDto.setRegion(selectorRegionDto);
 
       selectorAccessibilityRegionDto.setType(((AccessibilityRegionBySelector) getAccessibilityRegion).getAccessibilityRegionType().name());

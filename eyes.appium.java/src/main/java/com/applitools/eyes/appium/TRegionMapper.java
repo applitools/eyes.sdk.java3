@@ -5,7 +5,8 @@ import com.applitools.eyes.Region;
 import com.applitools.eyes.selenium.universal.dto.TRegion;
 import com.applitools.eyes.selenium.universal.mapper.ElementRegionMapper;
 import com.applitools.eyes.selenium.universal.mapper.RectangleRegionMapper;
-import com.applitools.eyes.selenium.universal.mapper.SelectorRegionMapper;
+import io.appium.java_client.pagefactory.bys.builder.ByAll;
+import io.appium.java_client.pagefactory.bys.builder.ByChained;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 

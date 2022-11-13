@@ -26,13 +26,10 @@
 <!--            </class>-->
 <!--        </classes>-->
 <!--    </test>-->
-    <test name="TestEyes">
+    <test name="TestEyes" parallel="classes">
         <classes>
-            <class name="com.applitools.eyes.appium.ScrollRootElementTest">
-                <methods>
-                    <include name="test" />
-                </methods>
-            </class>
+            <class name="com.applitools.eyes.appium.ScrollRootElementTest"/>
+            <class name="com.applitools.eyes.appium.android.AndroidTestByAll"/>
         </classes>
     </test>
 </suite>

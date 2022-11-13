@@ -10,6 +10,8 @@ public class TargetPathLocatorDto extends TRegion {
     private String type;
     private String elementId;
     private TargetPathLocatorDto shadow;
+    private TargetPathLocatorDto fallback;
+    private TargetPathLocatorDto child;
 
     public TargetPathLocatorDto getShadow() {
         return shadow;
@@ -41,6 +43,22 @@ public class TargetPathLocatorDto extends TRegion {
 
     public void setElementId(String elementId) {
         this.elementId = elementId;
+    }
+
+    public TargetPathLocatorDto getFallback() {
+        return fallback;
+    }
+
+    public void setFallback(TargetPathLocatorDto fallback) {
+        this.fallback = fallback;
+    }
+
+    public TargetPathLocatorDto getChild() {
+        return child;
+    }
+
+    public void setChild(TargetPathLocatorDto child) {
+        this.child = child;
     }
 
     public String toJson() throws JsonProcessingException {
