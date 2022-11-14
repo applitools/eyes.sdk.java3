@@ -281,6 +281,20 @@ public class CommandExecutor {
     return getDebugHistory.getPayload().getResult();
   }
 
+  public static void deleteTest(DeleteTestSettingsDto settings) {
+    RequestDto<CommandDeleteTestRequestDto> request = new RequestDto<>();
+    request.setName("Core.deleteTest");
+    request.setKey(UUID.randomUUID().toString());
+    request.setPayload(new CommandDeleteTestRequestDto(settings));
+    SyncTaskListener syncTaskListener = checkedCommand(request, true);
+
+    ResponseDto deleteTestResponse = (ResponseDto) syncTaskListener.get();
+    if (deleteTestResponse != null && deleteTestResponse.getPayload().getError() != null) {
+      String message = deleteTestResponse.getPayload().getError().getMessage();
+      throw new EyesException(message);
+    }
+  }
+
   public static SyncTaskListener checkedCommand(Command command, boolean waitResult) {
     try {
       return connection.executeCommand(command, waitResult);

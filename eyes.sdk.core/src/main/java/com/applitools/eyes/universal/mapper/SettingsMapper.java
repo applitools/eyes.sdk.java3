@@ -2,6 +2,7 @@ package com.applitools.eyes.universal.mapper;
 
 import com.applitools.eyes.CutProvider;
 import com.applitools.eyes.FixedCutProvider;
+import com.applitools.eyes.TestResults;
 import com.applitools.eyes.config.Configuration;
 import com.applitools.eyes.config.ContentInset;
 import com.applitools.eyes.universal.dto.*;
@@ -136,5 +137,19 @@ public class SettingsMapper {
         }
 
         return imageCropRectDto;
+    }
+
+    public static DeleteTestSettingsDto toDeleteTestSettingsDto(TestResults testResults) {
+        if (testResults == null) {
+            return null;
+        }
+
+        DeleteTestSettingsDto deleteTestSettingsDto = new DeleteTestSettingsDto();
+
+        deleteTestSettingsDto.setTestId(testResults.getId());
+        deleteTestSettingsDto.setBatchId(testResults.getBatchId());
+        deleteTestSettingsDto.setSecretToken(testResults.getSecretToken());
+
+        return deleteTestSettingsDto;
     }
 }
