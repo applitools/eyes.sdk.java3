@@ -9,4 +9,5 @@ module.exports = {
   tests: "https://raw.githubusercontent.com/applitools/sdk.coverage.tests/universal-sdk/coverage-tests.js",
   ext: ".java",
   outPath: "./src/test/java/coverage/generic",
+  fixtures: "./fixtures",
 };

@@ -31,7 +31,7 @@
 
   },
   "dependencies": {
-    "@applitools/sdk-coverage-tests": "^2.3.18",
-    "@applitools/eyes-universal": "^2.5.19"
+    "@applitools/sdk-coverage-tests": "^2.7.0",
+    "@applitools/eyes-universal": "^3.0.1"
   }
 }

@@ -25,6 +25,11 @@
     <dependencies>
         <dependency>
             <groupId>com.applitools</groupId>
+            <artifactId>eyes-images-java5</artifactId>
+            <version>5.35.0</version>
+        </dependency>
+        <dependency>
+            <groupId>com.applitools</groupId>
             <artifactId>eyes-appium-java5</artifactId>
             <version>5.35.0</version>
         </dependency>
