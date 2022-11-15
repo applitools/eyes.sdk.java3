@@ -30,6 +30,7 @@ public class AndroidTestByAll {
     private Eyes eyes;
 
     private final String target = "com.applitools.app_androidx:id/layout";
+    private final Integer TIMEOUT = 3000;
 
     @BeforeTest
     public void before() throws MalformedURLException, InterruptedException {
@@ -45,7 +46,7 @@ public class AndroidTestByAll {
         driver = new AndroidDriver(new URL(SL_URL), caps);
         driver.findElement(AppiumBy.id("btn_view_shadow_activity")).click();
 
-        Thread.sleep(3000);
+        Thread.sleep(TIMEOUT);
 
         eyes = new Eyes();
         eyes.setApiKey(GeneralUtils.getEnvString("APPLITOOLS_API_KEY"));
@@ -80,7 +81,7 @@ public class AndroidTestByAll {
     @Test
     public void testAppiumByAllScrollRootElement() throws InterruptedException {
         driver.navigate().back();
-        Thread.sleep(1000);
+        Thread.sleep(TIMEOUT);
         eyes.open(driver,"Android Test","TestAppiumByAllScrollRootElement");
 
         ByAll byAll = new ByAll(
@@ -92,14 +93,14 @@ public class AndroidTestByAll {
         );
 
         driver.findElement(AppiumBy.id("btn_recycler_view_in_scroll_view_activity")).click();
-        Thread.sleep(1000);
+        Thread.sleep(TIMEOUT);
         eyes.check(Target.window().scrollRootElement(byAll).fully());
         eyes.close();
 
         driver.navigate().back();
-        Thread.sleep(3000);
+        Thread.sleep(TIMEOUT);
         driver.findElement(AppiumBy.id("btn_view_shadow_activity")).click();
-        Thread.sleep(3000);
+        Thread.sleep(TIMEOUT);
     }
 
     @Test
@@ -196,7 +197,7 @@ public class AndroidTestByAll {
     @Test
     public void testAppiumByChainedScrollRootElement() throws InterruptedException {
         driver.navigate().back();
-        Thread.sleep(1000);
+        Thread.sleep(TIMEOUT);
         eyes.open(driver,"Android Test","TestAppiumByChainedScrollRootElement");
 
         ByChained byChained = new ByChained(
@@ -208,12 +209,12 @@ public class AndroidTestByAll {
         );
 
         driver.findElement(AppiumBy.id("btn_recycler_view_in_scroll_view_activity")).click();
-        Thread.sleep(1000);
+        Thread.sleep(TIMEOUT);
         eyes.check(Target.window().scrollRootElement(byChained).fully());
         eyes.close();
 
         driver.navigate().back();
-        Thread.sleep(1000);
+        Thread.sleep(TIMEOUT);
         driver.findElement(AppiumBy.id("btn_view_shadow_activity")).click();
         Thread.sleep(1000);
     }

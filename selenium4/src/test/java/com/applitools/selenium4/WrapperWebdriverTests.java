@@ -11,6 +11,7 @@ import org.testng.annotations.Test;
 
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.time.Duration;
 
 public class WrapperWebdriverTests {
 
@@ -22,9 +23,9 @@ public class WrapperWebdriverTests {
         eyes = new Eyes();
         String url = "https://applitools:zBo67o7BsoKhdkf8Va4u@hub-cloud.browserstack.com/wd/hub";
         ImmutableCapabilities capabilities = new ImmutableCapabilities("browserName", "chrome");
-
         driver = new RemoteWebDriver(new URL(url), capabilities);
         driver = new Augmenter().augment(driver);
+        driver.manage().timeouts().scriptTimeout(Duration.ofMinutes(7));
     }
 
     @AfterTest(alwaysRun = true)
