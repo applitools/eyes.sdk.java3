@@ -1,6 +1,6 @@
 <!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd" >
 
-<suite name="android suite" verbose="1">
+<suite name="android suite" verbose="1" parallel="classes">
     <listeners>
         <listener class-name="com.applitools.eyes.utils.ReportingListener"/>
     </listeners>
@@ -30,6 +30,7 @@
         <classes>
             <class name="com.applitools.eyes.appium.ScrollRootElementTest"/>
             <class name="com.applitools.eyes.appium.android.AndroidTestByAll"/>
+            <class name="com.applitools.eyes.appium.android.TestAndroidContentSizeFallback"/>
         </classes>
     </test>
     <test name="Unit" parallel="classes">
