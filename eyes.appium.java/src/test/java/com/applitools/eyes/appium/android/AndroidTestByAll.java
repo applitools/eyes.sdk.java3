@@ -32,7 +32,7 @@ public class AndroidTestByAll {
     private final String target = "com.applitools.app_androidx:id/layout";
 
     @BeforeTest
-    public void before() throws MalformedURLException {
+    public void before() throws MalformedURLException, InterruptedException {
         DesiredCapabilities caps = new DesiredCapabilities();
         caps.setCapability("deviceName","Google Pixel 5 GoogleAPI Emulator");
         caps.setCapability("deviceOrientation", "portrait");
@@ -45,13 +45,15 @@ public class AndroidTestByAll {
         driver = new AndroidDriver(new URL(SL_URL), caps);
         driver.findElement(AppiumBy.id("btn_view_shadow_activity")).click();
 
+        Thread.sleep(3000);
+
         eyes = new Eyes();
         eyes.setApiKey(GeneralUtils.getEnvString("APPLITOOLS_API_KEY"));
         eyes.setLogHandler(new StdoutLogHandler(true));
         eyes.setBatch(new BatchInfo("Android ByAll ByChained"));
     }
 
-    @AfterTest
+    @AfterTest(alwaysRun = true)
     public void teardown() {
         if (driver != null)
             driver.quit();
