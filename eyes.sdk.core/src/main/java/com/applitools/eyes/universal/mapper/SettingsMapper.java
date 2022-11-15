@@ -7,6 +7,9 @@ import com.applitools.eyes.config.Configuration;
 import com.applitools.eyes.config.ContentInset;
 import com.applitools.eyes.universal.dto.*;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class SettingsMapper {
 
     public static OpenSettingsDto toOpenSettingsDto(Configuration config, Boolean keepBatchOpen) {
@@ -151,5 +154,14 @@ public class SettingsMapper {
         deleteTestSettingsDto.setSecretToken(testResults.getSecretToken());
 
         return deleteTestSettingsDto;
+    }
+
+    public static List<CloseBatchSettingsDto> toCloseBatchSettingsDto(List<String> batchIds) {
+        List<CloseBatchSettingsDto> dto = new ArrayList<>();
+        for (String batchId : batchIds) {
+            dto.add(new CloseBatchSettingsDto(batchId));
+        }
+
+        return dto;
     }
 }

@@ -4,7 +4,11 @@ import com.applitools.connectivity.ServerConnector;
 import com.applitools.eyes.Logger;
 import com.applitools.eyes.ProxySettings;
 import com.applitools.eyes.logging.Stage;
+import com.applitools.eyes.logging.TraceLevel;
 import com.applitools.eyes.logging.Type;
+import com.applitools.eyes.universal.CommandExecutor;
+import com.applitools.eyes.universal.dto.CloseBatchSettingsDto;
+import com.applitools.eyes.universal.mapper.SettingsMapper;
 import com.applitools.utils.ArgumentGuard;
 import org.apache.commons.lang3.tuple.Pair;
 
@@ -55,8 +59,12 @@ public class EnabledBatchClose extends BatchClose {
 
     public void close() {
         logger.log(new HashSet<String>(), Stage.CLOSE, Type.CLOSE_BATCH, Pair.of("batchSize", batchIds.size()));
-        for (String batchId : batchIds) {
-            serverConnector.closeBatch(batchId, serverUrl);
+
+        if (batchIds == null || batchIds.isEmpty()) {
+            return;
         }
+
+        List<CloseBatchSettingsDto> dto = SettingsMapper.toCloseBatchSettingsDto(batchIds);
+        CommandExecutor.closeBatch(dto);
     }
 }
