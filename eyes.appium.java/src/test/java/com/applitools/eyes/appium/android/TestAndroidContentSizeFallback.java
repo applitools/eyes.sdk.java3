@@ -30,12 +30,12 @@ public class TestAndroidContentSizeFallback {
         caps.setCapability("platformVersion","11.0");
         caps.setCapability("platformName", "Android");
         caps.setCapability("automationName", "UiAutomator2");
-        caps.setCapability("app", "/Users/idos/Downloads/app-androidx-debug_v4.16.2_no_helper.apk");
+        caps.setCapability("app", "https://applitools.jfrog.io/artifactory/Examples/androidx/1.3.6/app_androidx.apk"); //TODO - change me
         caps.setCapability("noReset", true);
         caps.setCapability("fullReset", false);
         caps.setCapability("newCommandTimeout", 2000);
 
-        driver = new AndroidDriver(new URL("http://0.0.0.0:4723/wd/hub"), caps);
+        driver = new AndroidDriver(new URL(SL_URL), caps);
 
         eyes = new Eyes();
         eyes.setApiKey(GeneralUtils.getEnvString("APPLITOOLS_API_KEY"));
