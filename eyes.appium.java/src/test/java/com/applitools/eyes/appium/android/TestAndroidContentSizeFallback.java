@@ -41,7 +41,7 @@ public class TestAndroidContentSizeFallback {
         eyes.setApiKey(GeneralUtils.getEnvString("APPLITOOLS_API_KEY"));
     }
 
-    @AfterTest(alwaysRun = true)
+    @AfterTest
     public void teardown() {
         if (driver != null) {
             driver.quit();
@@ -52,7 +52,7 @@ public class TestAndroidContentSizeFallback {
     public void shouldNotFailOnTypeErrorWhenNoHelperLib() throws InterruptedException {
         driver.findElement(AppiumBy.id("btn_recycler_view_nested_collapsing")).click();
 
-        Thread.sleep(1000);
+        Thread.sleep(3000);
 
         eyes.open(driver, "Java Appium - Android", "shouldNotFailOnTypeErrorWhenNoHelperLib");
         eyes.check(Target.region(AppiumBy.id("card_view")).scrollRootElement(AppiumBy.id("recyclerView")).fully(false));

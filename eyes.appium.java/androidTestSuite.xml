@@ -34,7 +34,6 @@
     <test name="TestEyes" parallel="classes">
         <classes>
             <class name="com.applitools.eyes.appium.ScrollRootElementTest"/>
-            <class name="com.applitools.eyes.appium.android.AndroidTestByAll"/>
             <class name="com.applitools.eyes.appium.android.TestAndroidContentSizeFallback"/>
         </classes>
     </test>
