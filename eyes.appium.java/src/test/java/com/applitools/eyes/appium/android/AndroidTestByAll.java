@@ -14,6 +14,7 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.remote.DesiredCapabilities;
 import org.testng.Assert;
 import org.testng.annotations.AfterTest;
+import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.BeforeTest;
 import org.testng.annotations.Test;
 
@@ -28,13 +29,14 @@ public class AndroidTestByAll {
 
     private AndroidDriver driver;
     private Eyes eyes;
+    private DesiredCapabilities caps;
 
     private final String target = "com.applitools.app_androidx:id/layout";
     private final Integer TIMEOUT = 3000;
 
     @BeforeTest
-    public void before() throws MalformedURLException, InterruptedException {
-        DesiredCapabilities caps = new DesiredCapabilities();
+    public void before() {
+        caps = new DesiredCapabilities();
         caps.setCapability("deviceName","Google Pixel 5 GoogleAPI Emulator");
         caps.setCapability("deviceOrientation", "portrait");
         caps.setCapability("platformVersion","11.0");
@@ -43,15 +45,17 @@ public class AndroidTestByAll {
         caps.setCapability("app", "https://applitools.jfrog.io/artifactory/Examples/androidx/1.3.6/app_androidx.apk");
         caps.setCapability("newCommandTimeout", 2000);
 
-        driver = new AndroidDriver(new URL(SL_URL), caps);
-        driver.findElement(AppiumBy.id("btn_view_shadow_activity")).click();
-
-        Thread.sleep(TIMEOUT);
-
         eyes = new Eyes();
         eyes.setApiKey(GeneralUtils.getEnvString("APPLITOOLS_API_KEY"));
         eyes.setLogHandler(new StdoutLogHandler(true));
         eyes.setBatch(new BatchInfo("Android ByAll ByChained"));
+    }
+
+    @BeforeMethod
+    public void beforeEach() throws InterruptedException, MalformedURLException {
+        driver = new AndroidDriver(new URL(SL_URL), caps);
+        driver.findElement(AppiumBy.id("btn_view_shadow_activity")).click();
+        Thread.sleep(TIMEOUT);
     }
 
     @AfterTest
