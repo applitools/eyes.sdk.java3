@@ -13,10 +13,7 @@ import io.appium.java_client.pagefactory.bys.builder.ByChained;
 import org.openqa.selenium.By;
 import org.openqa.selenium.remote.DesiredCapabilities;
 import org.testng.Assert;
-import org.testng.annotations.AfterTest;
-import org.testng.annotations.BeforeMethod;
-import org.testng.annotations.BeforeTest;
-import org.testng.annotations.Test;
+import org.testng.annotations.*;
 
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -58,11 +55,14 @@ public class AndroidTestByAll {
         Thread.sleep(TIMEOUT);
     }
 
-    @AfterTest
-    public void teardown() {
+    @AfterMethod
+    public void afterEach() {
         if (driver != null)
             driver.quit();
+    }
 
+    @AfterTest
+    public void teardown() {
         eyes.abortIfNotClosed();
     }
 
