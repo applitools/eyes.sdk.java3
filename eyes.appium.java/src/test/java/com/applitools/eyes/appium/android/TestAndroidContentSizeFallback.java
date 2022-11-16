@@ -55,7 +55,7 @@ public class TestAndroidContentSizeFallback {
         Thread.sleep(1000);
 
         eyes.open(driver, "Java Appium - Android", "shouldNotFailOnTypeErrorWhenNoHelperLib");
-        eyes.check(Target.region(AppiumBy.id("card_view")).scrollRootElement(AppiumBy.id("recyclerView")).fully());
+        eyes.check(Target.region(AppiumBy.id("card_view")).scrollRootElement(AppiumBy.id("recyclerView")).fully(false));
         eyes.close(false);
     }
 }
