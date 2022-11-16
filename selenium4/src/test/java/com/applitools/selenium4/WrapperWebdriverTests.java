@@ -22,13 +22,13 @@ public class WrapperWebdriverTests {
     public void setup() throws MalformedURLException {
         eyes = new Eyes();
         String url = "https://applitools:zBo67o7BsoKhdkf8Va4u@hub-cloud.browserstack.com/wd/hub";
-        ImmutableCapabilities capabilities = new ImmutableCapabilities("browserName", "chrome");
+        ImmutableCapabilities capabilities = new ImmutableCapabilities("browserName", "chrome", "browserVersion", "103");
         driver = new RemoteWebDriver(new URL(url), capabilities);
         driver = new Augmenter().augment(driver);
         driver.manage().timeouts().scriptTimeout(Duration.ofMinutes(7));
     }
 
-    @AfterTest(alwaysRun = true)
+    @AfterTest
     public void teardown() {
         if (driver != null) driver.quit();
         eyes.abort();

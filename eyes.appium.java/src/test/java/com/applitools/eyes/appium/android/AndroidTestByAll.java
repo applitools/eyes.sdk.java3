@@ -54,7 +54,7 @@ public class AndroidTestByAll {
         eyes.setBatch(new BatchInfo("Android ByAll ByChained"));
     }
 
-    @AfterTest(alwaysRun = true)
+    @AfterTest
     public void teardown() {
         if (driver != null)
             driver.quit();
