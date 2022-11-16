@@ -5,6 +5,7 @@ import com.applitools.eyes.appium.Target;
 import com.applitools.utils.GeneralUtils;
 import io.appium.java_client.AppiumBy;
 import io.appium.java_client.android.AndroidDriver;
+import io.appium.java_client.remote.MobileCapabilityType;
 import org.openqa.selenium.remote.DesiredCapabilities;
 import org.testng.annotations.AfterTest;
 import org.testng.annotations.BeforeTest;
@@ -25,14 +26,13 @@ public class TestAndroidContentSizeFallback {
     @BeforeTest
     public void setup() throws MalformedURLException {
         DesiredCapabilities caps = new DesiredCapabilities();
-        caps.setCapability("deviceName","Google Pixel 5 GoogleAPI Emulator");
+        caps.setCapability("deviceName","Google Pixel 3a XL GoogleAPI Emulator");
         caps.setCapability("deviceOrientation", "portrait");
-        caps.setCapability("platformVersion","11.0");
+        caps.setCapability("platformVersion","10.0");
+        caps.setCapability("extendedDebugging", true);
         caps.setCapability("platformName", "Android");
         caps.setCapability("automationName", "UiAutomator2");
-        caps.setCapability("app", "https://applitools.jfrog.io/artifactory/Examples/androidx/1.3.6/app_androidx.apk"); //TODO - change me
-        caps.setCapability("noReset", true);
-        caps.setCapability("fullReset", false);
+        caps.setCapability("app", "storage:0743f3dd-abd2-4efc-a249-aee12e083c7f"); // app-androidx-debug_v4.16.2_no_helper.apk from Sauce storage
         caps.setCapability("newCommandTimeout", 2000);
 
         driver = new AndroidDriver(new URL(SL_URL), caps);
