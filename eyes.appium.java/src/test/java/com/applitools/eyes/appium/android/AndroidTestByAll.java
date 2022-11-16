@@ -6,6 +6,7 @@ import com.applitools.eyes.appium.Target;
 import com.applitools.eyes.metadata.SessionResults;
 import com.applitools.eyes.utils.TestUtils;
 import com.applitools.utils.GeneralUtils;
+import gherkin.lexer.Th;
 import io.appium.java_client.AppiumBy;
 import io.appium.java_client.android.AndroidDriver;
 import io.appium.java_client.pagefactory.bys.builder.ByAll;
@@ -32,7 +33,7 @@ public class AndroidTestByAll {
     private final Integer TIMEOUT = 3000;
 
     @BeforeTest
-    public void before() {
+    public void before() throws MalformedURLException {
         caps = new DesiredCapabilities();
         caps.setCapability("deviceName","Google Pixel 5 GoogleAPI Emulator");
         caps.setCapability("deviceOrientation", "portrait");
@@ -42,32 +43,27 @@ public class AndroidTestByAll {
         caps.setCapability("app", "https://applitools.jfrog.io/artifactory/Examples/androidx/1.3.6/app_androidx.apk");
         caps.setCapability("newCommandTimeout", 2000);
 
+        driver = new AndroidDriver(new URL(SL_URL), caps);
+
         eyes = new Eyes();
         eyes.setApiKey(GeneralUtils.getEnvString("APPLITOOLS_API_KEY"));
         eyes.setLogHandler(new StdoutLogHandler(true));
         eyes.setBatch(new BatchInfo("Android ByAll ByChained"));
     }
 
-    @BeforeMethod
-    public void beforeEach() throws InterruptedException, MalformedURLException {
-        driver = new AndroidDriver(new URL(SL_URL), caps);
-        driver.findElement(AppiumBy.id("btn_view_shadow_activity")).click();
-        Thread.sleep(TIMEOUT);
-    }
-
-    @AfterMethod
-    public void afterEach() {
-        if (driver != null)
-            driver.quit();
-    }
-
     @AfterTest
     public void teardown() {
+        if (driver != null)
+            driver.quit();
+
         eyes.abortIfNotClosed();
     }
 
     @Test
-    public void testAppiumByAll() {
+    public void testAppiumByAll() throws InterruptedException {
+        driver.findElement(AppiumBy.id("btn_view_shadow_activity")).click();
+        Thread.sleep(TIMEOUT);
+
         eyes.open(driver,"Android Test","TestAppiumByAll");
 
         ByAll byAll = new ByAll(
@@ -80,12 +76,13 @@ public class AndroidTestByAll {
 
         eyes.check(Target.region(byAll).fully(false));
         eyes.close();
+
+        driver.navigate().back();
+        Thread.sleep(TIMEOUT);
     }
 
     @Test
     public void testAppiumByAllScrollRootElement() throws InterruptedException {
-        driver.navigate().back();
-        Thread.sleep(TIMEOUT);
         eyes.open(driver,"Android Test","TestAppiumByAllScrollRootElement");
 
         ByAll byAll = new ByAll(
@@ -103,12 +100,13 @@ public class AndroidTestByAll {
 
         driver.navigate().back();
         Thread.sleep(TIMEOUT);
-        driver.findElement(AppiumBy.id("btn_view_shadow_activity")).click();
-        Thread.sleep(TIMEOUT);
     }
 
     @Test
-    public void testAppiumByAllFloatingRegion() {
+    public void testAppiumByAllFloatingRegion() throws InterruptedException {
+        driver.findElement(AppiumBy.id("btn_view_shadow_activity")).click();
+        Thread.sleep(TIMEOUT);
+
         eyes.open(driver,"Android Test","TestAppiumByAllFloatingRegion");
 
         ByAll byAll = new ByAll(
@@ -126,10 +124,16 @@ public class AndroidTestByAll {
 
         FloatingMatchSettings[] floatingRegions = info.getActualAppOutput()[0].getImageMatchSettings().getFloating();
         Assert.assertEquals(floatingRegions[0], new FloatingMatchSettings(96, 66, 200, 300, 5, 10, 15, 20));
+
+        driver.navigate().back();
+        Thread.sleep(TIMEOUT);
     }
 
     @Test
-    public void testAppiumByAllAccessibilityRegion() {
+    public void testAppiumByAllAccessibilityRegion() throws InterruptedException {
+        driver.findElement(AppiumBy.id("btn_view_shadow_activity")).click();
+        Thread.sleep(TIMEOUT);
+
         eyes.open(driver,"Android Test","TestAppiumByAllAccessibilityRegion");
 
         ByAll byAll = new ByAll(
@@ -147,10 +151,16 @@ public class AndroidTestByAll {
 
         AccessibilityRegionByRectangle[] accessibilityRegion = info.getActualAppOutput()[0].getImageMatchSettings().getAccessibility();
         Assert.assertEquals(accessibilityRegion[0], new AccessibilityRegionByRectangle(96, 66, 200, 300, AccessibilityRegionType.RegularText));
+
+        driver.navigate().back();
+        Thread.sleep(TIMEOUT);
     }
 
     @Test
-    public void testAppiumByAllCodedRegions() {
+    public void testAppiumByAllCodedRegions() throws InterruptedException {
+        driver.findElement(AppiumBy.id("btn_view_shadow_activity")).click();
+        Thread.sleep(TIMEOUT);
+
         eyes.open(driver,"Android Test","TestAppiumByAllCodedRegions");
 
         ByAll byAll = new ByAll(
@@ -181,10 +191,16 @@ public class AndroidTestByAll {
         Assert.assertEquals(layoutRegion, new Region(96, 66, 200, 300), "layout");
         Assert.assertEquals(contentRegion, new Region(96, 66, 200, 300), "content");
         Assert.assertEquals(strictRegion, new Region(96, 66, 200, 300), "strict");
+
+        driver.navigate().back();
+        Thread.sleep(TIMEOUT);
     }
 
     @Test
-    public void testAppiumByChained() {
+    public void testAppiumByChained() throws InterruptedException {
+        driver.findElement(AppiumBy.id("btn_view_shadow_activity")).click();
+        Thread.sleep(TIMEOUT);
+
         eyes.open(driver,"Android Test","TestAppiumByChained");
 
         ByChained byChained = new ByChained(
@@ -196,12 +212,13 @@ public class AndroidTestByAll {
 
         eyes.check(Target.region(byChained).fully(false));
         eyes.close();
+
+        driver.navigate().back();
+        Thread.sleep(TIMEOUT);
     }
 
     @Test
     public void testAppiumByChainedScrollRootElement() throws InterruptedException {
-        driver.navigate().back();
-        Thread.sleep(TIMEOUT);
         eyes.open(driver,"Android Test","TestAppiumByChainedScrollRootElement");
 
         ByChained byChained = new ByChained(
@@ -214,17 +231,19 @@ public class AndroidTestByAll {
 
         driver.findElement(AppiumBy.id("btn_recycler_view_in_scroll_view_activity")).click();
         Thread.sleep(TIMEOUT);
+
         eyes.check(Target.window().scrollRootElement(byChained).fully());
         eyes.close();
 
         driver.navigate().back();
         Thread.sleep(TIMEOUT);
-        driver.findElement(AppiumBy.id("btn_view_shadow_activity")).click();
-        Thread.sleep(1000);
     }
 
     @Test
-    public void testAppiumByChainedFloatingRegion() {
+    public void testAppiumByChainedFloatingRegion() throws InterruptedException {
+        driver.findElement(AppiumBy.id("btn_view_shadow_activity")).click();
+        Thread.sleep(TIMEOUT);
+
         eyes.open(driver,"Android Test","TestAppiumByChainedFloatingRegion");
 
         ByChained byChained = new ByChained(
@@ -241,10 +260,16 @@ public class AndroidTestByAll {
 
         FloatingMatchSettings[] floatingRegions = info.getActualAppOutput()[0].getImageMatchSettings().getFloating();
         Assert.assertEquals(floatingRegions[0], new FloatingMatchSettings(96, 66, 200, 300, 5, 10, 15, 20));
+
+        driver.navigate().back();
+        Thread.sleep(TIMEOUT);
     }
 
     @Test
-    public void testAppiumByChainedAccessibilityRegion() {
+    public void testAppiumByChainedAccessibilityRegion() throws InterruptedException {
+        driver.findElement(AppiumBy.id("btn_view_shadow_activity")).click();
+        Thread.sleep(TIMEOUT);
+
         eyes.open(driver,"Android Test","TestAppiumByChainedAccessibilityRegion");
 
         ByChained byChained = new ByChained(
@@ -261,10 +286,16 @@ public class AndroidTestByAll {
 
         AccessibilityRegionByRectangle[] accessibilityRegion = info.getActualAppOutput()[0].getImageMatchSettings().getAccessibility();
         Assert.assertEquals(accessibilityRegion[0], new AccessibilityRegionByRectangle(96, 66, 200, 300, AccessibilityRegionType.RegularText));
+
+        driver.navigate().back();
+        Thread.sleep(TIMEOUT);
     }
 
     @Test
-    public void testAppiumByChainedCodedRegions() {
+    public void testAppiumByChainedCodedRegions() throws InterruptedException {
+        driver.findElement(AppiumBy.id("btn_view_shadow_activity")).click();
+        Thread.sleep(TIMEOUT);
+
         eyes.open(driver,"Android Test","TestAppiumByChainedCodedRegions");
 
         ByChained byChained = new ByChained(
@@ -294,6 +325,9 @@ public class AndroidTestByAll {
         Assert.assertEquals(layoutRegion, new Region(96, 66, 200, 300), "layout");
         Assert.assertEquals(contentRegion, new Region(96, 66, 200, 300), "content");
         Assert.assertEquals(strictRegion, new Region(96, 66, 200, 300), "strict");
+
+        driver.navigate().back();
+        Thread.sleep(TIMEOUT);
     }
 
     private SessionResults getTestInfo(TestResults results) {

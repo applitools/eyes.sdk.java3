@@ -26,6 +26,11 @@
 <!--            </class>-->
 <!--        </classes>-->
 <!--    </test>-->
+    <test name="TestBy" parallel="classes">
+        <classes>
+            <class name="com.applitools.eyes.appium.android.AndroidTestByAll"/>
+        </classes>
+    </test>
     <test name="TestEyes" parallel="classes">
         <classes>
             <class name="com.applitools.eyes.appium.ScrollRootElementTest"/>
