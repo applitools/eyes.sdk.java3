@@ -34,9 +34,10 @@ public class ScrollRootElementTest {
         eyes.setLogHandler(new StdoutLogHandler(true));
         try {
             eyes.open(driver,"Android Test","ScrollRootElement test");
-            //driver.findElementById("btn_recycler_view_in_scroll_view_activity").click();
+
             driver.findElement(AppiumBy.id("btn_recycler_view_in_scroll_view_activity")).click();
-            Thread.sleep(1000);
+            Thread.sleep(3000);
+
             eyes.check(Target.window().scrollRootElement(AppiumBy.id("recyclerView")).fully().timeout(0));
             eyes.close();
         } finally {
