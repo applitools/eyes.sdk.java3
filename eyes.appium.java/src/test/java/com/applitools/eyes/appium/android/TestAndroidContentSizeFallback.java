@@ -5,11 +5,8 @@ import com.applitools.eyes.appium.Target;
 import com.applitools.utils.GeneralUtils;
 import io.appium.java_client.AppiumBy;
 import io.appium.java_client.android.AndroidDriver;
-import io.appium.java_client.remote.MobileCapabilityType;
 import org.openqa.selenium.remote.DesiredCapabilities;
-import org.testng.annotations.AfterTest;
-import org.testng.annotations.BeforeTest;
-import org.testng.annotations.Test;
+import org.testng.annotations.*;
 
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -23,7 +20,7 @@ public class TestAndroidContentSizeFallback {
     private Eyes eyes;
     private AndroidDriver driver;
 
-    @BeforeTest
+    @BeforeMethod
     public void setup() throws MalformedURLException {
         DesiredCapabilities caps = new DesiredCapabilities();
         caps.setCapability("deviceName","Google Pixel 3a XL GoogleAPI Emulator");
@@ -43,7 +40,7 @@ public class TestAndroidContentSizeFallback {
         eyes.setApiKey(GeneralUtils.getEnvString("APPLITOOLS_API_KEY"));
     }
 
-    @AfterTest
+    @AfterMethod
     public void teardown() {
         if (driver != null) {
             driver.quit();
