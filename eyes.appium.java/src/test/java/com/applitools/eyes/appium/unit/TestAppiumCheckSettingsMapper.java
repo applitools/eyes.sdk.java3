@@ -31,8 +31,8 @@ public class TestAppiumCheckSettingsMapper {
         fallback_fallback.setType("accessibility id");
 
         SelectorRegionDto fallback = new SelectorRegionDto();
-        fallback.setSelector("[id=\"seleniumById\"]");
-        fallback.setType("css selector");
+        fallback.setSelector("seleniumById");
+        fallback.setType("id");
         fallback.setFallback(fallback_fallback);
 
         SelectorRegionDto region = new SelectorRegionDto();

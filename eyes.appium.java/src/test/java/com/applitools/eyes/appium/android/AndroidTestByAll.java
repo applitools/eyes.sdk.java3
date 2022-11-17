@@ -6,7 +6,6 @@ import com.applitools.eyes.appium.Target;
 import com.applitools.eyes.metadata.SessionResults;
 import com.applitools.eyes.utils.TestUtils;
 import com.applitools.utils.GeneralUtils;
-import gherkin.lexer.Th;
 import io.appium.java_client.AppiumBy;
 import io.appium.java_client.android.AndroidDriver;
 import io.appium.java_client.pagefactory.bys.builder.ByAll;
@@ -30,7 +29,7 @@ public class AndroidTestByAll {
     private DesiredCapabilities caps;
 
     private final String target = "com.applitools.app_androidx:id/layout";
-    private final Integer TIMEOUT = 3000;
+    private final Integer TIMEOUT = 5000;
 
     @BeforeTest
     public void before() throws MalformedURLException {
@@ -41,7 +40,8 @@ public class AndroidTestByAll {
         caps.setCapability("platformName", "Android");
         caps.setCapability("automationName", "UiAutomator2");
         caps.setCapability("app", "https://applitools.jfrog.io/artifactory/Examples/androidx/1.3.6/app_androidx.apk");
-        caps.setCapability("newCommandTimeout", 2000);
+        caps.setCapability("appiumVersion", "1.22.0");
+        caps.setCapability("name", "Pixel 5 (java) - ByAll / ByChained");
 
         driver = new AndroidDriver(new URL(SL_URL), caps);
 

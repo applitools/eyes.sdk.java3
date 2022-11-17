@@ -33,6 +33,8 @@ public class TestAndroidContentSizeFallback {
         caps.setCapability("platformName", "Android");
         caps.setCapability("automationName", "UiAutomator2");
         caps.setCapability("app", "storage:0743f3dd-abd2-4efc-a249-aee12e083c7f"); // app-androidx-debug_v4.16.2_no_helper.apk from Sauce storage
+        caps.setCapability("appiumVersion", "1.22.0");
+        caps.setCapability("name", "Pixel 3a XL (java) - 'type' error");
         caps.setCapability("newCommandTimeout", 2000);
 
         driver = new AndroidDriver(new URL(SL_URL), caps);
