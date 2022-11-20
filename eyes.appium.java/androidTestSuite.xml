@@ -13,8 +13,8 @@ in the same thread while taking advantage of TestNG using as many threads as pos
     <test name="TestEyes">
         <classes>
             <class name="com.applitools.eyes.appium.ScrollRootElementTest"/>
-            <class name="com.applitools.eyes.appium.android.TestAndroidContentSizeFallback"/>
-            <class name="com.applitools.eyes.appium.android.AndroidTestByAll"/>
+<!--            <class name="com.applitools.eyes.appium.android.TestAndroidContentSizeFallback"/>-->
+<!--            <class name="com.applitools.eyes.appium.android.AndroidTestByAll"/>-->
         </classes>
     </test>
 
