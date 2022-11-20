@@ -12,8 +12,8 @@ public class TestAndroidContentSizeFallback extends AndroidTestSetup {
         capabilities.setCapability("platformName", "Android");
         capabilities.setCapability("appium:platformVersion","10.0");
         capabilities.setCapability("appium:deviceName","Google Pixel 3a XL GoogleAPI Emulator");
-        capabilities.setCapability("appium:extendedDebugging", true);
         capabilities.setCapability("appium:automationName", "UiAutomator2");
+        capabilities.setCapability("appium:newCommandTimeout", 2000);
         setAppCapability();
 
         MutableCapabilities sauceOptions = new MutableCapabilities();
@@ -26,7 +26,7 @@ public class TestAndroidContentSizeFallback extends AndroidTestSetup {
     @Override
     protected void setAppCapability() {
         // app-androidx-debug_v4.16.2_no_helper.apk from Sauce storage
-        capabilities.setCapability("app", "storage:0743f3dd-abd2-4efc-a249-aee12e083c7f");
+        capabilities.setCapability("appium:app", "storage:filename=app-androidx-debug_v4.16.2_no_helper.apk");
     }
 
     @Test
