@@ -1,6 +1,6 @@
 <!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd" >
 
-<suite name="selenium4 suite" verbose="1">
+<suite name="selenium4 suite" verbose="1" parallel="false">
     <test name="tests">
         <groups>
             <run>
