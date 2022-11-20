@@ -2,6 +2,7 @@ package com.applitools.eyes.appium.android;
 
 import com.applitools.eyes.appium.Target;
 import io.appium.java_client.AppiumBy;
+import org.openqa.selenium.MutableCapabilities;
 import org.testng.annotations.Test;
 
 public class TestAndroidContentSizeFallback extends AndroidTestSetup {
@@ -16,6 +17,11 @@ public class TestAndroidContentSizeFallback extends AndroidTestSetup {
         capabilities.setCapability("automationName", "UiAutomator2");
         capabilities.setCapability("name", "Pixel 3a XL (java) - 'type' error");
         setAppCapability();
+
+        MutableCapabilities sauceOptions = new MutableCapabilities();
+        sauceOptions.setCapability("appiumVersion", "1.22.1");
+        sauceOptions.setCapability("name", "Java - Android");
+        capabilities.setCapability("sauce:options", sauceOptions);
     }
 
     @Override
