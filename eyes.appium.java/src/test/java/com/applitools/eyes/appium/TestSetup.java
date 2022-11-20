@@ -71,6 +71,7 @@ public abstract class TestSetup extends ReportingTestSuite implements ITest {
     protected void setCapabilities() {
         MutableCapabilities sauceOptions = new MutableCapabilities();
         sauceOptions.setCapability("appiumVersion", "1.22.1");
+        sauceOptions.setCapability("idleTimeout", 300);
         sauceOptions.setCapability("name", "Java - Android");
         capabilities.setCapability("sauce:options", sauceOptions);
         setAppCapability();

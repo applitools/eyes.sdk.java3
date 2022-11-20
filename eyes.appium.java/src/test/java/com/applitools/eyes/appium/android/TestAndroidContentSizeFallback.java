@@ -20,6 +20,7 @@ public class TestAndroidContentSizeFallback extends AndroidTestSetup {
         sauceOptions.setCapability("appiumVersion", "1.22.1");
         sauceOptions.setCapability("deviceOrientation", "PORTRAIT");
         sauceOptions.setCapability("name", "Java - Android");
+        sauceOptions.setCapability("idleTimeout", 300);
         capabilities.setCapability("sauce:options", sauceOptions);
     }
 
