@@ -8,9 +8,8 @@
     </test>
     <test name="TestEyes" parallel="classes">
         <classes>
-<!--            <class name="com.applitools.eyes.selenium.TestBatchAPI"/>-->
             <class name="com.applitools.eyes.AutProxyTest"/>
-<!--            <class name="com.applitools.eyes.selenium.TestByAll"/>-->
+            <class name="com.applitools.eyes.selenium.TestByAll"/>
         </classes>
     </test>
     <test name="Unit" parallel="classes">

@@ -15,7 +15,7 @@ public abstract class AndroidTestSetup extends TestSetup {
         capabilities.setCapability("appium:deviceName", "Google Pixel 5 GoogleAPI Emulator");
         capabilities.setCapability("appium:platformVersion", "11.0");
         capabilities.setCapability("appium:automationName", "UiAutomator2");
-        capabilities.setCapability("appium:newCommandTimeout", 300);
+        capabilities.setCapability("appium:newCommandTimeout", 2000);
     }
 
     @Override
