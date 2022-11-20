@@ -10,16 +10,15 @@ public class TestAndroidContentSizeFallback extends AndroidTestSetup {
     @Override
     public void setCapabilities() {
         capabilities.setCapability("platformName", "Android");
-        capabilities.setCapability("deviceName","Google Pixel 3a XL GoogleAPI Emulator");
-        capabilities.setCapability("platformVersion","10.0");
-        capabilities.setCapability("deviceOrientation", "portrait");
-        capabilities.setCapability("extendedDebugging", true);
-        capabilities.setCapability("automationName", "UiAutomator2");
-        capabilities.setCapability("name", "Pixel 3a XL (java) - 'type' error");
+        capabilities.setCapability("appium:platformVersion","10.0");
+        capabilities.setCapability("appium:deviceName","Google Pixel 3a XL GoogleAPI Emulator");
+        capabilities.setCapability("appium:extendedDebugging", true);
+        capabilities.setCapability("appium:automationName", "UiAutomator2");
         setAppCapability();
 
         MutableCapabilities sauceOptions = new MutableCapabilities();
         sauceOptions.setCapability("appiumVersion", "1.22.1");
+        sauceOptions.setCapability("deviceOrientation", "PORTRAIT");
         sauceOptions.setCapability("name", "Java - Android");
         capabilities.setCapability("sauce:options", sauceOptions);
     }
