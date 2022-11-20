@@ -1,45 +1,27 @@
 <!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd" >
 
-<suite name="android suite" verbose="1" parallel="classes">
+<!--
+TestNG will run all the methods in the same <test> tag in the same thread, but each <test> tag will be in a separate thread.
+This allows you to group all your classes that are not thread safe in the same <test> and guarantee they will all run
+in the same thread while taking advantage of TestNG using as many threads as possible to run your tests.
+-->
+<suite name="android suite" verbose="1" parallel="tests" thread-count="2">
     <listeners>
         <listener class-name="com.applitools.eyes.utils.ReportingListener"/>
     </listeners>
-    <test name="tests">
-        <groups>
-            <run>
-                <exclude name="failed"/>
-            </run>
-        </groups>
 
-        <packages>
-<!--            <package name="com.applitools.eyes.appium.android.*"/>-->
-<!--            <package name="com.applitools.eyes.appium.general.*"/>-->
-        </packages>
-    </test>
-<!--    <test name="TestEyes">-->
-<!--        <classes>-->
-<!--            <class name="com.applitools.eyes.appium.TestEyes">-->
-<!--                <methods>-->
-<!--                    <include name="testEyesApi" />-->
-<!--                    <include name="testConfigurationEdit" />-->
-<!--                </methods>-->
-<!--            </class>-->
-<!--        </classes>-->
-<!--    </test>-->
-    <test name="TestBy" parallel="classes">
-        <classes>
-            <class name="com.applitools.eyes.appium.android.AndroidTestByAll"/>
-        </classes>
-    </test>
-    <test name="TestEyes" parallel="classes">
+    <test name="TestEyes">
         <classes>
             <class name="com.applitools.eyes.appium.ScrollRootElementTest"/>
             <class name="com.applitools.eyes.appium.android.TestAndroidContentSizeFallback"/>
+            <class name="com.applitools.eyes.appium.android.AndroidTestByAll"/>
         </classes>
     </test>
-    <test name="Unit" parallel="classes">
+
+    <test name="Unit">
         <classes>
             <class name="com.applitools.eyes.appium.unit.TestAppiumCheckSettingsMapper"/>
         </classes>
     </test>
+
 </suite>

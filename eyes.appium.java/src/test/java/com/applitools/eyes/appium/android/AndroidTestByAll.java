@@ -1,62 +1,27 @@
 package com.applitools.eyes.appium.android;
 
 import com.applitools.eyes.*;
-import com.applitools.eyes.appium.Eyes;
 import com.applitools.eyes.appium.Target;
 import com.applitools.eyes.metadata.SessionResults;
 import com.applitools.eyes.utils.TestUtils;
-import com.applitools.utils.GeneralUtils;
 import io.appium.java_client.AppiumBy;
-import io.appium.java_client.android.AndroidDriver;
 import io.appium.java_client.pagefactory.bys.builder.ByAll;
 import io.appium.java_client.pagefactory.bys.builder.ByChained;
 import org.openqa.selenium.By;
-import org.openqa.selenium.remote.DesiredCapabilities;
 import org.testng.Assert;
-import org.testng.annotations.*;
+import org.testng.annotations.BeforeClass;
+import org.testng.annotations.Test;
 
 import java.net.MalformedURLException;
-import java.net.URL;
 
-public class AndroidTestByAll {
-
-    final static String USERNAME = GeneralUtils.getEnvString("SAUCE_USERNAME");
-    final static String ACCESS_KEY = GeneralUtils.getEnvString("SAUCE_ACCESS_KEY");
-    final static String SL_URL = "https://"+USERNAME+":" + ACCESS_KEY + "@ondemand.us-west-1.saucelabs.com:443/wd/hub";
-
-    private AndroidDriver driver;
-    private Eyes eyes;
-    private DesiredCapabilities caps;
+public class AndroidTestByAll extends AndroidTestSetup {
 
     private final String target = "com.applitools.app_androidx:id/layout";
     private final Integer TIMEOUT = 5000;
 
-    @BeforeTest
+    @BeforeClass
     public void before() throws MalformedURLException {
-        caps = new DesiredCapabilities();
-        caps.setCapability("deviceName","Google Pixel 5 GoogleAPI Emulator");
-        caps.setCapability("deviceOrientation", "portrait");
-        caps.setCapability("platformVersion","11.0");
-        caps.setCapability("platformName", "Android");
-        caps.setCapability("automationName", "UiAutomator2");
-        caps.setCapability("app", "https://applitools.jfrog.io/artifactory/Examples/androidx/1.3.6/app_androidx.apk");
-        caps.setCapability("appiumVersion", "1.22.0");
-        caps.setCapability("name", "Pixel 5 (java) - ByAll / ByChained");
-
-        driver = new AndroidDriver(new URL(SL_URL), caps);
-
-        eyes = new Eyes();
-        eyes.setApiKey(GeneralUtils.getEnvString("APPLITOOLS_API_KEY"));
-        eyes.setLogHandler(new StdoutLogHandler(true));
         eyes.setBatch(new BatchInfo("Android ByAll ByChained"));
-    }
-
-    @AfterTest
-    public void teardown() {
-        if (driver != null)
-            driver.quit();
-
-        eyes.abortIfNotClosed();
     }
 
     @Test
