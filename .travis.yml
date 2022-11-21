@@ -39,12 +39,7 @@ before_script:
 jobs:
   include:
     - stage: Test
-#      name: Core
-#      script:
-#        - echo $APPLITOOLS_REPORT_ID
-#        - chmod +x ./runTests.sh
-#        - ./runTests.sh "eyes.sdk.core"
-    - name: Appium Android
+      name: Appium Android
       if: type != cron
       script:
         - echo $APPLITOOLS_REPORT_ID
