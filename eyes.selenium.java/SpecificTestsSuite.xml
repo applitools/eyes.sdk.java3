@@ -1,7 +1,11 @@
 <!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd" >
 
-<!--<suite name="Java Specific Tests" verbose="1" parallel="tests" thread-count="15">-->
-<suite name="Java Specific Tests" verbose="1">
+<suite name="Java Specific Tests" verbose="1" parallel="tests" thread-count="2">
+    <test name="TestProxy">
+        <classes>
+            <class name="com.applitools.eyes.selenium.TestProxy"/>
+        </classes>
+    </test>
     <test name="TestEyes">
         <classes>
 <!--            <class name="com.applitools.eyes.selenium.TestBatchAPI"/>-->
@@ -9,6 +13,7 @@
             <class name="com.applitools.eyes.TestPadding"/>
             <class name="com.applitools.eyes.selenium.TestCodedRegionPadding"/>
             <class name="com.applitools.eyes.TestMatchLevel"/>
+            <class name="com.applitools.eyes.driver.TestCustomDriver"/>
         </classes>
     </test>
 </suite>
