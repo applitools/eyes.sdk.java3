@@ -7,24 +7,24 @@ import org.testng.annotations.Test;
 
 public class TestAndroidContentSizeFallback extends AndroidTestSetup {
 
-    @Override
-    public void setCapabilities() {
-        System.out.println("setCapabilities shouldNotFailOnTypeErrorWhenNoHelperLib");
-        capabilities.setCapability("platformName", "Android");
-        capabilities.setCapability("appium:platformVersion","10.0");
-        capabilities.setCapability("appium:deviceName","Google Pixel 3a XL GoogleAPI Emulator");
-        capabilities.setCapability("appium:automationName", "UiAutomator2");
-        capabilities.setCapability("appium:newCommandTimeout", 2000);
-
-        MutableCapabilities sauceOptions = new MutableCapabilities();
-        sauceOptions.setCapability("appiumVersion", "1.22.1");
-        sauceOptions.setCapability("deviceOrientation", "PORTRAIT");
-        sauceOptions.setCapability("name", "Java - Android");
-        sauceOptions.setCapability("idleTimeout", 300);
-        capabilities.setCapability("sauce:options", sauceOptions);
-
-        setAppCapability();
-    }
+//    @Override
+//    public void setCapabilities() {
+//        System.out.println("setCapabilities shouldNotFailOnTypeErrorWhenNoHelperLib");
+//        capabilities.setCapability("platformName", "Android");
+//        capabilities.setCapability("appium:platformVersion","10.0");
+//        capabilities.setCapability("appium:deviceName","Google Pixel 3a XL GoogleAPI Emulator");
+//        capabilities.setCapability("appium:automationName", "UiAutomator2");
+//        capabilities.setCapability("appium:newCommandTimeout", 2000);
+//
+//        MutableCapabilities sauceOptions = new MutableCapabilities();
+//        sauceOptions.setCapability("appiumVersion", "1.22.1");
+//        sauceOptions.setCapability("deviceOrientation", "PORTRAIT");
+//        sauceOptions.setCapability("name", "Java - Android");
+//        sauceOptions.setCapability("idleTimeout", 300);
+//        capabilities.setCapability("sauce:options", sauceOptions);
+//
+//        setAppCapability();
+//    }
 
     @Override
     protected void setAppCapability() {
