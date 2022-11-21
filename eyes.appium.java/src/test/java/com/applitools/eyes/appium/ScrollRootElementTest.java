@@ -13,9 +13,10 @@ public class ScrollRootElementTest extends AndroidTestSetup {
 
     @Test
     public void testScrollRootElement() throws InterruptedException {
-        eyes.open(driver,getApplicationName(),"ScrollRootElement test");
         driver.findElement(AppiumBy.id("btn_recycler_view_in_scroll_view_activity")).click();
-        Thread.sleep(1000);
+        Thread.sleep(3000);
+
+        eyes.open(driver,getApplicationName(),"ScrollRootElement test");
         eyes.check(Target.window().scrollRootElement(AppiumBy.id("recyclerView")).fully().timeout(0));
         eyes.close();
     }
