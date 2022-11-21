@@ -1,5 +1,6 @@
 ## [vNext] - dNext
 ### Fixed
+- Fix remote driver server URL mapping when using a custom driver implementation. [Trello 3067](https://trello.com/c/8eF4UZpy)
 - Fix `TestResults.delete()` not deleting the test correctly. [Trello 83, 3065](https://trello.com/c/0t5oESgv)
 - Fix `EnabledBatchClose.close()` not closing the batch correctly. [Trello 83, 3066](https://trello.com/c/Bk22nZcd)
 
