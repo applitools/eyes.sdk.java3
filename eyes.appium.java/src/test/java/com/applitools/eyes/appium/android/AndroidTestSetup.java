@@ -20,8 +20,11 @@ public abstract class AndroidTestSetup extends TestSetup {
 
     @Override
     protected void initDriver() throws MalformedURLException {
+        System.out.println("starting android driver");
+        System.out.println("capabilities: " + capabilities);
+        System.out.println("url: " + SL_URL);
         driver = new AndroidDriver(new URL(SL_URL), capabilities);
-
+        System.out.println("android driver started successfully");
     }
 
     @Override
