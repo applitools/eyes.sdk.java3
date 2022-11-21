@@ -39,11 +39,11 @@ before_script:
 jobs:
   include:
     - stage: Test
-      name: Core
-      script:
-        - echo $APPLITOOLS_REPORT_ID
-        - chmod +x ./runTests.sh
-        - ./runTests.sh "eyes.sdk.core"
+#      name: Core
+#      script:
+#        - echo $APPLITOOLS_REPORT_ID
+#        - chmod +x ./runTests.sh
+#        - ./runTests.sh "eyes.sdk.core"
     - name: Appium Android
       if: type != cron
       script:
@@ -52,12 +52,12 @@ jobs:
         - sh upload_app.sh "https://applitools.jfrog.io/artifactory/Examples/androidx/1.3.1/app_androidx.apk" "app_androidx"
         - chmod +x ./runTests.sh
         - ./runTests.sh "eyes.appium.java"
-    - name: Selenium 4
-      if: type != cron
-      script:
-        - echo $APPLITOOLS_REPORT_ID
-        - chmod +x ./runTests.sh
-        - ./runTests.sh "selenium4"
+#    - name: Selenium 4
+#      if: type != cron
+#      script:
+#        - echo $APPLITOOLS_REPORT_ID
+#        - chmod +x ./runTests.sh
+#        - ./runTests.sh "selenium4"
 #    - name: Selenium Specific
 #      addons:
 #        apt:
@@ -97,27 +97,27 @@ jobs:
     #        - sed -i 's/passedTestsSuite.xml/mobileTestsSuite.xml/g' $TRAVIS_BUILD_DIR/eyes.selenium.java/pom.xml;
     #        - chmod +x ./runTests.sh
     #        - ./runTests.sh "eyes.selenium.java"
-    - name: Generic
-      addons:
-        apt:
-          packages:
-            - dpkg # this is required for fixing Travis' invalid chrome version issue
-        chrome: stable
-        firefox: latest
-      script:
-        - "export DISPLAY=:99.0"
-        - "sh -e /etc/init.d/xvfb start"
-        - sleep 3
-        - echo $APPLITOOLS_REPORT_ID
-        - nvm install 14
-        - nvm use 14
-        - mvn clean install -DskipTests
-        - chmod +x ./initGeckoDriver.sh && ./initGeckoDriver.sh
-        - export FIREFOX_DRIVER_PATH=/home/travis/build/geckodriver
-        - chmod +x ./initChromeDriver.sh && ./initChromeDriver.sh
-        - export CHROME_DRIVER_PATH=/home/travis/build/chromedriver
-        - cd coverage-tests;
-        - chmod +x ./generic_tests.sh && ./generic_tests.sh
+#    - name: Generic
+#      addons:
+#        apt:
+#          packages:
+#            - dpkg # this is required for fixing Travis' invalid chrome version issue
+#        chrome: stable
+#        firefox: latest
+#      script:
+#        - "export DISPLAY=:99.0"
+#        - "sh -e /etc/init.d/xvfb start"
+#        - sleep 3
+#        - echo $APPLITOOLS_REPORT_ID
+#        - nvm install 14
+#        - nvm use 14
+#        - mvn clean install -DskipTests
+#        - chmod +x ./initGeckoDriver.sh && ./initGeckoDriver.sh
+#        - export FIREFOX_DRIVER_PATH=/home/travis/build/geckodriver
+#        - chmod +x ./initChromeDriver.sh && ./initChromeDriver.sh
+#        - export CHROME_DRIVER_PATH=/home/travis/build/chromedriver
+#        - cd coverage-tests;
+#        - chmod +x ./generic_tests.sh && ./generic_tests.sh
     #    - stage: Test Appium IOS
     #      if: type != cron
     #      script:
