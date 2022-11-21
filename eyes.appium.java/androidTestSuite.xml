@@ -7,15 +7,15 @@
 
     <test name="TestEyes">
         <classes>
-            <class name="com.applitools.eyes.appium.ScrollRootElementTest"/>
+<!--            <class name="com.applitools.eyes.appium.ScrollRootElementTest"/>-->
             <class name="com.applitools.eyes.appium.android.TestAndroidContentSizeFallback"/>
-            <class name="com.applitools.eyes.appium.android.AndroidTestByAll"/>
+<!--            <class name="com.applitools.eyes.appium.android.AndroidTestByAll"/>-->
         </classes>
     </test>
 
     <test name="Unit">
         <classes>
-            <class name="com.applitools.eyes.appium.unit.TestAppiumCheckSettingsMapper"/>
+<!--            <class name="com.applitools.eyes.appium.unit.TestAppiumCheckSettingsMapper"/>-->
         </classes>
     </test>
 
