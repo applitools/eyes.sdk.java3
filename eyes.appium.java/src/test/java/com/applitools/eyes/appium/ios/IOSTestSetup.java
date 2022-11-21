@@ -12,8 +12,6 @@ public abstract class IOSTestSetup extends TestSetup {
     protected void setCapabilities() {
         super.setCapabilities();
         capabilities.setCapability("platformName", "iOS");
-        capabilities.setCapability("device", "iPhone 12");
-        capabilities.setCapability("os_version", "14");
         capabilities.setCapability("automationName", "XCUITest");
         capabilities.setCapability("newCommandTimeout", 300);
         capabilities.setCapability("fullReset", false);
@@ -27,6 +25,16 @@ public abstract class IOSTestSetup extends TestSetup {
     @Override
     protected void setAppCapability() {
         capabilities.setCapability("app", "app_ios");
+    }
+
+    @Override
+    protected void setDeviceCapability() {
+        capabilities.setCapability("device", "iPhone 12");
+    }
+
+    @Override
+    protected void setPlatformVersionCapability() {
+        capabilities.setCapability("os_version", "14");
     }
 
     @Override

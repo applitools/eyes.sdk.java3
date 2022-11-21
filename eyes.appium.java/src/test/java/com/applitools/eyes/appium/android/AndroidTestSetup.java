@@ -12,20 +12,28 @@ public abstract class AndroidTestSetup extends TestSetup {
     public void setCapabilities() {
         super.setCapabilities();
         capabilities.setCapability("platformName", "Android");
-        capabilities.setCapability("appium:deviceName", "Google Pixel 5 GoogleAPI Emulator");
-        capabilities.setCapability("appium:platformVersion", "11.0");
         capabilities.setCapability("appium:automationName", "UiAutomator2");
+        capabilities.setCapability("appium:newCommandTimeout", 2000);
     }
 
     @Override
     protected void initDriver() throws MalformedURLException {
         driver = new AndroidDriver(new URL(SL_URL), capabilities);
-
     }
 
     @Override
     protected void setAppCapability() {
         capabilities.setCapability("appium:app", "https://applitools.jfrog.io/artifactory/Examples/androidx/helper_lib/1.8.6/app-androidx-debug.apk");
+    }
+
+    @Override
+    protected void setDeviceCapability() {
+        capabilities.setCapability("appium:deviceName", "Google Pixel 5 GoogleAPI Emulator");
+    }
+
+    @Override
+    protected void setPlatformVersionCapability() {
+        capabilities.setCapability("appium:platformVersion", "11.0");
     }
 
     @Override

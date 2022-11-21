@@ -69,15 +69,27 @@ public abstract class TestSetup extends ReportingTestSuite implements ITest {
     }
 
     protected void setCapabilities() {
+        setDeviceCapability();
+        setPlatformVersionCapability();
+        setSauceCapabilities();
+        setAppCapability();
+    }
+
+    protected void setSauceCapabilities() {
         MutableCapabilities sauceOptions = new MutableCapabilities();
         sauceOptions.setCapability("appiumVersion", "1.22.1");
+        sauceOptions.setCapability("name", "Java Appium");
+        sauceOptions.setCapability("idleTimeout", 300);
         capabilities.setCapability("sauce:options", sauceOptions);
-        setAppCapability();
     }
 
     protected abstract void initDriver() throws MalformedURLException;
 
     protected abstract void setAppCapability();
+
+    protected abstract void setDeviceCapability();
+
+    protected abstract void setPlatformVersionCapability();
 
     protected abstract String getApplicationName();
 }
