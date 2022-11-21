@@ -2,6 +2,7 @@ package com.applitools.eyes.appium;
 
 import com.applitools.eyes.EyesException;
 import com.applitools.eyes.selenium.universal.dto.SelectorRegionDto;
+import com.applitools.eyes.selenium.universal.mapper.SelectorRegionMapper;
 import com.applitools.utils.GeneralUtils;
 import io.appium.java_client.AppiumBy;
 import io.appium.java_client.MobileBy;
@@ -66,6 +67,9 @@ public class AppiumSelectorRegionMapper {
       selectorRegionDto.setType("-image");
     } else if (by instanceof AppiumBy.ByCustom) {
       selectorRegionDto.setType("-custom");
+    } // if there are no appium instances, try selenium
+    else {
+      selectorRegionDto = SelectorRegionMapper.toSelectorRegionDto(by);
     }
     return selectorRegionDto;
   }

@@ -13,4 +13,9 @@
             <class name="com.applitools.eyes.selenium.TestByAll"/>
         </classes>
     </test>
+    <test name="Unit" parallel="classes">
+        <classes>
+            <class name="com.applitools.eyes.unit.TestSeleniumCheckSettingsMapper"/>
+        </classes>
+    </test>
 </suite>
