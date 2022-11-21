@@ -26,12 +26,12 @@ public class TestAndroidContentSizeFallback extends AndroidTestSetup {
 //        setAppCapability();
 //    }
 
-    @Override
-    protected void setAppCapability() {
-        System.out.println("setAppCapability shouldNotFailOnTypeErrorWhenNoHelperLib");
-        // app-androidx-debug_v4.16.2_no_helper.apk from Sauce storage
-        capabilities.setCapability("appium:app", "storage:filename=app-androidx-debug_v4.16.2_no_helper.apk");
-    }
+//    @Override
+//    protected void setAppCapability() {
+//        System.out.println("setAppCapability shouldNotFailOnTypeErrorWhenNoHelperLib");
+//        // app-androidx-debug_v4.16.2_no_helper.apk from Sauce storage
+//        capabilities.setCapability("appium:app", "storage:filename=app-androidx-debug_v4.16.2_no_helper.apk");
+//    }
 
     @Test
     public void shouldNotFailOnTypeErrorWhenNoHelperLib() throws InterruptedException {
