@@ -1,3 +1,8 @@
+## [5.36.0] - 2022-11-21
+### Fixed
+- Fix fallback for Content Size error for Android
+- Add Selenium By as fallback to AppiumBy types.
+
 ## [5.34.0] - 2022-11-03
 ### Fixed
 - Fixed handling context lists in Appium
