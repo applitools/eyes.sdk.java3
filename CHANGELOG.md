@@ -4,6 +4,9 @@
 - Fix `TestResults.delete()` not deleting the test correctly. [Trello 83, 3065](https://trello.com/c/0t5oESgv)
 - Fix `EnabledBatchClose.close()` not closing the batch correctly. [Trello 83, 3066](https://trello.com/c/Bk22nZcd)
 
+### Updated
+- Update Universal binaries to 3.0.2 [Trello 3074](https://trello.com/c/DJCsbgY3)
+
 ## [5.35.0] - 2022-11-8
 ### Added
 - Images SDK eyes.images.java5
