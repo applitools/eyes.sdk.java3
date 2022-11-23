@@ -21,22 +21,22 @@ jobs:
         os: [ ubuntu-latest, macos-latest, windows-latest ]
         java-version: [ "8", "11" ]
       runs-on: ${{ matrix.os }}
-      steps:
-        - uses: actions/checkout@v3
-          with:
-            submodules: "recursive"
-            token: ${{ secrets.SUBMODULES_GA_TOKEN }}
-        - uses: actions/setup-node@v3
-          with:
-            node-version: 16
-        - uses: actions/setup-java@v3
-          with:
-            java-version: ${{ matrix.java-version }}
-            distribution: "temurin"
-        - run: |
-            echo $APPLITOOLS_REPORT_ID
-            chmod +x ./runTests.sh
-            ./runTests.sh "eyes.sdk.core"
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          submodules: "recursive"
+          token: ${{ secrets.SUBMODULES_GA_TOKEN }}
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 16
+      - uses: actions/setup-java@v3
+        with:
+          java-version: ${{ matrix.java-version }}
+          distribution: "temurin"
+      - run: |
+          echo $APPLITOOLS_REPORT_ID
+          chmod +x ./runTests.sh
+          ./runTests.sh "eyes.sdk.core"
 #          working-directory: java
-          env:
-            APPLITOOLS_API_KEY: ${{ secrets.APPLITOOLS_API_KEY }}
+        env:
+          APPLITOOLS_API_KEY: ${{ secrets.APPLITOOLS_API_KEY }}
