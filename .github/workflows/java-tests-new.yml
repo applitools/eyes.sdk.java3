@@ -6,17 +6,7 @@ on:
 #  pull_request:
 
 jobs:
-  build:
-    runs-on: ubuntu-latest
-    steps:
-      - run: |
-          pushd eyes.ufg.java/src/main/resources
-          npm install
-          popd
-          mvn clean install -DskipTests
-
   core-tests:
-    needs: build
     strategy:
       matrix:
         os: [ ubuntu-latest, macos-latest, windows-latest ]
@@ -34,6 +24,11 @@ jobs:
         with:
           java-version: ${{ matrix.java-version }}
           distribution: "temurin"
+      - run: |
+          pushd eyes.ufg.java/src/main/resources
+          npm install
+          popd
+          mvn clean install -DskipTests
       - run: |
           echo $APPLITOOLS_REPORT_ID
           chmod +x ./runTests.sh
