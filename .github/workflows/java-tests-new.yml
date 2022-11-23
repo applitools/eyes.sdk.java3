@@ -24,15 +24,16 @@ jobs:
         with:
           java-version: ${{ matrix.java-version }}
           distribution: "temurin"
-      - run: |
+      - name: initialize
+        run: |
           pushd eyes.ufg.java/src/main/resources
           npm install
           popd
           mvn clean install -DskipTests
-      - run: |
+      - name: SDK Core tests
+        run: |
           echo $APPLITOOLS_REPORT_ID
-          chmod +x ./runTests.sh
-          ./runTests.sh "eyes.sdk.core"
+          mvn test -pl "eyes.sdk.core" -e -X
 #          working-directory: java
         env:
           APPLITOOLS_API_KEY: ${{ secrets.APPLITOOLS_API_KEY }}
