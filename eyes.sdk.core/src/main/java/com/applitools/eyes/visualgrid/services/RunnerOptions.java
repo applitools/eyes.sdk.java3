@@ -1,23 +1,15 @@
 package com.applitools.eyes.visualgrid.services;
 
-import com.applitools.eyes.AbstractProxySettings;
+import com.applitools.eyes.*;
 
 public class RunnerOptions {
-
-    public enum AutProxyMode {
-        BLOCK,
-        ALLOW
-    }
 
     private Integer testConcurrency = null;
     private String apiKey = null;
     private String serverUrl = null;
     private AbstractProxySettings proxy = null;
-
-    private boolean isAutProxySet = false;
-    private AbstractProxySettings autProxy = null;
-    private String[] autProxyDomains = null;
-    private AutProxyMode autProxyMode;
+    private AutProxySettings autProxy = null;
+    private LogHandler logHandler  = new NullLogHandler();
 
     public RunnerOptions testConcurrency(int testConcurrency) {
         this.testConcurrency = testConcurrency;
@@ -61,8 +53,7 @@ public class RunnerOptions {
      * If AUT proxy is set to null, there will be no proxy for those specific requests.
      */
     public RunnerOptions autProxy(AbstractProxySettings autProxy) {
-        isAutProxySet = true;
-        this.autProxy = autProxy;
+        this.autProxy = new AutProxySettings(autProxy, null, null);
         return this;
     }
 
@@ -82,26 +73,24 @@ public class RunnerOptions {
      * If AUT proxy is set to null, the behavior will be the same as {@link #autProxy(AbstractProxySettings)}
      */
     public RunnerOptions autProxy(AbstractProxySettings autProxy, String[] domains, AutProxyMode mode) {
-        isAutProxySet = true;
-        this.autProxy = autProxy;
-        this.autProxyDomains = domains;
-        this.autProxyMode = mode;
+        this.autProxy = new AutProxySettings(autProxy, domains, mode);
         return this;
     }
 
-    public AbstractProxySettings getAutProxy() {
+    public RunnerOptions autProxy(AutProxySettings autProxy) {
+        this.autProxy = autProxy;
+        return this;
+    }
+
+    public AutProxySettings getAutProxy() {
         return autProxy;
     }
 
-    public String[] getAutProxyDomains() {
-        return autProxyDomains;
+    public RunnerOptions logHandler(LogHandler logHandler) {
+        this.logHandler = logHandler;
+        return this;
     }
 
-    public AutProxyMode getAutProxyMode() {
-        return autProxyMode;
-    }
+    public LogHandler getLogHandler() { return logHandler; }
 
-    public boolean isAutProxySet() {
-        return isAutProxySet;
-    }
 }

@@ -4,10 +4,9 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import com.applitools.eyes.selenium.fluent.FrameLocator;
-import com.applitools.eyes.selenium.universal.dto.ContextReferenceDto;
 import com.applitools.eyes.selenium.universal.dto.ElementRegionDto;
-import com.applitools.eyes.selenium.universal.dto.ScrollRootElementDto;
-import com.applitools.eyes.selenium.universal.dto.SelectorRegionDto;
+import com.applitools.eyes.universal.dto.ContextReferenceDto;
+import com.applitools.eyes.universal.dto.SelectorRegionDto;
 import com.google.common.base.Strings;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;

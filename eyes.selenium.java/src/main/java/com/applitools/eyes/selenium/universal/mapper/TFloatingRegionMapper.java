@@ -8,6 +8,8 @@ import com.applitools.eyes.fluent.GetFloatingRegion;
 import com.applitools.eyes.selenium.fluent.FloatingRegionByElement;
 import com.applitools.eyes.selenium.fluent.FloatingRegionBySelector;
 import com.applitools.eyes.selenium.universal.dto.*;
+import com.applitools.eyes.universal.dto.*;
+import com.applitools.eyes.universal.mapper.RectangleRegionMapper;
 
 /**
  * floating region mapper

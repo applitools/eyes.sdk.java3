@@ -1,6 +1,7 @@
 package com.applitools.eyes.selenium.universal.mapper;
 
 import com.applitools.eyes.selenium.universal.dto.EmulationBaseInfoDto;
+import com.applitools.eyes.universal.mapper.ViewportSizeMapper;
 import com.applitools.eyes.visualgrid.model.EmulationBaseInfo;
 import com.applitools.eyes.visualgrid.model.EmulationDevice;
 

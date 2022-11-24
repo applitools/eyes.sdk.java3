@@ -1,9 +1,15 @@
 package com.applitools.eyes.locators;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
+import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.List;
 
 public class VisualLocatorSettings {
+
+    @JsonIgnore
+    BufferedImage image;
 
     private List<String> names = new ArrayList<>();
     private Boolean firstOnly;
@@ -43,6 +49,12 @@ public class VisualLocatorSettings {
         return clone;
     }
 
+    public VisualLocatorSettings image(BufferedImage image) {
+        VisualLocatorSettings clone = clone();
+        clone.image = image;
+        return clone;
+    }
+
     protected VisualLocatorSettings clone() {
         VisualLocatorSettings settings = new VisualLocatorSettings();
         populateClone(settings);
@@ -52,6 +64,7 @@ public class VisualLocatorSettings {
     private void populateClone(VisualLocatorSettings clone) {
         clone.names = this.names;
         clone.firstOnly = this.firstOnly;
+        clone.image = this.image;
     }
 
     public List<String> getNames() {
@@ -61,4 +74,9 @@ public class VisualLocatorSettings {
     public Boolean isFirstOnly() {
         return firstOnly;
     }
+
+    public BufferedImage getImage() {
+        return image;
+    }
+
 }

@@ -20,4 +20,17 @@ public class Target {
     public static AppiumCheckSettings region(WebElement webElement) {
         return new AppiumCheckSettings(webElement);
     }
+
+    public static AppiumCheckSettings webview() {
+        return webview(true);
+    }
+
+    public static AppiumCheckSettings webview(Boolean isWebView) {
+        return new AppiumCheckSettings(isWebView);
+    }
+
+    public static AppiumCheckSettings webview(String webView) {
+        return new AppiumCheckSettings(webView);
+    }
+
 }

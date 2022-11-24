@@ -14,6 +14,7 @@ import java.awt.image.DataBuffer;
 import java.awt.image.DataBufferByte;
 import java.awt.image.Raster;
 import java.io.*;
+import java.net.URL;
 import java.nio.charset.Charset;
 
 public class ImageUtils {
@@ -553,4 +554,14 @@ public class ImageUtils {
         }
     }
 
+    public static BufferedImage imageFromUrl(URL url) {
+        ArgumentGuard.notNull(url, "url");
+        try {
+            BufferedImage img;
+            img = ImageIO.read(url);
+            return img;
+        } catch (IOException e) {
+            throw new EyesException("Failed load image from URL", e);
+        }
+    }
 }

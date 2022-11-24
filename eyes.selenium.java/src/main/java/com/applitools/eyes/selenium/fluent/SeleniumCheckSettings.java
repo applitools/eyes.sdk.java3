@@ -7,7 +7,6 @@ import com.applitools.eyes.fluent.ICheckSettingsInternal;
 import com.applitools.eyes.positioning.PositionProvider;
 import com.applitools.eyes.selenium.CheckState;
 import com.applitools.eyes.selenium.EyesSeleniumUtils;
-import com.applitools.eyes.selenium.LazyLoadOptions;
 import com.applitools.eyes.selenium.TargetPathLocator;
 import com.applitools.eyes.selenium.positioning.CssTranslatePositionProvider;
 import com.applitools.eyes.selenium.wrappers.EyesSeleniumDriver;
@@ -47,7 +46,6 @@ public class SeleniumCheckSettings extends CheckSettings implements ISeleniumChe
     private Boolean isDefaultLayoutBreakpointsSet;
     private final List<Integer> layoutBreakpoints = new ArrayList<>();
     private String pageId;
-    private LazyLoadOptions lazyLoadOptions;
 
     public SeleniumCheckSettings() {
     }
@@ -101,7 +99,6 @@ public class SeleniumCheckSettings extends CheckSettings implements ISeleniumChe
         clone.isDefaultLayoutBreakpointsSet = this.isDefaultLayoutBreakpointsSet;
         clone.layoutBreakpoints.addAll(this.layoutBreakpoints);
         clone.pageId = this.pageId;
-        clone.lazyLoadOptions = this.lazyLoadOptions;
         return clone;
     }
 
@@ -239,27 +236,77 @@ public class SeleniumCheckSettings extends CheckSettings implements ISeleniumChe
         return clone;
     }
 
+    /**
+     * add one ignore region with padding
+     * @param selector By selector to ignore when validating the screenshot.
+     * @param padding Padding to add around the ignore region
+     * @return An updated clone of this settings object.
+     */
+    public SeleniumCheckSettings ignore(By selector, Padding padding) {
+        SeleniumCheckSettings clone = this.clone();
+        clone.ignore_(new SimpleRegionBySelector(selector, padding));
+        return clone;
+    }
+
+    /**
+     * add one ignore region with padding and a region ID
+     * @param selector By selector to ignore when validating the screenshot.
+     * @param padding Padding to add around the ignore region.
+     * @param regionId The region ID
+     * @return An updated clone of this settings object.
+     */
+    public SeleniumCheckSettings ignore(By selector, Padding padding, String regionId) {
+        SeleniumCheckSettings clone = this.clone();
+        clone.ignore_(new SimpleRegionBySelector(selector, padding).regionId(regionId));
+        return clone;
+    }
+
+    /**
+     * add one ignore region with padding
+     * @param element WebElement to ignore when validating the screenshot.
+     * @param padding Padding to add around the ignore region
+     * @return An updated clone of this settings object.
+     */
+    public SeleniumCheckSettings ignore(WebElement element, Padding padding) {
+        SeleniumCheckSettings clone = this.clone();
+        clone.ignore_(new SimpleRegionByElement(element, padding));
+        return clone;
+    }
+
+    /**
+     * add one ignore region with padding and a region ID
+     * @param element WebElement to ignore when validating the screenshot.
+     * @param padding Padding to add around the ignore region.
+     * @param regionId The region ID
+     * @return An updated clone of this settings object.
+     */
+    public SeleniumCheckSettings ignore(WebElement element, Padding padding, String regionId) {
+        SeleniumCheckSettings clone = this.clone();
+        clone.ignore_(new SimpleRegionByElement(element, padding).regionId(regionId));
+        return clone;
+    }
+
     public SeleniumCheckSettings ignore(By selector, int leftPadding, int topPadding, int rightPadding, int bottomPadding) {
         SeleniumCheckSettings clone = this.clone();
-        clone.ignore_(new SimpleRegionBySelector(selector, new Borders(leftPadding, topPadding, rightPadding, bottomPadding)));
+        clone.ignore_(new SimpleRegionBySelector(selector, new Padding(topPadding, rightPadding, bottomPadding, leftPadding)));
         return clone;
     }
 
     public SeleniumCheckSettings ignore(By selector, int leftPadding, int topPadding, int rightPadding, int bottomPadding, String regionId) {
         SeleniumCheckSettings clone = this.clone();
-        clone.ignore_(new SimpleRegionBySelector(selector, new Borders(leftPadding, topPadding, rightPadding, bottomPadding)).regionId(regionId));
+        clone.ignore_(new SimpleRegionBySelector(selector, new Padding(topPadding, rightPadding, bottomPadding, leftPadding)).regionId(regionId));
         return clone;
     }
 
     public SeleniumCheckSettings ignore(WebElement element, int leftPadding, int topPadding, int rightPadding, int bottomPadding) {
         SeleniumCheckSettings clone = this.clone();
-        clone.ignore_(new SimpleRegionByElement(element, new Borders(leftPadding, topPadding, rightPadding, bottomPadding)));
+        clone.ignore_(new SimpleRegionByElement(element, new Padding(topPadding, rightPadding, bottomPadding, leftPadding)));
         return clone;
     }
 
     public SeleniumCheckSettings ignore(WebElement element, int leftPadding, int topPadding, int rightPadding, int bottomPadding, String regionId) {
         SeleniumCheckSettings clone = this.clone();
-        clone.ignore_(new SimpleRegionByElement(element, new Borders(leftPadding, topPadding, rightPadding, bottomPadding)).regionId(regionId));
+        clone.ignore_(new SimpleRegionByElement(element, new Padding(topPadding, rightPadding, bottomPadding, leftPadding)).regionId(regionId));
         return clone;
     }
 
@@ -343,27 +390,77 @@ public class SeleniumCheckSettings extends CheckSettings implements ISeleniumChe
         return clone;
     }
 
+    /**
+     * add one layout region with padding.
+     * @param selector By selector to match using the Layout method.
+     * @param padding Padding to add around the layout region.
+     * @return An updated clone of this settings object.
+     */
+    public SeleniumCheckSettings layout(By selector, Padding padding) {
+        SeleniumCheckSettings clone = this.clone();
+        clone.layout_(new SimpleRegionBySelector(selector, padding));
+        return clone;
+    }
+
+    /**
+     * add one layout region with padding and a region ID.
+     * @param selector By selector to match using the Layout method.
+     * @param padding Padding to add around the layout region.
+     * @param regionId The region ID.
+     * @return An updated clone of this settings object.
+     */
+    public SeleniumCheckSettings layout(By selector, Padding padding, String regionId) {
+        SeleniumCheckSettings clone = this.clone();
+        clone.layout_(new SimpleRegionBySelector(selector, padding).regionId(regionId));
+        return clone;
+    }
+
+    /**
+     * add one layout region with padding.
+     * @param element WebElement to match using the Layout method.
+     * @param padding Padding to add around the layout region.
+     * @return An updated clone of this settings object.
+     */
+    public SeleniumCheckSettings layout(WebElement element, Padding padding) {
+        SeleniumCheckSettings clone = this.clone();
+        clone.layout_(new SimpleRegionByElement(element, padding));
+        return clone;
+    }
+
+    /**
+     * add one layout region with padding and a region ID
+     * @param element WebElement to match using the Layout method.
+     * @param padding Padding to add around the layout region.
+     * @param regionId The region ID.
+     * @return An updated clone of this settings object.
+     */
+    public SeleniumCheckSettings layout(WebElement element, Padding padding, String regionId) {
+        SeleniumCheckSettings clone = this.clone();
+        clone.ignore_(new SimpleRegionByElement(element, padding).regionId(regionId));
+        return clone;
+    }
+
     public SeleniumCheckSettings layout(By selector, int leftPadding, int topPadding, int rightPadding, int bottomPadding) {
         SeleniumCheckSettings clone = this.clone();
-        clone.layout_(new SimpleRegionBySelector(selector, new Borders(leftPadding, topPadding, rightPadding, bottomPadding)));
+        clone.layout_(new SimpleRegionBySelector(selector, new Padding(topPadding, rightPadding, bottomPadding, leftPadding)));
         return clone;
     }
 
     public SeleniumCheckSettings layout(By selector, int leftPadding, int topPadding, int rightPadding, int bottomPadding, String regionId) {
         SeleniumCheckSettings clone = this.clone();
-        clone.layout_(new SimpleRegionBySelector(selector, new Borders(leftPadding, topPadding, rightPadding, bottomPadding)).regionId(regionId));
+        clone.layout_(new SimpleRegionBySelector(selector, new Padding(topPadding, rightPadding, bottomPadding, leftPadding)).regionId(regionId));
         return clone;
     }
 
     public SeleniumCheckSettings layout(WebElement element, int leftPadding, int topPadding, int rightPadding, int bottomPadding) {
         SeleniumCheckSettings clone = this.clone();
-        clone.layout_(new SimpleRegionByElement(element, new Borders(leftPadding, topPadding, rightPadding, bottomPadding)));
+        clone.layout_(new SimpleRegionByElement(element, new Padding(topPadding, rightPadding, bottomPadding, leftPadding)));
         return clone;
     }
 
     public SeleniumCheckSettings layout(WebElement element, int leftPadding, int topPadding, int rightPadding, int bottomPadding, String regionId) {
         SeleniumCheckSettings clone = this.clone();
-        clone.layout_(new SimpleRegionByElement(element, new Borders(leftPadding, topPadding, rightPadding, bottomPadding)).regionId(regionId));
+        clone.layout_(new SimpleRegionByElement(element, new Padding(topPadding, rightPadding, bottomPadding, leftPadding)).regionId(regionId));
         return clone;
     }
 
@@ -447,27 +544,77 @@ public class SeleniumCheckSettings extends CheckSettings implements ISeleniumChe
         return clone;
     }
 
+    /**
+     * add one strict region with padding.
+     * @param selector By selector to match using the Strict method.
+     * @param padding Padding to add around the strict region.
+     * @return An updated clone of this settings object.
+     */
+    public SeleniumCheckSettings strict(By selector, Padding padding) {
+        SeleniumCheckSettings clone = this.clone();
+        clone.strict_(new SimpleRegionBySelector(selector, padding));
+        return clone;
+    }
+
+    /**
+     * add one strict region with padding and a region ID.
+     * @param selector By selector to match using the Strict method.
+     * @param padding Padding to add around the strict region.
+     * @param regionId The region ID.
+     * @return An updated clone of this settings object.
+     */
+    public SeleniumCheckSettings strict(By selector, Padding padding, String regionId) {
+        SeleniumCheckSettings clone = this.clone();
+        clone.strict_(new SimpleRegionBySelector(selector, padding).regionId(regionId));
+        return clone;
+    }
+
+    /**
+     * add one strict region with padding.
+     * @param element WebElement to match using the Strict method.
+     * @param padding Padding to add around the strict region.
+     * @return An updated clone of this settings object.
+     */
+    public SeleniumCheckSettings strict(WebElement element, Padding padding) {
+        SeleniumCheckSettings clone = this.clone();
+        clone.strict_(new SimpleRegionByElement(element, padding));
+        return clone;
+    }
+
+    /**
+     * add one strict region with padding and a region ID
+     * @param element WebElement to match using the Strict method.
+     * @param padding Padding to add around the strict region.
+     * @param regionId The region ID.
+     * @return An updated clone of this settings object.
+     */
+    public SeleniumCheckSettings strict(WebElement element, Padding padding, String regionId) {
+        SeleniumCheckSettings clone = this.clone();
+        clone.strict_(new SimpleRegionByElement(element, padding).regionId(regionId));
+        return clone;
+    }
+
     public SeleniumCheckSettings strict(By selector, int leftPadding, int topPadding, int rightPadding, int bottomPadding) {
         SeleniumCheckSettings clone = this.clone();
-        clone.strict_(new SimpleRegionBySelector(selector, new Borders(leftPadding, topPadding, rightPadding, bottomPadding)));
+        clone.strict_(new SimpleRegionBySelector(selector, new Padding(topPadding, rightPadding, bottomPadding, leftPadding)));
         return clone;
     }
 
     public SeleniumCheckSettings strict(By selector, int leftPadding, int topPadding, int rightPadding, int bottomPadding, String regionId) {
         SeleniumCheckSettings clone = this.clone();
-        clone.strict_(new SimpleRegionBySelector(selector, new Borders(leftPadding, topPadding, rightPadding, bottomPadding)).regionId(regionId));
+        clone.strict_(new SimpleRegionBySelector(selector, new Padding(topPadding, rightPadding, bottomPadding, leftPadding)).regionId(regionId));
         return clone;
     }
 
     public SeleniumCheckSettings strict(WebElement element, int leftPadding, int topPadding, int rightPadding, int bottomPadding) {
         SeleniumCheckSettings clone = this.clone();
-        clone.strict_(new SimpleRegionByElement(element, new Borders(leftPadding, topPadding, rightPadding, bottomPadding)));
+        clone.strict_(new SimpleRegionByElement(element, new Padding(topPadding, rightPadding, bottomPadding, leftPadding)));
         return clone;
     }
 
     public SeleniumCheckSettings strict(WebElement element, int leftPadding, int topPadding, int rightPadding, int bottomPadding, String regionId) {
         SeleniumCheckSettings clone = this.clone();
-        clone.strict_(new SimpleRegionByElement(element, new Borders(leftPadding, topPadding, rightPadding, bottomPadding)).regionId(regionId));
+        clone.strict_(new SimpleRegionByElement(element, new Padding(topPadding, rightPadding, bottomPadding, leftPadding)).regionId(regionId));
         return clone;
     }
 
@@ -551,27 +698,77 @@ public class SeleniumCheckSettings extends CheckSettings implements ISeleniumChe
         return clone;
     }
 
+    /**
+     * add one content region with padding.
+     * @param selector By selector to match using the Content method.
+     * @param padding Padding to add around the content region.
+     * @return An updated clone of this settings object.
+     */
+    public SeleniumCheckSettings content(By selector, Padding padding) {
+        SeleniumCheckSettings clone = this.clone();
+        clone.content_(new SimpleRegionBySelector(selector, padding));
+        return clone;
+    }
+
+    /**
+     * add one content region with padding and a region ID.
+     * @param selector By selector to match using the Content method.
+     * @param padding Padding to add around the content region.
+     * @param regionId The region ID.
+     * @return An updated clone of this settings object.
+     */
+    public SeleniumCheckSettings content(By selector, Padding padding, String regionId) {
+        SeleniumCheckSettings clone = this.clone();
+        clone.content_(new SimpleRegionBySelector(selector, padding).regionId(regionId));
+        return clone;
+    }
+
+    /**
+     * add one content region with padding.
+     * @param element WebElement to match using the Content method.
+     * @param padding Padding to add around the content region.
+     * @return An updated clone of this settings object.
+     */
+    public SeleniumCheckSettings content(WebElement element, Padding padding) {
+        SeleniumCheckSettings clone = this.clone();
+        clone.content_(new SimpleRegionByElement(element, padding));
+        return clone;
+    }
+
+    /**
+     * add one content region with padding and a region ID
+     * @param element WebElement to match using the Content method.
+     * @param padding Padding to add around the content region.
+     * @param regionId The region ID.
+     * @return An updated clone of this settings object.
+     */
+    public SeleniumCheckSettings content(WebElement element, Padding padding, String regionId) {
+        SeleniumCheckSettings clone = this.clone();
+        clone.content_(new SimpleRegionByElement(element, padding).regionId(regionId));
+        return clone;
+    }
+
     public SeleniumCheckSettings content(By selector, int leftPadding, int topPadding, int rightPadding, int bottomPadding) {
         SeleniumCheckSettings clone = this.clone();
-        clone.content_(new SimpleRegionBySelector(selector, new Borders(leftPadding, topPadding, rightPadding, bottomPadding)));
+        clone.content_(new SimpleRegionBySelector(selector, new Padding(topPadding, rightPadding, bottomPadding, leftPadding)));
         return clone;
     }
 
     public SeleniumCheckSettings content(By selector, int leftPadding, int topPadding, int rightPadding, int bottomPadding, String regionId) {
         SeleniumCheckSettings clone = this.clone();
-        clone.content_(new SimpleRegionBySelector(selector, new Borders(leftPadding, topPadding, rightPadding, bottomPadding)).regionId(regionId));
+        clone.content_(new SimpleRegionBySelector(selector, new Padding(topPadding, rightPadding, bottomPadding, leftPadding)).regionId(regionId));
         return clone;
     }
 
     public SeleniumCheckSettings content(WebElement element, int leftPadding, int topPadding, int rightPadding, int bottomPadding) {
         SeleniumCheckSettings clone = this.clone();
-        clone.content_(new SimpleRegionByElement(element, new Borders(leftPadding, topPadding, rightPadding, bottomPadding)));
+        clone.content_(new SimpleRegionByElement(element, new Padding(topPadding, rightPadding, bottomPadding, leftPadding)));
         return clone;
     }
 
     public SeleniumCheckSettings content(WebElement element, int leftPadding, int topPadding, int rightPadding, int bottomPadding, String regionId) {
         SeleniumCheckSettings clone = this.clone();
-        clone.content_(new SimpleRegionByElement(element, new Borders(leftPadding, topPadding, rightPadding, bottomPadding)).regionId(regionId));
+        clone.content_(new SimpleRegionByElement(element, new Padding(topPadding, rightPadding, bottomPadding, leftPadding)).regionId(regionId));
         return clone;
     }
 
@@ -862,21 +1059,19 @@ public class SeleniumCheckSettings extends CheckSettings implements ISeleniumChe
         return this.pageId;
     }
 
-
+    @Override
     public SeleniumCheckSettings lazyLoad() {
-        SeleniumCheckSettings clone = this.clone();
-        clone.lazyLoadOptions = new LazyLoadOptions();
-        return clone;
+        return (SeleniumCheckSettings) super.lazyLoad();
     }
 
+    @Override
     public SeleniumCheckSettings lazyLoad(LazyLoadOptions lazyLoadOptions) {
-        SeleniumCheckSettings clone = this.clone();
-        clone.lazyLoadOptions = lazyLoadOptions;
-        return clone;
+        return (SeleniumCheckSettings) super.lazyLoad(lazyLoadOptions);
     }
 
+    @Override
     public LazyLoadOptions getLazyLoadOptions() {
-        return this.lazyLoadOptions;
+        return super.getLazyLoadOptions();
     }
 
     public TargetPathLocator getTargetPathLocator() {

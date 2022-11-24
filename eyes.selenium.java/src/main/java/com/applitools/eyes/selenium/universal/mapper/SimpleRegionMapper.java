@@ -8,6 +8,7 @@ import com.applitools.eyes.fluent.SimpleRegionByRectangle;
 import com.applitools.eyes.selenium.fluent.SimpleRegionByElement;
 import com.applitools.eyes.selenium.fluent.SimpleRegionBySelector;
 import com.applitools.eyes.selenium.universal.dto.SimpleRegionDto;
+import com.applitools.eyes.universal.mapper.RegionMapper;
 
 /**
  * simple region mapper

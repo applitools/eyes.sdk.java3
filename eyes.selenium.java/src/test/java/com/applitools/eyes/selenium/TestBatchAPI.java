@@ -7,6 +7,7 @@ import com.applitools.eyes.utils.ReportingTestSuite;
 import com.applitools.eyes.utils.SeleniumUtils;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
+import org.openqa.selenium.chrome.ChromeOptions;
 import org.testng.Assert;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
@@ -24,11 +25,15 @@ public final class TestBatchAPI extends ReportingTestSuite {
 
     @BeforeClass
     public static void classSetup() {
-//        String chromeDriverPath = System.getenv("CHROME_DRIVER_PATH");
-//        if(chromeDriverPath == null) throw new EyesException("CHROME_DRIVER_PATH missing");
-//        System.setProperty("webdriver.chrome.driver", chromeDriverPath);
-//        driver = SeleniumUtils.createChromeDriver();
-        driver = new ChromeDriver();
+        String chromeDriverPath = System.getenv("CHROME_DRIVER_PATH");
+        if(chromeDriverPath == null) throw new EyesException("CHROME_DRIVER_PATH missing");
+        System.setProperty("webdriver.chrome.driver", chromeDriverPath);
+
+        ChromeOptions options = new ChromeOptions().setHeadless(true);
+        options.addArguments("--disable-gpu"); // applicable to windows os only
+        options.addArguments("--no-sandbox"); // Bypass OS security model
+        driver = new ChromeDriver(options);
+
         driver.get("https://applitools.com/helloworld");
     }
 

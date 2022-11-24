@@ -1,6 +1,6 @@
 package com.applitools.eyes.selenium.universal.mapper;
 
-import com.applitools.eyes.selenium.universal.dto.IosDeviceInfoDto;
+import com.applitools.eyes.universal.dto.IosDeviceInfoDto;
 import com.applitools.eyes.visualgrid.model.IosDeviceInfo;
 
 /**

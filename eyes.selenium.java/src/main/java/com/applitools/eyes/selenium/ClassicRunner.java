@@ -16,6 +16,7 @@ import com.applitools.eyes.SyncTaskListener;
 import com.applitools.eyes.TestResultContainer;
 import com.applitools.eyes.TestResults;
 import com.applitools.eyes.TestResultsSummary;
+import com.applitools.eyes.exceptions.StaleElementReferenceException;
 import com.applitools.utils.ClassVersionGetter;
 
 
@@ -42,7 +43,13 @@ public class ClassicRunner extends EyesRunner {
 
   protected ClassicRunner(String baseAgentId, String version) {
     super(baseAgentId, version);
-    managerRef = commandExecutor.coreMakeManager(ManagerType.CLASSIC.value, null, null);
+    //TODO - check if baseAgentId is the correct agentId here
+    managerRef = commandExecutor.coreMakeManager(ManagerType.CLASSIC.value, null, null, baseAgentId);
+  }
+
+  @Override
+  public StaleElementReferenceException getStaleElementException() {
+    return new com.applitools.eyes.selenium.exceptions.StaleElementReferenceException();
   }
 
   @Override
@@ -62,10 +69,10 @@ public class ClassicRunner extends EyesRunner {
     this.allTestResult.add(testResult);
   }
 
-  @Override
-  public void setServerConnector(ServerConnector serverConnector) {
-    super.setServerConnector(serverConnector);
-  }
+//  @Override
+//  public void setServerConnector(ServerConnector serverConnector) {
+//    super.setServerConnector(serverConnector);
+//  }
 
   public RunningSession open(final String testId, SessionStartInfo sessionStartInfo) {
     final SyncTaskListener<RunningSession> listener = new SyncTaskListener<>(logger, String.format("openBase %s", sessionStartInfo));

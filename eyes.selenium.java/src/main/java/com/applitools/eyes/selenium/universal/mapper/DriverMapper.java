@@ -3,7 +3,10 @@ package com.applitools.eyes.selenium.universal.mapper;
 import java.lang.reflect.Field;
 
 import com.applitools.eyes.EyesException;
+import com.applitools.eyes.WebDriverProxySettings;
 import com.applitools.eyes.selenium.universal.dto.DriverDto;
+import com.applitools.eyes.selenium.universal.dto.DriverTargetDto;
+import com.applitools.eyes.universal.dto.ProxyDto;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.remote.HttpCommandExecutor;
 import org.openqa.selenium.remote.RemoteWebDriver;
@@ -100,4 +103,24 @@ public class DriverMapper {
       throw  new Exception("Cannot extract remote url from webdriver");
   }
 
+    public static DriverTargetDto toDriverTargetDto(WebDriver driver, WebDriverProxySettings wdProxy) {
+        if (driver == null) {
+            return null;
+        }
+
+        RemoteWebDriver remoteDriver = (RemoteWebDriver) driver;
+
+        DriverTargetDto driverTargetDto = new DriverTargetDto();
+        driverTargetDto.setSessionId(remoteDriver.getSessionId().toString());
+        driverTargetDto.setServerUrl(getRemoteServerUrl(remoteDriver));
+        driverTargetDto.setCapabilities(remoteDriver.getCapabilities().asMap());
+
+        ProxyDto proxyDto = new ProxyDto();
+        proxyDto.setUrl(wdProxy != null? wdProxy.getUrl() : null);
+        proxyDto.setUsername(wdProxy != null? wdProxy.getUsername() : null);
+        proxyDto.setPassword(wdProxy != null? wdProxy.getPassword() : null);
+        driverTargetDto.setProxy(proxyDto);
+
+        return driverTargetDto;
+    }
 }

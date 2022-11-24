@@ -1,16 +1,57 @@
 package com.applitools.eyes;
 
+import com.fasterxml.jackson.annotation.JsonPropertyOrder;
+
 /**
  * The environment in which the application under test is executing.
  */
+@JsonPropertyOrder({
+        "inferred",
+        "os",
+        "hostingApp",
+        "displaySize",
+        "deviceInfo",
+        "osInfo",
+        "hostingAppInfo",
+})
 public class AppEnvironment {
+
     private String inferred;
+
+    /**
+     * the OS name.
+     * former "hostOs".
+     */
     private String os;
-    private String hostingApp;
-    private RectangleSize displaySize;
-    private String deviceInfo;
+
+    /**
+     * the OS info.
+     * former "hostOsInfo".
+     */
     private String osInfo;
+
+    /**
+     * the hosting app name.
+     * former "hostApp".
+     */
+    private String hostingApp;
+
+    /**
+     * the hosting app info.
+     * former "hostAppInfo".
+     */
     private String hostingAppInfo;
+
+    /**
+     * the device name.
+     * former "deviceInfo".
+     */
+    private String deviceName;
+
+    /**
+     * the viewport size.
+     */
+    private RectangleSize displaySize;
 
     /**
      * Creates a new AppEnvironment instance.
@@ -26,7 +67,6 @@ public class AppEnvironment {
     public AppEnvironment(String inferred) {
         this.inferred = inferred;
     }
-
 
     /**
      * Creates a new AppEnvironment instance.
@@ -48,15 +88,15 @@ public class AppEnvironment {
      * @param os             the OS hosting the application under test or {@code null} if                    unknown.
      * @param hostingApp     the application hosting the application under test or {@code null}                    if unknown.
      * @param displaySize    the display size of the application or {@code null} if unknown.
-     * @param deviceInfo     specifies
+     * @param deviceName     specifies
      * @param osInfo         the os info
      * @param hostingAppInfo the hosting app info
      */
-    public AppEnvironment(String os, String hostingApp, RectangleSize displaySize, String deviceInfo, String osInfo, String hostingAppInfo) {
+    public AppEnvironment(String os, String hostingApp, RectangleSize displaySize, String deviceName, String osInfo, String hostingAppInfo) {
         this.os = os;
         this.hostingApp = hostingApp;
         this.displaySize = displaySize;
-        this.deviceInfo = deviceInfo;
+        this.deviceName = deviceName;
         this.osInfo = osInfo;
         this.hostingAppInfo = hostingAppInfo;
     }
@@ -147,7 +187,7 @@ public class AppEnvironment {
      * @return the device info
      */
     public String getDeviceInfo() {
-        return deviceInfo;
+        return deviceName;
     }
 
     /**
@@ -156,7 +196,7 @@ public class AppEnvironment {
      * @param deviceInfo the device info
      */
     public void setDeviceInfo(String deviceInfo) {
-        this.deviceInfo =  deviceInfo != null  ? deviceInfo : "Desktop";
+        this.deviceName =  deviceInfo != null  ? deviceInfo : "Desktop";
     }
 
     /**

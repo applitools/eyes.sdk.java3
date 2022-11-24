@@ -13,12 +13,20 @@ import com.applitools.eyes.selenium.fluent.SeleniumCheckSettings;
 import com.applitools.eyes.selenium.fluent.Target;
 import com.applitools.eyes.selenium.frames.FrameChain;
 import com.applitools.eyes.selenium.positioning.ImageRotation;
-import com.applitools.eyes.selenium.universal.dto.*;
-import com.applitools.eyes.selenium.universal.dto.response.CommandCloseResponseDto;
-import com.applitools.eyes.selenium.universal.mapper.*;
+import com.applitools.eyes.selenium.universal.dto.DriverTargetDto;
+import com.applitools.eyes.selenium.universal.mapper.CheckSettingsMapper;
+import com.applitools.eyes.selenium.universal.mapper.DriverMapper;
+import com.applitools.eyes.selenium.universal.mapper.OCRExtractSettingsDtoMapper;
+import com.applitools.eyes.universal.mapper.OCRSearchSettingsMapper;
+import com.applitools.eyes.universal.CommandExecutor;
+import com.applitools.eyes.universal.Reference;
+import com.applitools.eyes.universal.dto.*;
+import com.applitools.eyes.universal.dto.response.CommandCloseResponseDto;
 import com.applitools.eyes.triggers.MouseAction;
 import com.applitools.eyes.visualgrid.model.IDebugResourceWriter;
 import com.applitools.eyes.visualgrid.model.RenderingInfo;
+import com.applitools.eyes.visualgrid.services.VisualGridRunner;
+import com.applitools.eyes.universal.mapper.*;
 import com.applitools.utils.ArgumentGuard;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
@@ -38,7 +46,7 @@ public class Eyes implements IEyesBase {
     private static final int USE_DEFAULT_MATCH_TIMEOUT = -1;
 
     private boolean isVisualGridEyes = false;
-    private com.applitools.eyes.EyesRunner runner;
+    private EyesRunner runner;
     private Configuration configuration = new Configuration();
     private ImageRotation rotation;
     private WebDriver driver;
@@ -74,6 +82,17 @@ public class Eyes implements IEyesBase {
     public Eyes(EyesRunner runner0) {
         this.runner = runner0 == null ? new ClassicRunner() : runner0;
         commandExecutor = runner.getCommandExecutor();
+
+        if (runner instanceof VisualGridRunner) {
+            AutProxySettings autProxy = ((VisualGridRunner) runner).getAutProxy();
+            AbstractProxySettings proxySettings = runner.getProxy();
+            if (autProxy != null)
+                configurationProvider.get().setAutProxy(autProxy);
+            if (proxySettings != null)
+                configurationProvider.get().setProxy(proxySettings);
+
+        }
+
     }
 
 
@@ -98,6 +117,39 @@ public class Eyes implements IEyesBase {
     }
 
     /**
+     * Starts a test without a driver
+     * @param appName  The name of the application under test.
+     * @param testName The test name. (i.e., the visible part of the document's body) or {@code null} to use the current window's viewport.
+     */
+    public void open(String appName, String testName) {
+        this.open(appName, testName, null);
+    }
+
+    /**
+     * Starts a test without a driver
+     * @param appName  The name of the application under test.
+     * @param testName The test name. (i.e., the visible part of the document's body) or {@code null} to use the current window's viewport.
+     * @param viewportSize The required browser's viewport size (i.e., the visible part of the document's body) or {@code null} to use the current window's viewport.
+     */
+    public void open(String appName, String testName, RectangleSize viewportSize) {
+        if (getIsDisabled()) {
+            return;
+        }
+
+        configuration.setAppName(appName).setTestName(testName);
+        if (viewportSize != null && !viewportSize.isEmpty()) {
+            configuration.setViewportSize(new RectangleSize(viewportSize));
+        }
+
+        ConfigurationDto configurationDto = ConfigurationMapper
+                .toConfigurationDto(configuration, runner.isDontCloseBatches());
+        OpenSettingsDto settingsDto = SettingsMapper.toOpenSettingsDto(configuration, runner.isDontCloseBatches());
+        DriverTargetDto driverTargetDto = DriverMapper.toDriverTargetDto(getDriver(), configuration.getWebDriverProxy());
+
+        eyesRef = commandExecutor.managerOpenEyes(runner.getManagerRef(), driverTargetDto, settingsDto, configurationDto);
+    }
+
+    /**
      * Starts a test.
      * @param driver       The web driver that controls the browser hosting the application under test.
      * @param appName      The name of the application under test.
@@ -111,10 +163,8 @@ public class Eyes implements IEyesBase {
             return driver;
         }
 
-        WebDriverProxySettings wdProxy = configuration.getWebDriverProxy();
-        String wdProxyUrl = wdProxy != null? wdProxy.getProxyUrl() : null;
+        DriverTargetDto driverTargetDto = DriverMapper.toDriverTargetDto(driver, configuration.getWebDriverProxy());
 
-        DriverDto driverDto = DriverMapper.toDriverDto(driver, wdProxyUrl);
         configurationProvider.get().setAppName(appName).setTestName(testName);
 
         if (viewportSize != null && !viewportSize.isEmpty()) {
@@ -123,7 +173,9 @@ public class Eyes implements IEyesBase {
 
         ConfigurationDto configurationDto = ConfigurationMapper
                 .toConfigurationDto(configuration, runner.isDontCloseBatches());
-        eyesRef = commandExecutor.managerOpenEyes(runner.getManagerRef(), driverDto, configurationDto);
+        OpenSettingsDto settingsDto = SettingsMapper.toOpenSettingsDto(configuration, runner.isDontCloseBatches());
+
+        eyesRef = commandExecutor.managerOpenEyes(runner.getManagerRef(), driverTargetDto, settingsDto, configurationDto);
         this.driver = driver;
         return driver;
     }
@@ -451,11 +503,13 @@ public class Eyes implements IEyesBase {
         if (tag != null) {
             checkSettings = checkSettings.withName(tag);
         }
-        CheckSettingsDto checkSettingsDto = CheckSettingsMapper.toCheckSettingsDto(checkSettings);
-        checkDto(checkSettingsDto);
+
+        CheckSettingsDto checkSettingsDto = CheckSettingsMapper.toCheckSettingsDtoV3(checkSettings, configure());
+        DriverTargetDto driverTargetDto = DriverMapper.toDriverTargetDto(getDriver(), configuration.getWebDriverProxy());
+        checkDto(checkSettingsDto, driverTargetDto);
     }
 
-    private void checkDto(CheckSettingsDto checkSettingsDto) {
+    private void checkDto(CheckSettingsDto checkSettingsDto, DriverTargetDto target) {
         if (this.getIsDisabled()) {
             return;
         }
@@ -469,7 +523,7 @@ public class Eyes implements IEyesBase {
 
         ConfigurationDto configurationDto = ConfigurationMapper
                 .toConfigurationDto(configuration, runner.isDontCloseBatches());
-        commandExecutor.eyesCheck(eyesRef, checkSettingsDto, configurationDto);
+        commandExecutor.eyesCheck(eyesRef, target, checkSettingsDto, configurationDto);
     }
     /**
      * Close test results.
@@ -485,13 +539,50 @@ public class Eyes implements IEyesBase {
         if (!getIsOpen()) {
             throw new EyesException("Eyes not open");
         }
-        List<CommandCloseResponseDto> closeResponse = commandExecutor.close(eyesRef, true);
+
+        ConfigurationDto configurationDto = ConfigurationMapper
+                .toConfigurationDto(configuration, runner.isDontCloseBatches());
+        CloseSettingsDto settings = SettingsMapper.toCloseSettingsDto(getConfiguration(), shouldThrowException);
+
+        List<CommandCloseResponseDto> closeResponse = commandExecutor.close(eyesRef, settings, configurationDto, true);
         this.eyesRef = null;
         isClosed = true;
         List<TestResults> testResults = TestResultsMapper.toTestResultsList(closeResponse);
+        if (testResults == null)
+            return null;
         testResults.forEach(testResults1 -> runner.logSessionResultsAndThrowException(shouldThrowException, testResults1));
         return testResults.get(0);
     }
+
+//    /**
+//     * Check and Close test results.
+//     * @param target the target.
+//     * @param checkSettingsDto the check settings.
+//     * @param closeSettingsDto the close settings.
+//     * @param shouldThrowException should throw exception if visual differences were found.
+//     * @return
+//     */
+//    private TestResults checkAndCloseDto(ITargetDto target, CheckSettingsDto checkSettingsDto,
+//                                         CloseSettingsDto closeSettingsDto, Boolean shouldThrowException) {
+//        if (getIsDisabled()) {
+//            return null;
+//        }
+//
+//        if (!getIsOpen()) {
+//            throw new EyesException("Eyes not open");
+//        }
+//
+//        ConfigurationDto configurationDto = ConfigurationMapper
+//                .toConfigurationDto(configuration, runner.isDontCloseBatches());
+//
+//        List<CommandCloseResponseDto> closeResponse = commandExecutor.eyesCheckAndClose(eyesRef, target,
+//                checkSettingsDto, closeSettingsDto, configurationDto);
+//        this.eyesRef = null;
+//        isClosed = true;
+//        List<TestResults> testResults = TestResultsMapper.toTestResultsList(closeResponse);
+//        testResults.forEach(testResults1 -> runner.logSessionResultsAndThrowException(shouldThrowException, testResults1));
+//        return testResults.get(0);
+//    }
 
     /**
      * Manually set the scale ratio for the images being validated.
@@ -1170,8 +1261,8 @@ public class Eyes implements IEyesBase {
      * @return The viewport size of the current context.
      */
     public static RectangleSize getViewportSize(WebDriver driver) {
-        DriverDto driverDto = DriverMapper.toDriverDto(driver, null);
-        RectangleSizeDto rectangleSizeDto = CommandExecutor.getViewportSize(driverDto);
+        DriverTargetDto driverTargetDto = DriverMapper.toDriverTargetDto(driver, null);
+        RectangleSizeDto rectangleSizeDto = CommandExecutor.getViewportSize(driverTargetDto);
         return RectangleSizeMapper.toRectangleSize(rectangleSizeDto);
     }
 
@@ -1229,7 +1320,8 @@ public class Eyes implements IEyesBase {
     /**
      * Sets the time to wait just before taking a screenshot (e.g., to allow
      * positioning to stabilize when performing a full page stitching).
-     * @param waitBeforeScreenshots The time to wait (Milliseconds). Values                              smaller or equal to 0, will cause the                              default value to be used.
+     * @param waitBeforeScreenshots The time to wait (Milliseconds). Values smaller or equal to 0, will cause the
+     * default value to be used.
      */
     public void setWaitBeforeScreenshots(int waitBeforeScreenshots) {
         this.configuration.setWaitBeforeScreenshots(waitBeforeScreenshots);
@@ -1851,7 +1943,12 @@ public class Eyes implements IEyesBase {
         if (!getIsOpen()) {
             throw new EyesException("Eyes not open");
         }
-        List<CommandCloseResponseDto> closeResponse = commandExecutor.close(eyesRef, false);
+
+        ConfigurationDto configurationDto = ConfigurationMapper
+                .toConfigurationDto(configuration, runner.isDontCloseBatches());
+        CloseSettingsDto settings = SettingsMapper.toCloseSettingsDto(getConfiguration(), false);
+
+        List<CommandCloseResponseDto> closeResponse = commandExecutor.close(eyesRef, settings, configurationDto, false);
         this.eyesRef = null;
         isClosed = true;
         if (closeResponse != null) {
@@ -1865,16 +1962,33 @@ public class Eyes implements IEyesBase {
         VisualLocatorSettingsDto visualLocatorSettingsDto = VisualLocatorSettingsMapper
             .toVisualLocatorSettingsDto(visualLocatorSettings);
 
+        if (!getIsOpen()) {
+            this.abort();
+            throw new EyesException("you must call open() before locate");
+        }
+
         ConfigurationDto configurationDto = ConfigurationMapper
                 .toConfigurationDto(configuration, runner.isDontCloseBatches());
-        return commandExecutor.locate(eyesRef, visualLocatorSettingsDto, configurationDto);
+        DriverTargetDto target = DriverMapper.toDriverTargetDto(getDriver(), configuration.getWebDriverProxy());
+
+        return this.locateDto(target, visualLocatorSettingsDto, configurationDto);
     }
 
+    private Map<String, List<Region>> locateDto(ITargetDto target, VisualLocatorSettingsDto settings, ConfigurationDto config) {
+        return commandExecutor.locate(target, settings, config);
+    }
+
+    // in v3 this was changed to 'locateText'.
     public Map<String, List<TextRegion>> extractTextRegions(TextRegionSettings textRegionSettings) {
         OCRSearchSettingsDto ocrSearchSettingsDto = OCRSearchSettingsMapper.toOCRSearchSettingsDto(textRegionSettings);
         ConfigurationDto configurationDto = ConfigurationMapper
                 .toConfigurationDto(configuration, runner.isDontCloseBatches());
-        return commandExecutor.extractTextRegions(eyesRef, ocrSearchSettingsDto, configurationDto);
+        ITargetDto target = DriverMapper.toDriverTargetDto(getDriver(), configuration.getWebDriverProxy());
+        return locateTextDto(target, ocrSearchSettingsDto, configurationDto);
+    }
+
+    private Map<String, List<TextRegion>> locateTextDto(ITargetDto target, OCRSearchSettingsDto settings, ConfigurationDto config) {
+        return commandExecutor.locateText(eyesRef, target, settings, config);
     }
 
     public List<String> extractText(BaseOcrRegion... ocrRegions) {
@@ -1882,9 +1996,13 @@ public class Eyes implements IEyesBase {
             .toOCRExtractSettingsDtoList(Arrays.asList(ocrRegions));
         ConfigurationDto configurationDto = ConfigurationMapper
                 .toConfigurationDto(configuration, runner.isDontCloseBatches());
+        DriverTargetDto target = DriverMapper.toDriverTargetDto(getDriver(), configuration.getWebDriverProxy());
+        return extractTextDto(target, ocrExtractSettingsDtoList, configurationDto);
 
-        return commandExecutor.extractText(eyesRef, ocrExtractSettingsDtoList, configurationDto);
+    }
 
+    private List<String> extractTextDto(ITargetDto target, List<OCRExtractSettingsDto> settings, ConfigurationDto config) {
+        return commandExecutor.extractText(eyesRef, target, settings, config);
     }
 
     public Reference getEyesRef() {

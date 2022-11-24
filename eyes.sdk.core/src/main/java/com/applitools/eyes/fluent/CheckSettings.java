@@ -2,11 +2,12 @@ package com.applitools.eyes.fluent;
 
 import com.applitools.ICheckSettings;
 import com.applitools.eyes.*;
-import com.applitools.eyes.config.Configuration;
 import com.applitools.eyes.locators.BaseOcrRegion;
 import com.applitools.eyes.positioning.PositionProvider;
+import com.applitools.eyes.selenium.StitchMode;
 import com.applitools.eyes.visualgrid.model.VisualGridOption;
 import com.applitools.eyes.visualgrid.model.VisualGridSelector;
+import com.applitools.utils.ArgumentGuard;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 
@@ -17,28 +18,66 @@ public class CheckSettings implements ICheckSettings, ICheckSettingsInternal {
     // For Rendering Grid
     protected static final String BEFORE_CAPTURE_SCREENSHOT = "beforeCaptureScreenshot";
 
+//    private Region targetRegion;
+//    private MatchLevel matchLevel = null;
+//    private Boolean ignoreCaret = null;
+//    private Boolean stitchContent = null;
+//    protected final List<GetSimpleRegion> ignoreRegions = new ArrayList<>();
+//    protected final List<GetSimpleRegion> layoutRegions = new ArrayList<>();
+//    protected final List<GetSimpleRegion> strictRegions = new ArrayList<>();
+//    protected final List<GetSimpleRegion> contentRegions = new ArrayList<>();
+//    protected final List<GetFloatingRegion> floatingRegions = new ArrayList<>();
+//    protected List<GetAccessibilityRegion> accessibilityRegions = new ArrayList<>();
+//    private Integer timeout = null;
+//    protected String name;
+//    protected Boolean enablePatterns;
+//    protected Boolean sendDom = null;
+//    protected Boolean useDom;
+//    protected Map<String, String> scriptHooks = new HashMap<>();
+//    protected Boolean ignoreDisplacements;
+//    private List<VisualGridOption> visualGridOptions = new ArrayList<>();
+//    private BaseOcrRegion ocrRegion = null;
+//    private String variationGroupId = null;
+//    private Boolean disableBrowserFetching;
+//    private Integer waitBeforeCapture;
+//    private LazyLoadOptions lazyLoadOptions;
+
+    // screenshot
     private Region targetRegion;
-    private MatchLevel matchLevel = null;
-    private Boolean ignoreCaret = null;
     private Boolean stitchContent = null;
+    private StitchMode stitchMode = StitchMode.CSS; // "CSS" | "Scroll"
+    private Boolean hideScrollBars;
+    private Boolean hideCaret;
+    private Integer overlap;
+    private Integer waitBeforeCapture;
+    private LazyLoadOptions lazyLoadOptions;
+    protected Boolean ignoreDisplacements;
+    private Map<String, String> debugImages;
+
+    // check
+    protected String name;
     protected final List<GetSimpleRegion> ignoreRegions = new ArrayList<>();
     protected final List<GetSimpleRegion> layoutRegions = new ArrayList<>();
     protected final List<GetSimpleRegion> strictRegions = new ArrayList<>();
     protected final List<GetSimpleRegion> contentRegions = new ArrayList<>();
     protected final List<GetFloatingRegion> floatingRegions = new ArrayList<>();
     protected List<GetAccessibilityRegion> accessibilityRegions = new ArrayList<>();
-    private Integer timeout = null;
-    protected String name;
-    protected Boolean enablePatterns;
-    protected Boolean sendDom = null;
+    private MatchLevel matchLevel = null;
+    private AccessibilitySettings accessibilitySettings;
+    private Integer retryTimeout = null; // former timeout/matchTimeout
+    protected Boolean sendDom;
     protected Boolean useDom;
+    protected Boolean enablePatterns;
+    private Boolean ignoreCaret;
+    private List<VisualGridOption> ufgOptions = new ArrayList<>();
+    private Boolean isDefaultLayoutBreakpointsSet;
+    private final List<Integer> layoutBreakpoints = new ArrayList<>();
+    private Boolean disableBrowserFetching;
+    private AutProxySettings autProxy;
     protected Map<String, String> scriptHooks = new HashMap<>();
-    protected Boolean ignoreDisplacements;
-    private List<VisualGridOption> visualGridOptions = new ArrayList<>();
+
     private BaseOcrRegion ocrRegion = null;
     private String variationGroupId = null;
-    private Boolean disableBrowserFetching;
-    private Integer waitBeforeCapture;
 
     protected CheckSettings() { }
 
@@ -48,10 +87,10 @@ public class CheckSettings implements ICheckSettings, ICheckSettingsInternal {
 
     /**
      * For internal use only.
-     * @param timeout timeout
+     * @param retryTimeout timeout
      */
-    public CheckSettings(Integer timeout) {
-        this.timeout = timeout;
+    public CheckSettings(Integer retryTimeout) {
+        this.retryTimeout = retryTimeout;
     }
 
     protected void ignore_(Region region) {
@@ -256,7 +295,7 @@ public class CheckSettings implements ICheckSettings, ICheckSettingsInternal {
     @Override
     public ICheckSettings timeout(Integer timeoutMilliseconds) {
         CheckSettings clone = clone();
-        clone.timeout = timeoutMilliseconds;
+        clone.retryTimeout = timeoutMilliseconds;
         return clone;
     }
 
@@ -296,7 +335,7 @@ public class CheckSettings implements ICheckSettings, ICheckSettingsInternal {
     @Override
     public ICheckSettings content() {
         CheckSettings clone = clone();
-        clone.matchLevel = MatchLevel.CONTENT;
+        clone.matchLevel = MatchLevel.IGNORE_COLORS;
         return clone;
     }
 
@@ -381,7 +420,7 @@ public class CheckSettings implements ICheckSettings, ICheckSettingsInternal {
 
     @Override
     public Integer getTimeout() {
-        return this.timeout;
+        return this.retryTimeout;
     }
 
     @Override
@@ -450,7 +489,7 @@ public class CheckSettings implements ICheckSettings, ICheckSettingsInternal {
         clone.targetRegion = this.targetRegion;
         clone.matchLevel = this.matchLevel;
         clone.stitchContent = this.stitchContent;
-        clone.timeout = this.timeout;
+        clone.retryTimeout = this.retryTimeout;
         clone.ignoreCaret = this.ignoreCaret;
         clone.name = this.name;
 
@@ -464,11 +503,12 @@ public class CheckSettings implements ICheckSettings, ICheckSettingsInternal {
         clone.ignoreDisplacements = (this.ignoreDisplacements);
         clone.accessibilityRegions = this.accessibilityRegions;
         clone.useDom = (this.useDom);
-        clone.visualGridOptions = this.visualGridOptions;
+        clone.ufgOptions = this.ufgOptions;
         clone.ocrRegion = this.ocrRegion;
         clone.variationGroupId = this.variationGroupId;
         clone.disableBrowserFetching = this.disableBrowserFetching;
         clone.waitBeforeCapture = this.waitBeforeCapture;
+        clone.lazyLoadOptions = this.lazyLoadOptions;
     }
 
     public void setStitchContent(boolean stitchContent) {
@@ -585,10 +625,10 @@ public class CheckSettings implements ICheckSettings, ICheckSettingsInternal {
     @Override
     public ICheckSettings visualGridOptions(VisualGridOption... options) {
         CheckSettings clone = clone();
-        clone.visualGridOptions.clear();
+        clone.ufgOptions.clear();
         if (options != null) {
-            clone.visualGridOptions.addAll(Arrays.asList(options));
-            clone.visualGridOptions.remove(null);
+            clone.ufgOptions.addAll(Arrays.asList(options));
+            clone.ufgOptions.remove(null);
         }
 
         return clone;
@@ -607,7 +647,7 @@ public class CheckSettings implements ICheckSettings, ICheckSettingsInternal {
     }
 
     public List<VisualGridOption> getVisualGridOptions() {
-        return visualGridOptions;
+        return ufgOptions;
     }
 
     public Boolean isDisableBrowserFetching() {
@@ -622,5 +662,125 @@ public class CheckSettings implements ICheckSettings, ICheckSettingsInternal {
 
     public Integer getWaitBeforeCapture() {
         return waitBeforeCapture;
+    }
+
+    public ICheckSettings lazyLoad() {
+        CheckSettings clone = this.clone();
+        clone.lazyLoadOptions = new LazyLoadOptions();
+        return clone;
+    }
+
+    public ICheckSettings lazyLoad(LazyLoadOptions lazyLoadOptions) {
+        CheckSettings clone = this.clone();
+        clone.lazyLoadOptions = lazyLoadOptions;
+        return clone;
+    }
+
+    public LazyLoadOptions getLazyLoadOptions() {
+        return this.lazyLoadOptions;
+    }
+
+    // added in v3
+
+    public AutProxySettings getAutProxy() {
+        return autProxy;
+    }
+
+    public ICheckSettings autProxy(AutProxySettings autProxy) {
+        CheckSettings clone = this.clone();
+        clone.autProxy = autProxy;
+        return clone;
+    }
+
+    public AccessibilitySettings getAccessibilityValidation() {
+        return accessibilitySettings;
+    }
+
+    public ICheckSettings setAccessibilityValidation(AccessibilitySettings accessibilitySettings) {
+        if (accessibilitySettings == null) {
+            return this;
+        }
+
+        // TODO do we need such validation here?
+        if (accessibilitySettings.getLevel() == null || accessibilitySettings.getGuidelinesVersion() == null) {
+            throw new IllegalArgumentException("AccessibilitySettings should have the following properties: ‘level,version’");
+        }
+
+        CheckSettings clone = this.clone();
+//        this.defaultMatchSettings.setAccessibilitySettings(accessibilitySettings);
+        clone.accessibilitySettings = accessibilitySettings;
+        return clone;
+    }
+
+    public StitchMode getStitchMode() {
+        return stitchMode;
+    }
+
+    public ICheckSettings stitchMode(StitchMode stitchMode) {
+        CheckSettings clone = this.clone();
+        clone.stitchMode = stitchMode;
+        return clone;
+    }
+
+    public Boolean getHideScrollBars() {
+        return hideScrollBars;
+    }
+
+    public ICheckSettings setHideScrollBars(Boolean hideScrollBars) {
+        CheckSettings clone = this.clone();
+        clone.hideScrollBars = hideScrollBars;
+        return clone;
+    }
+
+    public Boolean getHideCaret() {
+        return hideCaret;
+    }
+
+    public ICheckSettings setHideCaret(Boolean hideCaret) {
+        CheckSettings clone = this.clone();
+        clone.hideCaret = hideCaret;
+        return clone;
+    }
+
+    public Integer getOverlap() {
+        return overlap;
+    }
+
+    public ICheckSettings setOverlap(Integer overlap) {
+        CheckSettings clone = this.clone();
+        clone.overlap = overlap;
+        return clone;
+    }
+
+    public ICheckSettings setLayoutBreakpoints(Boolean shouldSet) {
+        CheckSettings clone = this.clone();
+        clone.isDefaultLayoutBreakpointsSet = shouldSet;
+        clone.layoutBreakpoints.clear();
+        return clone;
+    }
+
+    public Boolean isDefaultLayoutBreakpointsSet() {
+        return isDefaultLayoutBreakpointsSet;
+    }
+
+    public ICheckSettings setLayoutBreakpoints(int... breakpoints) {
+        CheckSettings clone = this.clone();
+        clone.isDefaultLayoutBreakpointsSet = false;
+        clone.layoutBreakpoints.clear();
+        if (breakpoints == null || breakpoints.length == 0) {
+            return this;
+        }
+
+        for (int breakpoint : breakpoints) {
+            ArgumentGuard.greaterThanZero(breakpoint, "breakpoint");
+            clone.layoutBreakpoints.add(breakpoint);
+        }
+
+        Collections.sort(clone.layoutBreakpoints);
+        return clone;
+    }
+
+    public List<Integer> getLayoutBreakpoints() {
+        return layoutBreakpoints;
     }
 }

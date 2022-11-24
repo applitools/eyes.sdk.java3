@@ -24,6 +24,7 @@ before_install:
   - echo -e "\n\nmachine github.com\n  login $GITHUB_TOKEN\n" >~/.netrc
   - git submodule update --init --recursive
 before_script:
+  - export SE_DOCKER="true" # TODO this is used with selenium-java 4.5.2 see PortProber.class L103 and may be subject to changed
   - export APPLITOOLS_REPORT_ID=${TRAVIS_COMMIT:0:7}-$TRAVIS_BUILD_NUMBER
   - echo "Travis tag is $TRAVIS_TAG"
   - echo "Travis event type is $TRAVIS_EVENT_TYPE"
@@ -58,12 +59,25 @@ jobs:
         - echo $APPLITOOLS_REPORT_ID
         - chmod +x ./runTests.sh
         - ./runTests.sh "selenium4"
-#    - name: Selenium Specific
-#      if: type != cron
-#      script:
-#        - echo $APPLITOOLS_REPORT_ID
-#        - chmod +x ./runTests.sh
-#        - ./runTests.sh "eyes.selenium.java"
+    - name: Selenium Specific
+      addons:
+        apt:
+          packages:
+            - dpkg # this is required for fixing Travis' invalid chrome version issue
+        chrome: stable
+      if: type != cron
+      script:
+        - echo $APPLITOOLS_REPORT_ID
+        - chmod +x ./initChromeDriver.sh && ./initChromeDriver.sh
+        - export CHROME_DRIVER_PATH=/home/travis/build/chromedriver
+        - chmod +x ./runTests.sh
+        - ./runTests.sh "eyes.selenium.java"
+    - name: Images
+      if: type != cron
+      script:
+        - echo $APPLITOOLS_REPORT_ID
+        - chmod +x ./runTests.sh
+        - ./runTests.sh "eyes.images.java"
 #    - name: Selenium
 #      script:
 #        - echo $APPLITOOLS_REPORT_ID
@@ -112,13 +126,13 @@ jobs:
         - cd coverage-tests;
         - chmod +x ./generic_tests.sh && ./generic_tests.sh
     #    - stage: Test Appium IOS
-#      if: type != cron
-#      script:
-#        - echo $APPLITOOLS_REPORT_ID
-#        - sh upload_app.sh "https://applitools.jfrog.io/artifactory/Examples/IOSTestApp/1.6/ipa/IOSTestApp.ipa" "app_ios"
-#        - sed -i 's/androidTestSuite.xml/iosTestSuite.xml/g' $TRAVIS_BUILD_DIR/eyes.appium.java/pom.xml;
-#        - chmod +x ./runTests.sh
-#        - ./runTests.sh "eyes.appium.java"
+    #      if: type != cron
+    #      script:
+    #        - echo $APPLITOOLS_REPORT_ID
+    #        - sh upload_app.sh "https://applitools.jfrog.io/artifactory/Examples/IOSTestApp/1.6/ipa/IOSTestApp.ipa" "app_ios"
+    #        - sed -i 's/androidTestSuite.xml/iosTestSuite.xml/g' $TRAVIS_BUILD_DIR/eyes.appium.java/pom.xml;
+    #        - chmod +x ./runTests.sh
+    #        - ./runTests.sh "eyes.appium.java"
     - stage: Full Regression Mail
       if: type = cron AND branch = master
       script:
@@ -127,16 +141,17 @@ jobs:
     - stage: Deploy
       if: tag =~ ^RELEASE_CANDIDATE AND fork == false
       script:
-          # save the email of the person who did this commit in COMMITTER_EMAIL
+        # save the email of the person who did this commit in COMMITTER_EMAIL
         - COMMITTER_EMAIL="$(git log -1 $TRAVIS_COMMIT --pretty="%cE")"
         - echo $COMMITTER_EMAIL
         - SDK_VERSION=$(echo $TRAVIS_TAG | sed 's/[^.0-9]*//g')
-        - echo "DEPLOY";
-        - chmod +x ./extractChangeLog.sh;
-        - TMP_CHANGELOG=$(./extractChangeLog.sh "$SDK_VERSION" "CHANGELOG.md");
-        - CHANGELOG=$([ -z "$TMP_CHANGELOG" ] && echo "There is no change log for version $SDK_VERSION"; echo "$TMP_CHANGELOG");
-        - echo $CHANGELOG;
-        - chmod +x ./sendMail.sh;
-        - TEST_COVERAGE_GAP=$(cat testCoverageGap.txt);
-        - ./sendMail.sh "$SDK" "$TRAVIS_TAG" "$CHANGELOG" "$TEST_COVERAGE_GAP";
-        - fi
+        - if [[ $ALLOWED_RELEASE_COMMITERS =~ $COMMITTER_EMAIL ]]; then
+          echo "DEPLOY";
+          chmod +x ./extractChangeLog.sh;
+          TMP_CHANGELOG=$(./extractChangeLog.sh "$SDK_VERSION" "CHANGELOG.md");
+          CHANGELOG=$([ -z "$TMP_CHANGELOG" ] && echo "There is no change log for version $SDK_VERSION"; echo "$TMP_CHANGELOG");
+          echo $CHANGELOG;
+          chmod +x ./sendMail.sh;
+          TEST_COVERAGE_GAP=$(cat testCoverageGap.txt);
+          ./sendMail.sh "$SDK" "$TRAVIS_TAG" "$CHANGELOG" "$TEST_COVERAGE_GAP";
+          fi

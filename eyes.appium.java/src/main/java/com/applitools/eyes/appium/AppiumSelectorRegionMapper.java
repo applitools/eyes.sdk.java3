@@ -1,6 +1,6 @@
 package com.applitools.eyes.appium;
 
-import com.applitools.eyes.selenium.universal.dto.SelectorRegionDto;
+import com.applitools.eyes.universal.dto.SelectorRegionDto;
 import com.applitools.utils.GeneralUtils;
 import io.appium.java_client.AppiumBy;
 import io.appium.java_client.MobileBy;

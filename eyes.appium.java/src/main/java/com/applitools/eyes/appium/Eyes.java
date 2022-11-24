@@ -9,21 +9,90 @@ import com.applitools.eyes.locators.TextRegion;
 import com.applitools.eyes.locators.TextRegionSettings;
 import com.applitools.eyes.locators.VisualLocatorSettings;
 import com.applitools.eyes.positioning.PositionProvider;
-import com.applitools.eyes.selenium.*;
 import com.applitools.eyes.selenium.positioning.ImageRotation;
-import com.applitools.eyes.selenium.universal.dto.CheckSettingsDto;
-import com.applitools.utils.*;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import org.openqa.selenium.*;
-
-import java.lang.reflect.InvocationTargetException;
+import com.applitools.eyes.selenium.universal.dto.DriverTargetDto;
+import com.applitools.eyes.selenium.universal.mapper.DriverMapper;
+import com.applitools.eyes.universal.dto.CheckSettingsDto;
+import com.applitools.utils.ArgumentGuard;
+import com.applitools.utils.GeneralUtils;
+import org.openqa.selenium.By;
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
+import org.openqa.selenium.remote.DesiredCapabilities;
 import java.lang.reflect.Method;
 import java.net.URI;
-import java.util.*;
+import java.util.List;
+import java.util.Map;
 
 public class Eyes implements IEyesBase {
     private com.applitools.eyes.selenium.Eyes originEyes;
+
+    public static void setNMGCapabilities(DesiredCapabilities caps) {
+        setNMGCapabilities(caps, null, null, null);
+    }
+
+    public static void setNMGCapabilities(DesiredCapabilities caps, String apiKey) {
+        setNMGCapabilities(caps, apiKey, null, null);
+    }
+
+    public static void setNMGCapabilities(DesiredCapabilities caps, String apiKey, String eyesServerUrl) {
+        setNMGCapabilities(caps, apiKey, eyesServerUrl, null);
+    }
+
+    public static void setNMGCapabilities(DesiredCapabilities caps, String apiKey,
+                                          String eyesServerUrl, ProxySettings proxySettings) {
+
+        String iosCapsKey = "processArguments";
+        String iosCapValue = "{\"args\": [], \"env\":"
+                + "{\"DYLD_INSERT_LIBRARIES\":\"@executable_path/Frameworks/UFG_lib.xcframework/ios-arm64/UFG_lib.framework/UFG_lib"
+                + ":"
+                + "@executable_path/Frameworks/UFG_lib.xcframework/ios-arm64_x86_64-simulator/UFG_lib.framework/UFG_lib\"";
+
+        String iosCapValueSuffix = "}}";
+
+        String androidCapKey = "optionalIntentArguments";
+        String androidCapValue = "--es APPLITOOLS \'{";
+        String androidCapValueSuffix = "}\'";
+
+        // Take the API key from the environment if it's not explicitly given.
+        if (apiKey == null) {
+            apiKey = GeneralUtils.getEnvString(("APPLITOOLS_API_KEY"));
+            if (apiKey == null || apiKey.equalsIgnoreCase("")) {
+                throw new EyesException("No API key was given, or is an empty string.");
+            }
+        }
+
+        androidCapValue += "\"NML_API_KEY\":\"" + apiKey + "\"";
+        iosCapValue += ",\"NML_API_KEY\":\"" + apiKey + "\"";
+
+        // Check for the server URL in the env variable. (might still be null and this is fine.
+        if (eyesServerUrl == null) {
+            eyesServerUrl = GeneralUtils.getEnvString(("APPLITOOLS_SERVER_URL"));
+        }
+
+        if (eyesServerUrl != null && !eyesServerUrl.equalsIgnoreCase("")) {
+            androidCapValue += ",\"NML_SERVER_URL\":\"" + eyesServerUrl + "\"";
+            iosCapValue += ",\"NML_SERVER_URL\":\"" + eyesServerUrl + "\"";
+        }
+
+        if (proxySettings == null) {
+            String proxyFromEnv = GeneralUtils.getEnvString("APPLITOOLS_HTTP_PROXY");
+            if (proxyFromEnv != null && !proxyFromEnv.equalsIgnoreCase("")) {
+                proxySettings = new ProxySettings(proxyFromEnv);
+            }
+        }
+
+        if (proxySettings != null) {
+            androidCapValue += ",\"NML_PROXY_URL\":\"" + proxySettings + "\"";
+            iosCapValue += ",\"NML_PROXY_URL\":\"" + proxySettings + "\"";
+        }
+
+        androidCapValue += androidCapValueSuffix;
+        iosCapValue += iosCapValueSuffix;
+
+        caps.setCapability(androidCapKey, androidCapValue);
+        caps.setCapability(iosCapsKey, iosCapValue);
+    }
 
     /**
      * Instantiates a new Eyes.
@@ -520,17 +589,23 @@ public class Eyes implements IEyesBase {
 
 
     public void check(ICheckSettings checkSettings) {
-        CheckSettingsDto checkSettingsDto = AppiumCheckSettingsMapper.toCheckSettingsDto(checkSettings);
-        this.checkDto(checkSettingsDto);
+        CheckSettingsDto checkSettingsDto = AppiumCheckSettingsMapper.toCheckSettingsDtoV3(checkSettings, configure());
+        DriverTargetDto driverTargetDto = DriverMapper.toDriverTargetDto(getDriver(), configure().getWebDriverProxy());
+        this.checkDto(checkSettingsDto, driverTargetDto);
     }
 
-    private void checkDto(CheckSettingsDto checkSettingsDto) throws EyesException {
+    private void checkDto(CheckSettingsDto checkSettingsDto, DriverTargetDto driverTargetDto) throws EyesException {
         try {
-            Method checkDto = originEyes.getClass().getDeclaredMethod("checkDto", CheckSettingsDto.class);
+            Method checkDto = originEyes.getClass().getDeclaredMethod("checkDto", CheckSettingsDto.class, DriverTargetDto.class);
             checkDto.setAccessible(true);
-            checkDto.invoke(originEyes, checkSettingsDto);
-        } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
-            throw new EyesException(e.getMessage());
+            checkDto.invoke(originEyes, checkSettingsDto, driverTargetDto);
+        } catch (NoSuchMethodException | IllegalAccessException e) {
+            System.out.println("Got a failure trying to activate checkDTO using reflection! Error " + e.getMessage());
+            throw new EyesException("Got a failure trying to activate checkDTO using reflection! Error " + e.getMessage());
+        } catch (Exception e) {
+            String errorMessage = GeneralUtils.createErrorMessageFromExceptionWithText(e, "Got a failure trying to perform a 'check'!");
+            System.out.println(errorMessage);
+            throw new EyesException(errorMessage, e);
         }
     }
 

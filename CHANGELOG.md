@@ -1,10 +1,40 @@
-## [5.20.0] - 2022-09-09
+## [5.35.0] - 2022-11-8
+### Added
+- Images SDK eyes.images.java5
+
+### Breaking Changes
+- Images Eyes eyes.check no longer returns a boolean if there were diffs
+- Images Eyes eyes.open requires a viewport size set either from the configuration or from eyes.open
+
+## [5.33.0] - 2022-11-2
+### Added
+- setNMGCapabilities API.
+
+## [5.32.0] - 2022-10-31
 ### Updated
 - Add support for AppiumBy selector. [Trello 3022](https://trello.com/c/VpnV7BBN/)
-
-## [5.19.0] - 2022-09-06
-### Updated
 - Making Universal Core start process robust. [Trello 2993, 3023](https://trello.com/c/ArmjDFta/)
+
+## [5.28.0] - 2022-10-10
+### Updated
+- Added Selenium Coded Regions Padding support [Trello 42](https://trello.com/c/PYKqJLbg)
+- Update Universal binaries to 2.16.3 [Trello 3035](https://trello.com/c/kWgtcLkT)
+
+## [5.26.0] - 2022-09-09
+### Updated
+- Added Appium Lazy Load support [Trello 2834](https://trello.com/c/MvCP3cer)
+
+## [5.23.0] - 2022-09-16
+### Added
+- NMG communication revamp. [Trello 2983](https://trello.com/c/DKnYOU5W)
+
+## [5.22.0] - 2022-09-14
+### Fixed
+- Missing ContentInset Configuration API. [Trello 2981](https://trello.com/c/i0vUcO3P)
+
+## [5.21.0] - 2022-09-09
+### Updated
+- Use correct binary for alpine docker image [Trello 2961](https://trello.com/c/DAo9uo8r)
 
 ## [5.18.0] - 2022-09-05
 ### Updated

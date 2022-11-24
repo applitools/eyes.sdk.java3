@@ -4,8 +4,9 @@ import com.applitools.eyes.fluent.GetSimpleRegion;
 import com.applitools.eyes.fluent.SimpleRegionByRectangle;
 import com.applitools.eyes.selenium.fluent.SimpleRegionByElement;
 import com.applitools.eyes.selenium.fluent.SimpleRegionBySelector;
-import com.applitools.eyes.selenium.universal.dto.CodedRegionReference;
-import com.applitools.eyes.selenium.universal.dto.TRegion;
+import com.applitools.eyes.universal.dto.CodedRegionReference;
+import com.applitools.eyes.universal.dto.TRegion;
+import com.applitools.eyes.universal.mapper.RectangleRegionMapper;
 
 import java.util.List;
 import java.util.Objects;
@@ -25,19 +26,19 @@ public class CodedRegionReferenceMapper {
             TRegion region = RectangleRegionMapper.toRectangleRegionDto(simpleRegionByRectangle.getRegion());
             codedRegionReference.setRegion(region);
             codedRegionReference.setRegionId(simpleRegionByRectangle.getRegion().getRegionId());
-            // set padding here
+            codedRegionReference.setPadding(simpleRegionByRectangle.getPadding());
         } else if (getSimpleRegion instanceof SimpleRegionByElement) {
             SimpleRegionByElement simpleRegionByElement = (SimpleRegionByElement) getSimpleRegion;
             TRegion region = ElementRegionMapper.toElementRegionDto(simpleRegionByElement.getElement());
             codedRegionReference.setRegion(region);
             codedRegionReference.setRegionId(simpleRegionByElement.getRegionId());
-            // set padding here
+            codedRegionReference.setPadding(simpleRegionByElement.getPadding());
         } else if (getSimpleRegion instanceof SimpleRegionBySelector) {
             SimpleRegionBySelector simpleRegionBySelector = (SimpleRegionBySelector) getSimpleRegion;
             TRegion region = SelectorRegionMapper.toSelectorRegionDto(simpleRegionBySelector.getSelector());
             codedRegionReference.setRegion(region);
             codedRegionReference.setRegionId(simpleRegionBySelector.getRegionId());
-            // set padding here
+            codedRegionReference.setPadding(simpleRegionBySelector.getPadding());
         }
 
         return codedRegionReference;
@@ -49,8 +50,8 @@ public class CodedRegionReferenceMapper {
         }
 
         return getSimpleRegionList
-                .stream().
-                filter(Objects::nonNull)
+                .stream()
+                .filter(Objects::nonNull)
                 .map(CodedRegionReferenceMapper::toCodedRegionReference)
                 .collect(Collectors.toList());
     }

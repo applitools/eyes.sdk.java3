@@ -1,7 +1,7 @@
 package coverage.drivers;
 
 public enum SELENIUM {
-    SAUCE(" https://ondemand.us-west-1.saucelabs.com/wd/hub"),
+    SAUCE("https://ondemand.us-west-1.saucelabs.com:443/wd/hub"),
     CHROME_LOCAL("http://localhost:4444/wd/hub"),
     FIREFOX_LOCAL("http://localhost:4445/wd/hub");
 

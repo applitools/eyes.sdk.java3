@@ -5,7 +5,8 @@ import java.util.stream.Collectors;
 
 import com.applitools.eyes.locators.BaseOcrRegion;
 import com.applitools.eyes.locators.OcrRegion;
-import com.applitools.eyes.selenium.universal.dto.OCRExtractSettingsDto;
+import com.applitools.eyes.universal.dto.OCRExtractSettingsDto;
+import com.applitools.eyes.universal.mapper.RectangleRegionMapper;
 
 /**
  * OCRExtractSettingsDtoMapper
@@ -22,11 +23,11 @@ public class OCRExtractSettingsDtoMapper {
 
     OCRExtractSettingsDto ocrExtractSettingsDto = new OCRExtractSettingsDto();
     if (ocrRegion.getSelector() != null) {
-      ocrExtractSettingsDto.setTarget(SelectorRegionMapper.toSelectorRegionDto(ocrRegion.getSelector()));
+      ocrExtractSettingsDto.setRegion(SelectorRegionMapper.toSelectorRegionDto(ocrRegion.getSelector()));
     } else if (ocrRegion.getElement() != null) {
-      ocrExtractSettingsDto.setTarget(ElementRegionMapper.toElementRegionDto(ocrRegion.getElement()));
+      ocrExtractSettingsDto.setRegion(ElementRegionMapper.toElementRegionDto(ocrRegion.getElement()));
     } else if (ocrRegion.getRegion() != null) {
-      ocrExtractSettingsDto.setTarget(RectangleRegionMapper.toRectangleRegionDto(ocrRegion.getRegion()));
+      ocrExtractSettingsDto.setRegion(RectangleRegionMapper.toRectangleRegionDto(ocrRegion.getRegion()));
     }
 
     ocrExtractSettingsDto.setHint(ocrRegion.getHint());

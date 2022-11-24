@@ -142,6 +142,22 @@ public class CapabilitiesHelper {
         return setSauceCredentials(device, legacy, options);
     }
 
+    public static Capabilities getIphone12(boolean legacy) {
+        DesiredCapabilities device = new DesiredCapabilities();
+        device.setCapability("browserName", "");
+        device.setCapability("platformName", "iOS");
+        if (legacy) {
+            device.setCapability("platformVersion", "15.0");
+            device.setCapability("deviceName", "iPhone 12 Simulator");
+        } else {
+            device.setCapability("appium:platformVersion", "15.0");
+            device.setCapability("appium:deviceName", "iPhone 12 Simulator");
+        }
+        MutableCapabilities options = new MutableCapabilities();
+        options.setCapability("name", "iPhone 12 (java))");
+        return setSauceCredentials(device, legacy, options);
+    }
+
     public static Capabilities getIphoneXS(boolean legacy) {
         DesiredCapabilities device = new DesiredCapabilities();
         device.setCapability("browserName", "");
