@@ -107,6 +107,7 @@
         <module>eyes-universal-core</module>
         <module>selenium4</module>
         <module>eyes.images.java</module>
+        <module>eyes.playwright.java</module>
     </modules>
 
     <distributionManagement>
