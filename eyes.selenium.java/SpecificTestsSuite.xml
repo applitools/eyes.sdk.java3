@@ -20,6 +20,12 @@ but each class will be run in a separate thread.-->
             <class name="com.applitools.eyes.selenium.TestCodedRegionPadding"/>
             <class name="com.applitools.eyes.TestMatchLevel"/>
             <class name="com.applitools.eyes.driver.TestCustomDriver"/>
+            <class name="com.applitools.eyes.selenium.TestByAll"/>
+        </classes>
+    </test>
+    <test name="Unit">
+        <classes>
+            <class name="com.applitools.eyes.unit.TestSeleniumCheckSettingsMapper"/>
         </classes>
     </test>
 </suite>
