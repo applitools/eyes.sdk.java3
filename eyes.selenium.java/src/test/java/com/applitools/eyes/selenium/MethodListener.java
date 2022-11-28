@@ -33,9 +33,9 @@ public class MethodListener implements IInvokedMethodListener2 {
 //            TestResultReportSummary reportSummary = getReportSummary(iTestResult);
 //            System.out.println("Unified report: sending JSON to report " + reportSummary.toString());
 //            try {
-//                CommUtils.postJson("http://sdk-test-results.herokuapp.com/result", reportSummary, null);
+//                CommUtils.postJson("http://applitools-quality-server.herokuapp.com/result", reportSummary, null);
 //            } catch (Throwable t) {
-//                CommUtils.postJson("http://sdk-test-results.herokuapp.com/result", reportSummary, null);
+//                CommUtils.postJson("http://applitools-quality-server.herokuapp.com/result", reportSummary, null);
 //            }
 //        }
     }
