@@ -165,13 +165,13 @@ public class USDKConnection {
                     }
                   } else if (payload.contains("Core.deleteTest")) {
                     try {
-                      ResponseDto debugHistoryResponse = objectMapper.readValue(payload,
+                      ResponseDto deleteTestResponse = objectMapper.readValue(payload,
                               new TypeReference<ResponseDto>() {
                               });
 
-                      SyncTaskListener<ResponseDto<?>> syncTaskListener = map.get(debugHistoryResponse.getKey());
-                      syncTaskListener.onComplete(debugHistoryResponse);
-                      map.remove(debugHistoryResponse.getKey());
+                      SyncTaskListener<ResponseDto<?>> syncTaskListener = map.get(deleteTestResponse.getKey());
+                      syncTaskListener.onComplete(deleteTestResponse);
+                      map.remove(deleteTestResponse.getKey());
                     } catch (Exception e) {
                       e.printStackTrace();
                     }
