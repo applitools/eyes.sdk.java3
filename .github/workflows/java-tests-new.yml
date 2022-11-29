@@ -288,5 +288,5 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: report
-        runs: |
+        run: |
           echo "all tests finished successfully."
