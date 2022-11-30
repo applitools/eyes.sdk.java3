@@ -4,7 +4,7 @@ services:
   - docker
 
 jdk: oraclejdk8
-
+script: jdk_switcher use oraclejdk8
 dist: xenial
 
 addons:
