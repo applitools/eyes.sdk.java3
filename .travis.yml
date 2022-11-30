@@ -5,12 +5,14 @@ services:
 
 jdk: oraclejdk8
 
-dist: trusty
+dist: xenial
 
 addons:
   apt:
+    sources:
+      - google-chrome
     packages:
-      - dpkg # this is required for fixing Travis' invalid chrome version issue
+      - google-chrome-stable
   chrome: stable
 
 # env variables
