@@ -10,7 +10,7 @@ dist: trusty
 addons:
   apt:
     packages:
-      - google-chrome-stable
+      - dpkg # this is required for fixing Travis' invalid chrome version issue
   chrome: stable
 
 # env variables
