@@ -1,7 +1,6 @@
 package com.applitools.eyes.appium.ios;
 
 import com.applitools.eyes.appium.TestSetup;
-import com.google.common.collect.ImmutableMap;
 import io.appium.java_client.ios.IOSDriver;
 
 import java.net.MalformedURLException;
@@ -13,8 +12,6 @@ public abstract class IOSTestSetup extends TestSetup {
     protected void setCapabilities() {
         super.setCapabilities();
         capabilities.setCapability("platformName", "iOS");
-        capabilities.setCapability("device", "iPhone 12");
-        capabilities.setCapability("os_version", "14");
         capabilities.setCapability("automationName", "XCUITest");
         capabilities.setCapability("newCommandTimeout", 300);
         capabilities.setCapability("fullReset", false);
@@ -22,12 +19,22 @@ public abstract class IOSTestSetup extends TestSetup {
 
     @Override
     protected void initDriver() throws MalformedURLException {
-        driver = new IOSDriver(new URL(appiumServerUrl), capabilities);
+        driver = new IOSDriver(new URL(BS_URL), capabilities);
     }
 
     @Override
     protected void setAppCapability() {
         capabilities.setCapability("app", "app_ios");
+    }
+
+    @Override
+    protected void setDeviceCapability() {
+        capabilities.setCapability("device", "iPhone 12");
+    }
+
+    @Override
+    protected void setPlatformVersionCapability() {
+        capabilities.setCapability("os_version", "14");
     }
 
     @Override

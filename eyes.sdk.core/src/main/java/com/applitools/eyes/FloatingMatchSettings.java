@@ -72,7 +72,11 @@ public class FloatingMatchSettings {
         return otherFMS.width == width &&
         otherFMS.height == height &&
         otherFMS.left == left &&
-        otherFMS.top == top;
+        otherFMS.top == top &&
+        otherFMS.maxUpOffset == maxUpOffset &&
+        otherFMS.maxRightOffset == maxRightOffset &&
+        otherFMS.maxDownOffset == maxDownOffset &&
+        otherFMS.maxLeftOffset == maxLeftOffset;
     }
 
     @Override

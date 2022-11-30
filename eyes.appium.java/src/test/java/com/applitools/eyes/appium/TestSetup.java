@@ -1,5 +1,6 @@
 package com.applitools.eyes.appium;
 
+import com.applitools.eyes.BatchInfo;
 import com.applitools.eyes.LogHandler;
 import com.applitools.eyes.ProxySettings;
 import com.applitools.eyes.utils.ReportingTestSuite;
@@ -8,7 +9,6 @@ import com.applitools.eyes.utils.TestUtils;
 import com.applitools.utils.GeneralUtils;
 import io.appium.java_client.AppiumDriver;
 import org.openqa.selenium.MutableCapabilities;
-import org.openqa.selenium.remote.DesiredCapabilities;
 import org.testng.ITest;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
@@ -22,8 +22,8 @@ public abstract class TestSetup extends ReportingTestSuite implements ITest {
     protected Eyes eyes;
 
     // To run locally use http://127.0.0.1:4723/wd/hub
-    protected String appiumServerUrl = "http://" + GeneralUtils.getEnvString("BROWSERSTACK_USERNAME") + ":" +
-        GeneralUtils.getEnvString("BROWSERSTACK_ACCESS_KEY") + "@hub-cloud.browserstack.com/wd/hub";
+    protected String BS_URL = "http://" + GeneralUtils.getEnvString("BROWSERSTACK_USERNAME") + ":" +
+            GeneralUtils.getEnvString("BROWSERSTACK_ACCESS_KEY") + "@hub-cloud.browserstack.com/wd/hub";
 
     private final String USERNAME = GeneralUtils.getEnvString("SAUCE_USERNAME");
     private final String ACCESS_KEY = GeneralUtils.getEnvString("SAUCE_ACCESS_KEY");
@@ -37,11 +37,12 @@ public abstract class TestSetup extends ReportingTestSuite implements ITest {
     @BeforeClass
     public void beforeClass() {
         super.setGroupName("appium");
-        capabilities = new DesiredCapabilities();
+        capabilities = new MutableCapabilities();
         setCapabilities();
 
         eyes = new Eyes();
         eyes.setApiKey(System.getenv("APPLITOOLS_API_KEY"));
+        eyes.setBatch(new BatchInfo(getApplicationName()));
 
         LogHandler logHandler = new StdoutLogHandler(TestUtils.verboseLogs);
         eyes.setLogHandler(logHandler);
@@ -68,13 +69,27 @@ public abstract class TestSetup extends ReportingTestSuite implements ITest {
     }
 
     protected void setCapabilities() {
-        capabilities.setCapability("browserstack.appium_version", "1.21.0");
+        setDeviceCapability();
+        setPlatformVersionCapability();
+        setSauceCapabilities();
         setAppCapability();
+    }
+
+    protected void setSauceCapabilities() {
+        MutableCapabilities sauceOptions = new MutableCapabilities();
+        sauceOptions.setCapability("appiumVersion", "1.22.1");
+        sauceOptions.setCapability("name", "Java Appium");
+        sauceOptions.setCapability("idleTimeout", 300);
+        capabilities.setCapability("sauce:options", sauceOptions);
     }
 
     protected abstract void initDriver() throws MalformedURLException;
 
     protected abstract void setAppCapability();
+
+    protected abstract void setDeviceCapability();
+
+    protected abstract void setPlatformVersionCapability();
 
     protected abstract String getApplicationName();
 }

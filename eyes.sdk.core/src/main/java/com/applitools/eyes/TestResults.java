@@ -1,6 +1,9 @@
 package com.applitools.eyes;
 
 import com.applitools.connectivity.ServerConnector;
+import com.applitools.eyes.universal.CommandExecutor;
+import com.applitools.eyes.universal.dto.DeleteTestSettingsDto;
+import com.applitools.eyes.universal.mapper.SettingsMapper;
 import com.applitools.utils.ArgumentGuard;
 import com.applitools.utils.Iso8610CalendarDeserializer;
 import com.fasterxml.jackson.annotation.JsonGetter;
@@ -427,13 +430,12 @@ public class TestResults {
     }
 
     public void delete() {
-        if (serverConnector == null) {
+        if (getId() == null || getBatchId() == null || getSecretToken() == null) {
             return;
         }
 
-        SyncTaskListener<Void> listener = new SyncTaskListener<Void>(new Logger(), "delete");
-        serverConnector.deleteSession(listener, this);
-        listener.get();
+        DeleteTestSettingsDto settings = SettingsMapper.toDeleteTestSettingsDto(this);
+        CommandExecutor.deleteTest(settings);
     }
 
     @Override

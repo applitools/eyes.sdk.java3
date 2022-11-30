@@ -1,7 +1,17 @@
 <!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd" >
 
-<!--<suite name="Java Specific Tests" verbose="1" parallel="tests" thread-count="15">-->
-<suite name="Java Specific Tests" verbose="1">
+<!--TestNG will run all the methods in the same class in the same thread,
+but each class will be run in a separate thread.-->
+<suite name="Java Specific Tests" verbose="1" parallel="classes" thread-count="15">
+    <listeners>
+        <listener class-name="com.applitools.eyes.utils.ReportingListener"/>
+    </listeners>
+
+    <test name="TestProxy">
+        <classes>
+            <class name="com.applitools.eyes.selenium.TestProxy"/>
+        </classes>
+    </test>
     <test name="TestEyes">
         <classes>
 <!--            <class name="com.applitools.eyes.selenium.TestBatchAPI"/>-->
@@ -9,6 +19,13 @@
             <class name="com.applitools.eyes.TestPadding"/>
             <class name="com.applitools.eyes.selenium.TestCodedRegionPadding"/>
             <class name="com.applitools.eyes.TestMatchLevel"/>
+            <class name="com.applitools.eyes.driver.TestCustomDriver"/>
+            <class name="com.applitools.eyes.selenium.TestByAll"/>
+        </classes>
+    </test>
+    <test name="Unit">
+        <classes>
+            <class name="com.applitools.eyes.unit.TestSeleniumCheckSettingsMapper"/>
         </classes>
     </test>
 </suite>

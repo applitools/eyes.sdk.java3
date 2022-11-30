@@ -2,16 +2,20 @@ language: java
 
 services:
   - docker
+  - xvfb
 
-jdk: oraclejdk8
+jdk: openjdk8
 
-dist: trusty
+dist: xenial
 
 addons:
   apt:
+    sources:
+      - google-chrome
     packages:
-      - dpkg # this is required for fixing Travis' invalid chrome version issue
+      - google-chrome-stable
   chrome: stable
+  firefox: latest
 
 # env variables
 # $RELEASE_BRANCH
@@ -60,11 +64,6 @@ jobs:
         - chmod +x ./runTests.sh
         - ./runTests.sh "selenium4"
     - name: Selenium Specific
-      addons:
-        apt:
-          packages:
-            - dpkg # this is required for fixing Travis' invalid chrome version issue
-        chrome: stable
       if: type != cron
       script:
         - echo $APPLITOOLS_REPORT_ID
@@ -105,15 +104,8 @@ jobs:
 #        - chmod +x ./runTests.sh
 #        - ./runTests.sh "eyes.selenium.java"
     - name: Generic
-      addons:
-        apt:
-          packages:
-            - dpkg # this is required for fixing Travis' invalid chrome version issue
-        chrome: stable
-        firefox: latest
       script:
         - "export DISPLAY=:99.0"
-        - "sh -e /etc/init.d/xvfb start"
         - sleep 3
         - echo $APPLITOOLS_REPORT_ID
         - nvm install 14

@@ -1,5 +1,6 @@
 package com.applitools.eyes.universal;
 
+import java.sql.Timestamp;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -9,6 +10,8 @@ import com.applitools.eyes.Logger;
 import com.applitools.eyes.Region;
 import com.applitools.eyes.SyncTaskListener;
 import com.applitools.eyes.locators.TextRegion;
+import com.applitools.eyes.logging.Stage;
+import com.applitools.eyes.logging.TraceLevel;
 import com.applitools.eyes.universal.dto.*;
 import com.applitools.eyes.universal.dto.response.CommandCloseResponseDto;
 import com.applitools.eyes.universal.server.UniversalSdkNativeLoader;
@@ -160,6 +163,43 @@ public class USDKConnection {
                       SyncTaskListener<ResponseDto<?>> syncTaskListener = map.get(debugHistoryResponse.getKey());
                       syncTaskListener.onComplete(debugHistoryResponse);
                       map.remove(debugHistoryResponse.getKey());
+                    } catch (Exception e) {
+                      e.printStackTrace();
+                    }
+                  } else if (payload.contains("Core.deleteTest")) {
+                    try {
+                      ResponseDto deleteTestResponse = objectMapper.readValue(payload,
+                              new TypeReference<ResponseDto>() {
+                              });
+
+                      SyncTaskListener<ResponseDto<?>> syncTaskListener = map.get(deleteTestResponse.getKey());
+                      syncTaskListener.onComplete(deleteTestResponse);
+                      map.remove(deleteTestResponse.getKey());
+                    } catch (Exception e) {
+                      e.printStackTrace();
+                    }
+                  } else if (payload.contains("Core.closeBatch")) {
+                    try {
+                      ResponseDto closeBatchResponse = objectMapper.readValue(payload,
+                              new TypeReference<ResponseDto>() {
+                              });
+
+                      SyncTaskListener<ResponseDto<?>> syncTaskListener = map.get(closeBatchResponse.getKey());
+                      syncTaskListener.onComplete(closeBatchResponse);
+                      map.remove(closeBatchResponse.getKey());
+                    } catch (Exception e) {
+                      e.printStackTrace();
+                    }
+                  } else if (payload.contains("Server.log")) {
+                    try {
+                      LogResponseDto serverLogResponse = objectMapper.readValue(payload,
+                              new TypeReference<LogResponseDto>() {
+                              });
+                      String message = "eyes | " + new Timestamp(System.currentTimeMillis())
+                              + " | [" + serverLogResponse.getPayload().getLevel() + "] | "
+                              + serverLogResponse.getPayload().getMessage();
+                      logger.log(TraceLevel.Debug, Stage.GENERAL, message);
+                      System.out.println(message);
                     } catch (Exception e) {
                       e.printStackTrace();
                     }
