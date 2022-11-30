@@ -127,6 +127,7 @@ jobs:
           APPLITOOLS_API_KEY: ${{ secrets.APPLITOOLS_API_KEY }}
           SAUCE_USERNAME: ${{ secrets.SAUCE_USERNAME }}
           SAUCE_ACCESS_KEY: ${{ secrets.SAUCE_ACCESS_KEY }}
+          CHROME_DRIVER_PATH: "/usr/local/bin/chromedriver"
 
   alpine-tests:
     needs: build
@@ -160,6 +161,7 @@ jobs:
           APPLITOOLS_API_KEY: ${{ secrets.APPLITOOLS_API_KEY }}
           SAUCE_USERNAME: ${{ secrets.SAUCE_USERNAME }}
           SAUCE_ACCESS_KEY: ${{ secrets.SAUCE_ACCESS_KEY }}
+          CHROME_DRIVER_PATH: "/usr/local/bin/chromedriver"
 
   specific-tests:
     needs: build
@@ -262,8 +264,6 @@ jobs:
           mvn clean install -DskipTests
           chmod +x ./initGeckoDriver.sh && ./initGeckoDriver.sh
           chmod +x ./initChromeDriver.sh && ./initChromeDriver.sh
-#          export FIREFOX_DRIVER_PATH=FIXME
-#          export CHROME_DRIVER_PATH=FIXME
 
       - name: SDK Generic tests
         run: |
@@ -276,6 +276,7 @@ jobs:
           APPLITOOLS_API_KEY: ${{ secrets.APPLITOOLS_API_KEY }}
           SAUCE_USERNAME: ${{ secrets.SAUCE_USERNAME }}
           SAUCE_ACCESS_KEY: ${{ secrets.SAUCE_ACCESS_KEY }}
+          CHROME_DRIVER_PATH: "/usr/local/bin/chromedriver"
 
   report:
     needs:
