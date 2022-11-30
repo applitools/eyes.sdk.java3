@@ -1,157 +1,54 @@
-#language: java
-#
-#services:
-#  - docker
-#
-#jdk: oraclejdk8
-#
-#dist: trusty
-#
-#addons:
-#  apt:
-#    packages:
-#      - dpkg # this is required for fixing Travis' invalid chrome version issue
-#  chrome: stable
-#
-## env variables
-## $RELEASE_BRANCH
-## $GITHUB_TOKEN
-## $ALLOWED_RELEASE_COMMITERS
-## $SDK
-#git:
-#  submodules: false
-#before_install:
-#  - echo -e "\n\nmachine github.com\n  login $GITHUB_TOKEN\n" >~/.netrc
-#  - git submodule update --init --recursive
-#before_script:
-#  - export SE_DOCKER="true" # TODO this is used with selenium-java 4.5.2 see PortProber.class L103 and may be subject to changed
-#  - export APPLITOOLS_REPORT_ID=${TRAVIS_COMMIT:0:7}-$TRAVIS_BUILD_NUMBER
-#  - echo "Travis tag is $TRAVIS_TAG"
-#  - echo "Travis event type is $TRAVIS_EVENT_TYPE"
-#  - if [[ "$TRAVIS_EVENT_TYPE" == "cron" || "$TRAVIS_TAG" =~ ^RELEASE_CANDIDATE ]]; then
-#    echo "Sandbox is false in test report";
-#    export APPLITOOLS_REPORT_TO_SANDBOX="false";
-#    echo "APPLITOOLS_REPORT_TO_SANDBOX=$APPLITOOLS_REPORT_TO_SANDBOX";
-#    fi
-#  - pushd eyes.ufg.java/src/main/resources
-#  - npm install
-#  - popd
-#  - mvn install -DskipTests
-#jobs:
-#  include:
-#    - stage: Test
-#      name: Core
-#      script:
-#        - echo $APPLITOOLS_REPORT_ID
-#        - chmod +x ./runTests.sh
-#        - ./runTests.sh "eyes.sdk.core"
-#    - name: Appium Android
-#      if: type != cron
-#      script:
-#        - echo $APPLITOOLS_REPORT_ID
-#        - sh upload_app.sh "https://applitools.jfrog.io/artifactory/Examples/android/1.3/app-debug.apk" "app_android"
-#        - sh upload_app.sh "https://applitools.jfrog.io/artifactory/Examples/androidx/1.3.1/app_androidx.apk" "app_androidx"
-#        - chmod +x ./runTests.sh
-#        - ./runTests.sh "eyes.appium.java"
-#    - name: Selenium 4
-#      if: type != cron
-#      script:
-#        - echo $APPLITOOLS_REPORT_ID
-#        - chmod +x ./runTests.sh
-#        - ./runTests.sh "selenium4"
-#    - name: Selenium Specific
-#      addons:
-#        apt:
-#          packages:
-#            - dpkg # this is required for fixing Travis' invalid chrome version issue
-#        chrome: stable
-#      if: type != cron
-#      script:
-#        - echo $APPLITOOLS_REPORT_ID
-#        - chmod +x ./initChromeDriver.sh && ./initChromeDriver.sh
-#        - export CHROME_DRIVER_PATH=/home/travis/build/chromedriver
-#        - chmod +x ./runTests.sh
+language: java
+
+services:
+  - docker
+
+jdk: oraclejdk8
+
+dist: trusty
+
+addons:
+  apt:
+    packages:
+      - dpkg # this is required for fixing Travis' invalid chrome version issue
+  chrome: stable
+
+# env variables
+# $RELEASE_BRANCH
+# $GITHUB_TOKEN
+# $ALLOWED_RELEASE_COMMITERS
+# $SDK
+git:
+  submodules: false
+before_install:
+  - echo -e "\n\nmachine github.com\n  login $GITHUB_TOKEN\n" >~/.netrc
+  - git submodule update --init --recursive
+before_script:
+  - export SE_DOCKER="true" # TODO this is used with selenium-java 4.5.2 see PortProber.class L103 and may be subject to changed
+  - export APPLITOOLS_REPORT_ID=${TRAVIS_COMMIT:0:7}-$TRAVIS_BUILD_NUMBER
+  - echo "Travis tag is $TRAVIS_TAG"
+  - echo "Travis event type is $TRAVIS_EVENT_TYPE"
+  - if [[ "$TRAVIS_EVENT_TYPE" == "cron" || "$TRAVIS_TAG" =~ ^RELEASE_CANDIDATE ]]; then
+    echo "Sandbox is false in test report";
+    export APPLITOOLS_REPORT_TO_SANDBOX="false";
+    echo "APPLITOOLS_REPORT_TO_SANDBOX=$APPLITOOLS_REPORT_TO_SANDBOX";
+    fi
+  - pushd eyes.ufg.java/src/main/resources
+  - npm install
+  - popd
+  - mvn install -DskipTests
+jobs:
+  include:
+    - name: Test chromedriver
+      addons:
+        apt:
+          packages:
+            - dpkg # this is required for fixing Travis' invalid chrome version issue
+        chrome: stable
+      if: type != cron
+      script:
+        - echo $APPLITOOLS_REPORT_ID
+        - chmod +x ./initChromeDriver.sh && ./initChromeDriver.sh
+        - export CHROME_DRIVER_PATH=/home/travis/build/chromedriver
+        - chmod +x ./runTests.sh
 #        - ./runTests.sh "eyes.selenium.java"
-#    - name: Images
-#      if: type != cron
-#      script:
-#        - echo $APPLITOOLS_REPORT_ID
-#        - chmod +x ./runTests.sh
-#        - ./runTests.sh "eyes.images.java"
-##    - name: Selenium
-##      script:
-##        - echo $APPLITOOLS_REPORT_ID
-##        - google-chrome --version
-##        - chromium-browser --version
-##        - chmod +x ./initChromeDriver.sh && ./initChromeDriver.sh
-##        - env webdriver.chrome.driver=/home/travis/build/
-##        - echo $TRAVIS_EVENT_TYPE
-##        - echo $TRAVIS_BRANCH
-##        - if [[ "$TRAVIS_EVENT_TYPE" == "cron" && "$TRAVIS_BRANCH" == "master" ]]; then
-##          sed -i 's/passedTestsSuite.xml/devTestsSuite.xml/g' $TRAVIS_BUILD_DIR/eyes.selenium.java/pom.xml;
-##          fi
-##        - chmod +x ./runConnectivityTests.sh
-##        - ./runConnectivityTests.sh
-##        - chmod +x ./runTests.sh
-##        - ./runTests.sh "eyes.selenium.java"
-##    - name: Selenium Mobile
-##      if: type != cron
-##      script:
-##        - echo $APPLITOOLS_REPORT_ID
-##        - chmod +x ./initChromeDriver.sh && ./initChromeDriver.sh
-##        - /home/travis/build/chromedriver --version
-##        - env webdriver.chrome.driver=/home/travis/build/
-##        - sed -i 's/passedTestsSuite.xml/mobileTestsSuite.xml/g' $TRAVIS_BUILD_DIR/eyes.selenium.java/pom.xml;
-##        - chmod +x ./runTests.sh
-##        - ./runTests.sh "eyes.selenium.java"
-#    - name: Generic
-#      addons:
-#        apt:
-#          packages:
-#            - dpkg # this is required for fixing Travis' invalid chrome version issue
-#        chrome: stable
-#        firefox: latest
-#      script:
-#        - "export DISPLAY=:99.0"
-#        - "sh -e /etc/init.d/xvfb start"
-#        - sleep 3
-#        - echo $APPLITOOLS_REPORT_ID
-#        - nvm install 14
-#        - nvm use 14
-#        - mvn clean install -DskipTests
-#        - chmod +x ./initGeckoDriver.sh && ./initGeckoDriver.sh
-#        - export FIREFOX_DRIVER_PATH=/home/travis/build/geckodriver
-#        - chmod +x ./initChromeDriver.sh && ./initChromeDriver.sh
-#        - export CHROME_DRIVER_PATH=/home/travis/build/chromedriver
-#        - cd coverage-tests;
-#        - chmod +x ./generic_tests.sh && ./generic_tests.sh
-#    #    - stage: Test Appium IOS
-#    #      if: type != cron
-#    #      script:
-#    #        - echo $APPLITOOLS_REPORT_ID
-#    #        - sh upload_app.sh "https://applitools.jfrog.io/artifactory/Examples/IOSTestApp/1.6/ipa/IOSTestApp.ipa" "app_ios"
-#    #        - sed -i 's/androidTestSuite.xml/iosTestSuite.xml/g' $TRAVIS_BUILD_DIR/eyes.appium.java/pom.xml;
-#    #        - chmod +x ./runTests.sh
-#    #        - ./runTests.sh "eyes.appium.java"
-#    - stage: Full Regression Mail
-#      if: type = cron AND branch = master
-#      script:
-#        - chmod +x ./send_full_regression_mail.sh;
-#        - ./send_full_regression_mail.sh "$SDK"
-#    - stage: Deploy
-#      if: tag =~ ^RELEASE_CANDIDATE AND fork == false
-#      script:
-#        # save the email of the person who did this commit in COMMITTER_EMAIL
-#        - COMMITTER_EMAIL="$(git log -1 $TRAVIS_COMMIT --pretty="%cE")"
-#        - echo $COMMITTER_EMAIL
-#        - SDK_VERSION=$(echo $TRAVIS_TAG | sed 's/[^.0-9]*//g')
-#        - if [[ $ALLOWED_RELEASE_COMMITERS =~ $COMMITTER_EMAIL ]]; then
-#          echo "DEPLOY";
-#          chmod +x ./extractChangeLog.sh;
-#          TMP_CHANGELOG=$(./extractChangeLog.sh "$SDK_VERSION" "CHANGELOG.md");
-#          CHANGELOG=$([ -z "$TMP_CHANGELOG" ] && echo "There is no change log for version $SDK_VERSION"; echo "$TMP_CHANGELOG");
-#          echo $CHANGELOG;
-#          chmod +x ./sendMail.sh;
-#          TEST_COVERAGE_GAP=$(cat testCoverageGap.txt);
-#          ./sendMail.sh "$SDK" "$TRAVIS_TAG" "$CHANGELOG" "$TEST_COVERAGE_GAP";
-#          fi
