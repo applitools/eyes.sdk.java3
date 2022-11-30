@@ -42,7 +42,7 @@ jobs:
         run: |
           echo "Starting SDK Core tests."
           echo $APPLITOOLS_REPORT_ID
-          test -pl "eyes.sdk.core" -e -X
+          mvn test -pl "eyes.sdk.core" -e -X
         #          working-directory: java
         env:
           APPLITOOLS_API_KEY: ${{ secrets.APPLITOOLS_API_KEY }}
@@ -76,7 +76,7 @@ jobs:
         run: |
           echo "Starting SDK Appium tests."
           echo $APPLITOOLS_REPORT_ID
-          test -pl "eyes.appium.java" -e -X
+          mvn test -pl "eyes.appium.java" -e -X
         #          working-directory: java
         env:
           APPLITOOLS_API_KEY: ${{ secrets.APPLITOOLS_API_KEY }}
@@ -121,7 +121,7 @@ jobs:
         run: |
           echo "Starting SDK Selenium tests."
           echo $APPLITOOLS_REPORT_ID
-          test -pl "eyes.selenium.java" -e -X
+          mvn test -pl "eyes.selenium.java" -e -X
         #          working-directory: java
         env:
           APPLITOOLS_API_KEY: ${{ secrets.APPLITOOLS_API_KEY }}
@@ -154,7 +154,7 @@ jobs:
         run: |
           echo "Starting SDK Alpine tests."
           echo $APPLITOOLS_REPORT_ID
-          test -pl "eyes.selenium.java" -e -X
+          mvn test -pl "eyes.selenium.java" -e -X
         #          working-directory: java
         env:
           APPLITOOLS_API_KEY: ${{ secrets.APPLITOOLS_API_KEY }}
@@ -190,7 +190,7 @@ jobs:
         run: |
           echo "Starting SDK Specific tests."
           echo $APPLITOOLS_REPORT_ID
-          test -pl "selenium4" -e -X
+          mvn test -pl "selenium4" -e -X
         #          working-directory: java
         env:
           APPLITOOLS_API_KEY: ${{ secrets.APPLITOOLS_API_KEY }}
@@ -224,7 +224,7 @@ jobs:
         run: |
           echo "Starting SDK Images tests."
           echo $APPLITOOLS_REPORT_ID
-          test -pl "eyes.images.java" -e -X
+          mvn test -pl "eyes.images.java" -e -X
         #          working-directory: java
         env:
           APPLITOOLS_API_KEY: ${{ secrets.APPLITOOLS_API_KEY }}
