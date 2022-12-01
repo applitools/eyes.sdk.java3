@@ -105,15 +105,9 @@ jobs:
         with:
           java-version: ${{ matrix.java-version }}
           distribution: "temurin"
-      - uses: nanasess/setup-chromedriver@v1
-      - name: chromedriver setup windows
-        if: ${{ matrix.os == 'windows-latest' }}
-        run: chromedriver --url-base=/wd/hub &
-      - name: chromedriver setup unix
-        if: ${{ matrix.os != 'windows-latest' }}
-        run: |
-          export DISPLAY=:99
-          chromedriver --url-base=/wd/hub &
+      - uses: ./.github/workflows/java-chromedriver.yml
+        with:
+          os: ${{ matrix.os }}
       - name: initialize
         run: |
           pushd eyes.ufg.java/src/main/resources
@@ -148,6 +142,9 @@ jobs:
         with:
           java-version: 8
           distribution: "temurin"
+      - uses: ./.github/workflows/java-chromedriver.yml
+        with:
+          os: ${{ matrix.os }}
       - name: initialize
         run: |
           pushd eyes.ufg.java/src/main/resources
@@ -262,7 +259,6 @@ jobs:
         with:
           os: ${{ matrix.os }}
       - uses: browser-actions/setup-firefox@latest
-        run: firefox --version
       - name: initialize
         run: |
           pushd eyes.ufg.java/src/main/resources
@@ -275,7 +271,6 @@ jobs:
           mvn clean install -DskipTests
           chmod +x ./initGeckoDriver.sh && ./initGeckoDriver.sh
           chmod +x ./initChromeDriver.sh && ./initChromeDriver.sh
-
       - name: SDK Generic tests
         run: |
           echo "Starting SDK Generic tests."
