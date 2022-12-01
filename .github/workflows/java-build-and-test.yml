@@ -137,6 +137,9 @@ jobs:
     runs-on: ubuntu-20.04
     container: "alpine:latest"
     steps:
+      - name: Installing dependencies
+        run: |
+          apt install -y git
       - name: Checkout repository and submodules
         uses: actions/checkout@v2
         with:
@@ -276,7 +279,9 @@ jobs:
         run: |
           export DISPLAY=:99
           chromedriver --url-base=/wd/hub &
-      - uses: browser-actions/setup-firefox@latest
+      - name: Setup firefox
+        if: matrix.os != 'windows-latest'
+        uses: browser-actions/setup-firefox@latest
       - name: initialize
         run: |
           pushd eyes.ufg.java/src/main/resources
@@ -296,6 +301,7 @@ jobs:
           SAUCE_USERNAME: ${{ secrets.SAUCE_USERNAME }}
           SAUCE_ACCESS_KEY: ${{ secrets.SAUCE_ACCESS_KEY }}
           CHROME_DRIVER_PATH: "/usr/local/bin/chromedriver"
+          FIREFOX_DRIVER_PATH: "/usr/local/bin/geckodriver"
 
   report:
     needs:
