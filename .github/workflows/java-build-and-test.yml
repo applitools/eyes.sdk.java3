@@ -107,10 +107,10 @@ jobs:
           distribution: "temurin"
       - uses: nanasess/setup-chromedriver@v1
       - name: chromedriver setup windows
-        if: ${{ inputs.os == 'windows-latest' }}
+        if: ${{ matrix.os == 'windows-latest' }}
         run: chromedriver --url-base=/wd/hub &
       - name: chromedriver setup unix
-        if: ${{ inputs.os != 'windows-latest' }}
+        if: ${{ matrix.os != 'windows-latest' }}
         run: |
           export DISPLAY=:99
           chromedriver --url-base=/wd/hub &
@@ -134,7 +134,7 @@ jobs:
 
   alpine-tests:
     needs: build
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
     container: "alpine:latest"
     steps:
       - name: checkout submodules
@@ -149,10 +149,10 @@ jobs:
           distribution: "temurin"
       - uses: nanasess/setup-chromedriver@v1
       - name: chromedriver setup windows
-        if: ${{ inputs.os == 'windows-latest' }}
+        if: ${{ matrix.os == 'windows-latest' }}
         run: chromedriver --url-base=/wd/hub &
       - name: chromedriver setup unix
-        if: ${{ inputs.os != 'windows-latest' }}
+        if: ${{ matrix.os != 'windows-latest' }}
         run: |
           export DISPLAY=:99
           chromedriver --url-base=/wd/hub &
@@ -268,10 +268,10 @@ jobs:
           distribution: "temurin"
       - uses: nanasess/setup-chromedriver@v1
       - name: chromedriver setup windows
-        if: ${{ inputs.os == 'windows-latest' }}
+        if: ${{ matrix.os == 'windows-latest' }}
         run: chromedriver --url-base=/wd/hub &
       - name: chromedriver setup unix
-        if: ${{ inputs.os != 'windows-latest' }}
+        if: ${{ matrix.os != 'windows-latest' }}
         run: |
           export DISPLAY=:99
           chromedriver --url-base=/wd/hub &
