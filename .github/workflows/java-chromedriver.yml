@@ -1,0 +1,17 @@
+on:
+  workflow_call:
+    inputs:
+      os:
+        required: true
+        type: string
+
+jobs:
+  setup-chrome:
+    - name: chromedriver setup windows
+      if: ${{ inputs.os == 'windows-latest' }}
+      run: chromedriver --url-base=/wd/hub &
+    - name: chromedriver setup unix
+      if: ${{ inputs.os != 'windows-latest' }}
+      run: |
+        export DISPLAY=:99
+        chromedriver --url-base=/wd/hub &
