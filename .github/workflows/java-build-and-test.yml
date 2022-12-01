@@ -134,7 +134,6 @@ jobs:
     steps:
       - name: checkout submodules
         run: |
-          echo -e "\n\nmachine github.com\n  login ${{ secrets.SUBMODULES_GA_TOKEN }}\n" >~/.netrc
           git submodule update --init --recursive
       - uses: actions/setup-node@v3
         with:
