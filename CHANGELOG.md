@@ -1,3 +1,7 @@
+## [vNext] - dNext
+### Updated
+- Update universal binaries to 3.0.3 [Trello 2633, 3078](https://trello.com/c/dQqN02TN)
+
 ## [5.37.0] - 2022-11-30
 ### Fixed
 - Fix remote driver server URL mapping when using a custom driver implementation. [Trello 3067](https://trello.com/c/8eF4UZpy)
