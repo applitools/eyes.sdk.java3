@@ -139,7 +139,7 @@ jobs:
     steps:
       - name: Installing dependencies
         run: |
-          apt install -y git
+          apk add git
       - name: Checkout repository and submodules
         uses: actions/checkout@v2
         with:
