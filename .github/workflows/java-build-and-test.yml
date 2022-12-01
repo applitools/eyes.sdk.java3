@@ -16,6 +16,7 @@ jobs:
   core-tests:
     needs: build
     strategy:
+      fail-fast: false
       matrix:
         os: [ ubuntu-latest, macos-latest, windows-latest ]
         java-version: [ "8", "11" ]
@@ -50,6 +51,7 @@ jobs:
   appium-tests:
     needs: build
     strategy:
+      fail-fast: false
       matrix:
         os: [ ubuntu-latest, macos-latest, windows-latest ]
         java-version: [ "8", "11" ]
@@ -86,6 +88,7 @@ jobs:
   selenium-tests:
     needs: build
     strategy:
+      fail-fast: false
       matrix:
         os: [ ubuntu-latest, macos-latest, windows-latest ]
         java-version: [ "8", "11" ]
@@ -134,10 +137,10 @@ jobs:
     runs-on: ubuntu-latest
     container: "alpine:latest"
     steps:
-      - uses: actions/checkout@v3
-        with:
-          submodules: "recursive"
-          token: ${{ secrets.SUBMODULES_GA_TOKEN }}
+      - name: checkout submodules
+        run: |
+          echo -e "\n\nmachine github.com\n  login ${{ secrets.SUBMODULES_GA_TOKEN }}\n" >~/.netrc
+          git submodule update --init --recursive
       - uses: actions/setup-node@v3
         with:
           node-version: 16
@@ -166,6 +169,7 @@ jobs:
   specific-tests:
     needs: build
     strategy:
+      fail-fast: false
       matrix:
         os: [ ubuntu-latest, macos-latest, windows-latest ]
         java-version: [ "8", "11" ]
@@ -200,6 +204,7 @@ jobs:
   images-tests:
     needs: build
     strategy:
+      fail-fast: false
       matrix:
         os: [ ubuntu-latest, macos-latest, windows-latest ]
         java-version: [ "8", "11" ]
@@ -236,6 +241,7 @@ jobs:
   generic-tests:
     needs: build
     strategy:
+      fail-fast: false
       matrix:
         os: [ ubuntu-latest, macos-latest, windows-latest ]
         java-version: [ "8", "11" ]
@@ -252,6 +258,11 @@ jobs:
         with:
           java-version: ${{ matrix.java-version }}
           distribution: "temurin"
+      - uses: ./.github/workflows/java-chromedriver.yml
+        with:
+          os: ${{ matrix.os }}
+      - uses: browser-actions/setup-firefox@latest
+        run: firefox --version
       - name: initialize
         run: |
           pushd eyes.ufg.java/src/main/resources
