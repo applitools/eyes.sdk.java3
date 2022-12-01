@@ -105,10 +105,15 @@ jobs:
         with:
           java-version: ${{ matrix.java-version }}
           distribution: "temurin"
-      - uses: ./.github/workflows/java-chromedriver.yml
-        with:
-          os: ${{ matrix.os }}
-          ref: ${{ github.ref }}
+      - uses: nanasess/setup-chromedriver@v1
+      - name: chromedriver setup windows
+        if: ${{ inputs.os == 'windows-latest' }}
+        run: chromedriver --url-base=/wd/hub &
+      - name: chromedriver setup unix
+        if: ${{ inputs.os != 'windows-latest' }}
+        run: |
+          export DISPLAY=:99
+          chromedriver --url-base=/wd/hub &
       - name: initialize
         run: |
           pushd eyes.ufg.java/src/main/resources
@@ -142,10 +147,15 @@ jobs:
         with:
           java-version: 8
           distribution: "temurin"
-      - uses: ./.github/workflows/java-chromedriver.yml
-        with:
-          os: ${{ matrix.os }}
-          ref: ${{ github.ref }}
+      - uses: nanasess/setup-chromedriver@v1
+      - name: chromedriver setup windows
+        if: ${{ inputs.os == 'windows-latest' }}
+        run: chromedriver --url-base=/wd/hub &
+      - name: chromedriver setup unix
+        if: ${{ inputs.os != 'windows-latest' }}
+        run: |
+          export DISPLAY=:99
+          chromedriver --url-base=/wd/hub &
       - name: initialize
         run: |
           pushd eyes.ufg.java/src/main/resources
@@ -256,10 +266,15 @@ jobs:
         with:
           java-version: ${{ matrix.java-version }}
           distribution: "temurin"
-      - uses: ./.github/workflows/java-chromedriver.yml
-        with:
-          os: ${{ matrix.os }}
-          ref: ${{ github.ref }}
+      - uses: nanasess/setup-chromedriver@v1
+      - name: chromedriver setup windows
+        if: ${{ inputs.os == 'windows-latest' }}
+        run: chromedriver --url-base=/wd/hub &
+      - name: chromedriver setup unix
+        if: ${{ inputs.os != 'windows-latest' }}
+        run: |
+          export DISPLAY=:99
+          chromedriver --url-base=/wd/hub &
       - uses: browser-actions/setup-firefox@latest
       - name: initialize
         run: |
