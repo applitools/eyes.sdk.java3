@@ -282,8 +282,6 @@ jobs:
           npm install
           popd
           mvn install -DskipTests
-          "export DISPLAY=:99.0"
-          "sh -e /etc/init.d/xvfb start"
           sleep 3
           mvn clean install -DskipTests
           chmod +x ./initGeckoDriver.sh && ./initGeckoDriver.sh
