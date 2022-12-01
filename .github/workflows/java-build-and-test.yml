@@ -137,9 +137,10 @@ jobs:
     runs-on: ubuntu-20.04
     container: "alpine:latest"
     steps:
-      - name: checkout submodules
-        run: |
-          git submodule update --init --recursive
+      - name: Checkout repository and submodules
+        uses: actions/checkout@v2
+        with:
+          submodules: recursive
       - uses: actions/setup-node@v3
         with:
           node-version: 16
@@ -283,8 +284,6 @@ jobs:
           popd
           mvn install -DskipTests
           mvn clean install -DskipTests
-          chmod +x ./initGeckoDriver.sh && ./initGeckoDriver.sh
-          chmod +x ./initChromeDriver.sh && ./initChromeDriver.sh
       - name: SDK Generic tests
         run: |
           echo "Starting SDK Generic tests."
