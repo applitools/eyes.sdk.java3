@@ -12,6 +12,7 @@ import org.openqa.selenium.MutableCapabilities;
 import org.testng.ITest;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
+import org.testng.annotations.BeforeSuite;
 
 import java.net.MalformedURLException;
 
@@ -20,6 +21,7 @@ public abstract class TestSetup extends ReportingTestSuite implements ITest {
     protected MutableCapabilities capabilities;
     protected AppiumDriver driver;
     protected Eyes eyes;
+    protected BatchInfo batch;
 
     // To run locally use http://127.0.0.1:4723/wd/hub
     protected String BS_URL = "http://" + GeneralUtils.getEnvString("BROWSERSTACK_USERNAME") + ":" +
@@ -28,6 +30,11 @@ public abstract class TestSetup extends ReportingTestSuite implements ITest {
     private final String USERNAME = GeneralUtils.getEnvString("SAUCE_USERNAME");
     private final String ACCESS_KEY = GeneralUtils.getEnvString("SAUCE_ACCESS_KEY");
     protected final String SL_URL = "https://"+USERNAME+":" + ACCESS_KEY + "@ondemand.us-west-1.saucelabs.com:443/wd/hub";
+
+    @BeforeSuite
+    public void beforeSuite() {
+        batch = new BatchInfo(getApplicationName());
+    }
 
     @Override
     public String getTestName() {
@@ -42,7 +49,7 @@ public abstract class TestSetup extends ReportingTestSuite implements ITest {
 
         eyes = new Eyes();
         eyes.setApiKey(System.getenv("APPLITOOLS_API_KEY"));
-        eyes.setBatch(new BatchInfo(getApplicationName()));
+        eyes.setBatch(batch);
 
         LogHandler logHandler = new StdoutLogHandler(TestUtils.verboseLogs);
         eyes.setLogHandler(logHandler);
