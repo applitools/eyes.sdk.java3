@@ -4,11 +4,19 @@ on:
       os:
         required: true
         type: string
+        description: the operating system
+      ref:
+        required: true
+        type: string
+        description: the reference
 
 jobs:
   setup-chrome:
     runs-on: ${{ inputs.os }}
     steps:
+      - uses: actions/checkout@v3
+        with:
+          ref: ${{ inputs.ref }}
       - uses: nanasess/setup-chromedriver@v1
       - name: chromedriver setup windows
         if: ${{ inputs.os == 'windows-latest' }}

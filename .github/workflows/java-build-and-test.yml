@@ -108,6 +108,7 @@ jobs:
       - uses: ./.github/workflows/java-chromedriver.yml
         with:
           os: ${{ matrix.os }}
+          ref: ${{ github.ref }}
       - name: initialize
         run: |
           pushd eyes.ufg.java/src/main/resources
@@ -145,6 +146,7 @@ jobs:
       - uses: ./.github/workflows/java-chromedriver.yml
         with:
           os: ${{ matrix.os }}
+          ref: ${{ github.ref }}
       - name: initialize
         run: |
           pushd eyes.ufg.java/src/main/resources
@@ -258,6 +260,7 @@ jobs:
       - uses: ./.github/workflows/java-chromedriver.yml
         with:
           os: ${{ matrix.os }}
+          ref: ${{ github.ref }}
       - uses: browser-actions/setup-firefox@latest
       - name: initialize
         run: |
