@@ -87,7 +87,9 @@ jobs:
 
   selenium-tests:
     needs: build
+    concurrency: test_group_1
     strategy:
+      max-parallel: 1
       fail-fast: false
       matrix:
         os: [ ubuntu-latest, macos-latest, windows-latest ]
@@ -141,9 +143,10 @@ jobs:
         run: |
           apk add git
       - name: Checkout repository and submodules
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
         with:
           submodules: recursive
+          token: ${{ secrets.SUBMODULES_GA_TOKEN }}
       - uses: actions/setup-node@v3
         with:
           node-version: 16
@@ -252,7 +255,7 @@ jobs:
 
   generic-tests:
     needs: build
-    concurrency: test_group_1
+    concurrency: test_group_2
     strategy:
       fail-fast: false
       max-parallel: 1
