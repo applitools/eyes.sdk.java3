@@ -132,7 +132,7 @@ jobs:
           APPLITOOLS_API_KEY: ${{ secrets.APPLITOOLS_API_KEY }}
           SAUCE_USERNAME: ${{ secrets.SAUCE_USERNAME }}
           SAUCE_ACCESS_KEY: ${{ secrets.SAUCE_ACCESS_KEY }}
-          CHROME_DRIVER_PATH: "/usr/local/bin/chromedriver"
+#          CHROME_DRIVER_PATH: "/usr/local/bin/chromedriver"
 
   alpine-tests:
     needs: build
@@ -142,6 +142,7 @@ jobs:
       - name: Installing dependencies
         run: |
           apk add git
+          apk add chromium
       - name: Checkout repository and submodules
         uses: actions/checkout@v3
         with:
@@ -154,7 +155,7 @@ jobs:
         with:
           java-version: 8
           distribution: "temurin"
-      - uses: browser-actions/setup-chrome@latest
+#      - uses: browser-actions/setup-chrome@latest
       - name: chromedriver setup alpine
         run: |
           export DISPLAY=:99
@@ -175,7 +176,7 @@ jobs:
           APPLITOOLS_API_KEY: ${{ secrets.APPLITOOLS_API_KEY }}
           SAUCE_USERNAME: ${{ secrets.SAUCE_USERNAME }}
           SAUCE_ACCESS_KEY: ${{ secrets.SAUCE_ACCESS_KEY }}
-          CHROME_DRIVER_PATH: "/usr/local/bin/chromedriver"
+#          CHROME_DRIVER_PATH: "/usr/local/bin/chromedriver"
 
   specific-tests:
     needs: build
@@ -302,8 +303,8 @@ jobs:
           APPLITOOLS_API_KEY_READ: ${{ secrets.APPLITOOLS_API_KEY_READ }}
           SAUCE_USERNAME: ${{ secrets.SAUCE_USERNAME }}
           SAUCE_ACCESS_KEY: ${{ secrets.SAUCE_ACCESS_KEY }}
-          CHROME_DRIVER_PATH: "/usr/local/bin/chromedriver"
-          FIREFOX_DRIVER_PATH: "/usr/local/bin/geckodriver"
+#          CHROME_DRIVER_PATH: "/usr/local/bin/chromedriver"
+#          FIREFOX_DRIVER_PATH: "/usr/local/bin/geckodriver"
 
   report:
     needs:
