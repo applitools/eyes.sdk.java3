@@ -1,4 +1,9 @@
-## [5.38.0] - - 2022-12-01
+## [vNext] - dNext
+### Updated
+- Update Selenium to `4.7.0`. [Trello 3089](https://trello.com/c/K8dEXR4U)
+- Update Appium to `8.3.0`. [Trello 3089](https://trello.com/c/K8dEXR4U)
+
+## [5.38.0] - 2022-12-01
 ### Updated
 - Fix for Android full pgae (universal updated to 3.0.3)  [Trello 2633, 3078](https://trello.com/c/dQqN02TN)
 
