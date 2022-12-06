@@ -5,7 +5,7 @@ send_test_results() {
     curl -sS \
       -X POST \
       -H 'Content-Type: application/json' \
-      -d @- http://sdk-test-results.herokuapp.com/result
+      -d @- http://applitools-quality-server.herokuapp.com/result
 }
 
 cd "$TRAVIS_BUILD_DIR/report" || exit
