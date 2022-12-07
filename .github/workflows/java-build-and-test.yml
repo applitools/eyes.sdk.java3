@@ -105,6 +105,7 @@ jobs:
           mvn clean install -DskipTests
       - uses: browser-actions/setup-chrome@latest
       - run: |
+          chmod +x ./initChromeDriver.sh && ./initChromeDriver.sh
           export DISPLAY=:99
           chromedriver --url-base=/wd/hub &
       - name: SDK Selenium tests
@@ -143,9 +144,11 @@ jobs:
           distribution: "temurin"
       - name: chromedriver setup alpine
         run: |
+          chmod +x ./initChromeDriver.sh && ./initChromeDriver.sh
           export DISPLAY=:99
           chromedriver --url-base=/wd/hub &
       - name: initialize
+        shell: bash
         run: |
           pushd eyes.ufg.java/src/main/resources
           npm install
@@ -244,18 +247,18 @@ jobs:
           java-version: 8
           distribution: "temurin"
           cache: "maven"
+      - name: Setup firefox
+        uses: browser-actions/setup-firefox@latest
       - name: initialize
         run: |
           pushd eyes.ufg.java/src/main/resources
           npm install
           popd
           mvn clean install -DskipTests
-      - uses: browser-actions/setup-chrome@latest
-      - run: |
+          chmod +x ./initGeckoDriver.sh && ./initGeckoDriver.sh
+          chmod +x ./initChromeDriver.sh && ./initChromeDriver.sh
           export DISPLAY=:99
           chromedriver --url-base=/wd/hub &
-      - name: Setup firefox
-        uses: browser-actions/setup-firefox@latest
       - name: SDK Generic tests
         run: |
           echo "Starting SDK Generic tests."

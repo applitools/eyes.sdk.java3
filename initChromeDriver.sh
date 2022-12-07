@@ -5,6 +5,6 @@ latestChromeDriverURL=$(wget http://chromedriver.storage.googleapis.com/LATEST_R
 #latestChromeDriverURL=$(wget http://chromedriver.storage.googleapis.com/LATEST_RELEASE_99 -q -O -)
 echo $latestChromeDriverURL
 wget "http://chromedriver.storage.googleapis.com/107.0.5304.62/chromedriver_linux64.zip"
-unzip chromedriver_linux64.zip -d /home/travis/build/
-chmod +x /home/travis/build/chromedriver
-/home/travis/build/chromedriver --version
+unzip chromedriver_linux64.zip -d /usr/local/bin/chromedriver
+chmod +x /usr/local/bin/chromedriver
+/usr/local/bin/chromedriver --version
