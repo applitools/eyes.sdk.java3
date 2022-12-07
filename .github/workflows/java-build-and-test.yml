@@ -192,11 +192,7 @@ jobs:
       - images-tests
       - generic-tests
     # Support workflow which will be run
-    steps:
-      - name: Log ref name
-        run: echo ${{github.ref_name}}
-      - name: Support Matrix
-        uses: applitools/applitools_support_matrix/.github/workflows/java.yml@${{github.ref_name}}
+    uses: applitools/applitools_support_matrix/.github/workflows/java.yml@${{github.ref_name}}
     secrets:
       APPLITOOLS_API_KEY: ${{ secrets.APPLITOOLS_API_KEY }}
 
