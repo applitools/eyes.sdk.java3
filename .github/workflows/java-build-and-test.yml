@@ -2,7 +2,6 @@ name: Java - Test on all platforms
 on:
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
-    inputs:
 
   push:
     branches:
@@ -16,6 +15,11 @@ jobs:
       - name: Log info
         run: |
           echo "Starting CI Tests"
+
+  core-tests:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
       - uses: actions/checkout@v3
         with:
           submodules: "recursive"
@@ -34,11 +38,6 @@ jobs:
           npm install
           popd
           mvn clean install -DskipTests
-
-  core-tests:
-    needs: build
-    runs-on: ubuntu-latest
-    steps:
       - name: SDK Core tests
         run: |
           echo "Starting SDK Core tests."
@@ -52,6 +51,24 @@ jobs:
     needs: build
     runs-on: ubuntu-latest
     steps:
+      - uses: actions/checkout@v3
+        with:
+          submodules: "recursive"
+          token: ${{ secrets.SUBMODULES_GA_TOKEN }}
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 16
+      - uses: actions/setup-java@v3
+        with:
+          java-version: 8
+          distribution: "temurin"
+          cache: "maven"
+      - name: initialize
+        run: |
+          pushd eyes.ufg.java/src/main/resources
+          npm install
+          popd
+          mvn clean install -DskipTests
       - name: SDK Appium tests
         run: |
           echo "Starting SDK Appium tests."
@@ -68,6 +85,24 @@ jobs:
     concurrency: test_group_1
     runs-on: ubuntu-latest
     steps:
+      - uses: actions/checkout@v3
+        with:
+          submodules: "recursive"
+          token: ${{ secrets.SUBMODULES_GA_TOKEN }}
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 16
+      - uses: actions/setup-java@v3
+        with:
+          java-version: 8
+          distribution: "temurin"
+          cache: "maven"
+      - name: initialize
+        run: |
+          pushd eyes.ufg.java/src/main/resources
+          npm install
+          popd
+          mvn clean install -DskipTests
       - uses: browser-actions/setup-chrome@latest
       - run: |
           export DISPLAY=:99
@@ -132,6 +167,24 @@ jobs:
     needs: build
     runs-on: ubuntu-latest
     steps:
+      - uses: actions/checkout@v3
+        with:
+          submodules: "recursive"
+          token: ${{ secrets.SUBMODULES_GA_TOKEN }}
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 16
+      - uses: actions/setup-java@v3
+        with:
+          java-version: 8
+          distribution: "temurin"
+          cache: "maven"
+      - name: initialize
+        run: |
+          pushd eyes.ufg.java/src/main/resources
+          npm install
+          popd
+          mvn clean install -DskipTests
       - name: SDK Specific tests
         run: |
           echo "Starting SDK Specific tests."
@@ -145,6 +198,24 @@ jobs:
     needs: build
     runs-on: ubuntu-latest
     steps:
+      - uses: actions/checkout@v3
+        with:
+          submodules: "recursive"
+          token: ${{ secrets.SUBMODULES_GA_TOKEN }}
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 16
+      - uses: actions/setup-java@v3
+        with:
+          java-version: 8
+          distribution: "temurin"
+          cache: "maven"
+      - name: initialize
+        run: |
+          pushd eyes.ufg.java/src/main/resources
+          npm install
+          popd
+          mvn clean install -DskipTests
       - name: SDK Images tests
         run: |
           echo "Starting SDK Images tests."
@@ -161,6 +232,24 @@ jobs:
     concurrency: test_group_2
     runs-on: ubuntu-latest
     steps:
+      - uses: actions/checkout@v3
+        with:
+          submodules: "recursive"
+          token: ${{ secrets.SUBMODULES_GA_TOKEN }}
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 16
+      - uses: actions/setup-java@v3
+        with:
+          java-version: 8
+          distribution: "temurin"
+          cache: "maven"
+      - name: initialize
+        run: |
+          pushd eyes.ufg.java/src/main/resources
+          npm install
+          popd
+          mvn clean install -DskipTests
       - uses: browser-actions/setup-chrome@latest
       - run: |
           export DISPLAY=:99
@@ -179,8 +268,8 @@ jobs:
           APPLITOOLS_API_KEY_READ: ${{ secrets.APPLITOOLS_API_KEY_READ }}
           SAUCE_USERNAME: ${{ secrets.SAUCE_USERNAME }}
           SAUCE_ACCESS_KEY: ${{ secrets.SAUCE_ACCESS_KEY }}
-#          CHROME_DRIVER_PATH: "/usr/local/bin/chromedriver"
-#          FIREFOX_DRIVER_PATH: "/usr/local/bin/geckodriver"
+          CHROME_DRIVER_PATH: "/usr/local/bin/chromedriver"
+          FIREFOX_DRIVER_PATH: "/usr/local/bin/geckodriver"
 
 #  support-tests:
 #    needs:
