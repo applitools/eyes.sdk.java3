@@ -199,7 +199,14 @@ jobs:
   deploy:
     needs:
       - build
-      - support-tests
+      - core-tests
+      - appium-tests
+      - selenium-tests
+      - specific-tests
+      - alpine-tests
+      - images-tests
+      - generic-tests
+#      - support-tests
     runs-on: ubuntu-latest
     name: Deploy
     steps:
