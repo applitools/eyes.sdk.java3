@@ -145,7 +145,6 @@ jobs:
           distribution: "temurin"
       - name: chromedriver setup alpine
         run: |
-          chmod +x ./initChromeDriver.sh && ./initChromeDriver.sh
           export DISPLAY=:99
           chromedriver --url-base=/wd/hub &
       - name: initialize
