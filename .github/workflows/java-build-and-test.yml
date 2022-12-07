@@ -131,6 +131,7 @@ jobs:
           apk add bash
           apk add chromium
           apk add chromium-chromedriver
+          apk add --no-cache libstdc++
       - name: Checkout repository and submodules
         uses: actions/checkout@v3
         with:
