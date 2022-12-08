@@ -1,0 +1,11 @@
+<!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd" >
+
+<suite name="Alpine tests" verbose="1">
+
+    <test name="Test Universal Core">
+        <classes>
+            <class name="com.applitools.eyes.universal.server.TestAlpineContainer"/>
+        </classes>
+    </test>
+
+</suite>
