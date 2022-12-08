@@ -25,7 +25,7 @@ addons:
 git:
   submodules: false
 before_install:
-  - echo -e "\n\nmachine github.com\n  login $GITHUB_TOKEN_2\n" >~/.netrc
+  - echo -e "\n\nmachine github.com\n  login $GITHUB_TOKEN\n" >~/.netrc
   - git submodule update --init --recursive
 before_script:
   - export SE_DOCKER="true" # TODO this is used with selenium-java 4.5.2 see PortProber.class L103 and may be subject to changed
