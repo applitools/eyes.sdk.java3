@@ -1,33 +1,316 @@
-name: Test on all platforms
+name: Java - Test on all platforms
 on:
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
   push:
-  pull_request:
+    branches:
+      - bugfix_github_actions
+#  pull_request:
 
 jobs:
-  tests:
-    strategy:
-      matrix:
-        os: [ ubuntu-latest, macos-latest, windows-latest ]
-        java-version: [ "8", "11" ]
-    runs-on: ${{ matrix.os }}
+  build:
+    runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - name: Log info
+        run: |
+          echo "Starting CI Tests"
+  core-tests:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository and submodules
+        uses: actions/checkout@v3
         with:
-          submodules: "recursive"
+          submodules: recursive
           token: ${{ secrets.SUBMODULES_GA_TOKEN }}
-      - uses: actions/setup-node@v3
+      - name: Setup Node
+        uses: actions/setup-node@v3
         with:
           node-version: 16
-      - uses: actions/setup-java@v3
+      - name: Setup Java
+        uses: actions/setup-java@v3
         with:
-          java-version: ${{ matrix.java-version }}
+          java-version: 8
           distribution: "temurin"
-      - run: |
+          cache: "maven"
+      - name: initialize
+        run: |
           pushd eyes.ufg.java/src/main/resources
           npm install
           popd
-          mvn install -DskipTests
+          mvn clean install -DskipTests
+      - name: SDK Core tests
+        run: |
+          echo "Starting SDK Core tests."
           echo $APPLITOOLS_REPORT_ID
-          chmod +x ./runTests.sh
-          ./runTests.sh "eyes.sdk.core"
-      
+          mvn test -pl "eyes.sdk.core" -e -X
+        #          working-directory: java
+        env:
+          APPLITOOLS_API_KEY: ${{ secrets.APPLITOOLS_API_KEY }}
+
+  appium-tests:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository and submodules
+        uses: actions/checkout@v3
+        with:
+          submodules: recursive
+          token: ${{ secrets.SUBMODULES_GA_TOKEN }}
+      - name: Setup Node
+        uses: actions/setup-node@v3
+        with:
+          node-version: 16
+      - name: Setup Java
+        uses: actions/setup-java@v3
+        with:
+          java-version: 8
+          distribution: "temurin"
+          cache: "maven"
+      - name: initialize
+        run: |
+          pushd eyes.ufg.java/src/main/resources
+          npm install
+          popd
+          mvn clean install -DskipTests
+      - name: SDK Appium tests
+        run: |
+          echo "Starting SDK Appium tests."
+          echo $APPLITOOLS_REPORT_ID
+          mvn test -pl "eyes.appium.java" -e -X
+        #          working-directory: java
+        env:
+          APPLITOOLS_API_KEY: ${{ secrets.APPLITOOLS_API_KEY }}
+          SAUCE_USERNAME: ${{ secrets.SAUCE_USERNAME }}
+          SAUCE_ACCESS_KEY: ${{ secrets.SAUCE_ACCESS_KEY }}
+
+  selenium-tests:
+    needs: build
+    concurrency: test_group_1
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository and submodules
+        uses: actions/checkout@v3
+        with:
+          submodules: recursive
+          token: ${{ secrets.SUBMODULES_GA_TOKEN }}
+      - name: Setup Node
+        uses: actions/setup-node@v3
+        with:
+          node-version: 16
+      - name: Setup Java
+        uses: actions/setup-java@v3
+        with:
+          java-version: 8
+          distribution: "temurin"
+          cache: "maven"
+      - name: initialize
+        run: |
+          pushd eyes.ufg.java/src/main/resources
+          npm install
+          popd
+          mvn clean install -DskipTests
+      - uses: browser-actions/setup-chrome@latest
+      - run: |
+          chmod +x ./initChromeDriver.sh && ./initChromeDriver.sh
+          export DISPLAY=:99
+          chromedriver --url-base=/wd/hub &
+      - name: SDK Selenium tests
+        run: |
+          echo "Starting SDK Selenium tests."
+          echo $APPLITOOLS_REPORT_ID
+          mvn test -pl "eyes.selenium.java" -e -X
+        #          working-directory: java
+        env:
+          APPLITOOLS_API_KEY: ${{ secrets.APPLITOOLS_API_KEY }}
+          SAUCE_USERNAME: ${{ secrets.SAUCE_USERNAME }}
+          SAUCE_ACCESS_KEY: ${{ secrets.SAUCE_ACCESS_KEY }}
+          CHROME_DRIVER_PATH: "/usr/local/bin/chromedriver"
+
+  alpine-tests:
+    needs: build
+    runs-on: ubuntu-20.04
+    container: "alpine:latest"
+    steps:
+      - name: Installing dependencies
+        run: |
+          apk add git
+          apk add bash
+          apk add chromium
+          apk add chromium-chromedriver
+          apk add --no-cache libstdc++
+      - name: Checkout repository and submodules
+        uses: actions/checkout@v3
+        with:
+          submodules: recursive
+          token: ${{ secrets.SUBMODULES_GA_TOKEN }}
+      - name: Setup Node
+        uses: actions/setup-node@v3
+        with:
+          node-version: 16
+      - name: Setup Java
+        uses: actions/setup-java@v3
+        with:
+          java-version: 8
+          distribution: "temurin"
+          cache: "maven"
+      - name: Setup chromedriver
+        run: |
+          export DISPLAY=:99
+          chromedriver --url-base=/wd/hub &
+      - name: Start containers and test
+        run: docker-compose -f "docker-compose.yaml" up -d --build
+      - name: Stop containers
+        run: docker-compose -f "docker-compose.yaml" down
+        #          working-directory: java
+        env:
+          APPLITOOLS_API_KEY: ${{ secrets.APPLITOOLS_API_KEY }}
+
+  specific-tests:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository and submodules
+        uses: actions/checkout@v3
+        with:
+          submodules: recursive
+          token: ${{ secrets.SUBMODULES_GA_TOKEN }}
+      - name: Setup Node
+        uses: actions/setup-node@v3
+        with:
+          node-version: 16
+      - name: Setup Java
+        uses: actions/setup-java@v3
+        with:
+          java-version: 8
+          distribution: "temurin"
+          cache: "maven"
+      - name: initialize
+        run: |
+          pushd eyes.ufg.java/src/main/resources
+          npm install
+          popd
+          mvn clean install -DskipTests
+      - name: SDK Specific tests
+        run: |
+          echo "Starting SDK Specific tests."
+          echo $APPLITOOLS_REPORT_ID
+          mvn test -pl "selenium4" -e -X
+        #          working-directory: java
+        env:
+          APPLITOOLS_API_KEY: ${{ secrets.APPLITOOLS_API_KEY }}
+
+  images-tests:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository and submodules
+        uses: actions/checkout@v3
+        with:
+          submodules: recursive
+          token: ${{ secrets.SUBMODULES_GA_TOKEN }}
+      - name: Setup Node
+        uses: actions/setup-node@v3
+        with:
+          node-version: 16
+      - name: Setup Java
+        uses: actions/setup-java@v3
+        with:
+          java-version: 8
+          distribution: "temurin"
+          cache: "maven"
+      - name: initialize
+        run: |
+          pushd eyes.ufg.java/src/main/resources
+          npm install
+          popd
+          mvn clean install -DskipTests
+      - name: SDK Images tests
+        run: |
+          echo "Starting SDK Images tests."
+          echo $APPLITOOLS_REPORT_ID
+          mvn test -pl "eyes.images.java" -e -X
+        #          working-directory: java
+        env:
+          APPLITOOLS_API_KEY: ${{ secrets.APPLITOOLS_API_KEY }}
+          SAUCE_USERNAME: ${{ secrets.SAUCE_USERNAME }}
+          SAUCE_ACCESS_KEY: ${{ secrets.SAUCE_ACCESS_KEY }}
+
+  generic-tests:
+    needs: build
+    concurrency: test_group_2
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository and submodules
+        uses: actions/checkout@v3
+        with:
+          submodules: recursive
+          token: ${{ secrets.SUBMODULES_GA_TOKEN }}
+      - name: Setup Node
+        uses: actions/setup-node@v3
+        with:
+          node-version: 16
+      - name: Setup Java
+        uses: actions/setup-java@v3
+        with:
+          java-version: 8
+          distribution: "temurin"
+          cache: "maven"
+      - name: Setup firefox
+        uses: browser-actions/setup-firefox@latest
+      - name: initialize
+        run: |
+          pushd eyes.ufg.java/src/main/resources
+          npm install
+          popd
+          mvn clean install -DskipTests
+          chmod +x ./initGeckoDriver.sh && ./initGeckoDriver.sh
+          chmod +x ./initChromeDriver.sh && ./initChromeDriver.sh
+          export DISPLAY=:99
+          chromedriver --url-base=/wd/hub &
+      - name: SDK Generic tests
+        run: |
+          echo "Starting SDK Generic tests."
+          echo $APPLITOOLS_REPORT_ID
+          cd coverage-tests;
+          chmod +x ./generic_tests.sh && ./generic_tests.sh
+        #          working-directory: java
+        env:
+          APPLITOOLS_API_KEY: ${{ secrets.APPLITOOLS_API_KEY }}
+          APPLITOOLS_API_KEY_READ: ${{ secrets.APPLITOOLS_API_KEY_READ }}
+          SAUCE_USERNAME: ${{ secrets.SAUCE_USERNAME }}
+          SAUCE_ACCESS_KEY: ${{ secrets.SAUCE_ACCESS_KEY }}
+          CHROME_DRIVER_PATH: "/usr/local/bin/chromedriver"
+          FIREFOX_DRIVER_PATH: "/usr/local/bin/geckodriver"
+
+  support-tests:
+    needs:
+      - core-tests
+      - appium-tests
+      - selenium-tests
+      - specific-tests
+      - alpine-tests
+      - images-tests
+      - generic-tests
+    # Support workflow which will be run
+    uses: applitools/applitools_support_matrix/.github/workflows/java.yml@${{ github.ref_name }}
+    secrets:
+      APPLITOOLS_API_KEY: ${{ secrets.APPLITOOLS_API_KEY }}
+
+  deploy:
+    needs:
+      - build
+      - core-tests
+      - appium-tests
+      - selenium-tests
+      - specific-tests
+      - alpine-tests
+      - images-tests
+      - generic-tests
+    #      - support-tests
+    runs-on: ubuntu-latest
+    name: Deploy
+    steps:
+      - run: |
+          echo "All tests finished successfuly"
