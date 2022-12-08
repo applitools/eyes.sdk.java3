@@ -111,7 +111,7 @@ jobs:
           mvn clean install -DskipTests
       - uses: browser-actions/setup-chrome@latest
       - run: |
-          chmod +x ./initChromeDriver.sh && ./initChromeDriver.sh
+          chmod +x ./initChromeDriverGHA.sh && ./initChromeDriverGHA.sh
           export DISPLAY=:99
           chromedriver --url-base=/wd/hub &
       - name: SDK Selenium tests
@@ -126,44 +126,44 @@ jobs:
           SAUCE_ACCESS_KEY: ${{ secrets.SAUCE_ACCESS_KEY }}
           CHROME_DRIVER_PATH: "/usr/local/bin/chromedriver"
 
-  alpine-tests:
-    needs: build
-    runs-on: ubuntu-20.04
-    container: "alpine:latest"
-    steps:
-      - name: Installing dependencies
-        run: |
-          apk add git
-          apk add bash
-          apk add chromium
-          apk add chromium-chromedriver
-          apk add --no-cache libstdc++
-      - name: Checkout repository and submodules
-        uses: actions/checkout@v3
-        with:
-          submodules: recursive
-          token: ${{ secrets.SUBMODULES_GA_TOKEN }}
-      - name: Setup Node
-        uses: actions/setup-node@v3
-        with:
-          node-version: 16
-      - name: Setup Java
-        uses: actions/setup-java@v3
-        with:
-          java-version: 8
-          distribution: "temurin"
-          cache: "maven"
-      - name: Setup chromedriver
-        run: |
-          export DISPLAY=:99
-          chromedriver --url-base=/wd/hub &
-      - name: Start containers and test
-        run: docker-compose -f "docker-compose.yaml" up -d --build
-      - name: Stop containers
-        run: docker-compose -f "docker-compose.yaml" down
-        #          working-directory: java
-        env:
-          APPLITOOLS_API_KEY: ${{ secrets.APPLITOOLS_API_KEY }}
+#  alpine-tests:
+#    needs: build
+#    runs-on: ubuntu-20.04
+#    container: "alpine:latest"
+#    steps:
+#      - name: Installing dependencies
+#        run: |
+#          apk add git
+#          apk add bash
+#          apk add chromium
+#          apk add chromium-chromedriver
+#          apk add --no-cache libstdc++
+#      - name: Checkout repository and submodules
+#        uses: actions/checkout@v3
+#        with:
+#          submodules: recursive
+#          token: ${{ secrets.SUBMODULES_GA_TOKEN }}
+#      - name: Setup Node
+#        uses: actions/setup-node@v3
+#        with:
+#          node-version: 16
+#      - name: Setup Java
+#        uses: actions/setup-java@v3
+#        with:
+#          java-version: 8
+#          distribution: "temurin"
+#          cache: "maven"
+#      - name: Setup chromedriver
+#        run: |
+#          export DISPLAY=:99
+#          chromedriver --url-base=/wd/hub &
+#      - name: Start containers and test
+#        run: docker-compose -f "docker-compose.yaml" up -d --build
+#      - name: Stop containers
+#        run: docker-compose -f "docker-compose.yaml" down
+#        #          working-directory: java
+#        env:
+#          APPLITOOLS_API_KEY: ${{ secrets.APPLITOOLS_API_KEY }}
 
   specific-tests:
     needs: build
@@ -263,8 +263,8 @@ jobs:
           npm install
           popd
           mvn clean install -DskipTests
-          chmod +x ./initGeckoDriver.sh && ./initGeckoDriver.sh
-          chmod +x ./initChromeDriver.sh && ./initChromeDriver.sh
+          chmod +x ./initGeckoDriverGHA.sh && ./initGeckoDriverGHA.sh
+          chmod +x ./initChromeDriverGHA.sh && ./initChromeDriverGHA.sh
           export DISPLAY=:99
           chromedriver --url-base=/wd/hub &
       - name: SDK Generic tests
@@ -303,10 +303,10 @@ jobs:
       - appium-tests
       - selenium-tests
       - specific-tests
-      - alpine-tests
       - images-tests
       - generic-tests
-    #      - support-tests
+#      - alpine-tests
+#      - support-tests
     runs-on: ubuntu-latest
     name: Deploy
     steps:
