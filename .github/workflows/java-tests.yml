@@ -282,19 +282,19 @@ jobs:
           CHROME_DRIVER_PATH: "/usr/local/bin/chromedriver"
           FIREFOX_DRIVER_PATH: "/usr/local/bin/geckodriver"
 
-  support-tests:
-    needs:
-      - core-tests
-      - appium-tests
-      - selenium-tests
-      - specific-tests
-      - alpine-tests
-      - images-tests
-      - generic-tests
-    # Support workflow which will be run
-    uses: applitools/applitools_support_matrix/.github/workflows/java.yml@${GITHUB_REF##*/}
-    secrets:
-      APPLITOOLS_API_KEY: ${{ secrets.APPLITOOLS_API_KEY }}
+#  support-tests:
+#    needs:
+#      - core-tests
+#      - appium-tests
+#      - selenium-tests
+#      - specific-tests
+#      - alpine-tests
+#      - images-tests
+#      - generic-tests
+#    # Support workflow which will be run
+#    uses: applitools/applitools_support_matrix/.github/workflows/java.yml@${GITHUB_REF##*/}
+#    secrets:
+#      APPLITOOLS_API_KEY: ${{ secrets.APPLITOOLS_API_KEY }}
 
   deploy:
     needs:
