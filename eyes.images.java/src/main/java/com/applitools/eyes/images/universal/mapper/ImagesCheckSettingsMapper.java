@@ -6,6 +6,7 @@ import com.applitools.eyes.config.Configuration;
 import com.applitools.eyes.images.ImagesCheckSettings;
 import com.applitools.eyes.universal.dto.CheckSettingsDto;
 import com.applitools.eyes.universal.dto.DebugScreenshotHandlerDto;
+import com.applitools.eyes.universal.dto.ImageCropRectDto;
 import com.applitools.eyes.universal.dto.TRegion;
 import com.applitools.eyes.universal.mapper.*;
 
@@ -31,7 +32,9 @@ public class ImagesCheckSettingsMapper {
         checkSettingsDto.setStitchMode(config.getStitchMode() == null ? null : config.getStitchMode().getName());
         checkSettingsDto.setHideScrollbars(config.getHideScrollbars());
         checkSettingsDto.setHideCaret(config.getHideCaret());
-        checkSettingsDto.setOverlap(config.getStitchOverlap());
+        ImageCropRectDto overlap = new ImageCropRectDto();
+        overlap.setBottom(config.getStitchOverlap());
+        checkSettingsDto.setOverlap(overlap);
         checkSettingsDto.setWaitBeforeCapture(imagesCheckSettings.getWaitBeforeCapture());
         checkSettingsDto.setLazyLoad(imagesCheckSettings.getLazyLoadOptions());
         checkSettingsDto.setIgnoreDisplacements(imagesCheckSettings.isIgnoreDisplacements());

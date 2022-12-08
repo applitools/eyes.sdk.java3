@@ -285,11 +285,11 @@ public class ConfigurationDto {
     this.close.setUpdateBaselineIfDifferent(saveFailedTests);
   }
 
-  public Integer getStitchOverlap() {
-    return screenshot.getOverlap().getBottom();
+  public ImageCropRectDto getStitchOverlap() {
+    return screenshot.getOverlap();
   }
 
-  public void setStitchOverlap(Integer stitchOverlap) {
+  public void setStitchOverlap(ImageCropRectDto stitchOverlap) {
     this.screenshot.setOverlap(stitchOverlap);
   }
 

@@ -121,9 +121,8 @@ public class CheckSettingsDto {
     return overlap;
   }
 
-  public void setOverlap(Integer overlap) {
-    this.overlap = new ImageCropRectDto();
-    this.overlap.setBottom(overlap);
+  public void setOverlap(ImageCropRectDto overlap) {
+    this.overlap = overlap;
   }
 
   public Integer getWaitBeforeCapture() {
