@@ -97,7 +97,7 @@ public class CheckSettingsMapper {
     checkSettingsDto.setHideCaret(config.getHideCaret());
     ImageCropRectDto overlap = new ImageCropRectDto();
     overlap.setBottom(config.getStitchOverlap());
-    checkSettingsDto.setOverlap(overlap);
+    checkSettingsDto.setOverlap(config.getStitchOverlap() == null ? null : overlap);
     checkSettingsDto.setWaitBeforeCapture(seleniumCheckSettings.getWaitBeforeCapture());
     checkSettingsDto.setLazyLoad(seleniumCheckSettings.getLazyLoadOptions());
     checkSettingsDto.setIgnoreDisplacements(seleniumCheckSettings.isIgnoreDisplacements());

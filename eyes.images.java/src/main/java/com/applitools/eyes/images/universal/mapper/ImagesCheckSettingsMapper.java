@@ -34,7 +34,7 @@ public class ImagesCheckSettingsMapper {
         checkSettingsDto.setHideCaret(config.getHideCaret());
         ImageCropRectDto overlap = new ImageCropRectDto();
         overlap.setBottom(config.getStitchOverlap());
-        checkSettingsDto.setOverlap(overlap);
+        checkSettingsDto.setOverlap(config.getStitchOverlap() == null ? null : overlap);
         checkSettingsDto.setWaitBeforeCapture(imagesCheckSettings.getWaitBeforeCapture());
         checkSettingsDto.setLazyLoad(imagesCheckSettings.getLazyLoadOptions());
         checkSettingsDto.setIgnoreDisplacements(imagesCheckSettings.isIgnoreDisplacements());

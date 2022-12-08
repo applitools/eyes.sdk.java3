@@ -76,7 +76,7 @@ public class ConfigurationMapper {
     dto.setHideCaret(config.getHideCaret());
     ImageCropRectDto overlap = new ImageCropRectDto();
     overlap.setBottom(config.getStitchOverlap());
-    dto.setStitchOverlap(overlap);
+    dto.setStitchOverlap(config.getStitchOverlap() == null ? null : overlap);
     dto.setScrollRootElement(null);
     dto.setCut(toImageCropRect(config.getCutProvider(), config.getContentInset()));
 

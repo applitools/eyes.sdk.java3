@@ -85,7 +85,7 @@ public class AppiumCheckSettingsMapper {
         checkSettingsDto.setHideCaret(config.getHideCaret());
         ImageCropRectDto overlap = new ImageCropRectDto();
         overlap.setBottom(config.getStitchOverlap());
-        checkSettingsDto.setOverlap(overlap);
+        checkSettingsDto.setOverlap(config.getStitchOverlap() == null ? null : overlap);
         checkSettingsDto.setWaitBeforeCapture(appiumCheckSettings.getWaitBeforeCapture());
         checkSettingsDto.setLazyLoad(appiumCheckSettings.getLazyLoadOptions());
         checkSettingsDto.setIgnoreDisplacements(appiumCheckSettings.isIgnoreDisplacements());
