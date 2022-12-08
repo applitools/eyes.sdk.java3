@@ -3,9 +3,12 @@
 - Update Selenium to `4.7.0`. [Trello 3089](https://trello.com/c/K8dEXR4U)
 - Update Appium to `8.3.0`. [Trello 3089](https://trello.com/c/K8dEXR4U)
 
+### Fixed
+- Fix `overlap` (formerly known as `stitchOverlap`) mapping. [Trello 3076](https://trello.com/c/AREJRXtC)
+
 ## [5.38.0] - 2022-12-01
 ### Updated
-- Fix for Android full pgae (universal updated to 3.0.3)  [Trello 2633, 3078](https://trello.com/c/dQqN02TN)
+- Fix for Android full page (universal updated to 3.0.3).  [Trello 2633, 3078](https://trello.com/c/dQqN02TN)
 
 ## [5.37.0] - 2022-11-30
 ### Fixed
