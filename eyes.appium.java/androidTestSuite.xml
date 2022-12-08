@@ -18,6 +18,7 @@ in the same thread while taking advantage of TestNG using as many threads as pos
             <!--            <class name="com.applitools.eyes.appium.TestCodedRegionPadding"/>--> <!--to be added later-->
             <class name="com.applitools.eyes.appium.android.TestAndroidContentSizeFallback"/>
             <class name="com.applitools.eyes.appium.android.AndroidTestByAll"/>
+            <class name="com.applitools.eyes.appium.android.AndroidStitchOverlapTest"/>
         </classes>
     </test>
 
