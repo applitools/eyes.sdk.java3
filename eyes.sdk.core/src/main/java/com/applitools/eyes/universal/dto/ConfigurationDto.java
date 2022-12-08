@@ -286,7 +286,7 @@ public class ConfigurationDto {
   }
 
   public Integer getStitchOverlap() {
-    return screenshot.getOverlap();
+    return screenshot.getOverlap().getBottom();
   }
 
   public void setStitchOverlap(Integer stitchOverlap) {

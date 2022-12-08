@@ -49,7 +49,7 @@ public class CombinedSettingsDto {
     private String stitchMode; // "CSS" | "Scroll"
     private Boolean hideScrollBars;
     private Boolean hideCaret;
-    private Integer overlap;
+    private ImageCropRectDto overlap;
     private Integer waitBeforeCapture;
     private LazyLoadOptions lazyLoad;
     private Boolean ignoreDisplacements;
@@ -349,12 +349,13 @@ public class CombinedSettingsDto {
         this.hideCaret = hideCaret;
     }
 
-    public Integer getOverlap() {
+    public ImageCropRectDto getOverlap() {
         return overlap;
     }
 
     public void setOverlap(Integer overlap) {
-        this.overlap = overlap;
+        this.overlap = new ImageCropRectDto();
+        this.overlap.setBottom(overlap);
     }
 
     public Integer getWaitBeforeCapture() {
