@@ -39,6 +39,8 @@ public class NativeSetup extends GlobalSetup {
 
     // Eyes configuration
 
+    public void setStitchOverlap(Integer overlap) { eyes.setStitchOverlap(overlap); }
+
     public void setParentBranchName(String parentTestBranch) {
         eyes.setParentBranchName(parentTestBranch);
     }

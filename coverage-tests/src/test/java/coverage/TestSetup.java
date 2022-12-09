@@ -56,6 +56,7 @@ public class TestSetup extends GlobalSetup {
 
     // Eyes configuration
 
+    public void setStitchOverlap(Integer overlap) { eyes.setStitchOverlap(overlap); }
     public void setAppName(String appName) { eyes.setAppName(appName);}
     public void setStitchMode(String stitchMode) { eyes.setStitchMode(stitchMode.equals("CSS") ? StitchMode.CSS : StitchMode.SCROLL);}
     public void setParentBranchName(String parentTestBranch) { eyes.setParentBranchName(parentTestBranch);}
