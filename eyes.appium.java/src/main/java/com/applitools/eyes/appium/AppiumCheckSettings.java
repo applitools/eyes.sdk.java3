@@ -37,6 +37,7 @@ public class AppiumCheckSettings extends CheckSettings implements ImplicitInitia
     private String pageId;
     private Boolean isDefaultWebview;
     private String webview;
+    private Boolean exists; //FIXME - rename me
 
     protected AppiumCheckSettings() {
         super();
@@ -97,6 +98,7 @@ public class AppiumCheckSettings extends CheckSettings implements ImplicitInitia
         clone.pageId = this.pageId;
         clone.isDefaultWebview = this.isDefaultWebview;
         clone.webview = this.webview;
+        clone.exists = this.exists;
         return clone;
     }
 
@@ -435,5 +437,17 @@ public class AppiumCheckSettings extends CheckSettings implements ImplicitInitia
 
     public String getWebview() {
         return this.webview;
+    }
+
+    //FIXME - rename me
+    public Boolean getExists() {
+        return this.exists;
+    }
+
+    //FIXME - rename me
+    public AppiumCheckSettings exists() {
+        AppiumCheckSettings clone = this.clone();
+        clone.exists = true;
+        return clone;
     }
 }

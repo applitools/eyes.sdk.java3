@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Map;
 
 import com.applitools.eyes.LazyLoadOptions;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 
 
@@ -52,6 +53,8 @@ public class CheckSettingsDto {
   private Map<String, String> hooks;
   private List<IBrowsersInfo> renderers;
   private String userCommandId;
+  @JsonIgnore
+  private String type;
 
   public CheckSettingsDto() {
 
@@ -344,4 +347,14 @@ public class CheckSettingsDto {
   public Object getWebview() { return webview; }
 
   public void setWebview(Object webview) { this.webview = webview; }
+
+  @JsonIgnore
+  public void setType(String type) {
+    this.type = type;
+  }
+
+  @JsonIgnore
+  public String getType() {
+    return type;
+  }
 }

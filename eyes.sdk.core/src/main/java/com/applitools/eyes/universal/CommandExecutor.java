@@ -95,7 +95,7 @@ public class CommandExecutor {
     RequestDto<CheckEyes> request = new RequestDto<>();
     request.setName("Eyes.check");
     request.setKey(UUID.randomUUID().toString());
-    request.setPayload(new CheckEyes(eyesRef, target, settings, config));
+    request.setPayload(new CheckEyes(eyesRef, target, settings, config, settings.getType()));
     SyncTaskListener syncTaskListener = checkedCommand(request, true);
     ResponseDto<MatchResultDto> responseDto = (ResponseDto<MatchResultDto>) syncTaskListener.get();
     if (responseDto != null && responseDto.getPayload().getError() != null) {

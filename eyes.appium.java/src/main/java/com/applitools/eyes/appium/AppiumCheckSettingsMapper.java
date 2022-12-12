@@ -2,6 +2,7 @@ package com.applitools.eyes.appium;
 
 import com.applitools.ICheckSettings;
 import com.applitools.eyes.config.Configuration;
+import com.applitools.eyes.universal.ManagerType;
 import com.applitools.eyes.universal.dto.CheckSettingsDto;
 import com.applitools.eyes.universal.dto.ImageCropRectDto;
 import com.applitools.eyes.universal.mapper.ProxyMapper;
@@ -120,6 +121,7 @@ public class AppiumCheckSettingsMapper {
         checkSettingsDto.setAutProxy(ProxyMapper.toAutProxyDto(config.getAutProxy()));
         checkSettingsDto.setHooks(appiumCheckSettings.getScriptHooks());
 
+        checkSettingsDto.setType(appiumCheckSettings.getExists() == null? null : ManagerType.CLASSIC.value);
 
         return checkSettingsDto;
     }
