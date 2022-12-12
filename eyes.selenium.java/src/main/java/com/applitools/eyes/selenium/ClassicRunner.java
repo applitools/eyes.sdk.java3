@@ -3,7 +3,6 @@ package com.applitools.eyes.selenium;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.applitools.connectivity.ServerConnector;
 import com.applitools.eyes.EyesException;
 
 import com.applitools.eyes.EyesRunner;
@@ -17,6 +16,7 @@ import com.applitools.eyes.TestResultContainer;
 import com.applitools.eyes.TestResults;
 import com.applitools.eyes.TestResultsSummary;
 import com.applitools.eyes.exceptions.StaleElementReferenceException;
+import com.applitools.eyes.universal.ManagerType;
 import com.applitools.utils.ClassVersionGetter;
 
 

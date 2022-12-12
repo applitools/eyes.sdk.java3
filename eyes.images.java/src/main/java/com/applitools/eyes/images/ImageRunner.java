@@ -4,6 +4,7 @@ import com.applitools.eyes.EyesRunner;
 import com.applitools.eyes.TestResultsSummary;
 import com.applitools.eyes.exceptions.StaleElementReferenceException;
 import com.applitools.eyes.images.universal.mapper.ImageStaleElementReferenceException;
+import com.applitools.eyes.universal.ManagerType;
 import com.applitools.utils.ClassVersionGetter;
 
 public class ImageRunner extends EyesRunner {
@@ -30,7 +31,7 @@ public class ImageRunner extends EyesRunner {
     public ImageRunner(String baseAgentId, String version) {
         super(baseAgentId, version);
         //TODO - check if baseAgentId is the correct agentId here
-        managerRef = commandExecutor.coreMakeManager("classic", null, null, baseAgentId);
+        managerRef = commandExecutor.coreMakeManager(ManagerType.CLASSIC.value, null, null, baseAgentId);
     }
 
     @Override

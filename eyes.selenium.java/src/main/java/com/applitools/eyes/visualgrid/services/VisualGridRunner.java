@@ -8,11 +8,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import com.applitools.connectivity.ServerConnector;
 import com.applitools.eyes.*;
 import com.applitools.eyes.logging.Stage;
 import com.applitools.eyes.logging.TraceLevel;
-import com.applitools.eyes.selenium.ManagerType;
+import com.applitools.eyes.universal.ManagerType;
 import com.applitools.eyes.selenium.exceptions.StaleElementReferenceException;
 import com.applitools.eyes.services.EyesServiceRunner;
 import com.applitools.eyes.visualgrid.model.FrameData;
