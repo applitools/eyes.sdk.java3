@@ -174,6 +174,14 @@ public class Eyes implements IEyesBase {
     }
 
     /**
+     * Gets proxy.
+     * @return The current proxy settings used by the server, or {@code null} if no proxy is set.
+     */
+    public AbstractProxySettings getProxy() {
+        return this.originEyes.getProxy();
+    }
+
+    /**
      * Sets is disabled.
      *
      * @param isDisabled If true, all interactions with this API will be silently ignored.
