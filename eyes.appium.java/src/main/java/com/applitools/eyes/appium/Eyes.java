@@ -736,5 +736,9 @@ public class Eyes implements IEyesBase {
     protected Configuration getConfigurationInstance() {
         return configure();
     }
+
+    public void setScaleRatio(Double scaleRatio) {
+        this.originEyes.setScaleRatio(scaleRatio);
+    }
 }
 
