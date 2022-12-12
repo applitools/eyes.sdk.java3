@@ -737,8 +737,20 @@ public class Eyes implements IEyesBase {
         return configure();
     }
 
+    /**
+     * Manually set the scale ratio for the images being validated.
+     * @param scaleRatio The scale ratio to use, or {@code null} to reset back to automatic scaling.
+     */
     public void setScaleRatio(Double scaleRatio) {
         this.originEyes.setScaleRatio(scaleRatio);
+    }
+
+    /**
+     * Gets scale ratio.
+     * @return The ratio used to scale the images being validated.
+     */
+    public Double getScaleRatio() {
+        return this.originEyes.getScaleRatio();
     }
 }
 
