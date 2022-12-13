@@ -182,5 +182,9 @@ public class TestAppiumCheckSettingsMapper {
 
         CheckSettingsDto dto = AppiumCheckSettingsMapper.toCheckSettingsDtoV3(checkSettings, new Configuration());
         Assert.assertNull(dto.getType());
+
+        checkSettings = Target.window();
+        dto = AppiumCheckSettingsMapper.toCheckSettingsDtoV3(checkSettings, new Configuration());
+        Assert.assertNull(dto.getType());
     }
 }
