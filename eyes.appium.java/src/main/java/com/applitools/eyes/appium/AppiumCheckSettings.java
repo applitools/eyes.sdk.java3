@@ -11,11 +11,14 @@ import com.applitools.eyes.fluent.GetRegion;
 import com.applitools.eyes.selenium.wrappers.EyesWebDriver;
 import com.applitools.eyes.serializers.BySerializer;
 import com.applitools.eyes.serializers.WebElementSerializer;
+import com.applitools.eyes.visualgrid.model.NMGOptions;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 
 import javax.annotation.Nonnull;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class AppiumCheckSettings extends CheckSettings implements ImplicitInitiation {
@@ -37,7 +40,7 @@ public class AppiumCheckSettings extends CheckSettings implements ImplicitInitia
     private String pageId;
     private Boolean isDefaultWebview;
     private String webview;
-    private Boolean exists; //FIXME - rename me
+    private List<NMGOptions> nmgOptions = new ArrayList<>();
 
     protected AppiumCheckSettings() {
         super();
@@ -98,7 +101,7 @@ public class AppiumCheckSettings extends CheckSettings implements ImplicitInitia
         clone.pageId = this.pageId;
         clone.isDefaultWebview = this.isDefaultWebview;
         clone.webview = this.webview;
-        clone.exists = this.exists;
+        clone.nmgOptions = this.nmgOptions;
         return clone;
     }
 
@@ -439,15 +442,17 @@ public class AppiumCheckSettings extends CheckSettings implements ImplicitInitia
         return this.webview;
     }
 
-    //FIXME - rename me
-    public Boolean getExists() {
-        return this.exists;
+    public List<NMGOptions> getNMGOptions() {
+        return nmgOptions;
     }
 
-    //FIXME - rename me
-    public AppiumCheckSettings exists() {
+    public AppiumCheckSettings NMGOptions(NMGOptions... options) {
         AppiumCheckSettings clone = this.clone();
-        clone.exists = true;
+        clone.nmgOptions.clear();
+        if (options != null) {
+            clone.nmgOptions.addAll(Arrays.asList(options));
+            clone.nmgOptions.remove(null);
+        }
         return clone;
     }
 }
