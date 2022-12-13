@@ -18,30 +18,6 @@ public class CheckSettings implements ICheckSettings, ICheckSettingsInternal {
     // For Rendering Grid
     protected static final String BEFORE_CAPTURE_SCREENSHOT = "beforeCaptureScreenshot";
 
-//    private Region targetRegion;
-//    private MatchLevel matchLevel = null;
-//    private Boolean ignoreCaret = null;
-//    private Boolean stitchContent = null;
-//    protected final List<GetSimpleRegion> ignoreRegions = new ArrayList<>();
-//    protected final List<GetSimpleRegion> layoutRegions = new ArrayList<>();
-//    protected final List<GetSimpleRegion> strictRegions = new ArrayList<>();
-//    protected final List<GetSimpleRegion> contentRegions = new ArrayList<>();
-//    protected final List<GetFloatingRegion> floatingRegions = new ArrayList<>();
-//    protected List<GetAccessibilityRegion> accessibilityRegions = new ArrayList<>();
-//    private Integer timeout = null;
-//    protected String name;
-//    protected Boolean enablePatterns;
-//    protected Boolean sendDom = null;
-//    protected Boolean useDom;
-//    protected Map<String, String> scriptHooks = new HashMap<>();
-//    protected Boolean ignoreDisplacements;
-//    private List<VisualGridOption> visualGridOptions = new ArrayList<>();
-//    private BaseOcrRegion ocrRegion = null;
-//    private String variationGroupId = null;
-//    private Boolean disableBrowserFetching;
-//    private Integer waitBeforeCapture;
-//    private LazyLoadOptions lazyLoadOptions;
-
     // screenshot
     private Region targetRegion;
     private Boolean stitchContent = null;
