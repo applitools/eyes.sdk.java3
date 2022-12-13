@@ -3,8 +3,11 @@ package com.applitools.eyes.appium.unit;
 import com.applitools.eyes.appium.AppiumCheckSettings;
 import com.applitools.eyes.appium.AppiumCheckSettingsMapper;
 import com.applitools.eyes.appium.Target;
+import com.applitools.eyes.config.Configuration;
+import com.applitools.eyes.universal.ManagerType;
 import com.applitools.eyes.universal.dto.CheckSettingsDto;
 import com.applitools.eyes.universal.dto.SelectorRegionDto;
+import com.applitools.eyes.visualgrid.model.NMGOptions;
 import io.appium.java_client.AppiumBy;
 import io.appium.java_client.pagefactory.bys.builder.ByAll;
 import io.appium.java_client.pagefactory.bys.builder.ByChained;
@@ -24,7 +27,7 @@ public class TestAppiumCheckSettingsMapper {
                 }
         ));
 
-        CheckSettingsDto dto = AppiumCheckSettingsMapper.toCheckSettingsDto(checkSettings);
+        CheckSettingsDto dto = AppiumCheckSettingsMapper.toCheckSettingsDtoV3(checkSettings, new Configuration());
 
         SelectorRegionDto fallback_fallback = new SelectorRegionDto();
         fallback_fallback.setSelector("appiumByAccessibilityId");
@@ -61,7 +64,7 @@ public class TestAppiumCheckSettingsMapper {
                 }
         ));
 
-        CheckSettingsDto dto = AppiumCheckSettingsMapper.toCheckSettingsDto(checkSettings);
+        CheckSettingsDto dto = AppiumCheckSettingsMapper.toCheckSettingsDtoV3(checkSettings, new Configuration());
 
         SelectorRegionDto fallback = new SelectorRegionDto();
         fallback.setSelector("appiumByXpath");
@@ -92,7 +95,7 @@ public class TestAppiumCheckSettingsMapper {
                 }
         ));
 
-        CheckSettingsDto dto = AppiumCheckSettingsMapper.toCheckSettingsDto(checkSettings);
+        CheckSettingsDto dto = AppiumCheckSettingsMapper.toCheckSettingsDtoV3(checkSettings, new Configuration());
 
         SelectorRegionDto child = new SelectorRegionDto();
         child.setSelector("appiumByXpath");
@@ -124,7 +127,7 @@ public class TestAppiumCheckSettingsMapper {
                 }
         ));
 
-        CheckSettingsDto dto = AppiumCheckSettingsMapper.toCheckSettingsDto(checkSettings);
+        CheckSettingsDto dto = AppiumCheckSettingsMapper.toCheckSettingsDtoV3(checkSettings, new Configuration());
 
         SelectorRegionDto child_child = new SelectorRegionDto();
         child_child.setSelector("appiumByXpath");
@@ -151,5 +154,33 @@ public class TestAppiumCheckSettingsMapper {
         Assert.assertEquals(actual.getChild().getChild().getSelector(), child_child.getSelector());
         Assert.assertEquals(actual.getChild().getChild().getType(), child_child.getType());
         Assert.assertNull(actual.getChild().getChild().getChild());
+    }
+
+    @Test
+    public void shouldMapNMGOptions() {
+        AppiumCheckSettings checkSettings = Target.window().fully()
+                .NMGOptions(
+                        new NMGOptions("a1", "b1"),
+                        new NMGOptions("a2", "b2"),
+                        new NMGOptions("nonNMGCheck", "addToAllDevices"),
+                        new NMGOptions("a3", null)
+                );
+
+        CheckSettingsDto dto = AppiumCheckSettingsMapper.toCheckSettingsDtoV3(checkSettings, new Configuration());
+        Assert.assertEquals(dto.getType(), ManagerType.CLASSIC.value);
+    }
+
+    @Test
+    public void shouldNotMapNMGOptionsWhenDidNotSpecify_nonNMGCheck_addToAllDevices() {
+        AppiumCheckSettings checkSettings = Target.window().fully()
+                .NMGOptions(
+                        new NMGOptions("a1", "b1"),
+                        new NMGOptions("a2", "b2"),
+                        new NMGOptions("a3", "b3"),
+                        new NMGOptions("a3", null)
+                        );
+
+        CheckSettingsDto dto = AppiumCheckSettingsMapper.toCheckSettingsDtoV3(checkSettings, new Configuration());
+        Assert.assertNull(dto.getType());
     }
 }
