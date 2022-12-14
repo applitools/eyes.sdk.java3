@@ -24,7 +24,7 @@ public class DemoSuncorp {
     private EyesRunner runner;
     private IOSDriver driver;
 
-    private final String APPLITOOLS_API_KEY = System.getenv("APPLITOOLS_API_KEY");
+    private final String APPLITOOLS_API_KEY = System.getenv("APPLITOOLS_API_KEY_SDK_TEAM");
 
     @BeforeTest
     public void setup() throws MalformedURLException {
@@ -40,30 +40,21 @@ public class DemoSuncorp {
         eyes.setApiKey(APPLITOOLS_API_KEY);
         eyes.setConfiguration(eyes.getConfiguration()
                 .addMobileDevice(new IosDeviceInfo(IosDeviceName.iPhone_14))
-                .addMobileDevice(new IosDeviceInfo(IosDeviceName.iPhone_12_Pro_Max, ScreenOrientation.LANDSCAPE))
+                .addMobileDevice(new IosDeviceInfo(IosDeviceName.iPhone_8))
+                .addMobileDevice(new IosDeviceInfo(IosDeviceName.iPhone_11_Pro))
+                .addMobileDevice(new IosDeviceInfo(IosDeviceName.iPhone_12_Pro_Max))
         );
 
-        eyes.open(driver, "Demo", "NMG Options nonNMGCheck");
-    }
-
-    @Test
-    public void testCameraPrivacy() throws InterruptedException {
-        clickOnElementByText("Camera");
-        requestSystemAccess();
-
-        eyes.check(Target.window().fully().NMGOptions(new NMGOptions("nonNMGCheck", "addToAllDevices"))
-                .withName("test with NMG Options"));
-
-        acceptSystemAlert();
-        driver.navigate().back();
+        eyes.open(driver, "Suncorp Demo", "NMG Options nonNMGCheck");
     }
 
     @Test
     public void testCalendarsPrivacy() throws InterruptedException {
         clickOnElementByText("Calendars");
-        requestSystemAccess();
 
-        eyes.check(Target.window().fully().NMGOptions(new NMGOptions("nonNMGCheck", "addToAllDevices"))
+        eyes.check(Target.window().fully(false).withName("test without NMG Options"));
+        requestSystemAccess();
+        eyes.check(Target.window().fully(false).NMGOptions(new NMGOptions("nonNMGCheck", "addToAllDevices"))
                 .withName("test with NMG Options"));
 
         acceptSystemAlert();
@@ -119,7 +110,7 @@ public class DemoSuncorp {
             wait.until(ExpectedConditions.alertIsPresent());
             driver.switchTo().alert().accept();
         } catch (Exception e) {
-            System.err.println("   no alert visible after 10 sec.");
+            System.err.println("no alert visible after 10 sec.");
         }
         Thread.sleep(1000);
     }
