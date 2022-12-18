@@ -163,14 +163,13 @@ public class Eyes implements IEyesBase {
     }
 
     /**
-     * Sets the proxy settings to be used by the rest client.
+     * Sets the proxy settings to be used by the server.
      *
-     * @param proxySettings The proxy settings to be used by the rest client.
+     * @param proxySettings The proxy settings to be used by the server.
      *                      If {@code null} then no proxy is set.
      */
     public void setProxy(AbstractProxySettings proxySettings) {
         originEyes.setProxy(proxySettings);
-
     }
 
     /**
@@ -760,5 +759,6 @@ public class Eyes implements IEyesBase {
     public Double getScaleRatio() {
         return this.originEyes.getScaleRatio();
     }
+
 }
 
