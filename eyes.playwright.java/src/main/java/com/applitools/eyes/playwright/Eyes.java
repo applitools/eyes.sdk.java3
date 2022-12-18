@@ -6,6 +6,7 @@ import com.applitools.eyes.config.Configuration;
 import com.applitools.eyes.locators.TextRegion;
 import com.applitools.eyes.playwright.universal.dto.DriverTargetDto;
 import com.applitools.eyes.playwright.universal.mapper.DriverMapper;
+import com.applitools.eyes.playwright.universal.mapper.PlaywrightCheckSettingsMapper;
 import com.applitools.eyes.playwright.universal.mapper.PlaywrightTargetMapper;
 import com.applitools.eyes.universal.CommandExecutor;
 import com.applitools.eyes.universal.Reference;
@@ -145,7 +146,7 @@ public class Eyes implements IEyesBase {
         IPlaywrightCheckSettings playwrightCheckSettings = (checkSettings instanceof IPlaywrightCheckSettings) ? (IPlaywrightCheckSettings) checkSettings : null;
         ArgumentGuard.notNull(playwrightCheckSettings, "checkSettings");
 
-        CheckSettingsDto checkSettingsDto = PlaywrightCheckSettings.toCheckSettingsDto(playwrightCheckSettings, configure());
+        CheckSettingsDto checkSettingsDto = PlaywrightCheckSettingsMapper.toCheckSettingsDto(playwrightCheckSettings, configure());
 
         DriverTargetDto driverTargetDto = DriverMapper.toDriverTargetDto(getDriver(), configuration.getWebDriverProxy());
         checkDto(checkSettingsDto, driverTargetDto);
