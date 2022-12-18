@@ -1,5 +1,6 @@
 import com.applitools.eyes.TestResults;
 import com.applitools.eyes.playwright.Eyes;
+import com.applitools.eyes.playwright.Target;
 import com.microsoft.playwright.Browser;
 import com.microsoft.playwright.Page;
 import com.microsoft.playwright.Playwright;
@@ -37,7 +38,7 @@ public class PlaywrightDemo {
 
         eyes.setApiKey(System.getenv("APPLITOOLS_API_KEY"));
         eyes.open(page, "Playwright Java", "Test Playwright Java");
-//        eyes.check(Target.window());
+        eyes.check(Target.window());
         TestResults res = eyes.close(true);
         System.out.println(res);
     }
