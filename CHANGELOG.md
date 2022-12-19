@@ -2,6 +2,8 @@
 ### Updated
 - Update Selenium to `4.7.0`. [Trello 3089](https://trello.com/c/K8dEXR4U)
 - Update Appium to `8.3.0`. [Trello 3089](https://trello.com/c/K8dEXR4U)
+- Support taking a classic screenshot with the NMG. [Trello 3101](https://trello.com/c/ucAZuzyx)
+- Update Universal binaries to `3.1.0`. [Trello 3042](https://trello.com/c/kQT5e0SL), [3080](https://trello.com/c/xXhsxgHX)
 
 ### Fixed
 - Fix `overlap` (formerly known as `stitchOverlap`) mapping. [Trello 3076](https://trello.com/c/AREJRXtC)
