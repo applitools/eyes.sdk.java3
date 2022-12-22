@@ -16,7 +16,7 @@
     <parent>
         <groupId>com.applitools</groupId>
         <artifactId>eyes-sdk-java5-parent</artifactId>
-        <version>5.38.0</version>
+        <version>5.39.0</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
 
@@ -24,12 +24,12 @@
         <dependency>
             <groupId>com.applitools</groupId>
             <artifactId>eyes-universal-core</artifactId>
-            <version>5.38.0</version>
+            <version>5.39.0</version>
         </dependency>
         <dependency>
             <groupId>com.applitools</groupId>
             <artifactId>eyes-ufg-java5</artifactId>
-            <version>5.38.0</version>
+            <version>5.39.0</version>
             <!--This exclusion does nothing. We need it for running tests for all 3 connectivity packages-->
             <exclusions>
                 <exclusion>
@@ -41,7 +41,7 @@
         <dependency>
             <groupId>com.applitools</groupId>
             <artifactId>eyes-connectivity-java5-jersey2x</artifactId>
-            <version>5.38.0</version>
+            <version>5.39.0</version>
         </dependency>
         <!-- https://mvnrepository.com/artifact/javax.websocket/javax.websocket-client-api -->
         <dependency>
