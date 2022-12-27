@@ -7,7 +7,8 @@ public class Target {
 
     /**
      * Specify the target as window.
-     * @return the check settings.
+     *
+     * @return the check settings
      */
     public static PlaywrightCheckSettings window()
     {
@@ -16,8 +17,9 @@ public class Target {
 
     /**
      * Specify the target as a region.
+     *
      * @param region the region to capture.
-     * @return the check settings.
+     * @return the check settings
      */
     public static PlaywrightCheckSettings region(Region region) {
         return new PlaywrightCheckSettings(region);
@@ -25,8 +27,9 @@ public class Target {
 
     /**
      * Specify the target as a locator.
+     *
      * @param locator the locator.
-     * @return the check settings.
+     * @return the check settings
      */
     public static PlaywrightCheckSettings region(String locator) {
         return new PlaywrightCheckSettings(locator);
@@ -34,8 +37,9 @@ public class Target {
 
     /**
      * Specify the target as a frame.
+     *
      * @param locator the locator of the frame.
-     * @return the check settings.
+     * @return the check settings
      */
     public static PlaywrightCheckSettings frame(String locator) {
         PlaywrightCheckSettings settings = new PlaywrightCheckSettings();
@@ -45,8 +49,9 @@ public class Target {
 
     /**
      * Specify the target as a frame.
+     *
      * @param index the index of the frame.
-     * @return the check settings.
+     * @return the check settings
      */
     public static PlaywrightCheckSettings frame(int index) {
         PlaywrightCheckSettings settings = new PlaywrightCheckSettings();
@@ -56,8 +61,9 @@ public class Target {
 
     /**
      * Specify the target as a frame.
+     *
      * @param frame the frame.
-     * @return the check settings.
+     * @return the check settings
      */
     public static PlaywrightCheckSettings frame(Frame frame) {
         PlaywrightCheckSettings settings = new PlaywrightCheckSettings();
