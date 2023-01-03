@@ -1,3 +1,10 @@
+## [vNext] - dNext
+### Updated
+- Update Universal binaries to `3.2.0`.
+- `BatchClose` will now start a universal server process if no server is available.
+### Fixed
+- Fix `BatchClose` not mapping the serverUrl, apiKey and proxy correctly. [Trello 3110](https://trello.com/c/2bmqhBsd)
+
 ## [5.39.0] - 2022-12-22
 ### Updated
 - Update Selenium to `4.7.0`. [Trello 3089](https://trello.com/c/K8dEXR4U)
