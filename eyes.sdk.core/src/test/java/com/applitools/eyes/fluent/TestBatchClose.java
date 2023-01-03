@@ -49,7 +49,6 @@ public class TestBatchClose {
         Assert.assertEquals(enabledBatchClose.serverUrl, serverUrl2);
 
         ServerConnector serverConnector = mock(ServerConnector.class);
-        enabledBatchClose.serverConnector = serverConnector;
         Assert.assertEquals(enabledBatchClose.apiKey, "key");
         Assert.assertNotNull(enabledBatchClose.proxySettings);
 
