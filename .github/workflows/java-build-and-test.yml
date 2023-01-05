@@ -126,7 +126,26 @@ jobs:
           SAUCE_ACCESS_KEY: ${{ secrets.SAUCE_ACCESS_KEY }}
           CHROME_DRIVER_PATH: "/usr/local/bin/chromedriver"
 
-#  alpine-tests:
+  arm64-tests:
+    needs: build
+    runs-on: ubuntu-latest
+    architecture: arm64
+    steps:
+      - name: Checkout repository and submodules
+        uses: actions/checkout@v3
+        with:
+          submodules: recursive
+          token: ${{ secrets.SUBMODULES_GA_TOKEN }}
+      - name: Setup Java
+          uses: actions/setup-java@v3
+          with:
+            java-version: 8
+            distribution: "temurin"
+            cache: "maven"
+      - name: Run Maven Test
+        run: mvn test -Dtest=com.applitools.eyes.universal.server.TestLinuxArmArchitecture.java
+
+  #  alpine-tests:
 #    needs: build
 #    runs-on: ubuntu-20.04
 #    container: "alpine:latest"
@@ -305,6 +324,7 @@ jobs:
       - specific-tests
       - images-tests
       - generic-tests
+      - arm64-tests
 #      - alpine-tests
 #      - support-tests
     runs-on: ubuntu-latest
