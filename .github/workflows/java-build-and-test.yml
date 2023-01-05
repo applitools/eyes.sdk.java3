@@ -150,7 +150,7 @@ jobs:
             set -e
             apt-get update
             apt-get install --no-install-recommends -y ca-certificates maven 
-          run: mvn test -Dtest=com.applitools.eyes.universal.server.TestLinuxArmArchitecture.java
+          run: mvn clean install -DskipTests && mvn test -Dtest="TestLinuxArmArchitecture" -DfailIfNoTests=false
 
   #  alpine-tests:
 #    needs: build
