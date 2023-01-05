@@ -72,7 +72,7 @@ public class SystemInfo {
             suffix = "linux";
             if (Files.exists(Paths.get(ALPINE_PATH))) {
                 suffix = "alpine";
-            } else if (osArchitecture.equals("arm64")) {
+            } else if (osArchitecture.contains("arm64") || osArchitecture.contains("aarch64")) {
                 suffix = "arm64";
             }
         } else {

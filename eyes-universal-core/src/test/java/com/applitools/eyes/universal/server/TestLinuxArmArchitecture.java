@@ -19,6 +19,6 @@ public class TestLinuxArmArchitecture {
         String osVersion = GeneralUtils.getPropertyString("os.name").toLowerCase();
         String osArchitecture = GeneralUtils.getPropertyString("os.arch").toLowerCase();
         Assert.assertTrue(osVersion.contains("linux"));
-        Assert.assertEquals(osArchitecture, "arm64");
+        Assert.assertTrue(osArchitecture.contains("arm64") || osArchitecture.contains("aarch64"));
     }
 }
