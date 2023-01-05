@@ -1,6 +1,7 @@
 ## [vNext] - dNext
 ### Updated
-- Update Universal binaries to `3.2.1`.
+- Added support for linux-arm64 architecture.
+- Update Universal binaries to `3.2.2`.
 - `BatchClose` will now start a universal server process if no server is available.
 ### Fixed
 - Fix `BatchClose` not mapping the serverUrl, apiKey and proxy correctly. [Trello 3110](https://trello.com/c/2bmqhBsd)
