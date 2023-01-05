@@ -129,7 +129,6 @@ jobs:
   arm64-tests:
     needs: build
     runs-on: ubuntu-latest
-    architecture: arm64
     steps:
       - name: Checkout repository and submodules
         uses: actions/checkout@v3
@@ -137,11 +136,20 @@ jobs:
           submodules: recursive
           token: ${{ secrets.SUBMODULES_GA_TOKEN }}
       - name: Setup Java
-          uses: actions/setup-java@v3
-          with:
-            java-version: 8
-            distribution: "temurin"
-            cache: "maven"
+        uses: actions/setup-java@v3
+        with:
+          java-version: 8
+          distribution: "temurin"
+          cache: "maven"
+      - uses: uraimo/run-on-arch-action@v2
+        with:
+          arch: aarch64
+          distro: ubuntu18.04
+          githubToken: ${{ github.token }}
+          install: |
+            set -e
+            apt-get update
+            apt-get install --no-install-recommends -y ca-certificates maven 
       - name: Run Maven Test
         run: mvn test -Dtest=com.applitools.eyes.universal.server.TestLinuxArmArchitecture.java
 
