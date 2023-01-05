@@ -73,7 +73,7 @@ public class SystemInfo {
             if (Files.exists(Paths.get(ALPINE_PATH))) {
                 suffix = "alpine";
             } else if (osArchitecture.contains("arm64") || osArchitecture.contains("aarch64")) {
-                suffix = "arm64";
+                suffix = "linux-arm64";
             }
         } else {
             throw new EyesException(String.format("Operating system is not supported. Version: %s, Architecture: %s",
