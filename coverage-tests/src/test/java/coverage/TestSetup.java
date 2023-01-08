@@ -63,6 +63,20 @@ public class TestSetup extends GlobalSetup {
     public void setHideScrollbars(Boolean hideScrollbars) { eyes.setHideScrollbars(hideScrollbars);}
     public void setIsDisabled(Boolean isDisabled){ eyes.setIsDisabled(isDisabled);}
     public void setBranchName(String name) {eyes.setBranchName(name);}
+    public void setApiKey(String apiKey) {
+        if (apiKey.startsWith("APPLITOOLS")) {
+            eyes.setApiKey(System.getenv(apiKey));
+        } else {
+            eyes.setApiKey(apiKey);
+        }
+    }
+    public void setServerUrl(String serverUrl) {
+        if (serverUrl.startsWith("APPLITOOLS")) {
+            eyes.setServerUrl(System.getenv(serverUrl));
+        } else {
+            eyes.setServerUrl(serverUrl);
+        }
+    }
     public void setBrowsersInfo(IRenderingBrowserInfo ...browsers){
         Configuration conf = eyes.getConfiguration();
         conf.addBrowsers(browsers);
@@ -101,11 +115,33 @@ public class TestSetup extends GlobalSetup {
         return sessionResults;
     }
 
+    public com.applitools.eyes.metadata.BatchInfo getBatchInfo(TestResults results) {
+        com.applitools.eyes.metadata.BatchInfo batchInfo = null;
+        try {
+            batchInfo = TestUtils.getBatchResults(eyes.getApiKey(), results);
+        } catch (Throwable e) {
+            e.printStackTrace();
+            Assert.fail("Exception appeared while getting session results");
+        }
+        return batchInfo;
+    }
+
     public void setBatch(String name, HashMap<String, String>[] properties) {
         BatchInfo batch = new BatchInfo(name);
         for (Map<String, String> property : properties) {
             batch.addProperty(property.get("name"), property.get("value"));
         }
+        eyes.setBatch(batch);
+    }
+
+    public void setBatch(String name) {
+        BatchInfo batch = new BatchInfo(name);
+        eyes.setBatch(batch);
+    }
+
+    public void setBatch(String name, String id) {
+        BatchInfo batch = new BatchInfo(name);
+        batch.setId(id);
         eyes.setBatch(batch);
     }
 

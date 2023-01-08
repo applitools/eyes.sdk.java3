@@ -38,6 +38,9 @@ public class BatchInfo {
     @JsonProperty("isCompleted")
     private Boolean isCompleted;
 
+    @JsonProperty("pointerId")
+    private String pointerId;
+
     @JsonProperty("id")
     public String getId() {
         return id;
@@ -95,5 +98,13 @@ public class BatchInfo {
 
     public boolean getIsCompleted() {
         return isCompleted;
+    }
+
+    public String getPointerId() {
+        return pointerId;
+    }
+
+    public void setPointerId(String pointerId) {
+        this.pointerId = pointerId;
     }
 }
