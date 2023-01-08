@@ -1,4 +1,4 @@
-## [vNext] - dNext
+## [5.40.0] - 2022-01-08
 ### Updated
 - Added support for linux-arm64 architecture.
 - Update Universal binaries to `3.2.2`.
