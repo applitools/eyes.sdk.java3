@@ -3,6 +3,7 @@ package com.applitools.eyes.utils;
 import com.applitools.connectivity.RestClient;
 import com.applitools.connectivity.ServerConnector;
 import com.applitools.eyes.*;
+import com.applitools.eyes.metadata.BatchInfo;
 import com.applitools.eyes.metadata.SessionResults;
 import com.applitools.utils.ArgumentGuard;
 import com.applitools.utils.ClassVersionGetter;
@@ -196,5 +197,26 @@ public class TestUtils {
             }
         }
         return success;
+    }
+
+    public static BatchInfo getBatchResults(String apiKey, TestResults results) throws JsonProcessingException {
+        String apiBatchUrl = results.getApiUrls().getBatch() + "/batch";
+        URI apiBatchUri = UriBuilder.fromUri(apiBatchUrl)
+                .queryParam("format", "json")
+                .queryParam("AccessToken", results.getSecretToken())
+                .queryParam("apiKey", apiKey)
+                .build();
+
+        RestClient client = new RestClient(new Logger(new StdoutLogHandler()), apiBatchUri, ServerConnector.DEFAULT_CLIENT_TIMEOUT);
+        client.setAgentId(ClassVersionGetter.CURRENT_VERSION);
+        if (System.getenv("APPLITOOLS_USE_PROXY") != null) {
+            client.setProxy(new ProxySettings("http://127.0.0.1", 8888));
+        }
+
+        String srStr = client.sendHttpRequest(apiBatchUri.toString(), HttpMethod.GET, MediaType.APPLICATION_JSON).getBodyString();
+        ObjectMapper jsonMapper = new ObjectMapper();
+        jsonMapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
+
+        return jsonMapper.readValue(srStr, BatchInfo.class);
     }
 }

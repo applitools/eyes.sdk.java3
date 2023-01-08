@@ -6,6 +6,7 @@ import com.applitools.eyes.selenium.Eyes;
 import com.applitools.eyes.selenium.fluent.Target;
 import com.applitools.eyes.universal.dto.CloseBatchSettingsDto;
 import com.applitools.eyes.universal.mapper.SettingsMapper;
+import com.applitools.eyes.utils.TestUtils;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
@@ -45,33 +46,50 @@ public class TestCloseBatch {
         }
     }
 
-    @Test(priority = 2)
-    public void testCloseBatchClassicRunner() {
+    @Test(priority = 1)
+    public void testCloseBatchClassicRunner() throws InterruptedException {
 
         eyes = new Eyes();
         eyes.setBatch(batch);
-        eyes.setApiKey("APPLTOOLS_TEST_EYES_API_KEY");
+        eyes.setApiKey(System.getenv("APPLITOOLS_API_KEY_TEST_EYES"));
         eyes.setServerUrl("https://testeyes.applitools.com");
 
         eyes.open(driver, "test close batch", "test close batch");
         eyes.check(Target.window().fully(false));
-        eyes.close(false);
+        TestResults results = eyes.close(false);
+        com.applitools.eyes.metadata.BatchInfo batchInfo = getBatchInfo(results);
 
-//        BatchClose bc = new BatchClose();
-//        bc.setUrl("https://testeyes.applitools.com");
-//        bc.setApiKey("APPLTOOLS_TEST_EYES_API_KEY");
-//        EnabledBatchClose close = bc.setBatchId(Arrays.asList(batch.getId()));
-//        close.close();
+        BatchClose bc = new BatchClose();
+        bc.setUrl("https://testeyes.applitools.com");
+        bc.setApiKey(System.getenv("APPLITOOLS_API_KEY_TEST_EYES"));
+        EnabledBatchClose close = bc.setBatchId(Arrays.asList(batch.getId()));
+        Assert.assertFalse(batchInfo.getIsCompleted());
+        close.close();
+        Thread.sleep(3000);
+        batchInfo = getBatchInfo(results);
+        Assert.assertTrue(batchInfo.getIsCompleted());
     }
 
     // using bc.setBatchId() will spawn a universal server now
-    @Test(priority = 1)
-    public void testCloseBatchWithoutEyes() {
-        BatchClose bc = new BatchClose();
-        bc.setUrl("https://testeyes.applitools.com");
-        bc.setApiKey("APPLTOOLS_TEST_EYES_API_KEY");
-        EnabledBatchClose close = bc.setBatchId(Arrays.asList("a0a86603-f36c-4590-b557-c52731c37bd8"));
-        close.close();
+    // can test manually with below
+//    @Test(priority = 2)
+//    public void testCloseBatchWithoutEyes() {
+//        BatchClose bc = new BatchClose();
+//        bc.setUrl("https://testeyes.applitools.com");
+//        bc.setApiKey("APPLTOOLS_TEST_EYES_API_KEY");
+//        EnabledBatchClose close = bc.setBatchId(Arrays.asList("a0a86603-f36c-4590-b557-c52731c37bd8"));
+//        close.close();
+//    }
+
+    private com.applitools.eyes.metadata.BatchInfo getBatchInfo(TestResults results) {
+        com.applitools.eyes.metadata.BatchInfo batchInfo = null;
+        try {
+            batchInfo = TestUtils.getBatchResults(eyes.getApiKey(), results);
+        } catch (Throwable e) {
+            e.printStackTrace();
+            Assert.fail("Exception appeared while getting session results");
+        }
+        return batchInfo;
     }
 
     @Test

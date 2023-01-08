@@ -21,6 +21,7 @@ but each class will be run in a separate thread.-->
             <class name="com.applitools.eyes.TestMatchLevel"/>
             <class name="com.applitools.eyes.driver.TestCustomDriver"/>
             <class name="com.applitools.eyes.selenium.TestByAll"/>
+            <class name="com.applitools.eyes.TestCloseBatch"/>
         </classes>
     </test>
     <test name="Unit">
