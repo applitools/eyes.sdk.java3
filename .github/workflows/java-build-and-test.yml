@@ -122,6 +122,7 @@ jobs:
         #          working-directory: java
         env:
           APPLITOOLS_API_KEY: ${{ secrets.APPLITOOLS_API_KEY }}
+          APPLITOOLS_API_KEY_TEST_EYES: ${{ secrets.APPLITOOLS_API_KEY_TEST_EYES }}
           SAUCE_USERNAME: ${{ secrets.SAUCE_USERNAME }}
           SAUCE_ACCESS_KEY: ${{ secrets.SAUCE_ACCESS_KEY }}
           CHROME_DRIVER_PATH: "/usr/local/bin/chromedriver"

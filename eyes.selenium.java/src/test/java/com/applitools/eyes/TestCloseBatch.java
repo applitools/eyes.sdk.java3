@@ -65,7 +65,7 @@ public class TestCloseBatch {
         EnabledBatchClose close = bc.setBatchId(Arrays.asList(batch.getId()));
         Assert.assertFalse(batchInfo.getIsCompleted());
         close.close();
-        Thread.sleep(3000);
+        Thread.sleep(5000);
         batchInfo = getBatchInfo(results);
         Assert.assertTrue(batchInfo.getIsCompleted());
     }
