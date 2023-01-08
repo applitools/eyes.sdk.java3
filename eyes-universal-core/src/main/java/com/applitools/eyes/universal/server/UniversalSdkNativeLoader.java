@@ -15,6 +15,7 @@ import com.applitools.eyes.EyesRunnable;
 import com.applitools.eyes.Logger;
 import com.applitools.eyes.logging.Stage;
 import com.applitools.eyes.logging.TraceLevel;
+import com.applitools.eyes.universal.utils.SystemInfo;
 import com.applitools.utils.GeneralUtils;
 
 /**
@@ -27,7 +28,6 @@ public class UniversalSdkNativeLoader {
   private static final String TEMP_FOLDER_PATH = "java.io.tmpdir";
   private static final long MAX_ACTION_WAIT_SECONDS = 90;
   private static final long SLEEP_BETWEEN_ACTION_CHECK_MS = 3000;
-  private static final String ALPINE_PATH = "/etc/alpine-release";
   private static Logger logger = new Logger();
   private static final TraceLevel INFO_LOG_LEVEL = TraceLevel.Info;
   private static final String UNIVERSAL_DEBUG = GeneralUtils.getEnvString("APPLITOOLS_UNIVERSAL_DEBUG");
@@ -70,42 +70,27 @@ public class UniversalSdkNativeLoader {
     if (nativeProcess == null) {
 
       // Get the OS we're running on.
-      String osVersion = GeneralUtils.getPropertyString("os.name").toLowerCase();
-      String os;
-      String suffix;
+      SystemInfo systemInfo = SystemInfo.getSystemInfo();
 
-      if (osVersion.contains("windows")) {
-        os = "win-x64";
-        suffix = "win.exe";
-      } else if (osVersion.contains("mac")) {
-        os = "mac-x64";
-        suffix = "macos";
-      } else if (osVersion.contains("linux") && Files.exists(Paths.get(ALPINE_PATH))) {
-        os = "linux-x64";
-        suffix = "alpine";
-      } else {
-        os = "linux-x64";
-        suffix = "linux";
-      }
-
-      logger.log(INFO_LOG_LEVEL, Stage.GENERAL, String.format("Identifies OS: %s", os));
+      logger.log(INFO_LOG_LEVEL, Stage.GENERAL, String.format("Identifies OS: %s", systemInfo.getOs()));
+      logger.log(INFO_LOG_LEVEL, Stage.GENERAL, String.format("Identifies Architecture: %s", systemInfo.getArchitecture()));
 
       // Set the target path for the server
       String userSetPath = GeneralUtils.getEnvString(BINARY_SERVER_PATH); // might not exist
       Path directoryPath =
           userSetPath == null ? Paths.get(GeneralUtils.getPropertyString(TEMP_FOLDER_PATH)) : Paths.get(userSetPath);
 
-      String serverFilename = "eyes-universal-" + suffix;
+      String serverFilename = "eyes-universal-" + systemInfo.getSuffix();
 
       Path serverTargetPath;
       // Read the server bytes from SDK resources, and write it to the target path
-      String pathInJar = getBinaryPath(os, suffix);
+      String pathInJar = getBinaryPath(systemInfo.getOs(), systemInfo.getSuffix());
       try (InputStream serverBinaryAsStream = getFileFromResourceAsStream(pathInJar)) {
         serverTargetPath = copyBinaryFileToLocalPath(serverBinaryAsStream, directoryPath, serverFilename);
       }
 
       // Set the permissions on the binary
-      setAndVerifyPosixPermissionsForUniversalCore(osVersion, serverTargetPath);
+      setAndVerifyPosixPermissionsForUniversalCore(systemInfo.getOsVersion(), serverTargetPath);
 
       createProcessAndReadPort(serverTargetPath.toString());
     }

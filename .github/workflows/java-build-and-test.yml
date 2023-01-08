@@ -122,11 +122,38 @@ jobs:
         #          working-directory: java
         env:
           APPLITOOLS_API_KEY: ${{ secrets.APPLITOOLS_API_KEY }}
+          APPLITOOLS_API_KEY_TEST_EYES: ${{ secrets.APPLITOOLS_API_KEY_TEST_EYES }}
           SAUCE_USERNAME: ${{ secrets.SAUCE_USERNAME }}
           SAUCE_ACCESS_KEY: ${{ secrets.SAUCE_ACCESS_KEY }}
           CHROME_DRIVER_PATH: "/usr/local/bin/chromedriver"
 
-#  alpine-tests:
+  arm64-tests:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository and submodules
+        uses: actions/checkout@v3
+        with:
+          submodules: recursive
+          token: ${{ secrets.SUBMODULES_GA_TOKEN }}
+      - name: Setup Java
+        uses: actions/setup-java@v3
+        with:
+          java-version: 8
+          distribution: "temurin"
+          cache: "maven"
+      - uses: uraimo/run-on-arch-action@v2
+        with:
+          arch: aarch64
+          distro: ubuntu18.04
+          githubToken: ${{ github.token }}
+          install: |
+            set -e
+            apt-get update
+            apt-get install --no-install-recommends -y ca-certificates maven 
+          run: mvn clean install -DskipTests && mvn test -Dtest="TestLinuxArmArchitecture" -DfailIfNoTests=false
+
+  #  alpine-tests:
 #    needs: build
 #    runs-on: ubuntu-20.04
 #    container: "alpine:latest"
@@ -305,6 +332,7 @@ jobs:
       - specific-tests
       - images-tests
       - generic-tests
+      - arm64-tests
 #      - alpine-tests
 #      - support-tests
     runs-on: ubuntu-latest

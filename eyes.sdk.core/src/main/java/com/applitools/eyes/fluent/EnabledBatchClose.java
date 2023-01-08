@@ -1,27 +1,29 @@
 package com.applitools.eyes.fluent;
 
-import com.applitools.connectivity.ServerConnector;
 import com.applitools.eyes.Logger;
 import com.applitools.eyes.ProxySettings;
 import com.applitools.eyes.logging.Stage;
-import com.applitools.eyes.logging.TraceLevel;
 import com.applitools.eyes.logging.Type;
 import com.applitools.eyes.universal.CommandExecutor;
 import com.applitools.eyes.universal.dto.CloseBatchSettingsDto;
 import com.applitools.eyes.universal.mapper.SettingsMapper;
+import com.applitools.eyes.universal.server.UniversalSdkNativeLoader;
 import com.applitools.utils.ArgumentGuard;
+import com.applitools.utils.ClassVersionGetter;
 import org.apache.commons.lang3.tuple.Pair;
 
 import java.util.HashSet;
 import java.util.List;
 
 public class EnabledBatchClose extends BatchClose {
-    ServerConnector serverConnector;
     private List<String> batchIds;
+    private String BASE_AGENT_ID = "eyes.sdk.java";
 
     EnabledBatchClose(Logger logger, String serverUrl, List<String> batchIds) {
         super(logger);
-        this.serverConnector = new ServerConnector(logger);
+        UniversalSdkNativeLoader.setLogger(logger);
+        UniversalSdkNativeLoader.start();
+        CommandExecutor.getInstance(BASE_AGENT_ID, ClassVersionGetter.CURRENT_VERSION, null);
         this.serverUrl = serverUrl;
         this.batchIds = batchIds;
     }
@@ -37,7 +39,6 @@ public class EnabledBatchClose extends BatchClose {
     public EnabledBatchClose setApiKey(String apiKey) {
         ArgumentGuard.notNull(apiKey, "apiKey");
         this.apiKey = apiKey;
-        serverConnector.setApiKey(apiKey);
         return this;
     }
 
@@ -45,7 +46,6 @@ public class EnabledBatchClose extends BatchClose {
     public EnabledBatchClose setProxy(ProxySettings proxySettings) {
         ArgumentGuard.notNull(proxySettings, "proxySettings");
         this.proxySettings = proxySettings;
-        serverConnector.setProxy(proxySettings);
         return this;
     }
 
@@ -64,7 +64,7 @@ public class EnabledBatchClose extends BatchClose {
             return;
         }
 
-        List<CloseBatchSettingsDto> dto = SettingsMapper.toCloseBatchSettingsDto(batchIds);
+        List<CloseBatchSettingsDto> dto = SettingsMapper.toCloseBatchSettingsDto(batchIds, apiKey, serverUrl, proxySettings);
         CommandExecutor.closeBatch(dto);
     }
 }

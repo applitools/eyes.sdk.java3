@@ -35,6 +35,12 @@ public class BatchInfo {
     @JsonProperty("properties")
     private List<Map<String, String>> properties;
 
+    @JsonProperty("isCompleted")
+    private Boolean isCompleted;
+
+    @JsonProperty("pointerId")
+    private String pointerId;
+
     @JsonProperty("id")
     public String getId() {
         return id;
@@ -80,5 +86,25 @@ public class BatchInfo {
 
     public void setProperties(List<Map<String, String>> properties) {
         this.properties = properties;
+    }
+
+    public Boolean getCompleted() {
+        return isCompleted;
+    }
+
+    public void setCompleted(Boolean completed) {
+        isCompleted = completed;
+    }
+
+    public boolean getIsCompleted() {
+        return isCompleted;
+    }
+
+    public String getPointerId() {
+        return pointerId;
+    }
+
+    public void setPointerId(String pointerId) {
+        this.pointerId = pointerId;
     }
 }

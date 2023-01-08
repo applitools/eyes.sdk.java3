@@ -2,6 +2,7 @@ package com.applitools.eyes.universal.mapper;
 
 import com.applitools.eyes.CutProvider;
 import com.applitools.eyes.FixedCutProvider;
+import com.applitools.eyes.ProxySettings;
 import com.applitools.eyes.TestResults;
 import com.applitools.eyes.config.Configuration;
 import com.applitools.eyes.config.ContentInset;
@@ -156,10 +157,10 @@ public class SettingsMapper {
         return deleteTestSettingsDto;
     }
 
-    public static List<CloseBatchSettingsDto> toCloseBatchSettingsDto(List<String> batchIds) {
+    public static List<CloseBatchSettingsDto> toCloseBatchSettingsDto(List<String> batchIds, String apiKey, String serverUrl, ProxySettings proxySettings) {
         List<CloseBatchSettingsDto> dto = new ArrayList<>();
         for (String batchId : batchIds) {
-            dto.add(new CloseBatchSettingsDto(batchId));
+            dto.add(new CloseBatchSettingsDto(batchId, apiKey, serverUrl, ProxyMapper.toProxyDto(proxySettings)));
         }
 
         return dto;
