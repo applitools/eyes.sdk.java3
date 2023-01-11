@@ -9,6 +9,17 @@ public class ErrorDto {
   private String reason;
   private InfoDto info;
 
+  public ErrorDto() {
+
+  }
+
+  public ErrorDto(String message, String stack, String reason, InfoDto info) {
+    this.message = message;
+    this.stack = stack;
+    this.reason = reason;
+    this.info = info;
+  }
+
   public String getMessage() {
     return message;
   }
@@ -45,6 +56,7 @@ public class ErrorDto {
   public String toString() {
     return "ErrorDto{" +
         "message='" + message + '\'' +
+        "stack='" + stack + '\'' +
         '}';
   }
 }
