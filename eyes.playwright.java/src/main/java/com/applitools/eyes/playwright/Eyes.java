@@ -3,21 +3,25 @@ package com.applitools.eyes.playwright;
 import com.applitools.ICheckSettings;
 import com.applitools.eyes.*;
 import com.applitools.eyes.config.Configuration;
+import com.applitools.eyes.locators.BaseOcrRegion;
 import com.applitools.eyes.locators.TextRegion;
-import com.applitools.eyes.playwright.universal.dto.DriverTargetDto;
-import com.applitools.eyes.playwright.universal.mapper.DriverMapper;
+import com.applitools.eyes.locators.TextRegionSettings;
+import com.applitools.eyes.locators.VisualLocatorSettings;
+import com.applitools.eyes.playwright.universal.Refer;
 import com.applitools.eyes.playwright.universal.mapper.PlaywrightCheckSettingsMapper;
-import com.applitools.eyes.playwright.universal.mapper.PlaywrightTargetMapper;
+import com.applitools.eyes.selenium.StitchMode;
 import com.applitools.eyes.universal.CommandExecutor;
 import com.applitools.eyes.universal.Reference;
+import com.applitools.eyes.playwright.universal.driver.Driver;
 import com.applitools.eyes.universal.dto.*;
 import com.applitools.eyes.universal.dto.response.CommandCloseResponseDto;
-import com.applitools.eyes.universal.mapper.ConfigurationMapper;
-import com.applitools.eyes.universal.mapper.SettingsMapper;
-import com.applitools.eyes.universal.mapper.TestResultsMapper;
+import com.applitools.eyes.universal.mapper.*;
 import com.applitools.utils.ArgumentGuard;
+import com.applitools.utils.GeneralUtils;
 import com.microsoft.playwright.Page;
 
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.net.URI;
 import java.util.List;
 import java.util.Map;
@@ -49,9 +53,6 @@ public class Eyes implements IEyesBase {
      */
     private boolean isClosed;
 
-    /**
-     * the playwright page.
-     */
     private Page page;
 
 
@@ -105,8 +106,11 @@ public class Eyes implements IEyesBase {
             return page;
         }
 
-        DriverTargetDto driverTargetDto = DriverMapper.toDriverTargetDto(page, configuration.getWebDriverProxy());
+        Driver driver = new Driver();
+        driver.setApplitoolsRefId(getRefer().generate(page, driver));
+        driver.setWebDriverProxy(configuration.getWebDriverProxy());
 
+        configuration.setAppName(appName).setTestName(testName);
         if (viewportSize != null && !viewportSize.isEmpty()) {
             configuration.setViewportSize(new RectangleSize(viewportSize));
         }
@@ -115,7 +119,8 @@ public class Eyes implements IEyesBase {
                 .toConfigurationDto(configuration, runner.isDontCloseBatches());
         OpenSettingsDto settingsDto = SettingsMapper.toOpenSettingsDto(configuration, runner.isDontCloseBatches());
 
-        eyesRef = commandExecutor.managerOpenEyes(runner.getManagerRef(), driverTargetDto, settingsDto, configurationDto);
+        eyesRef = commandExecutor.managerOpenEyes(runner.getManagerRef(), driver, settingsDto, configurationDto);
+        this.page = page;
         return page;
     }
 
@@ -140,75 +145,76 @@ public class Eyes implements IEyesBase {
 
     /**
      * Check.
+     *
      * @param checkSettings the check settings
      */
     public void check(ICheckSettings checkSettings) {
         IPlaywrightCheckSettings playwrightCheckSettings = (checkSettings instanceof IPlaywrightCheckSettings) ? (IPlaywrightCheckSettings) checkSettings : null;
         ArgumentGuard.notNull(playwrightCheckSettings, "checkSettings");
 
-        CheckSettingsDto checkSettingsDto = PlaywrightCheckSettingsMapper.toCheckSettingsDto(playwrightCheckSettings, configure());
+        CheckSettingsDto checkSettingsDto = PlaywrightCheckSettingsMapper.toCheckSettingsDto(playwrightCheckSettings, configure(), getRefer());
 
-        DriverTargetDto driverTargetDto = DriverMapper.toDriverTargetDto(getDriver(), configuration.getWebDriverProxy());
-        checkDto(checkSettingsDto, driverTargetDto);
+        Driver target = (Driver) getRefer().getRelation(getDriver());
+        checkDto(checkSettingsDto, target);
     }
 
     private Page getDriver() {
-        return this.page;
+        return page;
     }
 
-
-//    /**
-//     * Extract text.
-//     * @param ocrRegions
-//     * @return
-//     */
-//    public List<String> extractText(BaseOcrRegion... ocrRegions) {
+    /**
+     * Extract text.
+     *
+     * @param ocrRegions  the ocrRegions.
+     * @return the extracted text
+     */
+    public List<String> extractText(BaseOcrRegion... ocrRegions) {
 //        List<OCRExtractSettingsDto> ocrExtractSettingsDtoList = ImageOCRExtractSettingsDtoMapper
 //                .toOCRExtractSettingsDtoList(Arrays.asList(ocrRegions));
-//        ConfigurationDto configurationDto = ConfigurationMapper
-//                .toConfigurationDto(configure(), false);
+        ConfigurationDto configurationDto = ConfigurationMapper
+                .toConfigurationDto(configure(), false);
 //        OcrRegion ocrRegion = (OcrRegion) Arrays.asList(ocrRegions).get(0);
-//        ImageTargetDto target = ImageTargetMapper.toImageTargetDto(ocrRegion.getImage(), null);
-//
-//        return extractTextDto(target, ocrExtractSettingsDtoList, configurationDto);
-//    }
+        Driver target = (Driver) getRefer().getRelation(getDriver());
 
-//    /**
-//     * Locate text. Formerly known as extractTextRegions
-//     * @param image the image from which the location of the text will be extracted.
-//     * @return mapping of the located text regions.
-//     */
-//    public Map<String, List<TextRegion>> extractTextRegions(TextRegionSettings image) {
-//        OCRSearchSettingsDto ocrSearchSettingsDto = OCRSearchSettingsMapper.toOCRSearchSettingsDto(image);
-//        ConfigurationDto configurationDto = ConfigurationMapper
-//                .toConfigurationDto(configure(), false);
-//        ITargetDto target = ImageTargetMapper.toImageTargetDto(image.getImage(), null);
-//
-//        return locateTextDto(target, ocrSearchSettingsDto, configurationDto);
-//    }
+        return extractTextDto(target, null, configurationDto);
+    }
 
-//    /**
-//     * Locate.
-//     * @param visualLocatorSettings the locator settings.
-//     * @return mapping of the region locations.
-//     */
-//    public Map<String, List<Region>> locate(VisualLocatorSettings visualLocatorSettings) {
-//        ArgumentGuard.notNull(visualLocatorSettings, "visualLocatorSettings");
-//
-//        if (!getIsOpen()) {
-//            this.abort();
-//            throw new EyesException("you must call open() before locate");
-//        }
-//
-//        VisualLocatorSettingsDto visualLocatorSettingsDto = VisualLocatorSettingsMapper
-//                .toVisualLocatorSettingsDto(visualLocatorSettings);
-//
-//        ConfigurationDto configurationDto = ConfigurationMapper
-//                .toConfigurationDto(configure(), false);
-//        ImageTargetDto target = ImageTargetMapper.toImageTargetDto(visualLocatorSettings);
-//
-//        return locateDto(target, visualLocatorSettingsDto, configurationDto);
-//    }
+    /**
+     * Locate text. Formerly known as extractTextRegions
+     * @param image the image from which the location of the text will be extracted.
+     * @return mapping of the located text regions.
+     */
+    public Map<String, List<TextRegion>> extractTextRegions(TextRegionSettings image) {
+        OCRSearchSettingsDto ocrSearchSettingsDto = OCRSearchSettingsMapper.toOCRSearchSettingsDto(image);
+        ConfigurationDto configurationDto = ConfigurationMapper
+                .toConfigurationDto(configure(), false);
+        Driver target = (Driver) getRefer().getRelation(getDriver());
+
+        return locateTextDto(target, ocrSearchSettingsDto, configurationDto);
+    }
+
+    /**
+     * Locate.
+     * @param visualLocatorSettings the locator settings.
+     * @return mapping of the region locations.
+     */
+    public Map<String, List<Region>> locate(VisualLocatorSettings visualLocatorSettings) {
+        ArgumentGuard.notNull(visualLocatorSettings, "visualLocatorSettings");
+
+        if (!getIsOpen()) {
+            this.abort();
+            throw new EyesException("you must call open() before locate");
+        }
+
+        VisualLocatorSettingsDto visualLocatorSettingsDto = VisualLocatorSettingsMapper
+                .toVisualLocatorSettingsDto(visualLocatorSettings);
+
+        ConfigurationDto configurationDto = ConfigurationMapper
+                .toConfigurationDto(configure(), false);
+        Driver target = (Driver) getRefer().getRelation(getDriver());
+
+        return locateDto(target, visualLocatorSettingsDto, configurationDto);
+    }
 
     /**
      * See {@link #close(boolean)}.
@@ -249,7 +255,7 @@ public class Eyes implements IEyesBase {
         return testResults.get(0);
     }
 
-    private Configuration configure() {
+    public Configuration configure() {
         return this.configuration;
     }
 
@@ -678,8 +684,6 @@ public class Eyes implements IEyesBase {
 
     public Configuration getConfiguration() { return new Configuration(configuration); }
 
-    public Configuration getConfigurationInstance() { return configure(); }
-
     public void setProxy(AbstractProxySettings proxySettings) { configure().setProxy(proxySettings); }
 
     @Override
@@ -829,7 +833,19 @@ public class Eyes implements IEyesBase {
         return configure().getDebugScreenshotsPrefix();
     }
 
-    private void checkDto(CheckSettingsDto checkSettingsDto, DriverTargetDto driverTargetDto) throws EyesException {
+    public void setHideScrollbars(Boolean hideScrollbars) {
+        configure().setHideScrollbars(hideScrollbars);
+    }
+
+    public void setHideCaret(Boolean hideCaret) {
+        configure().setHideCaret(hideCaret);
+    }
+
+    public void setStitchMode(StitchMode stitchMode) {
+        configure().setStitchMode(stitchMode);
+    }
+
+    private void checkDto(CheckSettingsDto checkSettingsDto, ITargetDto driverTargetDto) throws EyesException {
         if (getIsDisabled()) {
             return;
         }
@@ -846,10 +862,6 @@ public class Eyes implements IEyesBase {
         commandExecutor.eyesCheck(eyesRef, driverTargetDto, checkSettingsDto, configurationDto);
     }
 
-//    private TestResults checkAndCloseDto(ImageTargetDto imageTargetDto, CheckSettingsDto checkSettingsDto, CloseSettingsDto closeSettingsDto, Boolean shouldThrowException) {
-//        return commandExecutor.eyesCheckAndClose(eyesRef, imageTargetDto, checkSettingsDto, closeSettingsDto, configuration, shouldThrowException)
-//    }
-
     private List<String> extractTextDto(ITargetDto target, List<OCRExtractSettingsDto> settings, ConfigurationDto config) throws EyesException {
         return commandExecutor.extractText(eyesRef, target, settings, config);
     }
@@ -858,7 +870,18 @@ public class Eyes implements IEyesBase {
         return commandExecutor.locateText(eyesRef, target, settings, config);
     }
 
-    private Map<String, List<Region>> locateDto(ImageTargetDto target, VisualLocatorSettingsDto settings, ConfigurationDto config) {
+    private Map<String, List<Region>> locateDto(ITargetDto target, VisualLocatorSettingsDto settings, ConfigurationDto config) {
         return commandExecutor.locate(target, settings, config);
+    }
+
+    private Refer getRefer() {
+        try {
+            Method getRef = runner.getClass().getDeclaredMethod("getRef");
+            getRef.setAccessible(true);
+            return (Refer) getRef.invoke(runner);
+        } catch (IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
+            String message = GeneralUtils.createErrorMessageFromExceptionWithText(e, "got an error trying to getRef!");
+            throw new EyesException(message);
+        }
     }
 }

@@ -1,7 +1,9 @@
 package com.applitools.eyes.playwright;
 
 import com.applitools.eyes.Region;
+import com.microsoft.playwright.ElementHandle;
 import com.microsoft.playwright.Frame;
+import com.microsoft.playwright.Locator;
 
 public class Target {
 
@@ -22,41 +24,47 @@ public class Target {
      * @return the check settings
      */
     public static PlaywrightCheckSettings region(Region region) {
-        return new PlaywrightCheckSettings(region);
+        return new PlaywrightCheckSettings().region(region);
     }
 
     /**
-     * Specify the target as a locator.
+     * Specify the target as a region.
+     *
+     * @param selector the locator.
+     * @return the check settings
+     */
+    public static PlaywrightCheckSettings region(String selector) {
+        return new PlaywrightCheckSettings().region(selector);
+    }
+
+    /**
+     * Specify the target as a region.
      *
      * @param locator the locator.
      * @return the check settings
      */
-    public static PlaywrightCheckSettings region(String locator) {
-        return new PlaywrightCheckSettings(locator);
+    public static PlaywrightCheckSettings region(Locator locator) {
+        return region(locator.elementHandle());
+    }
+
+    /**
+     * Specify the target as a region.
+     *
+     * @param element  the element.
+     * @return the check settings
+     */
+    public static PlaywrightCheckSettings region(ElementHandle element) {
+        return new PlaywrightCheckSettings().region(element);
     }
 
     /**
      * Specify the target as a frame.
      *
-     * @param locator the locator of the frame.
+     * @param selector the locator of the frame.
      * @return the check settings
      */
-    public static PlaywrightCheckSettings frame(String locator) {
-        PlaywrightCheckSettings settings = new PlaywrightCheckSettings();
-        settings = settings.frame(locator);
-        return settings;
-    }
-
-    /**
-     * Specify the target as a frame.
-     *
-     * @param index the index of the frame.
-     * @return the check settings
-     */
-    public static PlaywrightCheckSettings frame(int index) {
-        PlaywrightCheckSettings settings = new PlaywrightCheckSettings();
-        settings = settings.frame(index);
-        return settings;
+    public static PlaywrightCheckSettings frame(String selector) {
+        return new PlaywrightCheckSettings().frame(selector);
     }
 
     /**
@@ -66,8 +74,16 @@ public class Target {
      * @return the check settings
      */
     public static PlaywrightCheckSettings frame(Frame frame) {
-        PlaywrightCheckSettings settings = new PlaywrightCheckSettings();
-        settings = settings.frame(frame);
-        return settings;
+        return frame(frame.frameElement());
+    }
+
+    /**
+     * Specify the target as a frame.
+     *
+     * @param frameElement  the frame element.
+     * @return the check settings
+     */
+    public static PlaywrightCheckSettings frame(ElementHandle frameElement) {
+        return new PlaywrightCheckSettings().frame(frameElement);
     }
 }
