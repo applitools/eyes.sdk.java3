@@ -5,7 +5,7 @@ TestNG will run all the methods in the same <test> tag in the same thread, but e
 This allows you to group all your classes that are not thread safe in the same <test> and guarantee they will all run
 in the same thread while taking advantage of TestNG using as many threads as possible to run your tests.
 -->
-<suite name="android suite" verbose="1" parallel="tests" thread-count="2">
+<suite name="android suite" verbose="1" parallel="classes" thread-count="15">
     <listeners>
         <listener class-name="com.applitools.eyes.utils.ReportingListener"/>
     </listeners>
