@@ -1,45 +1,68 @@
-import com.applitools.eyes.TestResults;
+import com.applitools.eyes.*;
+import com.applitools.eyes.playwright.ClassicRunner;
+import com.applitools.eyes.playwright.visualgrid.BrowserType;
 import com.applitools.eyes.playwright.Eyes;
 import com.applitools.eyes.playwright.Target;
-import com.microsoft.playwright.Browser;
-import com.microsoft.playwright.Page;
-import com.microsoft.playwright.Playwright;
+import com.applitools.eyes.selenium.ClassicRunner0;
+import com.microsoft.playwright.*;
 import org.testng.annotations.*;
 
 public class PlaywrightDemo {
 
-    private Browser browser;
+    // Shared between all tests in this class.
+    private static Playwright playwright;
+    private static Browser browser;
+
+    // New instance for each test method.
+    private BrowserContext context;
     private Page page;
     private Eyes eyes;
 
+
     @BeforeTest
     public void setup() {
-        try (Playwright playwright = Playwright.create()) {
-            browser = playwright.chromium().launch();
-            page = browser.newPage();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        playwright = Playwright.create();
+        browser = playwright.chromium().launch();
+
+//        eyes = new Eyes(new VisualGridRunner(new RunnerOptions().testConcurrency(5)));
+//        setUFGConfiguration(eyes);
+        eyes = new Eyes(new ClassicRunner());
+        eyes.setApiKey(System.getenv("APPLITOOLS_API_KEY"));
+    }
+
+    private void setUFGConfiguration(Eyes eyes) {
+        eyes.setConfiguration(eyes.getConfiguration()
+                .addBrowser(1400, 700, BrowserType.CHROME)
+                .addBrowser(1200, 900, BrowserType.FIREFOX)
+        );
     }
 
     @BeforeMethod
     public void beforeEach() {
-        page.navigate("https://demo.applitools.com");
+        context = browser.newContext();
+        page = context.newPage();
+    }
+
+    @AfterMethod
+    public void afterEach() {
+        context.close();
     }
 
     @AfterTest
     public void teardown() {
-        browser.close();
+        playwright.close();
     }
 
     @Test
     public void test() {
-        eyes = new Eyes();
+        page.navigate("https://demo.applitools.com");
 
-        eyes.setApiKey(System.getenv("APPLITOOLS_API_KEY"));
-        eyes.open(page, "Playwright Java", "Test Playwright Java");
-        eyes.check(Target.window());
+        eyes.open(page, "Playwright Java", "Test Playwright Java"
+                 , new RectangleSize(1400, 700));
+        eyes.check(Target.window().fully(true));
         TestResults res = eyes.close(true);
         System.out.println(res);
     }
+
+
 }
