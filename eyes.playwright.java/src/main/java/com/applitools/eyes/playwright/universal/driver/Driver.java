@@ -10,6 +10,9 @@ public class Driver extends Reference implements ITargetDto {
     private ProxyDto proxy;
 
     public void setWebDriverProxy(WebDriverProxySettings webDriverProxy) {
+        if (webDriverProxy == null) {
+            return;
+        }
         this.proxy = new ProxyDto();
         setUrl(webDriverProxy.getUrl());
         setUsername(webDriverProxy.getUsername());
