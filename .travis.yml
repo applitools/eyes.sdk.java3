@@ -12,8 +12,8 @@ addons:
   apt:
     sources:
       - google-chrome
-    packages:
-      - google-chrome-stable
+#    packages:
+#      - google-chrome-stable
   chrome: stable
   firefox: latest
 
