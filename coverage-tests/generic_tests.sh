@@ -10,7 +10,10 @@ if [ "$?" -ne 0 ]; then
 fi
 
 export UFG_ON_EG=true
-yarn generate
+if [ -n "$1" ]; then
+  yarn "$1"
+else
+  yarn generate
 if [ "$?" -ne 0 ]; then
     ((RESULT+=1))
     MESSAGE+=$'\n unable to generate tests'

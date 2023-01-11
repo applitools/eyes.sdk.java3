@@ -18,6 +18,7 @@
     "release": "yarn && yarn test:local && yarn report:prod",
     "local": "yarn install --no-lockfile && yarn docker:start && yarn test && yarn report; yarn docker:stop",
     "generate": "coverage-tests generate ./configuration --pascalizeTests --strict",
+    "generate:playwright": "coverage-tests generate ./configuration/playwright.js --pascalizeTests --strict",
     "generate:eg": "coverage-tests generate ./configuration/eg_configuration.js --pascalizeTests --strict",
     "generate:local": "coverage-tests generate ./configuration/local.js --pascalizeTests --strict",
     "test": "yarn generate:eg && mvn test -DsuiteFile=EGSuite.xml",

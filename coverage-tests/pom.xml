@@ -25,6 +25,11 @@
     <dependencies>
         <dependency>
             <groupId>com.applitools</groupId>
+            <artifactId>eyes-playwright-java5</artifactId>
+            <version>5.39.0</version>
+        </dependency>
+        <dependency>
+            <groupId>com.applitools</groupId>
             <artifactId>eyes-images-java5</artifactId>
             <version>5.40.0</version>
         </dependency>
@@ -65,6 +70,14 @@
                     </suiteXmlFiles>
                     <useFile>false</useFile>
                     <trimStackTrace>false</trimStackTrace>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <configuration>
+                    <source>8</source>
+                    <target>8</target>
                 </configuration>
             </plugin>
         </plugins>
