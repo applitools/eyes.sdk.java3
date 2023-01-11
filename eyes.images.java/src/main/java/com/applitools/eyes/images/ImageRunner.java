@@ -1,7 +1,6 @@
 package com.applitools.eyes.images;
 
 import com.applitools.eyes.EyesRunner;
-import com.applitools.eyes.TestResultsSummary;
 import com.applitools.eyes.exceptions.StaleElementReferenceException;
 import com.applitools.eyes.images.universal.mapper.ImageStaleElementReferenceException;
 import com.applitools.eyes.universal.ManagerType;
@@ -39,8 +38,4 @@ public class ImageRunner extends EyesRunner {
         return new ImageStaleElementReferenceException();
     }
 
-    @Override
-    public TestResultsSummary getAllTestResultsImpl(boolean shouldThrowException) {
-        return null;
-    }
 }

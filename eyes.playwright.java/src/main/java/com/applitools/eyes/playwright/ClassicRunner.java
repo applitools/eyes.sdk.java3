@@ -1,9 +1,11 @@
 package com.applitools.eyes.playwright;
 
 import com.applitools.eyes.EyesRunner;
-import com.applitools.eyes.TestResultsSummary;
 import com.applitools.eyes.exceptions.StaleElementReferenceException;
+import com.applitools.eyes.playwright.universal.PSDKListener;
 import com.applitools.eyes.playwright.universal.PlaywrightStaleElementReferenceException;
+import com.applitools.eyes.playwright.universal.Refer;
+import com.applitools.eyes.playwright.universal.driver.SpecDriverPlaywright;
 import com.applitools.utils.ClassVersionGetter;
 
 public class ClassicRunner extends EyesRunner {
@@ -18,18 +20,34 @@ public class ClassicRunner extends EyesRunner {
     protected static String VERSION = ClassVersionGetter.CURRENT_VERSION;
 
     /**
-     * used for instantiating Image Runner
+     * the protocol to be used
+     */
+    protected static String PROTOCOL = "playwright";
+
+    /**
+     * spec-driver
+     */
+    protected static String[] COMMANDS = SpecDriverPlaywright.getMethodNames();
+
+    /**
+     * universal server listener
+     */
+    private static PSDKListener listener = new PSDKListener();
+
+    /**
+     * used for instantiating Playwright Runner
      */
     public ClassicRunner() {
         this(BASE_AGENT_ID, VERSION);
     }
 
     /**
-     * used for instantiating Image Runner
+     * used for instantiating Playwright Runner
      */
     public ClassicRunner(String baseAgentId, String version) {
-        super(baseAgentId, version);
+        super(baseAgentId, version, PROTOCOL, COMMANDS, listener);
         managerRef = commandExecutor.coreMakeManager("classic", null, null, baseAgentId);
+
     }
 
     @Override
@@ -37,8 +55,11 @@ public class ClassicRunner extends EyesRunner {
         return new PlaywrightStaleElementReferenceException();
     }
 
-    @Override
-    public TestResultsSummary getAllTestResultsImpl(boolean shouldThrowException) {
-        return null;
+    private Refer getRef() {
+        return listener.getRef();
+    }
+
+    private SpecDriverPlaywright getSpec() {
+        return listener.getSpecDriver();
     }
 }
