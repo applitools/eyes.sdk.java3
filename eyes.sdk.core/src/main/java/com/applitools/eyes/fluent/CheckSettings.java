@@ -32,6 +32,7 @@ public class CheckSettings implements ICheckSettings, ICheckSettingsInternal {
 
     // check
     protected String name;
+    protected String pageId;
     protected final List<GetSimpleRegion> ignoreRegions = new ArrayList<>();
     protected final List<GetSimpleRegion> layoutRegions = new ArrayList<>();
     protected final List<GetSimpleRegion> strictRegions = new ArrayList<>();
@@ -111,6 +112,7 @@ public class CheckSettings implements ICheckSettings, ICheckSettingsInternal {
         this.floatingRegions.add(regionProvider);
     }
 
+    @SuppressWarnings("MethodDoesntCallSuperMethod")
     @Override
     public CheckSettings clone(){
         CheckSettings clone = new CheckSettings();
@@ -447,6 +449,7 @@ public class CheckSettings implements ICheckSettings, ICheckSettingsInternal {
         return this.name;
     }
 
+
     @Override
     public Map<String, String> getScriptHooks() {
         return scriptHooks;
@@ -468,7 +471,7 @@ public class CheckSettings implements ICheckSettings, ICheckSettingsInternal {
         clone.retryTimeout = this.retryTimeout;
         clone.ignoreCaret = this.ignoreCaret;
         clone.name = this.name;
-
+        clone.pageId = this.pageId;
         clone.ignoreRegions.addAll(this.ignoreRegions);
         clone.contentRegions.addAll(this.contentRegions);
         clone.layoutRegions.addAll(this.layoutRegions);
@@ -758,5 +761,15 @@ public class CheckSettings implements ICheckSettings, ICheckSettingsInternal {
 
     public List<Integer> getLayoutBreakpoints() {
         return layoutBreakpoints;
+    }
+
+    public ICheckSettings pageId(String pageId) {
+        CheckSettings clone = this.clone();
+        clone.pageId = pageId;
+        return clone;
+    }
+
+    public String getPageId() {
+        return this.pageId;
     }
 }
