@@ -5,6 +5,7 @@ import com.applitools.eyes.SyncTaskListener;
 import com.applitools.eyes.locators.TextRegion;
 import com.applitools.eyes.logging.Stage;
 import com.applitools.eyes.logging.TraceLevel;
+import com.applitools.eyes.playwright.universal.driver.Context;
 import com.applitools.eyes.playwright.universal.driver.Element;
 import com.applitools.eyes.playwright.universal.driver.SpecDriverPlaywright;
 import com.applitools.eyes.playwright.universal.driver.dto.DriverCommandDto;
@@ -55,23 +56,6 @@ public class PSDKListener extends USDKListener {
             ResponseDto response = objectMapper.readValue(payload, ResponseDto.class);
 
             switch(response.getName()) {
-//                case "Driver.getCapabilities":
-//                    ResponseDto<?> getCapabilitiesResponse = new ResponseDto<>();
-//                    getCapabilitiesResponse.setName(response.getName());
-//                    try {
-//                        DriverCommandDto target = objectMapper.readValue(payload,
-//                                new TypeReference<RequestDto<DriverCommandDto>>() {
-//                                }).getPayload();
-//                        Map<String, Object> capabilities = specDriver.getCapabilities(target.getDriver());
-//                        getCapabilitiesResponse.setPayload(new ResponsePayload(capabilities, null));
-//                    } catch (Exception e) {
-//                        ErrorDto err = new ErrorDto(e.getMessage(), Arrays.toString(e.getStackTrace()),"internal",null);
-//                        getCapabilitiesResponse.setPayload(new ResponsePayload<>(null, err));
-//                    }
-//
-//                    getCapabilitiesResponse.setKey(response.getKey());
-//                    webSocket.sendTextFrame(objectMapper.writeValueAsString(getCapabilitiesResponse));
-//                    break;
                 case "Driver.getDriverInfo":
                     ResponseDto<?> getDriverInfoResponse = new ResponseDto<>();
                     getDriverInfoResponse.setName(response.getName());
@@ -82,7 +66,7 @@ public class PSDKListener extends USDKListener {
                         DriverInfoDto driverInfo = (DriverInfoDto) specDriver.getDriverInfo(target.getDriver());
                         getDriverInfoResponse.setPayload(new ResponsePayload(driverInfo, null));
                     } catch (Exception e) {
-                        ErrorDto err = new ErrorDto(e.getMessage(), Arrays.toString(e.getStackTrace()),"internal",null);
+                        ErrorDto err = new ErrorDto(e.getMessage(), Arrays.toString(e.getStackTrace()),"spec-driver",null);
                         getDriverInfoResponse.setPayload(new ResponsePayload<>(null, err));
                     }
 
@@ -99,7 +83,7 @@ public class PSDKListener extends USDKListener {
                         Object handleObject = specDriver.executeScript(dto.getContext(), dto.getScript(), dto.getArg());
                         executeScriptResponse.setPayload(new ResponsePayload(handleObject, null));
                     } catch (Exception e) {
-                        ErrorDto err = new ErrorDto(e.getMessage(), Arrays.toString(e.getStackTrace()),"internal",null);
+                        ErrorDto err = new ErrorDto(e.getMessage(), Arrays.toString(e.getStackTrace()),"spec-driver",null);
                         executeScriptResponse.setPayload(new ResponsePayload<>(null, err));
                     }
 
@@ -116,30 +100,13 @@ public class PSDKListener extends USDKListener {
                         RectangleSizeDto viewportSize = specDriver.getViewportSize(target.getDriver());
                         getViewportSizeResponse.setPayload(new ResponsePayload(viewportSize, null));
                     } catch (Exception e) {
-                        ErrorDto err = new ErrorDto(e.getMessage(), Arrays.toString(e.getStackTrace()),"internal",null);
+                        ErrorDto err = new ErrorDto(e.getMessage(), Arrays.toString(e.getStackTrace()),"spec-driver",null);
                         getViewportSizeResponse.setPayload(new ResponsePayload<>(null, err));
                     }
 
                     getViewportSizeResponse.setKey(response.getKey());
                     webSocket.sendTextFrame(objectMapper.writeValueAsString(getViewportSizeResponse));
                     break;
-//                case "Driver.getWindowSize":
-//                    ResponseDto<?> getWindowSize = new ResponseDto<>();
-//                    getWindowSize.setName(response.getName());
-//                    try {
-//                        DriverCommandDto target = objectMapper.readValue(payload,
-//                                new TypeReference<RequestDto<DriverCommandDto>>() {
-//                                }).getPayload();
-//                        RectangleSizeDto viewportSize = specDriver.getWindowSize(target.getDriver());
-//                        getWindowSize.setPayload(new ResponsePayload(viewportSize, null));
-//                    } catch (Exception e) {
-//                        ErrorDto err = new ErrorDto(e.getMessage(), Arrays.toString(e.getStackTrace()),"internal",null);
-//                        getWindowSize.setPayload(new ResponsePayload<>(null, err));
-//                    }
-//
-//                    getWindowSize.setKey(response.getKey());
-//                    webSocket.sendTextFrame(objectMapper.writeValueAsString(getWindowSize));
-//                    break;
                 case "Driver.setViewportSize":
                     ResponseDto<?> setViewportSize = new ResponseDto<>();
                     setViewportSize.setName(response.getName());
@@ -150,7 +117,7 @@ public class PSDKListener extends USDKListener {
                         specDriver.setViewportSize(target.getDriver(), target.getSize());
                         setViewportSize.setPayload(new ResponsePayload("complete", null));
                     } catch (Exception e) {
-                        ErrorDto err = new ErrorDto(e.getMessage(), Arrays.toString(e.getStackTrace()),"internal",null);
+                        ErrorDto err = new ErrorDto(e.getMessage(), Arrays.toString(e.getStackTrace()),"spec-driver",null);
                         setViewportSize.setPayload(new ResponsePayload<>(null, err));
                     }
 
@@ -167,7 +134,7 @@ public class PSDKListener extends USDKListener {
                         Element element = (Element) specDriver.findElement(target.getContext(), target.getSelector(), target.getParent());
                         findElement.setPayload(new ResponsePayload(element, null));
                     } catch (Exception e) {
-                        ErrorDto err = new ErrorDto(e.getMessage(), Arrays.toString(e.getStackTrace()),"internal",null);
+                        ErrorDto err = new ErrorDto(e.getMessage(), Arrays.toString(e.getStackTrace()),"spec-driver",null);
                         findElement.setPayload(new ResponsePayload<>(null, err));
                     }
 
@@ -184,7 +151,7 @@ public class PSDKListener extends USDKListener {
                         byte[] screenshot = (byte[]) specDriver.takeScreenshot(target.getDriver());
                         takeScreenshot.setPayload(new ResponsePayload(Base64.getEncoder().encodeToString(screenshot), null));
                     } catch (Exception e) {
-                        ErrorDto err = new ErrorDto(e.getMessage(), Arrays.toString(e.getStackTrace()),"internal",null);
+                        ErrorDto err = new ErrorDto(e.getMessage(), Arrays.toString(e.getStackTrace()),"spec-driver",null);
                         takeScreenshot.setPayload(new ResponsePayload<>(null, err));
                     }
 
@@ -201,7 +168,7 @@ public class PSDKListener extends USDKListener {
                         String title = specDriver.getTitle(target.getDriver());
                         getTitle.setPayload(new ResponsePayload(title, null));
                     } catch (Exception e) {
-                        ErrorDto err = new ErrorDto(e.getMessage(), Arrays.toString(e.getStackTrace()),"internal",null);
+                        ErrorDto err = new ErrorDto(e.getMessage(), Arrays.toString(e.getStackTrace()),"spec-driver",null);
                         getTitle.setPayload(new ResponsePayload<>(null, err));
                     }
 
@@ -218,7 +185,7 @@ public class PSDKListener extends USDKListener {
                         String url = specDriver.getUrl(target.getDriver());
                         getUrl.setPayload(new ResponsePayload(url, null));
                     } catch (Exception e) {
-                        ErrorDto err = new ErrorDto(e.getMessage(), Arrays.toString(e.getStackTrace()),"internal",null);
+                        ErrorDto err = new ErrorDto(e.getMessage(), Arrays.toString(e.getStackTrace()),"spec-driver",null);
                         getUrl.setPayload(new ResponsePayload<>(null, err));
                     }
 
@@ -235,7 +202,7 @@ public class PSDKListener extends USDKListener {
                         specDriver.visit(target.getDriver(), target.getUrl());
                         visit.setPayload(new ResponsePayload("complete", null));
                     } catch (Exception e) {
-                        ErrorDto err = new ErrorDto(e.getMessage(), Arrays.toString(e.getStackTrace()),"internal",null);
+                        ErrorDto err = new ErrorDto(e.getMessage(), Arrays.toString(e.getStackTrace()),"spec-driver",null);
                         visit.setPayload(new ResponsePayload<>(null, err));
                     }
 
@@ -252,12 +219,46 @@ public class PSDKListener extends USDKListener {
                         List<ICookie> cookies = specDriver.getCookies(target.getDriver(), target.getContext());
                         getCookies.setPayload(new ResponsePayload(cookies.toString(), null));
                     } catch (Exception e) {
-                        ErrorDto err = new ErrorDto(e.getMessage(), Arrays.toString(e.getStackTrace()),"internal",null);
+                        ErrorDto err = new ErrorDto(e.getMessage(), Arrays.toString(e.getStackTrace()),"spec-driver",null);
                         getCookies.setPayload(new ResponsePayload<>(null, err));
                     }
 
                     getCookies.setKey(response.getKey());
                     webSocket.sendTextFrame(objectMapper.writeValueAsString(getCookies));
+                    break;
+                case "Driver.childContext":
+                    ResponseDto<?> childContext = new ResponseDto<>();
+                    childContext.setName(response.getName());
+                    try {
+                        DriverCommandDto target = objectMapper.readValue(payload,
+                                new TypeReference<RequestDto<DriverCommandDto>>() {
+                                }).getPayload();
+                        Context context = specDriver.childContext(target.getContext(), target.getElement());
+                        childContext.setPayload(new ResponsePayload(context, null));
+                    } catch (Exception e) {
+                        ErrorDto err = new ErrorDto(e.getMessage(), Arrays.toString(e.getStackTrace()),"spec-driver",null);
+                        childContext.setPayload(new ResponsePayload<>(null, err));
+                    }
+
+                    childContext.setKey(response.getKey());
+                    webSocket.sendTextFrame(objectMapper.writeValueAsString(childContext));
+                    break;
+                case "Driver.mainContext":
+                    ResponseDto<?> mainContext = new ResponseDto<>();
+                    mainContext.setName(response.getName());
+                    try {
+                        DriverCommandDto target = objectMapper.readValue(payload,
+                                new TypeReference<RequestDto<DriverCommandDto>>() {
+                                }).getPayload();
+                        Context context = specDriver.mainContext(target.getContext());
+                        mainContext.setPayload(new ResponsePayload(context, null));
+                    } catch (Exception e) {
+                        ErrorDto err = new ErrorDto(e.getMessage(), Arrays.toString(e.getStackTrace()),"spec-driver",null);
+                        mainContext.setPayload(new ResponsePayload<>(null, err));
+                    }
+
+                    mainContext.setKey(response.getKey());
+                    webSocket.sendTextFrame(objectMapper.writeValueAsString(mainContext));
                     break;
             }
 
@@ -400,6 +401,7 @@ public class PSDKListener extends USDKListener {
                     e.printStackTrace();
                 }
             }
+
         } catch (Exception e) {
             e.printStackTrace();
         }

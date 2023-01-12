@@ -9,7 +9,7 @@ import java.util.Map;
 public interface ISpecDriver {
 
     //region UTILITY
-    default Boolean isDriver(Reference driver) {
+    default Boolean isDriver(Object driver) {
         throw new UnsupportedOperationException("isDriver is not supported");
     }
 
@@ -39,7 +39,7 @@ public interface ISpecDriver {
         throw new UnsupportedOperationException("parentContext is not supported");
     }
 
-    default Reference childContext() {
+    default Reference childContext(Reference context, Reference element) {
         throw new UnsupportedOperationException("childContext is not supported");
     }
 

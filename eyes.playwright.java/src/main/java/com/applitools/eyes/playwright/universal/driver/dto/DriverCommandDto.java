@@ -3,8 +3,10 @@ package com.applitools.eyes.playwright.universal.driver.dto;
 import com.applitools.eyes.playwright.universal.driver.Selector;
 import com.applitools.eyes.universal.Reference;
 import com.applitools.eyes.universal.dto.RectangleSizeDto;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class DriverCommandDto {
 
     @JsonProperty("driver")

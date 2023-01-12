@@ -4,10 +4,12 @@ import com.applitools.eyes.WebDriverProxySettings;
 import com.applitools.eyes.universal.Reference;
 import com.applitools.eyes.universal.dto.ITargetDto;
 import com.applitools.eyes.universal.dto.ProxyDto;
+import com.fasterxml.jackson.annotation.JsonInclude;
 
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class Driver extends Reference implements ITargetDto {
 
-    private ProxyDto proxy;
+    private ProxyDto proxy = null;
 
     public void setWebDriverProxy(WebDriverProxySettings webDriverProxy) {
         if (webDriverProxy == null) {

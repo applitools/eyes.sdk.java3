@@ -107,7 +107,7 @@ public class Eyes implements IEyesBase {
         }
 
         Driver driver = new Driver();
-        driver.setApplitoolsRefId(getRefer().generate(page, driver));
+        driver.setApplitoolsRefId(getRefer().ref(page, driver));
         driver.setWebDriverProxy(configuration.getWebDriverProxy());
 
         configuration.setAppName(appName).setTestName(testName);
@@ -154,7 +154,7 @@ public class Eyes implements IEyesBase {
 
         CheckSettingsDto checkSettingsDto = PlaywrightCheckSettingsMapper.toCheckSettingsDto(playwrightCheckSettings, configure(), getRefer());
 
-        Driver target = (Driver) getRefer().getRelation(getDriver());
+        Driver target = (Driver) getRefer().getPage(getDriver());
         checkDto(checkSettingsDto, target);
     }
 
@@ -174,7 +174,7 @@ public class Eyes implements IEyesBase {
         ConfigurationDto configurationDto = ConfigurationMapper
                 .toConfigurationDto(configure(), false);
 //        OcrRegion ocrRegion = (OcrRegion) Arrays.asList(ocrRegions).get(0);
-        Driver target = (Driver) getRefer().getRelation(getDriver());
+        Driver target = (Driver) getRefer().getPage(getDriver());
 
         return extractTextDto(target, null, configurationDto);
     }
@@ -188,7 +188,7 @@ public class Eyes implements IEyesBase {
         OCRSearchSettingsDto ocrSearchSettingsDto = OCRSearchSettingsMapper.toOCRSearchSettingsDto(image);
         ConfigurationDto configurationDto = ConfigurationMapper
                 .toConfigurationDto(configure(), false);
-        Driver target = (Driver) getRefer().getRelation(getDriver());
+        Driver target = (Driver) getRefer().getPage(getDriver());
 
         return locateTextDto(target, ocrSearchSettingsDto, configurationDto);
     }
@@ -211,7 +211,7 @@ public class Eyes implements IEyesBase {
 
         ConfigurationDto configurationDto = ConfigurationMapper
                 .toConfigurationDto(configure(), false);
-        Driver target = (Driver) getRefer().getRelation(getDriver());
+        Driver target = (Driver) getRefer().getPage(getDriver());
 
         return locateDto(target, visualLocatorSettingsDto, configurationDto);
     }

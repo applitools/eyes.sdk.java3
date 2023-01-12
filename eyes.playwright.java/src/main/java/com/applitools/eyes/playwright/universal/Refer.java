@@ -19,7 +19,7 @@ public class Refer extends com.applitools.eyes.universal.Refer {
      *
      * @return the UUID
      */
-    public String generate(Page page, Driver target) {
+    public String ref(Page page, Driver target) {
         String ref = UUID.randomUUID().toString();
         references.put(ref, page);
         relations.put(page, target);
@@ -45,6 +45,10 @@ public class Refer extends com.applitools.eyes.universal.Refer {
      * @return the ref
      */
     public Object deref(String applitoolsRefId) {
+        if (applitoolsRefId == null) {
+            return  null;
+        }
+
         return isRef(applitoolsRefId)? references.get(applitoolsRefId) : applitoolsRefId;
     }
 
@@ -52,5 +56,5 @@ public class Refer extends com.applitools.eyes.universal.Refer {
         return references.containsKey(applitoolsRefId);
     }
 
-    public Object getRelation(Page page) { return relations.get(page); }
+    public Object getPage(Page page) { return relations.get(page); }
 }

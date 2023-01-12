@@ -3,9 +3,11 @@ package com.applitools.eyes.playwright.universal.driver;
 import com.applitools.eyes.Padding;
 import com.applitools.eyes.universal.Reference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.microsoft.playwright.ElementHandle;
 
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class Element extends Reference {
 
     private String type;
