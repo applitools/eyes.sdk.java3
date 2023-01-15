@@ -271,6 +271,23 @@ public class PSDKListener extends USDKListener {
                     mainContext.setKey(response.getKey());
                     webSocket.sendTextFrame(objectMapper.writeValueAsString(mainContext));
                     break;
+                case "Driver.parentContext":
+                    ResponseDto<?> parentContext = new ResponseDto<>();
+                    parentContext.setName(response.getName());
+                    try {
+                        DriverCommandDto target = objectMapper.readValue(payload,
+                                new TypeReference<RequestDto<DriverCommandDto>>() {
+                                }).getPayload();
+                        Context context = specDriver.parentContext(target.getContext());
+                        parentContext.setPayload(new ResponsePayload(context, null));
+                    } catch (Exception e) {
+                        ErrorDto err = new ErrorDto(e.getMessage(), Arrays.toString(e.getStackTrace()),"spec-driver",null);
+                        parentContext.setPayload(new ResponsePayload<>(null, err));
+                    }
+
+                    parentContext.setKey(response.getKey());
+                    webSocket.sendTextFrame(objectMapper.writeValueAsString(parentContext));
+                    break;
 
                 case "Core.makeManager":
                 case "EyesManager.openEyes":

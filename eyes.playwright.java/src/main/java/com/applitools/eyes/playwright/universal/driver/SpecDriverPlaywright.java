@@ -60,7 +60,7 @@ public class SpecDriverPlaywright implements ISpecDriver {
     }
 
     @Override
-    public Reference parentContext(Reference context) {
+    public Context parentContext(Reference context) {
         Frame frame = extractContextUtil(context);
 
         Context frameContext = new Context();
