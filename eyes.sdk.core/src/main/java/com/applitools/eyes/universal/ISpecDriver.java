@@ -35,7 +35,7 @@ public interface ISpecDriver {
         throw new UnsupportedOperationException("mainContext is not supported");
     }
 
-    default Reference parentContext() {
+    default Reference parentContext(Reference context) {
         throw new UnsupportedOperationException("parentContext is not supported");
     }
 

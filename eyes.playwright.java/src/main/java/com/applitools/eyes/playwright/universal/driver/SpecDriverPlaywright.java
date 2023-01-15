@@ -60,8 +60,12 @@ public class SpecDriverPlaywright implements ISpecDriver {
     }
 
     @Override
-    public Reference parentContext() {
-        return ISpecDriver.super.parentContext();
+    public Reference parentContext(Reference context) {
+        Frame frame = extractContextUtil(context);
+
+        Context frameContext = new Context();
+        frameContext.setApplitoolsRefId(refer.ref(frame.parentFrame()));
+        return frameContext;
     }
 
     @Override
