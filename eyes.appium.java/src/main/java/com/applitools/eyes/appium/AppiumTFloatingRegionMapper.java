@@ -1,7 +1,7 @@
 package com.applitools.eyes.appium;
 
 import com.applitools.eyes.fluent.FloatingRegionByRectangle;
-import com.applitools.eyes.fluent.GetFloatingRegion;
+import com.applitools.eyes.fluent.GetRegion;
 import com.applitools.eyes.selenium.fluent.FloatingRegionByElement;
 import com.applitools.eyes.selenium.fluent.FloatingRegionBySelector;
 import com.applitools.eyes.selenium.universal.dto.ElementFloatingRegionDto;
@@ -14,7 +14,7 @@ import java.util.stream.Collectors;
 
 public class AppiumTFloatingRegionMapper {
 
-    public static TFloatingRegion toTFloatingRegionDto(GetFloatingRegion getFloatingRegion) {
+    public static TFloatingRegion toTFloatingRegionDto(GetRegion getFloatingRegion) {
         if (getFloatingRegion == null) {
             return null;
         }
@@ -69,7 +69,7 @@ public class AppiumTFloatingRegionMapper {
 
     }
 
-    public static List<TFloatingRegion> toTFloatingRegionDtoList(List<GetFloatingRegion> getFloatingRegionList) {
+    public static List<TFloatingRegion> toTFloatingRegionDtoList(List<GetRegion> getFloatingRegionList) {
         if (getFloatingRegionList == null || getFloatingRegionList.isEmpty()) {
             return null;
         }

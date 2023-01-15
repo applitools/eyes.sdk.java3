@@ -4,8 +4,6 @@ import com.applitools.ICheckSettings;
 import com.applitools.eyes.Region;
 import com.applitools.eyes.playwright.PlaywrightCheckSettings;
 import com.applitools.eyes.playwright.universal.Refer;
-import com.applitools.eyes.playwright.universal.driver.Element;
-import com.applitools.eyes.playwright.universal.driver.Selector;
 import com.applitools.eyes.universal.Reference;
 import com.applitools.eyes.universal.dto.TRegion;
 import com.applitools.eyes.universal.mapper.RectangleRegionMapper;
@@ -21,13 +19,8 @@ public class TRegionMapper {
 
         Reference element = playwrightCheckSettings.getTargetElement();
 
-        if (element instanceof Element) {
-            String refId = refer.ref(element);
-            element.setApplitoolsRefId(refId);
-            return element;
-        } else if(element instanceof Selector) {
-            String refId = refer.ref(element);
-            element.setApplitoolsRefId(refId);
+        if (element != null) {
+            element.setApplitoolsRefId(refer.ref(element));
             return element;
         }
 
@@ -41,16 +34,11 @@ public class TRegionMapper {
     }
 
     public static TRegion toTRegionDtoFromSRE(Reference scrollRootElement, Refer refer) {
-        if (scrollRootElement instanceof Element) {
-            String refId = refer.ref(scrollRootElement);
-            scrollRootElement.setApplitoolsRefId(refId);
-            return scrollRootElement;
-        } else if(scrollRootElement instanceof Selector) {
-            String refId = refer.ref(scrollRootElement);
-            scrollRootElement.setApplitoolsRefId(refId);
-            return scrollRootElement;
+        if (scrollRootElement == null) {
+            return null;
         }
 
-        return null;
+        scrollRootElement.setApplitoolsRefId(refer.ref(scrollRootElement));
+        return scrollRootElement;
     }
 }

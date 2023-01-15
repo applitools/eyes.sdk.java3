@@ -10,15 +10,15 @@ public interface ICheckSettingsInternal extends com.applitools.ICheckSettingsInt
 
     Boolean getStitchContent();
 
-    GetSimpleRegion[] getIgnoreRegions();
+    GetRegion[] getIgnoreRegions();
 
-    GetSimpleRegion[] getStrictRegions();
+    GetRegion[] getStrictRegions();
 
-    GetSimpleRegion[] getLayoutRegions();
+    GetRegion[] getLayoutRegions();
 
-    GetSimpleRegion[] getContentRegions();
+    GetRegion[] getContentRegions();
 
-    GetFloatingRegion[] getFloatingRegions();
+    GetRegion[] getFloatingRegions();
 
     Boolean getIgnoreCaret();
 
@@ -37,7 +37,7 @@ public interface ICheckSettingsInternal extends com.applitools.ICheckSettingsInt
 
     Boolean isIgnoreDisplacements();
 
-    GetAccessibilityRegion[] getAccessibilityRegions();
+    GetRegion[] getAccessibilityRegions();
 
     BaseOcrRegion getOcrRegion();
 

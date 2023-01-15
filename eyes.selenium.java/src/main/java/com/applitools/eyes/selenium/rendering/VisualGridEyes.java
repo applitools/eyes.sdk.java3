@@ -886,20 +886,21 @@ public class VisualGridEyes implements ISeleniumEyes {
 
     private List<WebElementRegion>[] collectSeleniumRegions(ICheckSettingsInternal csInternal) {
         CheckSettings settings = (CheckSettings) csInternal;
-        GetSimpleRegion[] ignoreRegions = settings.getIgnoreRegions();
-        GetSimpleRegion[] layoutRegions = settings.getLayoutRegions();
-        GetSimpleRegion[] strictRegions = settings.getStrictRegions();
-        GetSimpleRegion[] contentRegions = settings.getContentRegions();
-        GetFloatingRegion[] floatingRegions = settings.getFloatingRegions();
-        GetAccessibilityRegion[] accessibilityRegions = settings.getAccessibilityRegions();
+//        GetSimpleRegion[] ignoreRegions = settings.getIgnoreRegions();
+//        GetSimpleRegion[] layoutRegions = settings.getLayoutRegions();
+//        GetSimpleRegion[] strictRegions = settings.getStrictRegions();
+//        GetSimpleRegion[] contentRegions = settings.getContentRegions();
+//        GetFloatingRegion[] floatingRegions = settings.getFloatingRegions();
+//        GetAccessibilityRegion[] accessibilityRegions = settings.getAccessibilityRegions();
 
-        List<WebElementRegion> ignoreElements = getElementsFromRegions(Arrays.asList(ignoreRegions));
-        List<WebElementRegion> layoutElements = getElementsFromRegions(Arrays.asList(layoutRegions));
-        List<WebElementRegion> strictElements = getElementsFromRegions(Arrays.asList(strictRegions));
-        List<WebElementRegion> contentElements = getElementsFromRegions(Arrays.asList(contentRegions));
-        List<WebElementRegion> floatingElements = getElementsFromRegions(Arrays.asList(floatingRegions));
-        List<WebElementRegion> accessibilityElements = getElementsFromRegions(Arrays.asList(accessibilityRegions));
-        return (List<WebElementRegion>[]) new List[]{ignoreElements, layoutElements, strictElements, contentElements, floatingElements, accessibilityElements};
+//        List<WebElementRegion> ignoreElements = getElementsFromRegions(Arrays.asList(ignoreRegions));
+//        List<WebElementRegion> layoutElements = getElementsFromRegions(Arrays.asList(layoutRegions));
+//        List<WebElementRegion> strictElements = getElementsFromRegions(Arrays.asList(strictRegions));
+//        List<WebElementRegion> contentElements = getElementsFromRegions(Arrays.asList(contentRegions));
+//        List<WebElementRegion> floatingElements = getElementsFromRegions(Arrays.asList(floatingRegions));
+//        List<WebElementRegion> accessibilityElements = getElementsFromRegions(Arrays.asList(accessibilityRegions));
+//        return (List<WebElementRegion>[]) new List[]{ignoreElements, layoutElements, strictElements, contentElements, floatingElements, accessibilityElements};
+        return null;
     }
 
 

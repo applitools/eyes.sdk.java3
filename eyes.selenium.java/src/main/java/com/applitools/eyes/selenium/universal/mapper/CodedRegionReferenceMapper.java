@@ -1,6 +1,6 @@
 package com.applitools.eyes.selenium.universal.mapper;
 
-import com.applitools.eyes.fluent.GetSimpleRegion;
+import com.applitools.eyes.fluent.GetRegion;
 import com.applitools.eyes.fluent.SimpleRegionByRectangle;
 import com.applitools.eyes.selenium.fluent.SimpleRegionByElement;
 import com.applitools.eyes.selenium.fluent.SimpleRegionBySelector;
@@ -14,7 +14,7 @@ import java.util.stream.Collectors;
 
 public class CodedRegionReferenceMapper {
 
-    public static CodedRegionReference toCodedRegionReference(GetSimpleRegion getSimpleRegion) {
+    public static CodedRegionReference toCodedRegionReference(GetRegion getSimpleRegion) {
         if (getSimpleRegion == null) {
             return null;
         }
@@ -44,7 +44,7 @@ public class CodedRegionReferenceMapper {
         return codedRegionReference;
     }
 
-    public static List<CodedRegionReference> toCodedRegionReferenceList(List<GetSimpleRegion> getSimpleRegionList) {
+    public static List<CodedRegionReference> toCodedRegionReferenceList(List<GetRegion> getSimpleRegionList) {
         if (getSimpleRegionList == null || getSimpleRegionList.isEmpty()) {
             return null;
         }

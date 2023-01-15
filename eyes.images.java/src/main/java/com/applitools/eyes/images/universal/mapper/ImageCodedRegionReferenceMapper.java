@@ -1,6 +1,6 @@
 package com.applitools.eyes.images.universal.mapper;
 
-import com.applitools.eyes.fluent.GetSimpleRegion;
+import com.applitools.eyes.fluent.GetRegion;
 import com.applitools.eyes.fluent.SimpleRegionByRectangle;
 import com.applitools.eyes.universal.dto.CodedRegionReference;
 import com.applitools.eyes.universal.dto.TRegion;
@@ -12,7 +12,7 @@ import java.util.stream.Collectors;
 
 public class ImageCodedRegionReferenceMapper {
 
-    public static CodedRegionReference toCodedRegionReference(GetSimpleRegion getSimpleRegion) {
+    public static CodedRegionReference toCodedRegionReference(GetRegion getSimpleRegion) {
         if (getSimpleRegion == null) {
             return null;
         }
@@ -30,7 +30,7 @@ public class ImageCodedRegionReferenceMapper {
         return codedRegionReference;
     }
 
-    public static List<CodedRegionReference> toCodedRegionReferenceList(List<GetSimpleRegion> getSimpleRegionList) {
+    public static List<CodedRegionReference> toCodedRegionReferenceList(List<GetRegion> getSimpleRegionList) {
         if (getSimpleRegionList == null || getSimpleRegionList.isEmpty()) {
             return null;
         }

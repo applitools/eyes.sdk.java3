@@ -1,60 +1,71 @@
 package com.applitools.eyes.playwright.universal.mapper;
 
 import com.applitools.eyes.AccessibilityRegionByRectangle;
-import com.applitools.eyes.GetAccessibilityRegion;
-import com.applitools.eyes.universal.dto.*;
-import com.applitools.eyes.universal.mapper.RectangleRegionMapper;
+import com.applitools.eyes.fluent.GetRegion;
+import com.applitools.eyes.playwright.fluent.AccessibilityElement;
+import com.applitools.eyes.playwright.fluent.AccessibilitySelector;
+import com.applitools.eyes.playwright.universal.Refer;
+import com.applitools.eyes.playwright.universal.dto.AccessibilityRegionByElement;
+import com.applitools.eyes.playwright.universal.dto.AccessibilityRegionBySelector;
+import com.applitools.eyes.universal.dto.RectangleAccessibilityRegionDto;
+import com.applitools.eyes.universal.dto.RectangleRegionDto;
+import com.applitools.eyes.universal.dto.TAccessibilityRegion;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
 public class TAccessibilityRegionMapper {
 
-    public static TAccessibilityRegion toTAccessibilityRegionDto(GetAccessibilityRegion getAccessibilityRegion) {
+    public static TAccessibilityRegion toTAccessibilityRegionDto(GetRegion getAccessibilityRegion, Refer refer) {
         if (getAccessibilityRegion == null) {
             return null;
         }
 
-        if (getAccessibilityRegion instanceof AccessibilityRegionByRectangle) {
+        if (getAccessibilityRegion instanceof AccessibilitySelector) {
+            AccessibilityRegionBySelector accessibilityRegionBySelector = new AccessibilityRegionBySelector();
+            AccessibilitySelector selector = (AccessibilitySelector) getAccessibilityRegion;
+            selector.setApplitoolsRefId(refer.ref(getAccessibilityRegion));
+
+            accessibilityRegionBySelector.setRegion(selector);
+            accessibilityRegionBySelector.setType(selector.getAccessibilityRegionType().name());
+            return accessibilityRegionBySelector;
+
+        } else if (getAccessibilityRegion instanceof AccessibilityElement) {
+            AccessibilityRegionByElement accessibilityRegionByElement = new AccessibilityRegionByElement();
+            AccessibilityElement element = (AccessibilityElement) getAccessibilityRegion;
+            element.setApplitoolsRefId(refer.ref(getAccessibilityRegion));
+
+            accessibilityRegionByElement.setRegion(element);
+            accessibilityRegionByElement.setType(element.getAccessibilityRegionType().name());
+            return accessibilityRegionByElement;
+
+        } else if (getAccessibilityRegion instanceof AccessibilityRegionByRectangle) {
             RectangleAccessibilityRegionDto rectangleAccessibilityRegionDto = new RectangleAccessibilityRegionDto();
+            AccessibilityRegionByRectangle accessibilityRegionByRectangle = (AccessibilityRegionByRectangle) getAccessibilityRegion;
 
-            RectangleRegionDto rectangleRegionDto =
-                    RectangleRegionMapper.toRectangleRegionDto(((AccessibilityRegionByRectangle) getAccessibilityRegion).getRegion());
+            RectangleRegionDto rectangleRegionDto = new RectangleRegionDto();
+            rectangleRegionDto.setX(accessibilityRegionByRectangle.getLeft());
+            rectangleRegionDto.setY(accessibilityRegionByRectangle.getTop());
+            rectangleRegionDto.setHeight(accessibilityRegionByRectangle.getHeight());
+            rectangleRegionDto.setWidth(accessibilityRegionByRectangle.getWidth());
+
             rectangleAccessibilityRegionDto.setRegion(rectangleRegionDto);
-
-            rectangleAccessibilityRegionDto.setType(((AccessibilityRegionByRectangle) getAccessibilityRegion).getType().name());
+            rectangleAccessibilityRegionDto.setType(accessibilityRegionByRectangle.getType().name());
             return rectangleAccessibilityRegionDto;
         }
-//        else if (getAccessibilityRegion instanceof AccessibilityRegionByElement) {
-//            ElementAccessibilityRegionDto elementAccessibilityRegionDto = new ElementAccessibilityRegionDto();
-//
-//            WebElement element = ((AccessibilityRegionByElement) getAccessibilityRegion).getElement();
-//            ElementRegionDto elementRegionDto = ElementRegionMapper.toElementRegionDto(element);
-//            elementAccessibilityRegionDto.setRegion(elementRegionDto);
-//
-//            elementAccessibilityRegionDto.setType(((AccessibilityRegionByElement) getAccessibilityRegion).getAccessibilityRegionType().name());
-//            return elementAccessibilityRegionDto;
-//        } else if (getAccessibilityRegion instanceof AccessibilityRegionBySelector) {
-//            SelectorAccessibilityRegionDto selectorAccessibilityRegionDto = new SelectorAccessibilityRegionDto();
-//
-//            By by = ((AccessibilityRegionBySelector) getAccessibilityRegion).getSelector();
-//            SelectorRegionDto selectorRegionDto = SelectorRegionMapper.toSelectorRegionDto(by);
-//
-//            selectorAccessibilityRegionDto.setRegion(selectorRegionDto);
-//
-//            selectorAccessibilityRegionDto.setType(((AccessibilityRegionBySelector) getAccessibilityRegion).getAccessibilityRegionType().name());
-//            return selectorAccessibilityRegionDto;
-//        }
 
         return null;
     }
 
-    //TODO
-    public static List<TAccessibilityRegion> toTAccessibilityRegionDtoList(List<GetAccessibilityRegion> getAccessibilityRegionList) {
+    public static List<TAccessibilityRegion> toTAccessibilityRegionDtoList(List<GetRegion> getAccessibilityRegionList, Refer refer) {
         if (getAccessibilityRegionList == null || getAccessibilityRegionList.isEmpty()) {
             return null;
         }
 
-        return getAccessibilityRegionList.stream().map(TAccessibilityRegionMapper::toTAccessibilityRegionDto).collect(Collectors.toList());
+        return getAccessibilityRegionList.stream()
+                .map(reference -> toTAccessibilityRegionDto(reference, refer))
+                .collect(Collectors.toList());
+
+
     }
 }

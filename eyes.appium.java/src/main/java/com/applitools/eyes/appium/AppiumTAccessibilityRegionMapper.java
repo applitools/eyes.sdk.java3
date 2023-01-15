@@ -1,7 +1,7 @@
 package com.applitools.eyes.appium;
 
 import com.applitools.eyes.AccessibilityRegionByRectangle;
-import com.applitools.eyes.GetAccessibilityRegion;
+import com.applitools.eyes.fluent.GetRegion;
 import com.applitools.eyes.selenium.fluent.AccessibilityRegionByElement;
 import com.applitools.eyes.selenium.fluent.AccessibilityRegionBySelector;
 import com.applitools.eyes.selenium.universal.dto.ElementAccessibilityRegionDto;
@@ -17,7 +17,7 @@ import java.util.stream.Collectors;
 
 public class AppiumTAccessibilityRegionMapper {
 
-    public static TAccessibilityRegion toTAccessibilityRegionDto(GetAccessibilityRegion getAccessibilityRegion) {
+    public static TAccessibilityRegion toTAccessibilityRegionDto(GetRegion getAccessibilityRegion) {
         if (getAccessibilityRegion == null) {
             return null;
         }
@@ -55,7 +55,7 @@ public class AppiumTAccessibilityRegionMapper {
         return null;
     }
 
-    public static List<TAccessibilityRegion> toTAccessibilityRegionDtoList(List<GetAccessibilityRegion> getAccessibilityRegionList) {
+    public static List<TAccessibilityRegion> toTAccessibilityRegionDtoList(List<GetRegion> getAccessibilityRegionList) {
         if (getAccessibilityRegionList == null || getAccessibilityRegionList.isEmpty()) {
             return null;
         }

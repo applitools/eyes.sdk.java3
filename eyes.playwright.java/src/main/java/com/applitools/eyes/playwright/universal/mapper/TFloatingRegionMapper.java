@@ -1,78 +1,85 @@
 package com.applitools.eyes.playwright.universal.mapper;
 
+import com.applitools.eyes.Region;
 import com.applitools.eyes.fluent.FloatingRegionByRectangle;
-import com.applitools.eyes.fluent.GetFloatingRegion;
+import com.applitools.eyes.fluent.GetRegion;
+import com.applitools.eyes.playwright.fluent.FloatingRegionElement;
+import com.applitools.eyes.playwright.fluent.FloatingRegionSelector;
+import com.applitools.eyes.playwright.universal.Refer;
+import com.applitools.eyes.playwright.universal.dto.FloatingRegionByElement;
+import com.applitools.eyes.playwright.universal.dto.FloatingRegionBySelector;
 import com.applitools.eyes.universal.dto.*;
-import com.applitools.eyes.universal.mapper.RectangleRegionMapper;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
 public class TFloatingRegionMapper {
 
-    public static TFloatingRegion toTFloatingRegionDto(GetFloatingRegion getFloatingRegion) {
+    public static TFloatingRegion toTFloatingRegionDto(GetRegion getFloatingRegion, Refer refer) {
         if (getFloatingRegion == null) {
             return null;
         }
 
-        if (getFloatingRegion instanceof FloatingRegionByRectangle) {
+        if (getFloatingRegion instanceof FloatingRegionSelector) {
+            FloatingRegionBySelector floatingRegionBySelector = new FloatingRegionBySelector();
+            FloatingRegionSelector selector = (FloatingRegionSelector) getFloatingRegion;
+            selector.setApplitoolsRefId(refer.ref(getFloatingRegion));
+
+            floatingRegionBySelector.setRegion(selector);
+            floatingRegionBySelector.setRegionId(selector.getRegionId());
+            floatingRegionBySelector.setMaxUpOffset(selector.getMaxUpOffset());
+            floatingRegionBySelector.setMaxRightOffset(selector.getMaxRightOffset());
+            floatingRegionBySelector.setMaxDownOffset(selector.getMaxDownOffset());
+            floatingRegionBySelector.setMaxLeftOffset(selector.getMaxLeftOffset());
+            return floatingRegionBySelector;
+
+        } else if (getFloatingRegion instanceof FloatingRegionElement) {
+            FloatingRegionByElement floatingRegionByElement = new FloatingRegionByElement();
+            FloatingRegionElement element = (FloatingRegionElement) getFloatingRegion;
+            element.setApplitoolsRefId(refer.ref(getFloatingRegion));
+
+            floatingRegionByElement.setRegion(element);
+            floatingRegionByElement.setRegionId(element.getRegionId());
+            floatingRegionByElement.setMaxUpOffset(element.getMaxUpOffset());
+            floatingRegionByElement.setMaxRightOffset(element.getMaxRightOffset());
+            floatingRegionByElement.setMaxDownOffset(element.getMaxDownOffset());
+            floatingRegionByElement.setMaxLeftOffset(element.getMaxLeftOffset());
+            return floatingRegionByElement;
+
+        } else if (getFloatingRegion instanceof FloatingRegionByRectangle) {
             FloatingRegionByRectangle floatingRegionByRectangle = (FloatingRegionByRectangle) getFloatingRegion;
+            RectangleRegionDto rectangleRegionDto = new RectangleRegionDto();
+            RectangleFloatingRegionDto rectangleFloatingRegionDto = new RectangleFloatingRegionDto();
 
-            RectangleRegionDto rectangleRegionDto = RectangleRegionMapper
-                    .toRectangleRegionDto(((FloatingRegionByRectangle) getFloatingRegion).getRegion());
+            Region region = floatingRegionByRectangle.getRegion();
+            if (region != null) {
+                rectangleRegionDto.setX(region.getLeft());
+                rectangleRegionDto.setY(region.getTop());
+                rectangleRegionDto.setHeight(region.getHeight());
+                rectangleRegionDto.setWidth(region.getWidth());
 
-            RectangleFloatingRegionDto response = new RectangleFloatingRegionDto();
-            response.setRegion(rectangleRegionDto);
-            response.setMaxUpOffset(floatingRegionByRectangle.getMaxUpOffset());
-            response.setMaxDownOffset(floatingRegionByRectangle.getMaxDownOffset());
-            response.setMaxLeftOffset(floatingRegionByRectangle.getMaxLeftOffset());
-            response.setMaxRightOffset(floatingRegionByRectangle.getMaxRightOffset());
-            response.setRegionId(floatingRegionByRectangle.getRegion().getRegionId());
+                rectangleFloatingRegionDto.setRegionId(region.getRegionId());
+            }
 
-            return response;
+            rectangleFloatingRegionDto.setRegion(rectangleRegionDto);
+            rectangleFloatingRegionDto.setMaxUpOffset(floatingRegionByRectangle.getMaxUpOffset());
+            rectangleFloatingRegionDto.setMaxRightOffset(floatingRegionByRectangle.getMaxRightOffset());
+            rectangleFloatingRegionDto.setMaxDownOffset(floatingRegionByRectangle.getMaxDownOffset());
+            rectangleFloatingRegionDto.setMaxLeftOffset(floatingRegionByRectangle.getMaxLeftOffset());
+
+            return rectangleFloatingRegionDto;
         }
-        //TODO by element
-//        else if (getFloatingRegion instanceof FloatingRegionByElement) {
-//            FloatingRegionByElement floatingRegionByElement = (FloatingRegionByElement) getFloatingRegion;
-//
-//            ElementRegionDto elementRegionDto = ElementRegionMapper.toElementRegionDto(floatingRegionByElement.getElement());
-//
-//            ElementFloatingRegionDto elementFloatingRegionDto = new ElementFloatingRegionDto();
-//            elementFloatingRegionDto.setRegion(elementRegionDto);
-//            elementFloatingRegionDto.setMaxUpOffset(floatingRegionByElement.getMaxUpOffset());
-//            elementFloatingRegionDto.setMaxDownOffset(floatingRegionByElement.getMaxDownOffset());
-//            elementFloatingRegionDto.setMaxLeftOffset(floatingRegionByElement.getMaxLeftOffset());
-//            elementFloatingRegionDto.setMaxRightOffset(floatingRegionByElement.getMaxRightOffset());
-//            elementFloatingRegionDto.setRegionId(floatingRegionByElement.getRegionId());
-//
-//            return elementFloatingRegionDto;
-        //TODO by selector
-//        } else if (getFloatingRegion instanceof FloatingRegionBySelector) {
-//            FloatingRegionBySelector floatingRegionBySelector = (FloatingRegionBySelector) getFloatingRegion;
-//
-//            SelectorRegionDto selectorRegionDto = SelectorRegionMapper
-//                    .toSelectorRegionDto(floatingRegionBySelector.getSelector());
-//
-//            SelectorFloatingRegionDto selectorFloatingRegionDto = new SelectorFloatingRegionDto();
-//            selectorFloatingRegionDto.setRegion(selectorRegionDto);
-//            selectorFloatingRegionDto.setMaxUpOffset(floatingRegionBySelector.getMaxUpOffset());
-//            selectorFloatingRegionDto.setMaxDownOffset(floatingRegionBySelector.getMaxDownOffset());
-//            selectorFloatingRegionDto.setMaxLeftOffset(floatingRegionBySelector.getMaxLeftOffset());
-//            selectorFloatingRegionDto.setMaxRightOffset(floatingRegionBySelector.getMaxRightOffset());
-//            selectorFloatingRegionDto.setRegionId(floatingRegionBySelector.getRegionId());
-//
-//            return selectorFloatingRegionDto;
-//        }
 
         return null;
-
     }
 
-    public static List<TFloatingRegion> toTFloatingRegionDtoList(List<GetFloatingRegion> getFloatingRegionList) {
+    public static List<TFloatingRegion> toTFloatingRegionDtoList(List<GetRegion> getFloatingRegionList, Refer refer) {
         if (getFloatingRegionList == null || getFloatingRegionList.isEmpty()) {
             return null;
         }
 
-        return getFloatingRegionList.stream().map(TFloatingRegionMapper::toTFloatingRegionDto).collect(Collectors.toList());
+        return getFloatingRegionList.stream()
+                .map(reference -> toTFloatingRegionDto(reference, refer))
+                .collect(Collectors.toList());
     }
 }

@@ -1,7 +1,7 @@
 package com.applitools.eyes.images.universal.mapper;
 
 import com.applitools.eyes.fluent.FloatingRegionByRectangle;
-import com.applitools.eyes.fluent.GetFloatingRegion;
+import com.applitools.eyes.fluent.GetRegion;
 import com.applitools.eyes.universal.dto.*;
 import com.applitools.eyes.universal.mapper.RectangleRegionMapper;
 
@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 public class ImageTFloatingRegionMapper {
-    public static TFloatingRegion toTFloatingRegionDto(GetFloatingRegion getFloatingRegion) {
+    public static TFloatingRegion toTFloatingRegionDto(GetRegion getFloatingRegion) {
         if (getFloatingRegion == null) {
             return null;
         }
@@ -35,7 +35,7 @@ public class ImageTFloatingRegionMapper {
 
     }
 
-    public static List<TFloatingRegion> toTFloatingRegionDtoList(List<GetFloatingRegion> getFloatingRegionList) {
+    public static List<TFloatingRegion> toTFloatingRegionDtoList(List<GetRegion> getFloatingRegionList) {
         if (getFloatingRegionList == null || getFloatingRegionList.isEmpty()) {
             return null;
         }

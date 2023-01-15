@@ -10,10 +10,15 @@ public class Selector extends Reference {
 
     @JsonProperty("type")
     private String type;
+
     @JsonProperty("selector")
     private String selector;
+
     @JsonProperty("padding")
     private Padding padding;
+
+    @JsonProperty("regionId")
+    private String regionId;
 
     public Selector() {
         this.type = "selector";
@@ -46,5 +51,13 @@ public class Selector extends Reference {
 
     public Padding getPadding() {
         return padding;
+    }
+
+    public String getRegionId() {
+        return regionId;
+    }
+
+    public void setRegionId(String regionId) {
+        this.regionId = regionId;
     }
 }

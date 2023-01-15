@@ -17,6 +17,7 @@ public class Element extends Reference {
 
     @JsonProperty("padding")
     private Padding padding;
+
     @JsonProperty("regionId")
     private String regionId;
 

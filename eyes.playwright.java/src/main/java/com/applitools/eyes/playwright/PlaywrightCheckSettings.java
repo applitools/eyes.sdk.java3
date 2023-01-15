@@ -2,13 +2,18 @@ package com.applitools.eyes.playwright;
 
 import com.applitools.eyes.*;
 import com.applitools.eyes.fluent.CheckSettings;
+import com.applitools.eyes.fluent.FloatingRegionByRectangle;
+import com.applitools.eyes.fluent.GetRegion;
+import com.applitools.eyes.fluent.SimpleRegionByRectangle;
 import com.applitools.eyes.playwright.fluent.AccessibilityElement;
 import com.applitools.eyes.playwright.fluent.AccessibilitySelector;
 import com.applitools.eyes.playwright.fluent.FloatingRegionElement;
 import com.applitools.eyes.playwright.fluent.FloatingRegionSelector;
 import com.applitools.eyes.playwright.universal.driver.Element;
 import com.applitools.eyes.playwright.universal.driver.Selector;
+import com.applitools.eyes.selenium.StitchMode;
 import com.applitools.eyes.universal.Reference;
+import com.applitools.eyes.visualgrid.model.VisualGridOption;
 import com.applitools.utils.ArgumentGuard;
 import com.microsoft.playwright.ElementHandle;
 import com.microsoft.playwright.Frame;
@@ -22,16 +27,7 @@ public class PlaywrightCheckSettings extends CheckSettings implements IPlaywrigh
 
     private Reference targetElement;
     private Reference scrollRootElement;
-
-    protected final List<Reference> ignoreRegions = new ArrayList<>();
-    protected final List<Reference> layoutRegions = new ArrayList<>();
-    protected final List<Reference> strictRegions = new ArrayList<>();
-    protected final List<Reference> contentRegions = new ArrayList<>();
-    protected final List<Reference> floatingRegions = new ArrayList<>();
-    protected List<Reference> accessibilityRegions = new ArrayList<>();
-
     private final List<Reference> frameChain = new ArrayList<>();
-
     private Boolean isDefaultLayoutBreakpointsSet;
     private final List<Integer> layoutBreakpoints = new ArrayList<>();
 
@@ -134,8 +130,29 @@ public class PlaywrightCheckSettings extends CheckSettings implements IPlaywrigh
         return clone;
     }
 
+    @Override
+    public PlaywrightCheckSettings ignore(Region[] regions) {
+        PlaywrightCheckSettings clone = this.clone();
+        for (Region r : regions) {
+            clone.ignore_(r);
+        }
+        return clone;
+    }
+
+    @Override
     public PlaywrightCheckSettings ignore(Region region, Region... regions) {
-        return (PlaywrightCheckSettings) super.ignore(region);
+        PlaywrightCheckSettings clone = this.clone();
+        clone.ignore_(region);
+        for (Region r : regions) {
+            clone.ignore_(r);
+        }
+        return clone;
+    }
+
+    @Override
+    protected void ignore_(Region region) {
+        SimpleRegionByRectangle simpleRegionByRectangle = new SimpleRegionByRectangle(region);
+        this.ignoreRegions.add(simpleRegionByRectangle);
     }
 
     public PlaywrightCheckSettings layout(String selector) {
@@ -183,6 +200,31 @@ public class PlaywrightCheckSettings extends CheckSettings implements IPlaywrigh
         return clone;
     }
 
+    @Override
+    public PlaywrightCheckSettings layout(Region[] regions) {
+        PlaywrightCheckSettings clone = this.clone();
+        for (Region r : regions) {
+            clone.layout_(r);
+        }
+        return clone;
+    }
+
+    @Override
+    public PlaywrightCheckSettings layout(Region region, Region... regions) {
+        PlaywrightCheckSettings clone = this.clone();
+        clone.layout_(region);
+        for (Region r : regions) {
+            clone.layout_(r);
+        }
+        return clone;
+    }
+
+    @Override
+    protected void layout_(Region region) {
+        SimpleRegionByRectangle simpleRegionByRectangle = new SimpleRegionByRectangle(region);
+        this.layoutRegions.add(simpleRegionByRectangle);
+    }
+
     public PlaywrightCheckSettings strict(String selector) {
         PlaywrightCheckSettings clone = this.clone();
         clone.strictRegions.add(new Selector(selector));
@@ -228,32 +270,29 @@ public class PlaywrightCheckSettings extends CheckSettings implements IPlaywrigh
         return clone;
     }
 
-    public PlaywrightCheckSettings content(String selector) {
-        return ignoreColors(selector);
+    @Override
+    public PlaywrightCheckSettings strict(Region[] regions) {
+        PlaywrightCheckSettings clone = this.clone();
+        for (Region r : regions) {
+            clone.strict_(r);
+        }
+        return clone;
     }
 
-    public PlaywrightCheckSettings content(Locator locator) {
-        return ignoreColors(locator.elementHandle());
+    @Override
+    public PlaywrightCheckSettings strict(Region region, Region... regions) {
+        PlaywrightCheckSettings clone = this.clone();
+        clone.strict_(region);
+        for (Region r : regions) {
+            clone.strict_(r);
+        }
+        return clone;
     }
 
-    public PlaywrightCheckSettings content(ElementHandle element) {
-        return ignoreColors(element);
-    }
-
-    public PlaywrightCheckSettings content(ElementHandle element, String regionId) {
-        return ignoreColors(element, regionId);
-    }
-
-    public PlaywrightCheckSettings content(String selector, Padding padding) {
-        return ignoreColors(selector, padding);
-    }
-
-    public PlaywrightCheckSettings content(Locator locator, Padding padding) {
-        return ignoreColors(locator.elementHandle(), padding);
-    }
-
-    public PlaywrightCheckSettings content(ElementHandle element, Padding padding) {
-        return ignoreColors(element, padding);
+    @Override
+    protected void strict_(Region region) {
+        SimpleRegionByRectangle simpleRegionByRectangle = new SimpleRegionByRectangle(region);
+        this.strictRegions.add(simpleRegionByRectangle);
     }
 
     public PlaywrightCheckSettings ignoreColors(String selector) {
@@ -300,6 +339,28 @@ public class PlaywrightCheckSettings extends CheckSettings implements IPlaywrigh
         return clone;
     }
 
+    public PlaywrightCheckSettings ignoreColors(Region[] regions) {
+        PlaywrightCheckSettings clone = this.clone();
+        for (Region r : regions) {
+            clone.ignoreColors_(r);
+        }
+        return clone;
+    }
+
+    public PlaywrightCheckSettings ignoreColors(Region region, Region... regions) {
+        PlaywrightCheckSettings clone = this.clone();
+        clone.ignoreColors_(region);
+        for (Region r : regions) {
+            clone.ignoreColors_(r);
+        }
+        return clone;
+    }
+
+    protected void ignoreColors_(Region region) {
+        SimpleRegionByRectangle simpleRegionByRectangle = new SimpleRegionByRectangle(region);
+        this.contentRegions.add(simpleRegionByRectangle);
+    }
+
     public PlaywrightCheckSettings floating(String selector, int maxUpOffset, int mapDownOffset, int maxLeftOffset, int maxRightOffset) {
         PlaywrightCheckSettings clone = this.clone();
         clone.floatingRegions.add(new FloatingRegionSelector(selector, maxUpOffset, mapDownOffset, maxLeftOffset, maxRightOffset));
@@ -336,6 +397,27 @@ public class PlaywrightCheckSettings extends CheckSettings implements IPlaywrigh
         return clone;
     }
 
+    @Override
+    public PlaywrightCheckSettings floating(int maxOffset, Region... regions) {
+        PlaywrightCheckSettings clone = this.clone();
+        for (Region r: regions) {
+            clone.floating_(r, maxOffset, maxOffset, maxOffset, maxOffset);
+        }
+        return clone;
+    }
+
+    @Override
+    public PlaywrightCheckSettings floating(Region region, int maxUpOffset, int maxDownOffset, int maxLeftOffset, int maxRightOffset) {
+        PlaywrightCheckSettings clone = this.clone();
+        clone.floating_(region, maxUpOffset, maxDownOffset, maxLeftOffset, maxRightOffset);
+        return clone;
+    }
+
+    @Override
+    protected void floating_(Region region, int maxUpOffset, int maxDownOffset, int maxLeftOffset, int maxRightOffset) {
+        this.floatingRegions.add(new FloatingRegionByRectangle(region, maxUpOffset, maxDownOffset, maxLeftOffset, maxRightOffset));
+    }
+
     public PlaywrightCheckSettings accessibility(String selector, AccessibilityRegionType type) {
         PlaywrightCheckSettings clone = this.clone();
         clone.accessibilityRegions.add(new AccessibilitySelector(selector, type));
@@ -352,6 +434,18 @@ public class PlaywrightCheckSettings extends CheckSettings implements IPlaywrigh
         return clone;
     }
 
+    @Override
+    public PlaywrightCheckSettings accessibility(Region region, AccessibilityRegionType regionType) {
+        PlaywrightCheckSettings clone = this.clone();
+        clone.accessibility_(region, regionType);
+        return clone;
+    }
+
+    @Override
+    protected void accessibility_(Region rect, AccessibilityRegionType regionType) {
+        this.accessibilityRegions.add(new AccessibilityRegionByRectangle(rect, regionType));
+    }
+
     public PlaywrightCheckSettings scrollRootElement(String selector) {
         PlaywrightCheckSettings clone = this.clone();
         clone.scrollRootElement = new Selector(selector);
@@ -366,6 +460,38 @@ public class PlaywrightCheckSettings extends CheckSettings implements IPlaywrigh
         PlaywrightCheckSettings clone = this.clone();
         clone.scrollRootElement = new Element(element);
         return clone;
+    }
+
+    public PlaywrightCheckSettings layoutBreakpoints(int... breakpoints) {
+        isDefaultLayoutBreakpointsSet = false;
+        layoutBreakpoints.clear();
+        if (breakpoints == null || breakpoints.length == 0) {
+            return this;
+        }
+
+        for (int breakpoint : breakpoints) {
+            ArgumentGuard.greaterThanZero(breakpoint, "breakpoint");
+            layoutBreakpoints.add(breakpoint);
+        }
+
+        Collections.sort(layoutBreakpoints);
+        return this;
+    }
+
+    public PlaywrightCheckSettings layoutBreakpoints(Boolean shouldSet) {
+        this.isDefaultLayoutBreakpointsSet = shouldSet;
+        layoutBreakpoints.clear();
+        return this;
+    }
+
+    @Override
+    public PlaywrightCheckSettings setLayoutBreakpoints(int... breakpoints) {
+        return layoutBreakpoints(breakpoints);
+    }
+
+    @Override
+    public PlaywrightCheckSettings setLayoutBreakpoints(Boolean shouldSet) {
+        return layoutBreakpoints(shouldSet);
     }
 
     @Override
@@ -389,6 +515,111 @@ public class PlaywrightCheckSettings extends CheckSettings implements IPlaywrigh
     }
 
     @Override
+    public PlaywrightCheckSettings sendDom(Boolean sendDom) {
+        return (PlaywrightCheckSettings) super.sendDom(sendDom);
+    }
+
+    @Override
+    public PlaywrightCheckSettings sendDom() {
+        return (PlaywrightCheckSettings) super.sendDom();
+    }
+
+    @Override
+    public PlaywrightCheckSettings enablePatterns(Boolean enablePatterns) {
+        return (PlaywrightCheckSettings) super.enablePatterns(enablePatterns);
+    }
+
+    @Override
+    public PlaywrightCheckSettings enablePatterns() {
+        return (PlaywrightCheckSettings) super.enablePatterns();
+    }
+
+    @Override
+    public PlaywrightCheckSettings beforeRenderScreenshotHook(String hook) {
+        return (PlaywrightCheckSettings) super.beforeRenderScreenshotHook(hook);
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * @param timeoutMilliseconds
+     */
+    @Override
+    public PlaywrightCheckSettings timeout(Integer timeoutMilliseconds) {
+        return (PlaywrightCheckSettings) super.timeout(timeoutMilliseconds);
+    }
+
+    @Override
+    public PlaywrightCheckSettings useDom(Boolean useDom) {
+        return (PlaywrightCheckSettings) super.useDom(useDom);
+    }
+
+    @Override
+    public PlaywrightCheckSettings variationGroupId(String variationGroupId) {
+        return (PlaywrightCheckSettings) super.variationGroupId(variationGroupId);
+    }
+
+    @Override
+    public PlaywrightCheckSettings visualGridOptions(VisualGridOption... options) {
+        return (PlaywrightCheckSettings) super.visualGridOptions(options);
+    }
+
+    @Override
+    public PlaywrightCheckSettings waitBeforeCapture(Integer milliSec) {
+        return (PlaywrightCheckSettings) super.waitBeforeCapture(milliSec);
+    }
+
+    @Override
+    public PlaywrightCheckSettings setDisableBrowserFetching(Boolean disableBrowserFetching) {
+        return (PlaywrightCheckSettings) super.setDisableBrowserFetching(disableBrowserFetching);
+    }
+
+    @Override
+    public PlaywrightCheckSettings autProxy(AutProxySettings autProxy) {
+        return (PlaywrightCheckSettings) super.autProxy(autProxy);
+    }
+
+    @Override
+    public PlaywrightCheckSettings setAccessibilityValidation(AccessibilitySettings accessibilitySettings) {
+        return (PlaywrightCheckSettings) super.setAccessibilityValidation(accessibilitySettings);
+    }
+
+    @Override
+    public PlaywrightCheckSettings stitchMode(StitchMode stitchMode) {
+        return (PlaywrightCheckSettings) super.stitchMode(stitchMode);
+    }
+
+    @Override
+    public PlaywrightCheckSettings setHideScrollBars(Boolean hideScrollBars) {
+        return (PlaywrightCheckSettings) super.setHideScrollBars(hideScrollBars);
+    }
+
+    @Override
+    public PlaywrightCheckSettings setHideCaret(Boolean hideCaret) {
+        return (PlaywrightCheckSettings) super.setHideCaret(hideCaret);
+    }
+
+    @Override
+    public PlaywrightCheckSettings setOverlap(Integer overlap) {
+        return (PlaywrightCheckSettings) super.setOverlap(overlap);
+    }
+
+    @Override
+    public PlaywrightCheckSettings pageId(String pageId) {
+        return (PlaywrightCheckSettings) super.pageId(pageId);
+    }
+
+    @Override
+    public PlaywrightCheckSettings ignoreDisplacements(Boolean ignoreDisplacements) {
+        return (PlaywrightCheckSettings) super.ignoreDisplacements(ignoreDisplacements);
+    }
+
+    @Override
+    public PlaywrightCheckSettings ignoreDisplacements() {
+        return (PlaywrightCheckSettings) super.ignoreDisplacements();
+    }
+
+    @Override
     public PlaywrightCheckSettings ignoreCaret() {
         return (PlaywrightCheckSettings) super.ignoreCaret();
     }
@@ -396,11 +627,6 @@ public class PlaywrightCheckSettings extends CheckSettings implements IPlaywrigh
     @Override
     public PlaywrightCheckSettings matchLevel(MatchLevel matchLevel) {
         return (PlaywrightCheckSettings) super.matchLevel(matchLevel);
-    }
-
-    @Override
-    public PlaywrightCheckSettings content() {
-        return (PlaywrightCheckSettings) super.content();
     }
 
     @Override
@@ -428,33 +654,6 @@ public class PlaywrightCheckSettings extends CheckSettings implements IPlaywrigh
         return (PlaywrightCheckSettings) super.lazyLoad(lazyLoadOptions);
     }
 
-    @Override
-    public LazyLoadOptions getLazyLoadOptions() {
-        return super.getLazyLoadOptions();
-    }
-
-    public PlaywrightCheckSettings layoutBreakpoints(Integer... breakpoints) {
-        isDefaultLayoutBreakpointsSet = false;
-        layoutBreakpoints.clear();
-        if (breakpoints == null || breakpoints.length == 0) {
-            return this;
-        }
-
-        for (int breakpoint : breakpoints) {
-            ArgumentGuard.greaterThanZero(breakpoint, "breakpoint");
-            layoutBreakpoints.add(breakpoint);
-        }
-
-        Collections.sort(layoutBreakpoints);
-        return this;
-    }
-
-    public PlaywrightCheckSettings layoutBreakpoints(Boolean shouldSet) {
-        this.isDefaultLayoutBreakpointsSet = shouldSet;
-        layoutBreakpoints.clear();
-        return this;
-    }
-
     @SuppressWarnings("MethodDoesntCallSuperMethod")
     @Override
     public PlaywrightCheckSettings clone() {
@@ -470,7 +669,7 @@ public class PlaywrightCheckSettings extends CheckSettings implements IPlaywrigh
         clone.layoutRegions.addAll(this.layoutRegions);
         clone.strictRegions.addAll(this.strictRegions);
         clone.floatingRegions.addAll(this.floatingRegions);
-        clone.accessibilityRegions = this.accessibilityRegions;
+        clone.accessibilityRegions.addAll(this.accessibilityRegions);
         return clone;
     }
 
@@ -484,5 +683,93 @@ public class PlaywrightCheckSettings extends CheckSettings implements IPlaywrigh
 
     public List<Reference> getFrameChain() {
         return frameChain;
+    }
+
+    @Override
+    public LazyLoadOptions getLazyLoadOptions() {
+        return super.getLazyLoadOptions();
+    }
+
+    @Override
+    public GetRegion[] getIgnoreRegions() {
+        return ignoreRegions.toArray(new GetRegion[0]);
+    }
+
+    @Override
+    public GetRegion[] getLayoutRegions() {
+        return layoutRegions.toArray(new GetRegion[0]);
+    }
+
+    @Override
+    public GetRegion[] getStrictRegions() {
+        return strictRegions.toArray(new GetRegion[0]);
+    }
+
+    @Override
+    public GetRegion[] getContentRegions() {
+        return contentRegions.toArray(new GetRegion[0]);
+    }
+
+    @Override
+    public GetRegion[] getFloatingRegions() {
+        return floatingRegions.toArray(new GetRegion[0]);
+    }
+
+    @Override
+    public GetRegion[] getAccessibilityRegions() {
+        return accessibilityRegions.toArray(new GetRegion[0]);
+    }
+
+    @Deprecated
+    @Override
+    public PlaywrightCheckSettings content() {
+        return (PlaywrightCheckSettings) super.content();
+    }
+
+    @Deprecated
+    public PlaywrightCheckSettings content(String selector) {
+        return ignoreColors(selector);
+    }
+
+    @Deprecated
+    public PlaywrightCheckSettings content(Locator locator) {
+        return ignoreColors(locator.elementHandle());
+    }
+
+    @Deprecated
+    public PlaywrightCheckSettings content(ElementHandle element) {
+        return ignoreColors(element);
+    }
+
+    @Deprecated
+    public PlaywrightCheckSettings content(ElementHandle element, String regionId) {
+        return ignoreColors(element, regionId);
+    }
+
+    @Deprecated
+    public PlaywrightCheckSettings content(String selector, Padding padding) {
+        return ignoreColors(selector, padding);
+    }
+
+    @Deprecated
+    public PlaywrightCheckSettings content(Locator locator, Padding padding) {
+        return ignoreColors(locator.elementHandle(), padding);
+    }
+
+    @Deprecated
+    public PlaywrightCheckSettings content(ElementHandle element, Padding padding) {
+        return ignoreColors(element, padding);
+    }
+
+    @Deprecated
+    @Override
+    public PlaywrightCheckSettings content(Region[] regions) {
+        return ignoreColors(regions);
+    }
+
+    @Deprecated
+    @Override
+    public PlaywrightCheckSettings content(Region region, Region... regions) {
+        return ignoreColors(region, regions);
     }
 }
