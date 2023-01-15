@@ -51,7 +51,7 @@ public interface ISpecDriver {
         throw new UnsupportedOperationException("findElement is not supported");
     }
 
-    default Reference[] findElements() {
+    default List<Reference> findElements(Reference context, Reference selector, Reference parent) {
         throw new UnsupportedOperationException("findElements is not supported");
     }
 
@@ -109,6 +109,18 @@ public interface ISpecDriver {
 
     default void visit(Reference driver, String url) {
         throw new UnsupportedOperationException("visit is not supported");
+    }
+
+    default void hover(Reference context, Reference element) {
+        throw new UnsupportedOperationException("hover is not supported");
+    }
+
+    default void scrollIntoView(Reference context, Reference element, Boolean align) {
+        throw new UnsupportedOperationException("scrollIntoView is not supported");
+    }
+
+    default void waitUntilDisplayed(Reference context, Reference selector) {
+        throw new UnsupportedOperationException("waitUntilDisplayed is not supported");
     }
     //endregion COMMANDS
 }

@@ -1,8 +1,6 @@
 package com.applitools.eyes.playwright.universal;
 
-import com.applitools.eyes.Region;
-import com.applitools.eyes.SyncTaskListener;
-import com.applitools.eyes.locators.TextRegion;
+import com.applitools.eyes.EyesException;
 import com.applitools.eyes.logging.Stage;
 import com.applitools.eyes.logging.TraceLevel;
 import com.applitools.eyes.playwright.universal.driver.Context;
@@ -14,14 +12,10 @@ import com.applitools.eyes.universal.Reference;
 import com.applitools.eyes.universal.USDKListener;
 import com.applitools.eyes.universal.driver.ICookie;
 import com.applitools.eyes.universal.dto.*;
-import com.applitools.eyes.universal.dto.response.CommandCloseResponseDto;
 import com.fasterxml.jackson.core.type.TypeReference;
 
 import java.sql.Timestamp;
-import java.util.Arrays;
-import java.util.Base64;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class PSDKListener extends USDKListener {
 
@@ -33,7 +27,7 @@ public class PSDKListener extends USDKListener {
     /**
      * refer
      */
-    private Refer ref;
+    private final Refer ref;
 
     public PSDKListener() {
         super();
@@ -63,7 +57,7 @@ public class PSDKListener extends USDKListener {
                         DriverCommandDto target = objectMapper.readValue(payload,
                                 new TypeReference<RequestDto<DriverCommandDto>>() {
                                 }).getPayload();
-                        DriverInfoDto driverInfo = (DriverInfoDto) specDriver.getDriverInfo(target.getDriver());
+                        DriverInfoDto driverInfo = specDriver.getDriverInfo(target.getDriver());
                         getDriverInfoResponse.setPayload(new ResponsePayload(driverInfo, null));
                     } catch (Exception e) {
                         ErrorDto err = new ErrorDto(e.getMessage(), Arrays.toString(e.getStackTrace()),"spec-driver",null);
@@ -131,7 +125,7 @@ public class PSDKListener extends USDKListener {
                         DriverCommandDto target = objectMapper.readValue(payload,
                                 new TypeReference<RequestDto<DriverCommandDto>>() {
                                 }).getPayload();
-                        Element element = (Element) specDriver.findElement(target.getContext(), target.getSelector(), target.getParent());
+                        Element element = specDriver.findElement(target.getContext(), target.getSelector(), target.getParent());
                         findElement.setPayload(new ResponsePayload(element, null));
                     } catch (Exception e) {
                         ErrorDto err = new ErrorDto(e.getMessage(), Arrays.toString(e.getStackTrace()),"spec-driver",null);
@@ -140,6 +134,23 @@ public class PSDKListener extends USDKListener {
 
                     findElement.setKey(response.getKey());
                     webSocket.sendTextFrame(objectMapper.writeValueAsString(findElement));
+                    break;
+                case "Driver.findElements":
+                    ResponseDto<?> findElements = new ResponseDto<>();
+                    findElements.setName(response.getName());
+                    try {
+                        DriverCommandDto target = objectMapper.readValue(payload,
+                                new TypeReference<RequestDto<DriverCommandDto>>() {
+                                }).getPayload();
+                        List<Reference> elements = specDriver.findElements(target.getContext(), target.getSelector(), target.getParent());
+                        findElements.setPayload(new ResponsePayload(elements, null));
+                    } catch (Exception e) {
+                        ErrorDto err = new ErrorDto(e.getMessage(), Arrays.toString(e.getStackTrace()),"spec-driver",null);
+                        findElements.setPayload(new ResponsePayload<>(null, err));
+                    }
+
+                    findElements.setKey(response.getKey());
+                    webSocket.sendTextFrame(objectMapper.writeValueAsString(findElements));
                     break;
                 case "Driver.takeScreenshot":
                     ResponseDto<?> takeScreenshot = new ResponseDto<>();
@@ -260,148 +271,41 @@ public class PSDKListener extends USDKListener {
                     mainContext.setKey(response.getKey());
                     webSocket.sendTextFrame(objectMapper.writeValueAsString(mainContext));
                     break;
+
+                case "Core.makeManager":
+                case "EyesManager.openEyes":
+                case "Eyes.check":
+                case "Core.locate":
+                case "Eyes.close":
+                case "Eyes.abort":
+                case "EyesManager.closeAllEyes":
+                case "Eyes.locateText":
+                case "Eyes.extractText":
+                case "Core.getViewportSize":
+                case "EyesManager.closeManager":
+                case "Debug.getHistory":
+                case "Core.deleteTest":
+                case "Core.closeBatch":
+                    handleResponse(payload, typeReferences.get(response.getName()));
+                    break;
+                case "Server.log":
+                    try {
+                        LogResponseDto serverLogResponse = objectMapper.readValue(payload,
+                                new TypeReference<LogResponseDto>() {
+                                });
+                        String message = "eyes | " + new Timestamp(System.currentTimeMillis())
+                                + " | [" + serverLogResponse.getPayload().getLevel() + "] | "
+                                + serverLogResponse.getPayload().getMessage();
+                        logger.log(TraceLevel.Debug, Stage.GENERAL, message);
+                        System.out.println(message);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                    break;
+
+                default:
+                    throw new EyesException("Unknown server command " + response.getName());
             }
-
-            if (payload.contains("Core.makeManager") || payload.contains("EyesManager.openEyes")) {
-                try {
-                    ResponseDto<Reference> referenceResponseDto = objectMapper.readValue(payload, new TypeReference<ResponseDto<Reference>>() {
-                    });
-
-                    SyncTaskListener<ResponseDto<?>> syncTaskLister = map.get(referenceResponseDto.getKey());
-                    syncTaskLister.onComplete(referenceResponseDto);
-                    map.remove(referenceResponseDto.getKey());
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            }
-            // "Debug.getHistory" could contain "Eyes.check" inside since it is a command of eyes.
-            // getHistory is used in proxy tests.
-            else if(payload.contains("Eyes.check") && !payload.contains("Debug.getHistory")) {
-                try {
-                    ResponseDto<List<MatchResultDto>> checkResponse = objectMapper.readValue(payload, new TypeReference<ResponseDto<List<MatchResultDto>>>() {
-                    });
-                    SyncTaskListener<ResponseDto<?>> syncTaskLister = map.get(checkResponse.getKey());
-                    syncTaskLister.onComplete(checkResponse);
-                    map.remove(checkResponse.getKey());
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            } else if (payload.contains("Core.locate")) {
-                try {
-                    ResponseDto<Map<String, List<Region>>> locateResponse = objectMapper
-                            .readValue(payload, new TypeReference<ResponseDto<Map<String, List<Region>>>>() {
-                            });
-                    SyncTaskListener<ResponseDto<?>> syncTaskLister = map.get(locateResponse.getKey());
-                    syncTaskLister.onComplete(locateResponse);
-                    map.remove(locateResponse.getKey());
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            } else if (payload.contains("Eyes.close") || payload.contains("Eyes.abort") || payload.contains("EyesManager.closeAllEyes")) {
-                try {
-                    ResponseDto<List<CommandCloseResponseDto>> closeResponse = objectMapper.readValue(payload,
-                            new TypeReference<ResponseDto<List<CommandCloseResponseDto>>>() {
-                            });
-                    SyncTaskListener<ResponseDto<?>> syncTaskLister = map.get(closeResponse.getKey());
-                    syncTaskLister.onComplete(closeResponse);
-                    map.remove(closeResponse.getKey());
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            } else if (payload.contains("Eyes.locateText")) {
-                try {
-                    ResponseDto<Map<String, List<TextRegion>>> extractTextRegionsResponse = objectMapper
-                            .readValue(payload, new TypeReference<ResponseDto<Map<String, List<TextRegion>>>>() {
-                            });
-                    SyncTaskListener<ResponseDto<?>> syncTaskLister = map.get(extractTextRegionsResponse.getKey());
-                    syncTaskLister.onComplete(extractTextRegionsResponse);
-                    map.remove(extractTextRegionsResponse.getKey());
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            } else if (payload.contains("Eyes.extractText")) {
-                try {
-                    ResponseDto<List<String>> responseDto = objectMapper.readValue(payload, new TypeReference<ResponseDto<List<String>>>() {
-                    });
-                    SyncTaskListener<ResponseDto<?>> syncTaskLister = map.get(responseDto.getKey());
-                    syncTaskLister.onComplete(responseDto);
-                    map.remove(responseDto.getKey());
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            } else if (payload.contains("Core.getViewportSize")) {
-                try {
-                    ResponseDto<RectangleSizeDto> getViewportSizeResponse = objectMapper.readValue(payload, new TypeReference<ResponseDto<RectangleSizeDto>>() {
-                    });
-                    SyncTaskListener<ResponseDto<?>> syncTaskLister = map.get(getViewportSizeResponse.getKey());
-                    syncTaskLister.onComplete(getViewportSizeResponse);
-                    map.remove(getViewportSizeResponse.getKey());
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            } else if (payload.contains("EyesManager.closeManager")) {
-                try {
-                    ResponseDto<TestResultsSummaryDto> closeManagerResponse = objectMapper.readValue(payload,
-                            new TypeReference<ResponseDto<TestResultsSummaryDto>>() {
-                            });
-                    SyncTaskListener<ResponseDto<?>> syncTaskLister = map.get(closeManagerResponse.getKey());
-                    syncTaskLister.onComplete(closeManagerResponse);
-                    map.remove(closeManagerResponse.getKey());
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-
-            } else if (payload.contains("Debug.getHistory")) {
-                try {
-                    ResponseDto<DebugHistoryDto> debugHistoryResponse = objectMapper.readValue(payload,
-                            new TypeReference<ResponseDto<DebugHistoryDto>>() {
-                            });
-
-                    SyncTaskListener<ResponseDto<?>> syncTaskListener = map.get(debugHistoryResponse.getKey());
-                    syncTaskListener.onComplete(debugHistoryResponse);
-                    map.remove(debugHistoryResponse.getKey());
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            } else if (payload.contains("Core.deleteTest")) {
-                try {
-                    ResponseDto deleteTestResponse = objectMapper.readValue(payload,
-                            new TypeReference<ResponseDto>() {
-                            });
-
-                    SyncTaskListener<ResponseDto<?>> syncTaskListener = map.get(deleteTestResponse.getKey());
-                    syncTaskListener.onComplete(deleteTestResponse);
-                    map.remove(deleteTestResponse.getKey());
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            } else if (payload.contains("Core.closeBatch")) {
-                try {
-                    ResponseDto closeBatchResponse = objectMapper.readValue(payload,
-                            new TypeReference<ResponseDto>() {
-                            });
-
-                    SyncTaskListener<ResponseDto<?>> syncTaskListener = map.get(closeBatchResponse.getKey());
-                    syncTaskListener.onComplete(closeBatchResponse);
-                    map.remove(closeBatchResponse.getKey());
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            } else if (payload.contains("Server.log")) {
-                try {
-                    LogResponseDto serverLogResponse = objectMapper.readValue(payload,
-                            new TypeReference<LogResponseDto>() {
-                            });
-                    String message = "eyes | " + new Timestamp(System.currentTimeMillis())
-                            + " | [" + serverLogResponse.getPayload().getLevel() + "] | "
-                            + serverLogResponse.getPayload().getMessage();
-                    logger.log(TraceLevel.Debug, Stage.GENERAL, message);
-                    System.out.println(message);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            }
-
         } catch (Exception e) {
             e.printStackTrace();
         }

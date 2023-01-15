@@ -2,15 +2,17 @@ package com.applitools.eyes.playwright.universal.driver;
 
 import com.applitools.eyes.Padding;
 import com.applitools.eyes.universal.Reference;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class Selector extends Reference {
 
     @JsonProperty("type")
     private String type;
     @JsonProperty("selector")
     private String selector;
-    @JsonProperty("padding]")
+    @JsonProperty("padding")
     private Padding padding;
 
     public Selector() {

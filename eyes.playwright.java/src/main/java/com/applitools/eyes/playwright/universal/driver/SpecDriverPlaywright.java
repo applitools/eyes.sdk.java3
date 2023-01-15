@@ -113,8 +113,24 @@ public class SpecDriverPlaywright implements ISpecDriver {
     }
 
     @Override
-    public Element[] findElements() {
-        return (Element[]) ISpecDriver.super.findElements();
+    public List<Reference> findElements(Reference context, Reference selector, Reference parent) {
+        Object ctx = refer.deref(context.getApplitoolsRefId());
+        Object root = parent == null? ctx : refer.deref(parent.getApplitoolsRefId());
+
+        List<ElementHandle> elementHandles = new ArrayList<>();
+        if (root instanceof Frame) {
+            elementHandles = ((Frame) root).locator(((Selector)selector).getSelector()).elementHandles();
+        } else if (root instanceof Page) {
+            elementHandles = ((Page) root).locator(((Selector)selector).getSelector()).elementHandles();
+        }
+
+        return elementHandles.stream()
+                .map(elementHandle -> {
+                    Element element = new Element(elementHandle);
+                    element.setApplitoolsRefId(refer.ref(elementHandle));
+                    return element;
+                })
+                .collect(Collectors.toList());
     }
 
     @Override
