@@ -59,7 +59,4 @@ public class ClassicRunner extends EyesRunner {
         return listener.getRef();
     }
 
-    private SpecDriverPlaywright getSpec() {
-        return listener.getSpecDriver();
-    }
 }
