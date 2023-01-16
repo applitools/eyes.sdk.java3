@@ -48,10 +48,9 @@ public class SpecDriverPlaywright implements ISpecDriver {
 
     @Override
     public Context mainContext(Reference context) {
-        Frame frame = extractContextUtil(context);
-        Frame mainFrame = frame;
+        Frame mainFrame = extractContextUtil(context);
         while (mainFrame.parentFrame() != null) {
-            mainFrame = frame.parentFrame();
+            mainFrame = mainFrame.parentFrame();
         }
 
         Context frameContext = new Context();
