@@ -9,6 +9,7 @@ import com.applitools.eyes.locators.TextRegionSettings;
 import com.applitools.eyes.locators.VisualLocatorSettings;
 import com.applitools.eyes.playwright.universal.Refer;
 import com.applitools.eyes.playwright.universal.mapper.PlaywrightCheckSettingsMapper;
+import com.applitools.eyes.playwright.universal.mapper.PlaywrightOCRExtractSettingsDtoMapper;
 import com.applitools.eyes.selenium.StitchMode;
 import com.applitools.eyes.universal.CommandExecutor;
 import com.applitools.eyes.universal.Reference;
@@ -23,6 +24,7 @@ import com.microsoft.playwright.Page;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.URI;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -169,23 +171,28 @@ public class Eyes implements IEyesBase {
      * @return the extracted text
      */
     public List<String> extractText(BaseOcrRegion... ocrRegions) {
-//        List<OCRExtractSettingsDto> ocrExtractSettingsDtoList = ImageOCRExtractSettingsDtoMapper
-//                .toOCRExtractSettingsDtoList(Arrays.asList(ocrRegions));
+        if (!getIsOpen()) {
+            this.abort();
+            throw new EyesException("you must call open() before extractText");
+        }
+
+        List<OCRExtractSettingsDto> ocrExtractSettingsDtoList = PlaywrightOCRExtractSettingsDtoMapper
+                .toOCRExtractSettingsDtoList(Arrays.asList(ocrRegions), getRefer());
         ConfigurationDto configurationDto = ConfigurationMapper
                 .toConfigurationDto(configure(), false);
-//        OcrRegion ocrRegion = (OcrRegion) Arrays.asList(ocrRegions).get(0);
         Driver target = (Driver) getRefer().getPage(getDriver());
 
-        return extractTextDto(target, null, configurationDto);
+        return extractTextDto(target, ocrExtractSettingsDtoList, configurationDto);
     }
 
     /**
-     * Locate text. Formerly known as extractTextRegions
-     * @param image the image from which the location of the text will be extracted.
-     * @return mapping of the located text regions.
+     * Locate text. Formerly known as extractTextRegions.
+     *
+     * @param textRegionSettings  the image from which the location of the text will be extracted.
+     * @return mapping of the located text regions
      */
-    public Map<String, List<TextRegion>> extractTextRegions(TextRegionSettings image) {
-        OCRSearchSettingsDto ocrSearchSettingsDto = OCRSearchSettingsMapper.toOCRSearchSettingsDto(image);
+    public Map<String, List<TextRegion>> extractTextRegions(TextRegionSettings textRegionSettings) {
+        OCRSearchSettingsDto ocrSearchSettingsDto = OCRSearchSettingsMapper.toOCRSearchSettingsDto(textRegionSettings);
         ConfigurationDto configurationDto = ConfigurationMapper
                 .toConfigurationDto(configure(), false);
         Driver target = (Driver) getRefer().getPage(getDriver());
