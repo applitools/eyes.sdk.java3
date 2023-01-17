@@ -21,10 +21,10 @@ public class TFloatingRegionMapper {
         }
 
         if (getFloatingRegion instanceof FloatingRegionSelector) {
-            FloatingRegionBySelector floatingRegionBySelector = new FloatingRegionBySelector();
             FloatingRegionSelector selector = (FloatingRegionSelector) getFloatingRegion;
             selector.setApplitoolsRefId(refer.ref(getFloatingRegion));
 
+            FloatingRegionBySelector floatingRegionBySelector = new FloatingRegionBySelector();
             floatingRegionBySelector.setRegion(selector);
             floatingRegionBySelector.setRegionId(selector.getRegionId());
             floatingRegionBySelector.setMaxUpOffset(selector.getMaxUpOffset());
@@ -34,10 +34,10 @@ public class TFloatingRegionMapper {
             return floatingRegionBySelector;
 
         } else if (getFloatingRegion instanceof FloatingRegionElement) {
-            FloatingRegionByElement floatingRegionByElement = new FloatingRegionByElement();
             FloatingRegionElement element = (FloatingRegionElement) getFloatingRegion;
-            element.setApplitoolsRefId(refer.ref(getFloatingRegion));
+            element.setApplitoolsRefId(refer.ref(element.getElementHandle()));
 
+            FloatingRegionByElement floatingRegionByElement = new FloatingRegionByElement();
             floatingRegionByElement.setRegion(element);
             floatingRegionByElement.setRegionId(element.getRegionId());
             floatingRegionByElement.setMaxUpOffset(element.getMaxUpOffset());

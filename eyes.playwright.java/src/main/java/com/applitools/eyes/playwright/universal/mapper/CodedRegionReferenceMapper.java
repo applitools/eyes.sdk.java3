@@ -24,7 +24,7 @@ public class CodedRegionReferenceMapper {
 
         if (getSimpleRegion instanceof Element) {
             Element element = (Element) getSimpleRegion;
-            element.setApplitoolsRefId(refer.ref(getSimpleRegion));
+            element.setApplitoolsRefId(refer.ref(element.getElementHandle()));
             codedRegionReference.setRegion(element);
             codedRegionReference.setRegionId(((Element) getSimpleRegion).getRegionId());
             codedRegionReference.setPadding(((Element) getSimpleRegion).getPadding());

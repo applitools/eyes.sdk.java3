@@ -1,7 +1,9 @@
 package com.applitools.eyes.playwright.universal.mapper;
 
 import com.applitools.eyes.playwright.universal.Refer;
+import com.applitools.eyes.playwright.universal.driver.Element;
 import com.applitools.eyes.universal.Reference;
+import com.microsoft.playwright.ElementHandle;
 
 import java.util.List;
 
@@ -12,8 +14,13 @@ public class TFramesMapper {
         }
 
         for (Reference ref : frameChain) {
-            String refId = refer.ref(ref);
-            ref.setApplitoolsRefId(refId);
+
+            if (ref instanceof Element) {
+                ElementHandle elementHandle = ((Element) ref).getElementHandle();
+                ref.setApplitoolsRefId(refer.ref(elementHandle));
+            } else {
+                ref.setApplitoolsRefId(refer.ref(ref));
+            }
         }
 
         return frameChain;

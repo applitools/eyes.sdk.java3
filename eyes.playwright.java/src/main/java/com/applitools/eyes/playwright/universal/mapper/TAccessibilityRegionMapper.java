@@ -22,19 +22,19 @@ public class TAccessibilityRegionMapper {
         }
 
         if (getAccessibilityRegion instanceof AccessibilitySelector) {
-            AccessibilityRegionBySelector accessibilityRegionBySelector = new AccessibilityRegionBySelector();
             AccessibilitySelector selector = (AccessibilitySelector) getAccessibilityRegion;
             selector.setApplitoolsRefId(refer.ref(getAccessibilityRegion));
 
+            AccessibilityRegionBySelector accessibilityRegionBySelector = new AccessibilityRegionBySelector();
             accessibilityRegionBySelector.setRegion(selector);
             accessibilityRegionBySelector.setType(selector.getAccessibilityRegionType().name());
             return accessibilityRegionBySelector;
 
         } else if (getAccessibilityRegion instanceof AccessibilityElement) {
-            AccessibilityRegionByElement accessibilityRegionByElement = new AccessibilityRegionByElement();
             AccessibilityElement element = (AccessibilityElement) getAccessibilityRegion;
-            element.setApplitoolsRefId(refer.ref(getAccessibilityRegion));
+            element.setApplitoolsRefId(refer.ref(element.getElementHandle()));
 
+            AccessibilityRegionByElement accessibilityRegionByElement = new AccessibilityRegionByElement();
             accessibilityRegionByElement.setRegion(element);
             accessibilityRegionByElement.setType(element.getAccessibilityRegionType().name());
             return accessibilityRegionByElement;
