@@ -80,6 +80,8 @@ public class TestCloseBatch {
                 if (retries == 0) {
                     throw e;
                 }
+                try { Thread.sleep(2000); }
+                catch (InterruptedException ex) { ex.printStackTrace(); }
             }
         }
     }
