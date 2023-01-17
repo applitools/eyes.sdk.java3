@@ -19,14 +19,13 @@ public class ConfigurationMapper {
     ConfigurationDto dto = new ConfigurationDto();
 
     dto.setOpen(new OpenSettingsDto());
-    dto.setScreenshot(new CheckSettingsDto(new NormalizationDto()));
+    dto.setScreenshot(new CheckSettingsDto());
     dto.setCheck(new CheckSettingsDto());
     dto.setClose(new CloseSettingsDto());
 
     // EyesBaseConfig
-//    dto.setLogs(null);
-    dto.setDebugScreenshots(new DebugScreenshotHandlerDto(config.getSaveDebugScreenshots(),
-        config.getDebugScreenshotsPath(), config.getDebugScreenshotsPrefix()));
+    dto.setDebugScreenshots(toDebugScreenshots(config.getSaveDebugScreenshots(),
+            config.getDebugScreenshotsPath(), config.getDebugScreenshotsPrefix()));
     dto.setAgentId(config.getAgentId());
     dto.setApiKey(config.getApiKey());
     dto.setServerUrl(config.getServerUrl() == null ? null : config.getServerUrl().toString());
@@ -102,6 +101,14 @@ public class ConfigurationMapper {
 //    dto.setUseCeilForViewportSize(config.getUseCeilForViewportSize());
 
     return dto;
+  }
+
+  private static DebugScreenshotHandlerDto toDebugScreenshots(Boolean saveDebugScreenshots, String debugScreenshotsPath, String debugScreenshotsPrefix) {
+    if (saveDebugScreenshots == null && debugScreenshotsPath == null && debugScreenshotsPrefix == null) {
+      return null;
+    }
+
+    return new DebugScreenshotHandlerDto(saveDebugScreenshots, debugScreenshotsPath,debugScreenshotsPrefix);
   }
 
   private static ImageCropRectDto toImageCropRect(CutProvider cutProvider, ContentInset contentInset) {
