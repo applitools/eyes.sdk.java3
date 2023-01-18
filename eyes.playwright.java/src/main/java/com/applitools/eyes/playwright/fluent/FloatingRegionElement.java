@@ -1,6 +1,6 @@
 package com.applitools.eyes.playwright.fluent;
 
-import com.applitools.eyes.playwright.universal.driver.Element;
+import com.applitools.eyes.playwright.universal.dto.Element;
 import com.applitools.eyes.visualgrid.model.IGetFloatingRegionOffsets;
 import com.microsoft.playwright.ElementHandle;
 import com.microsoft.playwright.Locator;

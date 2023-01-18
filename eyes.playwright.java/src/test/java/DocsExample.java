@@ -3,7 +3,7 @@ import com.applitools.eyes.config.Configuration;
 import com.applitools.eyes.playwright.visualgrid.BrowserType;
 import com.applitools.eyes.playwright.ClassicRunner;
 import com.applitools.eyes.playwright.Eyes;
-import com.applitools.eyes.playwright.Target;
+import com.applitools.eyes.playwright.fluent.Target;
 import com.applitools.eyes.playwright.visualgrid.VisualGridRunner;
 import com.applitools.eyes.selenium.StitchMode;
 import com.applitools.eyes.visualgrid.services.RunnerOptions;

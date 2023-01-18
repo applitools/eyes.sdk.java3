@@ -1,4 +1,4 @@
-package com.applitools.eyes.playwright.universal.driver;
+package com.applitools.eyes.playwright.universal.dto;
 
 import com.applitools.eyes.WebDriverProxySettings;
 import com.applitools.eyes.universal.Reference;

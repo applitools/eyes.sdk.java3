@@ -2,7 +2,7 @@ package com.applitools.eyes.playwright.universal.mapper;
 
 import com.applitools.ICheckSettings;
 import com.applitools.eyes.config.Configuration;
-import com.applitools.eyes.playwright.PlaywrightCheckSettings;
+import com.applitools.eyes.playwright.fluent.PlaywrightCheckSettings;
 import com.applitools.eyes.playwright.universal.Refer;
 import com.applitools.eyes.universal.dto.CheckSettingsDto;
 import com.applitools.eyes.universal.dto.DebugScreenshotHandlerDto;

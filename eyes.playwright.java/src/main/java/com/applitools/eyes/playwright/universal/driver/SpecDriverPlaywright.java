@@ -2,6 +2,9 @@ package com.applitools.eyes.playwright.universal.driver;
 
 import com.applitools.eyes.playwright.universal.Refer;
 import com.applitools.eyes.playwright.universal.driver.dto.DriverInfoDto;
+import com.applitools.eyes.playwright.universal.dto.Context;
+import com.applitools.eyes.playwright.universal.dto.Element;
+import com.applitools.eyes.playwright.universal.dto.Selector;
 import com.applitools.eyes.universal.ISpecDriver;
 import com.applitools.eyes.universal.Reference;
 import com.applitools.eyes.universal.driver.ICookie;

@@ -1,4 +1,4 @@
-package com.applitools.eyes.playwright;
+package com.applitools.eyes.playwright.fluent;
 
 import com.applitools.eyes.Region;
 import com.microsoft.playwright.ElementHandle;
@@ -60,11 +60,21 @@ public class Target {
     /**
      * Specify the target as a frame.
      *
-     * @param selector the locator of the frame.
+     * @param frameNameOrId the locator of the frame.
      * @return the check settings
      */
-    public static PlaywrightCheckSettings frame(String selector) {
-        return new PlaywrightCheckSettings().frame(selector);
+    public static PlaywrightCheckSettings frame(String frameNameOrId) {
+        return new PlaywrightCheckSettings().frame(frameNameOrId);
+    }
+
+    /**
+     * Specify the target as a frame.
+     *
+     * @param frameIndex  the index of the frame.
+     * @return the check settings
+     */
+    public static PlaywrightCheckSettings frame(Integer frameIndex) {
+        return new PlaywrightCheckSettings().frame(frameIndex);
     }
 
     /**

@@ -1,7 +1,7 @@
 package com.applitools.eyes.playwright.fluent;
 
 import com.applitools.eyes.AccessibilityRegionType;
-import com.applitools.eyes.playwright.universal.driver.Element;
+import com.applitools.eyes.playwright.universal.dto.Element;
 import com.microsoft.playwright.ElementHandle;
 
 public class AccessibilityElement extends Element {

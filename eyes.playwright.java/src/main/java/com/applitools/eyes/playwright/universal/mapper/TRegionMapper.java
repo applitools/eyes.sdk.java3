@@ -2,9 +2,9 @@ package com.applitools.eyes.playwright.universal.mapper;
 
 import com.applitools.ICheckSettings;
 import com.applitools.eyes.Region;
-import com.applitools.eyes.playwright.PlaywrightCheckSettings;
+import com.applitools.eyes.playwright.fluent.PlaywrightCheckSettings;
 import com.applitools.eyes.playwright.universal.Refer;
-import com.applitools.eyes.playwright.universal.driver.Element;
+import com.applitools.eyes.playwright.universal.dto.Element;
 import com.applitools.eyes.universal.Reference;
 import com.applitools.eyes.universal.dto.TRegion;
 import com.applitools.eyes.universal.mapper.RectangleRegionMapper;

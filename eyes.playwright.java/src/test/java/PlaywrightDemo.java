@@ -2,8 +2,7 @@ import com.applitools.eyes.*;
 import com.applitools.eyes.playwright.ClassicRunner;
 import com.applitools.eyes.playwright.visualgrid.BrowserType;
 import com.applitools.eyes.playwright.Eyes;
-import com.applitools.eyes.playwright.Target;
-import com.applitools.eyes.selenium.ClassicRunner0;
+import com.applitools.eyes.playwright.fluent.Target;
 import com.microsoft.playwright.*;
 import org.testng.annotations.*;
 

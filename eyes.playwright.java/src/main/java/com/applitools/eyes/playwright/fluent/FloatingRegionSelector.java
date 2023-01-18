@@ -1,6 +1,6 @@
 package com.applitools.eyes.playwright.fluent;
 
-import com.applitools.eyes.playwright.universal.driver.Selector;
+import com.applitools.eyes.playwright.universal.dto.Selector;
 import com.applitools.eyes.visualgrid.model.IGetFloatingRegionOffsets;
 
 public class FloatingRegionSelector extends Selector implements IGetFloatingRegionOffsets {

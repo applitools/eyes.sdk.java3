@@ -1,4 +1,4 @@
-package com.applitools.eyes.playwright;
+package com.applitools.eyes.playwright.fluent;
 
 import com.applitools.ICheckSettings;
 

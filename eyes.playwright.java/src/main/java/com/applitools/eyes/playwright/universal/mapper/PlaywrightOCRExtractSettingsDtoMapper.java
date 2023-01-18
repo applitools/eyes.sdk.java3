@@ -3,8 +3,8 @@ package com.applitools.eyes.playwright.universal.mapper;
 import com.applitools.eyes.locators.BaseOcrRegion;
 import com.applitools.eyes.playwright.locators.OcrRegion;
 import com.applitools.eyes.playwright.universal.Refer;
-import com.applitools.eyes.playwright.universal.driver.Element;
-import com.applitools.eyes.playwright.universal.driver.Selector;
+import com.applitools.eyes.playwright.universal.dto.Element;
+import com.applitools.eyes.playwright.universal.dto.Selector;
 import com.applitools.eyes.universal.dto.OCRExtractSettingsDto;
 import com.applitools.eyes.universal.mapper.RectangleRegionMapper;
 

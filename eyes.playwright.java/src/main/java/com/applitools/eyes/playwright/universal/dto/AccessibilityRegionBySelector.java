@@ -1,7 +1,6 @@
 package com.applitools.eyes.playwright.universal.dto;
 
 import com.applitools.eyes.fluent.GetRegion;
-import com.applitools.eyes.playwright.universal.driver.Selector;
 import com.applitools.eyes.universal.dto.TAccessibilityRegion;
 import com.fasterxml.jackson.annotation.JsonInclude;
 

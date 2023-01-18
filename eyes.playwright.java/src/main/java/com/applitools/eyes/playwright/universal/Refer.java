@@ -1,6 +1,6 @@
 package com.applitools.eyes.playwright.universal;
 
-import com.applitools.eyes.playwright.universal.driver.Driver;
+import com.applitools.eyes.playwright.universal.dto.Driver;
 import com.microsoft.playwright.Page;
 
 import java.util.UUID;

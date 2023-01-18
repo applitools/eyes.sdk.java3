@@ -1,19 +1,18 @@
-package com.applitools.eyes.playwright.universal.driver;
+package com.applitools.eyes.playwright.universal.dto;
 
 import com.applitools.eyes.Padding;
 import com.applitools.eyes.universal.Reference;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.microsoft.playwright.ElementHandle;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class Element extends Reference {
+public class Selector extends Reference {
 
+    @JsonProperty("type")
     private String type;
 
-    @JsonIgnore
-    private ElementHandle elementHandle;
+    @JsonProperty("selector")
+    private String selector;
 
     @JsonProperty("padding")
     private Padding padding;
@@ -21,13 +20,13 @@ public class Element extends Reference {
     @JsonProperty("regionId")
     private String regionId;
 
-    public Element() {
-        this.type = "element";
+    public Selector() {
+
     }
 
-    public Element(ElementHandle element) {
-        this();
-        this.elementHandle = element;
+    public Selector(String selector) {
+        this.type = "selector";
+        this.selector = selector;
     }
 
     public String getType() {
@@ -38,20 +37,20 @@ public class Element extends Reference {
         this.type = type;
     }
 
-    public ElementHandle getElementHandle() {
-        return elementHandle;
+    public String getSelector() {
+        return selector;
     }
 
-    public void setElementHandle(ElementHandle elementHandle) {
-        this.elementHandle = elementHandle;
-    }
-
-    public Padding getPadding() {
-        return padding;
+    public void setSelector(String selector) {
+        this.selector = selector;
     }
 
     public void setPadding(Padding padding) {
         this.padding = padding;
+    }
+
+    public Padding getPadding() {
+        return padding;
     }
 
     public String getRegionId() {

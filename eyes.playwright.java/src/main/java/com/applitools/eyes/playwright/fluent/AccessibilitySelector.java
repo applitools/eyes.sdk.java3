@@ -1,7 +1,7 @@
 package com.applitools.eyes.playwright.fluent;
 
 import com.applitools.eyes.AccessibilityRegionType;
-import com.applitools.eyes.playwright.universal.driver.Selector;
+import com.applitools.eyes.playwright.universal.dto.Selector;
 
 public class AccessibilitySelector extends Selector {
 

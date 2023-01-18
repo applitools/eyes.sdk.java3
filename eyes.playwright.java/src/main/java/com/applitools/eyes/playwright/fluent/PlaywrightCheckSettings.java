@@ -1,16 +1,13 @@
-package com.applitools.eyes.playwright;
+package com.applitools.eyes.playwright.fluent;
 
 import com.applitools.eyes.*;
 import com.applitools.eyes.fluent.CheckSettings;
 import com.applitools.eyes.fluent.FloatingRegionByRectangle;
 import com.applitools.eyes.fluent.GetRegion;
 import com.applitools.eyes.fluent.SimpleRegionByRectangle;
-import com.applitools.eyes.playwright.fluent.AccessibilityElement;
-import com.applitools.eyes.playwright.fluent.AccessibilitySelector;
-import com.applitools.eyes.playwright.fluent.FloatingRegionElement;
-import com.applitools.eyes.playwright.fluent.FloatingRegionSelector;
-import com.applitools.eyes.playwright.universal.driver.Element;
-import com.applitools.eyes.playwright.universal.driver.Selector;
+import com.applitools.eyes.playwright.universal.dto.Element;
+import com.applitools.eyes.playwright.universal.dto.FrameLocator;
+import com.applitools.eyes.playwright.universal.dto.Selector;
 import com.applitools.eyes.selenium.StitchMode;
 import com.applitools.eyes.universal.Reference;
 import com.applitools.eyes.visualgrid.model.VisualGridOption;
@@ -27,7 +24,7 @@ public class PlaywrightCheckSettings extends CheckSettings implements IPlaywrigh
 
     private Reference targetElement;
     private Reference scrollRootElement;
-    private final List<Reference> frameChain = new ArrayList<>();
+    private final List<FrameLocator> frameChain = new ArrayList<>();
     private Boolean isDefaultLayoutBreakpointsSet;
     private final List<Integer> layoutBreakpoints = new ArrayList<>();
 
@@ -57,8 +54,16 @@ public class PlaywrightCheckSettings extends CheckSettings implements IPlaywrigh
         return clone;
     }
 
-    public PlaywrightCheckSettings frame(String selector) {
-        return frame(new Selector(selector));
+    public PlaywrightCheckSettings frame(String frameNameOrId) {
+        FrameLocator frameLocator = new FrameLocator();
+        frameLocator.setFrameNameOrId(frameNameOrId);
+        return frame(frameLocator);
+    }
+
+    public PlaywrightCheckSettings frame(Integer frameIndex) {
+        FrameLocator frameLocator = new FrameLocator();
+        frameLocator.setFrameIndex(frameIndex);
+        return frame(frameLocator);
     }
 
     public PlaywrightCheckSettings frame(Frame frame) {
@@ -74,14 +79,14 @@ public class PlaywrightCheckSettings extends CheckSettings implements IPlaywrigh
     }
 
     private PlaywrightCheckSettings frame(Element element) {
-        PlaywrightCheckSettings clone = this.clone();
-        clone.frameChain.add(element);
-        return clone;
+        FrameLocator frameLocator = new FrameLocator();
+        frameLocator.setFrameReference(element);
+        return frame(frameLocator);
     }
 
-    private PlaywrightCheckSettings frame(Selector selector) {
+    private PlaywrightCheckSettings frame(FrameLocator frameLocator) {
         PlaywrightCheckSettings clone = this.clone();
-        clone.frameChain.add(selector);
+        clone.frameChain.add(frameLocator);
         return clone;
     }
 
@@ -448,7 +453,11 @@ public class PlaywrightCheckSettings extends CheckSettings implements IPlaywrigh
 
     public PlaywrightCheckSettings scrollRootElement(String selector) {
         PlaywrightCheckSettings clone = this.clone();
-        clone.scrollRootElement = new Selector(selector);
+        if (frameChain.size() == 0) {
+            clone.scrollRootElement = new Selector(selector);
+        } else {
+            frameChain.get(frameChain.size() - 1).setScrollRootSelector(new Selector(selector));
+        }
         return clone;
     }
 
@@ -458,7 +467,11 @@ public class PlaywrightCheckSettings extends CheckSettings implements IPlaywrigh
 
     public PlaywrightCheckSettings scrollRootElement(ElementHandle element) {
         PlaywrightCheckSettings clone = this.clone();
-        clone.scrollRootElement = new Element(element);
+        if (frameChain.size() == 0) {
+            clone.scrollRootElement = new Element(element);
+        } else {
+            frameChain.get(frameChain.size() - 1).setScrollRootElement(new Element(element));
+        }
         return clone;
     }
 
@@ -664,12 +677,6 @@ public class PlaywrightCheckSettings extends CheckSettings implements IPlaywrigh
         clone.frameChain.addAll(this.frameChain);
         clone.isDefaultLayoutBreakpointsSet = this.isDefaultLayoutBreakpointsSet;
         clone.layoutBreakpoints.addAll(this.layoutBreakpoints);
-        clone.ignoreRegions.addAll(this.ignoreRegions);
-        clone.contentRegions.addAll(this.contentRegions);
-        clone.layoutRegions.addAll(this.layoutRegions);
-        clone.strictRegions.addAll(this.strictRegions);
-        clone.floatingRegions.addAll(this.floatingRegions);
-        clone.accessibilityRegions.addAll(this.accessibilityRegions);
         return clone;
     }
 
@@ -681,7 +688,7 @@ public class PlaywrightCheckSettings extends CheckSettings implements IPlaywrigh
         return scrollRootElement;
     }
 
-    public List<Reference> getFrameChain() {
+    public List<FrameLocator> getFrameChain() {
         return frameChain;
     }
 
