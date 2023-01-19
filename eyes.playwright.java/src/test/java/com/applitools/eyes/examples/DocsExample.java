@@ -1,3 +1,5 @@
+package com.applitools.eyes.examples;
+
 import com.applitools.eyes.*;
 import com.applitools.eyes.config.Configuration;
 import com.applitools.eyes.playwright.visualgrid.BrowserType;
