@@ -20,27 +20,22 @@ import java.util.*;
 public class PSDKListener extends USDKListener {
 
     /**
+     * refer
+     */
+    private final Refer ref = new Refer();
+
+    /**
      * spec driver
      */
     private final SpecDriverPlaywright specDriver;
 
-    /**
-     * refer
-     */
-    private final Refer ref;
-
     public PSDKListener() {
         super();
-        ref = new Refer();
         specDriver = new SpecDriverPlaywright(ref);
     }
 
-    public Refer getRef() {
+    public Refer getRefer() {
         return ref;
-    }
-
-    public SpecDriverPlaywright getSpecDriver() {
-        return specDriver;
     }
 
     @Override

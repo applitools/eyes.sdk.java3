@@ -12,10 +12,12 @@ public class Refer extends com.applitools.eyes.universal.Refer {
     }
 
     public void destroy() {
+        references.clear();
+        relations.clear();
     }
 
     /**
-     * generate a new UUID.
+     * store the driver's ref.
      *
      * @return the UUID
      */
@@ -56,5 +58,5 @@ public class Refer extends com.applitools.eyes.universal.Refer {
         return references.containsKey(applitoolsRefId);
     }
 
-    public Object getPage(Page page) { return relations.get(page); }
+    public Object getDriverTarget(Page page) { return relations.get(page); }
 }

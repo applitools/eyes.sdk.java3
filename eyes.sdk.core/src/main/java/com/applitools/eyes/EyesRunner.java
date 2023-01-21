@@ -211,4 +211,7 @@ public abstract class EyesRunner {
     return dontCloseBatches;
   }
 
+  protected Refer getRefer() {
+    return listener.getRefer();
+  }
 }

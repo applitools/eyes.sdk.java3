@@ -42,7 +42,7 @@ public class Eyes implements IEyesBase {
     private CommandExecutor commandExecutor;
 
     /**
-     * the configuration that will be used in eyes related requestes.
+     * the configuration that will be used in eyes related requests.
      */
     private Configuration configuration = new Configuration();
 
@@ -56,6 +56,9 @@ public class Eyes implements IEyesBase {
      */
     private boolean isClosed;
 
+    /**
+     * the playwright page associated with the test.
+     */
     private Page page;
 
 
@@ -68,7 +71,8 @@ public class Eyes implements IEyesBase {
 
     /**
      * Instantiates a new Eyes.
-     * @param runner0 the runner
+     *
+     * @param runner0  the runner
      */
     public Eyes(EyesRunner runner0) {
         this.runner = runner0 == null ? new ClassicRunner() : runner0;
@@ -76,9 +80,10 @@ public class Eyes implements IEyesBase {
     }
 
     /**
-     * Open page.
-     * @param page the page.
-     * @return the page.
+     * Starts a test.
+     *
+     * @param page   The web driver that controls the browser hosting the application under test.
+     * @return the page
      */
     public Page open(Page page) {
         return open(page, configuration.getAppName(), configuration.getTestName());
@@ -86,10 +91,11 @@ public class Eyes implements IEyesBase {
 
     /**
      * Starts a test.
-     * @param page   The web driver that controls the browser hosting the application under test.
-     * @param appName  The name of the application under test.
-     * @param testName The test name. (i.e., the visible part of the document's body) or {@code null} to use the current window's viewport.
-     * @return A wrapped WebDriver which enables SeleniumEyes trigger recording and frame handling.
+     *
+     * @param page      The web driver that controls the browser hosting the application under test.
+     * @param appName   The name of the application under test.
+     * @param testName  The test name. (i.e., the visible part of the document's body) or {@code null} to use the current window's viewport.
+     * @return the page
      */
     public Page open(Page page, String appName, String testName) {
         return open(page, appName, testName, configuration.getViewportSize());
@@ -97,11 +103,12 @@ public class Eyes implements IEyesBase {
 
     /**
      * Starts a test.
-     * @param page       The web driver that controls the browser hosting the application under test.
-     * @param appName      The name of the application under test.
-     * @param testName     The test name.
-     * @param viewportSize The required browser's viewport size (i.e., the visible part of the document's body) or {@code null} to use the current window's viewport.
-     * @return A wrapped WebDriver which enables SeleniumEyes trigger recording and frame handling. {@code sessionType} defaults to {@code null}.
+     *
+     * @param page          The web driver that controls the browser hosting the application under test.
+     * @param appName       The name of the application under test.
+     * @param testName      The test name.
+     * @param viewportSize  The required browser's viewport size (i.e., the visible part of the document's body) or {@code null} to use the current window's viewport.
+     * @return the page
      */
     public Page open(Page page, String appName, String testName,
                           RectangleSize viewportSize) {
@@ -157,7 +164,7 @@ public class Eyes implements IEyesBase {
 
         CheckSettingsDto checkSettingsDto = PlaywrightCheckSettingsMapper.toCheckSettingsDto(playwrightCheckSettings, configure(), getRefer());
 
-        Driver target = (Driver) getRefer().getPage(getDriver());
+        Driver target = (Driver) getRefer().getDriverTarget(getDriver());
         checkDto(checkSettingsDto, target);
     }
 
@@ -174,14 +181,14 @@ public class Eyes implements IEyesBase {
     public List<String> extractText(BaseOcrRegion... ocrRegions) {
         if (!getIsOpen()) {
             this.abort();
-            throw new EyesException("you must call open() before extractText");
+            throw new EyesException("Eyes not open");
         }
 
         List<OCRExtractSettingsDto> ocrExtractSettingsDtoList = PlaywrightOCRExtractSettingsDtoMapper
                 .toOCRExtractSettingsDtoList(Arrays.asList(ocrRegions), getRefer());
         ConfigurationDto configurationDto = ConfigurationMapper
                 .toConfigurationDto(configure(), false);
-        Driver target = (Driver) getRefer().getPage(getDriver());
+        Driver target = (Driver) getRefer().getDriverTarget(getDriver());
 
         return extractTextDto(target, ocrExtractSettingsDtoList, configurationDto);
     }
@@ -196,7 +203,7 @@ public class Eyes implements IEyesBase {
         OCRSearchSettingsDto ocrSearchSettingsDto = OCRSearchSettingsMapper.toOCRSearchSettingsDto(textRegionSettings);
         ConfigurationDto configurationDto = ConfigurationMapper
                 .toConfigurationDto(configure(), false);
-        Driver target = (Driver) getRefer().getPage(getDriver());
+        Driver target = (Driver) getRefer().getDriverTarget(getDriver());
 
         return locateTextDto(target, ocrSearchSettingsDto, configurationDto);
     }
@@ -211,7 +218,7 @@ public class Eyes implements IEyesBase {
 
         if (!getIsOpen()) {
             this.abort();
-            throw new EyesException("you must call open() before locate");
+            throw new EyesException("Eyes not open");
         }
 
         VisualLocatorSettingsDto visualLocatorSettingsDto = VisualLocatorSettingsMapper
@@ -219,7 +226,7 @@ public class Eyes implements IEyesBase {
 
         ConfigurationDto configurationDto = ConfigurationMapper
                 .toConfigurationDto(configure(), false);
-        Driver target = (Driver) getRefer().getPage(getDriver());
+        Driver target = (Driver) getRefer().getDriverTarget(getDriver());
 
         return locateDto(target, visualLocatorSettingsDto, configurationDto);
     }
@@ -256,6 +263,7 @@ public class Eyes implements IEyesBase {
         List<CommandCloseResponseDto> closeResponse = commandExecutor.close(eyesRef, settings, configurationDto, true);
         this.eyesRef = null;
         isClosed = true;
+        getRefer().destroy();
         List<TestResults> testResults = TestResultsMapper.toTestResultsList(closeResponse);
         if (testResults == null)
             return null;
@@ -371,16 +379,6 @@ public class Eyes implements IEyesBase {
      * @param ms Total number of ms to wait for a match.
      */
     public Configuration setMatchTimeout(int ms) {
-        final int MIN_MATCH_TIMEOUT = 500;
-        if (getIsDisabled()) {
-            return configure();
-        }
-
-        if ((ms != 0) && (MIN_MATCH_TIMEOUT > ms)) {
-            throw new IllegalArgumentException("Match timeout must be set in milliseconds, and must be > " +
-                    MIN_MATCH_TIMEOUT);
-        }
-
         return configure().setMatchTimeout(ms);
     }
 
@@ -778,6 +776,7 @@ public class Eyes implements IEyesBase {
         List<CommandCloseResponseDto> closeResponse = commandExecutor.close(eyesRef, settings, configurationDto, false);
         this.eyesRef = null;
         isClosed = true;
+        getRefer().destroy();
         if (closeResponse != null) {
             List<TestResults> testResults = TestResultsMapper.toTestResultsList(closeResponse);
             testResults.forEach(testResults1 -> runner.logSessionResultsAndThrowException(false, testResults1));
@@ -789,6 +788,7 @@ public class Eyes implements IEyesBase {
         if (!isClosed && getIsOpen()) {
             commandExecutor.abort(eyesRef, false);
             this.eyesRef = null;
+            getRefer().destroy();
         }
     }
 
@@ -798,6 +798,7 @@ public class Eyes implements IEyesBase {
             List<CommandCloseResponseDto> abortResponse = commandExecutor.abort(eyesRef, true);
             List<TestResults> testResults = TestResultsMapper.toTestResultsList(abortResponse);
             this.eyesRef = null;
+            getRefer().destroy();
             if (testResults != null) {
                 return testResults.isEmpty() ? null : testResults.get(0);
             }
@@ -884,7 +885,7 @@ public class Eyes implements IEyesBase {
 
     private Refer getRefer() {
         try {
-            Method getRef = runner.getClass().getDeclaredMethod("getRef");
+            Method getRef = runner.getClass().getDeclaredMethod("getRefer");
             getRef.setAccessible(true);
             return (Refer) getRef.invoke(runner);
         } catch (IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {

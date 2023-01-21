@@ -224,4 +224,8 @@ public class USDKListener implements WebSocketListener {
             e.printStackTrace();
         }
     }
+
+    public Refer getRefer() {
+        return null;
+    }
 }

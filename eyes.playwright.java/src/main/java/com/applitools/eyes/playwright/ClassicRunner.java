@@ -55,8 +55,9 @@ public class ClassicRunner extends EyesRunner {
         return new PlaywrightStaleElementReferenceException();
     }
 
-    private Refer getRef() {
-        return listener.getRef();
+    @Override
+    protected Refer getRefer() {
+        return listener.getRefer();
     }
 
 }

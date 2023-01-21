@@ -54,6 +54,9 @@ public class VisualGridRunner extends EyesRunner {
      */
     protected static String[] COMMANDS = SpecDriverPlaywright.getMethodNames();
 
+    /**
+     * webSocket listener
+     */
     private static PSDKListener listener = new PSDKListener();
 
     private static final int CONCURRENCY_FACTOR = 5;
@@ -64,10 +67,6 @@ public class VisualGridRunner extends EyesRunner {
     private RunnerOptions runnerOptions;
 
     public VisualGridRunner() {
-        this(Thread.currentThread().getStackTrace()[2].getClassName());
-    }
-
-    public VisualGridRunner(String suiteName) {
         super(BASE_AGENT_ID, VERSION, PROTOCOL, COMMANDS, listener);
         this.testConcurrency = new TestConcurrency();
         this.runnerOptions = new RunnerOptions().testConcurrency(testConcurrency.actualConcurrency);
@@ -75,21 +74,13 @@ public class VisualGridRunner extends EyesRunner {
     }
 
     public VisualGridRunner(int testConcurrency) {
-        this(testConcurrency, Thread.currentThread().getStackTrace()[2].getClassName());
-    }
-
-    public VisualGridRunner(int testConcurrency0, String suiteName) {
         super(BASE_AGENT_ID, VERSION, PROTOCOL, COMMANDS, listener);
-        this.testConcurrency = new TestConcurrency(testConcurrency0, true);
-        this.runnerOptions = new RunnerOptions().testConcurrency(testConcurrency.actualConcurrency);
-        managerRef = commandExecutor.coreMakeManager(ManagerType.VISUAL_GRID.value, testConcurrency.userConcurrency, testConcurrency.actualConcurrency, BASE_AGENT_ID);
+        this.testConcurrency = new TestConcurrency(testConcurrency, true);
+        this.runnerOptions = new RunnerOptions().testConcurrency(this.testConcurrency.actualConcurrency);
+        managerRef = commandExecutor.coreMakeManager(ManagerType.VISUAL_GRID.value, this.testConcurrency.userConcurrency, this.testConcurrency.actualConcurrency, BASE_AGENT_ID);
     }
 
     public VisualGridRunner(RunnerOptions runnerOptions) {
-        this(runnerOptions, Thread.currentThread().getStackTrace()[2].getClassName());
-    }
-
-    public VisualGridRunner(RunnerOptions runnerOptions, String suiteName) {
         super(BASE_AGENT_ID, VERSION, PROTOCOL, COMMANDS, listener, runnerOptions);
         this.runnerOptions = runnerOptions;
         int testConcurrency0 = runnerOptions.getTestConcurrency() == null ? DEFAULT_CONCURRENCY : runnerOptions.getTestConcurrency();
@@ -104,11 +95,11 @@ public class VisualGridRunner extends EyesRunner {
         managerRef = commandExecutor.coreMakeManager(ManagerType.VISUAL_GRID.value, testConcurrency.userConcurrency, testConcurrency.actualConcurrency, BASE_AGENT_ID);
     }
 
-    protected VisualGridRunner(int testConcurrency0, String baseAgentId, String version) {
+    protected VisualGridRunner(int testConcurrency, String baseAgentId, String version) {
         super(baseAgentId, version, PROTOCOL, COMMANDS, listener);
-        this.testConcurrency = new TestConcurrency(testConcurrency0, true);
-        this.runnerOptions = new RunnerOptions().testConcurrency(testConcurrency.actualConcurrency);
-        managerRef = commandExecutor.coreMakeManager(ManagerType.VISUAL_GRID.value, testConcurrency.userConcurrency, testConcurrency.actualConcurrency, BASE_AGENT_ID);
+        this.testConcurrency = new TestConcurrency(testConcurrency, true);
+        this.runnerOptions = new RunnerOptions().testConcurrency(this.testConcurrency.actualConcurrency);
+        managerRef = commandExecutor.coreMakeManager(ManagerType.VISUAL_GRID.value, this.testConcurrency.userConcurrency, this.testConcurrency.actualConcurrency, BASE_AGENT_ID);
     }
 
     protected VisualGridRunner(RunnerOptions runnerOptions,  String baseAgentId, String version) {
@@ -151,8 +142,9 @@ public class VisualGridRunner extends EyesRunner {
         return this.isDisabled;
     }
 
-    private Refer getRef() {
-        return listener.getRef();
+    @Override
+    protected Refer getRefer() {
+        return listener.getRefer();
     }
 
 }
