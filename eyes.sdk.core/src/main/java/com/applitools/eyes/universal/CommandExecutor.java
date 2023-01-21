@@ -26,7 +26,7 @@ public class CommandExecutor {
   private static StaleElementReferenceException staleElementReferenceException;
 
   public static CommandExecutor getInstance(String name, String version, String protocol, String[] commands,
-                                                        USDKListener listener, StaleElementReferenceException e) {
+                                            USDKListener listener, StaleElementReferenceException e) {
     if (instance == null) {
       synchronized (CommandExecutor.class) {
         if (instance == null) {
@@ -49,7 +49,7 @@ public class CommandExecutor {
     MakeCore makeCore = new MakeCore(name, version, cwd, protocol, commands);
     request.setName("Core.makeCore");
     request.setPayload(makeCore);
-    checkedCommand(request, false);
+    checkedCommand(request);
   }
 
   // TODO - agentId is currently null because this will set the agentID incorrectly in the dashboard/logs
@@ -58,15 +58,15 @@ public class CommandExecutor {
     request.setName("Core.makeManager");
     request.setKey(UUID.randomUUID().toString());
     request.setPayload(new MakeManager(type, concurrency, legacyConcurrency, null));
-    SyncTaskListener syncTaskListener = checkedCommand(request, true);
+    SyncTaskListener syncTaskListener = checkedCommand(request);
+
     ResponseDto<Reference> makeManagerResponse = (ResponseDto<Reference>) syncTaskListener.get();
     if (makeManagerResponse != null && makeManagerResponse.getPayload().getError() != null) {
       String message = makeManagerResponse.getPayload().getError().getMessage();
       if (message != null && message.contains("stale element reference")) {
         staleElementReferenceException.throwException(message);
       }
-      ErrorDto error = makeManagerResponse.getPayload().getError();
-      throw new EyesException("Message: " +  error.getMessage() + ", Stack: " +  error.getStack());
+      throw new EyesException(message);
     }
     return makeManagerResponse.getPayload().getResult();
   }
@@ -76,7 +76,8 @@ public class CommandExecutor {
     request.setName("EyesManager.openEyes");
     request.setKey(UUID.randomUUID().toString());
     request.setPayload(new OpenEyes(ref, target, settings, config));
-    SyncTaskListener syncTaskListener = checkedCommand(request, true);
+
+    SyncTaskListener syncTaskListener = checkedCommand(request);
     ResponseDto<Reference> referenceResponseDto = (ResponseDto<Reference>) syncTaskListener.get();
 
     if (referenceResponseDto != null && referenceResponseDto.getPayload().getError() != null) {
@@ -85,7 +86,10 @@ public class CommandExecutor {
         staleElementReferenceException.throwException(message);
       }
       ErrorDto error = referenceResponseDto.getPayload().getError();
-      throw new EyesException("Message: " +  error.getMessage() + ", Stack: " +  error.getStack());
+      if (error.getReason() != null && error.getReason().equals("spec-driver")) {
+        throw new EyesException("Message: " +  error.getMessage() + ", Stack: " +  error.getStack());
+      }
+      throw new EyesException(message);
     }
     return referenceResponseDto.getPayload().getResult();
   }
@@ -95,7 +99,8 @@ public class CommandExecutor {
     request.setName("Eyes.check");
     request.setKey(UUID.randomUUID().toString());
     request.setPayload(new CheckEyes(eyesRef, target, settings, config, settings.getType()));
-    SyncTaskListener syncTaskListener = checkedCommand(request, true);
+    SyncTaskListener syncTaskListener = checkedCommand(request);
+
     ResponseDto<MatchResultDto> checkResponse = (ResponseDto<MatchResultDto>) syncTaskListener.get();
     if (checkResponse != null && checkResponse.getPayload().getError() != null) {
       String message = checkResponse.getPayload().getError().getMessage();
@@ -103,7 +108,10 @@ public class CommandExecutor {
         staleElementReferenceException.throwException(message);
       }
       ErrorDto error = checkResponse.getPayload().getError();
-      throw new EyesException("Message: " +  error.getMessage() + ", Stack: " +  error.getStack());
+      if (error.getReason() != null && error.getReason().equals("spec-driver")) {
+        throw new EyesException("Message: " +  error.getMessage() + ", Stack: " +  error.getStack());
+      }
+      throw new EyesException(message);
     }
   }
 
@@ -112,7 +120,8 @@ public class CommandExecutor {
     request.setName("Core.locate");
     request.setKey(UUID.randomUUID().toString());
     request.setPayload(new LocateDto(target, locatorSettingsDto, config));
-    SyncTaskListener syncTaskListener = checkedCommand(request, true);
+    SyncTaskListener syncTaskListener = checkedCommand(request);
+
     ResponseDto<Map<String, List<Region>>> locateResponse = (ResponseDto<Map<String, List<Region>>>) syncTaskListener.get();
     if (locateResponse != null && locateResponse.getPayload().getError() != null) {
       String message = locateResponse.getPayload().getError().getMessage();
@@ -120,7 +129,10 @@ public class CommandExecutor {
         staleElementReferenceException.throwException(message);
       }
       ErrorDto error = locateResponse.getPayload().getError();
-      throw new EyesException("Message: " +  error.getMessage() + ", Stack: " +  error.getStack());
+      if (error.getReason() != null && error.getReason().equals("spec-driver")) {
+        throw new EyesException("Message: " +  error.getMessage() + ", Stack: " +  error.getStack());
+      }
+      throw new EyesException(message);
     }
     return locateResponse.getPayload().getResult();
   }
@@ -131,7 +143,8 @@ public class CommandExecutor {
     request.setName("Eyes.locateText");
     request.setKey(UUID.randomUUID().toString());
     request.setPayload(new LocateTextDto(eyesRef, target, searchSettingsDto, config));
-    SyncTaskListener syncTaskListener = checkedCommand(request, true);
+    SyncTaskListener syncTaskListener = checkedCommand(request);
+
     ResponseDto<Map<String, List<TextRegion>>> locateTextResponse = (ResponseDto<Map<String, List<TextRegion>>>) syncTaskListener.get();
     if (locateTextResponse != null && locateTextResponse.getPayload().getError() != null) {
       String message = locateTextResponse.getPayload().getError().getMessage();
@@ -139,7 +152,10 @@ public class CommandExecutor {
         staleElementReferenceException.throwException(message);
       }
       ErrorDto error = locateTextResponse.getPayload().getError();
-      throw new EyesException("Message: " +  error.getMessage() + ", Stack: " +  error.getStack());
+      if (error.getReason() != null && error.getReason().equals("spec-driver")) {
+        throw new EyesException("Message: " +  error.getMessage() + ", Stack: " +  error.getStack());
+      }
+      throw new EyesException(message);
     }
     return locateTextResponse.getPayload().getResult();
 
@@ -150,7 +166,8 @@ public class CommandExecutor {
     request.setName("Eyes.extractText");
     request.setKey(UUID.randomUUID().toString());
     request.setPayload(new ExtractTextDto(eyesRef, target, extractSettingsDtoList, config));
-    SyncTaskListener syncTaskListener = checkedCommand(request, true);
+    SyncTaskListener syncTaskListener = checkedCommand(request);
+
     ResponseDto<List<String>> extractTextResponse = (ResponseDto<List<String>>) syncTaskListener.get();
     if (extractTextResponse != null && extractTextResponse.getPayload().getError() != null) {
       String message = extractTextResponse.getPayload().getError().getMessage();
@@ -158,7 +175,10 @@ public class CommandExecutor {
         staleElementReferenceException.throwException(message);
       }
       ErrorDto error = extractTextResponse.getPayload().getError();
-      throw new EyesException("Message: " +  error.getMessage() + ", Stack: " +  error.getStack());
+      if (error.getReason() != null && error.getReason().equals("spec-driver")) {
+        throw new EyesException("Message: " +  error.getMessage() + ", Stack: " +  error.getStack());
+      }
+      throw new EyesException(message);
     }
     return extractTextResponse.getPayload().getResult();
   }
@@ -168,7 +188,8 @@ public class CommandExecutor {
     request.setName("Eyes.checkAndClose");
     request.setKey(UUID.randomUUID().toString());
     request.setPayload(new CommandCheckAndCloseRequestDto(eyesRef, target, checkSettings, closeSettings, config));
-    SyncTaskListener syncTaskListener = checkedCommand(request, true);
+    SyncTaskListener syncTaskListener = checkedCommand(request);
+
     ResponseDto<List<CommandCloseResponseDto>> closeResponse = (ResponseDto<List<CommandCloseResponseDto>>) syncTaskListener.get();
     if (closeResponse != null && closeResponse.getPayload().getError() != null) {
       String message = closeResponse.getPayload().getError().getMessage();
@@ -187,10 +208,11 @@ public class CommandExecutor {
     request.setName("Eyes.close");
     request.setKey(UUID.randomUUID().toString());
     request.setPayload(new CommandCloseRequestDto(eyesRef, closeSettings, config));
-    SyncTaskListener syncTaskListener = checkedCommand(request, waitResult);
+    SyncTaskListener syncTaskListener = checkedCommand(request);
     if (!waitResult) {
       return null;
     }
+
     ResponseDto<List<CommandCloseResponseDto>> closeResponse = (ResponseDto<List<CommandCloseResponseDto>>) syncTaskListener.get();
     if (closeResponse != null && closeResponse.getPayload() != null && closeResponse.getPayload().getError() != null) {
       String message = closeResponse.getPayload().getError().getMessage();
@@ -198,7 +220,10 @@ public class CommandExecutor {
         staleElementReferenceException.throwException(message);
       }
       ErrorDto error = closeResponse.getPayload().getError();
-      throw new EyesException("Message: " +  error.getMessage() + ", Stack: " +  error.getStack());
+      if (error.getReason() != null && error.getReason().equals("spec-driver")) {
+        throw new EyesException("Message: " +  error.getMessage() + ", Stack: " +  error.getStack());
+      }
+      throw new EyesException(message);
     }
 
     return closeResponse.getPayload().getResult();
@@ -209,18 +234,18 @@ public class CommandExecutor {
     request.setName("Eyes.abort");
     request.setKey(UUID.randomUUID().toString());
     request.setPayload(new CommandAbortRequestDto(eyesRef));
-    SyncTaskListener syncTaskListener = checkedCommand(request, waitResult);
+    SyncTaskListener syncTaskListener = checkedCommand(request);
     if (!waitResult) {
       return null;
     }
+
     ResponseDto<List<CommandCloseResponseDto>> abortResponse = (ResponseDto<List<CommandCloseResponseDto>>) syncTaskListener.get();
     if (abortResponse != null && abortResponse.getPayload().getError() != null) {
       String message = abortResponse.getPayload().getError().getMessage();
       if (message != null && message.contains("stale element reference")) {
         staleElementReferenceException.throwException(message);
       }
-      ErrorDto error = abortResponse.getPayload().getError();
-      throw new EyesException("Message: " +  error.getMessage() + ", Stack: " +  error.getStack());
+      throw new EyesException(message);
     }
     return abortResponse.getPayload().getResult();
   }
@@ -230,15 +255,15 @@ public class CommandExecutor {
     request.setName("EyesManager.closeAllEyes");
     request.setKey(UUID.randomUUID().toString());
     request.setPayload(new CommandCloseAllEyesRequestDto(managerRef));
-    SyncTaskListener syncTaskListener = checkedCommand(request, true);
+    SyncTaskListener syncTaskListener = checkedCommand(request);
+
     ResponseDto<List<CommandCloseResponseDto>> closeResponse = (ResponseDto<List<CommandCloseResponseDto>>) syncTaskListener.get();
     if (closeResponse != null && closeResponse.getPayload().getError() != null) {
       String message = closeResponse.getPayload().getError().getMessage();
       if (message != null && message.contains("stale element reference")) {
         staleElementReferenceException.throwException(message);
       }
-      ErrorDto error = closeResponse.getPayload().getError();
-      throw new EyesException("Message: " +  error.getMessage() + ", Stack: " +  error.getStack());
+      throw new EyesException(message);
     }
     return closeResponse.getPayload().getResult();
   }
@@ -248,7 +273,8 @@ public class CommandExecutor {
     request.setName("EyesManager.closeManager");
     request.setKey(UUID.randomUUID().toString());
     request.setPayload(new CommandCloseManagerRequestDto(managerRef, throwError));
-    SyncTaskListener syncTaskListener = checkedCommand(request, true);
+    SyncTaskListener syncTaskListener = checkedCommand(request);
+
     ResponseDto<TestResultsSummaryDto> closeResponse = (ResponseDto<TestResultsSummaryDto>) syncTaskListener.get();
     if (closeResponse != null && closeResponse.getPayload() != null) {
         if (closeResponse.getPayload().getError() != null) {
@@ -260,7 +286,7 @@ public class CommandExecutor {
             throwExceptionBasedOnReason(error.getReason(), error.getInfo() == null ?
                     null : error.getInfo().getResult());
           } else {
-            throw new EyesException("Message: " +  error.getMessage() + ", Stack: " +  error.getStack());
+            throw new EyesException(message);
           }
         } else {
           return closeResponse.getPayload().getResult();
@@ -274,7 +300,8 @@ public class CommandExecutor {
     request.setName("Core.getViewportSize");
     request.setKey(UUID.randomUUID().toString());
     request.setPayload(new CommandGetViewportSizeRequestDto(driver));
-    SyncTaskListener syncTaskListener = checkedCommand(request, true);
+    SyncTaskListener syncTaskListener = checkedCommand(request);
+
     ResponseDto<RectangleSizeDto> getViewportSizeResponse = (ResponseDto<RectangleSizeDto>) syncTaskListener.get();
     return getViewportSizeResponse.getPayload().getResult();
   }
@@ -283,7 +310,8 @@ public class CommandExecutor {
     RequestDto request = new RequestDto<>();
     request.setName("Debug.getHistory");
     request.setKey(UUID.randomUUID().toString());
-    SyncTaskListener syncTaskListener = checkedCommand(request, true);
+    SyncTaskListener syncTaskListener = checkedCommand(request);
+
     ResponseDto<DebugHistoryDto> getDebugHistory = (ResponseDto<DebugHistoryDto>) syncTaskListener.get();
     return getDebugHistory.getPayload().getResult();
   }
@@ -293,7 +321,7 @@ public class CommandExecutor {
     request.setName("Core.deleteTest");
     request.setKey(UUID.randomUUID().toString());
     request.setPayload(new CommandDeleteTestRequestDto(settings));
-    SyncTaskListener syncTaskListener = checkedCommand(request, true);
+    SyncTaskListener syncTaskListener = checkedCommand(request);
 
     ResponseDto deleteTestResponse = (ResponseDto) syncTaskListener.get();
     if (deleteTestResponse != null && deleteTestResponse.getPayload().getError() != null) {
@@ -307,7 +335,7 @@ public class CommandExecutor {
     request.setName("Core.closeBatch");
     request.setKey(UUID.randomUUID().toString());
     request.setPayload(new CommandCloseBatchRequestDto(settings));
-    SyncTaskListener syncTaskListener = checkedCommand(request, true);
+    SyncTaskListener syncTaskListener = checkedCommand(request);
 
     ResponseDto closeBatchResponse = (ResponseDto) syncTaskListener.get();
     if (closeBatchResponse != null && closeBatchResponse.getPayload().getError() != null) {
@@ -316,9 +344,9 @@ public class CommandExecutor {
     }
   }
 
-  public static SyncTaskListener checkedCommand(Command command, boolean waitResult) {
+  public static SyncTaskListener checkedCommand(Command command) {
     try {
-      return connection.executeCommand(command, waitResult);
+      return connection.executeCommand(command);
     } catch (Exception e) {
       e.printStackTrace();
     }

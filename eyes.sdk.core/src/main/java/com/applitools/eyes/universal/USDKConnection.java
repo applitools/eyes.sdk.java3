@@ -44,7 +44,7 @@ public class USDKConnection {
 
   }
 
-  public synchronized SyncTaskListener executeCommand(Command command, boolean waitResult) throws Exception {
+  public synchronized SyncTaskListener executeCommand(Command command) throws Exception {
     if (command instanceof EventDto<?>) {
       webSocket.sendTextFrame(listener.objectMapper.writeValueAsString(command));
       return null;
@@ -56,6 +56,5 @@ public class USDKConnection {
     webSocket.sendTextFrame(listener.objectMapper.writeValueAsString(request));
     return syncTaskListener;
   }
-
 
 }
