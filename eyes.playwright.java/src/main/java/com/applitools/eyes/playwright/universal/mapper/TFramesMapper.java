@@ -5,6 +5,7 @@ import com.applitools.eyes.playwright.universal.dto.Element;
 import com.applitools.eyes.playwright.universal.dto.FrameLocator;
 import com.applitools.eyes.playwright.universal.dto.Selector;
 import com.applitools.eyes.universal.dto.ContextReferenceDto;
+import com.google.common.base.Strings;
 import com.microsoft.playwright.ElementHandle;
 
 import java.util.List;
@@ -20,7 +21,7 @@ public class TFramesMapper {
         ContextReferenceDto contextReferenceDto = new ContextReferenceDto();
 
         String frameNameOrId = frame.getFrameNameOrId();
-        if (frameNameOrId != null || !frameNameOrId.equals("")) {
+        if (!Strings.isNullOrEmpty(frameNameOrId)) {
             contextReferenceDto.setFrame(frameNameOrId);
         }
 
