@@ -4,6 +4,7 @@ import com.applitools.eyes.EyesRunner;
 import com.applitools.eyes.exceptions.StaleElementReferenceException;
 import com.applitools.eyes.images.universal.mapper.ImageStaleElementReferenceException;
 import com.applitools.eyes.universal.ManagerType;
+import com.applitools.eyes.universal.USDKListener;
 import com.applitools.utils.ClassVersionGetter;
 
 public class ImageRunner extends EyesRunner {
@@ -18,6 +19,11 @@ public class ImageRunner extends EyesRunner {
     protected static String VERSION = ClassVersionGetter.CURRENT_VERSION;
 
     /**
+     * universal server listener
+     */
+    private static final USDKListener listener = USDKListener.getInstance();
+
+    /**
      * used for instantiating Image Runner
      */
     public ImageRunner() {
@@ -28,8 +34,7 @@ public class ImageRunner extends EyesRunner {
      * used for instantiating Image Runner
      */
     public ImageRunner(String baseAgentId, String version) {
-        super(baseAgentId, version);
-        //TODO - check if baseAgentId is the correct agentId here
+        super(baseAgentId, version, listener);
         managerRef = commandExecutor.coreMakeManager(ManagerType.CLASSIC.value, null, null, baseAgentId);
     }
 

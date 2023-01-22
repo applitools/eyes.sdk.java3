@@ -3,6 +3,7 @@ package com.applitools.eyes.selenium;
 import com.applitools.eyes.EyesRunner;
 import com.applitools.eyes.exceptions.StaleElementReferenceException;
 import com.applitools.eyes.universal.ManagerType;
+import com.applitools.eyes.universal.USDKListener;
 import com.applitools.utils.ClassVersionGetter;
 
 
@@ -21,14 +22,18 @@ public class ClassicRunner extends EyesRunner {
    */
   protected static String VERSION = ClassVersionGetter.CURRENT_VERSION;
 
+  /**
+   * universal server listener
+   */
+  private static final USDKListener listener = USDKListener.getInstance();
+
 
   public ClassicRunner() {
     this(BASE_AGENT_ID, VERSION);
   }
 
   protected ClassicRunner(String baseAgentId, String version) {
-    super(baseAgentId, version);
-    //TODO - check if baseAgentId is the correct agentId here
+    super(baseAgentId, version, listener);
     managerRef = commandExecutor.coreMakeManager(ManagerType.CLASSIC.value, null, null, baseAgentId);
   }
 

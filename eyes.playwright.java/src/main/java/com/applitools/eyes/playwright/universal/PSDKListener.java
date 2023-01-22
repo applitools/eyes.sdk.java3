@@ -3,21 +3,24 @@ package com.applitools.eyes.playwright.universal;
 import com.applitools.eyes.EyesException;
 import com.applitools.eyes.logging.Stage;
 import com.applitools.eyes.logging.TraceLevel;
-import com.applitools.eyes.playwright.universal.dto.Context;
-import com.applitools.eyes.playwright.universal.dto.Element;
 import com.applitools.eyes.playwright.universal.driver.SpecDriverPlaywright;
 import com.applitools.eyes.playwright.universal.driver.dto.DriverCommandDto;
 import com.applitools.eyes.playwright.universal.driver.dto.DriverInfoDto;
+import com.applitools.eyes.playwright.universal.dto.Context;
+import com.applitools.eyes.playwright.universal.dto.Element;
+import com.applitools.eyes.universal.AbstractSDKListener;
 import com.applitools.eyes.universal.Reference;
-import com.applitools.eyes.universal.USDKListener;
 import com.applitools.eyes.universal.driver.ICookie;
 import com.applitools.eyes.universal.dto.*;
 import com.fasterxml.jackson.core.type.TypeReference;
+import org.asynchttpclient.ws.WebSocket;
 
 import java.sql.Timestamp;
-import java.util.*;
+import java.util.Arrays;
+import java.util.Base64;
+import java.util.List;
 
-public class PSDKListener extends USDKListener {
+public class PSDKListener extends AbstractSDKListener {
 
     private static volatile PSDKListener instance;
 
@@ -49,6 +52,21 @@ public class PSDKListener extends USDKListener {
 
     public Refer getRefer() {
         return ref;
+    }
+
+    @Override
+    public void onOpen(WebSocket webSocket) {
+
+    }
+
+    @Override
+    public void onClose(WebSocket webSocket, int i, String s) {
+
+    }
+
+    @Override
+    public void onError(Throwable throwable) {
+
     }
 
     @Override

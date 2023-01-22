@@ -26,7 +26,7 @@ public class CommandExecutor {
   private static StaleElementReferenceException staleElementReferenceException;
 
   public static CommandExecutor getInstance(String name, String version, String protocol, String[] commands,
-                                            USDKListener listener, StaleElementReferenceException e) {
+                                            AbstractSDKListener listener, StaleElementReferenceException e) {
     if (instance == null) {
       synchronized (CommandExecutor.class) {
         if (instance == null) {
@@ -38,7 +38,7 @@ public class CommandExecutor {
     return instance;
   }
 
-  private CommandExecutor(String name, String version, String protocol, String[] commands, USDKListener listener) {
+  private CommandExecutor(String name, String version, String protocol, String[] commands, AbstractSDKListener listener) {
     connection = new USDKConnection(listener);
     connection.init();
     makeCore(name, version, GeneralUtils.getPropertyString("user.dir"), protocol, commands);

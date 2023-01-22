@@ -42,9 +42,14 @@ public abstract class EyesRunner {
   protected static String PROTOCOL = "webdriver";
 
   /**
-   * the universal server listener
+   * list of commands sent to the server.
    */
-  protected static USDKListener listener = new USDKListener();
+  protected static String[] COMMANDS = null;
+
+  /**
+   * the universal server listener.
+   */
+  protected static USDKListener listener;
 
   private Boolean dontCloseBatches;
 
@@ -66,6 +71,10 @@ public abstract class EyesRunner {
     runServer(baseAgentId, version);
   }
 
+  public EyesRunner(String baseAgentId, String version, AbstractSDKListener listener) {
+    runServer(baseAgentId, version, PROTOCOL, COMMANDS, listener);
+  }
+
   /**
    * used for instantiating VisualGrid Runner
    */
@@ -76,9 +85,18 @@ public abstract class EyesRunner {
   }
 
   /**
+   * used for instantiating VisualGrid Runner
+   */
+  public EyesRunner(String baseAgentId, String version, RunnerOptions runnerOptions, AbstractSDKListener listener) {
+    ArgumentGuard.notNull(runnerOptions, "runnerOptions");
+    setLogHandler(new NullLogHandler());
+    runServer(baseAgentId, version, PROTOCOL, COMMANDS, listener);
+  }
+
+  /**
    * used for instantiating Classic Runner
    */
-  public EyesRunner(String baseAgentId, String version, String protocol, String[] commands, USDKListener listener) {
+  public EyesRunner(String baseAgentId, String version, String protocol, String[] commands, AbstractSDKListener listener) {
     setLogHandler(new NullLogHandler());
     runServer(baseAgentId, version, protocol, commands, listener);
   }
@@ -86,7 +104,7 @@ public abstract class EyesRunner {
   /**
    * used for instantiating VisualGrid Runner
    */
-  public EyesRunner(String baseAgentId, String version, String protocol, String[] commands, USDKListener listener, RunnerOptions runnerOptions) {
+  public EyesRunner(String baseAgentId, String version, String protocol, String[] commands, AbstractSDKListener listener, RunnerOptions runnerOptions) {
     ArgumentGuard.notNull(runnerOptions, "runnerOptions");
     setLogHandler(runnerOptions.getLogHandler());
     runServer(baseAgentId, version, protocol, commands, listener);
@@ -96,7 +114,7 @@ public abstract class EyesRunner {
     runServer(baseAgentId, version, PROTOCOL, null, listener);
   }
 
-  protected void runServer(String baseAgentId, String version, String protocol, String[] commands, USDKListener listener){
+  protected void runServer(String baseAgentId, String version, String protocol, String[] commands, AbstractSDKListener listener){
     UniversalSdkNativeLoader.setLogger(getLogger());
     UniversalSdkNativeLoader.start();
     commandExecutor = CommandExecutor.getInstance(baseAgentId, version, protocol, commands, listener, getStaleElementException());

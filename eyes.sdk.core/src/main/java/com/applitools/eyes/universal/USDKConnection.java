@@ -19,9 +19,9 @@ import org.asynchttpclient.ws.WebSocketUpgradeHandler;
 public class USDKConnection {
   private WebSocket webSocket;
   protected Logger logger = new Logger();
-  private USDKListener listener;
+  private AbstractSDKListener listener;
 
-  public USDKConnection(USDKListener listener) {
+  public USDKConnection(AbstractSDKListener listener) {
     this.listener = listener;
   }
 

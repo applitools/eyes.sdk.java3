@@ -8,10 +8,12 @@ import com.applitools.eyes.exceptions.StaleElementReferenceException;
 import com.applitools.eyes.logging.Stage;
 import com.applitools.eyes.logging.Type;
 import com.applitools.eyes.universal.CommandExecutor;
+import com.applitools.eyes.universal.USDKListener;
 import com.applitools.eyes.universal.dto.CloseBatchSettingsDto;
 import com.applitools.eyes.universal.mapper.SettingsMapper;
 import com.applitools.eyes.universal.server.UniversalSdkNativeLoader;
 import com.applitools.utils.ArgumentGuard;
+import com.applitools.utils.ClassVersionGetter;
 import com.applitools.utils.GeneralUtils;
 import org.apache.commons.lang3.tuple.Pair;
 
@@ -22,6 +24,17 @@ import java.util.HashSet;
 import java.util.List;
 
 public class EnabledBatchClose extends BatchClose {
+
+    /**
+     * name of the client sdk
+     */
+    protected static String BASE_AGENT_ID = "eyes.sdk.java";
+
+    /**
+     * version of the client sdk
+     */
+    protected static String VERSION = ClassVersionGetter.CURRENT_VERSION;
+
     private List<String> batchIds;
 
     EnabledBatchClose(Logger logger, String serverUrl, List<String> batchIds) {
@@ -94,7 +107,7 @@ public class EnabledBatchClose extends BatchClose {
 
         // start the server only if it's not alive to avoid runner conflicts
         if (shouldStopServer) {
-            new EyesRunner() {
+            new EyesRunner(BASE_AGENT_ID, VERSION, USDKListener.getInstance()) {
                 @Override
                 public StaleElementReferenceException getStaleElementException() {
                     return null;

@@ -6,6 +6,7 @@ import com.applitools.eyes.EyesRunner;
 import com.applitools.eyes.Logger;
 import com.applitools.eyes.selenium.exceptions.StaleElementReferenceException;
 import com.applitools.eyes.universal.ManagerType;
+import com.applitools.eyes.universal.USDKListener;
 import com.applitools.utils.ArgumentGuard;
 import com.applitools.utils.ClassVersionGetter;
 
@@ -50,12 +51,17 @@ public class VisualGridRunner extends EyesRunner {
      */
     protected static String VERSION = ClassVersionGetter.CURRENT_VERSION;
 
+    /**
+     * universal server listener
+     */
+    private static final USDKListener listener = USDKListener.getInstance();
+
     public VisualGridRunner() {
         this(Thread.currentThread().getStackTrace()[2].getClassName());
     }
 
     public VisualGridRunner(String suiteName) {
-        super(BASE_AGENT_ID, VERSION);
+        super(BASE_AGENT_ID, VERSION, listener);
         this.testConcurrency = new TestConcurrency();
         this.runnerOptions = new RunnerOptions().testConcurrency(testConcurrency.actualConcurrency);
         managerRef = commandExecutor.coreMakeManager(ManagerType.VISUAL_GRID.value, testConcurrency.userConcurrency, testConcurrency.actualConcurrency, BASE_AGENT_ID);
@@ -66,7 +72,7 @@ public class VisualGridRunner extends EyesRunner {
     }
 
     public VisualGridRunner(int testConcurrency0, String suiteName) {
-        super(BASE_AGENT_ID, VERSION);
+        super(BASE_AGENT_ID, VERSION, listener);
         this.testConcurrency = new TestConcurrency(testConcurrency0, true);
         this.runnerOptions = new RunnerOptions().testConcurrency(testConcurrency.actualConcurrency);
         managerRef = commandExecutor.coreMakeManager(ManagerType.VISUAL_GRID.value, testConcurrency.userConcurrency, testConcurrency.actualConcurrency, BASE_AGENT_ID);
@@ -77,7 +83,7 @@ public class VisualGridRunner extends EyesRunner {
     }
 
     public VisualGridRunner(RunnerOptions runnerOptions, String suiteName) {
-        super(BASE_AGENT_ID, VERSION, runnerOptions);
+        super(BASE_AGENT_ID, VERSION, runnerOptions, listener);
         this.runnerOptions = runnerOptions;
         int testConcurrency0 = runnerOptions.getTestConcurrency() == null ? DEFAULT_CONCURRENCY : runnerOptions.getTestConcurrency();
         this.testConcurrency = new TestConcurrency(testConcurrency0, false);
@@ -85,7 +91,7 @@ public class VisualGridRunner extends EyesRunner {
     }
 
     protected VisualGridRunner(String baseAgentId, String version) {
-        super(baseAgentId, version);
+        super(baseAgentId, version, listener);
         this.testConcurrency = new TestConcurrency();
         this.runnerOptions = new RunnerOptions().testConcurrency(testConcurrency.actualConcurrency);
         managerRef = commandExecutor.coreMakeManager(ManagerType.VISUAL_GRID.value, testConcurrency.userConcurrency, testConcurrency.actualConcurrency, BASE_AGENT_ID);
@@ -97,14 +103,14 @@ public class VisualGridRunner extends EyesRunner {
     }
 
     protected VisualGridRunner(int testConcurrency0, String baseAgentId, String version) {
-        super(baseAgentId, version);
+        super(baseAgentId, version, listener);
         this.testConcurrency = new TestConcurrency(testConcurrency0, true);
         this.runnerOptions = new RunnerOptions().testConcurrency(testConcurrency.actualConcurrency);
         managerRef = commandExecutor.coreMakeManager(ManagerType.VISUAL_GRID.value, testConcurrency.userConcurrency, testConcurrency.actualConcurrency, BASE_AGENT_ID);
     }
 
     protected VisualGridRunner(RunnerOptions runnerOptions,  String baseAgentId, String version) {
-        super(baseAgentId, version);
+        super(baseAgentId, version, listener);
         ArgumentGuard.notNull(runnerOptions, "runnerOptions");
         this.runnerOptions = runnerOptions;
         int testConcurrency0 = runnerOptions.getTestConcurrency() == null ? DEFAULT_CONCURRENCY : runnerOptions.getTestConcurrency();
