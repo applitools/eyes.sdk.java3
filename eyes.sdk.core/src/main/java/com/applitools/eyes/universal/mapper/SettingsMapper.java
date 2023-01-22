@@ -121,6 +121,10 @@ public class SettingsMapper {
     }
 
     public static NormalizationDto toNormalizationDto(ICut cut, Integer rotation, Double scaleRatio) {
+        if (cut == null && rotation == null && scaleRatio == null) {
+            return null;
+        }
+
         NormalizationDto normalizationDto = new NormalizationDto();
 
         normalizationDto.setCut(cut);
