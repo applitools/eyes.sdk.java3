@@ -272,7 +272,7 @@ public class SpecDriverPlaywright implements ISpecDriver {
         } else if (arg instanceof LinkedHashMap){
             LinkedHashMap<Object, Object> map = new LinkedHashMap<>();
             for (Map.Entry<?, ?> entry : ((LinkedHashMap<?, ?>) arg).entrySet()) {
-                map.put(entry.getKey(), refer.deref((Reference) entry.getValue()));
+                map.put(entry.getKey(), refer.deref(entry.getValue()));
             }
             return map;
         }
