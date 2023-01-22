@@ -34,20 +34,20 @@ public class PSDKListener extends AbstractSDKListener {
      */
     private final SpecDriverPlaywright specDriver;
 
-    private PSDKListener() {
-        super();
-        specDriver = new SpecDriverPlaywright(ref);
-    }
-
     public static PSDKListener getInstance() {
         if (instance == null) {
-            synchronized (PSDKListener.class) {
+            synchronized (AbstractSDKListener.class) {
                 if (instance == null) {
                     instance = new PSDKListener();
                 }
             }
         }
         return instance;
+    }
+
+    private PSDKListener() {
+        super();
+        specDriver = new SpecDriverPlaywright(ref);
     }
 
     public Refer getRefer() {

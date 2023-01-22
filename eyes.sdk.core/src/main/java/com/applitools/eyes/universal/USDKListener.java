@@ -18,19 +18,19 @@ public class USDKListener extends AbstractSDKListener implements WebSocketListen
 
     private static volatile USDKListener instance;
 
-    private USDKListener() {
-        super();
-    }
-
     public static USDKListener getInstance() {
         if (instance == null) {
-            synchronized (USDKListener.class) {
+            synchronized (AbstractSDKListener.class) {
                 if (instance == null) {
                     instance = new USDKListener();
                 }
             }
         }
         return instance;
+    }
+
+    private USDKListener() {
+        super();
     }
 
     @Override
