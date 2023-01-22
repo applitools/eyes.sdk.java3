@@ -158,6 +158,10 @@ public class Eyes implements IEyesBase {
      * @param checkSettings the check settings
      */
     public void check(ICheckSettings checkSettings) {
+        if (getIsDisabled()) {
+            return;
+        }
+
         IPlaywrightCheckSettings playwrightCheckSettings = (checkSettings instanceof IPlaywrightCheckSettings) ? (IPlaywrightCheckSettings) checkSettings : null;
         ArgumentGuard.notNull(playwrightCheckSettings, "checkSettings");
 
