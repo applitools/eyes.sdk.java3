@@ -18,6 +18,8 @@ import com.microsoft.playwright.options.Cookie;
 
 import java.lang.reflect.Method;
 import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -220,12 +222,15 @@ public class SpecDriverPlaywright implements ISpecDriver {
         if (jsHandle == null) {
             return null;
         }
-        String[] types = jsHandle.toString().split("/(?:.+@)?(\\w*)(?:\\(\\d+\\))?/i");
-        String type = types.length > 0? types[0].toLowerCase() : null;
 
-        if (type == null) {
-            return null;
-        } else if (type.contains("array")) {
+        String type = "";
+        Pattern pattern = Pattern.compile("(?:.+@)?(\\w*)(?:\\(\\d+\\))?", Pattern.CASE_INSENSITIVE);
+        Matcher matcher = pattern.matcher(jsHandle.toString());
+        if (matcher.find()) {
+            type = matcher.group(0).toLowerCase();
+        }
+
+        if (type.contains("array")) {
             Map<String, JSHandle> map = jsHandle.getProperties();
             List<Object> arrayValues = new ArrayList<>();
             for (JSHandle jsHandle1: map.values()) {
