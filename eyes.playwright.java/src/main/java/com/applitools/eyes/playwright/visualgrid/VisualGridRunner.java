@@ -57,7 +57,7 @@ public class VisualGridRunner extends EyesRunner {
     /**
      * webSocket listener
      */
-    private static PSDKListener listener = new PSDKListener();
+    private static final PSDKListener listener = PSDKListener.getInstance();
 
     private static final int CONCURRENCY_FACTOR = 5;
     static final int DEFAULT_CONCURRENCY = 5;

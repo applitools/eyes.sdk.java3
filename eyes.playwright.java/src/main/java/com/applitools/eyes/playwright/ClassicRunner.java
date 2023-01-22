@@ -32,7 +32,7 @@ public class ClassicRunner extends EyesRunner {
     /**
      * universal server listener
      */
-    private static PSDKListener listener = new PSDKListener();
+    private static final PSDKListener listener = PSDKListener.getInstance();
 
     /**
      * used for instantiating Playwright Runner

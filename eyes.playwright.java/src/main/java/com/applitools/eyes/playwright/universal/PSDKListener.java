@@ -19,6 +19,8 @@ import java.util.*;
 
 public class PSDKListener extends USDKListener {
 
+    private static volatile PSDKListener instance;
+
     /**
      * refer
      */
@@ -29,9 +31,20 @@ public class PSDKListener extends USDKListener {
      */
     private final SpecDriverPlaywright specDriver;
 
-    public PSDKListener() {
+    private PSDKListener() {
         super();
         specDriver = new SpecDriverPlaywright(ref);
+    }
+
+    public static PSDKListener getInstance() {
+        if (instance == null) {
+            synchronized (PSDKListener.class) {
+                if (instance == null) {
+                    instance = new PSDKListener();
+                }
+            }
+        }
+        return instance;
     }
 
     public Refer getRefer() {
