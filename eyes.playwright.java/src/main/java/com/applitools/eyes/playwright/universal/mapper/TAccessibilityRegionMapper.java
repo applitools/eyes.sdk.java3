@@ -7,6 +7,7 @@ import com.applitools.eyes.playwright.fluent.AccessibilitySelector;
 import com.applitools.eyes.playwright.universal.Refer;
 import com.applitools.eyes.playwright.universal.dto.AccessibilityRegionByElement;
 import com.applitools.eyes.playwright.universal.dto.AccessibilityRegionBySelector;
+import com.applitools.eyes.universal.Reference;
 import com.applitools.eyes.universal.dto.RectangleAccessibilityRegionDto;
 import com.applitools.eyes.universal.dto.RectangleRegionDto;
 import com.applitools.eyes.universal.dto.TAccessibilityRegion;
@@ -16,14 +17,14 @@ import java.util.stream.Collectors;
 
 public class TAccessibilityRegionMapper {
 
-    public static TAccessibilityRegion toTAccessibilityRegionDto(GetRegion getAccessibilityRegion, Refer refer) {
+    public static TAccessibilityRegion toTAccessibilityRegionDto(GetRegion getAccessibilityRegion, Refer refer, Reference root) {
         if (getAccessibilityRegion == null) {
             return null;
         }
 
         if (getAccessibilityRegion instanceof AccessibilitySelector) {
             AccessibilitySelector selector = (AccessibilitySelector) getAccessibilityRegion;
-            selector.setApplitoolsRefId(refer.ref(getAccessibilityRegion));
+            selector.setApplitoolsRefId(refer.ref(getAccessibilityRegion, root));
 
             AccessibilityRegionBySelector accessibilityRegionBySelector = new AccessibilityRegionBySelector();
             accessibilityRegionBySelector.setRegion(selector);
@@ -32,7 +33,7 @@ public class TAccessibilityRegionMapper {
 
         } else if (getAccessibilityRegion instanceof AccessibilityElement) {
             AccessibilityElement element = (AccessibilityElement) getAccessibilityRegion;
-            element.setApplitoolsRefId(refer.ref(element.getElementHandle()));
+            element.setApplitoolsRefId(refer.ref(element.getElementHandle(), root));
 
             AccessibilityRegionByElement accessibilityRegionByElement = new AccessibilityRegionByElement();
             accessibilityRegionByElement.setRegion(element);
@@ -57,13 +58,13 @@ public class TAccessibilityRegionMapper {
         return null;
     }
 
-    public static List<TAccessibilityRegion> toTAccessibilityRegionDtoList(List<GetRegion> getAccessibilityRegionList, Refer refer) {
+    public static List<TAccessibilityRegion> toTAccessibilityRegionDtoList(List<GetRegion> getAccessibilityRegionList, Refer refer, Reference root) {
         if (getAccessibilityRegionList == null || getAccessibilityRegionList.isEmpty()) {
             return null;
         }
 
         return getAccessibilityRegionList.stream()
-                .map(reference -> toTAccessibilityRegionDto(reference, refer))
+                .map(reference -> toTAccessibilityRegionDto(reference, refer, root))
                 .collect(Collectors.toList());
 
 

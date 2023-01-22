@@ -4,6 +4,7 @@ import com.applitools.ICheckSettings;
 import com.applitools.eyes.config.Configuration;
 import com.applitools.eyes.playwright.fluent.PlaywrightCheckSettings;
 import com.applitools.eyes.playwright.universal.Refer;
+import com.applitools.eyes.universal.Reference;
 import com.applitools.eyes.universal.dto.CheckSettingsDto;
 import com.applitools.eyes.universal.dto.DebugScreenshotHandlerDto;
 import com.applitools.eyes.universal.dto.ImageCropRectDto;
@@ -17,7 +18,7 @@ import static com.applitools.eyes.universal.mapper.SettingsMapper.toImageCropRec
 import static com.applitools.eyes.universal.mapper.SettingsMapper.toNormalizationDto;
 
 public class PlaywrightCheckSettingsMapper {
-    public static CheckSettingsDto toCheckSettingsDto(ICheckSettings checkSettings, Configuration config, Refer refer) {
+    public static CheckSettingsDto toCheckSettingsDto(ICheckSettings checkSettings, Configuration config, Refer refer, Reference root) {
         if (!(checkSettings instanceof PlaywrightCheckSettings)) {
             return null;
         }
@@ -26,10 +27,10 @@ public class PlaywrightCheckSettingsMapper {
 
         CheckSettingsDto checkSettingsDto = new CheckSettingsDto();
         // CheckSettings
-        checkSettingsDto.setRegion(TRegionMapper.toTRegionFromCheckSettings(playwrightCheckSettings, refer));
-        checkSettingsDto.setFrames(TFramesMapper.toTFramesFromCheckSettings(playwrightCheckSettings.getFrameChain(), refer));
+        checkSettingsDto.setRegion(TRegionMapper.toTRegionFromCheckSettings(playwrightCheckSettings, refer, root));
+        checkSettingsDto.setFrames(TFramesMapper.toTFramesFromCheckSettings(playwrightCheckSettings.getFrameChain(), refer, root));
         checkSettingsDto.setFully(playwrightCheckSettings.getStitchContent());
-        checkSettingsDto.setScrollRootElement(TRegionMapper.toTRegionDtoFromSRE(playwrightCheckSettings.getScrollRootElement(), refer));
+        checkSettingsDto.setScrollRootElement(TRegionMapper.toTRegionDtoFromSRE(playwrightCheckSettings.getScrollRootElement(), refer, root));
         checkSettingsDto.setStitchMode(config.getStitchMode() == null ? null : config.getStitchMode().getName());
         checkSettingsDto.setHideScrollbars(config.getHideScrollbars());
         checkSettingsDto.setHideCaret(config.getHideCaret());
@@ -46,15 +47,15 @@ public class PlaywrightCheckSettingsMapper {
         checkSettingsDto.setName(playwrightCheckSettings.getName());
         checkSettingsDto.setPageId(playwrightCheckSettings.getPageId());
         checkSettingsDto.setIgnoreRegions(CodedRegionReferenceMapper
-                .toCodedRegionReferenceList(Arrays.asList(playwrightCheckSettings.getIgnoreRegions()), refer));
+                .toCodedRegionReferenceList(Arrays.asList(playwrightCheckSettings.getIgnoreRegions()), refer, root));
         checkSettingsDto.setLayoutRegions(CodedRegionReferenceMapper
-                .toCodedRegionReferenceList(Arrays.asList(playwrightCheckSettings.getLayoutRegions()), refer));
+                .toCodedRegionReferenceList(Arrays.asList(playwrightCheckSettings.getLayoutRegions()), refer, root));
         checkSettingsDto.setStrictRegions(CodedRegionReferenceMapper
-                .toCodedRegionReferenceList(Arrays.asList(playwrightCheckSettings.getStrictRegions()), refer));
+                .toCodedRegionReferenceList(Arrays.asList(playwrightCheckSettings.getStrictRegions()), refer, root));
         checkSettingsDto.setContentRegions(CodedRegionReferenceMapper
-                .toCodedRegionReferenceList(Arrays.asList(playwrightCheckSettings.getContentRegions()), refer));
-        checkSettingsDto.setFloatingRegions(TFloatingRegionMapper.toTFloatingRegionDtoList(Arrays.asList(playwrightCheckSettings.getFloatingRegions()), refer));
-        checkSettingsDto.setAccessibilityRegions(TAccessibilityRegionMapper.toTAccessibilityRegionDtoList(Arrays.asList(playwrightCheckSettings.getAccessibilityRegions()), refer));
+                .toCodedRegionReferenceList(Arrays.asList(playwrightCheckSettings.getContentRegions()), refer, root));
+        checkSettingsDto.setFloatingRegions(TFloatingRegionMapper.toTFloatingRegionDtoList(Arrays.asList(playwrightCheckSettings.getFloatingRegions()), refer, root));
+        checkSettingsDto.setAccessibilityRegions(TAccessibilityRegionMapper.toTAccessibilityRegionDtoList(Arrays.asList(playwrightCheckSettings.getAccessibilityRegions()), refer, root));
         checkSettingsDto.setAccessibilitySettings(AccessibilitySettingsMapper.toAccessibilitySettingsDto(((PlaywrightCheckSettings) checkSettings).getAccessibilityValidation()));
         checkSettingsDto.setMatchLevel(playwrightCheckSettings.getMatchLevel() == null ? null : playwrightCheckSettings.getMatchLevel().getName());
         checkSettingsDto.setRetryTimeout(config.getMatchTimeout());

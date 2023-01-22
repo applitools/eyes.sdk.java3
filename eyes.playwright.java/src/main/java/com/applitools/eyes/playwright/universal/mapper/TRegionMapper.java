@@ -12,7 +12,7 @@ import com.microsoft.playwright.ElementHandle;
 
 public class TRegionMapper {
 
-    public static TRegion toTRegionFromCheckSettings(ICheckSettings checkSettings, Refer refer) {
+    public static TRegion toTRegionFromCheckSettings(ICheckSettings checkSettings, Refer refer, Reference root) {
         if (!(checkSettings instanceof PlaywrightCheckSettings)) {
             return null;
         }
@@ -23,9 +23,9 @@ public class TRegionMapper {
         if (element != null) {
             if (element instanceof Element) {
                 ElementHandle elementHandle = ((Element) element).getElementHandle();
-                element.setApplitoolsRefId(refer.ref(elementHandle));
+                element.setApplitoolsRefId(refer.ref(elementHandle, root));
             } else {
-                element.setApplitoolsRefId(refer.ref(element));
+                element.setApplitoolsRefId(refer.ref(element, root));
             }
             return element;
         }
@@ -38,16 +38,16 @@ public class TRegionMapper {
         return null;
     }
 
-    public static TRegion toTRegionDtoFromSRE(Reference scrollRootElement, Refer refer) {
+    public static TRegion toTRegionDtoFromSRE(Reference scrollRootElement, Refer refer, Reference root) {
         if (scrollRootElement == null) {
             return null;
         }
 
         if (scrollRootElement instanceof Element) {
             ElementHandle elementHandle = ((Element) scrollRootElement).getElementHandle();
-            scrollRootElement.setApplitoolsRefId(refer.ref(elementHandle));
+            scrollRootElement.setApplitoolsRefId(refer.ref(elementHandle, root));
         } else {
-            scrollRootElement.setApplitoolsRefId(refer.ref(scrollRootElement));
+            scrollRootElement.setApplitoolsRefId(refer.ref(scrollRootElement, root));
         }
         return scrollRootElement;
     }

@@ -5,6 +5,7 @@ import com.applitools.eyes.fluent.SimpleRegionByRectangle;
 import com.applitools.eyes.playwright.universal.Refer;
 import com.applitools.eyes.playwright.universal.dto.Element;
 import com.applitools.eyes.playwright.universal.dto.Selector;
+import com.applitools.eyes.universal.Reference;
 import com.applitools.eyes.universal.dto.CodedRegionReference;
 import com.applitools.eyes.universal.dto.TRegion;
 import com.applitools.eyes.universal.mapper.RectangleRegionMapper;
@@ -15,7 +16,7 @@ import java.util.stream.Collectors;
 
 public class CodedRegionReferenceMapper {
 
-    public static CodedRegionReference toCodedRegionReference(GetRegion getSimpleRegion, Refer refer) {
+    public static CodedRegionReference toCodedRegionReference(GetRegion getSimpleRegion, Refer refer, Reference root) {
         if (getSimpleRegion == null) {
             return null;
         }
@@ -24,13 +25,13 @@ public class CodedRegionReferenceMapper {
 
         if (getSimpleRegion instanceof Element) {
             Element element = (Element) getSimpleRegion;
-            element.setApplitoolsRefId(refer.ref(element.getElementHandle()));
+            element.setApplitoolsRefId(refer.ref(element.getElementHandle(), root));
             codedRegionReference.setRegion(element);
             codedRegionReference.setRegionId(element.getRegionId());
             codedRegionReference.setPadding(element.getPadding());
         } else if (getSimpleRegion instanceof Selector) {
             Selector selector = (Selector) getSimpleRegion;
-            selector.setApplitoolsRefId(refer.ref(getSimpleRegion));
+            selector.setApplitoolsRefId(refer.ref(getSimpleRegion, root));
             codedRegionReference.setRegion(selector);
             codedRegionReference.setRegionId(selector.getRegionId());
             codedRegionReference.setPadding(selector.getPadding());
@@ -45,7 +46,7 @@ public class CodedRegionReferenceMapper {
         return codedRegionReference;
     }
 
-    public static List<CodedRegionReference> toCodedRegionReferenceList(List<GetRegion> getSimpleRegionList, Refer refer) {
+    public static List<CodedRegionReference> toCodedRegionReferenceList(List<GetRegion> getSimpleRegionList, Refer refer, Reference root) {
         if (getSimpleRegionList == null || getSimpleRegionList.isEmpty()) {
             return null;
         }
@@ -53,7 +54,7 @@ public class CodedRegionReferenceMapper {
         return getSimpleRegionList
                 .stream()
                 .filter(Objects::nonNull)
-                .map(reference -> toCodedRegionReference(reference, refer))
+                .map(reference -> toCodedRegionReference(reference, refer, root))
                 .collect(Collectors.toList());
     }
 }

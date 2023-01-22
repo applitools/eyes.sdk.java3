@@ -8,6 +8,7 @@ import com.applitools.eyes.playwright.fluent.FloatingRegionSelector;
 import com.applitools.eyes.playwright.universal.Refer;
 import com.applitools.eyes.playwright.universal.dto.FloatingRegionByElement;
 import com.applitools.eyes.playwright.universal.dto.FloatingRegionBySelector;
+import com.applitools.eyes.universal.Reference;
 import com.applitools.eyes.universal.dto.*;
 
 import java.util.List;
@@ -15,14 +16,14 @@ import java.util.stream.Collectors;
 
 public class TFloatingRegionMapper {
 
-    public static TFloatingRegion toTFloatingRegionDto(GetRegion getFloatingRegion, Refer refer) {
+    public static TFloatingRegion toTFloatingRegionDto(GetRegion getFloatingRegion, Refer refer, Reference root) {
         if (getFloatingRegion == null) {
             return null;
         }
 
         if (getFloatingRegion instanceof FloatingRegionSelector) {
             FloatingRegionSelector selector = (FloatingRegionSelector) getFloatingRegion;
-            selector.setApplitoolsRefId(refer.ref(getFloatingRegion));
+            selector.setApplitoolsRefId(refer.ref(getFloatingRegion, root));
 
             FloatingRegionBySelector floatingRegionBySelector = new FloatingRegionBySelector();
             floatingRegionBySelector.setRegion(selector);
@@ -35,7 +36,7 @@ public class TFloatingRegionMapper {
 
         } else if (getFloatingRegion instanceof FloatingRegionElement) {
             FloatingRegionElement element = (FloatingRegionElement) getFloatingRegion;
-            element.setApplitoolsRefId(refer.ref(element.getElementHandle()));
+            element.setApplitoolsRefId(refer.ref(element.getElementHandle(), root));
 
             FloatingRegionByElement floatingRegionByElement = new FloatingRegionByElement();
             floatingRegionByElement.setRegion(element);
@@ -73,13 +74,13 @@ public class TFloatingRegionMapper {
         return null;
     }
 
-    public static List<TFloatingRegion> toTFloatingRegionDtoList(List<GetRegion> getFloatingRegionList, Refer refer) {
+    public static List<TFloatingRegion> toTFloatingRegionDtoList(List<GetRegion> getFloatingRegionList, Refer refer, Reference root) {
         if (getFloatingRegionList == null || getFloatingRegionList.isEmpty()) {
             return null;
         }
 
         return getFloatingRegionList.stream()
-                .map(reference -> toTFloatingRegionDto(reference, refer))
+                .map(reference -> toTFloatingRegionDto(reference, refer, root))
                 .collect(Collectors.toList());
     }
 }

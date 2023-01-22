@@ -57,9 +57,9 @@ public class Eyes implements IEyesBase {
     private boolean isClosed;
 
     /**
-     * the playwright page associated with the test.
+     * the driver reference associated with the test.
      */
-    private Page page;
+    private Driver driver;
 
 
     /**
@@ -116,8 +116,8 @@ public class Eyes implements IEyesBase {
             return page;
         }
 
-        Driver driver = new Driver();
-        driver.setApplitoolsRefId(getRefer().ref(page, driver));
+        driver = new Driver(page);
+        driver.setApplitoolsRefId(getRefer().ref(page, driver.getRoot()));
         driver.setWebDriverProxy(configuration.getWebDriverProxy());
 
         configuration.setAppName(appName).setTestName(testName);
@@ -130,7 +130,6 @@ public class Eyes implements IEyesBase {
         OpenSettingsDto settingsDto = SettingsMapper.toOpenSettingsDto(configuration, runner.isDontCloseBatches());
 
         eyesRef = commandExecutor.managerOpenEyes(runner.getManagerRef(), driver, settingsDto, configurationDto);
-        this.page = page;
         return page;
     }
 
@@ -162,14 +161,10 @@ public class Eyes implements IEyesBase {
         IPlaywrightCheckSettings playwrightCheckSettings = (checkSettings instanceof IPlaywrightCheckSettings) ? (IPlaywrightCheckSettings) checkSettings : null;
         ArgumentGuard.notNull(playwrightCheckSettings, "checkSettings");
 
-        CheckSettingsDto checkSettingsDto = PlaywrightCheckSettingsMapper.toCheckSettingsDto(playwrightCheckSettings, configure(), getRefer());
+        CheckSettingsDto checkSettingsDto = PlaywrightCheckSettingsMapper.toCheckSettingsDto(playwrightCheckSettings,
+                configure(), getRefer(), driver.getRoot());
 
-        Driver target = (Driver) getRefer().getDriverTarget(getDriver());
-        checkDto(checkSettingsDto, target);
-    }
-
-    private Page getDriver() {
-        return page;
+        checkDto(checkSettingsDto, driver);
     }
 
     /**
@@ -185,12 +180,11 @@ public class Eyes implements IEyesBase {
         }
 
         List<OCRExtractSettingsDto> ocrExtractSettingsDtoList = PlaywrightOCRExtractSettingsDtoMapper
-                .toOCRExtractSettingsDtoList(Arrays.asList(ocrRegions), getRefer());
+                .toOCRExtractSettingsDtoList(Arrays.asList(ocrRegions), getRefer(), driver.getRoot());
         ConfigurationDto configurationDto = ConfigurationMapper
                 .toConfigurationDto(configure(), false);
-        Driver target = (Driver) getRefer().getDriverTarget(getDriver());
 
-        return extractTextDto(target, ocrExtractSettingsDtoList, configurationDto);
+        return extractTextDto(driver, ocrExtractSettingsDtoList, configurationDto);
     }
 
     /**
@@ -203,9 +197,8 @@ public class Eyes implements IEyesBase {
         OCRSearchSettingsDto ocrSearchSettingsDto = OCRSearchSettingsMapper.toOCRSearchSettingsDto(textRegionSettings);
         ConfigurationDto configurationDto = ConfigurationMapper
                 .toConfigurationDto(configure(), false);
-        Driver target = (Driver) getRefer().getDriverTarget(getDriver());
 
-        return locateTextDto(target, ocrSearchSettingsDto, configurationDto);
+        return locateTextDto(driver, ocrSearchSettingsDto, configurationDto);
     }
 
     /**
@@ -226,9 +219,8 @@ public class Eyes implements IEyesBase {
 
         ConfigurationDto configurationDto = ConfigurationMapper
                 .toConfigurationDto(configure(), false);
-        Driver target = (Driver) getRefer().getDriverTarget(getDriver());
 
-        return locateDto(target, visualLocatorSettingsDto, configurationDto);
+        return locateDto(driver, visualLocatorSettingsDto, configurationDto);
     }
 
     /**
@@ -263,7 +255,8 @@ public class Eyes implements IEyesBase {
         List<CommandCloseResponseDto> closeResponse = commandExecutor.close(eyesRef, settings, configurationDto, true);
         this.eyesRef = null;
         isClosed = true;
-        getRefer().destroy();
+        getRefer().destroy(driver.getRoot());
+        driver = null;
         List<TestResults> testResults = TestResultsMapper.toTestResultsList(closeResponse);
         if (testResults == null)
             return null;
@@ -776,7 +769,8 @@ public class Eyes implements IEyesBase {
         List<CommandCloseResponseDto> closeResponse = commandExecutor.close(eyesRef, settings, configurationDto, false);
         this.eyesRef = null;
         isClosed = true;
-        getRefer().destroy();
+        getRefer().destroy(driver.getRoot());
+        driver = null;
         if (closeResponse != null) {
             List<TestResults> testResults = TestResultsMapper.toTestResultsList(closeResponse);
             testResults.forEach(testResults1 -> runner.logSessionResultsAndThrowException(false, testResults1));
@@ -788,7 +782,8 @@ public class Eyes implements IEyesBase {
         if (!isClosed && getIsOpen()) {
             commandExecutor.abort(eyesRef, false);
             this.eyesRef = null;
-            getRefer().destroy();
+            getRefer().destroy(driver.getRoot());
+            driver = null;
         }
     }
 
@@ -798,7 +793,8 @@ public class Eyes implements IEyesBase {
             List<CommandCloseResponseDto> abortResponse = commandExecutor.abort(eyesRef, true);
             List<TestResults> testResults = TestResultsMapper.toTestResultsList(abortResponse);
             this.eyesRef = null;
-            getRefer().destroy();
+            getRefer().destroy(driver.getRoot());
+            driver = null;
             if (testResults != null) {
                 return testResults.isEmpty() ? null : testResults.get(0);
             }

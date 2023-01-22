@@ -57,7 +57,7 @@ public class SpecDriverPlaywright implements ISpecDriver {
         }
 
         Context frameContext = new Context();
-        frameContext.setApplitoolsRefId(refer.ref(mainFrame));
+        frameContext.setApplitoolsRefId(refer.ref(mainFrame, context));
         return frameContext;
     }
 
@@ -66,18 +66,18 @@ public class SpecDriverPlaywright implements ISpecDriver {
         Frame frame = extractContextUtil(context);
 
         Context frameContext = new Context();
-        frameContext.setApplitoolsRefId(refer.ref(frame.parentFrame()));
+        frameContext.setApplitoolsRefId(refer.ref(frame.parentFrame(), context));
         return frameContext;
     }
 
     @Override
     public Context childContext(Reference context, Reference element) {
-        Object root = refer.deref(element.getApplitoolsRefId());
+        Object root = refer.deref(element);
 
         if (root instanceof ElementHandle) {
             Context frameContext = new Context();
             Frame frame = ((ElementHandle) root).contentFrame();
-            frameContext.setApplitoolsRefId(refer.ref(frame));
+            frameContext.setApplitoolsRefId(refer.ref(frame, element));
 
             return frameContext;
         }
@@ -87,7 +87,7 @@ public class SpecDriverPlaywright implements ISpecDriver {
 
     @Override
     public Object executeScript(Reference context, String script, Object arg) {
-        Object ctx = refer.deref(context.getApplitoolsRefId());
+        Object ctx = refer.deref(context);
         JSHandle res = null;
 
         Object args = derefArgsUtil(arg);
@@ -98,13 +98,13 @@ public class SpecDriverPlaywright implements ISpecDriver {
             res = ((Page) ctx).evaluateHandle(script, args);
         }
 
-        return handlerToObjectUtil(res);
+        return handlerToObjectUtil(res, context);
     }
 
     @Override
     public Element findElement(Reference driver, Reference selector, Reference parent) {
-        Object context = refer.deref(driver.getApplitoolsRefId());
-        Object root = parent == null? context : refer.deref(parent.getApplitoolsRefId());
+        Object context = refer.deref(driver);
+        Object root = parent == null? context : refer.deref(parent);
 
         ElementHandle elementHandle = null;
         if (root instanceof Frame) {
@@ -114,14 +114,14 @@ public class SpecDriverPlaywright implements ISpecDriver {
         }
 
         Element element = new Element();
-        element.setApplitoolsRefId(refer.ref(elementHandle));
+        element.setApplitoolsRefId(refer.ref(elementHandle, driver));
         return elementHandle == null? null : element;
     }
 
     @Override
     public List<Reference> findElements(Reference context, Reference selector, Reference parent) {
-        Object ctx = refer.deref(context.getApplitoolsRefId());
-        Object root = parent == null? ctx : refer.deref(parent.getApplitoolsRefId());
+        Object ctx = refer.deref(context);
+        Object root = parent == null? ctx : refer.deref(parent);
 
         List<ElementHandle> elementHandles = new ArrayList<>();
         if (root instanceof Frame) {
@@ -133,7 +133,7 @@ public class SpecDriverPlaywright implements ISpecDriver {
         return elementHandles.stream()
                 .map(elementHandle -> {
                     Element element = new Element(elementHandle);
-                    element.setApplitoolsRefId(refer.ref(elementHandle));
+                    element.setApplitoolsRefId(refer.ref(elementHandle, context));
                     return element;
                 })
                 .collect(Collectors.toList());
@@ -151,13 +151,13 @@ public class SpecDriverPlaywright implements ISpecDriver {
 
     @Override
     public void setViewportSize(Reference driver, RectangleSizeDto windowSize) {
-        Object page = refer.deref(driver.getApplitoolsRefId());
+        Object page = refer.deref(driver);
         ((Page) page).setViewportSize(windowSize.getWidth(), windowSize.getHeight());
     }
 
     @Override
     public RectangleSizeDto getViewportSize(Reference driver) {
-        Object page = refer.deref(driver.getApplitoolsRefId());
+        Object page = refer.deref(driver);
         RectangleSizeDto viewportSize = new RectangleSizeDto();
         viewportSize.setWidth(((Page) page).viewportSize().width);
         viewportSize.setHeight(((Page) page).viewportSize().height);
@@ -166,7 +166,7 @@ public class SpecDriverPlaywright implements ISpecDriver {
 
     @Override
     public List<ICookie> getCookies(Reference driver, Reference context) {
-        Page ctx = (Page) refer.deref(driver.getApplitoolsRefId());
+        Page ctx = (Page) refer.deref(driver);
         List<Cookie> cookies = ctx.context().cookies();
 
         return cookies.stream()
@@ -181,25 +181,25 @@ public class SpecDriverPlaywright implements ISpecDriver {
 
     @Override
     public String getTitle(Reference driver) {
-        Page context = (Page) refer.deref(driver.getApplitoolsRefId());
+        Page context = (Page) refer.deref(driver);
         return context.title();
     }
 
     @Override
     public String getUrl(Reference driver) {
-        Page context = (Page) refer.deref(driver.getApplitoolsRefId());
+        Page context = (Page) refer.deref(driver);
         return context.url();
     }
 
     @Override
     public void visit(Reference driver, String url) {
-        Page context = (Page) refer.deref(driver.getApplitoolsRefId());
+        Page context = (Page) refer.deref(driver);
         context.navigate(url);
     }
 
     @Override
     public byte[] takeScreenshot(Reference driver) {
-        Page context = (Page) refer.deref(driver.getApplitoolsRefId());
+        Page context = (Page) refer.deref(driver);
         return context.screenshot();
     }
 
@@ -216,7 +216,7 @@ public class SpecDriverPlaywright implements ISpecDriver {
                 .toArray(String[]::new);
     }
 
-    private Object handlerToObjectUtil(JSHandle jsHandle) {
+    private Object handlerToObjectUtil(JSHandle jsHandle, Reference context) {
         if (jsHandle == null) {
             return null;
         }
@@ -229,19 +229,19 @@ public class SpecDriverPlaywright implements ISpecDriver {
             Map<String, JSHandle> map = jsHandle.getProperties();
             List<Object> arrayValues = new ArrayList<>();
             for (JSHandle jsHandle1: map.values()) {
-                arrayValues.add(handlerToObjectUtil(jsHandle1));
+                arrayValues.add(handlerToObjectUtil(jsHandle1, context));
             }
             return arrayValues;
         } else if (type.equals("object")) {
             Map<String, JSHandle> map = jsHandle.getProperties();
             Map<String, Object> resultMap = new HashMap<>();
             for (Map.Entry<String, JSHandle> entry: map.entrySet()) {
-                resultMap.put(entry.getKey(), handlerToObjectUtil(entry.getValue()));
+                resultMap.put(entry.getKey(), handlerToObjectUtil(entry.getValue(), context));
             }
             return resultMap;
         } else if (type.equals("jshandle@node")) {
             Element element = new Element();
-            element.setApplitoolsRefId(refer.ref(jsHandle.asElement()));
+            element.setApplitoolsRefId(refer.ref(jsHandle.asElement(), context));
             return element;
         }
 
@@ -263,7 +263,7 @@ public class SpecDriverPlaywright implements ISpecDriver {
                     if (id == null) {
                         derefArg.add(argument);
                     } else {
-                        Object deref = refer.deref(id.toString());
+                        Object deref = refer.deref(new Reference(id.toString()));
                         derefArg.add(deref);
                     }
                 }
@@ -272,7 +272,7 @@ public class SpecDriverPlaywright implements ISpecDriver {
         } else if (arg instanceof LinkedHashMap){
             LinkedHashMap<Object, Object> map = new LinkedHashMap<>();
             for (Map.Entry<?, ?> entry : ((LinkedHashMap<?, ?>) arg).entrySet()) {
-                map.put(entry.getKey(), refer.deref(entry.getValue().toString()));
+                map.put(entry.getKey(), refer.deref((Reference) entry.getValue()));
             }
             return map;
         }
@@ -281,7 +281,7 @@ public class SpecDriverPlaywright implements ISpecDriver {
     }
 
     private Frame extractContextUtil(Reference context) {
-        Object root = refer.deref(context.getApplitoolsRefId());
+        Object root = refer.deref(context);
         return isDriver(root) ? ((PageImpl) root).mainFrame() : (Frame) root;
     }
 }

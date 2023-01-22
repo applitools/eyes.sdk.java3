@@ -4,12 +4,47 @@ import com.applitools.eyes.WebDriverProxySettings;
 import com.applitools.eyes.universal.Reference;
 import com.applitools.eyes.universal.dto.ITargetDto;
 import com.applitools.eyes.universal.dto.ProxyDto;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.microsoft.playwright.Page;
+
+import java.util.UUID;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class Driver extends Reference implements ITargetDto {
 
     private ProxyDto proxy = null;
+
+    @JsonIgnore
+    private Page page;
+    @JsonIgnore
+    private Reference root;
+
+    public Driver() {
+        super();
+        root = new Reference();
+        root.setApplitoolsRefId(UUID.randomUUID().toString());
+    }
+
+    public Driver(Page page) {
+        super();
+        this.page = page;
+
+        root = new Driver();
+        root.setApplitoolsRefId(UUID.randomUUID().toString());
+    }
+
+    public Page getPage() {
+        return page;
+    }
+
+    public void setPage(Page page) {
+        this.page = page;
+    }
+
+    public Reference getRoot() {
+        return root;
+    }
 
     public void setWebDriverProxy(WebDriverProxySettings webDriverProxy) {
         if (webDriverProxy == null) {

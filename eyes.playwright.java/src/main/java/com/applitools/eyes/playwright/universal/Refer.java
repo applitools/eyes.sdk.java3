@@ -1,8 +1,8 @@
 package com.applitools.eyes.playwright.universal;
 
-import com.applitools.eyes.playwright.universal.dto.Driver;
-import com.microsoft.playwright.Page;
+import com.applitools.eyes.universal.Reference;
 
+import java.util.HashSet;
 import java.util.UUID;
 
 public class Refer extends com.applitools.eyes.universal.Refer {
@@ -11,52 +11,63 @@ public class Refer extends com.applitools.eyes.universal.Refer {
         super();
     }
 
-    public void destroy() {
-        references.clear();
-        relations.clear();
-    }
-
     /**
      * store the driver's ref.
      *
      * @return the UUID
      */
-    public String ref(Page page, Driver target) {
-        String ref = UUID.randomUUID().toString();
-        references.put(ref, page);
-        relations.put(page, target);
-        return ref;
-    }
+    public String ref(Object value, Reference root) {
+        if (value == null) {
+            return null;
+        }
 
-    /**
-     * store a new ref
-     *
-     * @param context  the context to ref
-     * @return the ref id
-     */
-    public String ref(Object context) {
         String ref = UUID.randomUUID().toString();
-        references.put(ref, context);
+        references.put(ref, value);
+
+        if (root != null) {
+            HashSet<Reference> childRefs = this.relations.computeIfAbsent(root.getApplitoolsRefId(), k -> new HashSet<>());
+            childRefs.add(new Reference(ref));
+        }
         return ref;
     }
 
     /**
      * get a ref from store
      *
-     * @param applitoolsRefId  the ref id
+     * @param ref  the ref
      * @return the ref
      */
-    public Object deref(String applitoolsRefId) {
-        if (applitoolsRefId == null) {
-            return  null;
+    public Object deref(Object ref) {
+        if (isRef(ref)) {
+            Reference reference = (Reference) ref;
+            return references.get(reference.getApplitoolsRefId());
         }
 
-        return isRef(applitoolsRefId)? references.get(applitoolsRefId) : applitoolsRefId;
+        return ref;
     }
 
-    public Boolean isRef(String applitoolsRefId) {
-        return references.containsKey(applitoolsRefId);
+    public void destroy(Reference root) {
+        if (!isRef(root)) {
+            return;
+        }
+
+        HashSet<Reference> childRefs = relations.get(root.getApplitoolsRefId());
+        if (childRefs != null) {
+            for (Reference childRef : childRefs) {
+                destroy(childRef);
+            }
+
+            relations.remove(root.getApplitoolsRefId());
+        }
+
+        references.remove(root.getApplitoolsRefId());
     }
 
-    public Object getDriverTarget(Page page) { return relations.get(page); }
+    public Boolean isRef(Object ref) {
+        if (ref instanceof Reference)
+            return ((Reference) ref).getApplitoolsRefId() != null;
+
+        return false;
+    }
+
 }
