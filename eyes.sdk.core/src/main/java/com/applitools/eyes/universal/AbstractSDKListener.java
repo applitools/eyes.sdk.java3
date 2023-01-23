@@ -61,4 +61,6 @@ public abstract class AbstractSDKListener implements WebSocketListener {
     protected void setWebSocket(WebSocket webSocket) {
         this.webSocket = webSocket;
     }
+
+    public abstract Refer getRefer();
 }
