@@ -30,7 +30,7 @@ public class PlaywrightOCRExtractSettingsDtoMapper {
             ocrExtractSettingsDto.setRegion(selector);
         } else if (ocrRegion.getElement() != null) {
             Element element = new Element(ocrRegion.getElement());
-            element.setApplitoolsRefId(refer.ref(element, root));
+            element.setApplitoolsRefId(refer.ref(ocrRegion.getElement(), root));
             ocrExtractSettingsDto.setRegion(element);
         } else if (ocrRegion.getRegion() != null) {
             ocrExtractSettingsDto.setRegion(RectangleRegionMapper.toRectangleRegionDto(ocrRegion.getRegion()));
