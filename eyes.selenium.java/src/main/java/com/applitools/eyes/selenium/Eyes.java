@@ -9,6 +9,7 @@ import com.applitools.eyes.debug.DebugScreenshotsProvider;
 import com.applitools.eyes.exceptions.TestFailedException;
 import com.applitools.eyes.locators.*;
 import com.applitools.eyes.positioning.PositionProvider;
+import com.applitools.eyes.selenium.exceptions.StaleElementReferenceException;
 import com.applitools.eyes.selenium.fluent.SeleniumCheckSettings;
 import com.applitools.eyes.selenium.fluent.Target;
 import com.applitools.eyes.selenium.frames.FrameChain;
@@ -17,17 +18,20 @@ import com.applitools.eyes.selenium.universal.dto.DriverTargetDto;
 import com.applitools.eyes.selenium.universal.mapper.CheckSettingsMapper;
 import com.applitools.eyes.selenium.universal.mapper.DriverMapper;
 import com.applitools.eyes.selenium.universal.mapper.OCRExtractSettingsDtoMapper;
+import com.applitools.eyes.universal.USDKListener;
 import com.applitools.eyes.universal.mapper.OCRSearchSettingsMapper;
 import com.applitools.eyes.universal.CommandExecutor;
 import com.applitools.eyes.universal.Reference;
 import com.applitools.eyes.universal.dto.*;
 import com.applitools.eyes.universal.dto.response.CommandCloseResponseDto;
 import com.applitools.eyes.triggers.MouseAction;
+import com.applitools.eyes.universal.server.UniversalSdkNativeLoader;
 import com.applitools.eyes.visualgrid.model.IDebugResourceWriter;
 import com.applitools.eyes.visualgrid.model.RenderingInfo;
 import com.applitools.eyes.visualgrid.services.VisualGridRunner;
 import com.applitools.eyes.universal.mapper.*;
 import com.applitools.utils.ArgumentGuard;
+import com.applitools.utils.ClassVersionGetter;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
@@ -42,6 +46,11 @@ import java.util.Map;
  * The type Eyes.
  */
 public class Eyes implements IEyesBase {
+
+    /**
+     * name of the client sdk
+     */
+    protected static String BASE_AGENT_ID = "eyes.sdk.java";
 
     private static final int USE_DEFAULT_MATCH_TIMEOUT = -1;
 
@@ -58,7 +67,30 @@ public class Eyes implements IEyesBase {
         }
     };
 
-    private CommandExecutor commandExecutor;
+    private static CommandExecutor commandExecutor;
+
+
+    public static String getExecutionCloudURL() {
+        return getExecutionCloudURL(null, null, null);
+    }
+
+    public static String getExecutionCloudURL(String apiKey) {
+        return getExecutionCloudURL(apiKey, null, null);
+    }
+
+    public static String getExecutionCloudURL(String apiKey, String serverUrl) {
+        return getExecutionCloudURL(apiKey, serverUrl, null);
+    }
+
+    public static String getExecutionCloudURL(String apiKey, String serverUrl, AbstractProxySettings proxySettings) {
+        // start the universal server earlier than normally
+        UniversalSdkNativeLoader.setLogger(new Logger());
+        UniversalSdkNativeLoader.start();
+
+        EGClientSettingsDto settings = new EGClientSettingsDto(apiKey, serverUrl, ProxyMapper.toProxyDto(proxySettings));
+        return CommandExecutor.coreMakeEGClient(settings).getUrl();
+    }
+
 
     /**
      * this reference has to be used in eyes related requests (Eyes.check, Eyes.locate, Eyes.extractTextRegions, Eyes.extractText, Eyes.close, Eyes.abort)

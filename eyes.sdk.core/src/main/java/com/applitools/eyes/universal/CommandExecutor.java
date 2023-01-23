@@ -52,6 +52,22 @@ public class CommandExecutor {
     checkedCommand(request);
   }
 
+  public static MakeEGClientResponsePayload coreMakeEGClient(EGClientSettingsDto settings) {
+    RequestDto<MakeEGClient> request = new RequestDto<>();
+    MakeEGClient makeEGClient = new MakeEGClient(settings);
+    request.setName("Core.makeEGClient");
+    request.setKey(UUID.randomUUID().toString());
+    request.setPayload(makeEGClient);
+    SyncTaskListener syncTaskListener = checkedCommand(request);
+
+    ResponseDto<MakeEGClientResponsePayload> response = (ResponseDto<MakeEGClientResponsePayload>) syncTaskListener.get();
+    if (response != null && response.getPayload().getError() != null) {
+      String message = response.getPayload().getError().getMessage();
+      throw new EyesException(message);
+    }
+    return response.getPayload().getResult();
+  }
+
   // TODO - agentId is currently null because this will set the agentID incorrectly in the dashboard/logs
   public Reference coreMakeManager(String type, Integer concurrency, Integer legacyConcurrency, String agentId) {
     RequestDto<MakeManager> request = new RequestDto<>();
