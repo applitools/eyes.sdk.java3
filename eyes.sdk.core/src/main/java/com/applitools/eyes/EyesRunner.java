@@ -49,7 +49,7 @@ public abstract class EyesRunner {
   /**
    * the universal server listener.
    */
-  protected static USDKListener listener;
+  protected static AbstractSDKListener listener;
 
   private Boolean dontCloseBatches;
 
