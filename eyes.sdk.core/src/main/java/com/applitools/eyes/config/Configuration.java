@@ -135,7 +135,7 @@ public class Configuration implements IConfiguration {
         this.hideScrollbars = other.getHideScrollbars();
         this.hideCaret = other.getHideCaret();
         this.isRenderingConfig = other.isRenderingConfig();
-        this.browsersInfo.addAll(other.getBrowsersInfo());
+        this.browsersInfo = new ArrayList<>(other.getBrowsersInfo());
         this.defaultMatchSettings = new ImageMatchSettings(other.getDefaultMatchSettings());
         this.isVisualGrid = other.isVisualGrid();
         this.features = new HashSet<>(other.getFeatures());
@@ -687,11 +687,7 @@ public class Configuration implements IConfiguration {
             return browsersInfo;
         }
 
-        if (this.viewportSize != null) {
-            RenderBrowserInfo renderBrowserInfo = new RenderBrowserInfo(this.viewportSize.getWidth(), this.viewportSize.getHeight(), BrowserType.CHROME, baselineEnvName);
-            return Collections.singletonList(renderBrowserInfo);
-        }
-        return browsersInfo;
+        return null;
     }
 
     public Configuration setBrowsersInfo(List<RenderBrowserInfo> browsersInfo) {
