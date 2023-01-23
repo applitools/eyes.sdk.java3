@@ -135,7 +135,9 @@ public class Configuration implements IConfiguration {
         this.hideScrollbars = other.getHideScrollbars();
         this.hideCaret = other.getHideCaret();
         this.isRenderingConfig = other.isRenderingConfig();
-        this.browsersInfo = new ArrayList<>(other.getBrowsersInfo());
+        if (other.getBrowsersInfo() != null) {
+            this.browsersInfo = new ArrayList<>(other.getBrowsersInfo());
+        }
         this.defaultMatchSettings = new ImageMatchSettings(other.getDefaultMatchSettings());
         this.isVisualGrid = other.isVisualGrid();
         this.features = new HashSet<>(other.getFeatures());
