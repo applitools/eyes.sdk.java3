@@ -271,6 +271,8 @@ public class SpecDriverPlaywright implements ISpecDriver {
                         Object deref = refer.deref(new Reference(id.toString()));
                         derefArg.add(deref);
                     }
+                } else {
+                    derefArg.add(refer.deref(argument));
                 }
             }
             return derefArg;
@@ -282,7 +284,7 @@ public class SpecDriverPlaywright implements ISpecDriver {
             return map;
         }
 
-        return derefArg;
+        return refer.deref(arg);
     }
 
     private Frame extractContextUtil(Reference context) {
