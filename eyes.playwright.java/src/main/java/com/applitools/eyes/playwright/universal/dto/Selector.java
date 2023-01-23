@@ -2,14 +2,18 @@ package com.applitools.eyes.playwright.universal.dto;
 
 import com.applitools.eyes.Padding;
 import com.applitools.eyes.universal.Reference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.microsoft.playwright.Locator;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class Selector extends Reference {
 
     @JsonProperty("type")
     private String type;
+    @JsonIgnore
+    private Locator locator;
 
     @JsonProperty("selector")
     private String selector;
@@ -25,8 +29,12 @@ public class Selector extends Reference {
     }
 
     public Selector(String selector) {
-        this.type = "selector";
         this.selector = selector;
+    }
+
+    public Selector(Locator locator) {
+        this.type = "selector";
+        this.locator = locator;
     }
 
     public String getType() {
@@ -35,6 +43,14 @@ public class Selector extends Reference {
 
     public void setType(String type) {
         this.type = type;
+    }
+
+    public Locator getLocator() {
+        return locator;
+    }
+
+    public void setLocator(Locator locator) {
+        this.locator = locator;
     }
 
     public String getSelector() {

@@ -5,6 +5,7 @@ import com.applitools.eyes.Region;
 import com.applitools.eyes.playwright.fluent.PlaywrightCheckSettings;
 import com.applitools.eyes.playwright.universal.Refer;
 import com.applitools.eyes.playwright.universal.dto.Element;
+import com.applitools.eyes.playwright.universal.dto.Selector;
 import com.applitools.eyes.universal.Reference;
 import com.applitools.eyes.universal.dto.TRegion;
 import com.applitools.eyes.universal.mapper.RectangleRegionMapper;
@@ -24,8 +25,11 @@ public class TRegionMapper {
             if (element instanceof Element) {
                 ElementHandle elementHandle = ((Element) element).getElementHandle();
                 element.setApplitoolsRefId(refer.ref(elementHandle, root));
-            } else {
-                element.setApplitoolsRefId(refer.ref(element, root));
+            } else if (element instanceof Selector){
+                Selector selector = (Selector) element;
+                if (selector.getLocator() != null) {
+                    element.setApplitoolsRefId(refer.ref(element, root));
+                }
             }
             return element;
         }
