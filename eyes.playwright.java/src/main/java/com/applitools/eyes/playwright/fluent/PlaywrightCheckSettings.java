@@ -515,6 +515,11 @@ public class PlaywrightCheckSettings extends CheckSettings implements IPlaywrigh
     }
 
     @Override
+    public Boolean isDefaultLayoutBreakpointsSet() {
+        return isDefaultLayoutBreakpointsSet;
+    }
+
+    @Override
     public PlaywrightCheckSettings fully() {
         return fully(true);
     }
