@@ -12,7 +12,7 @@ public class ClassicRunner extends EyesRunner {
     /**
      * name of the client sdk
      */
-    protected static String BASE_AGENT_ID = "eyes.sdk.playwright";
+    protected static String BASE_AGENT_ID = "eyes.playwright.java";
 
     /**
      * version of the client sdk
