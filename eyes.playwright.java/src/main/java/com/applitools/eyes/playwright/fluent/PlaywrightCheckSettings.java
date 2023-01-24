@@ -476,35 +476,42 @@ public class PlaywrightCheckSettings extends CheckSettings implements IPlaywrigh
     }
 
     public PlaywrightCheckSettings layoutBreakpoints(int... breakpoints) {
-        isDefaultLayoutBreakpointsSet = false;
-        layoutBreakpoints.clear();
+        return setLayoutBreakpoints(breakpoints);
+    }
+
+    public PlaywrightCheckSettings layoutBreakpoints(Boolean shouldSet) {
+        return setLayoutBreakpoints(shouldSet);
+    }
+
+    @Override
+    public PlaywrightCheckSettings setLayoutBreakpoints(int... breakpoints) {
+        PlaywrightCheckSettings clone = this.clone();
+        clone.isDefaultLayoutBreakpointsSet = false;
+        clone.layoutBreakpoints.clear();
         if (breakpoints == null || breakpoints.length == 0) {
             return this;
         }
 
         for (int breakpoint : breakpoints) {
             ArgumentGuard.greaterThanZero(breakpoint, "breakpoint");
-            layoutBreakpoints.add(breakpoint);
+            clone.layoutBreakpoints.add(breakpoint);
         }
 
-        Collections.sort(layoutBreakpoints);
-        return this;
-    }
-
-    public PlaywrightCheckSettings layoutBreakpoints(Boolean shouldSet) {
-        this.isDefaultLayoutBreakpointsSet = shouldSet;
-        layoutBreakpoints.clear();
-        return this;
-    }
-
-    @Override
-    public PlaywrightCheckSettings setLayoutBreakpoints(int... breakpoints) {
-        return layoutBreakpoints(breakpoints);
+        Collections.sort(clone.layoutBreakpoints);
+        return clone;
     }
 
     @Override
     public PlaywrightCheckSettings setLayoutBreakpoints(Boolean shouldSet) {
-        return layoutBreakpoints(shouldSet);
+        PlaywrightCheckSettings clone = this.clone();
+        clone.isDefaultLayoutBreakpointsSet = shouldSet;
+        clone.layoutBreakpoints.clear();
+        return clone;
+    }
+
+    @Override
+    public List<Integer> getLayoutBreakpoints() {
+        return layoutBreakpoints;
     }
 
     @Override
