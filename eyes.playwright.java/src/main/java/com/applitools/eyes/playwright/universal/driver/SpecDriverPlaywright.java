@@ -263,22 +263,14 @@ public class SpecDriverPlaywright implements ISpecDriver {
             for (Object argument: (ArrayList) arg) {
                 if (argument instanceof ArrayList) {
                     derefArg.add(derefArgsUtil(argument));
-                } else if (argument instanceof LinkedHashMap){
-                    Object id = ((LinkedHashMap) argument).get(Refer.APPLITOOLS_REF_ID);
-                    if (id == null) {
-                        derefArg.add(argument);
-                    } else {
-                        Object deref = refer.deref(new Reference(id.toString()));
-                        derefArg.add(deref);
-                    }
                 } else {
                     derefArg.add(refer.deref(argument));
                 }
             }
             return derefArg;
-        } else if (arg instanceof LinkedHashMap){
-            LinkedHashMap<Object, Object> map = new LinkedHashMap<>();
-            for (Map.Entry<?, ?> entry : ((LinkedHashMap<?, ?>) arg).entrySet()) {
+        } else if (arg instanceof HashMap){
+            HashMap<Object, Object> map = new HashMap<>();
+            for (Map.Entry<?, ?> entry : ((HashMap<?, ?>) arg).entrySet()) {
                 map.put(entry.getKey(), refer.deref(entry.getValue()));
             }
             return map;

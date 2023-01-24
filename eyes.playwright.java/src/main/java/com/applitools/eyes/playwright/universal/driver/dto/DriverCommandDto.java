@@ -1,10 +1,12 @@
 package com.applitools.eyes.playwright.universal.driver.dto;
 
+import com.applitools.eyes.playwright.deserializers.ExecuteScriptDeserializer;
 import com.applitools.eyes.playwright.universal.dto.Selector;
 import com.applitools.eyes.universal.Reference;
 import com.applitools.eyes.universal.dto.RectangleSizeDto;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class DriverCommandDto {
@@ -27,6 +29,7 @@ public class DriverCommandDto {
     @JsonProperty("script")
     protected String script;
 
+    @JsonDeserialize(using = ExecuteScriptDeserializer.class)
     @JsonProperty("arg")
     protected Object arg;
 
