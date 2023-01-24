@@ -255,7 +255,7 @@ public class PSDKListener extends AbstractSDKListener {
                                 new TypeReference<RequestDto<DriverCommandDto>>() {
                                 }).getPayload();
                         List<ICookie> cookies = specDriver.getCookies(target.getDriver(), target.getContext());
-                        getCookies.setPayload(new ResponsePayload(cookies.toString(), null));
+                        getCookies.setPayload(new ResponsePayload(cookies, null));
                     } catch (Exception e) {
                         ErrorDto err = new ErrorDto(e.getMessage(), Arrays.toString(e.getStackTrace()),"spec-driver",null);
                         getCookies.setPayload(new ResponsePayload<>(null, err));
