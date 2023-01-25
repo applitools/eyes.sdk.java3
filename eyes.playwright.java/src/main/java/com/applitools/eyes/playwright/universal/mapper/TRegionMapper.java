@@ -10,6 +10,7 @@ import com.applitools.eyes.universal.Reference;
 import com.applitools.eyes.universal.dto.TRegion;
 import com.applitools.eyes.universal.mapper.RectangleRegionMapper;
 import com.microsoft.playwright.ElementHandle;
+import com.microsoft.playwright.Locator;
 
 public class TRegionMapper {
 
@@ -28,7 +29,8 @@ public class TRegionMapper {
             } else if (element instanceof Selector){
                 Selector selector = (Selector) element;
                 if (selector.getLocator() != null) {
-                    element.setApplitoolsRefId(refer.ref(element, root));
+                    Locator locator = selector.getLocator();
+                    element.setApplitoolsRefId(refer.ref(locator, root));
                 }
             }
             return element;
