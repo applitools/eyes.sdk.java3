@@ -2,8 +2,13 @@ package com.applitools.eyes.playwright.fluent;
 
 import com.applitools.eyes.AccessibilityRegionType;
 import com.applitools.eyes.playwright.universal.dto.Element;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.microsoft.playwright.ElementHandle;
 
+/**
+ * Used internally to represent a ref of an accessibility element
+ */
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class AccessibilityElement extends Element {
 
     private AccessibilityRegionType accessibilityRegionType;

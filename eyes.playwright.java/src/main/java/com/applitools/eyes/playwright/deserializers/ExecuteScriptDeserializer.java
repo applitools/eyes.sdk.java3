@@ -1,10 +1,10 @@
 package com.applitools.eyes.playwright.deserializers;
 
+import com.applitools.eyes.EyesException;
 import com.applitools.eyes.playwright.universal.dto.Element;
 import com.applitools.eyes.playwright.universal.dto.Selector;
 import com.applitools.eyes.universal.Refer;
 import com.applitools.eyes.universal.Reference;
-import com.fasterxml.jackson.core.JacksonException;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.DeserializationContext;
@@ -13,11 +13,17 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.io.IOException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
+/**
+ * Custom deserializer for the additional arguments in {@link com.applitools.eyes.playwright.universal.driver.SpecDriverPlaywright#executeScript(Reference, String, Object)}
+ */
 public class ExecuteScriptDeserializer extends JsonDeserializer<Object> {
     @Override
-    public Object deserialize(JsonParser jsonParser, DeserializationContext deserializationContext) throws IOException, JacksonException {
+    public Object deserialize(JsonParser jsonParser, DeserializationContext deserializationContext) throws IOException {
         JsonNode jsonNode = jsonParser.readValueAsTree();
 
         if (jsonNode.isObject()) {
@@ -31,8 +37,7 @@ public class ExecuteScriptDeserializer extends JsonDeserializer<Object> {
             return null;
         }
 
-        System.out.println("Unsupported class for: " + jsonNode);
-        return null;
+        throw new EyesException("Unsupported type to deserialize!");
     }
 
     private Object handleObject(JsonNode jsonNode) {

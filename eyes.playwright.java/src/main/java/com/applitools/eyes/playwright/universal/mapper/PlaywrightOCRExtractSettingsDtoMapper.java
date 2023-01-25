@@ -3,7 +3,6 @@ package com.applitools.eyes.playwright.universal.mapper;
 import com.applitools.eyes.locators.BaseOcrRegion;
 import com.applitools.eyes.playwright.locators.OcrRegion;
 import com.applitools.eyes.playwright.universal.Refer;
-import com.applitools.eyes.playwright.universal.dto.Driver;
 import com.applitools.eyes.playwright.universal.dto.Element;
 import com.applitools.eyes.playwright.universal.dto.Selector;
 import com.applitools.eyes.universal.Reference;
@@ -26,7 +25,10 @@ public class PlaywrightOCRExtractSettingsDtoMapper {
         OCRExtractSettingsDto ocrExtractSettingsDto = new OCRExtractSettingsDto();
         if (ocrRegion.getSelector() != null) {
             Selector selector = new Selector(ocrRegion.getSelector());
-            selector.setApplitoolsRefId(refer.ref(selector, root));
+            ocrExtractSettingsDto.setRegion(selector);
+        } else if (ocrRegion.getLocator() != null) {
+            Selector selector = new Selector(ocrRegion.getLocator());
+            selector.setApplitoolsRefId(refer.ref(ocrRegion.getLocator(), root));
             ocrExtractSettingsDto.setRegion(selector);
         } else if (ocrRegion.getElement() != null) {
             Element element = new Element(ocrRegion.getElement());

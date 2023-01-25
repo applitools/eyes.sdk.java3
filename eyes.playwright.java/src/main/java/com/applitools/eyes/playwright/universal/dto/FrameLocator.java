@@ -7,8 +7,8 @@ public class FrameLocator {
 
     private String frameNameOrId;
     private Integer frameIndex;
-
-    private Element frameReference;
+    private Element frameElement;
+    private Selector frameSelector;
     private Selector scrollRootSelector;
     private Element scrollRootElement;
 
@@ -28,12 +28,20 @@ public class FrameLocator {
         this.frameIndex = frameIndex;
     }
 
-    public Element getFrameReference() {
-        return frameReference;
+    public Element getFrameElement() {
+        return frameElement;
     }
 
-    public void setFrameReference(Element frameReference) {
-        this.frameReference = frameReference;
+    public void setFrameElement(Element frameElement) {
+        this.frameElement = frameElement;
+    }
+
+    public Selector getFrameSelector() {
+        return frameSelector;
+    }
+
+    public void setFrameSelector(Selector frameSelector) {
+        this.frameSelector = frameSelector;
     }
 
     public Selector getScrollRootSelector() {

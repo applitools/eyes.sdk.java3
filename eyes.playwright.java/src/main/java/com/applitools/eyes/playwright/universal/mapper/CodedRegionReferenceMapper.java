@@ -31,7 +31,9 @@ public class CodedRegionReferenceMapper {
             codedRegionReference.setPadding(element.getPadding());
         } else if (getSimpleRegion instanceof Selector) {
             Selector selector = (Selector) getSimpleRegion;
-            selector.setApplitoolsRefId(refer.ref(getSimpleRegion, root));
+            if (selector.getLocator() != null) {
+                selector.setApplitoolsRefId(refer.ref(selector.getLocator(), root));
+            }
             codedRegionReference.setRegion(selector);
             codedRegionReference.setRegionId(selector.getRegionId());
             codedRegionReference.setPadding(selector.getPadding());

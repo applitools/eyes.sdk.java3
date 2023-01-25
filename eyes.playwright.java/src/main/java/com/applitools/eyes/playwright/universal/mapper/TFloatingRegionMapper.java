@@ -23,7 +23,9 @@ public class TFloatingRegionMapper {
 
         if (getFloatingRegion instanceof FloatingRegionSelector) {
             FloatingRegionSelector selector = (FloatingRegionSelector) getFloatingRegion;
-            selector.setApplitoolsRefId(refer.ref(getFloatingRegion, root));
+            if (selector.getLocator() != null) {
+                selector.setApplitoolsRefId(refer.ref(selector.getLocator(), root));
+            }
 
             FloatingRegionBySelector floatingRegionBySelector = new FloatingRegionBySelector();
             floatingRegionBySelector.setRegion(selector);

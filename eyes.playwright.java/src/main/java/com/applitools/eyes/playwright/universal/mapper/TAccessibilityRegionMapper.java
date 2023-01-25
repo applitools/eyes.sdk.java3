@@ -23,21 +23,23 @@ public class TAccessibilityRegionMapper {
         }
 
         if (getAccessibilityRegion instanceof AccessibilitySelector) {
-            AccessibilitySelector selector = (AccessibilitySelector) getAccessibilityRegion;
-            selector.setApplitoolsRefId(refer.ref(getAccessibilityRegion, root));
+            AccessibilitySelector accessibilitySelector = (AccessibilitySelector) getAccessibilityRegion;
+            if (accessibilitySelector.getLocator() != null) {
+                accessibilitySelector.setApplitoolsRefId(refer.ref(accessibilitySelector.getLocator(), root));
+            }
 
             AccessibilityRegionBySelector accessibilityRegionBySelector = new AccessibilityRegionBySelector();
-            accessibilityRegionBySelector.setRegion(selector);
-            accessibilityRegionBySelector.setType(selector.getAccessibilityRegionType().name());
+            accessibilityRegionBySelector.setRegion(accessibilitySelector);
+            accessibilityRegionBySelector.setType(accessibilitySelector.getAccessibilityRegionType().name());
             return accessibilityRegionBySelector;
 
         } else if (getAccessibilityRegion instanceof AccessibilityElement) {
-            AccessibilityElement element = (AccessibilityElement) getAccessibilityRegion;
-            element.setApplitoolsRefId(refer.ref(element.getElementHandle(), root));
+            AccessibilityElement accessibilityElement = (AccessibilityElement) getAccessibilityRegion;
+            accessibilityElement.setApplitoolsRefId(refer.ref(accessibilityElement.getElementHandle(), root));
 
             AccessibilityRegionByElement accessibilityRegionByElement = new AccessibilityRegionByElement();
-            accessibilityRegionByElement.setRegion(element);
-            accessibilityRegionByElement.setType(element.getAccessibilityRegionType().name());
+            accessibilityRegionByElement.setRegion(accessibilityElement);
+            accessibilityRegionByElement.setType(accessibilityElement.getAccessibilityRegionType().name());
             return accessibilityRegionByElement;
 
         } else if (getAccessibilityRegion instanceof AccessibilityRegionByRectangle) {
