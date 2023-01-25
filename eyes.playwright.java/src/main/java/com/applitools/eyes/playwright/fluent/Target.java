@@ -44,7 +44,7 @@ public class Target {
      * @return the check settings
      */
     public static PlaywrightCheckSettings region(Locator locator) {
-        return region(locator.elementHandle());
+        return new PlaywrightCheckSettings().region(locator);
     }
 
     /**
