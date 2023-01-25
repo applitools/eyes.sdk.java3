@@ -9,10 +9,7 @@ import com.applitools.eyes.universal.ISpecDriver;
 import com.applitools.eyes.universal.Reference;
 import com.applitools.eyes.universal.driver.ICookie;
 import com.applitools.eyes.universal.dto.*;
-import com.microsoft.playwright.ElementHandle;
-import com.microsoft.playwright.Frame;
-import com.microsoft.playwright.JSHandle;
-import com.microsoft.playwright.Page;
+import com.microsoft.playwright.*;
 import com.microsoft.playwright.impl.PageImpl;
 import com.microsoft.playwright.options.Cookie;
 
@@ -111,12 +108,16 @@ public class SpecDriverPlaywright implements ISpecDriver {
     public Element findElement(Reference driver, Reference selector, Reference parent) {
         Object context = refer.deref(driver);
         Object root = parent == null? context : refer.deref(parent);
+        Object locator = refer.deref(selector);
 
         ElementHandle elementHandle = null;
-        if (root instanceof Frame) {
-            elementHandle = ((Frame) root).locator(((Selector)selector).getSelector()).elementHandle();
+        String _selector = ((Selector)selector).getSelector();
+        if (locator instanceof Locator) {
+            elementHandle = ((Locator) locator).elementHandle();
+        } else if (root instanceof Frame) {
+            elementHandle = ((Frame) root).querySelector(_selector);
         } else if (root instanceof Page) {
-            elementHandle = ((Page) root).locator(((Selector)selector).getSelector()).elementHandle();
+            elementHandle = ((Page) root).querySelector(_selector);
         }
 
         if (elementHandle == null) {
@@ -132,12 +133,16 @@ public class SpecDriverPlaywright implements ISpecDriver {
     public List<Reference> findElements(Reference context, Reference selector, Reference parent) {
         Object ctx = refer.deref(context);
         Object root = parent == null? ctx : refer.deref(parent);
+        Object locator = refer.deref(selector);
 
         List<ElementHandle> elementHandles = new ArrayList<>();
-        if (root instanceof Frame) {
-            elementHandles = ((Frame) root).locator(((Selector)selector).getSelector()).elementHandles();
+        String _selector = ((Selector)selector).getSelector();
+        if (locator instanceof Locator) {
+            elementHandles = ((Locator) locator).elementHandles();
+        } else if (root instanceof Frame) {
+            elementHandles = ((Frame) root).querySelectorAll(_selector);
         } else if (root instanceof Page) {
-            elementHandles = ((Page) root).locator(((Selector)selector).getSelector()).elementHandles();
+            elementHandles = ((Page) root).querySelectorAll(_selector);
         }
 
         return elementHandles.stream()
