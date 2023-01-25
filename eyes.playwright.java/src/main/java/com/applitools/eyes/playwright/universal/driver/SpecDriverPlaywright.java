@@ -67,6 +67,10 @@ public class SpecDriverPlaywright implements ISpecDriver {
     public Context parentContext(Reference context) {
         Frame frame = extractContextUtil(context);
 
+        if (frame.parentFrame() == null) {
+            return null;
+        }
+
         Context frameContext = new Context();
         frameContext.setApplitoolsRefId(refer.ref(frame.parentFrame(), context));
         return frameContext;
@@ -84,7 +88,7 @@ public class SpecDriverPlaywright implements ISpecDriver {
             return frameContext;
         }
 
-        return (Context) ISpecDriver.super.childContext(context, element);
+        return null;
     }
 
     @Override
@@ -115,9 +119,13 @@ public class SpecDriverPlaywright implements ISpecDriver {
             elementHandle = ((Page) root).locator(((Selector)selector).getSelector()).elementHandle();
         }
 
+        if (elementHandle == null) {
+            return null;
+        }
+
         Element element = new Element();
         element.setApplitoolsRefId(refer.ref(elementHandle, driver));
-        return elementHandle == null? null : element;
+        return element;
     }
 
     @Override
