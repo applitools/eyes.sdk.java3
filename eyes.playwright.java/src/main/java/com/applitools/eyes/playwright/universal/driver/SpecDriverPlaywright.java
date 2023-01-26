@@ -155,16 +155,6 @@ public class SpecDriverPlaywright implements ISpecDriver {
     }
 
     @Override
-    public void setElementText() {
-        ISpecDriver.super.setElementText();
-    }
-
-    @Override
-    public String getElementText() {
-        return ISpecDriver.super.getElementText();
-    }
-
-    @Override
     public void setViewportSize(Reference driver, RectangleSizeDto windowSize) {
         Object page = refer.deref(driver);
         ((Page) page).setViewportSize(windowSize.getWidth(), windowSize.getHeight());
@@ -216,11 +206,6 @@ public class SpecDriverPlaywright implements ISpecDriver {
     public byte[] takeScreenshot(Reference driver) {
         Page context = (Page) refer.deref(driver);
         return context.screenshot();
-    }
-
-    @Override
-    public void click() {
-        ISpecDriver.super.click();
     }
 
     static public String[] getMethodNames() {
