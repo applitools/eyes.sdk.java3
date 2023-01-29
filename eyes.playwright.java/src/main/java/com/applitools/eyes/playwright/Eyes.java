@@ -854,6 +854,11 @@ public class Eyes implements IEyesBase {
         configure().setStitchMode(stitchMode);
     }
 
+    //TODO should change when releasing a new major version
+    public void setStitchMode(com.applitools.eyes.StitchMode stitchMode) {
+        setStitchMode(stitchMode.getName().equals("CSS") ? StitchMode.CSS : StitchMode.SCROLL);
+    }
+
     private void checkDto(CheckSettingsDto checkSettingsDto, ITargetDto driverTargetDto) throws EyesException {
         if (getIsDisabled()) {
             return;
