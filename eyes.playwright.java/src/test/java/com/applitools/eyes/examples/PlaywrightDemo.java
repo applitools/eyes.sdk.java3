@@ -1,6 +1,6 @@
 package com.applitools.eyes.examples;
 
-import com.applitools.eyes.BrowserType;
+import com.applitools.eyes.visualgrid.BrowserType;
 import com.applitools.eyes.RectangleSize;
 import com.applitools.eyes.TestResults;
 import com.applitools.eyes.playwright.ClassicRunner;

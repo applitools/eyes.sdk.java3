@@ -1,14 +1,13 @@
 package com.applitools.eyes.examples;
 
 import com.applitools.eyes.*;
-import com.applitools.eyes.BrowserType;
+import com.applitools.eyes.visualgrid.BrowserType;
 import com.applitools.eyes.config.Configuration;
 import com.applitools.eyes.playwright.ClassicRunner;
 import com.applitools.eyes.playwright.Eyes;
 import com.applitools.eyes.playwright.fluent.Target;
 import com.applitools.eyes.playwright.visualgrid.VisualGridRunner;
 import com.applitools.eyes.selenium.StitchMode;
-import com.applitools.eyes.visualgrid.model.*;
 import com.applitools.eyes.visualgrid.services.RunnerOptions;
 import com.microsoft.playwright.*;
 
