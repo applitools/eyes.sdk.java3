@@ -114,4 +114,19 @@ public class DriverCommandDto {
     public void setUrl(String url) {
         this.url = url;
     }
+
+    @Override
+    public String toString() {
+        return "DriverCommandDto{" +
+                "driver=" + driver +
+                ", context=" + context +
+                ", element=" + element +
+                ", parent=" + parent +
+                ", selector=" + selector +
+                ", script='" + script + '\'' +
+                ", arg=" + arg +
+                ", size=" + size +
+                ", url='" + url + '\'' +
+                '}';
+    }
 }
