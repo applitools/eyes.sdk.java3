@@ -652,8 +652,17 @@ public class Configuration implements IConfiguration {
         return this;
     }
 
-    public Configuration addBrowser(int width, int height, IBrowserType browserType) {
-        return addBrowser(width, height, (BrowserType) browserType, baselineEnvName);
+    public Configuration addBrowser(int width, int height, BrowserType browserType) {
+        return addBrowser(width, height, browserType, baselineEnvName);
+    }
+
+    public Configuration addBrowser(int width, int height, com.applitools.eyes.BrowserType browserType, String baselineEnvName) {
+        BrowserType browserType1 = BrowserType.fromName(browserType.getName());
+        return addBrowser(width, height, browserType1, baselineEnvName);
+    }
+
+    public Configuration addBrowser(int width, int height, com.applitools.eyes.BrowserType browserType) {
+        return addBrowser(width, height, browserType, baselineEnvName);
     }
 
     public Configuration addDeviceEmulation(DeviceName deviceName, ScreenOrientation orientation) {

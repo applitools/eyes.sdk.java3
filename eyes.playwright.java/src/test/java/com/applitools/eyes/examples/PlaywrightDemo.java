@@ -1,11 +1,15 @@
 package com.applitools.eyes.examples;
 
-import com.applitools.eyes.*;
+import com.applitools.eyes.BrowserType;
+import com.applitools.eyes.RectangleSize;
+import com.applitools.eyes.TestResults;
 import com.applitools.eyes.playwright.ClassicRunner;
-import com.applitools.eyes.playwright.visualgrid.BrowserType;
 import com.applitools.eyes.playwright.Eyes;
 import com.applitools.eyes.playwright.fluent.Target;
-import com.microsoft.playwright.*;
+import com.microsoft.playwright.Browser;
+import com.microsoft.playwright.BrowserContext;
+import com.microsoft.playwright.Page;
+import com.microsoft.playwright.Playwright;
 import org.testng.annotations.*;
 
 public class PlaywrightDemo {
