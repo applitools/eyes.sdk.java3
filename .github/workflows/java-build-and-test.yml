@@ -127,6 +127,47 @@ jobs:
           SAUCE_ACCESS_KEY: ${{ secrets.SAUCE_ACCESS_KEY }}
           CHROME_DRIVER_PATH: "/usr/local/bin/chromedriver"
 
+  playwright-tests:
+    needs: build
+    concurrency: test_group_5
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository and submodules
+        uses: actions/checkout@v3
+        with:
+          submodules: recursive
+          token: ${{ secrets.SUBMODULES_GA_TOKEN }}
+      - name: Setup Node
+        uses: actions/setup-node@v3
+        with:
+          node-version: 16
+      - name: Setup Java
+        uses: actions/setup-java@v3
+        with:
+          java-version: 8
+          distribution: "temurin"
+          cache: "maven"
+      - name: initialize
+        run: |
+          pushd eyes.ufg.java/src/main/resources
+          npm install
+          popd
+          mvn clean install -DskipTests
+      - uses: browser-actions/setup-chrome@latest
+      - run: |
+          chmod +x ./initChromeDriverGHA.sh && ./initChromeDriverGHA.sh
+          export DISPLAY=:99
+          chromedriver --url-base=/wd/hub &
+      - name: SDK Playwright tests
+        run: |
+          echo "Starting SDK Playwright tests."
+          echo $APPLITOOLS_REPORT_ID
+          mvn test -pl "eyes.playwright.java" -e -X
+        #          working-directory: java
+        env:
+          APPLITOOLS_API_KEY: ${{ secrets.APPLITOOLS_API_KEY }}
+          CHROME_DRIVER_PATH: "/usr/local/bin/chromedriver"
+
   arm64-tests:
     needs: build
     runs-on: ubuntu-latest
