@@ -52,8 +52,12 @@ public class TRegionMapper {
         if (scrollRootElement instanceof Element) {
             ElementHandle elementHandle = ((Element) scrollRootElement).getElementHandle();
             scrollRootElement.setApplitoolsRefId(refer.ref(elementHandle, root));
-        } else {
-            scrollRootElement.setApplitoolsRefId(refer.ref(scrollRootElement, root));
+        } else if (scrollRootElement instanceof Selector) {
+            Selector selector = (Selector) scrollRootElement;
+            if (selector.getLocator() != null) {
+                Locator locator = selector.getLocator();
+                scrollRootElement.setApplitoolsRefId(refer.ref(locator, root));
+            }
         }
         return scrollRootElement;
     }
