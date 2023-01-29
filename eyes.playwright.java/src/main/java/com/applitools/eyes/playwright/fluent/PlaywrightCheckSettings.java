@@ -125,16 +125,6 @@ public class PlaywrightCheckSettings extends CheckSettings implements IPlaywrigh
     /**
      * Specify the target as a frame.
      *
-     * @param frame  the frame
-     * @return an updated instance of this settings object
-     */
-    public PlaywrightCheckSettings frame(@Nonnull Frame frame) {
-        return frame(frame.frameElement());
-    }
-
-    /**
-     * Specify the target as a frame.
-     *
      * @param frameLocator  the frame as a locator
      * @return an updated instance of this settings object
      */

@@ -22,8 +22,6 @@ public interface IPlaywrightCheckSettings extends ICheckSettings {
 
     PlaywrightCheckSettings frame(Integer frameIndex);
 
-    PlaywrightCheckSettings frame(Frame frame);
-
     PlaywrightCheckSettings frame(Locator locator);
 
     PlaywrightCheckSettings frame(ElementHandle elementHandle);

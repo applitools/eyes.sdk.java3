@@ -80,11 +80,11 @@ public class Target {
     /**
      * Specify the target as a frame.
      *
-     * @param frame the frame.
+     * @param locator the frame locator.
      * @return the check settings
      */
-    public static PlaywrightCheckSettings frame(Frame frame) {
-        return frame(frame.frameElement());
+    public static PlaywrightCheckSettings frame(Locator locator) {
+        return new PlaywrightCheckSettings().frame(locator);
     }
 
     /**
