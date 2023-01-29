@@ -27,4 +27,12 @@ public class DriverInfoFeaturesDto {
     public void setCanExecuteOnlyFunctionScripts(Boolean canExecuteOnlyFunctionScripts) {
         this.canExecuteOnlyFunctionScripts = canExecuteOnlyFunctionScripts;
     }
+
+    @Override
+    public String toString() {
+        return "DriverInfoFeaturesDto{" +
+                "allCookies=" + allCookies +
+                ", canExecuteOnlyFunctionScripts=" + canExecuteOnlyFunctionScripts +
+                '}';
+    }
 }

@@ -18,4 +18,11 @@ public class DriverInfoDto {
     public void setFeatures(DriverInfoFeaturesDto features) {
         this.features = features;
     }
+
+    @Override
+    public String toString() {
+        return "DriverInfoDto{" +
+                "features=" + features +
+                '}';
+    }
 }
