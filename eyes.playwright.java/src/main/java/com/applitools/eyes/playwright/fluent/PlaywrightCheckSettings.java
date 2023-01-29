@@ -696,6 +696,14 @@ public class PlaywrightCheckSettings extends CheckSettings implements IPlaywrigh
     }
 
     /**
+     * Shortcut to set the match level to {@code MatchLevel.CONTENT}.
+     * @return An updated clone of this settings object.
+     */
+    public PlaywrightCheckSettings ignoreColors() {
+        return (PlaywrightCheckSettings) super.ignoreColors();
+    }
+
+    /**
      * Adds an ignore colors region.
      *
      * @param selector  the css or xpath selector to match using the ignore colors algorithm
@@ -1502,13 +1510,11 @@ public class PlaywrightCheckSettings extends CheckSettings implements IPlaywrigh
         return accessibilityRegions.toArray(new GetRegion[0]);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    /** see {@link #ignoreColors()} */
     @Deprecated
     @Override
     public PlaywrightCheckSettings content() {
-        return (PlaywrightCheckSettings) super.content();
+        return ignoreColors();
     }
 
     /** see {@link #ignoreColors(String)} */

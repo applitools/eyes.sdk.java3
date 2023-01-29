@@ -317,6 +317,12 @@ public class CheckSettings implements ICheckSettings, ICheckSettingsInternal {
         return clone;
     }
 
+    public ICheckSettings ignoreColors() {
+        CheckSettings clone = clone();
+        clone.matchLevel = MatchLevel.IGNORE_COLORS;
+        return clone;
+    }
+
     /**
      * {@inheritDoc}
      */

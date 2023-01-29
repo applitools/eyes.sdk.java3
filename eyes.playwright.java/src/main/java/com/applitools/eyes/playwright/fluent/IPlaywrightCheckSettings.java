@@ -100,6 +100,8 @@ public interface IPlaywrightCheckSettings extends ICheckSettings {
 
     PlaywrightCheckSettings content(ElementHandle elementHandle, Padding padding);
 
+    PlaywrightCheckSettings ignoreColors();
+
     PlaywrightCheckSettings ignoreColors(String selector);
 
     PlaywrightCheckSettings ignoreColors(Locator locator);
