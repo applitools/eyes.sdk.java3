@@ -41,7 +41,7 @@ public class PlaywrightTestSetup implements ITest {
         batch = new BatchInfo(name);
         String id = System.getenv("APPLITOOLS_BATCH_ID");
         if (id != null) batch.setId(id);
-        apiKey = System.getenv("APPLITOOLS_API_KEY_SDK_TEAM");
+        apiKey = System.getenv("APPLITOOLS_API_KEY");
     }
 
     protected Page initDriver(Boolean headless) {

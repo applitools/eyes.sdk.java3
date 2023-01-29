@@ -422,6 +422,7 @@ jobs:
       - arm64-tests
       - generic-tests-selenium
       - generic-tests-playwright
+      - playwright-tests
 #      - alpine-tests
 #      - support-tests
     runs-on: ubuntu-latest
