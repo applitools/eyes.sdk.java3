@@ -236,7 +236,7 @@ public class Eyes implements IEyesBase {
         List<CommandCloseResponseDto> closeResponse = commandExecutor.close(eyesRef, settings, configurationDto, true);
         this.eyesRef = null;
         isClosed = true;
-        List<TestResults> testResults = TestResultsMapper.toTestResultsList(closeResponse);
+        List<TestResults> testResults = TestResultsMapper.toTestResultsList(closeResponse, getApiKey(), getServerUrl(), getProxy());
         if (testResults == null)
             return null;
         testResults.forEach(testResults1 -> runner.logSessionResultsAndThrowException(shouldThrowException, testResults1));
@@ -859,6 +859,8 @@ public class Eyes implements IEyesBase {
 
     public void setProxy(AbstractProxySettings proxySettings) { configure().setProxy(proxySettings); }
 
+    public AbstractProxySettings getProxy() { return configure().getProxy(); }
+
     @Override
     public String getApiKey() {
         return configure().getApiKey();
@@ -944,7 +946,7 @@ public class Eyes implements IEyesBase {
         this.eyesRef = null;
         isClosed = true;
         if (closeResponse != null) {
-            List<TestResults> testResults = TestResultsMapper.toTestResultsList(closeResponse);
+            List<TestResults> testResults = TestResultsMapper.toTestResultsList(closeResponse, getApiKey(), getServerUrl(), getProxy());
             testResults.forEach(testResults1 -> runner.logSessionResultsAndThrowException(false, testResults1));
         }
     }
@@ -961,7 +963,7 @@ public class Eyes implements IEyesBase {
     public TestResults abort() {
         if (!isClosed && getIsOpen()) {
             List<CommandCloseResponseDto> abortResponse = commandExecutor.abort(eyesRef, true);
-            List<TestResults> testResults = TestResultsMapper.toTestResultsList(abortResponse);
+            List<TestResults> testResults = TestResultsMapper.toTestResultsList(abortResponse, getApiKey(), getServerUrl(), getProxy());
             this.eyesRef = null;
             if (testResults != null) {
                 return testResults.isEmpty() ? null : testResults.get(0);

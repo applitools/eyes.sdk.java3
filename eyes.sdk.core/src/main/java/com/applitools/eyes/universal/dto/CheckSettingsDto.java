@@ -60,10 +60,6 @@ public class CheckSettingsDto {
 
   }
 
-  public CheckSettingsDto(NormalizationDto normalization) {
-    this.normalization = normalization;
-  }
-
   public TRegion getRegion() {
     return region;
   }

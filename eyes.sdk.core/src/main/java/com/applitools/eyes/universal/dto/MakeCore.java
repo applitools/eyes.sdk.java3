@@ -81,7 +81,7 @@ public class MakeCore {
 
   @Override
   public String toString() {
-    return "MakeSdk{" +
+    return "MakeCore{" +
         "name='" + name + '\'' +
         ", version='" + version + '\'' +
         ", cwd='" + cwd + '\'' +

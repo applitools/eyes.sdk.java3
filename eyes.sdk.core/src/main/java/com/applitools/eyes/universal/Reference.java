@@ -1,11 +1,13 @@
 package com.applitools.eyes.universal;
 
+import com.applitools.eyes.fluent.GetRegion;
+import com.applitools.eyes.universal.dto.TRegion;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
  * reference
  */
-public class Reference {
+public class Reference extends TRegion implements GetRegion {
 
   @JsonProperty("applitools-ref-id")
   private String applitoolsRefId;
@@ -32,4 +34,5 @@ public class Reference {
         "applitoolsRefId='" + applitoolsRefId + '\'' +
         '}';
   }
+
 }

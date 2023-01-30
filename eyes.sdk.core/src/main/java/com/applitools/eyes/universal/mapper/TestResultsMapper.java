@@ -1,12 +1,10 @@
 package com.applitools.eyes.universal.mapper;
 
+import java.net.URI;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import com.applitools.eyes.SessionUrls;
-import com.applitools.eyes.StepInfo;
-import com.applitools.eyes.TestResults;
-import com.applitools.eyes.TestResultsStatus;
+import com.applitools.eyes.*;
 import com.applitools.eyes.universal.dto.SessionUrlsDto;
 import com.applitools.eyes.universal.dto.StepInfoDto;
 import com.applitools.eyes.universal.dto.response.CommandCloseResponseDto;
@@ -16,12 +14,18 @@ import com.applitools.eyes.universal.dto.response.CommandCloseResponseDto;
  */
 public class TestResultsMapper {
 
-  public static TestResults toTestResults(CommandCloseResponseDto response) {
+  public static TestResults toTestResults(CommandCloseResponseDto response, String apiKey, URI serverUrl, AbstractProxySettings proxySettings) {
     if (response == null) {
       return null;
     }
 
     TestResults testResults = new TestResults();
+
+    // set apiKey, serverUrl and proxy in case the user will call .delete()
+    testResults.setApiKey(apiKey);
+    testResults.setServerUrl(serverUrl != null? serverUrl.toString() : null);
+    testResults.setProxy(ProxyMapper.toProxyDto(proxySettings));
+
     testResults.setId(response.getId());
     testResults.setName(response.getName());
     testResults.setSecretToken(response.getSecretToken());
@@ -113,11 +117,13 @@ public class TestResultsMapper {
 
   }
 
-  public static List<TestResults> toTestResultsList(List<CommandCloseResponseDto> responseDtoList) {
+  public static List<TestResults> toTestResultsList(List<CommandCloseResponseDto> responseDtoList, String apiKey, URI serverUrl, AbstractProxySettings proxySettings) {
     if (responseDtoList == null || responseDtoList.isEmpty()) {
       return null;
     }
 
-    return responseDtoList.stream().map(TestResultsMapper::toTestResults).collect(Collectors.toList());
+    return responseDtoList.stream()
+            .map(commandCloseResponseDto -> toTestResults(commandCloseResponseDto, apiKey, serverUrl, proxySettings))
+            .collect(Collectors.toList());
   }
 }

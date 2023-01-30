@@ -1,6 +1,6 @@
 package com.applitools.eyes.appium;
 
-import com.applitools.eyes.fluent.GetSimpleRegion;
+import com.applitools.eyes.fluent.GetRegion;
 import com.applitools.eyes.fluent.SimpleRegionByRectangle;
 import com.applitools.eyes.selenium.fluent.SimpleRegionByElement;
 import com.applitools.eyes.selenium.fluent.SimpleRegionBySelector;
@@ -15,7 +15,7 @@ import java.util.stream.Collectors;
 
 public class AppiumCodedRegionReferenceMapper {
 
-    public static CodedRegionReference toCodedRegionReference(GetSimpleRegion getSimpleRegion) {
+    public static CodedRegionReference toCodedRegionReference(GetRegion getSimpleRegion) {
         if (getSimpleRegion == null) {
             return null;
         }
@@ -45,7 +45,7 @@ public class AppiumCodedRegionReferenceMapper {
         return codedRegionReference;
     }
 
-    public static List<CodedRegionReference> toCodedRegionReferenceList(List<GetSimpleRegion> getSimpleRegionList) {
+    public static List<CodedRegionReference> toCodedRegionReferenceList(List<GetRegion> getSimpleRegionList) {
         if (getSimpleRegionList == null || getSimpleRegionList.isEmpty()) {
             return null;
         }

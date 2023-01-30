@@ -121,6 +121,10 @@ public class SettingsMapper {
     }
 
     public static NormalizationDto toNormalizationDto(ICut cut, Integer rotation, Double scaleRatio) {
+        if (cut == null && rotation == null && scaleRatio == null) {
+            return null;
+        }
+
         NormalizationDto normalizationDto = new NormalizationDto();
 
         normalizationDto.setCut(cut);
@@ -143,7 +147,8 @@ public class SettingsMapper {
         return imageCropRectDto;
     }
 
-    public static DeleteTestSettingsDto toDeleteTestSettingsDto(TestResults testResults) {
+    public static DeleteTestSettingsDto toDeleteTestSettingsDto(TestResults testResults, String apiKey,
+                                                                String serverUrl, ProxyDto proxy) {
         if (testResults == null) {
             return null;
         }
@@ -153,6 +158,9 @@ public class SettingsMapper {
         deleteTestSettingsDto.setTestId(testResults.getId());
         deleteTestSettingsDto.setBatchId(testResults.getBatchId());
         deleteTestSettingsDto.setSecretToken(testResults.getSecretToken());
+        deleteTestSettingsDto.setApiKey(apiKey);
+        deleteTestSettingsDto.setServerUrl(serverUrl);
+        deleteTestSettingsDto.setProxy(proxy);
 
         return deleteTestSettingsDto;
     }

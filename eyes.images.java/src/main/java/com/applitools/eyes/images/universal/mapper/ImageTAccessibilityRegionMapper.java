@@ -1,7 +1,7 @@
 package com.applitools.eyes.images.universal.mapper;
 
 import com.applitools.eyes.AccessibilityRegionByRectangle;
-import com.applitools.eyes.GetAccessibilityRegion;
+import com.applitools.eyes.fluent.GetRegion;
 import com.applitools.eyes.universal.dto.*;
 import com.applitools.eyes.universal.mapper.RectangleRegionMapper;
 
@@ -10,7 +10,7 @@ import java.util.stream.Collectors;
 
 public class ImageTAccessibilityRegionMapper {
 
-    public static TAccessibilityRegion toTAccessibilityRegionDto(GetAccessibilityRegion getAccessibilityRegion) {
+    public static TAccessibilityRegion toTAccessibilityRegionDto(GetRegion getAccessibilityRegion) {
         if (getAccessibilityRegion == null) {
             return null;
         }
@@ -29,7 +29,7 @@ public class ImageTAccessibilityRegionMapper {
         return null;
     }
 
-    public static List<TAccessibilityRegion> toTAccessibilityRegionDtoList(List<GetAccessibilityRegion> getAccessibilityRegionList) {
+    public static List<TAccessibilityRegion> toTAccessibilityRegionDtoList(List<GetRegion> getAccessibilityRegionList) {
         if (getAccessibilityRegionList == null || getAccessibilityRegionList.isEmpty()) {
             return null;
         }

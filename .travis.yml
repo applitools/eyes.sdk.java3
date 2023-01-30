@@ -6,14 +6,14 @@ services:
 
 jdk: openjdk8
 
-dist: xenial
+dist: bionic
 
 addons:
   apt:
     sources:
       - google-chrome
-    packages:
-      - google-chrome-stable
+#    packages:
+#      - google-chrome-stable
   chrome: stable
   firefox: latest
 
@@ -117,6 +117,20 @@ jobs:
         - export CHROME_DRIVER_PATH=/home/travis/build/chromedriver
         - cd coverage-tests;
         - chmod +x ./generic_tests.sh && ./generic_tests.sh
+    - name: Generic Playwright
+      script:
+        - "export DISPLAY=:99.0"
+        - sleep 3
+        - echo $APPLITOOLS_REPORT_ID
+        - nvm install 14
+        - nvm use 14
+        - mvn clean install -DskipTests
+        - chmod +x ./initGeckoDriver.sh && ./initGeckoDriver.sh
+        - export FIREFOX_DRIVER_PATH=/home/travis/build/geckodriver
+        - chmod +x ./initChromeDriver.sh && ./initChromeDriver.sh
+        - export CHROME_DRIVER_PATH=/home/travis/build/chromedriver
+        - cd coverage-tests;
+        - chmod +x ./generic_tests.sh && ./generic_tests.sh "generate:playwright"
     #    - stage: Test Appium IOS
     #      if: type != cron
     #      script:

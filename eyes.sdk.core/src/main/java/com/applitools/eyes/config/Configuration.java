@@ -135,7 +135,9 @@ public class Configuration implements IConfiguration {
         this.hideScrollbars = other.getHideScrollbars();
         this.hideCaret = other.getHideCaret();
         this.isRenderingConfig = other.isRenderingConfig();
-        this.browsersInfo.addAll(other.getBrowsersInfo());
+        if (other.getBrowsersInfo() != null) {
+            this.browsersInfo = new ArrayList<>(other.getBrowsersInfo());
+        }
         this.defaultMatchSettings = new ImageMatchSettings(other.getDefaultMatchSettings());
         this.isVisualGrid = other.isVisualGrid();
         this.features = new HashSet<>(other.getFeatures());
@@ -150,6 +152,11 @@ public class Configuration implements IConfiguration {
         this.waitBeforeCapture = other.getWaitBeforeCapture();
         this.webdriverProxySettings = other.getWebDriverProxy();
         this.contentInset = other.getContentInset();
+        this.cutProvider = other.getCutProvider();
+        this.rotation = other.getRotation();
+        this.scaleRatio = other.getScaleRatio();
+        this.debugScreenshotsPath = other.getDebugScreenshotsPath();
+        this.debugScreenshotsPrefix = other.getDebugScreenshotsPrefix();
     }
 
     public Configuration() {
@@ -654,6 +661,15 @@ public class Configuration implements IConfiguration {
         return addBrowser(width, height, browserType, baselineEnvName);
     }
 
+    public Configuration addBrowser(int width, int height, com.applitools.eyes.visualgrid.BrowserType browserType, String baselineEnvName) {
+        BrowserType browserType1 = BrowserType.fromName(browserType.getName());
+        return addBrowser(width, height, browserType1, baselineEnvName);
+    }
+
+    public Configuration addBrowser(int width, int height, com.applitools.eyes.visualgrid.BrowserType browserType) {
+        return addBrowser(width, height, browserType, baselineEnvName);
+    }
+
     public Configuration addDeviceEmulation(DeviceName deviceName, ScreenOrientation orientation) {
         EmulationBaseInfo emulationInfo = new ChromeEmulationInfo(deviceName, orientation);
         RenderBrowserInfo browserInfo = new RenderBrowserInfo(emulationInfo, baselineEnvName);
@@ -687,11 +703,7 @@ public class Configuration implements IConfiguration {
             return browsersInfo;
         }
 
-        if (this.viewportSize != null) {
-            RenderBrowserInfo renderBrowserInfo = new RenderBrowserInfo(this.viewportSize.getWidth(), this.viewportSize.getHeight(), BrowserType.CHROME, baselineEnvName);
-            return Collections.singletonList(renderBrowserInfo);
-        }
-        return browsersInfo;
+        return null;
     }
 
     public Configuration setBrowsersInfo(List<RenderBrowserInfo> browsersInfo) {

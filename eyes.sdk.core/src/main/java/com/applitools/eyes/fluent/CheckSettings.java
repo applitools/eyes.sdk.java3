@@ -32,12 +32,13 @@ public class CheckSettings implements ICheckSettings, ICheckSettingsInternal {
 
     // check
     protected String name;
-    protected final List<GetSimpleRegion> ignoreRegions = new ArrayList<>();
-    protected final List<GetSimpleRegion> layoutRegions = new ArrayList<>();
-    protected final List<GetSimpleRegion> strictRegions = new ArrayList<>();
-    protected final List<GetSimpleRegion> contentRegions = new ArrayList<>();
-    protected final List<GetFloatingRegion> floatingRegions = new ArrayList<>();
-    protected List<GetAccessibilityRegion> accessibilityRegions = new ArrayList<>();
+    protected String pageId;
+    protected final List<GetRegion> ignoreRegions = new ArrayList<>();
+    protected final List<GetRegion> layoutRegions = new ArrayList<>();
+    protected final List<GetRegion> strictRegions = new ArrayList<>();
+    protected final List<GetRegion> contentRegions = new ArrayList<>();
+    protected final List<GetRegion> floatingRegions = new ArrayList<>();
+    protected List<GetRegion> accessibilityRegions = new ArrayList<>();
     private MatchLevel matchLevel = null;
     private AccessibilitySettings accessibilitySettings;
     private Integer retryTimeout = null; // former timeout/matchTimeout
@@ -111,6 +112,7 @@ public class CheckSettings implements ICheckSettings, ICheckSettingsInternal {
         this.floatingRegions.add(regionProvider);
     }
 
+    @SuppressWarnings("MethodDoesntCallSuperMethod")
     @Override
     public CheckSettings clone(){
         CheckSettings clone = new CheckSettings();
@@ -315,6 +317,12 @@ public class CheckSettings implements ICheckSettings, ICheckSettingsInternal {
         return clone;
     }
 
+    public ICheckSettings ignoreColors() {
+        CheckSettings clone = clone();
+        clone.matchLevel = MatchLevel.IGNORE_COLORS;
+        return clone;
+    }
+
     /**
      * {@inheritDoc}
      */
@@ -410,31 +418,31 @@ public class CheckSettings implements ICheckSettings, ICheckSettingsInternal {
     }
 
     @Override
-    public GetSimpleRegion[] getIgnoreRegions() {
-        return this.ignoreRegions.toArray(new GetSimpleRegion[0]);
+    public GetRegion[] getIgnoreRegions() {
+        return this.ignoreRegions.toArray(new GetRegion[0]);
     }
 
     @Override
-    public GetSimpleRegion[] getStrictRegions() {
-        return this.strictRegions.toArray(new GetSimpleRegion[0]);
-    }
-
-
-    @Override
-    public GetSimpleRegion[] getLayoutRegions() {
-        return this.layoutRegions.toArray(new GetSimpleRegion[0]);
+    public GetRegion[] getStrictRegions() {
+        return this.strictRegions.toArray(new GetRegion[0]);
     }
 
 
     @Override
-    public GetSimpleRegion[] getContentRegions() {
-        return this.contentRegions.toArray(new GetSimpleRegion[0]);
+    public GetRegion[] getLayoutRegions() {
+        return this.layoutRegions.toArray(new GetRegion[0]);
     }
 
 
     @Override
-    public GetFloatingRegion[] getFloatingRegions() {
-        return this.floatingRegions.toArray(new GetFloatingRegion[0]);
+    public GetRegion[] getContentRegions() {
+        return this.contentRegions.toArray(new GetRegion[0]);
+    }
+
+
+    @Override
+    public GetRegion[] getFloatingRegions() {
+        return this.floatingRegions.toArray(new GetRegion[0]);
     }
 
     @Override
@@ -446,6 +454,7 @@ public class CheckSettings implements ICheckSettings, ICheckSettingsInternal {
     public String getName(){
         return this.name;
     }
+
 
     @Override
     public Map<String, String> getScriptHooks() {
@@ -468,7 +477,7 @@ public class CheckSettings implements ICheckSettings, ICheckSettingsInternal {
         clone.retryTimeout = this.retryTimeout;
         clone.ignoreCaret = this.ignoreCaret;
         clone.name = this.name;
-
+        clone.pageId = this.pageId;
         clone.ignoreRegions.addAll(this.ignoreRegions);
         clone.contentRegions.addAll(this.contentRegions);
         clone.layoutRegions.addAll(this.layoutRegions);
@@ -563,8 +572,8 @@ public class CheckSettings implements ICheckSettings, ICheckSettingsInternal {
     }
 
     @Override
-    public GetAccessibilityRegion[] getAccessibilityRegions() {
-        return this.accessibilityRegions.toArray(new GetAccessibilityRegion[0]);
+    public GetRegion[] getAccessibilityRegions() {
+        return this.accessibilityRegions.toArray(new GetRegion[0]);
     }
 
     public ICheckSettings ocrRegion(BaseOcrRegion ocrRegion) {
@@ -758,5 +767,15 @@ public class CheckSettings implements ICheckSettings, ICheckSettingsInternal {
 
     public List<Integer> getLayoutBreakpoints() {
         return layoutBreakpoints;
+    }
+
+    public ICheckSettings pageId(String pageId) {
+        CheckSettings clone = this.clone();
+        clone.pageId = pageId;
+        return clone;
+    }
+
+    public String getPageId() {
+        return this.pageId;
     }
 }

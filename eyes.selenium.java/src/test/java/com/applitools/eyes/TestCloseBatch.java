@@ -47,7 +47,7 @@ public class TestCloseBatch {
     }
 
     @Test(priority = 1)
-    public void testCloseBatchClassicRunner() throws InterruptedException {
+    public void testCloseBatchClassicRunner() {
 
         eyes = new Eyes();
         eyes.setBatch(batch);
@@ -65,9 +65,25 @@ public class TestCloseBatch {
         EnabledBatchClose close = bc.setBatchId(Arrays.asList(batch.getId()));
         Assert.assertFalse(batchInfo.getIsCompleted());
         close.close();
-        Thread.sleep(10000); // 10 seconds for Travis (slow network)
-        batchInfo = getBatchInfo(results);
-        Assert.assertTrue(batchInfo.getIsCompleted());
+        AssertBatchInfoWithRetry(results);
+    }
+
+    private void AssertBatchInfoWithRetry(TestResults results) {
+        int retries = 5;
+        while (retries > 0) {
+            try {
+                com.applitools.eyes.metadata.BatchInfo batchInfo = getBatchInfo(results);
+                Assert.assertTrue(batchInfo.getIsCompleted());
+                break;
+            } catch (AssertionError e) {
+                retries--;
+                if (retries == 0) {
+                    throw e;
+                }
+                try { Thread.sleep(2000); }
+                catch (InterruptedException ex) { ex.printStackTrace(); }
+            }
+        }
     }
 
     // using bc.setBatchId() will spawn a universal server now
@@ -76,8 +92,8 @@ public class TestCloseBatch {
 //    public void testCloseBatchWithoutEyes() {
 //        BatchClose bc = new BatchClose();
 //        bc.setUrl("https://testeyes.applitools.com");
-//        bc.setApiKey("APPLTOOLS_TEST_EYES_API_KEY");
-//        EnabledBatchClose close = bc.setBatchId(Arrays.asList("a0a86603-f36c-4590-b557-c52731c37bd8"));
+//        bc.setApiKey(System.getenv("APPLITOOLS_API_KEY_TEST_EYES"));
+//        EnabledBatchClose close = bc.setBatchId(Arrays.asList("0048356c-d2c0-4063-92fe-eec2accbe348"));
 //        close.close();
 //    }
 

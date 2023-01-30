@@ -327,17 +327,6 @@ public class TestRenderings extends ReportingTestSuite {
             }
         };
         VisualGridRunner runner = spy(new VisualGridRunner(10));
-        doAnswer(new Answer() {
-            @Override
-            public Object answer(InvocationOnMock invocation) throws Throwable {
-                FrameData frameData = invocation.getArgument(0);
-                frameData.getResourceUrls().add(missingUrl);
-                frameData.getResourceUrls().add(unknownHostUrl);
-                invocation.callRealMethod();
-                return null;
-            }
-        }).when(runner).check(any(FrameData.class), ArgumentMatchers.<List<CheckTask>>any());
-
         Eyes eyes = new Eyes(runner);
         eyes.setLogHandler(new StdoutLogHandler());
         eyes.setServerConnector(serverConnector);
