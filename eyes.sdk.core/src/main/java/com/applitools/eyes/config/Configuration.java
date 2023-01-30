@@ -152,6 +152,11 @@ public class Configuration implements IConfiguration {
         this.waitBeforeCapture = other.getWaitBeforeCapture();
         this.webdriverProxySettings = other.getWebDriverProxy();
         this.contentInset = other.getContentInset();
+        this.cutProvider = other.getCutProvider();
+        this.rotation = other.getRotation();
+        this.scaleRatio = other.getScaleRatio();
+        this.debugScreenshotsPath = other.getDebugScreenshotsPath();
+        this.debugScreenshotsPrefix = other.getDebugScreenshotsPrefix();
     }
 
     public Configuration() {
