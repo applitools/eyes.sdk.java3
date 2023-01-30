@@ -3,10 +3,12 @@ package com.applitools.eyes;
 import com.applitools.connectivity.ServerConnector;
 import com.applitools.eyes.universal.CommandExecutor;
 import com.applitools.eyes.universal.dto.DeleteTestSettingsDto;
+import com.applitools.eyes.universal.dto.ProxyDto;
 import com.applitools.eyes.universal.mapper.SettingsMapper;
 import com.applitools.utils.ArgumentGuard;
 import com.applitools.utils.Iso8610CalendarDeserializer;
 import com.fasterxml.jackson.annotation.JsonGetter;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonSetter;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
@@ -51,6 +53,13 @@ public class TestResults {
     private ServerConnector serverConnector;
     private SessionAccessibilityStatus accessibilityStatus;
     private String userTestId;
+
+    @JsonIgnore
+    private String apiKey;
+    @JsonIgnore
+    private String serverUrl;
+    @JsonIgnore
+    private ProxyDto proxy;
 
     public StepInfo[] getStepsInfo() {
         return stepsInfo;
@@ -429,12 +438,27 @@ public class TestResults {
         this.userTestId = userTestId;
     }
 
+    @JsonIgnore
+    public void setApiKey(String apiKey) {
+        this.apiKey = apiKey;
+    }
+
+    @JsonIgnore
+    public void setServerUrl(String serverUrl) {
+        this.serverUrl = serverUrl;
+    }
+
+    @JsonIgnore
+    public void setProxy(ProxyDto proxy) {
+        this.proxy = proxy;
+    }
+
     public void delete() {
         if (getId() == null || getBatchId() == null || getSecretToken() == null) {
             return;
         }
 
-        DeleteTestSettingsDto settings = SettingsMapper.toDeleteTestSettingsDto(this);
+        DeleteTestSettingsDto settings = SettingsMapper.toDeleteTestSettingsDto(this, apiKey, serverUrl, proxy);
         CommandExecutor.deleteTest(settings);
     }
 
