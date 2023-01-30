@@ -6,7 +6,7 @@ services:
 
 jdk: openjdk8
 
-dist: xenial
+dist: bionic
 
 addons:
   apt:
