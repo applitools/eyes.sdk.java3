@@ -1,4 +1,8 @@
-## [5.40.0] - 2022-01-08
+## [5.41.0] - 2023-01-31
+### Added
+- Added support for Playwright.
+
+## [5.40.0] - 2023-01-08
 ### Updated
 - Added support for linux-arm64 architecture.
 - Update Universal binaries to `3.2.2`.
