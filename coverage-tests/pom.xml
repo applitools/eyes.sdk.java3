@@ -18,7 +18,7 @@
     <parent>
         <groupId>com.applitools</groupId>
         <artifactId>eyes-sdk-java5-parent</artifactId>
-        <version>5.40.0</version>
+        <version>5.41.0</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
 
@@ -26,27 +26,27 @@
         <dependency>
             <groupId>com.applitools</groupId>
             <artifactId>eyes-playwright-java5</artifactId>
-            <version>5.40.0</version>
+            <version>5.41.0</version>
         </dependency>
         <dependency>
             <groupId>com.applitools</groupId>
             <artifactId>eyes-images-java5</artifactId>
-            <version>5.40.0</version>
+            <version>5.41.0</version>
         </dependency>
         <dependency>
             <groupId>com.applitools</groupId>
             <artifactId>eyes-appium-java5</artifactId>
-            <version>5.40.0</version>
+            <version>5.41.0</version>
         </dependency>
         <dependency>
             <groupId>com.applitools</groupId>
             <artifactId>eyes-selenium-java5</artifactId>
-            <version>5.40.0</version>
+            <version>5.41.0</version>
         </dependency>
         <dependency>
             <groupId>com.applitools</groupId>
             <artifactId>eyes-sdk-core-java5</artifactId>
-            <version>5.40.0</version>
+            <version>5.41.0</version>
             <type>test-jar</type>
             <scope>test</scope>
         </dependency>
