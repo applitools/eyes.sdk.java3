@@ -89,7 +89,7 @@ public abstract class EyesRunner {
    */
   public EyesRunner(String baseAgentId, String version, RunnerOptions runnerOptions, AbstractSDKListener listener) {
     ArgumentGuard.notNull(runnerOptions, "runnerOptions");
-    setLogHandler(new NullLogHandler());
+    setLogHandler(runnerOptions.getLogHandler());
     runServer(baseAgentId, version, PROTOCOL, COMMANDS, listener);
   }
 
