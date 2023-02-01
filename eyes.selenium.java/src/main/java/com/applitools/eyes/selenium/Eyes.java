@@ -49,38 +49,12 @@ public class Eyes implements IEyesBase {
     private Configuration configuration = new Configuration();
     private ImageRotation rotation;
     private WebDriver driver;
-    VisualLocatorsProvider visualLocatorsProvider;
     ConfigurationProvider configurationProvider = new ConfigurationProvider() {
         @Override
         public Configuration get() {
             return configuration;
         }
     };
-
-    private CommandExecutor commandExecutor;
-
-
-    public static String getExecutionCloudURL() {
-        return getExecutionCloudURL(null, null, null);
-    }
-
-    public static String getExecutionCloudURL(String apiKey) {
-        return getExecutionCloudURL(apiKey, null, null);
-    }
-
-    public static String getExecutionCloudURL(String apiKey, String serverUrl) {
-        return getExecutionCloudURL(apiKey, serverUrl, null);
-    }
-
-    public static String getExecutionCloudURL(String apiKey, String serverUrl, AbstractProxySettings proxySettings) {
-        // start the universal server earlier than normally
-        UniversalSdkNativeLoader.setLogger(new Logger());
-        UniversalSdkNativeLoader.start();
-
-        EGClientSettingsDto settings = new EGClientSettingsDto(apiKey, serverUrl, ProxyMapper.toProxyDto(proxySettings));
-        return CommandExecutor.coreMakeEGClient(settings).getUrl();
-    }
-
 
     /**
      * this reference has to be used in eyes related requests (Eyes.check, Eyes.locate, Eyes.extractTextRegions, Eyes.extractText, Eyes.close, Eyes.abort)
@@ -89,6 +63,56 @@ public class Eyes implements IEyesBase {
 
     // used to check abort after close
     private boolean isClosed;
+
+    private CommandExecutor commandExecutor;
+
+
+    /**
+     * Get the Execution Cloud URL.
+     *
+     * @return the Execution Cloud URL using default params
+     */
+    public static String getExecutionCloudURL() {
+        return getExecutionCloudURL(null, null, null);
+    }
+
+    /**
+     * Get the Execution Cloud URL.
+     *
+     * @param apiKey  the api-key
+     * @return the Execution Cloud URL matching the api-key
+     */
+    public static String getExecutionCloudURL(String apiKey) {
+        return getExecutionCloudURL(apiKey, null, null);
+    }
+
+    /**
+     * Get the Execution Cloud URL.
+     *
+     * @param apiKey  the api-key
+     * @param serverUrl  Eyes' server URL
+     * @return the Execution Cloud URL matching the api-key and serverUrl
+     */
+    public static String getExecutionCloudURL(String apiKey, String serverUrl) {
+        return getExecutionCloudURL(apiKey, serverUrl, null);
+    }
+
+    /**
+     * Get the Execution Cloud URL.
+     *
+     * @param apiKey  the api-key
+     * @param serverUrl  Eyes' server URL
+     * @param proxySettings  the proxy settings
+     * @return the Execution Cloud URL matching the api-key, serverUrl, using proxy
+     */
+    public static String getExecutionCloudURL(String apiKey, String serverUrl, AbstractProxySettings proxySettings) {
+        // start the universal server earlier than normally
+        UniversalSdkNativeLoader.setLogger(new Logger());
+        UniversalSdkNativeLoader.start();
+
+        EGClientSettingsDto settings = new EGClientSettingsDto(apiKey, serverUrl, ProxyMapper.toProxyDto(proxySettings));
+        return CommandExecutor.coreMakeEGClient(settings).getUrl();
+    }
 
     /**
      * Instantiates a new Eyes.
