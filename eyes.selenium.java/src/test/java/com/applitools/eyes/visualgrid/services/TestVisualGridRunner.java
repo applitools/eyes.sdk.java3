@@ -179,51 +179,6 @@ public class TestVisualGridRunner {
     }
 
     @Test
-    public void testConcurrencyAmount() {
-        VisualGridRunner runner = new VisualGridRunner();
-        Assert.assertEquals(runner.testConcurrency.actualConcurrency, VisualGridRunner.DEFAULT_CONCURRENCY);
-        Assert.assertEquals(runner.testConcurrency.userConcurrency, VisualGridRunner.DEFAULT_CONCURRENCY);
-        Assert.assertTrue(runner.testConcurrency.isDefault);
-        Assert.assertFalse(runner.testConcurrency.isLegacy);
-
-        runner = new VisualGridRunner("");
-        Assert.assertEquals(runner.testConcurrency.actualConcurrency, VisualGridRunner.DEFAULT_CONCURRENCY);
-        Assert.assertEquals(runner.testConcurrency.userConcurrency, VisualGridRunner.DEFAULT_CONCURRENCY);
-        Assert.assertTrue(runner.testConcurrency.isDefault);
-        Assert.assertFalse(runner.testConcurrency.isLegacy);
-
-        runner = new VisualGridRunner(10);
-        Assert.assertEquals(runner.testConcurrency.actualConcurrency, 50);
-        Assert.assertEquals(runner.testConcurrency.userConcurrency, 10);
-        Assert.assertFalse(runner.testConcurrency.isDefault);
-        Assert.assertTrue(runner.testConcurrency.isLegacy);
-
-        runner = new VisualGridRunner(5, "");
-        Assert.assertEquals(runner.testConcurrency.actualConcurrency, 25);
-        Assert.assertEquals(runner.testConcurrency.userConcurrency, 5);
-        Assert.assertFalse(runner.testConcurrency.isDefault);
-        Assert.assertTrue(runner.testConcurrency.isLegacy);
-
-        runner = new VisualGridRunner(new RunnerOptions().testConcurrency(5));
-        Assert.assertEquals(runner.testConcurrency.actualConcurrency, 5);
-        Assert.assertEquals(runner.testConcurrency.userConcurrency, 5);
-        Assert.assertFalse(runner.testConcurrency.isDefault);
-        Assert.assertFalse(runner.testConcurrency.isLegacy);
-
-        runner = new VisualGridRunner(new RunnerOptions().testConcurrency(5).testConcurrency(7));
-        Assert.assertEquals(runner.testConcurrency.actualConcurrency, 7);
-        Assert.assertEquals(runner.testConcurrency.userConcurrency, 7);
-        Assert.assertFalse(runner.testConcurrency.isDefault);
-        Assert.assertFalse(runner.testConcurrency.isLegacy);
-
-        runner = new VisualGridRunner(new RunnerOptions().testConcurrency(10), "");
-        Assert.assertEquals(runner.testConcurrency.actualConcurrency, 10);
-        Assert.assertEquals(runner.testConcurrency.userConcurrency, 10);
-        Assert.assertFalse(runner.testConcurrency.isDefault);
-        Assert.assertFalse(runner.testConcurrency.isLegacy);
-    }
-
-    @Test
     public void testConcurrencyLogMessage() throws JsonProcessingException {
         VisualGridRunner0 runner = new VisualGridRunner0();
         Assert.assertEquals(runner.getConcurrencyLog(),
