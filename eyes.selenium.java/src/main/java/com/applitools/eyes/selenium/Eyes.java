@@ -73,48 +73,10 @@ public class Eyes implements IEyesBase {
      * @return the Execution Cloud URL using default params
      */
     public static String getExecutionCloudURL() {
-        return getExecutionCloudURL(null, "https://eyesapi.applitools.com", null);
-    }
-
-    /**
-     * Get the Execution Cloud URL.
-     *
-     * @param apiKey  the api-key
-     * @return the Execution Cloud URL matching the api-key
-     */
-    public static String getExecutionCloudURL(String apiKey) {
-        return getExecutionCloudURL(apiKey, "https://eyesapi.applitools.com", null);
-    }
-
-    /**
-     * Get the Execution Cloud URL.
-     *
-     * @param apiKey  the api-key
-     * @param serverUrl  Eyes' server URL
-     * @return the Execution Cloud URL matching the api-key and serverUrl
-     */
-    public static String getExecutionCloudURL(String apiKey, String serverUrl) {
-        return getExecutionCloudURL(apiKey, serverUrl, null);
-    }
-
-    /**
-     * Get the Execution Cloud URL.
-     *
-     * @param apiKey  the api-key
-     * @param serverUrl  Eyes' server URL
-     * @param proxySettings  the proxy settings
-     * @return the Execution Cloud URL matching the api-key, serverUrl, using proxy
-     */
-    public static String getExecutionCloudURL(String apiKey, String serverUrl, AbstractProxySettings proxySettings) {
         // start the universal server earlier than normally
-        EyesRunner dummyRunner = new ClassicRunner();
-        commandExecutor = dummyRunner.getCommandExecutor();
+        commandExecutor = new ClassicRunner().getCommandExecutor();
 
-        ECCapabilities capabilities = new ECCapabilities();
-        capabilities.setApiKey(apiKey);
-        Integer port = null; //TODO
-        ECClientSettingsDto settings = new ECClientSettingsDto(serverUrl, capabilities, port, ProxyMapper.toProxyDto(proxySettings));
-        MakeECClientResponsePayload payload = commandExecutor.coreMakeECClient(settings);
+        MakeECClientResponsePayload payload = commandExecutor.coreMakeECClient();
         return payload.getUrl();
     }
 

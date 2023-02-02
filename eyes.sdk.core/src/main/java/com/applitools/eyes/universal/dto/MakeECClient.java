@@ -1,8 +1,14 @@
 package com.applitools.eyes.universal.dto;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class MakeECClient {
 
     private ECClientSettingsDto settings;
+
+    public MakeECClient() {
+    }
 
     public MakeECClient(ECClientSettingsDto settings) {
         this.settings = settings;

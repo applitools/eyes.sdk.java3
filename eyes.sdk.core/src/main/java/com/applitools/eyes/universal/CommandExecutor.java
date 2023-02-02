@@ -52,16 +52,13 @@ public class CommandExecutor {
     checkedCommand(request);
   }
 
-  public MakeECClientResponsePayload coreMakeECClient(ECClientSettingsDto settings) {
+  public MakeECClientResponsePayload coreMakeECClient() {
     RequestDto<MakeECClient> request = new RequestDto<>();
-    MakeECClient makeECClient = new MakeECClient(settings);
+    MakeECClient makeECClient = new MakeECClient();
     request.setName("Core.makeECClient");
     request.setKey(UUID.randomUUID().toString());
     request.setPayload(makeECClient);
     SyncTaskListener syncTaskListener = checkedCommand(request);
-
-    System.out.println("sending " + request.getName() + ": " + request);
-    System.out.println("request payload: " + request.getPayload());
 
     ResponseDto<MakeECClientResponsePayload> response = (ResponseDto<MakeECClientResponsePayload>) syncTaskListener.get();
     if (response != null && response.getPayload().getError() != null) {

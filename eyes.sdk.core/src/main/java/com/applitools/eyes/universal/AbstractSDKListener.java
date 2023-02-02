@@ -38,6 +38,7 @@ public abstract class AbstractSDKListener implements WebSocketListener {
         put("Debug.getHistory", new TypeReference<ResponseDto<DebugHistoryDto>>() {});
         put("Core.deleteTest", new TypeReference<ResponseDto>() {});
         put("Core.closeBatch", new TypeReference<ResponseDto>() {});
+        put("Core.makeECClient", new TypeReference<ResponseDto<MakeECClientResponsePayload>>() {});
     }};
 
     public AbstractSDKListener() {

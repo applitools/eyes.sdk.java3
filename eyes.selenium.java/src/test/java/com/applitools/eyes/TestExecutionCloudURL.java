@@ -1,5 +1,6 @@
 package com.applitools.eyes;
 
+import com.applitools.eyes.selenium.ClassicRunner;
 import com.applitools.eyes.selenium.Eyes;
 import com.applitools.eyes.selenium.fluent.Target;
 import com.applitools.eyes.visualgrid.services.VisualGridRunner;
@@ -31,10 +32,12 @@ public class TestExecutionCloudURL {
 
     @BeforeMethod(alwaysRun = true)
     public void beforeEach() throws MalformedURLException {
-        runner = new VisualGridRunner(5);
+        runner = new ClassicRunner();
         eyes = new Eyes(runner);
 
-        MutableCapabilities caps = new DesiredCapabilities("chrome", "", Platform.ANY);
+
+        DesiredCapabilities caps = new DesiredCapabilities();
+        caps.setBrowserName("chrome");
         driver = new RemoteWebDriver(new URL(EG_URL), caps);
 
         System.out.println(getClass().getName());
@@ -52,6 +55,6 @@ public class TestExecutionCloudURL {
         driver.get("https://demo.applitools.com");
         eyes.open(driver, "Eyes Selenium SDK", "Test EC Url", new RectangleSize(700, 460));
         eyes.check(Target.window().fully(false));
-        eyes.close(true);
+        eyes.closeAsync();
     }
 }
