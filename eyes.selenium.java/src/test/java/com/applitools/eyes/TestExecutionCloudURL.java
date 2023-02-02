@@ -1,13 +1,11 @@
 package com.applitools.eyes;
 
-import com.applitools.eyes.selenium.ClassicRunner;
 import com.applitools.eyes.selenium.Eyes;
-import com.applitools.eyes.selenium.StitchMode;
-import com.applitools.eyes.selenium.TestSetup;
 import com.applitools.eyes.selenium.fluent.Target;
-import com.applitools.eyes.utils.SeleniumUtils;
-import org.openqa.selenium.*;
-import org.openqa.selenium.chrome.ChromeOptions;
+import com.applitools.eyes.visualgrid.services.VisualGridRunner;
+import org.openqa.selenium.MutableCapabilities;
+import org.openqa.selenium.Platform;
+import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.remote.RemoteWebDriver;
 import org.testng.annotations.AfterMethod;
@@ -33,7 +31,7 @@ public class TestExecutionCloudURL {
 
     @BeforeMethod(alwaysRun = true)
     public void beforeEach() throws MalformedURLException {
-        runner = new ClassicRunner();
+        runner = new VisualGridRunner(5);
         eyes = new Eyes(runner);
 
         MutableCapabilities caps = new DesiredCapabilities("chrome", "", Platform.ANY);
@@ -51,9 +49,9 @@ public class TestExecutionCloudURL {
 
     @Test
     public void CheckWindowFullyWithCustomScrollRootWithScrollStitching() {
-        driver.get("https://applitools.github.io/demo/TestPages/SimpleTestPage/scrollablebody.html");
-        eyes.open(driver, "Eyes Selenium SDK - Scroll Root Element", "TestCheckWindow_Body_Scroll", new RectangleSize(700, 460));
-        eyes.check(Target.window().scrollRootElement(By.cssSelector("body")).fully());
+        driver.get("https://demo.applitools.com");
+        eyes.open(driver, "Eyes Selenium SDK", "Test EC Url", new RectangleSize(700, 460));
+        eyes.check(Target.window().fully(false));
         eyes.close(true);
     }
 }

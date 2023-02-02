@@ -52,15 +52,18 @@ public class CommandExecutor {
     checkedCommand(request);
   }
 
-  public static MakeEGClientResponsePayload coreMakeEGClient(EGClientSettingsDto settings) {
-    RequestDto<MakeEGClient> request = new RequestDto<>();
-    MakeEGClient makeEGClient = new MakeEGClient(settings);
-    request.setName("Core.makeEGClient");
+  public MakeECClientResponsePayload coreMakeECClient(ECClientSettingsDto settings) {
+    RequestDto<MakeECClient> request = new RequestDto<>();
+    MakeECClient makeECClient = new MakeECClient(settings);
+    request.setName("Core.makeECClient");
     request.setKey(UUID.randomUUID().toString());
-    request.setPayload(makeEGClient);
+    request.setPayload(makeECClient);
     SyncTaskListener syncTaskListener = checkedCommand(request);
 
-    ResponseDto<MakeEGClientResponsePayload> response = (ResponseDto<MakeEGClientResponsePayload>) syncTaskListener.get();
+    System.out.println("sending " + request.getName() + ": " + request);
+    System.out.println("request payload: " + request.getPayload());
+
+    ResponseDto<MakeECClientResponsePayload> response = (ResponseDto<MakeECClientResponsePayload>) syncTaskListener.get();
     if (response != null && response.getPayload().getError() != null) {
       String message = response.getPayload().getError().getMessage();
       throw new EyesException(message);

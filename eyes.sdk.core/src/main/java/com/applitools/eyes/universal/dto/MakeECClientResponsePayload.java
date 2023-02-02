@@ -1,10 +1,10 @@
 package com.applitools.eyes.universal.dto;
 
-public class MakeEGClientResponsePayload {
+public class MakeECClientResponsePayload {
 
     private String url;
 
-    public MakeEGClientResponsePayload() {
+    public MakeECClientResponsePayload() {
 
     }
 

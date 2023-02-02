@@ -6,6 +6,7 @@ import com.applitools.eyes.*;
 import com.applitools.eyes.config.Configuration;
 import com.applitools.eyes.config.ConfigurationProvider;
 import com.applitools.eyes.debug.DebugScreenshotsProvider;
+import com.applitools.eyes.exceptions.StaleElementReferenceException;
 import com.applitools.eyes.exceptions.TestFailedException;
 import com.applitools.eyes.locators.*;
 import com.applitools.eyes.positioning.PositionProvider;
@@ -23,7 +24,6 @@ import com.applitools.eyes.universal.Reference;
 import com.applitools.eyes.universal.dto.*;
 import com.applitools.eyes.universal.dto.response.CommandCloseResponseDto;
 import com.applitools.eyes.universal.mapper.*;
-import com.applitools.eyes.universal.server.UniversalSdkNativeLoader;
 import com.applitools.eyes.visualgrid.model.IDebugResourceWriter;
 import com.applitools.eyes.visualgrid.model.RenderingInfo;
 import com.applitools.eyes.visualgrid.services.VisualGridRunner;
@@ -64,7 +64,7 @@ public class Eyes implements IEyesBase {
     // used to check abort after close
     private boolean isClosed;
 
-    private CommandExecutor commandExecutor;
+    private static CommandExecutor commandExecutor;
 
 
     /**
@@ -73,7 +73,7 @@ public class Eyes implements IEyesBase {
      * @return the Execution Cloud URL using default params
      */
     public static String getExecutionCloudURL() {
-        return getExecutionCloudURL(null, null, null);
+        return getExecutionCloudURL(null, "https://eyesapi.applitools.com", null);
     }
 
     /**
@@ -83,7 +83,7 @@ public class Eyes implements IEyesBase {
      * @return the Execution Cloud URL matching the api-key
      */
     public static String getExecutionCloudURL(String apiKey) {
-        return getExecutionCloudURL(apiKey, null, null);
+        return getExecutionCloudURL(apiKey, "https://eyesapi.applitools.com", null);
     }
 
     /**
@@ -107,11 +107,20 @@ public class Eyes implements IEyesBase {
      */
     public static String getExecutionCloudURL(String apiKey, String serverUrl, AbstractProxySettings proxySettings) {
         // start the universal server earlier than normally
-        UniversalSdkNativeLoader.setLogger(new Logger());
-        UniversalSdkNativeLoader.start();
+        EyesRunner dummyRunner = new EyesRunner() {
+            @Override
+            public StaleElementReferenceException getStaleElementException() {
+                return new com.applitools.eyes.selenium.exceptions.StaleElementReferenceException();
+            }
+        };
+        commandExecutor = dummyRunner.getCommandExecutor();
 
-        EGClientSettingsDto settings = new EGClientSettingsDto(apiKey, serverUrl, ProxyMapper.toProxyDto(proxySettings));
-        return CommandExecutor.coreMakeEGClient(settings).getUrl();
+        ECCapabilities capabilities = new ECCapabilities();
+        capabilities.setApiKey(apiKey);
+        Integer port = null; //TODO
+        ECClientSettingsDto settings = new ECClientSettingsDto(serverUrl, capabilities, port, ProxyMapper.toProxyDto(proxySettings));
+        MakeECClientResponsePayload payload = commandExecutor.coreMakeECClient(settings);
+        return payload.getUrl();
     }
 
     /**
