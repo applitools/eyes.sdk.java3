@@ -107,12 +107,7 @@ public class Eyes implements IEyesBase {
      */
     public static String getExecutionCloudURL(String apiKey, String serverUrl, AbstractProxySettings proxySettings) {
         // start the universal server earlier than normally
-        EyesRunner dummyRunner = new EyesRunner() {
-            @Override
-            public StaleElementReferenceException getStaleElementException() {
-                return new com.applitools.eyes.selenium.exceptions.StaleElementReferenceException();
-            }
-        };
+        EyesRunner dummyRunner = new ClassicRunner();
         commandExecutor = dummyRunner.getCommandExecutor();
 
         ECCapabilities capabilities = new ECCapabilities();
