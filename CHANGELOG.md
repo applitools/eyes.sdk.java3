@@ -2,7 +2,7 @@
 ### Added
 - Added NML support for Android.
 ### Updated
-- Update Universal binaries to `3.2.3`.
+- Update Universal binaries to `3.2.4`.
 - Update Selenium to `4.8.0`.
 
 
