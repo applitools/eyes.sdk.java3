@@ -1,3 +1,11 @@
+## [vNext] - dNext
+### Added
+- Added NML support for Android.
+### Updated
+- Update Universal binaries to `3.2.3`.
+- Update Selenium to `4.8.0`.
+
+
 ## [5.41.0] - 2023-01-31
 ### Added
 - Added support for Playwright.
@@ -74,7 +82,7 @@
 ## [5.18.0] - 2022-09-05
 ### Updated
 - Updated Android 12 NMG support. [Trello 3002](https://trello.com/c/p77C3eTL)
-- Added iOS NML support in universal core. 
+- Added iOS NML support in universal core.
 
 ## [5.17.0] - 2022-08-24
 ### Fixed
@@ -132,7 +140,7 @@
 
 ## [5.8.0] - 2022-06-21
 ### Updated
-- Updated core to fix self-signed certs. [Trello 1444](https://trello.com/c/0Pslnto9) 
+- Updated core to fix self-signed certs. [Trello 1444](https://trello.com/c/0Pslnto9)
 
 ## [5.7.0] - 2022-06-10
 ### Updated
@@ -176,14 +184,14 @@
 
 ## [5.0.3] - 2022-04-11
 ### Updated
-- Java Universal Core 2.1.3 
+- Java Universal Core 2.1.3
 ### Fixed
 - Universal Core now always started with the same name.
 - Handling TracedCommandExecutor for Selenium 4. [Trello 2848](https://trello.com/c/U1wSAVt2/)
 - ExtractTextRegions API. [Trello 2841](https://trello.com/c/NKSyj3Dg/)
 
 ## [5.0.3] - 2022-03-17
-## Updated 
+## Updated
 - Java Universal SDK Release
 
 ## [3.210.6] - 2021-12-10
@@ -203,7 +211,7 @@
 - Changed checking of `isMobileDevice`. Handle exceptions correctly. [Trello 2712](https://trello.com/c/89U7DfV0)
 
 ## [3.210.2] - 2021-11-26
-### Fixed 
+### Fixed
 - Robust scrolling for flaky environment - `POSITION_PROVIDER_EXTRA_SCROLL` feature flag . [Trello 2607](https://trello.com/c/u5yzG8XE)
 
 ## [3.210.1] - 2021-11-23
@@ -214,14 +222,14 @@
 ### Added
 - APPLITOOLS_DEBUG_RCA envrionment variable for additional DOM debug data. [Trello 2749](https://trello.com/c/V8k6KUQ1/)
 ### Fixed
- - Android full page issue for complex hierarchy. [Trello 2633](https://trello.com/c/dQqN02TN/)
+- Android full page issue for complex hierarchy. [Trello 2633](https://trello.com/c/dQqN02TN/)
 
 ## [3.209.1] - 2021-11-18
 ### Updated
 - No-change version up, for Maven re-deployment.
 
 ## [3.209.0] - 2021-11-18
-### Added 
+### Added
 - Selenium 4 Compatibility
 ### Updated
 - Translate coordinates of web elements inside WebView according to WebView location on the device screen. [Trello 2607](https://trello.com/c/u5yzG8XE)
@@ -265,7 +273,7 @@
 ### Added
 - Support iPad Pro 11 safari tests. [Trello 2659](https://trello.com/c/Z83V8TWC)
 - Clean cached data in IOSScrollPositionProvider. [Trello 2661](https://trello.com/c/J5nCNBkF)
-### Updated 
+### Updated
 - Checking driver context to define if mobile device used while getting pixel ratio of the device. [Trello 2650](https://trello.com/c/elq5kosS)
 - Cleanup stitched image if real size is smaller than expected. [Trello 2552](https://trello.com/c/cxcv9edh)
 - It's now possible to disable autProxy for specific domains through the `RunnerOptions` class. [Trello 2604](https://trello.com/c/mNTo6koP)
@@ -281,7 +289,7 @@
 = Reverted timeout for downloading resources to 30 seconds. [Trello 2604](https://trello.com/c/mNTo6koP)
 
 ## [3.205.0] - 2021-06-30
-### Added 
+### Added
 - Allow to make a screenshot with status bar via captureStatusBar() functionality. [Trello 2520](https://trello.com/c/dvFOU51I)
 ### Updated
 - Added `fonts.gstatic.com` to the list of domain that we try to download without useragent header. [Trello 2620](https://trello.com/c/7uutwpyx)
@@ -293,7 +301,7 @@
 ## [3.204.0] - 2021-06-23
 ### Fixed
 - Caching the results of resources parsing properly. [Trello 2620](https://trello.com/c/7uutwpyx)
-### Added 
+### Added
 - Scrollable offset calculation with iOS helper library for XCUIElementTypeCollectionView. [Trello 2633](https://trello.com/c/dQqN02TN)
 
 ## [3.203.1] - 2021-06-21
@@ -312,7 +320,7 @@
 ### Added
 - New connectivity package for android.
 ### Updated
-- Increased wait action time when do scroll on iOS. [Trello 2543](https://trello.com/c/gT47BTwz) 
+- Increased wait action time when do scroll on iOS. [Trello 2543](https://trello.com/c/gT47BTwz)
 
 ## [3.201.1]
 ### Fixed
@@ -385,7 +393,7 @@
 
 ## [3.194.0]
 ### Added
-- Users can now use a separated proxy for networks requests which aren't sent to Applitools servers. [Trello 2449](https://trello.com/c/xVScV0PP) 
+- Users can now use a separated proxy for networks requests which aren't sent to Applitools servers. [Trello 2449](https://trello.com/c/xVScV0PP)
 
 ## [3.193.1]
 ### Added
@@ -451,7 +459,7 @@
 
 ## [3.190.1] - 2021-01-01
 ### Fixed
-- reverted rename of "getIsOpen". 
+- reverted rename of "getIsOpen".
 
 ## [3.190.0] - 2020-12-31
 ### Added
@@ -461,7 +469,7 @@
 - Updated `isMobileDevice()` method to make `isBrowser()` accessible. [Trello 2307](https://trello.com/c/8VCtSmfN)
 - Now sending screenshot location in match window data and setting correct scrolled element for dom capture. [Trello 2379](https://trello.com/c/Wn9Fp4XN)
 - A massive update to eyes runners and services. [Trello 2092](https://trello.com/c/gulak9SJ)
-### Fixed 
+### Fixed
 - Initialize content size from element bounds if IOException is thrown. [Trello 2250](https://trello.com/c/mVAzVx0X)
 
 ## [3.189.0] - 2020-12-17
@@ -469,7 +477,7 @@
 - DOM Capture won't be stuck in an infinite recursion because of bidirectional frame dependency anymore. [Trello 2292](https://trello.com/c/HmNKvpk4)
 ### Updated
 - Dom snapshot 4.4.1. [Trello 2360](https://trello.com/c/Nkq5X4dJ)
-- Updated method for searching scrollable view. Ignore horizontal scrollable views on searching for the scrollable element. [Trello 2347](https://trello.com/c/FDZ1oWF9) 
+- Updated method for searching scrollable view. Ignore horizontal scrollable views on searching for the scrollable element. [Trello 2347](https://trello.com/c/FDZ1oWF9)
 - Adjusted scroll coordinates on a stitchOverlap value. [Trello 2138](https://trello.com/c/EI2mxmTD)
 - Added new browser for UFG tests: SAFARI_EARLY_ACCESS. [Trello 2385](https://trello.com/c/5PncFGDO)
 
@@ -524,14 +532,14 @@
 - Fixed a bug in the css tokenizer. [Trello 2299](https://trello.com/c/r13tsIrG)
 - Now sanitizing relative urls. [Trello 2299](https://trello.com/c/r13tsIrG)
 
-## [3.182.0] - 2020-10-28 
+## [3.182.0] - 2020-10-28
 ### Added
 - New logs for printing dom snapshot result. [Trello 2252](https://trello.com/c/7aalHb28)
 - New API `runner.setDontCloseBatched` in case the user doesn't want to close the batches in the end of the test. [Trello 1908](https://trello.com/c/8BGfvXKU)
 ### Updated
 - Dom Snapshot script version 4.2.2. [Trello 2226](https://trello.com/c/yH8WYHgt)
 - Dom Snapshot script version 4.2.3 and DOM Capture script version 8.0.1. [Trello 2260](https://trello.com/c/IKvMS37R)
-- Added retry mechanism for requests for the server. [Trello 2265](https://trello.com/c/fv6gC31H) 
+- Added retry mechanism for requests for the server. [Trello 2265](https://trello.com/c/fv6gC31H)
 - Getting platform version with previous implementation to avoid NoSuchMethodError with old Appium client versions. [Trello 2204](https://trello.com/c/LfbGdoxz)
 ### Fixed
 - Now checking if the element is scrollable before choosing default root element. [Trello 2198](https://trello.com/c/DTvpdAj4), [Trello 2207](https://trello.com/c/v5s4lv8u), [Trello 2215](https://trello.com/c/nUzTl0KB)
@@ -580,7 +588,7 @@
 - Now parsing cached resources when collecting resources before rendering. [Trello 2135](https://trello.com/c/hwkbp14g)
 - Checking non scrollable elements after scrolling the page works now. [Trello 2100](https://trello.com/c/7TDFAWUn)
 
-## [3.177.0] - 2020-09-07 
+## [3.177.0] - 2020-09-07
 ### Added
 - Use predefined device info for pixel ratio. [Trello 301](https://trello.com/c/vGSi2NFz)
 ### Fixed
@@ -672,7 +680,7 @@
 
 ## [3.169.0] - 2020-07-05
 ### Fixed
-- Correct size calculation for elements that change when hiding scrollbars. [Trello 1881](https://trello.com/c/9pVjoVwC) 
+- Correct size calculation for elements that change when hiding scrollbars. [Trello 1881](https://trello.com/c/9pVjoVwC)
 ### Updated
 - Updated DOM Snapshot to 3.6.0 and supported scripts for internet explorer. [Trello 1962](https://trello.com/c/MlHqSdXv)
 - The default scroll root element is now the bigger one between "body" and "html" instead of only "html". [Trello 1972](https://trello.com/c/YfJRReVo)
@@ -796,10 +804,10 @@
 ## [3.158.9] - 2019-12-12
 ### Fixed
 - Fixed ensuring eyes open before check. [Trello 722](https://trello.com/c/JgXaAhPo)
-- Fixed creation of new Rest client when closing batches. [Trello 1327](https://trello.com/c/Jdoj8AQ9) 
-- Disabled ImageDeltaCompressor. [Trello 1361](https://trello.com/c/AZiEB8bP) 
-- Added new stitchingServiceUrl field to RenderingInfo and RenderRequest [Trello 1368](https://trello.com/c/RkBRBJCu) 
-- Unrecognized fields in server response JSON are ignored. [Trello 1375](https://trello.com/c/RqYEUoIq) 
+- Fixed creation of new Rest client when closing batches. [Trello 1327](https://trello.com/c/Jdoj8AQ9)
+- Disabled ImageDeltaCompressor. [Trello 1361](https://trello.com/c/AZiEB8bP)
+- Added new stitchingServiceUrl field to RenderingInfo and RenderRequest [Trello 1368](https://trello.com/c/RkBRBJCu)
+- Unrecognized fields in server response JSON are ignored. [Trello 1375](https://trello.com/c/RqYEUoIq)
 
 ## [3.158.8] - 2019-11-22
 ### Fixed
@@ -811,11 +819,11 @@
 
 ## [3.158.6] - 2019-11-13
 ### Fixed
-- Fixed connection pool hanging with DomCapture. [Trello 1144](https://trello.com/c/Aex0NkjK) 
+- Fixed connection pool hanging with DomCapture. [Trello 1144](https://trello.com/c/Aex0NkjK)
 
 ## [3.158.5] - 2019-11-08
 ### Fixed
-- CSS scrolling in chrome 78. [Trello 1206](https://trello.com/c/euVqe1Sv) 
+- CSS scrolling in chrome 78. [Trello 1206](https://trello.com/c/euVqe1Sv)
 
 ## [3.158.4] - 2019-10-23
 ### Fixed
@@ -830,18 +838,18 @@
 - Updated accessibility enums (experimental).
 
 ## [3.158.1] - 2019-10-10
-### Added 
+### Added
 - Batch close & notification support for JBoss and Jersey1x.
 ### Fixed
 - Batch close now checks for bamboo_ prefix for env var.
 
 ## [3.158.0] - 2019-10-10
-### Added 
+### Added
 - Accessibility support [experimental].
 - Batch close & notification support.
 
 ## [3.157.12] - 2019-07-27
-### Added 
+### Added
 - This CHANGELOG file.
 ### Fixed
 - Bugfix: Creating screenshots correctly when IEDriver provides a full page without being requested to do so.
