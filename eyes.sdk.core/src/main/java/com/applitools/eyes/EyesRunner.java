@@ -172,7 +172,14 @@ public abstract class EyesRunner {
     }
   }
 
-  public abstract StaleElementReferenceException getStaleElementException();
+  protected StaleElementReferenceException getStaleElementException() {
+    return new StaleElementReferenceException() {
+      @Override
+      public void throwException(String message) {
+        throw new RuntimeException(message);
+      }
+    };
+  }
 
   public TestResultsSummary getAllTestResults() {
     return getAllTestResults(true);
