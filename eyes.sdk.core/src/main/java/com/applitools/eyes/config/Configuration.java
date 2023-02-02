@@ -44,7 +44,7 @@ public class Configuration implements IConfiguration {
     private Integer stitchOverlap;
     private Boolean isSendDom;
     private String apiKey = GeneralUtils.getEnvString("APPLITOOLS_API_KEY");
-    private String serverUrl = "https://eyes.applitools.com/";
+    private String serverUrl = GeneralUtils.getEnvString("APPLITOOLS_SERVER_URL");
     private AbstractProxySettings proxy;
     private AutProxySettings autProxy;
     private FailureReports failureReports;

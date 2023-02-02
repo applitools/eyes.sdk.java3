@@ -19,7 +19,7 @@ public class SettingsMapper {
         }
         OpenSettingsDto dto = new OpenSettingsDto();
 
-        dto.setServerUrl(config.getServerUrl().toString());
+        dto.setServerUrl(config.getServerUrl() == null? null : config.getServerUrl().toString());
         dto.setApiKey(config.getApiKey());
         dto.setProxy(ProxyMapper.toProxyDto(config.getProxy()));
         dto.setConnectionTimeout(null); //TODO - why is this null?
