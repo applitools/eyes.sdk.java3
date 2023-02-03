@@ -1,0 +1,5 @@
+eyes-universal-core/src/main/resources/runtimes/linux-x64/native/eyes-universal-linux filter=lfs diff=lfs merge=lfs -text
+eyes-universal-core/src/main/resources/runtimes/linux-x64/native/eyes-universal-alpine filter=lfs diff=lfs merge=lfs -text
+eyes-universal-core/src/main/resources/runtimes/linux-x64/native/eyes-universal-linux-arm64 filter=lfs diff=lfs merge=lfs -text
+eyes-universal-core/src/main/resources/runtimes/mac-x64/native/eyes-universal-macos filter=lfs diff=lfs merge=lfs -text
+eyes-universal-core/src/main/resources/runtimes/win-x64/native/eyes-universal-win.exe filter=lfs diff=lfs merge=lfs -text
