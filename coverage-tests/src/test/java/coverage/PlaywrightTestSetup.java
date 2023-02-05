@@ -57,6 +57,7 @@ public class PlaywrightTestSetup extends GlobalSetup {
 
     // Eyes configuration
 
+    public void setEnablePatterns(Boolean shouldSet) { eyes.setEnablePatterns(shouldSet); }
     public void setStitchOverlap(Integer overlap) { eyes.setStitchOverlap(overlap); }
     public void setAppName(String appName) { eyes.setAppName(appName);}
     public void setStitchMode(String stitchMode) { eyes.setStitchMode(stitchMode.equals("CSS") ? StitchMode.CSS : StitchMode.SCROLL);}
