@@ -1,0 +1,102 @@
+name: "Java - Deploy"
+
+on:
+  workflow_dispatch:
+    inputs:
+      new_version:
+        description: Version to be set
+        type: string
+        required: true
+      ref:
+        description: Branch to be used
+        type: string
+        required: false
+  workflow_call:
+    inputs:
+      new_version:
+        description: Version to be set
+        type: string
+        required: true
+      ref:
+        description: Branch to be used
+        type: string
+        required: false
+
+jobs:
+  deploy:
+    if: (github.event.pull_request.head.repo.name == github.repository && github.event.pull_request.head.repo.fork == false) || (github.event_name == 'workflow_dispatch' && github.event.pull_request.head.repo.name == github.repository && github.event.pull_request.head.repo.fork == false)
+    runs-on: ubuntu-20.04
+
+    steps:
+      - name: Checkout repository and submodules
+        uses: actions/checkout@v3
+        with:
+          ref: ${{inputs.ref || github.ref}}
+          submodules: recursive
+          token: ${{ secrets.SUBMODULES_GA_TOKEN }}
+
+      - name: Set versions
+        run: |
+          cd coverage-tests
+          mvn versions:set -DnewVersion=${{ inputs.new_version }}
+
+      - name: Commit version changes
+        run: |
+          git config --global user.email "action@github.com"
+          git config --global user.name "GitHub Actions"
+          git add pom.xml
+          git submodule foreach --recursive git add pom.xml
+          git commit -m "Version up ${{ inputs.new_version }}"
+
+      - name: Tag and push
+        run: |
+          TAG="RELEASE_CANDIDATE-${{inputs.new_version}}"
+          git tag $TAG
+          git push origin ${{ inputs.ref || github.ref }} $TAG
+
+      - name: Build project
+        run: mvn clean install -P local-build -DskipTests
+
+      - name: Replace UFG sources
+        run: |
+          cd eyes.ufg.java/target
+          echo "NA" > na.txt
+          SOURCES="eyes-ufg-java-${{inputs.new_version}}-sources.jar"
+          rm -f $SOURCES
+          zip $SOURCES na.txt
+          gpg -s --armor -u ${{ secrets.GPG_KEY_ID }} --passphrase "${{ secrets.GPG_KEY_SECRET }}" $SOURCES 
+          rm -f na.txt
+
+      - name: Replace Core sources
+        run: |
+          cd eyes-universal-core/target
+          echo "NA" > na.txt
+          SOURCES="eyes-universal-core-${{inputs.new_version}}-sources.jar"
+          rm -f $SOURCES
+          zip $SOURCES na.txt
+          gpg -s --armor -u ${{ secrets.GPG_KEY_ID }} --passphrase "${{ secrets.GPG_KEY_SECRET }}" $SOURCES 
+          rm -f na.txt
+
+  regression-mail:
+    needs: deploy
+    runs-on: ubuntu-20.04
+
+    steps:
+      - name: Checkout repository and submodules
+        uses: actions/checkout@v3
+        with:
+          ref: ${{inputs.ref || github.ref}}
+          submodules: recursive
+          token: ${{ secrets.SUBMODULES_GA_TOKEN }}
+
+      - name: Send regression mail
+        run: |
+          SDK_VERSION="test-deploy-gh"
+          chmod +x ./extractChangeLog.sh;
+          TMP_CHANGELOG=$(./extractChangeLog.sh "$SDK_VERSION" "CHANGELOG.md");
+          CHANGELOG=$([ -z "$TMP_CHANGELOG" ] && echo "There is no change log for version $SDK_VERSION"; echo "$TMP_CHANGELOG");
+          echo $CHANGELOG;
+          chmod +x ./sendMail.sh;
+          TEST_COVERAGE_GAP=$(cat testCoverageGap.txt);
+          TAG="RELEASE_CANDIDATE-${{inputs.new_version}}";
+          ./sendMail.sh "Java" $TAG "$CHANGELOG" "$TEST_COVERAGE_GAP";
