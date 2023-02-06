@@ -23,8 +23,19 @@ on:
         required: false
 
 jobs:
+  build:
+    runs-on: ubuntu-20.04
+    steps:
+      - name: debug
+        run: |
+          echo "PR head repo name ${{ github.event.pull_request.head.repo.name }}"
+          echo "Repo name ${{ github.repository }}"
+          echo "is not fork ${{github.event.pull_request.head.repo.fork == false }}"
+          echo "is dispatch ${{ github.event_name == 'workflow_dispatch' }}"
+
   deploy:
-    if: (github.event.pull_request.head.repo.name == github.repository && github.event.pull_request.head.repo.fork == false) || (github.event_name == 'workflow_dispatch' && github.event.pull_request.head.repo.name == github.repository && github.event.pull_request.head.repo.fork == false)
+    needs: build
+    if: ${{ (github.event.pull_request.head.repo.name == github.repository && github.event.pull_request.head.repo.fork == false) || github.event_name == 'workflow_dispatch' }}
     runs-on: ubuntu-20.04
 
     steps:
@@ -36,9 +47,7 @@ jobs:
           token: ${{ secrets.SUBMODULES_GA_TOKEN }}
 
       - name: Set versions
-        run: |
-          cd coverage-tests
-          mvn versions:set -DnewVersion=${{ inputs.new_version }}
+        run: mvn versions:set -DnewVersion=${{ inputs.new_version }}
 
       - name: Commit version changes
         run: |
