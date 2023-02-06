@@ -54,7 +54,7 @@ jobs:
           git config --global user.email "action@github.com"
           git config --global user.name "GitHub Actions"
           git add pom.xml
-          git submodule foreach --recursive git add pom.xml
+          git submodule foreach --recursive "if [ "$path" == "eyes.common.java" ]; then git add eyes.common.java/pom.xml; else git add pom.xml; fi"
           git commit -m "Version up ${{ inputs.new_version }}"
 
       - name: Tag and push
