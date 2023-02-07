@@ -12,7 +12,11 @@
     <parent>
         <artifactId>eyes-sdk-java5-parent</artifactId>
         <groupId>com.applitools</groupId>
-        <version>5.46.0</version>
+<<<<<<< HEAD
+        <version>5.45.0</version>
+=======
+        <version>${revision}</version>
+>>>>>>> f8d9b319b (use revision placeholder for version)
         <relativePath>../pom.xml</relativePath>
     </parent>
 
@@ -25,7 +29,11 @@
         <dependency>
             <groupId>com.applitools</groupId>
             <artifactId>eyes-sdk-core-java5</artifactId>
-            <version>5.46.0</version>
+<<<<<<< HEAD
+            <version>5.45.0</version>
+=======
+            <version>${revision}</version>
+>>>>>>> f8d9b319b (use revision placeholder for version)
             <exclusions>
                 <exclusion>
                     <groupId>com.applitools</groupId>
@@ -36,7 +44,11 @@
         <dependency>
             <groupId>com.applitools</groupId>
             <artifactId>eyes-connectivity-java5-jersey2x</artifactId>
-            <version>5.46.0</version>
+<<<<<<< HEAD
+            <version>5.45.0</version>
+=======
+            <version>${revision}</version>
+>>>>>>> f8d9b319b (use revision placeholder for version)
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -45,14 +57,17 @@
             <version>31.1-jre</version>
             <scope>compile</scope>
         </dependency>
+<<<<<<< HEAD
         <!--    for sdk.core test sources    -->
         <dependency>
             <groupId>com.applitools</groupId>
             <artifactId>eyes-sdk-core-java5</artifactId>
-            <version>5.46.0</version>
+            <version>5.45.0</version>
             <type>test-jar</type>
             <scope>test</scope>
         </dependency>
+=======
+>>>>>>> f8d9b319b (use revision placeholder for version)
     </dependencies>
 
     <build>

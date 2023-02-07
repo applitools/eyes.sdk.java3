@@ -12,7 +12,11 @@
     <parent>
         <artifactId>eyes-sdk-java5-parent</artifactId>
         <groupId>com.applitools</groupId>
-        <version>5.46.0</version>
+<<<<<<< HEAD
+        <version>5.45.0</version>
+=======
+        <version>${revision}</version>
+>>>>>>> f8d9b319b (use revision placeholder for version)
         <relativePath>../pom.xml</relativePath>
     </parent>
 
@@ -20,19 +24,27 @@
         <dependency>
             <groupId>com.applitools</groupId>
             <artifactId>eyes-sdk-core-java5</artifactId>
-            <version>5.46.0</version>
+<<<<<<< HEAD
+            <version>5.45.0</version>
+=======
+            <version>${revision}</version>
+>>>>>>> f8d9b319b (use revision placeholder for version)
         </dependency>
         <dependency>
             <groupId>com.applitools</groupId>
             <artifactId>eyes-sdk-core-java5</artifactId>
-            <version>5.46.0</version>
+<<<<<<< HEAD
+            <version>5.45.0</version>
+=======
+            <version>${revision}</version>
+>>>>>>> f8d9b319b (use revision placeholder for version)
             <type>test-jar</type>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.seleniumhq.selenium</groupId>
             <artifactId>selenium-java</artifactId>
-            <version>4.8.3</version>
+            <version>4.7.0</version>
         </dependency>
     </dependencies>
 </project>
