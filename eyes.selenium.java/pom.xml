@@ -12,11 +12,7 @@
     <parent>
         <groupId>com.applitools</groupId>
         <artifactId>eyes-sdk-java5-parent</artifactId>
-<<<<<<< HEAD
-        <version>5.45.0</version>
-=======
         <version>${revision}</version>
->>>>>>> f8d9b319b (use revision placeholder for version)
         <relativePath>../pom.xml</relativePath>
     </parent>
 
@@ -24,40 +20,24 @@
         <dependency>
             <groupId>com.applitools</groupId>
             <artifactId>eyes-common-java5</artifactId>
-<<<<<<< HEAD
-            <version>5.45.0</version>
-=======
-            <version>${revision}</version>
->>>>>>> f8d9b319b (use revision placeholder for version)
+            <version>${project.version}</version>
         </dependency>
         <dependency>
             <groupId>com.applitools</groupId>
             <artifactId>eyes-selenium-common-java5</artifactId>
-<<<<<<< HEAD
-            <version>5.45.0</version>
-=======
-            <version>${revision}</version>
->>>>>>> f8d9b319b (use revision placeholder for version)
+            <version>${project.version}</version>
         </dependency>
         <dependency>
             <groupId>com.applitools</groupId>
             <artifactId>eyes-sdk-core-java5</artifactId>
-<<<<<<< HEAD
-            <version>5.45.0</version>
-=======
-            <version>${revision}</version>
->>>>>>> f8d9b319b (use revision placeholder for version)
+            <version>${project.version}</version>
             <type>test-jar</type>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>com.applitools</groupId>
             <artifactId>eyes-universal-core</artifactId>
-<<<<<<< HEAD
-            <version>5.45.0</version>
-=======
-            <version>${revision}</version>
->>>>>>> f8d9b319b (use revision placeholder for version)
+            <version>${project.version}</version>
         </dependency>
         <dependency>
             <groupId>com.helger</groupId>
