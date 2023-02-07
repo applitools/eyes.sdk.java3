@@ -19,7 +19,7 @@
         <dependency>
             <groupId>com.applitools</groupId>
             <artifactId>eyes-common-java5</artifactId>
-            <version>${revision}</version>
+            <version>${project.version}</version>
         </dependency>
         <dependency>
             <groupId>org.junit.jupiter</groupId>
