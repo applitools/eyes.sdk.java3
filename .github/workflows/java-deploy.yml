@@ -49,12 +49,16 @@ jobs:
       - name: Set versions
         run: mvn versions:set -DnewVersion=${{ inputs.new_version }}
 
+      - name: Debug submodule names
+        run: |
+          git submodule --quiet foreach 'echo submodule: $path'
+
       - name: Commit version changes
         run: |
           git config --global user.email "action@github.com"
           git config --global user.name "GitHub Actions"
-          git add pom.xml
-          git submodule foreach --recursive "if [ "$path" == "eyes.common.java" ]; then git add eyes.common.java/pom.xml; else git add pom.xml; fi"
+          git submodule --quiet foreach 'if [ $path == "eyes.common.java" ]; then git add eyes.common.java/pom.xml; else git add pom.xml; fi'
+          git add pom.xml eyes.common.java eyes.ufg.java
           git commit -m "Version up ${{ inputs.new_version }}"
 
       - name: Tag and push
