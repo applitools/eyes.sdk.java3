@@ -9,7 +9,7 @@ if [ "$?" -ne 0 ]; then
 
 fi
 
-export UFG_ON_EG=true
+#export UFG_ON_EG=true
 if [ -n "$1" ]; then
   yarn "$1"
 else
