@@ -255,7 +255,7 @@ public class Eyes implements IEyesBase {
             CloseSettingsDto settings = SettingsMapper.toCloseSettingsDto(getConfiguration());
             commandExecutor.abort(eyesRef, settings);
 
-            GetResultsSettings getResultsSettings = new GetResultsSettings(true);
+            GetResultsSettings getResultsSettings = new GetResultsSettings(false);
             List<CommandEyesGetResultsResponseDto> getResultsResponse = commandExecutor.eyesGetResults(eyesRef, getResultsSettings);
 
             eyesRef = null;
