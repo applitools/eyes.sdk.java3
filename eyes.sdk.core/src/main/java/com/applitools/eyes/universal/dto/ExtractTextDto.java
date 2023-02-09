@@ -8,10 +8,6 @@ import java.util.List;
  * extract text dto
  */
 public class ExtractTextDto {
-  /**
-   * reference received from "Core.openEyes" command
-   */
-  private Reference eyes;
 
   /**
    * the target
@@ -29,19 +25,10 @@ public class ExtractTextDto {
    */
   private ConfigurationDto config;
 
-  public ExtractTextDto(Reference eyes, ITargetDto target, List<OCRExtractSettingsDto> regions, ConfigurationDto config) {
-    this.eyes = eyes;
+  public ExtractTextDto(ITargetDto target, List<OCRExtractSettingsDto> regions, ConfigurationDto config) {
     this.settings = regions;
     this.config = config;
     this.target = target;
-  }
-
-  public Reference getEyes() {
-    return eyes;
-  }
-
-  public void setEyes(Reference eyes) {
-    this.eyes = eyes;
   }
 
   public List<OCRExtractSettingsDto> getSettings() {

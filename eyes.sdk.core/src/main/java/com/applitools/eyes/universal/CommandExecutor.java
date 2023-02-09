@@ -177,11 +177,11 @@ public class CommandExecutor {
 
   }
 
-  public List<String> extractText(Reference eyesRef, ITargetDto target, List<OCRExtractSettingsDto> extractSettingsDtoList, ConfigurationDto config) {
+  public List<String> extractText(ITargetDto target, List<OCRExtractSettingsDto> extractSettingsDtoList, ConfigurationDto config) {
     RequestDto<ExtractTextDto> request = new RequestDto<>();
-    request.setName("Eyes.extractText");
+    request.setName("Core.extractText");
     request.setKey(UUID.randomUUID().toString());
-    request.setPayload(new ExtractTextDto(eyesRef, target, extractSettingsDtoList, config));
+    request.setPayload(new ExtractTextDto(target, extractSettingsDtoList, config));
     SyncTaskListener syncTaskListener = checkedCommand(request);
 
     ResponseDto<List<String>> extractTextResponse = (ResponseDto<List<String>>) syncTaskListener.get();

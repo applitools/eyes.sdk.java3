@@ -874,7 +874,7 @@ public class Eyes implements IEyesBase {
     }
 
     private List<String> extractTextDto(ITargetDto target, List<OCRExtractSettingsDto> settings, ConfigurationDto config) throws EyesException {
-        return commandExecutor.extractText(eyesRef, target, settings, config);
+        return commandExecutor.extractText(target, settings, config);
     }
 
     private Map<String, List<TextRegion>> locateTextDto(ITargetDto target, OCRSearchSettingsDto settings, ConfigurationDto config) {

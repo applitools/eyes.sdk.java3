@@ -2014,7 +2014,7 @@ public class Eyes implements IEyesBase {
     }
 
     private List<String> extractTextDto(ITargetDto target, List<OCRExtractSettingsDto> settings, ConfigurationDto config) {
-        return commandExecutor.extractText(eyesRef, target, settings, config);
+        return commandExecutor.extractText(target, settings, config);
     }
 
     public Reference getEyesRef() {
