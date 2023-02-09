@@ -57,19 +57,19 @@ public class USDKListener extends AbstractSDKListener implements WebSocketListen
 
                 case "Core.makeManager":
                 case "Core.makeECClient":
+                case "Core.locate":
+                case "Core.locateText":
+                case "Core.extractText":
+                case "Core.getViewportSize":
+                case "Core.deleteTest":
+                case "Core.closeBatch":
                 case "EyesManager.openEyes":
                 case "Eyes.check":
-                case "Core.locate":
                 case "Eyes.close":
                 case "Eyes.abort":
                 case "Eyes.getResults":
-                case "Eyes.locateText":
-                case "Eyes.extractText":
-                case "Core.getViewportSize":
                 case "EyesManager.getResults":
                 case "Debug.getHistory":
-                case "Core.deleteTest":
-                case "Core.closeBatch":
                     handleResponse(payload, typeReferences.get(response.getName()));
                     break;
                 case "Server.log":

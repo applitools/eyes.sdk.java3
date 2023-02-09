@@ -25,20 +25,20 @@ public abstract class AbstractSDKListener implements WebSocketListener {
 
     protected static final Map<String, TypeReference<?>> typeReferences = new HashMap<String, TypeReference<?>>(){{
         put("Core.makeManager", new TypeReference<ResponseDto<Reference>>() {});
-        put("EyesManager.openEyes", new TypeReference<ResponseDto<Reference>>() {});
-        put("Eyes.check", new TypeReference<ResponseDto<List<MatchResultDto>>>() {});
+        put("Core.makeECClient", new TypeReference<ResponseDto<MakeECClientResponsePayload>>() {});
         put("Core.locate", new TypeReference<ResponseDto<Map<String, List<Region>>>>() {});
-        put("Eyes.getResults", new TypeReference<ResponseDto<List<CommandEyesGetResultsResponseDto>>>() {});
-        put("Eyes.close", new TypeReference<ResponseDto>() {});
-        put("Eyes.abort", new TypeReference<ResponseDto>() {});
-        put("Eyes.locateText", new TypeReference<ResponseDto<Map<String, List<TextRegion>>>>() {});
-        put("Eyes.extractText", new TypeReference<ResponseDto<List<String>>>() {});
+        put("Core.locateText", new TypeReference<ResponseDto<Map<String, List<TextRegion>>>>() {});
+        put("Core.extractText", new TypeReference<ResponseDto<List<String>>>() {});
         put("Core.getViewportSize", new TypeReference<ResponseDto<RectangleSizeDto>>() {});
-        put("EyesManager.getResults", new TypeReference<ResponseDto<TestResultsSummaryDto>>() {});
-        put("Debug.getHistory", new TypeReference<ResponseDto<DebugHistoryDto>>() {});
         put("Core.deleteTest", new TypeReference<ResponseDto>() {});
         put("Core.closeBatch", new TypeReference<ResponseDto>() {});
-        put("Core.makeECClient", new TypeReference<ResponseDto<MakeECClientResponsePayload>>() {});
+        put("EyesManager.openEyes", new TypeReference<ResponseDto<Reference>>() {});
+        put("Eyes.check", new TypeReference<ResponseDto<List<MatchResultDto>>>() {});
+        put("Eyes.close", new TypeReference<ResponseDto>() {});
+        put("Eyes.abort", new TypeReference<ResponseDto>() {});
+        put("Eyes.getResults", new TypeReference<ResponseDto<List<CommandEyesGetResultsResponseDto>>>() {});
+        put("EyesManager.getResults", new TypeReference<ResponseDto<TestResultsSummaryDto>>() {});
+        put("Debug.getHistory", new TypeReference<ResponseDto<DebugHistoryDto>>() {});
     }};
 
     public AbstractSDKListener() {
