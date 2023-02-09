@@ -12,14 +12,14 @@ import com.applitools.eyes.locators.BaseOcrRegion;
 import com.applitools.eyes.locators.TextRegion;
 import com.applitools.eyes.locators.TextRegionSettings;
 import com.applitools.eyes.locators.VisualLocatorSettings;
+import com.applitools.eyes.settings.GetResultsSettings;
 import com.applitools.eyes.universal.CommandExecutor;
 import com.applitools.eyes.universal.Reference;
 import com.applitools.eyes.universal.dto.*;
-import com.applitools.eyes.universal.dto.response.CommandCloseResponseDto;
+import com.applitools.eyes.universal.dto.response.CommandEyesGetResultsResponseDto;
 import com.applitools.eyes.universal.mapper.*;
 import com.applitools.utils.ArgumentGuard;
 import com.applitools.utils.ClassVersionGetter;
-import com.applitools.utils.GeneralUtils;
 import com.applitools.utils.ImageUtils;
 
 import java.awt.image.BufferedImage;
@@ -231,12 +231,16 @@ public class Eyes implements IEyesBase {
 
         ConfigurationDto configurationDto = ConfigurationMapper
                 .toConfigurationDto(configuration, runner.isDontCloseBatches());
-        CloseSettingsDto settings = SettingsMapper.toCloseSettingsDto(getConfiguration(), shouldThrowException);
+        CloseSettingsDto settings = SettingsMapper.toCloseSettingsDto(getConfiguration());
 
-        List<CommandCloseResponseDto> closeResponse = commandExecutor.close(eyesRef, settings, configurationDto, true);
-        this.eyesRef = null;
+        commandExecutor.close(eyesRef, settings, configurationDto);
+        GetResultsSettings getResultsSettings = new GetResultsSettings(shouldThrowException);
+        List<CommandEyesGetResultsResponseDto> getResultsResponse = commandExecutor.eyesGetResults(eyesRef, getResultsSettings);
+
+        eyesRef = null;
         isClosed = true;
-        List<TestResults> testResults = TestResultsMapper.toTestResultsList(closeResponse, getApiKey(), getServerUrl(), getProxy());
+
+        List<TestResults> testResults = TestResultsMapper.toTestResultsList(getResultsResponse, getApiKey(), getServerUrl(), getProxy());
         if (testResults == null)
             return null;
         testResults.forEach(testResults1 -> runner.logSessionResultsAndThrowException(shouldThrowException, testResults1));
@@ -940,31 +944,34 @@ public class Eyes implements IEyesBase {
 
         ConfigurationDto configurationDto = ConfigurationMapper
                 .toConfigurationDto(configuration, runner.isDontCloseBatches());
-        CloseSettingsDto settings = SettingsMapper.toCloseSettingsDto(getConfiguration(), false);
+        CloseSettingsDto settings = SettingsMapper.toCloseSettingsDto(getConfiguration());
 
-        List<CommandCloseResponseDto> closeResponse = commandExecutor.close(eyesRef, settings, configurationDto, false);
-        this.eyesRef = null;
+        commandExecutor.close(eyesRef, settings, configurationDto);
+        eyesRef = null;
         isClosed = true;
-        if (closeResponse != null) {
-            List<TestResults> testResults = TestResultsMapper.toTestResultsList(closeResponse, getApiKey(), getServerUrl(), getProxy());
-            testResults.forEach(testResults1 -> runner.logSessionResultsAndThrowException(false, testResults1));
-        }
     }
 
     @Override
     public void abortAsync() {
         if (!isClosed && getIsOpen()) {
-            commandExecutor.abort(eyesRef, false);
-            this.eyesRef = null;
+            CloseSettingsDto settings = SettingsMapper.toCloseSettingsDto(getConfiguration());
+            commandExecutor.abort(eyesRef, settings);
+            eyesRef = null;
         }
     }
 
     @Override
     public TestResults abort() {
         if (!isClosed && getIsOpen()) {
-            List<CommandCloseResponseDto> abortResponse = commandExecutor.abort(eyesRef, true);
-            List<TestResults> testResults = TestResultsMapper.toTestResultsList(abortResponse, getApiKey(), getServerUrl(), getProxy());
-            this.eyesRef = null;
+            CloseSettingsDto settings = SettingsMapper.toCloseSettingsDto(getConfiguration());
+            commandExecutor.abort(eyesRef, settings);
+
+            GetResultsSettings getResultsSettings = new GetResultsSettings(true);
+            List<CommandEyesGetResultsResponseDto> getResultsResponse = commandExecutor.eyesGetResults(eyesRef, getResultsSettings);
+
+            eyesRef = null;
+
+            List<TestResults> testResults = TestResultsMapper.toTestResultsList(getResultsResponse, getApiKey(), getServerUrl(), getProxy());
             if (testResults != null) {
                 return testResults.isEmpty() ? null : testResults.get(0);
             }

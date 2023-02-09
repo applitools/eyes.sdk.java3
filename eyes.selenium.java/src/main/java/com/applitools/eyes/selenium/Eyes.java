@@ -6,7 +6,6 @@ import com.applitools.eyes.*;
 import com.applitools.eyes.config.Configuration;
 import com.applitools.eyes.config.ConfigurationProvider;
 import com.applitools.eyes.debug.DebugScreenshotsProvider;
-import com.applitools.eyes.exceptions.StaleElementReferenceException;
 import com.applitools.eyes.exceptions.TestFailedException;
 import com.applitools.eyes.locators.*;
 import com.applitools.eyes.positioning.PositionProvider;
@@ -18,11 +17,12 @@ import com.applitools.eyes.selenium.universal.dto.DriverTargetDto;
 import com.applitools.eyes.selenium.universal.mapper.CheckSettingsMapper;
 import com.applitools.eyes.selenium.universal.mapper.DriverMapper;
 import com.applitools.eyes.selenium.universal.mapper.OCRExtractSettingsDtoMapper;
+import com.applitools.eyes.settings.GetResultsSettings;
 import com.applitools.eyes.triggers.MouseAction;
 import com.applitools.eyes.universal.CommandExecutor;
 import com.applitools.eyes.universal.Reference;
 import com.applitools.eyes.universal.dto.*;
-import com.applitools.eyes.universal.dto.response.CommandCloseResponseDto;
+import com.applitools.eyes.universal.dto.response.CommandEyesGetResultsResponseDto;
 import com.applitools.eyes.universal.mapper.*;
 import com.applitools.eyes.visualgrid.model.IDebugResourceWriter;
 import com.applitools.eyes.visualgrid.model.RenderingInfo;
@@ -252,9 +252,15 @@ public class Eyes implements IEyesBase {
 
     public TestResults abort() {
         if (!isClosed && getIsOpen()) {
-            List<CommandCloseResponseDto> abortResponse = commandExecutor.abort(eyesRef, true);
-            List<TestResults> testResults = TestResultsMapper.toTestResultsList(abortResponse, getApiKey(), getServerUrl(), getProxy());
-            this.eyesRef = null;
+            CloseSettingsDto settings = SettingsMapper.toCloseSettingsDto(getConfiguration());
+            commandExecutor.abort(eyesRef, settings);
+
+            GetResultsSettings getResultsSettings = new GetResultsSettings(true);
+            List<CommandEyesGetResultsResponseDto> getResultsResponse = commandExecutor.eyesGetResults(eyesRef, getResultsSettings);
+
+            eyesRef = null;
+
+            List<TestResults> testResults = TestResultsMapper.toTestResultsList(getResultsResponse, getApiKey(), getServerUrl(), getProxy());
             if (testResults != null) {
                 return testResults.isEmpty() ? null : testResults.get(0);
             }
@@ -264,8 +270,10 @@ public class Eyes implements IEyesBase {
 
     public void abortAsync() {
         if (!isClosed && getIsOpen()) {
-            commandExecutor.abort(eyesRef, false);
-            this.eyesRef = null;
+            CloseSettingsDto settings = SettingsMapper.toCloseSettingsDto(getConfiguration());
+            commandExecutor.abort(eyesRef, settings);
+
+            eyesRef = null;
         }
     }
 
@@ -554,12 +562,16 @@ public class Eyes implements IEyesBase {
 
         ConfigurationDto configurationDto = ConfigurationMapper
                 .toConfigurationDto(configuration, runner.isDontCloseBatches());
-        CloseSettingsDto settings = SettingsMapper.toCloseSettingsDto(getConfiguration(), shouldThrowException);
+        CloseSettingsDto settings = SettingsMapper.toCloseSettingsDto(getConfiguration());
 
-        List<CommandCloseResponseDto> closeResponse = commandExecutor.close(eyesRef, settings, configurationDto, true);
-        this.eyesRef = null;
+        commandExecutor.close(eyesRef, settings, configurationDto);
+        GetResultsSettings getResultsSettings = new GetResultsSettings(shouldThrowException);
+        List<CommandEyesGetResultsResponseDto> getResultsResponse = commandExecutor.eyesGetResults(eyesRef, getResultsSettings);
+
+        eyesRef = null;
         isClosed = true;
-        List<TestResults> testResults = TestResultsMapper.toTestResultsList(closeResponse, getApiKey(), getServerUrl(), getProxy());
+
+        List<TestResults> testResults = TestResultsMapper.toTestResultsList(getResultsResponse, getApiKey(), getServerUrl(), getProxy());
         if (testResults == null)
             return null;
         testResults.forEach(testResults1 -> runner.logSessionResultsAndThrowException(shouldThrowException, testResults1));
@@ -1958,15 +1970,11 @@ public class Eyes implements IEyesBase {
 
         ConfigurationDto configurationDto = ConfigurationMapper
                 .toConfigurationDto(configuration, runner.isDontCloseBatches());
-        CloseSettingsDto settings = SettingsMapper.toCloseSettingsDto(getConfiguration(), false);
+        CloseSettingsDto settings = SettingsMapper.toCloseSettingsDto(getConfiguration());
 
-        List<CommandCloseResponseDto> closeResponse = commandExecutor.close(eyesRef, settings, configurationDto, false);
-        this.eyesRef = null;
+        commandExecutor.close(eyesRef, settings, configurationDto);
+        eyesRef = null;
         isClosed = true;
-        if (closeResponse != null) {
-            List<TestResults> testResults = TestResultsMapper.toTestResultsList(closeResponse, getApiKey(), getServerUrl(), getProxy());
-            testResults.forEach(testResults1 -> runner.logSessionResultsAndThrowException(false, testResults1));
-        }
     }
 
     public Map<String, List<Region>> locate(VisualLocatorSettings visualLocatorSettings) {

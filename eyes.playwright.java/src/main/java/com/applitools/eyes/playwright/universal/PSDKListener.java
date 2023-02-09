@@ -363,11 +363,11 @@ public class PSDKListener extends AbstractSDKListener {
                 case "Core.locate":
                 case "Eyes.close":
                 case "Eyes.abort":
-                case "EyesManager.closeAllEyes":
+                case "Eyes.getResults":
                 case "Eyes.locateText":
                 case "Eyes.extractText":
                 case "Core.getViewportSize":
-                case "EyesManager.closeManager":
+                case "EyesManager.getResults":
                 case "Debug.getHistory":
                 case "Core.deleteTest":
                 case "Core.closeBatch":

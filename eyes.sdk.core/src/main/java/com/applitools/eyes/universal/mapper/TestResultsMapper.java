@@ -7,14 +7,14 @@ import java.util.stream.Collectors;
 import com.applitools.eyes.*;
 import com.applitools.eyes.universal.dto.SessionUrlsDto;
 import com.applitools.eyes.universal.dto.StepInfoDto;
-import com.applitools.eyes.universal.dto.response.CommandCloseResponseDto;
+import com.applitools.eyes.universal.dto.response.CommandEyesGetResultsResponseDto;
 
 /**
  * test results mapper
  */
 public class TestResultsMapper {
 
-  public static TestResults toTestResults(CommandCloseResponseDto response, String apiKey, URI serverUrl, AbstractProxySettings proxySettings) {
+  public static TestResults toTestResults(CommandEyesGetResultsResponseDto response, String apiKey, URI serverUrl, AbstractProxySettings proxySettings) {
     if (response == null) {
       return null;
     }
@@ -117,7 +117,7 @@ public class TestResultsMapper {
 
   }
 
-  public static List<TestResults> toTestResultsList(List<CommandCloseResponseDto> responseDtoList, String apiKey, URI serverUrl, AbstractProxySettings proxySettings) {
+  public static List<TestResults> toTestResultsList(List<CommandEyesGetResultsResponseDto> responseDtoList, String apiKey, URI serverUrl, AbstractProxySettings proxySettings) {
     if (responseDtoList == null || responseDtoList.isEmpty()) {
       return null;
     }

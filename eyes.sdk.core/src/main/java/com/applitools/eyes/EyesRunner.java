@@ -6,6 +6,7 @@ import com.applitools.eyes.exceptions.StaleElementReferenceException;
 import com.applitools.eyes.exceptions.TestFailedException;
 import com.applitools.eyes.logging.Stage;
 import com.applitools.eyes.logging.Type;
+import com.applitools.eyes.settings.GetResultsSettings;
 import com.applitools.eyes.universal.*;
 import com.applitools.eyes.universal.dto.TestResultsSummaryDto;
 import com.applitools.eyes.universal.mapper.TestResultsSummaryMapper;
@@ -121,7 +122,8 @@ public abstract class EyesRunner {
   }
 
   public TestResultsSummary getAllTestResults(boolean shouldThrowException) {
-    TestResultsSummaryDto dto = commandExecutor.closeManager(managerRef, shouldThrowException);
+    GetResultsSettings settings = new GetResultsSettings(shouldThrowException);
+    TestResultsSummaryDto dto = commandExecutor.getResults(managerRef, settings);
     return TestResultsSummaryMapper.fromDto(dto, shouldThrowException);
   }
 

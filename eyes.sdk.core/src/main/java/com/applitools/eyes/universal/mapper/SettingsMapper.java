@@ -55,14 +55,13 @@ public class SettingsMapper {
         return dto;
     }
 
-    public static CloseSettingsDto toCloseSettingsDto(Configuration config, Boolean shouldThrowErr) {
+    public static CloseSettingsDto toCloseSettingsDto(Configuration config) {
         if (config == null) {
             return null;
         }
 
         CloseSettingsDto closeSettingsDto = new CloseSettingsDto();
 
-        closeSettingsDto.setThrowErr(shouldThrowErr);
         closeSettingsDto.setUpdateBaselineIfNew(config.getSaveNewTests());
         closeSettingsDto.setUpdateBaselineIfDifferent(config.getSaveFailedTests());
 
@@ -113,7 +112,6 @@ public class SettingsMapper {
         settings.setHooks(checkSettings.getHooks());
 
         //CloseSettings
-        settings.setThrowErr(closeSettings.getThrowErr());
         settings.setUpdateBaselineIfNew(closeSettings.getUpdateBaselineIfNew());
         settings.setUpdateBaselineIfDifferent(closeSettings.getUpdateBaselineIfDifferent());
 

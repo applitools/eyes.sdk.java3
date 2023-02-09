@@ -1,12 +1,12 @@
 package com.applitools.eyes.universal.dto.request;
 
+import com.applitools.eyes.settings.GetResultsSettings;
 import com.applitools.eyes.universal.Reference;
-import com.applitools.eyes.universal.dto.CloseSettingsDto;
 
 /**
- * command abort request dto
+ * command eyes get results request dto
  */
-public class CommandAbortRequestDto {
+public class CommandEyesGetResultsDto {
 
     /**
      * reference received from "Core.openEyes" command
@@ -16,12 +16,12 @@ public class CommandAbortRequestDto {
     /**
      * close settings
      */
-    private CloseSettingsDto settings;
+    private GetResultsSettings settings;
 
-    public CommandAbortRequestDto() {
+    public CommandEyesGetResultsDto() {
     }
 
-    public CommandAbortRequestDto(Reference eyes, CloseSettingsDto settings) {
+    public CommandEyesGetResultsDto(Reference eyes, GetResultsSettings settings) {
         this.eyes = eyes;
         this.settings = settings;
     }
@@ -34,11 +34,12 @@ public class CommandAbortRequestDto {
         this.eyes = eyes;
     }
 
-    public CloseSettingsDto getSettings() {
+    public GetResultsSettings getSettings() {
         return settings;
     }
 
-    public void setSettings(CloseSettingsDto settings) {
+    public void setSettings(GetResultsSettings settings) {
         this.settings = settings;
     }
+
 }

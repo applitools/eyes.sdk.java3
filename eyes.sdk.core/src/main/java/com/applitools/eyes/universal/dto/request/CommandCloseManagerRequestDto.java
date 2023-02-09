@@ -1,23 +1,21 @@
 package com.applitools.eyes.universal.dto.request;
 
+import com.applitools.eyes.settings.GetResultsSettings;
 import com.applitools.eyes.universal.Reference;
-import com.applitools.eyes.universal.dto.CloseSettingsDto;
 
 /**
  * command close manager request dto
  */
 public class CommandCloseManagerRequestDto {
   private Reference manager;
-  private CloseSettingsDto settings;
+  private GetResultsSettings settings;
 
   public CommandCloseManagerRequestDto() {
   }
 
-  public CommandCloseManagerRequestDto(Reference manager, Boolean throwErr) {
+  public CommandCloseManagerRequestDto(Reference manager, GetResultsSettings settings) {
     this.manager = manager;
-    CloseSettingsDto closeSettingsDto = new CloseSettingsDto();
-    closeSettingsDto.setThrowErr(throwErr);
-    this.settings = closeSettingsDto;
+    this.settings = settings;
   }
 
   public Reference getManager() {
@@ -28,11 +26,11 @@ public class CommandCloseManagerRequestDto {
     this.manager = manager;
   }
 
-  public CloseSettingsDto getSettings() {
+  public GetResultsSettings getSettings() {
     return settings;
   }
 
-  public void setSettings(CloseSettingsDto settings) {
+  public void setSettings(GetResultsSettings settings) {
     this.settings = settings;
   }
 }

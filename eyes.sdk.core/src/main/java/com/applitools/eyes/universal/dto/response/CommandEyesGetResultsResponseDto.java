@@ -12,7 +12,7 @@ import com.fasterxml.jackson.annotation.JsonSetter;
 /**
  * command close response to
  */
-public class CommandCloseResponseDto {
+public class CommandEyesGetResultsResponseDto {
   private String userTestId;
   private String id;
   private String name;
@@ -45,7 +45,7 @@ public class CommandCloseResponseDto {
   private String url;
   private SessionAccessibilityStatus accessibilityStatus;
 
-  public CommandCloseResponseDto() {
+  public CommandEyesGetResultsResponseDto() {
   }
 
   public String getId() {

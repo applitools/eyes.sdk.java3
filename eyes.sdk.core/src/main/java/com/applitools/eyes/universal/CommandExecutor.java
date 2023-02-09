@@ -11,9 +11,10 @@ import com.applitools.eyes.exceptions.NewTestException;
 import com.applitools.eyes.exceptions.StaleElementReferenceException;
 import com.applitools.eyes.exceptions.TestFailedException;
 import com.applitools.eyes.locators.TextRegion;
+import com.applitools.eyes.settings.GetResultsSettings;
 import com.applitools.eyes.universal.dto.*;
 import com.applitools.eyes.universal.dto.request.*;
-import com.applitools.eyes.universal.dto.response.CommandCloseResponseDto;
+import com.applitools.eyes.universal.dto.response.CommandEyesGetResultsResponseDto;
 import com.applitools.utils.GeneralUtils;
 
 /**
@@ -199,14 +200,14 @@ public class CommandExecutor {
     return extractTextResponse.getPayload().getResult();
   }
 
-  public List<CommandCloseResponseDto> eyesCheckAndClose(Reference eyesRef, ITargetDto target, CheckSettingsDto checkSettings, CloseSettingsDto closeSettings, ConfigurationDto config) {
+  public List<CommandEyesGetResultsResponseDto> eyesCheckAndClose(Reference eyesRef, ITargetDto target, CheckSettingsDto checkSettings, CloseSettingsDto closeSettings, ConfigurationDto config) {
     RequestDto<CommandCheckAndCloseRequestDto> request = new RequestDto<>();
     request.setName("Eyes.checkAndClose");
     request.setKey(UUID.randomUUID().toString());
     request.setPayload(new CommandCheckAndCloseRequestDto(eyesRef, target, checkSettings, closeSettings, config));
     SyncTaskListener syncTaskListener = checkedCommand(request);
 
-    ResponseDto<List<CommandCloseResponseDto>> closeResponse = (ResponseDto<List<CommandCloseResponseDto>>) syncTaskListener.get();
+    ResponseDto<List<CommandEyesGetResultsResponseDto>> closeResponse = (ResponseDto<List<CommandEyesGetResultsResponseDto>>) syncTaskListener.get();
     if (closeResponse != null && closeResponse.getPayload().getError() != null) {
       String message = closeResponse.getPayload().getError().getMessage();
       if (message != null && message.contains("stale element reference")) {
@@ -219,17 +220,24 @@ public class CommandExecutor {
     return closeResponse.getPayload().getResult();
   }
 
-  public List<CommandCloseResponseDto> close(Reference eyesRef, CloseSettingsDto closeSettings, ConfigurationDto config, boolean waitResult) {
+  public void close(Reference eyesRef, CloseSettingsDto closeSettings, ConfigurationDto config) {
     RequestDto<CommandCloseRequestDto> request = new RequestDto<>();
     request.setName("Eyes.close");
     request.setKey(UUID.randomUUID().toString());
     request.setPayload(new CommandCloseRequestDto(eyesRef, closeSettings, config));
     SyncTaskListener syncTaskListener = checkedCommand(request);
-    if (!waitResult) {
-      return null;
-    }
+    // payload is empty, however, we must wait for the command to finish
+    syncTaskListener.get();
+  }
 
-    ResponseDto<List<CommandCloseResponseDto>> closeResponse = (ResponseDto<List<CommandCloseResponseDto>>) syncTaskListener.get();
+  public List<CommandEyesGetResultsResponseDto> eyesGetResults(Reference eyesRef, GetResultsSettings settings) {
+    RequestDto<CommandEyesGetResultsDto> request = new RequestDto<>();
+    request.setName("Eyes.getResults");
+    request.setKey(UUID.randomUUID().toString());
+    request.setPayload(new CommandEyesGetResultsDto(eyesRef, settings));
+    SyncTaskListener syncTaskListener = checkedCommand(request);
+
+    ResponseDto<List<CommandEyesGetResultsResponseDto>> closeResponse = (ResponseDto<List<CommandEyesGetResultsResponseDto>>) syncTaskListener.get();
     if (closeResponse != null && closeResponse.getPayload() != null && closeResponse.getPayload().getError() != null) {
       String message = closeResponse.getPayload().getError().getMessage();
       if (message != null && message.contains("stale element reference")) {
@@ -245,50 +253,22 @@ public class CommandExecutor {
     return closeResponse.getPayload().getResult();
   }
 
-  public List<CommandCloseResponseDto> abort(Reference eyesRef, boolean waitResult) {
+  public void abort(Reference eyesRef, CloseSettingsDto closeSettings) {
     RequestDto<CommandAbortRequestDto> request = new RequestDto<>();
     request.setName("Eyes.abort");
     request.setKey(UUID.randomUUID().toString());
-    request.setPayload(new CommandAbortRequestDto(eyesRef));
+    request.setPayload(new CommandAbortRequestDto(eyesRef, closeSettings));
     SyncTaskListener syncTaskListener = checkedCommand(request);
-    if (!waitResult) {
-      return null;
-    }
-
-    ResponseDto<List<CommandCloseResponseDto>> abortResponse = (ResponseDto<List<CommandCloseResponseDto>>) syncTaskListener.get();
-    if (abortResponse != null && abortResponse.getPayload().getError() != null) {
-      String message = abortResponse.getPayload().getError().getMessage();
-      if (message != null && message.contains("stale element reference")) {
-        staleElementReferenceException.throwException(message);
-      }
-      throw new EyesException(message);
-    }
-    return abortResponse.getPayload().getResult();
+    // payload is empty, however, we must wait for the command to finish
+    syncTaskListener.get();
   }
 
-  public List<CommandCloseResponseDto> closeAllEyes(Reference managerRef) {
-    RequestDto<CommandCloseAllEyesRequestDto> request = new RequestDto<>();
-    request.setName("EyesManager.closeAllEyes");
-    request.setKey(UUID.randomUUID().toString());
-    request.setPayload(new CommandCloseAllEyesRequestDto(managerRef));
-    SyncTaskListener syncTaskListener = checkedCommand(request);
-
-    ResponseDto<List<CommandCloseResponseDto>> closeResponse = (ResponseDto<List<CommandCloseResponseDto>>) syncTaskListener.get();
-    if (closeResponse != null && closeResponse.getPayload().getError() != null) {
-      String message = closeResponse.getPayload().getError().getMessage();
-      if (message != null && message.contains("stale element reference")) {
-        staleElementReferenceException.throwException(message);
-      }
-      throw new EyesException(message);
-    }
-    return closeResponse.getPayload().getResult();
-  }
-
-  public TestResultsSummaryDto closeManager(Reference managerRef, Boolean throwError) {
+  // formerly known as closeManager
+  public TestResultsSummaryDto getResults(Reference managerRef, GetResultsSettings settings) {
     RequestDto<CommandCloseManagerRequestDto> request = new RequestDto<>();
-    request.setName("EyesManager.closeManager");
+    request.setName("EyesManager.getResults");
     request.setKey(UUID.randomUUID().toString());
-    request.setPayload(new CommandCloseManagerRequestDto(managerRef, throwError));
+    request.setPayload(new CommandCloseManagerRequestDto(managerRef, settings));
     SyncTaskListener syncTaskListener = checkedCommand(request);
 
     ResponseDto<TestResultsSummaryDto> closeResponse = (ResponseDto<TestResultsSummaryDto>) syncTaskListener.get();
