@@ -2000,7 +2000,7 @@ public class Eyes implements IEyesBase {
     }
 
     private Map<String, List<TextRegion>> locateTextDto(ITargetDto target, OCRSearchSettingsDto settings, ConfigurationDto config) {
-        return commandExecutor.locateText(eyesRef, target, settings, config);
+        return commandExecutor.locateText(target, settings, config);
     }
 
     public List<String> extractText(BaseOcrRegion... ocrRegions) {

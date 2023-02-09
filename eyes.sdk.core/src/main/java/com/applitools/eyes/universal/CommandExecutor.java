@@ -154,11 +154,11 @@ public class CommandExecutor {
   }
 
   // former extractTextRegions
-  public Map<String, List<TextRegion>> locateText(Reference eyesRef, ITargetDto target, OCRSearchSettingsDto searchSettingsDto, ConfigurationDto config) {
+  public Map<String, List<TextRegion>> locateText(ITargetDto target, OCRSearchSettingsDto searchSettingsDto, ConfigurationDto config) {
     RequestDto<LocateTextDto> request = new RequestDto<>();
-    request.setName("Eyes.locateText");
+    request.setName("Core.locateText");
     request.setKey(UUID.randomUUID().toString());
-    request.setPayload(new LocateTextDto(eyesRef, target, searchSettingsDto, config));
+    request.setPayload(new LocateTextDto(target, searchSettingsDto, config));
     SyncTaskListener syncTaskListener = checkedCommand(request);
 
     ResponseDto<Map<String, List<TextRegion>>> locateTextResponse = (ResponseDto<Map<String, List<TextRegion>>>) syncTaskListener.get();

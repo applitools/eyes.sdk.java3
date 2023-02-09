@@ -8,11 +8,6 @@ import com.applitools.eyes.universal.Reference;
 public class LocateTextDto {
 
   /**
-   * reference received from "Core.openEyes" command
-   */
-  private Reference eyes;
-
-  /**
    * the target
    */
   private ITargetDto target;
@@ -27,8 +22,7 @@ public class LocateTextDto {
    */
   private ConfigurationDto config;
 
-  public LocateTextDto(Reference eyes, ITargetDto target, OCRSearchSettingsDto settings, ConfigurationDto config) {
-    this.eyes = eyes;
+  public LocateTextDto(ITargetDto target, OCRSearchSettingsDto settings, ConfigurationDto config) {
     this.settings = settings;
     this.config = config;
     this.target = target;
@@ -40,14 +34,6 @@ public class LocateTextDto {
 
   public void setConfig(ConfigurationDto config) {
     this.config = config;
-  }
-
-  public Reference getEyes() {
-    return eyes;
-  }
-
-  public void setEyes(Reference eyes) {
-    this.eyes = eyes;
   }
 
   public OCRSearchSettingsDto getSettings() {
