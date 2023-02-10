@@ -1,6 +1,7 @@
 ## [vNext] - dNext
 ### Added
 - Added NML support for Android.
+- Added support for Execution Cloud.
 ### Updated
 - Update Universal binaries to `4.0.1`.
 - Update Selenium to `4.8.0`.
