@@ -103,7 +103,7 @@ public class UniversalSdkNativeLoader {
         @Override
         public void run() {
           try {
-            nativeProcess = new ProcessBuilder(executablePath, "--port 0", "--no-singleton", "--shutdown-mode", "--debug", "stdin").start();
+            nativeProcess = new ProcessBuilder(executablePath, "universal", "--port 0", "--no-singleton", "--shutdown-mode", "--debug", "stdin").start();
           } catch (Exception e) {
             String errorMessage = GeneralUtils.createErrorMessageFromExceptionWithText(e, "Failed to start universal core!");
             logger.log(INFO_LOG_LEVEL, Stage.GENERAL, errorMessage);
@@ -122,7 +122,7 @@ public class UniversalSdkNativeLoader {
         @Override
         public void run() {
           try {
-            nativeProcess = new ProcessBuilder(executablePath, "--port 0", "--no-singleton", "--shutdown-mode", "stdin").start();
+            nativeProcess = new ProcessBuilder(executablePath, "universal", "--port 0", "--no-singleton", "--shutdown-mode", "stdin").start();
           } catch (Exception e) {
             String errorMessage = GeneralUtils.createErrorMessageFromExceptionWithText(e, "Failed to start universal core!");
             logger.log(INFO_LOG_LEVEL, Stage.GENERAL, errorMessage);
@@ -215,7 +215,7 @@ public class UniversalSdkNativeLoader {
         "/" +
         "native" +
         "/" +
-        "eyes-universal-" +
+        "core-" +
         suffix;
   }
 
@@ -309,7 +309,7 @@ public class UniversalSdkNativeLoader {
           logger.log(TraceLevel.Error, Stage.GENERAL, errorMessage);
           throw new EyesException(errorMessage, e);
         }
-        System.out.println("Directory structure created.");
+        logger.log(INFO_LOG_LEVEL, Stage.GENERAL, "Directory structure created.");
       }
 
     try {
