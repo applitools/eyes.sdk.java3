@@ -65,9 +65,11 @@ public class Eyes implements IEyesBase {
         androidCapValue += "\"NML_API_KEY\":\"" + apiKey + "\"";
         iosCapValue += ",\"NML_API_KEY\":\"" + apiKey + "\"";
 
-        // Check for the server URL in the env variable. (might still be null and this is fine.
+        // Check for the server URL in the env variable. Defaults to Applitools public cloud.
         if (eyesServerUrl == null) {
-            eyesServerUrl = GeneralUtils.getEnvString(("APPLITOOLS_SERVER_URL"));
+            String envVar = GeneralUtils.getEnvString(("APPLITOOLS_SERVER_URL"));
+            eyesServerUrl = envVar != null? envVar : IEyesBase.APPLITOOLS_PUBLIC_CLOUD_URL;
+
         }
 
         if (eyesServerUrl != null && !eyesServerUrl.equalsIgnoreCase("")) {
