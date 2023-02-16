@@ -374,7 +374,7 @@ public class PSDKListener extends AbstractSDKListener {
                 case "Debug.getHistory":
                     handleResponse(payload, typeReferences.get(response.getName()));
                     break;
-                case "Server.log":
+                case "Logger.log":
                     try {
                         LogResponseDto serverLogResponse = objectMapper.readValue(payload,
                                 new TypeReference<LogResponseDto>() {
