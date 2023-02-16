@@ -33,7 +33,6 @@ public class PlaywrightDemo {
 //        setUFGConfiguration(eyes);
         eyes = new Eyes(new ClassicRunner());
         eyes.setApiKey(System.getenv("APPLITOOLS_API_KEY"));
-        eyes.setHostOS("myHostOS");
     }
 
     private void setUFGConfiguration(Eyes eyes) {
