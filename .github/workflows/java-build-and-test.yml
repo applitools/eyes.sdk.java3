@@ -20,6 +20,7 @@ jobs:
       - name: Checkout repository and submodules
         uses: actions/checkout@v3
         with:
+          lfs: true # without this flag binaries won't be loaded
           submodules: recursive
           token: ${{ secrets.SUBMODULES_GA_TOKEN }}
       - name: Setup Node
@@ -54,6 +55,7 @@ jobs:
       - name: Checkout repository and submodules
         uses: actions/checkout@v3
         with:
+          lfs: true # without this flag binaries won't be loaded
           submodules: recursive
           token: ${{ secrets.SUBMODULES_GA_TOKEN }}
       - name: Setup Node
@@ -91,6 +93,7 @@ jobs:
       - name: Checkout repository and submodules
         uses: actions/checkout@v3
         with:
+          lfs: true # without this flag binaries won't be loaded
           submodules: recursive
           token: ${{ secrets.SUBMODULES_GA_TOKEN }}
       - name: Setup Node
@@ -135,6 +138,7 @@ jobs:
       - name: Checkout repository and submodules
         uses: actions/checkout@v3
         with:
+          lfs: true # without this flag binaries won't be loaded
           submodules: recursive
           token: ${{ secrets.SUBMODULES_GA_TOKEN }}
       - name: Setup Node
@@ -175,6 +179,7 @@ jobs:
       - name: Checkout repository and submodules
         uses: actions/checkout@v3
         with:
+          lfs: true # without this flag binaries won't be loaded
           submodules: recursive
           token: ${{ secrets.SUBMODULES_GA_TOKEN }}
       - name: Setup Java
@@ -240,6 +245,7 @@ jobs:
       - name: Checkout repository and submodules
         uses: actions/checkout@v3
         with:
+          lfs: true # without this flag binaries won't be loaded
           submodules: recursive
           token: ${{ secrets.SUBMODULES_GA_TOKEN }}
       - name: Setup Node
@@ -274,6 +280,7 @@ jobs:
       - name: Checkout repository and submodules
         uses: actions/checkout@v3
         with:
+          lfs: true # without this flag binaries won't be loaded
           submodules: recursive
           token: ${{ secrets.SUBMODULES_GA_TOKEN }}
       - name: Setup Node
@@ -311,6 +318,7 @@ jobs:
       - name: Checkout repository and submodules
         uses: actions/checkout@v3
         with:
+          lfs: true # without this flag binaries won't be loaded
           submodules: recursive
           token: ${{ secrets.SUBMODULES_GA_TOKEN }}
       - name: Setup Node
@@ -358,6 +366,7 @@ jobs:
       - name: Checkout repository and submodules
         uses: actions/checkout@v3
         with:
+          lfs: true # without this flag binaries won't be loaded
           submodules: recursive
           token: ${{ secrets.SUBMODULES_GA_TOKEN }}
       - name: Setup Node
