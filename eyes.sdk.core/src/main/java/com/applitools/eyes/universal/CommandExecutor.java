@@ -301,7 +301,8 @@ public class CommandExecutor {
     return getViewportSizeResponse.getPayload().getResult();
   }
 
-  public static DebugHistoryDto getDebugHistory() {
+  /** internal */
+  private static DebugHistoryDto getDebugHistory() {
     RequestDto request = new RequestDto<>();
     request.setName("Debug.getHistory");
     request.setKey(UUID.randomUUID().toString());

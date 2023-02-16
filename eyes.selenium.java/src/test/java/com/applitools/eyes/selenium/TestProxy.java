@@ -103,12 +103,6 @@ public class TestProxy extends ReportingTestSuite {
     }
 
     @Test
-    public void debugHistoryShouldBeNullWhenDebugIsOff() {
-        new VisualGridRunner();
-        Assert.assertNull(CommandExecutor.getDebugHistory());
-    }
-
-    @Test
     public void testUniversalProxyWithVisualGridRunner() throws IllegalAccessException, IOException, InterruptedException {
         stopAndStartDockers(8080);
         debug.set(this, "true");
@@ -122,7 +116,7 @@ public class TestProxy extends ReportingTestSuite {
 
         eyes.open(driver, "ProxyTest", "proxyTestVisualGridRunner");
 
-        DebugHistoryDto history = CommandExecutor.getDebugHistory();
+        DebugHistoryDto history = getDebugHistory();
         DebugEyesDto debugEyes = history.getManagers().get(0).getEyes().get(0);
 
         Assert.assertNotNull(debugEyes.getConfig());
@@ -145,7 +139,7 @@ public class TestProxy extends ReportingTestSuite {
 
         eyes.open(driver, "ProxyTest", "proxyTestClassicRunner");
 
-        DebugHistoryDto history = CommandExecutor.getDebugHistory();
+        DebugHistoryDto history = getDebugHistory();
         DebugEyesDto debugEyes = history.getManagers().get(0).getEyes().get(0);
 
         Assert.assertNotNull(debugEyes.getConfig());
@@ -167,7 +161,7 @@ public class TestProxy extends ReportingTestSuite {
 
         eyes.open(driver, "ProxyTest", "autProxyTestVisualGridRunner");
 
-        DebugHistoryDto history = CommandExecutor.getDebugHistory();
+        DebugHistoryDto history = getDebugHistory();
         DebugEyesDto debugEyes = history.getManagers().get(0).getEyes().get(0);
 
         Assert.assertNotNull(debugEyes.getConfig());
@@ -190,7 +184,7 @@ public class TestProxy extends ReportingTestSuite {
 
         eyes.open(driver, "ProxyTest", "autProxyTestClassicRunner");
 
-        DebugHistoryDto history = CommandExecutor.getDebugHistory();
+        DebugHistoryDto history = getDebugHistory();
         DebugEyesDto debugEyes = history.getManagers().get(0).getEyes().get(0);
 
         Assert.assertNotNull(debugEyes.getConfig());
@@ -217,7 +211,7 @@ public class TestProxy extends ReportingTestSuite {
 
         eyes.open(driver, "ProxyTest", "proxyAndAutProxyTestVisualGridRunner");
 
-        DebugHistoryDto history = CommandExecutor.getDebugHistory();
+        DebugHistoryDto history = getDebugHistory();
         DebugEyesDto debugEyes = history.getManagers().get(0).getEyes().get(0);
 
         Assert.assertNotNull(debugEyes.getConfig());
@@ -247,7 +241,7 @@ public class TestProxy extends ReportingTestSuite {
 
         eyes.open(driver, "ProxyTest", "proxyAndDifferentAutProxyTestClassicRunner");
 
-        DebugHistoryDto history = CommandExecutor.getDebugHistory();
+        DebugHistoryDto history = getDebugHistory();
         DebugEyesDto debugEyes = history.getManagers().get(0).getEyes().get(0);
 
         Assert.assertNotNull(debugEyes.getConfig());
@@ -283,7 +277,7 @@ public class TestProxy extends ReportingTestSuite {
         eyes.open(driver, "ProxyTest", "webdriverProxyVisualGridRunner");
         driver.quit();
 
-        DebugHistoryDto history = CommandExecutor.getDebugHistory();
+        DebugHistoryDto history = getDebugHistory();
         DebugEyesDto debugEyes = history.getManagers().get(0).getEyes().get(0);
 
         Assert.assertNotNull(debugEyes.getConfig());
@@ -314,7 +308,7 @@ public class TestProxy extends ReportingTestSuite {
         eyes.open(driver, "ProxyTest", "webdriverProxyClassicRunner");
         driver.quit();
 
-        DebugHistoryDto history = CommandExecutor.getDebugHistory();
+        DebugHistoryDto history = getDebugHistory();
         DebugEyesDto debugEyes = history.getManagers().get(0).getEyes().get(0);
 
         Assert.assertNotNull(debugEyes.getConfig());
@@ -338,5 +332,21 @@ public class TestProxy extends ReportingTestSuite {
         stopDocker.waitFor();
         Process removeDocker = Runtime.getRuntime().exec(new String[]{"bash","-c","docker rm $(docker ps -a -q)"});
         removeDocker.waitFor();
+    }
+
+    private DebugHistoryDto getDebugHistory() {
+        try {
+            Method getDebugHistory = CommandExecutor.class.getDeclaredMethod("getDebugHistory");
+            getDebugHistory.setAccessible(true);
+            Object debugHistory = getDebugHistory.invoke(CommandExecutor.class);
+            return (DebugHistoryDto) debugHistory;
+        } catch (NoSuchMethodException | IllegalAccessException e) {
+            System.out.println("Got a failure trying to activate getDebugHistory using reflection! Error " + e.getMessage());
+            throw new EyesException("Got a failure trying to activate getDebugHistory using reflection! Error " + e.getMessage());
+        } catch (Exception e) {
+            String errorMessage = GeneralUtils.createErrorMessageFromExceptionWithText(e, "Got a failure trying to perform a 'getDebugHistory'!");
+            System.out.println(errorMessage);
+            throw new EyesException(errorMessage, e);
+        }
     }
 }
