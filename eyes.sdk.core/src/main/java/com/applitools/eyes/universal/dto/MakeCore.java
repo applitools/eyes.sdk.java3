@@ -1,20 +1,15 @@
 package com.applitools.eyes.universal.dto;
 
-import java.util.Arrays;
+import com.fasterxml.jackson.annotation.JsonUnwrapped;
 
 /**
  * This event has to be sent in the first place just after a connection between Client and Server will be established.
  */
 public class MakeCore {
   /**
-   * name of the client sdk
+   * client sdk agent id
    */
-  private String name;
-
-  /**
-   * version of the client sdk
-   */
-  private String version;
+  private String agentId;
 
   /**
    * current working directory
@@ -22,37 +17,23 @@ public class MakeCore {
   private String cwd;
 
   /**
-   * the name of the prebuilt server-side driver
+   * the spec-driver (webdriver or custom)
    */
-  private String protocol;
+  @JsonUnwrapped
+  private SpecDto spec;
 
-  /**
-   * ?
-   */
-  private String[] commands;
-
-  public MakeCore(String name, String version, String cwd, String protocol, String[] commands) {
-    this.name = name;
-    this.version = version;
+  public MakeCore(String agentId, String cwd, SpecDto spec) {
+    this.agentId = agentId;
     this.cwd = cwd;
-    this.protocol = protocol;
-    this.commands = commands;
+    this.spec = spec;
   }
 
-  public String getName() {
-    return name;
+  public String getAgentId() {
+    return agentId;
   }
 
-  public void setName(String name) {
-    this.name = name;
-  }
-
-  public String getVersion() {
-    return version;
-  }
-
-  public void setVersion(String version) {
-    this.version = version;
+  public void setAgentId(String agentId) {
+    this.agentId = agentId;
   }
 
   public String getCwd() {
@@ -63,30 +44,20 @@ public class MakeCore {
     this.cwd = cwd;
   }
 
-  public String getProtocol() {
-    return protocol;
+  public SpecDto getSpec() {
+    return spec;
   }
 
-  public void setProtocol(String protocol) {
-    this.protocol = protocol;
-  }
-
-  public String[] getCommands() {
-    return commands;
-  }
-
-  public void setCommands(String[] commands) {
-    this.commands = commands;
+  public void setSpec(SpecDto spec) {
+    this.spec = spec;
   }
 
   @Override
   public String toString() {
     return "MakeCore{" +
-        "name='" + name + '\'' +
-        ", version='" + version + '\'' +
+        "agentId='" + agentId + '\'' +
         ", cwd='" + cwd + '\'' +
-        ", protocol='" + protocol + '\'' +
-        ", commands='" + Arrays.toString(commands) + '\'' +
+        ", spec='" + spec + '\'' +
         '}';
   }
 }

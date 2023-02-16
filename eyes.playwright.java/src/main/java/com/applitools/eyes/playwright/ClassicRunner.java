@@ -20,11 +20,6 @@ public class ClassicRunner extends EyesRunner {
     protected static String VERSION = ClassVersionGetter.CURRENT_VERSION;
 
     /**
-     * the protocol to be used
-     */
-    protected static String PROTOCOL = "playwright";
-
-    /**
      * spec-driver
      */
     protected static String[] COMMANDS = SpecDriverPlaywright.getMethodNames();
@@ -45,7 +40,7 @@ public class ClassicRunner extends EyesRunner {
      * used for instantiating Playwright Runner
      */
     public ClassicRunner(String baseAgentId, String version) {
-        super(baseAgentId, version, PROTOCOL, COMMANDS, listener);
+        super(baseAgentId, version, null, COMMANDS, listener);
         managerRef = commandExecutor.coreMakeManager("classic", null, null, baseAgentId);
 
     }

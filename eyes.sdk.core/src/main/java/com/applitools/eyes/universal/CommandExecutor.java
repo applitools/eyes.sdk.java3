@@ -26,30 +26,29 @@ public class CommandExecutor {
   private static volatile CommandExecutor instance;
   private static StaleElementReferenceException staleElementReferenceException;
 
-  public static CommandExecutor getInstance(String name, String version, String protocol, String[] commands,
-                                            AbstractSDKListener listener, StaleElementReferenceException e) {
+  public static CommandExecutor getInstance(String agentId, SpecDto spec, AbstractSDKListener listener,
+                                            StaleElementReferenceException e) {
     if (instance == null) {
       synchronized (CommandExecutor.class) {
         if (instance == null) {
           staleElementReferenceException = e;
-          instance = new CommandExecutor(name, version, protocol, commands, listener);
+          instance = new CommandExecutor(agentId, spec, listener);
         }
       }
     }
     return instance;
   }
 
-  private CommandExecutor(String name, String version, String protocol, String[] commands, AbstractSDKListener listener) {
+  private CommandExecutor(String agentId, SpecDto spec, AbstractSDKListener listener) {
     connection = new USDKConnection(listener);
     connection.init();
-    makeCore(name, version, GeneralUtils.getPropertyString("user.dir"), protocol, commands);
+    makeCore(agentId, GeneralUtils.getPropertyString("user.dir"), spec);
   }
 
-  public void makeCore(String name, String version, String cwd, String protocol, String[] commands) {
+  public void makeCore(String agentId, String cwd, SpecDto spec) {
     EventDto<MakeCore> request = new EventDto<>();
-    MakeCore makeCore = new MakeCore(name, version, cwd, protocol, commands);
     request.setName("Core.makeCore");
-    request.setPayload(makeCore);
+    request.setPayload(new MakeCore(agentId, cwd, spec));
     checkedCommand(request);
   }
 

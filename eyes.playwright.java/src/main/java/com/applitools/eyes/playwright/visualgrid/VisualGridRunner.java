@@ -25,11 +25,6 @@ public class VisualGridRunner extends EyesRunner {
     protected static String VERSION = ClassVersionGetter.CURRENT_VERSION;
 
     /**
-     * the protocol to be used
-     */
-    protected static String PROTOCOL = "playwright";
-
-    /**
      * spec-driver commands
      */
     protected static String[] COMMANDS = SpecDriverPlaywright.getMethodNames();
@@ -48,13 +43,13 @@ public class VisualGridRunner extends EyesRunner {
     }
 
     public VisualGridRunner(int testConcurrency) {
-        super(BASE_AGENT_ID, VERSION, PROTOCOL, COMMANDS, listener);
+        super(BASE_AGENT_ID, VERSION, null, COMMANDS, listener);
         this.runnerOptions = new RunnerOptions().testConcurrency(testConcurrency);
         managerRef = commandExecutor.coreMakeManager(ManagerType.VISUAL_GRID.value, null, testConcurrency, BASE_AGENT_ID);
     }
 
     public VisualGridRunner(RunnerOptions runnerOptions) {
-        super(BASE_AGENT_ID, VERSION, PROTOCOL, COMMANDS, listener, runnerOptions);
+        super(BASE_AGENT_ID, VERSION, null, COMMANDS, listener, runnerOptions);
         this.runnerOptions = runnerOptions;
         int testConcurrency = runnerOptions.getTestConcurrency() == null ? DEFAULT_CONCURRENCY : runnerOptions.getTestConcurrency();
         managerRef = commandExecutor.coreMakeManager(ManagerType.VISUAL_GRID.value, testConcurrency, null, BASE_AGENT_ID);

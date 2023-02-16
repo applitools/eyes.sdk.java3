@@ -8,6 +8,7 @@ import com.applitools.eyes.logging.Stage;
 import com.applitools.eyes.logging.Type;
 import com.applitools.eyes.settings.GetResultsSettings;
 import com.applitools.eyes.universal.*;
+import com.applitools.eyes.universal.dto.SpecDto;
 import com.applitools.eyes.universal.dto.TestResultsSummaryDto;
 import com.applitools.eyes.universal.mapper.TestResultsSummaryMapper;
 import com.applitools.eyes.universal.server.UniversalSdkNativeLoader;
@@ -118,7 +119,7 @@ public abstract class EyesRunner {
   protected void runServer(String baseAgentId, String version, String protocol, String[] commands, AbstractSDKListener listener){
     UniversalSdkNativeLoader.setLogger(getLogger());
     UniversalSdkNativeLoader.start();
-    commandExecutor = CommandExecutor.getInstance(baseAgentId, version, protocol, commands, listener, getStaleElementException());
+    commandExecutor = CommandExecutor.getInstance(baseAgentId + '/' + version, new SpecDto(protocol, commands), listener, getStaleElementException());
   }
 
   public TestResultsSummary getAllTestResults(boolean shouldThrowException) {
