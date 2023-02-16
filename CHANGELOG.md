@@ -1,6 +1,6 @@
-## [5.43.0] - 2023-02-10
+## [5.43.0] - 2023-02-16
 ### Updated
-- Update Universal binaries to _core_ version `2.3.1`.
+- Update Universal binaries to _core_ version `2.3.3`.
 
 ## [5.42.0] - 2023-02-10
 ### Added
