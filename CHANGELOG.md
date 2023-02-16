@@ -1,11 +1,14 @@
-## [5.41.0] - 2023-02-10
+## [5.43.0] - 2023-02-10
+### Updated
+- Update Universal binaries to _core_ version `2.3.1`.
+
+## [5.42.0] - 2023-02-10
 ### Added
 - Added NML support for Android.
 - Added support for Execution Cloud.
 ### Updated
 - Update Universal binaries to `4.0.1`.
 - Update Selenium to `4.8.0`.
-
 
 ## [5.41.0] - 2023-01-31
 ### Added
