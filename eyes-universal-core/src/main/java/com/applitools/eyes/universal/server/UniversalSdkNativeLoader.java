@@ -80,7 +80,7 @@ public class UniversalSdkNativeLoader {
       Path directoryPath =
           userSetPath == null ? Paths.get(GeneralUtils.getPropertyString(TEMP_FOLDER_PATH)) : Paths.get(userSetPath);
 
-      String serverFilename = "eyes-universal-" + systemInfo.getSuffix();
+      String serverFilename = "core-" + systemInfo.getSuffix();
 
       Path serverTargetPath;
       // Read the server bytes from SDK resources, and write it to the target path
