@@ -27,6 +27,8 @@ git:
 before_install:
   - echo -e "\n\nmachine github.com\n  login $GITHUB_TOKEN\n" >~/.netrc
   - git submodule update --init --recursive
+  - nvm install node
+  - nvm use node
 before_script:
   - export SE_DOCKER="true" # TODO this is used with selenium-java 4.5.2 see PortProber.class L103 and may be subject to changed
   - export APPLITOOLS_REPORT_ID=${TRAVIS_COMMIT:0:7}-$TRAVIS_BUILD_NUMBER
