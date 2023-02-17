@@ -1,5 +1,6 @@
 package com.applitools.eyes.universal.dto;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
@@ -8,8 +9,10 @@ import java.util.Arrays;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class SpecDto {
 
+    @JsonIgnore
     private String protocol;
 
+    @JsonIgnore
     private String[] commands;
 
     public SpecDto(String protocol, String[] commands) {
