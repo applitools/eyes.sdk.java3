@@ -543,7 +543,8 @@ public class Eyes implements IEyesBase {
 
         ConfigurationDto configurationDto = ConfigurationMapper
                 .toConfigurationDto(configuration, runner.isDontCloseBatches());
-        commandExecutor.eyesCheck(eyesRef, target, checkSettingsDto, configurationDto);
+        //TODO add image target
+        commandExecutor.eyesCheck(eyesRef, null, checkSettingsDto, configurationDto);
     }
     /**
      * Close test results.
