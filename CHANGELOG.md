@@ -1,3 +1,11 @@
+## [vNext] - dNext
+### Updated
+- Update core binaries to version `2.3.7`.
+### Added
+- Added support to provide density metrics. [Trello 3125](https://trello.com/c/6HYzeSfz)
+### Fixed
+- Fixed an issue where `setDeviceInfo` didn't work. [Trello 3157](https://trello.com/c/rz55PjXo)
+
 ## [5.43.0] - 2023-02-17
 ### Updated
 - Update Universal binaries to _core_ version `2.3.6`.
