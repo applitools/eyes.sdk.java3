@@ -1,9 +1,6 @@
 package com.applitools;
 
-import com.applitools.eyes.AccessibilityRegionType;
-import com.applitools.eyes.LazyLoadOptions;
-import com.applitools.eyes.MatchLevel;
-import com.applitools.eyes.Region;
+import com.applitools.eyes.*;
 import com.applitools.eyes.visualgrid.model.VisualGridOption;
 
 /**
@@ -204,4 +201,23 @@ public interface ICheckSettings {
      * @return An updated clone of this settings object.
      */
     ICheckSettings lazyLoad(LazyLoadOptions lazyLoadOptions);
+
+    /**
+     * sets the density metrics for the screenshot
+     *
+     * @param xDpi  the exact physical pixels per inch of the screen in the X dimension
+     * @param yDpi  the exact physical pixels per inch of the screen in the Y dimension
+     * @return @return An updated clone of this settings object
+     */
+    ICheckSettings densityMetrics(int xDpi, int yDpi);
+
+    /**
+     * sets the density metrics for the screenshot.
+     *
+     * @param xDpi  the exact physical pixels per inch of the screen in the X dimension
+     * @param yDpi  the exact physical pixels per inch of the screen in the Y dimension
+     * @param scaleRatio  the scale ratio
+     * @return @return An updated clone of this settings object
+     */
+    ICheckSettings densityMetrics(int xDpi, int yDpi, Double scaleRatio);
 }

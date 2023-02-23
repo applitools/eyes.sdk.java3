@@ -1063,6 +1063,16 @@ public class SeleniumCheckSettings extends CheckSettings implements ISeleniumChe
         return super.getLazyLoadOptions();
     }
 
+    @Override
+    public SeleniumCheckSettings densityMetrics(int xDpi, int yDpi) {
+        return (SeleniumCheckSettings) super.densityMetrics(xDpi, yDpi);
+    }
+
+    @Override
+    public SeleniumCheckSettings densityMetrics(int xDpi, int yDpi, Double scaleRatio) {
+        return (SeleniumCheckSettings) super.densityMetrics(xDpi, yDpi, scaleRatio);
+    }
+
     public TargetPathLocator getTargetPathLocator() {
         return this.targetLocator;
     }

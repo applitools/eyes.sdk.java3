@@ -52,9 +52,9 @@ public class CheckSettings implements ICheckSettings, ICheckSettingsInternal {
     private Boolean disableBrowserFetching;
     private AutProxySettings autProxy;
     protected Map<String, String> scriptHooks = new HashMap<>();
-
     private BaseOcrRegion ocrRegion = null;
     private String variationGroupId = null;
+    private DensityMetrics densityMetrics;
 
     protected CheckSettings() { }
 
@@ -494,6 +494,7 @@ public class CheckSettings implements ICheckSettings, ICheckSettingsInternal {
         clone.disableBrowserFetching = this.disableBrowserFetching;
         clone.waitBeforeCapture = this.waitBeforeCapture;
         clone.lazyLoadOptions = this.lazyLoadOptions;
+        clone.densityMetrics = this.densityMetrics;
     }
 
     public void setStitchContent(boolean stitchContent) {
@@ -777,5 +778,23 @@ public class CheckSettings implements ICheckSettings, ICheckSettingsInternal {
 
     public String getPageId() {
         return this.pageId;
+    }
+
+    @Override
+    public ICheckSettings densityMetrics(int xDpi, int yDpi) {
+        CheckSettings clone = this.clone();
+        clone.densityMetrics = new DensityMetrics(xDpi, yDpi);
+        return clone;
+    }
+
+    @Override
+    public ICheckSettings densityMetrics(int xDpi, int yDpi, Double scaleRatio) {
+        CheckSettings clone = this.clone();
+        clone.densityMetrics = new DensityMetrics(xDpi, yDpi).scaleRatio(scaleRatio);
+        return clone;
+    }
+
+    public DensityMetrics getDensityMetrics() {
+        return densityMetrics;
     }
 }

@@ -44,4 +44,14 @@ public class ImagesCheckSettings extends CheckSettings implements IImagesCheckTa
         clone.path = this.path;
         return clone;
     }
+
+    @Override
+    public ImagesCheckSettings densityMetrics(int xDpi, int yDpi) {
+        return (ImagesCheckSettings) super.densityMetrics(xDpi, yDpi);
+    }
+
+    @Override
+    public ImagesCheckSettings densityMetrics(int xDpi, int yDpi, Double scaleRatio) {
+        return (ImagesCheckSettings) super.densityMetrics(xDpi, yDpi, scaleRatio);
+    }
 }

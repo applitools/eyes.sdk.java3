@@ -5,6 +5,7 @@ import com.applitools.eyes.config.Configuration;
 import com.applitools.eyes.universal.ManagerType;
 import com.applitools.eyes.universal.dto.CheckSettingsDto;
 import com.applitools.eyes.universal.dto.ImageCropRectDto;
+import com.applitools.eyes.universal.mapper.AccessibilitySettingsMapper;
 import com.applitools.eyes.universal.mapper.NMGOptionsMapper;
 import com.applitools.eyes.universal.mapper.ProxyMapper;
 import com.applitools.eyes.universal.mapper.VisualGridOptionMapper;
@@ -12,62 +13,6 @@ import com.applitools.eyes.universal.mapper.VisualGridOptionMapper;
 import java.util.Arrays;
 
 public class AppiumCheckSettingsMapper {
-    public static CheckSettingsDto toCheckSettingsDto(ICheckSettings checkSettings) {
-        if (!(checkSettings instanceof AppiumCheckSettings)) {
-            return null;
-        }
-        AppiumCheckSettings appiumCheckSettings = (AppiumCheckSettings) checkSettings;
-        CheckSettingsDto checkSettingsDto = new CheckSettingsDto();
-
-        // CheckSettings
-        checkSettingsDto.setName(appiumCheckSettings.getName());
-        checkSettingsDto.setDisableBrowserFetching(appiumCheckSettings.isDisableBrowserFetching());
-//        checkSettingsDto.setVisualGridOptions(VisualGridOptionMapper.toVisualGridOptionDtoList(appiumCheckSettings.getVisualGridOptions()));
-        checkSettingsDto.setUfgOptions(VisualGridOptionMapper.toVisualGridOptionDtoList(appiumCheckSettings.getVisualGridOptions()));
-        checkSettingsDto.setHooks(appiumCheckSettings.getScriptHooks());
-//        checkSettingsDto.setRenderId(null);
-//        checkSettingsDto.setVariationGroupId(appiumCheckSettings.getVariationGroupId());
-//        checkSettingsDto.setTimeout(appiumCheckSettings.getTimeout());
-
-        // MatchSettings
-//        checkSettingsDto.setExact(null);
-        checkSettingsDto.setMatchLevel(appiumCheckSettings.getMatchLevel() == null ? null : appiumCheckSettings.getMatchLevel().getName());
-        checkSettingsDto.setSendDom(appiumCheckSettings.isSendDom());
-        checkSettingsDto.setUseDom(appiumCheckSettings.isUseDom());
-        checkSettingsDto.setEnablePatterns(appiumCheckSettings.isEnablePatterns());
-        checkSettingsDto.setIgnoreCaret(appiumCheckSettings.getIgnoreCaret());
-        checkSettingsDto.setIgnoreDisplacements(appiumCheckSettings.isIgnoreDisplacements());
-        checkSettingsDto.setAccessibilitySettings(null);
-
-        checkSettingsDto.setIgnoreRegions(AppiumCodedRegionReferenceMapper
-                .toCodedRegionReferenceList(Arrays.asList(appiumCheckSettings.getIgnoreRegions())));
-        checkSettingsDto.setLayoutRegions(AppiumCodedRegionReferenceMapper
-                .toCodedRegionReferenceList(Arrays.asList(appiumCheckSettings.getLayoutRegions())));
-        checkSettingsDto.setStrictRegions(AppiumCodedRegionReferenceMapper
-                .toCodedRegionReferenceList(Arrays.asList(appiumCheckSettings.getStrictRegions())));
-        checkSettingsDto.setContentRegions(AppiumCodedRegionReferenceMapper
-                .toCodedRegionReferenceList(Arrays.asList(appiumCheckSettings.getContentRegions())));
-
-        checkSettingsDto.setFloatingRegions(AppiumTFloatingRegionMapper.toTFloatingRegionDtoList(Arrays.asList(appiumCheckSettings.getFloatingRegions())));
-
-        checkSettingsDto.setAccessibilityRegions(AppiumTAccessibilityRegionMapper.toTAccessibilityRegionDtoList(Arrays.asList(appiumCheckSettings.getAccessibilityRegions())));
-        checkSettingsDto.setPageId(appiumCheckSettings.getPageId());
-        checkSettingsDto.setLazyLoad(appiumCheckSettings.getLazyLoadOptions());
-        checkSettingsDto.setWebview(appiumCheckSettings.getWebview() != null?
-                appiumCheckSettings.getWebview() : (appiumCheckSettings.getIsDefaultWebview() != null?
-                appiumCheckSettings.getIsDefaultWebview() : null));
-
-        // ScreenshotSettings
-        checkSettingsDto.setRegion(AppiumTRegionMapper.toTRegionFromCheckSettings(checkSettings));
-
-        checkSettingsDto.setFully(appiumCheckSettings.getStitchContent());
-
-        checkSettingsDto.
-                setScrollRootElement(AppiumTRegionMapper.toTRegionDtoFromScrolls(appiumCheckSettings
-                                .getScrollRootElementSelector(), appiumCheckSettings.getScrollRootElement()));
-
-        return checkSettingsDto;
-    }
 
     public static CheckSettingsDto toCheckSettingsDtoV3(ICheckSettings checkSettings, Configuration config) {
         if (!(checkSettings instanceof AppiumCheckSettings)) {
@@ -109,7 +54,7 @@ public class AppiumCheckSettingsMapper {
                 .toCodedRegionReferenceList(Arrays.asList(appiumCheckSettings.getContentRegions())));
         checkSettingsDto.setFloatingRegions(AppiumTFloatingRegionMapper.toTFloatingRegionDtoList(Arrays.asList(appiumCheckSettings.getFloatingRegions())));
         checkSettingsDto.setAccessibilityRegions(AppiumTAccessibilityRegionMapper.toTAccessibilityRegionDtoList(Arrays.asList(appiumCheckSettings.getAccessibilityRegions())));
-        checkSettingsDto.setAccessibilitySettings(null); //TODO why I am null?
+        checkSettingsDto.setAccessibilitySettings(AccessibilitySettingsMapper.toAccessibilitySettingsDto(appiumCheckSettings.getAccessibilityValidation()));
         checkSettingsDto.setMatchLevel(appiumCheckSettings.getMatchLevel() == null ? null : appiumCheckSettings.getMatchLevel().getName());
         checkSettingsDto.setRetryTimeout(config.getMatchTimeout()); //I'm NEW - former matchTimeout
         checkSettingsDto.setSendDom(appiumCheckSettings.isSendDom());
@@ -121,6 +66,7 @@ public class AppiumCheckSettingsMapper {
         checkSettingsDto.setDisableBrowserFetching(appiumCheckSettings.isDisableBrowserFetching());
         checkSettingsDto.setAutProxy(ProxyMapper.toAutProxyDto(config.getAutProxy()));
         checkSettingsDto.setHooks(appiumCheckSettings.getScriptHooks());
+        checkSettingsDto.setDensityMetrics(appiumCheckSettings.getDensityMetrics());
 
         checkSettingsDto.setType(NMGOptionsMapper.toNMGOptionsMapperDtoList(appiumCheckSettings.getNMGOptions()) == null? null : ManagerType.CLASSIC.value);
 

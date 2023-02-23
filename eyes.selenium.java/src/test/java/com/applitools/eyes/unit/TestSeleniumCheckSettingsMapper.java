@@ -1,4 +1,5 @@
 package com.applitools.eyes.unit;
+import com.applitools.eyes.config.Configuration;
 import com.applitools.eyes.selenium.ElementSelector;
 import com.applitools.eyes.selenium.fluent.SeleniumCheckSettings;
 import com.applitools.eyes.selenium.fluent.Target;
@@ -22,7 +23,7 @@ public class TestSeleniumCheckSettingsMapper {
 
         SeleniumCheckSettings checkSettings = Target.region(byAll);
 
-        CheckSettingsDto dto = CheckSettingsMapper.toCheckSettingsDto(checkSettings);
+        CheckSettingsDto dto = CheckSettingsMapper.toCheckSettingsDtoV3(checkSettings, new Configuration());
 
         ElementSelector fallback = new ElementSelector(By.xpath("byXpath"));
 
@@ -48,7 +49,7 @@ public class TestSeleniumCheckSettingsMapper {
 
         SeleniumCheckSettings checkSettings = Target.region(byChained);
 
-        CheckSettingsDto dto = CheckSettingsMapper.toCheckSettingsDto(checkSettings);
+        CheckSettingsDto dto = CheckSettingsMapper.toCheckSettingsDtoV3(checkSettings, new Configuration());
 
         ElementSelector child = new ElementSelector(By.xpath("byXpath"));
 

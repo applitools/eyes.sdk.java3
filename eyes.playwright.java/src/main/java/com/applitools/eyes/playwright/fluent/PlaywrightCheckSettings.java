@@ -13,7 +13,6 @@ import com.applitools.eyes.universal.Reference;
 import com.applitools.eyes.visualgrid.model.VisualGridOption;
 import com.applitools.utils.ArgumentGuard;
 import com.microsoft.playwright.ElementHandle;
-import com.microsoft.playwright.Frame;
 import com.microsoft.playwright.Locator;
 
 import javax.annotation.Nonnull;
@@ -1425,6 +1424,16 @@ public class PlaywrightCheckSettings extends CheckSettings implements IPlaywrigh
         return (PlaywrightCheckSettings) super.lazyLoad(lazyLoadOptions);
     }
 
+    @Override
+    public PlaywrightCheckSettings densityMetrics(int xDpi, int yDpi) {
+        return (PlaywrightCheckSettings) super.densityMetrics(xDpi, yDpi);
+    }
+
+    @Override
+    public PlaywrightCheckSettings densityMetrics(int xDpi, int yDpi, Double scaleRatio) {
+        return (PlaywrightCheckSettings) super.densityMetrics(xDpi, yDpi, scaleRatio);
+    }
+
     /**
      * Create a new clone of this settings object.
      *
@@ -1567,6 +1576,7 @@ public class PlaywrightCheckSettings extends CheckSettings implements IPlaywrigh
     public PlaywrightCheckSettings content(Region[] regions) {
         return ignoreColors(regions);
     }
+
     /** see {@link #ignoreColors(Region, Region...)} )} )} */
     @Deprecated
     @Override

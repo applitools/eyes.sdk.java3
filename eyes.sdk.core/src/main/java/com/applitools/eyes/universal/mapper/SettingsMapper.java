@@ -22,8 +22,6 @@ public class SettingsMapper {
         dto.setServerUrl(config.getServerUrl() == null? null : config.getServerUrl().toString());
         dto.setApiKey(config.getApiKey());
         dto.setProxy(ProxyMapper.toProxyDto(config.getProxy()));
-        dto.setConnectionTimeout(null); //TODO - why is this null?
-        dto.setRemoveSession(null); //TODO - why is this null?
         dto.setAgentId(config.getAgentId());
         dto.setAppName(config.getAppName());
         dto.setTestName(config.getTestName());
@@ -38,9 +36,9 @@ public class SettingsMapper {
                 config.getHostOS(),
                 config.getHostApp(),
                 config.getViewportSize(),
-                null,
-                null,
-                null));
+                config.getDeviceInfo(),
+                config.getOsInfo(),
+                config.getHostingAppInfo()));
 
         dto.setBranchName(config.getBranchName());
         dto.setParentBranchName(config.getParentBranchName());
