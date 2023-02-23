@@ -31,10 +31,6 @@ public class ConfigurationMapper {
     dto.setServerUrl(config.getServerUrl() == null ? null : config.getServerUrl().toString());
     dto.setProxy(ProxyMapper.toProxyDto(config.getProxy()));
     dto.setAutProxy(ProxyMapper.toAutProxyDto(config.getAutProxy()));
-//    dto.setDisabled(config.getIsDisabled()); //removed
-    dto.setConnectionTimeout(null);
-    dto.setRemoveSession(null);
-//    dto.setRemoteEvents(null);
 
     // EyesOpenConfig
     dto.setAppName(config.getAppName());
@@ -47,9 +43,9 @@ public class ConfigurationMapper {
     dto.setDefaultMatchSettings(MatchSettingsMapper.toMatchSettingsDto(config.getDefaultMatchSettings()));
     dto.setHostApp(config.getHostApp());
     dto.setHostOS(config.getHostOS());
-    dto.setHostAppInfo(null);
-    dto.setHostOSInfo(null);
-    dto.setDeviceInfo(null);
+    dto.setHostAppInfo(config.getHostingAppInfo());
+    dto.setHostOSInfo(config.getOsInfo());
+    dto.setDeviceInfo(config.getDeviceInfo());
     dto.setBaselineEnvName(config.getBaselineEnvName());
     dto.setEnvironmentName(config.getEnvironmentName());
     dto.setBranchName(config.getBranchName());
@@ -69,7 +65,6 @@ public class ConfigurationMapper {
 
 
     // EyesClassicConfig<TElement, TSelector>
-//    dto.setWaitBeforeScreenshots(config.getWaitBeforeScreenshots());
     dto.setStitchMode(config.getStitchMode() == null ? null : config.getStitchMode().getName());
     dto.setHideScrollBars(config.getHideScrollbars());
     dto.setHideCaret(config.getHideCaret());
@@ -84,7 +79,6 @@ public class ConfigurationMapper {
     dto.setWaitBeforeCapture(config.getWaitBeforeCapture());
 
     // EyesUFGConfig
-//    dto.setConcurrentSessions(null);
     dto.setBrowsersInfo(RenderBrowserInfoMapper.toRenderBrowserInfoDtoList(config.getBrowsersInfo()));
     dto.setVisualGridOptions(VisualGridOptionMapper.toVisualGridOptionDtoList(config.getVisualGridOptions()));
     Object layoutBreakpoints = null;
@@ -98,7 +92,6 @@ public class ConfigurationMapper {
 
     dto.setLayoutBreakpoints(layoutBreakpoints);
     dto.setDisableBrowserFetching(config.isDisableBrowserFetching());
-//    dto.setUseCeilForViewportSize(config.getUseCeilForViewportSize());
 
     return dto;
   }
