@@ -15,7 +15,7 @@ public class TestImagesCheckSettingsMapper extends ReportingTestSuite {
 
     @BeforeClass
     public void setup() {
-        super.setGroupName("playwright");
+        super.setGroupName("images");
     }
 
     @Test
