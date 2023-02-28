@@ -47,6 +47,7 @@ public class HelperLibraryTest extends AndroidTestSetup {
                 Assert.assertEquals(Integer.parseInt(value), PIXEL_5_OFFSET);
                 break;
             } catch (Exception e) {
+                System.out.println("test offset retry #" + i);
                 if(++i >= 3)
                     throw e;
             }

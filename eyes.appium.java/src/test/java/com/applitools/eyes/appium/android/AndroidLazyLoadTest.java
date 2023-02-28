@@ -26,6 +26,7 @@ public class AndroidLazyLoadTest extends AndroidTestSetup {
                 break;
             } catch (Exception e) {
                 driver.navigate().back();
+                System.out.println("test lazyLoad retry #" + j);
                 if(++j >= 2)
                     throw e;
             }

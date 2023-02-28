@@ -14,6 +14,7 @@ in the same thread while taking advantage of TestNG using as many threads as pos
         <classes>
             <class name="com.applitools.eyes.appium.ScrollRootElementTest"/>
             <class name="com.applitools.eyes.appium.android.AndroidLazyLoadTest"/>
+            <class name="com.applitools.eyes.appium.android.HelperLibraryTest"/>
             <class name="com.applitools.eyes.appium.android.AndroidContentInsetTest"/>
             <!--            <class name="com.applitools.eyes.appium.TestCodedRegionPadding"/>--> <!--to be added later-->
             <class name="com.applitools.eyes.appium.android.TestAndroidContentSizeFallback"/>
