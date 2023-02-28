@@ -45,6 +45,14 @@
             <version>31.1-jre</version>
             <scope>compile</scope>
         </dependency>
+        <!--    for sdk.core test sources    -->
+        <dependency>
+            <groupId>com.applitools</groupId>
+            <artifactId>eyes-sdk-core-java5</artifactId>
+            <version>5.43.0</version>
+            <type>test-jar</type>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
 
     <build>

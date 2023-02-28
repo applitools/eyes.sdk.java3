@@ -8,15 +8,22 @@ import com.applitools.eyes.config.Configuration;
 import com.applitools.eyes.universal.ManagerType;
 import com.applitools.eyes.universal.dto.CheckSettingsDto;
 import com.applitools.eyes.universal.dto.SelectorRegionDto;
+import com.applitools.eyes.utils.ReportingTestSuite;
 import com.applitools.eyes.visualgrid.model.NMGOptions;
 import io.appium.java_client.AppiumBy;
 import io.appium.java_client.pagefactory.bys.builder.ByAll;
 import io.appium.java_client.pagefactory.bys.builder.ByChained;
 import org.openqa.selenium.By;
 import org.testng.Assert;
+import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
-public class TestAppiumCheckSettingsMapper {
+public class TestAppiumCheckSettingsMapper extends ReportingTestSuite {
+
+    @BeforeClass
+    public void setup() {
+        super.setGroupName("appium");
+    }
 
     @Test
     public void testAppiumByAllWithSeleniumByMapping() {

@@ -17,7 +17,6 @@ import com.microsoft.playwright.Page;
 import com.microsoft.playwright.Playwright;
 import org.testng.Assert;
 import org.testng.ITest;
-import org.testng.annotations.BeforeClass;
 import org.testng.annotations.BeforeSuite;
 
 import javax.ws.rs.HttpMethod;
@@ -26,7 +25,7 @@ import javax.ws.rs.core.UriBuilder;
 import java.net.URI;
 import java.util.Arrays;
 
-public class PlaywrightTestSetup implements ITest {
+public class PlaywrightTestSetup extends ReportingTestSuite implements ITest {
     protected Eyes eyes;
     protected EyesRunner runner;
     protected Page page;
@@ -36,6 +35,7 @@ public class PlaywrightTestSetup implements ITest {
 
     @BeforeSuite
     public void beforeSuite() {
+        super.setGroupName("playwright");
         String name = System.getenv("APPLITOOLS_BATCH_NAME");
         if (name == null) name = "Eyes Playwright Java";
         batch = new BatchInfo(name);

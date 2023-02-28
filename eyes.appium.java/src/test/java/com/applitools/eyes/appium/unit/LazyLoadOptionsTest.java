@@ -3,10 +3,17 @@ package com.applitools.eyes.appium.unit;
 import com.applitools.eyes.LazyLoadOptions;
 import com.applitools.eyes.appium.AppiumCheckSettings;
 import com.applitools.eyes.appium.Target;
+import com.applitools.eyes.utils.ReportingTestSuite;
 import org.junit.Test;
 import org.testng.Assert;
+import org.testng.annotations.BeforeClass;
 
-public class LazyLoadOptionsTest {
+public class LazyLoadOptionsTest extends ReportingTestSuite {
+
+    @BeforeClass
+    public void setup() {
+        super.setGroupName("appium");
+    }
 
     @Test
     public void should_ReturnDefault_When_Initialized() {

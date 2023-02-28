@@ -2,13 +2,19 @@ package com.applitools.eyes;
 
 import com.applitools.eyes.config.Configuration;
 import com.applitools.eyes.selenium.Eyes;
+import com.applitools.eyes.utils.ReportingTestSuite;
 import com.applitools.eyes.visualgrid.services.RunnerOptions;
 import com.applitools.eyes.visualgrid.services.VisualGridRunner;
 import org.testng.Assert;
+import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
-public class AutProxyTest {
+public class AutProxyTest extends ReportingTestSuite {
 
+    @BeforeClass
+    public void setup() {
+        super.setGroupName("selenium");
+    }
 
     @Test
     public void shouldBeNullWhenProxySetInVisualGridRunnerProxy() {

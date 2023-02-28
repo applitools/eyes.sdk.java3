@@ -1,10 +1,17 @@
 package com.applitools.eyes.appium.unit;
 
 import com.applitools.eyes.config.ContentInset;
+import com.applitools.eyes.utils.ReportingTestSuite;
 import org.junit.Test;
 import org.testng.Assert;
+import org.testng.annotations.BeforeClass;
 
-public class TestContentInset {
+public class TestContentInset extends ReportingTestSuite {
+
+    @BeforeClass
+    public void setup() {
+        super.setGroupName("appium");
+    }
 
     @Test
     public void defualtInitialize() {

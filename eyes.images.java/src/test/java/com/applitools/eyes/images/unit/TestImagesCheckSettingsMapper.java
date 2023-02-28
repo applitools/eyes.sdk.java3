@@ -6,10 +6,17 @@ import com.applitools.eyes.config.Configuration;
 import com.applitools.eyes.images.Target;
 import com.applitools.eyes.images.universal.mapper.ImagesCheckSettingsMapper;
 import com.applitools.eyes.universal.dto.CheckSettingsDto;
+import com.applitools.eyes.utils.ReportingTestSuite;
 import org.testng.Assert;
+import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
-public class TestImagesCheckSettingsMapper {
+public class TestImagesCheckSettingsMapper extends ReportingTestSuite {
+
+    @BeforeClass
+    public void setup() {
+        super.setGroupName("playwright");
+    }
 
     @Test
     public void testImagesDensityMetrics() {

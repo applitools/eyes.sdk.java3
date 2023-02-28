@@ -6,12 +6,14 @@ import com.applitools.eyes.selenium.Eyes;
 import com.applitools.eyes.selenium.fluent.Target;
 import com.applitools.eyes.universal.dto.CloseBatchSettingsDto;
 import com.applitools.eyes.universal.mapper.SettingsMapper;
+import com.applitools.eyes.utils.ReportingTestSuite;
 import com.applitools.eyes.utils.TestUtils;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
 import org.testng.Assert;
 import org.testng.annotations.AfterTest;
+import org.testng.annotations.BeforeClass;
 import org.testng.annotations.BeforeTest;
 import org.testng.annotations.Test;
 
@@ -19,7 +21,12 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-public class TestCloseBatch {
+public class TestCloseBatch extends ReportingTestSuite {
+
+    @BeforeClass
+    public void setup() {
+        super.setGroupName("selenium");
+    }
 
     private WebDriver driver;
     private Eyes eyes;

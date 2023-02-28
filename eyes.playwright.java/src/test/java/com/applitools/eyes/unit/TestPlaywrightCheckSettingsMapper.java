@@ -6,10 +6,17 @@ import com.applitools.eyes.playwright.fluent.PlaywrightCheckSettings;
 import com.applitools.eyes.playwright.fluent.Target;
 import com.applitools.eyes.playwright.universal.mapper.PlaywrightCheckSettingsMapper;
 import com.applitools.eyes.universal.dto.CheckSettingsDto;
+import com.applitools.eyes.utils.ReportingTestSuite;
 import org.testng.Assert;
+import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
-public class TestPlaywrightCheckSettingsMapper {
+public class TestPlaywrightCheckSettingsMapper extends ReportingTestSuite {
+
+    @BeforeClass
+    public void setup() {
+        super.setGroupName("playwright");
+    }
 
     @Test
     public void testPlaywrightDensityMetrics() {

@@ -1,10 +1,17 @@
 package com.applitools.eyes.images;
 
 import com.applitools.eyes.config.Configuration;
+import com.applitools.eyes.utils.ReportingTestSuite;
 import org.testng.Assert;
+import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
-public class TestConfiguration {
+public class TestConfiguration extends ReportingTestSuite {
+
+    @BeforeClass
+    public void setup() {
+        super.setGroupName("images");
+    }
 
     @Test
     public void testSetEnablePatterns() {

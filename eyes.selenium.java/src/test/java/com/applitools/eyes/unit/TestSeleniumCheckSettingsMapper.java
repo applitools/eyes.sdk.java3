@@ -7,13 +7,20 @@ import com.applitools.eyes.selenium.fluent.Target;
 import com.applitools.eyes.selenium.universal.dto.TargetPathLocatorDto;
 import com.applitools.eyes.selenium.universal.mapper.CheckSettingsMapper;
 import com.applitools.eyes.universal.dto.CheckSettingsDto;
+import com.applitools.eyes.utils.ReportingTestSuite;
 import org.openqa.selenium.By;
 import org.openqa.selenium.support.pagefactory.ByAll;
 import org.openqa.selenium.support.pagefactory.ByChained;
 import org.testng.Assert;
+import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
-public class TestSeleniumCheckSettingsMapper {
+public class TestSeleniumCheckSettingsMapper extends ReportingTestSuite {
+
+    @BeforeClass
+    public void setup() {
+        super.setGroupName("selenium");
+    }
 
     @Test
     public void testSeleniumByAllMapping() {

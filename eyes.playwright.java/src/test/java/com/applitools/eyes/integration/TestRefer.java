@@ -1,7 +1,6 @@
-package com.applitools.eyes.unit;
+package com.applitools.eyes.integration;
 
 import com.applitools.eyes.playwright.universal.Refer;
-import com.applitools.eyes.playwright.universal.driver.SpecDriverPlaywright;
 import com.applitools.eyes.playwright.universal.dto.Driver;
 import com.applitools.eyes.playwright.universal.dto.Element;
 import com.applitools.eyes.utils.PlaywrightTestSetup;
@@ -11,7 +10,6 @@ import org.testng.annotations.Test;
 
 import java.lang.reflect.Field;
 import java.util.HashMap;
-import java.util.UUID;
 
 public class TestRefer extends PlaywrightTestSetup {
 

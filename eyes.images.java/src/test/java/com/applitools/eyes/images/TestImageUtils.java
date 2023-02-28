@@ -1,13 +1,20 @@
 package com.applitools.eyes.images;
 
 import com.applitools.eyes.Region;
+import com.applitools.eyes.utils.ReportingTestSuite;
 import com.applitools.utils.ImageUtils;
 import org.testng.Assert;
+import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 import java.awt.image.BufferedImage;
 
-public class TestImageUtils {
+public class TestImageUtils extends ReportingTestSuite {
+
+    @BeforeClass
+    public void setup() {
+        super.setGroupName("images");
+    }
 
     private final String TEST_IMAGE = "src/main/resources/minions_jpeg.jpeg";
 

@@ -5,6 +5,7 @@ import com.applitools.connectivity.ServerConnector;
 import com.applitools.eyes.*;
 import com.applitools.eyes.images.Eyes;
 import com.applitools.eyes.metadata.SessionResults;
+import com.applitools.eyes.utils.ReportingTestSuite;
 import com.applitools.utils.ClassVersionGetter;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -17,7 +18,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.UriBuilder;
 import java.net.URI;
 
-public class TestSetup {
+public class TestSetup extends ReportingTestSuite {
 
     public final static boolean runOnCI = System.getenv("CI") != null;
     public final static boolean verboseLogs = !runOnCI || "true".equalsIgnoreCase(System.getenv("APPLITOOLS_VERBOSE_LOGS"));
@@ -28,6 +29,7 @@ public class TestSetup {
 
     @BeforeMethod
     public void beforeClass() {
+        super.setGroupName("images");
         eyes = new Eyes();
         eyes.setApiKey(System.getenv("APPLITOOLS_API_KEY"));
 
