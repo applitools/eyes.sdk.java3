@@ -7,4 +7,10 @@
             <class name="com.applitools.eyes.e2e.TestLocators"/>
         </classes>
     </test>
+
+    <test name="Unit">
+        <packages>
+            <package name="com.applitools.eyes.playwright.unit"/>
+        </packages>
+    </test>
 </suite>

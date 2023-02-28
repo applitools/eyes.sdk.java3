@@ -1,4 +1,4 @@
-package com.applitools.eyes.appium;
+package com.applitools.eyes.appium.unit;
 
 import com.applitools.eyes.config.ContentInset;
 import org.junit.Test;

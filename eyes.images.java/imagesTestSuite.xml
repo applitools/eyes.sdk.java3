@@ -11,4 +11,10 @@
             <class name="com.applitools.eyes.images.TestImagesGeneric"/>
         </classes>
     </test>
+
+    <test name="Unit Tests">
+        <packages>
+            <package name="com.applitools.eyes.images.unit"/>
+        </packages>
+    </test>
 </suite>

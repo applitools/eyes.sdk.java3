@@ -25,8 +25,8 @@ but each class will be run in a separate thread.-->
         </classes>
     </test>
     <test name="Unit">
-        <classes>
-            <class name="com.applitools.eyes.unit.TestSeleniumCheckSettingsMapper"/>
-        </classes>
+        <packages>
+            <package name="com.applitools.eyes.unit"/>
+        </packages>
     </test>
 </suite>

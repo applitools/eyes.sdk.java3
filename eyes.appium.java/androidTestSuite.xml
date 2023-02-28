@@ -23,11 +23,9 @@ in the same thread while taking advantage of TestNG using as many threads as pos
     </test>
 
     <test name="Unit">
-        <classes>
-            <class name="com.applitools.eyes.appium.LazyLoadOptionsTest"/>
-            <class name="com.applitools.eyes.appium.TestContentInset"/>
-            <class name="com.applitools.eyes.appium.unit.TestAppiumCheckSettingsMapper"/>
-        </classes>
+        <packages>
+            <package name="com.applitools.eyes.appium.unit"/>
+        </packages>
     </test>
 
 </suite>
