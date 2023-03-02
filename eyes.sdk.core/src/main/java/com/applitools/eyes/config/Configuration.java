@@ -45,7 +45,7 @@ public class Configuration implements IConfiguration {
     private Boolean isSendDom;
     private String apiKey = GeneralUtils.getEnvString("APPLITOOLS_API_KEY");
     private String serverUrl = GeneralUtils.getEnvString("APPLITOOLS_SERVER_URL") == null?
-            "https://eyes.applitools.com" : GeneralUtils.getEnvString("APPLITOOLS_SERVER_URL");
+            IEyesBase.APPLITOOLS_PUBLIC_CLOUD_URL : GeneralUtils.getEnvString("APPLITOOLS_SERVER_URL");
     private AbstractProxySettings proxy;
     private AutProxySettings autProxy;
     private FailureReports failureReports;
