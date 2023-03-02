@@ -4,7 +4,7 @@ import java.net.URI;
 
 public interface IEyesBase {
 
-    String APPLITOOLS_PUBLIC_CLOUD_URL="https://eyes.applitools.com";
+    String APPLITOOLS_PUBLIC_CLOUD_URL= "https://eyesapi.applitools.com";
 
     String getApiKey();
 
