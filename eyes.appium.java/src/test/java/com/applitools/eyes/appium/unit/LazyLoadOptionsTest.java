@@ -1,15 +1,23 @@
-package com.applitools.eyes.appium;
+package com.applitools.eyes.appium.unit;
 
 import com.applitools.eyes.LazyLoadOptions;
+import com.applitools.eyes.appium.AppiumCheckSettings;
+import com.applitools.eyes.appium.Target;
+import com.applitools.eyes.utils.ReportingTestSuite;
 import org.junit.Test;
 import org.testng.Assert;
+import org.testng.annotations.BeforeClass;
 
-public class LazyLoadOptionsTest {
+public class LazyLoadOptionsTest extends ReportingTestSuite {
+
+    @BeforeClass
+    public void setup() {
+        super.setGroupName("appium");
+    }
 
     @Test
     public void should_ReturnDefault_When_Initialized() {
-        AppiumCheckSettings sc = new AppiumCheckSettings();
-        sc = sc.lazyLoad();
+        AppiumCheckSettings sc = Target.window().lazyLoad();
         Assert.assertEquals((int) sc.getLazyLoadOptions().getScrollLength(), 300);
         Assert.assertEquals((int) sc.getLazyLoadOptions().getWaitingTime(), 2000);
         Assert.assertEquals((int) sc.getLazyLoadOptions().getMaxAmountToScroll(), 15000);
@@ -17,8 +25,7 @@ public class LazyLoadOptionsTest {
 
     @Test
     public void should_ReturnAssigned_When_Called() {
-        AppiumCheckSettings sc = new AppiumCheckSettings();
-        sc = sc.lazyLoad(new LazyLoadOptions().maxAmountToScroll(111).scrollLength(100).waitingTime(1000));
+        AppiumCheckSettings sc = Target.window().lazyLoad(new LazyLoadOptions().maxAmountToScroll(111).scrollLength(100).waitingTime(1000));
         Assert.assertEquals((int) sc.getLazyLoadOptions().getScrollLength(), 100);
         Assert.assertEquals((int) sc.getLazyLoadOptions().getWaitingTime(), 1000);
         Assert.assertEquals((int) sc.getLazyLoadOptions().getMaxAmountToScroll(), 111);

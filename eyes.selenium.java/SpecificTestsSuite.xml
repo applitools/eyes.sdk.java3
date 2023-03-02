@@ -16,7 +16,6 @@ but each class will be run in a separate thread.-->
         <classes>
 <!--            <class name="com.applitools.eyes.selenium.TestBatchAPI"/>-->
             <class name="com.applitools.eyes.AutProxyTest"/>
-            <class name="com.applitools.eyes.TestPadding"/>
             <class name="com.applitools.eyes.selenium.TestCodedRegionPadding"/>
             <class name="com.applitools.eyes.TestMatchLevel"/>
             <class name="com.applitools.eyes.driver.TestCustomDriver"/>
@@ -25,8 +24,8 @@ but each class will be run in a separate thread.-->
         </classes>
     </test>
     <test name="Unit">
-        <classes>
-            <class name="com.applitools.eyes.unit.TestSeleniumCheckSettingsMapper"/>
-        </classes>
+        <packages>
+            <package name="com.applitools.eyes.unit"/>
+        </packages>
     </test>
 </suite>

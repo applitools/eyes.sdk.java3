@@ -1,5 +1,6 @@
 package com.applitools.eyes.appium.unit;
 
+import com.applitools.eyes.DensityMetrics;
 import com.applitools.eyes.appium.AppiumCheckSettings;
 import com.applitools.eyes.appium.AppiumCheckSettingsMapper;
 import com.applitools.eyes.appium.Target;
@@ -7,15 +8,22 @@ import com.applitools.eyes.config.Configuration;
 import com.applitools.eyes.universal.ManagerType;
 import com.applitools.eyes.universal.dto.CheckSettingsDto;
 import com.applitools.eyes.universal.dto.SelectorRegionDto;
+import com.applitools.eyes.utils.ReportingTestSuite;
 import com.applitools.eyes.visualgrid.model.NMGOptions;
 import io.appium.java_client.AppiumBy;
 import io.appium.java_client.pagefactory.bys.builder.ByAll;
 import io.appium.java_client.pagefactory.bys.builder.ByChained;
 import org.openqa.selenium.By;
 import org.testng.Assert;
+import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
-public class TestAppiumCheckSettingsMapper {
+public class TestAppiumCheckSettingsMapper extends ReportingTestSuite {
+
+    @BeforeClass
+    public void setup() {
+        super.setGroupName("appium");
+    }
 
     @Test
     public void testAppiumByAllWithSeleniumByMapping() {
@@ -186,5 +194,25 @@ public class TestAppiumCheckSettingsMapper {
         checkSettings = Target.window();
         dto = AppiumCheckSettingsMapper.toCheckSettingsDtoV3(checkSettings, new Configuration());
         Assert.assertNull(dto.getType());
+    }
+
+    @Test
+    public void testAppiumDensityMetrics() {
+        AppiumCheckSettings checkSettings1 = Target.window().densityMetrics(10, 20);
+        AppiumCheckSettings checkSettings2 = Target.window().densityMetrics(10, 20, 2.0);
+
+        CheckSettingsDto dto1 = AppiumCheckSettingsMapper.toCheckSettingsDtoV3(checkSettings1, new Configuration());
+        CheckSettingsDto dto2 = AppiumCheckSettingsMapper.toCheckSettingsDtoV3(checkSettings2, new Configuration());
+
+        DensityMetrics densityMetrics1 = dto1.getDensityMetrics();
+        DensityMetrics densityMetrics2 = dto2.getDensityMetrics();
+
+        Assert.assertEquals((int) densityMetrics1.getXdpi(), 10);
+        Assert.assertEquals((int) densityMetrics1.getYdpi(), 20);
+        Assert.assertNull(densityMetrics1.getScaleRatio());
+
+        Assert.assertEquals((int) densityMetrics2.getXdpi(), 10);
+        Assert.assertEquals((int) densityMetrics2.getYdpi(), 20);
+        Assert.assertEquals(densityMetrics2.getScaleRatio(), 2.0);
     }
 }

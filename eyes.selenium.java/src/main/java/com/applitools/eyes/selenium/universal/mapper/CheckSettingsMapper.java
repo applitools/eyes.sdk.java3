@@ -20,64 +20,6 @@ import static com.applitools.eyes.universal.mapper.SettingsMapper.toNormalizatio
  */
 public class CheckSettingsMapper {
 
-  public static CheckSettingsDto toCheckSettingsDto(ICheckSettings checkSettings) {
-    if (!(checkSettings instanceof SeleniumCheckSettings)) {
-      return null;
-    }
-
-    SeleniumCheckSettings seleniumCheckSettings = (SeleniumCheckSettings) checkSettings;
-
-    CheckSettingsDto checkSettingsDto = new CheckSettingsDto();
-    // CheckSettings
-    checkSettingsDto.setName(seleniumCheckSettings.getName());
-    checkSettingsDto.setDisableBrowserFetching(seleniumCheckSettings.isDisableBrowserFetching());
-    checkSettingsDto.setLayoutBreakpoints(seleniumCheckSettings
-            .getLayoutBreakpoints().isEmpty() ?
-            seleniumCheckSettings.isDefaultLayoutBreakpointsSet() : seleniumCheckSettings.getLayoutBreakpoints());
-    checkSettingsDto.setUfgOptions(VisualGridOptionMapper.toVisualGridOptionDtoList(seleniumCheckSettings.getVisualGridOptions()));
-    checkSettingsDto.setHooks(seleniumCheckSettings.getScriptHooks());
-//    checkSettingsDto.setRenderId(null);
-//    checkSettingsDto.setVariationGroupId(seleniumCheckSettings.getVariationGroupId());
-//    checkSettingsDto.setTimeout(seleniumCheckSettings.getTimeout());
-    checkSettingsDto.setWaitBeforeCapture(seleniumCheckSettings.getWaitBeforeCapture());
-
-    // MatchSettings
-//    checkSettingsDto.setExact(null);
-    checkSettingsDto.setMatchLevel(seleniumCheckSettings.getMatchLevel() == null ? null : seleniumCheckSettings.getMatchLevel().getName());
-    checkSettingsDto.setSendDom(seleniumCheckSettings.isSendDom());
-    checkSettingsDto.setUseDom(seleniumCheckSettings.isUseDom());
-    checkSettingsDto.setEnablePatterns(seleniumCheckSettings.isEnablePatterns());
-    checkSettingsDto.setIgnoreCaret(seleniumCheckSettings.getIgnoreCaret());
-    checkSettingsDto.setIgnoreDisplacements(seleniumCheckSettings.isIgnoreDisplacements());
-    checkSettingsDto.setAccessibilitySettings(null);
-    checkSettingsDto.setIgnoreRegions(CodedRegionReferenceMapper
-            .toCodedRegionReferenceList(Arrays.asList(seleniumCheckSettings.getIgnoreRegions())));
-    checkSettingsDto.setLayoutRegions(CodedRegionReferenceMapper
-            .toCodedRegionReferenceList(Arrays.asList(seleniumCheckSettings.getLayoutRegions())));
-    checkSettingsDto.setStrictRegions(CodedRegionReferenceMapper
-            .toCodedRegionReferenceList(Arrays.asList(seleniumCheckSettings.getStrictRegions())));
-    checkSettingsDto.setContentRegions(CodedRegionReferenceMapper
-            .toCodedRegionReferenceList(Arrays.asList(seleniumCheckSettings.getContentRegions())));
-
-    checkSettingsDto.setFloatingRegions(TFloatingRegionMapper.toTFloatingRegionDtoList(Arrays.asList(seleniumCheckSettings.getFloatingRegions())));
-
-    checkSettingsDto.setAccessibilityRegions(TAccessibilityRegionMapper.toTAccessibilityRegionDtoList(Arrays.asList(seleniumCheckSettings.getAccessibilityRegions())));
-    checkSettingsDto.setPageId(seleniumCheckSettings.getPageId());
-    checkSettingsDto.setLazyLoad(seleniumCheckSettings.getLazyLoadOptions());
-
-    // ScreenshotSettings
-    checkSettingsDto.setRegion(TRegionMapper.toTRegionFromCheckSettings(checkSettings));
-    checkSettingsDto.setFrames(ContextReferenceMapper.toContextReferenceDtoList(seleniumCheckSettings.getFrameChain()));
-
-    checkSettingsDto.setScrollRootElement(TRegionMapper.toTRegionDtoFromScrolls(seleniumCheckSettings.getScrollRootSelector(),
-        seleniumCheckSettings.getScrollRootElement()));
-
-    checkSettingsDto.setFully(seleniumCheckSettings.getStitchContent());
-
-
-    return checkSettingsDto;
-  }
-
   public static CheckSettingsDto toCheckSettingsDtoV3(ICheckSettings checkSettings, Configuration config) {
     if (!(checkSettings instanceof SeleniumCheckSettings)) {
       return null;
@@ -132,7 +74,7 @@ public class CheckSettingsMapper {
     checkSettingsDto.setAutProxy(ProxyMapper.toAutProxyDto(config.getAutProxy()));
     checkSettingsDto.setHooks(seleniumCheckSettings.getScriptHooks());
     checkSettingsDto.setUserCommandId(seleniumCheckSettings.getVariationGroupId());
-
+    checkSettingsDto.setDensityMetrics(seleniumCheckSettings.getDensityMetrics());
 
     return checkSettingsDto;
   }

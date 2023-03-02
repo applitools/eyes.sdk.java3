@@ -1,10 +1,17 @@
-package com.applitools.eyes;
+package com.applitools.eyes.unit;
 
+import com.applitools.eyes.Padding;
+import com.applitools.eyes.utils.ReportingTestSuite;
 import org.testng.Assert;
+import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
-public class TestPadding {
+public class TestPadding extends ReportingTestSuite {
 
+    @BeforeClass
+    public void setup() {
+        super.setGroupName("selenium");
+    }
     @Test
     public void testDefaultPadding() {
         Padding padding = new Padding();

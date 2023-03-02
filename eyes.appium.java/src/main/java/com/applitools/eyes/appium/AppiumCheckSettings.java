@@ -415,6 +415,16 @@ public class AppiumCheckSettings extends CheckSettings implements ImplicitInitia
         return super.getLazyLoadOptions();
     }
 
+    @Override
+    public AppiumCheckSettings densityMetrics(int xDpi, int yDpi) {
+        return (AppiumCheckSettings) super.densityMetrics(xDpi, yDpi);
+    }
+
+    @Override
+    public AppiumCheckSettings densityMetrics(int xDpi, int yDpi, Double scaleRatio) {
+        return (AppiumCheckSettings) super.densityMetrics(xDpi, yDpi, scaleRatio);
+    }
+
     public AppiumCheckSettings webview() {
         AppiumCheckSettings clone = this.clone();
         clone.isDefaultWebview = true;

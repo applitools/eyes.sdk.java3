@@ -71,6 +71,7 @@ public class PlaywrightCheckSettingsMapper {
         checkSettingsDto.setAutProxy(ProxyMapper.toAutProxyDto(config.getAutProxy()));
         checkSettingsDto.setHooks(playwrightCheckSettings.getScriptHooks());
         checkSettingsDto.setUserCommandId(playwrightCheckSettings.getVariationGroupId());
+        checkSettingsDto.setDensityMetrics(playwrightCheckSettings.getDensityMetrics());
 
         return checkSettingsDto;
     }

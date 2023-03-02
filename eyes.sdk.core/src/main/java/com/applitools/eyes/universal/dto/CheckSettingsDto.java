@@ -3,6 +3,7 @@ package com.applitools.eyes.universal.dto;
 import java.util.List;
 import java.util.Map;
 
+import com.applitools.eyes.DensityMetrics;
 import com.applitools.eyes.LazyLoadOptions;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
@@ -53,6 +54,7 @@ public class CheckSettingsDto {
   private Map<String, String> hooks;
   private List<IBrowsersInfo> renderers;
   private String userCommandId;
+  private DensityMetrics densityMetrics;
   @JsonIgnore
   private String type;
 
@@ -343,6 +345,14 @@ public class CheckSettingsDto {
   public Object getWebview() { return webview; }
 
   public void setWebview(Object webview) { this.webview = webview; }
+
+  public DensityMetrics getDensityMetrics() {
+    return densityMetrics;
+  }
+
+  public void setDensityMetrics(DensityMetrics densityMetrics) {
+    this.densityMetrics = densityMetrics;
+  }
 
   @JsonIgnore
   public void setType(String type) {

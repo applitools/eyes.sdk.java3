@@ -69,6 +69,7 @@ public class ImagesCheckSettingsMapper {
         checkSettingsDto.setDisableBrowserFetching(imagesCheckSettings.isDisableBrowserFetching());
         checkSettingsDto.setAutProxy(ProxyMapper.toAutProxyDto(config.getAutProxy()));
         checkSettingsDto.setHooks(imagesCheckSettings.getScriptHooks());
+        checkSettingsDto.setDensityMetrics(imagesCheckSettings.getDensityMetrics());
 
         return checkSettingsDto;
     }
