@@ -28,8 +28,9 @@ public class TestConfigurationMapper extends ReportingTestSuite {
         config.setHostingAppInfo("hostingAppInfo");
         config.setHostOS("hostOs");
 
-        config = new Configuration(config);
+        config.addProperty("customPropertyName", "customPropertyValue");
 
+        config = new Configuration(config);
         ConfigurationDto dto = ConfigurationMapper.toConfigurationDto(config, null);
 
         Assert.assertEquals(dto.getAppName(), "appName");
@@ -40,6 +41,9 @@ public class TestConfigurationMapper extends ReportingTestSuite {
         Assert.assertEquals(dto.getHostOSInfo(), "osInfo");
         Assert.assertEquals(dto.getHostAppInfo(), "hostingAppInfo");
         Assert.assertEquals(dto.getHostOS(), "hostOs");
+
+        Assert.assertEquals(dto.getProperties().get(0).getName(), "customPropertyName");
+        Assert.assertEquals(dto.getProperties().get(0).getValue(), "customPropertyValue");
 
         Assert.assertNull(dto.getDontCloseBatches());
     }

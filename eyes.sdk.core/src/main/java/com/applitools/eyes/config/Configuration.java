@@ -81,7 +81,7 @@ public class Configuration implements IConfiguration {
     private String debugScreenshotsPath;
     private String debugScreenshotsPrefix;
     private Boolean isDisabled = false;
-    private final List<PropertyData> properties = new ArrayList<>();
+    private List<PropertyData> properties = new ArrayList<>();
     private CutProvider cutProvider;
     private Integer rotation;
     private Double scaleRatio;
@@ -158,6 +158,9 @@ public class Configuration implements IConfiguration {
         this.scaleRatio = other.getScaleRatio();
         this.debugScreenshotsPath = other.getDebugScreenshotsPath();
         this.debugScreenshotsPrefix = other.getDebugScreenshotsPrefix();
+        this.saveDebugScreenshots = other.getSaveDebugScreenshots();
+        this.isDisabled = other.getIsDisabled();
+        this.properties = new ArrayList<>(other.getProperties());
     }
 
     public Configuration() {
@@ -908,9 +911,10 @@ public class Configuration implements IConfiguration {
         return isDisabled;
     }
 
-    public void addProperty(String name, String value) {
+    public Configuration addProperty(String name, String value) {
         PropertyData pd = new PropertyData(name, value);
         properties.add(pd);
+        return this;
     }
 
     public void clearProperties() {

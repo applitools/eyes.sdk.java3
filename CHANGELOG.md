@@ -1,6 +1,7 @@
 ## [vNext] - dNext
 ### Updated
 - Update core binaries to version `2.3.7`.
+- Update `config.addProperty` to be fluent.
 ### Added
 - Added support to provide density metrics. [Trello 3125](https://trello.com/c/6HYzeSfz)
 ### Fixed
