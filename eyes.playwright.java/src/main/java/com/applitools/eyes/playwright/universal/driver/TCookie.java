@@ -1,6 +1,7 @@
 package com.applitools.eyes.playwright.universal.driver;
 
 import com.applitools.eyes.universal.driver.ICookie;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.microsoft.playwright.options.Cookie;
 
 public class TCookie extends Cookie implements ICookie {
@@ -9,19 +10,27 @@ public class TCookie extends Cookie implements ICookie {
 
     public TCookie(Cookie cookie) {
         this(cookie.name, cookie.value);
-        this.expiry = cookie.expires;
-        this.expires = null;
+        setExpires(cookie.expires);
+        setDomain(cookie.domain);
+        setPath(cookie.path);
+        setUrl(cookie.url);
+        setSecure(cookie.secure);
+        setHttpOnly(cookie.httpOnly);
+        setSameSite(cookie.sameSite);
     }
 
-    public TCookie(String name, String value) {
+    private TCookie(String name, String value) {
         super(name, value);
     }
 
     public Double getExpires() {
-        return expires;
+        return expiry;
     }
 
-    public void setExpires(Double expires) {
-        this.expires = expires;
+    @JsonProperty("expiry")
+    @Override
+    public TCookie setExpires(double expires) {
+        this.expiry = expires;
+        return this;
     }
 }
