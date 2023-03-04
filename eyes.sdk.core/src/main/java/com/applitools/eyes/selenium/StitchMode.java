@@ -12,7 +12,12 @@ public enum StitchMode {
     /**
      * CSS translation based stitching.
      */
-    CSS("CSS");
+    CSS("CSS"),
+
+    /**
+     * Resize based full-content.
+     */
+    RESIZE("Resize");
 
     private final String name;
 
