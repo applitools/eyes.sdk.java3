@@ -1,3 +1,9 @@
+## [vNext] - dNext
+### Updated
+### Added
+### Fixed
+- Improve dom-snapshot result handling in Eyes Playwright. [Trello 3166](https://trello.com/c/zKPDp8L5)
+
 ## [5.44.0] - 2023-02-17
 ### Updated
 - Update core binaries to version `2.3.10`.
