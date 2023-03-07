@@ -1073,6 +1073,22 @@ public class SeleniumCheckSettings extends CheckSettings implements ISeleniumChe
         return (SeleniumCheckSettings) super.densityMetrics(xDpi, yDpi, scaleRatio);
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public SeleniumCheckSettings stitchOverlap(Integer overlap) {
+        return (SeleniumCheckSettings) super.stitchOverlap(overlap);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public SeleniumCheckSettings stitchOverlap(StitchOverlap stitchOverlap) {
+        return (SeleniumCheckSettings) super.stitchOverlap(stitchOverlap);
+    }
+
     public TargetPathLocator getTargetPathLocator() {
         return this.targetLocator;
     }

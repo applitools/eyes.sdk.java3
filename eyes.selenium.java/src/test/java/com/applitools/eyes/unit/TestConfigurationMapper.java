@@ -1,5 +1,6 @@
 package com.applitools.eyes.unit;
 
+import com.applitools.eyes.StitchOverlap;
 import com.applitools.eyes.config.Configuration;
 import com.applitools.eyes.universal.dto.ConfigurationDto;
 import com.applitools.eyes.universal.mapper.ConfigurationMapper;
@@ -46,5 +47,43 @@ public class TestConfigurationMapper extends ReportingTestSuite {
         Assert.assertEquals(dto.getProperties().get(0).getValue(), "customPropertyValue");
 
         Assert.assertNull(dto.getDontCloseBatches());
+    }
+
+    @Test
+    public void testStitchOverlap() {
+        Configuration config = new Configuration();
+
+        config.setStitchOverlap(10);
+
+        config = new Configuration(config);
+        ConfigurationDto dto = ConfigurationMapper.toConfigurationDto(config, null);
+
+        Assert.assertNull(dto.getStitchOverlap().getTop());
+        Assert.assertEquals((int) dto.getStitchOverlap().getBottom(), 10);
+
+        // new api
+        config.setStitchOverlap(new StitchOverlap());
+
+        config = new Configuration(config);
+        dto = ConfigurationMapper.toConfigurationDto(config, null);
+
+        Assert.assertNull(dto.getStitchOverlap().getTop());
+        Assert.assertNull(dto.getStitchOverlap().getBottom());
+
+        config.setStitchOverlap(new StitchOverlap().top(10));
+
+        config = new Configuration(config);
+        dto = ConfigurationMapper.toConfigurationDto(config, null);
+
+        Assert.assertEquals((int) dto.getStitchOverlap().getTop(), 10);
+        Assert.assertNull(dto.getStitchOverlap().getBottom());
+
+        config.setStitchOverlap(new StitchOverlap(10, 10));
+
+        config = new Configuration(config);
+        dto = ConfigurationMapper.toConfigurationDto(config, null);
+
+        Assert.assertEquals((int) dto.getStitchOverlap().getTop(), 10);
+        Assert.assertEquals((int) dto.getStitchOverlap().getBottom(), 10);
     }
 }

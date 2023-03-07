@@ -41,7 +41,7 @@ public class Configuration implements IConfiguration {
     // Used for automatic save of a test run.
     private Boolean saveNewTests;
     private Boolean saveFailedTests;
-    private Integer stitchOverlap;
+    private StitchOverlap stitchOverlap;
     private Boolean isSendDom;
     private String apiKey = GeneralUtils.getEnvString("APPLITOOLS_API_KEY");
     private String serverUrl = GeneralUtils.getEnvString("APPLITOOLS_SERVER_URL") == null?
@@ -112,7 +112,7 @@ public class Configuration implements IConfiguration {
         this.osInfo = other.getOsInfo();
         this.saveNewTests = other.getSaveNewTests();
         this.saveFailedTests = other.getSaveFailedTests();
-        this.stitchOverlap = other.getStitchOverlap();
+        this.stitchOverlap = other.getOverlap();
         this.isSendDom = other.isSendDom();
         this.apiKey = other.getApiKey();
         this.useDom = other.getUseDom();
@@ -254,11 +254,22 @@ public class Configuration implements IConfiguration {
 
     @Override
     public Integer getStitchOverlap() {
+        return stitchOverlap.getBottom();
+    }
+
+    @Override
+    public StitchOverlap getOverlap() {
         return stitchOverlap;
     }
 
     @Override
     public Configuration setStitchOverlap(Integer stitchOverlap) {
+        this.stitchOverlap = new StitchOverlap().bottom(stitchOverlap);
+        return this;
+    }
+
+    @Override
+    public Configuration setStitchOverlap(StitchOverlap stitchOverlap) {
         this.stitchOverlap = stitchOverlap;
         return this;
     }

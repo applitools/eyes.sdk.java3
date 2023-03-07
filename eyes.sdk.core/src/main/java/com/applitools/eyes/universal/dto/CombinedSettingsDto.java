@@ -1,6 +1,7 @@
 package com.applitools.eyes.universal.dto;
 
 import com.applitools.eyes.LazyLoadOptions;
+import com.applitools.eyes.StitchOverlap;
 import com.fasterxml.jackson.annotation.JsonInclude;
 
 import java.util.List;
@@ -49,7 +50,7 @@ public class CombinedSettingsDto {
     private String stitchMode; // "CSS" | "Scroll"
     private Boolean hideScrollBars;
     private Boolean hideCaret;
-    private ImageCropRectDto overlap;
+    private StitchOverlap overlap;
     private Integer waitBeforeCapture;
     private LazyLoadOptions lazyLoad;
     private Boolean ignoreDisplacements;
@@ -349,11 +350,11 @@ public class CombinedSettingsDto {
         this.hideCaret = hideCaret;
     }
 
-    public ImageCropRectDto getOverlap() {
+    public StitchOverlap getOverlap() {
         return overlap;
     }
 
-    public void setOverlap(ImageCropRectDto overlap) {
+    public void setOverlap(StitchOverlap overlap) {
         this.overlap = overlap;
     }
 

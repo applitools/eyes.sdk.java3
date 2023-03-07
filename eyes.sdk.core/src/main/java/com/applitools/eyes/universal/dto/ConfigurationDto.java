@@ -3,6 +3,7 @@ package com.applitools.eyes.universal.dto;
 import java.util.List;
 import java.util.Map;
 
+import com.applitools.eyes.StitchOverlap;
 import com.applitools.eyes.universal.mapper.CoreCodedRegionReferenceMapper;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
@@ -326,12 +327,12 @@ public class ConfigurationDto {
   }
 
   @JsonIgnore
-  public ImageCropRectDto getStitchOverlap() {
+  public StitchOverlap getStitchOverlap() {
     return screenshot.getOverlap();
   }
 
   @JsonIgnore
-  public void setStitchOverlap(ImageCropRectDto stitchOverlap) {
+  public void setStitchOverlap(StitchOverlap stitchOverlap) {
     this.screenshot.setOverlap(stitchOverlap);
   }
 

@@ -5,7 +5,6 @@ import com.applitools.eyes.config.Configuration;
 import com.applitools.eyes.selenium.fluent.SeleniumCheckSettings;
 import com.applitools.eyes.universal.dto.CheckSettingsDto;
 import com.applitools.eyes.universal.dto.DebugScreenshotHandlerDto;
-import com.applitools.eyes.universal.dto.ImageCropRectDto;
 import com.applitools.eyes.universal.mapper.AccessibilitySettingsMapper;
 import com.applitools.eyes.universal.mapper.ProxyMapper;
 import com.applitools.eyes.universal.mapper.VisualGridOptionMapper;
@@ -37,9 +36,7 @@ public class CheckSettingsMapper {
     checkSettingsDto.setStitchMode(config.getStitchMode() == null ? null : config.getStitchMode().getName());
     checkSettingsDto.setHideScrollbars(config.getHideScrollbars());
     checkSettingsDto.setHideCaret(config.getHideCaret());
-    ImageCropRectDto overlap = new ImageCropRectDto();
-    overlap.setBottom(config.getStitchOverlap());
-    checkSettingsDto.setOverlap(config.getStitchOverlap() == null ? null : overlap);
+    checkSettingsDto.setOverlap(config.getOverlap());
     checkSettingsDto.setWaitBeforeCapture(seleniumCheckSettings.getWaitBeforeCapture());
     checkSettingsDto.setLazyLoad(seleniumCheckSettings.getLazyLoadOptions());
     checkSettingsDto.setIgnoreDisplacements(seleniumCheckSettings.isIgnoreDisplacements());

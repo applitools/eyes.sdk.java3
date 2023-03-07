@@ -1340,8 +1340,16 @@ public class PlaywrightCheckSettings extends CheckSettings implements IPlaywrigh
      * {@inheritDoc}
      */
     @Override
-    public PlaywrightCheckSettings setOverlap(Integer overlap) {
-        return (PlaywrightCheckSettings) super.setOverlap(overlap);
+    public PlaywrightCheckSettings stitchOverlap(Integer overlap) {
+        return (PlaywrightCheckSettings) super.stitchOverlap(overlap);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public PlaywrightCheckSettings stitchOverlap(StitchOverlap stitchOverlap) {
+        return (PlaywrightCheckSettings) super.stitchOverlap(stitchOverlap);
     }
 
     /**

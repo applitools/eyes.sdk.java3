@@ -34,9 +34,7 @@ public class PlaywrightCheckSettingsMapper {
         checkSettingsDto.setStitchMode(config.getStitchMode() == null ? null : config.getStitchMode().getName());
         checkSettingsDto.setHideScrollbars(config.getHideScrollbars());
         checkSettingsDto.setHideCaret(config.getHideCaret());
-        ImageCropRectDto overlap = new ImageCropRectDto();
-        overlap.setBottom(config.getStitchOverlap());
-        checkSettingsDto.setOverlap(config.getStitchOverlap() == null ? null : overlap);
+        checkSettingsDto.setOverlap(config.getOverlap());
         checkSettingsDto.setWaitBeforeCapture(playwrightCheckSettings.getWaitBeforeCapture());
         checkSettingsDto.setLazyLoad(playwrightCheckSettings.getLazyLoadOptions());
         checkSettingsDto.setIgnoreDisplacements(playwrightCheckSettings.isIgnoreDisplacements());

@@ -5,6 +5,7 @@ import java.util.Map;
 
 import com.applitools.eyes.DensityMetrics;
 import com.applitools.eyes.LazyLoadOptions;
+import com.applitools.eyes.StitchOverlap;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 
@@ -24,7 +25,7 @@ public class CheckSettingsDto {
   private String stitchMode; // "CSS" | "Scroll"
   private Boolean hideScrollbars; // this is not camel case
   private Boolean hideCaret;
-  private ImageCropRectDto overlap;
+  private StitchOverlap overlap;
   private Integer waitBeforeCapture;
   private LazyLoadOptions lazyLoad;
   private Boolean ignoreDisplacements;
@@ -118,11 +119,11 @@ public class CheckSettingsDto {
     this.hideCaret = hideCaret;
   }
 
-  public ImageCropRectDto getOverlap() {
+  public StitchOverlap getOverlap() {
     return overlap;
   }
 
-  public void setOverlap(ImageCropRectDto overlap) {
+  public void setOverlap(StitchOverlap overlap) {
     this.overlap = overlap;
   }
 

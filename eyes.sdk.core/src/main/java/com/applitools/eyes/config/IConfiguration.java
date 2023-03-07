@@ -31,7 +31,11 @@ public interface IConfiguration {
 
     Integer getStitchOverlap();
 
+    StitchOverlap getOverlap();
+
     Configuration setStitchOverlap(Integer stitchingOverlap);
+
+    Configuration setStitchOverlap(StitchOverlap stitchOverlap);
 
     BatchInfo getBatch();
 
