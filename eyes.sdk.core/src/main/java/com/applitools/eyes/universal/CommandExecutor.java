@@ -199,26 +199,6 @@ public class CommandExecutor {
     return extractTextResponse.getPayload().getResult();
   }
 
-  public List<CommandEyesGetResultsResponseDto> eyesCheckAndClose(Reference eyesRef, ITargetDto target, CheckSettingsDto checkSettings, CloseSettingsDto closeSettings, ConfigurationDto config) {
-    RequestDto<CommandCheckAndCloseRequestDto> request = new RequestDto<>();
-    request.setName("Eyes.checkAndClose");
-    request.setKey(UUID.randomUUID().toString());
-    request.setPayload(new CommandCheckAndCloseRequestDto(eyesRef, target, checkSettings, closeSettings, config));
-    SyncTaskListener syncTaskListener = checkedCommand(request);
-
-    ResponseDto<List<CommandEyesGetResultsResponseDto>> closeResponse = (ResponseDto<List<CommandEyesGetResultsResponseDto>>) syncTaskListener.get();
-    if (closeResponse != null && closeResponse.getPayload().getError() != null) {
-      String message = closeResponse.getPayload().getError().getMessage();
-      if (message != null && message.contains("stale element reference")) {
-        staleElementReferenceException.throwException(message);
-      }
-      ErrorDto error = closeResponse.getPayload().getError();
-      throw new EyesException("Message: " +  error.getMessage() + ", Stack: " +  error.getStack());
-    }
-
-    return closeResponse.getPayload().getResult();
-  }
-
   public void close(Reference eyesRef, CloseSettingsDto closeSettings, ConfigurationDto config) {
     RequestDto<CommandCloseRequestDto> request = new RequestDto<>();
     request.setName("Eyes.close");

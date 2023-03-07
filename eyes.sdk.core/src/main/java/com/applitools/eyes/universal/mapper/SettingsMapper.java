@@ -66,56 +66,6 @@ public class SettingsMapper {
         return closeSettingsDto;
     }
 
-    public static CombinedSettingsDto toCheckAndCloseSettingsDto(CheckSettingsDto checkSettings, CloseSettingsDto closeSettings, ConfigurationDto configurationDto) {
-        if (checkSettings == null || closeSettings == null) {
-            return null;
-        }
-
-        CombinedSettingsDto settings = new CombinedSettingsDto();
-
-        //CheckSettings
-        settings.setRegion(checkSettings.getRegion()); // this is checkSettingsDto
-        settings.setFrames(checkSettings.getFrames());
-        settings.setFully(checkSettings.getFully());
-        settings.setScrollRootElement(checkSettings.getScrollRootElement());
-        settings.setStitchMode(configurationDto.getStitchMode());
-        settings.setHideScrollBars(configurationDto.getHideScrollBars());
-        settings.setHideCaret(configurationDto.getHideCaret());
-        settings.setOverlap(configurationDto.getStitchOverlap());
-        settings.setWaitBeforeCapture(checkSettings.getWaitBeforeCapture());
-        settings.setLazyLoad(checkSettings.getLazyLoad());
-        settings.setIgnoreDisplacements(checkSettings.getIgnoreDisplacements());
-        settings.setNormalization(toNormalizationDto(configurationDto.getCut(), configurationDto.getRotation(), configurationDto.getScaleRatio())); //TODO I'm NEW
-//        private Map<String, String> debugImages; //TODO I'm NEW
-        settings.setDebugImages(null);
-        settings.setName(checkSettings.getName());
-        settings.setPageId(checkSettings.getPageId());
-        settings.setIgnoreRegions(checkSettings.getIgnoreRegions());
-        settings.setLayoutRegions(checkSettings.getLayoutRegions());
-        settings.setStrictRegions(checkSettings.getStrictRegions());
-        settings.setContentRegions(checkSettings.getContentRegions());
-        settings.setFloatingRegions(checkSettings.getFloatingRegions());
-        settings.setAccessibilityRegions(checkSettings.getAccessibilityRegions());
-        settings.setAccessibilitySettings(checkSettings.getAccessibilitySettings());
-        settings.setMatchLevel(checkSettings.getMatchLevel());
-        settings.setRetryTimeout(configurationDto.getMatchTimeout()); //I'm NEW - former matchTimeout
-        settings.setSendDom(checkSettings.getSendDom());
-        settings.setUseDom(checkSettings.getUseDom());
-        settings.setEnablePatterns(checkSettings.getEnablePatterns());
-        settings.setIgnoreCaret(checkSettings.getIgnoreCaret());
-        settings.setUfgOptions(checkSettings.getUfgOptions()); //I'm NEW - former visualGridOptions
-        settings.setLayoutBreakpoints(checkSettings.getLayoutBreakpoints());
-        settings.setDisableBrowserFetching(checkSettings.getDisableBrowserFetching());
-        settings.setAutProxy(configurationDto.getAutProxy());
-        settings.setHooks(checkSettings.getHooks());
-
-        //CloseSettings
-        settings.setUpdateBaselineIfNew(closeSettings.getUpdateBaselineIfNew());
-        settings.setUpdateBaselineIfDifferent(closeSettings.getUpdateBaselineIfDifferent());
-
-        return settings;
-    }
-
     public static NormalizationDto toNormalizationDto(ICut cut, Integer rotation, Double scaleRatio) {
         if (cut == null && rotation == null && scaleRatio == null) {
             return null;
