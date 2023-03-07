@@ -1,6 +1,7 @@
 ## [vNext] - dNext
 ### Updated
 ### Added
+- Added support for `StitchOverlap`. [Trello 3160](https://trello.com/c/aSKNDUjn/3160)
 ### Fixed
 - Improve dom-snapshot result handling in Eyes Playwright. [Trello 3166](https://trello.com/c/zKPDp8L5)
 
