@@ -13,6 +13,7 @@ jobs:
       - name: Log info
         run: |
           echo "Starting CI Tests"
+          echo "Running on Eyes server: ${{ secrets.APPLITOOLS_SERVER_URL }}"
   core-tests:
     needs: build
     runs-on: ubuntu-latest
@@ -84,6 +85,7 @@ jobs:
           APPLITOOLS_API_KEY: ${{ secrets.APPLITOOLS_API_KEY }}
           SAUCE_USERNAME: ${{ secrets.SAUCE_USERNAME }}
           SAUCE_ACCESS_KEY: ${{ secrets.SAUCE_ACCESS_KEY }}
+          APPLITOOLS_SERVER_URL: ${{ secrets.APPLITOOLS_SERVER_URL }}
 
   selenium-tests:
     needs: build
@@ -129,6 +131,7 @@ jobs:
           SAUCE_USERNAME: ${{ secrets.SAUCE_USERNAME }}
           SAUCE_ACCESS_KEY: ${{ secrets.SAUCE_ACCESS_KEY }}
           CHROME_DRIVER_PATH: "/usr/local/bin/chromedriver"
+          APPLITOOLS_SERVER_URL: ${{ secrets.APPLITOOLS_SERVER_URL }}
 
   playwright-tests:
     needs: build
@@ -171,6 +174,7 @@ jobs:
         env:
           APPLITOOLS_API_KEY: ${{ secrets.APPLITOOLS_API_KEY }}
           CHROME_DRIVER_PATH: "/usr/local/bin/chromedriver"
+          APPLITOOLS_SERVER_URL: ${{ secrets.APPLITOOLS_SERVER_URL }}
 
   arm64-tests:
     needs: build
@@ -196,47 +200,47 @@ jobs:
           install: |
             set -e
             apt-get update
-            apt-get install --no-install-recommends -y ca-certificates maven 
+            apt-get install --no-install-recommends -y ca-certificates maven
           run: mvn clean install -DskipTests && mvn test -Dtest="TestLinuxArmArchitecture" -DfailIfNoTests=false
 
   #  alpine-tests:
-#    needs: build
-#    runs-on: ubuntu-20.04
-#    container: "alpine:latest"
-#    steps:
-#      - name: Installing dependencies
-#        run: |
-#          apk add git
-#          apk add bash
-#          apk add chromium
-#          apk add chromium-chromedriver
-#          apk add --no-cache libstdc++
-#      - name: Checkout repository and submodules
-#        uses: actions/checkout@v3
-#        with:
-#          submodules: recursive
-#          token: ${{ secrets.SUBMODULES_GA_TOKEN }}
-#      - name: Setup Node
-#        uses: actions/setup-node@v3
-#        with:
-#          node-version: 16
-#      - name: Setup Java
-#        uses: actions/setup-java@v3
-#        with:
-#          java-version: 8
-#          distribution: "temurin"
-#          cache: "maven"
-#      - name: Setup chromedriver
-#        run: |
-#          export DISPLAY=:99
-#          chromedriver --url-base=/wd/hub &
-#      - name: Start containers and test
-#        run: docker-compose -f "docker-compose.yaml" up -d --build
-#      - name: Stop containers
-#        run: docker-compose -f "docker-compose.yaml" down
-#        #          working-directory: java
-#        env:
-#          APPLITOOLS_API_KEY: ${{ secrets.APPLITOOLS_API_KEY }}
+  #    needs: build
+  #    runs-on: ubuntu-20.04
+  #    container: "alpine:latest"
+  #    steps:
+  #      - name: Installing dependencies
+  #        run: |
+  #          apk add git
+  #          apk add bash
+  #          apk add chromium
+  #          apk add chromium-chromedriver
+  #          apk add --no-cache libstdc++
+  #      - name: Checkout repository and submodules
+  #        uses: actions/checkout@v3
+  #        with:
+  #          submodules: recursive
+  #          token: ${{ secrets.SUBMODULES_GA_TOKEN }}
+  #      - name: Setup Node
+  #        uses: actions/setup-node@v3
+  #        with:
+  #          node-version: 16
+  #      - name: Setup Java
+  #        uses: actions/setup-java@v3
+  #        with:
+  #          java-version: 8
+  #          distribution: "temurin"
+  #          cache: "maven"
+  #      - name: Setup chromedriver
+  #        run: |
+  #          export DISPLAY=:99
+  #          chromedriver --url-base=/wd/hub &
+  #      - name: Start containers and test
+  #        run: docker-compose -f "docker-compose.yaml" up -d --build
+  #      - name: Stop containers
+  #        run: docker-compose -f "docker-compose.yaml" down
+  #        #          working-directory: java
+  #        env:
+  #          APPLITOOLS_API_KEY: ${{ secrets.APPLITOOLS_API_KEY }}
 
   specific-tests:
     needs: build
@@ -272,6 +276,7 @@ jobs:
         #          working-directory: java
         env:
           APPLITOOLS_API_KEY: ${{ secrets.APPLITOOLS_API_KEY }}
+          APPLITOOLS_SERVER_URL: ${{ secrets.APPLITOOLS_SERVER_URL }}
 
   images-tests:
     needs: build
@@ -309,6 +314,7 @@ jobs:
           APPLITOOLS_API_KEY: ${{ secrets.APPLITOOLS_API_KEY }}
           SAUCE_USERNAME: ${{ secrets.SAUCE_USERNAME }}
           SAUCE_ACCESS_KEY: ${{ secrets.SAUCE_ACCESS_KEY }}
+          APPLITOOLS_SERVER_URL: ${{ secrets.APPLITOOLS_SERVER_URL }}
 
   generic-tests-selenium:
     needs: build
@@ -357,6 +363,7 @@ jobs:
           SAUCE_ACCESS_KEY: ${{ secrets.SAUCE_ACCESS_KEY }}
           CHROME_DRIVER_PATH: "/usr/local/bin/chromedriver"
           FIREFOX_DRIVER_PATH: "/usr/local/bin/geckodriver"
+          APPLITOOLS_SERVER_URL: ${{ secrets.APPLITOOLS_SERVER_URL }}
 
   generic-tests-playwright:
     needs: build
@@ -405,20 +412,21 @@ jobs:
           SAUCE_ACCESS_KEY: ${{ secrets.SAUCE_ACCESS_KEY }}
           CHROME_DRIVER_PATH: "/usr/local/bin/chromedriver"
           FIREFOX_DRIVER_PATH: "/usr/local/bin/geckodriver"
+          APPLITOOLS_SERVER_URL: ${{ secrets.APPLITOOLS_SERVER_URL }}
 
-#  support-tests:
-#    needs:
-#      - core-tests
-#      - appium-tests
-#      - selenium-tests
-#      - specific-tests
-#      - alpine-tests
-#      - images-tests
-#      - generic-tests
-#    # Support workflow which will be run
-#    uses: applitools/applitools_support_matrix/.github/workflows/java.yml@${GITHUB_REF##*/}
-#    secrets:
-#      APPLITOOLS_API_KEY: ${{ secrets.APPLITOOLS_API_KEY }}
+  #  support-tests:
+  #    needs:
+  #      - core-tests
+  #      - appium-tests
+  #      - selenium-tests
+  #      - specific-tests
+  #      - alpine-tests
+  #      - images-tests
+  #      - generic-tests
+  #    # Support workflow which will be run
+  #    uses: applitools/applitools_support_matrix/.github/workflows/java.yml@${GITHUB_REF##*/}
+  #    secrets:
+  #      APPLITOOLS_API_KEY: ${{ secrets.APPLITOOLS_API_KEY }}
 
   deploy:
     needs:
@@ -432,8 +440,8 @@ jobs:
       - generic-tests-selenium
       - generic-tests-playwright
       - playwright-tests
-#      - alpine-tests
-#      - support-tests
+    #      - alpine-tests
+    #      - support-tests
     runs-on: ubuntu-latest
     name: Deploy
     steps:
