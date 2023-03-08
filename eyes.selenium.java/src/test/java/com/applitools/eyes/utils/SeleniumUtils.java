@@ -23,6 +23,7 @@ public class SeleniumUtils {
         if (TestUtils.runHeadless) {
             options.setHeadless(true);
         }
+        options.addArguments("--remote-allow-origins=*");
         options.addArguments("--no-sandbox");
         return new ChromeDriver(options);
     }

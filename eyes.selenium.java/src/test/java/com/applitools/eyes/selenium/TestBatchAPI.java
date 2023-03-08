@@ -29,10 +29,7 @@ public final class TestBatchAPI extends ReportingTestSuite {
         if(chromeDriverPath == null) throw new EyesException("CHROME_DRIVER_PATH missing");
         System.setProperty("webdriver.chrome.driver", chromeDriverPath);
 
-        ChromeOptions options = new ChromeOptions().setHeadless(true);
-        options.addArguments("--disable-gpu"); // applicable to windows os only
-        options.addArguments("--no-sandbox"); // Bypass OS security model
-        driver = new ChromeDriver(options);
+        driver = SeleniumUtils.createChromeDriver(new ChromeOptions().setHeadless(true));
 
         driver.get("https://applitools.com/helloworld");
     }

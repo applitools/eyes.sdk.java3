@@ -7,6 +7,7 @@ import com.applitools.eyes.selenium.fluent.Target;
 import com.applitools.eyes.universal.dto.CloseBatchSettingsDto;
 import com.applitools.eyes.universal.mapper.SettingsMapper;
 import com.applitools.eyes.utils.ReportingTestSuite;
+import com.applitools.eyes.utils.SeleniumUtils;
 import com.applitools.eyes.utils.TestUtils;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
@@ -38,10 +39,7 @@ public class TestCloseBatch extends ReportingTestSuite {
         if(chromeDriverPath == null) throw new EyesException("CHROME_DRIVER_PATH missing");
         System.setProperty("webdriver.chrome.driver", chromeDriverPath);
 
-        ChromeOptions options = new ChromeOptions().setHeadless(true);
-        options.addArguments("--disable-gpu"); // applicable to windows os only
-        options.addArguments("--no-sandbox"); // Bypass OS security model
-        driver = new ChromeDriver(options);
+        driver = SeleniumUtils.createChromeDriver(new ChromeOptions().setHeadless(true));
 
         batch = new BatchInfo("closeBatch");
     }
