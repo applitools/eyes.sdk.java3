@@ -74,15 +74,17 @@ public class TestCloseBatch extends ReportingTestSuite {
     }
 
     private void AssertBatchInfoWithRetry(TestResults results) {
-        int retries = 5;
+        int retries = 10;
         while (retries > 0) {
             try {
+                System.out.println("BatchInfo retry #" + retries);
                 com.applitools.eyes.metadata.BatchInfo batchInfo = getBatchInfo(results);
                 Assert.assertTrue(batchInfo.getIsCompleted());
                 break;
-            } catch (AssertionError e) {
+            } catch (AssertionError | Exception e) {
                 retries--;
                 if (retries == 0) {
+                    e.printStackTrace();
                     throw e;
                 }
                 try { Thread.sleep(2000); }
