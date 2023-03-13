@@ -1,6 +1,6 @@
 ## [vNext] - dNext
 ### Updated
-- Updated core binaries to `2.3.14`.
+- Updated core binaries to `2.4.0`.
 ### Added
 - Added support for `StitchOverlap`. [Trello 3160](https://trello.com/c/aSKNDUjn/3160)
 ### Fixed
