@@ -1,189 +1,232 @@
-name: Java - Test on all platforms
-on:
-  # Allows you to run this workflow manually from the Actions tab
-  workflow_dispatch:
+name: "Java - Tests"
 
-  push:
+on:
   pull_request:
+    types:
+      - opened
+      - reopened
+      - synchronize
+      - ready_for_review
+
+  workflow_dispatch:
+    inputs:
+      generic_tests_selenium:
+        description: Generic Selenium SDK Tests
+        type: boolean
+        required: false
+        default: false
+      generic_tests_playwright:
+        description: Generic Playwright SDK Tests
+        type: boolean
+        required: false
+        default: false
+      core_tests:
+        description: Core Tests
+        type: boolean
+        required: false
+        default: true
+      selenium_tests:
+        description: Selenium Tests
+        type: boolean
+        required: false
+        default: false
+      appium_tests:
+        description: Appium SDK Tests
+        type: boolean
+        required: false
+        default: false
+      images_tests:
+        description: Images SDK Tests
+        type: boolean
+        required: false
+        default: false
+      playwright_tests:
+        description: Playwright SDK tests
+        type: boolean
+        required: false
+        default: false
+      other_tests:
+        description: Other Tests
+        type: boolean
+        required: false
+        default: false
+      arm64_tests:
+        description: ARM64 Architecture Test
+        type: boolean
+        required: false
+        default: false
+      EG:
+        description: Run on EG (Execution Cloud)
+        type: boolean
+        required: false
+        default: true
 
 jobs:
-  build:
+  setup:
     runs-on: ubuntu-latest
     steps:
       - name: Log info
         run: |
           echo "Starting CI Tests"
-          echo "Running on Eyes server: ${{ secrets.APPLITOOLS_SERVER_URL }}"
+
   core-tests:
-    needs: build
+    needs: setup
+    if: ${{ !(github.event_name == 'workflow_dispatch') || inputs.core_tests }}
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository and submodules
         uses: actions/checkout@v3
         with:
-          lfs: true # without this flag binaries won't be loaded
+          ref: ${{inputs.ref || github.ref}}
           submodules: recursive
           token: ${{ secrets.SUBMODULES_GA_TOKEN }}
+
       - name: Setup Node
         uses: actions/setup-node@v3
         with:
           node-version: 16
+
       - name: Setup Java
         uses: actions/setup-java@v3
         with:
           java-version: 8
           distribution: "temurin"
           cache: "maven"
-      - name: initialize
-        run: |
-          pushd eyes.ufg.java/src/main/resources
-          npm install
-          popd
-          mvn clean install -DskipTests
-      - name: SDK Core tests
-        run: |
-          echo "Starting SDK Core tests."
-          echo $APPLITOOLS_REPORT_ID
-          mvn test -pl "eyes.sdk.core" -e -X
-        #          working-directory: java
+
+      - name: Test
+        uses: ./github/actions/tests/
+        with:
+          working-directory: ""
+          shell: bash
+          module: "eyes.sdk.core"
         env:
           APPLITOOLS_API_KEY: ${{ secrets.APPLITOOLS_API_KEY }}
 
   appium-tests:
-    needs: build
+    needs: setup
+    if: ${{ !(github.event_name == 'workflow_dispatch') || inputs.appium_tests }}
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository and submodules
         uses: actions/checkout@v3
         with:
-          lfs: true # without this flag binaries won't be loaded
+          ref: ${{inputs.ref || github.ref}}
           submodules: recursive
           token: ${{ secrets.SUBMODULES_GA_TOKEN }}
+
       - name: Setup Node
         uses: actions/setup-node@v3
         with:
           node-version: 16
+
       - name: Setup Java
         uses: actions/setup-java@v3
         with:
           java-version: 8
           distribution: "temurin"
           cache: "maven"
-      - name: initialize
-        run: |
-          pushd eyes.ufg.java/src/main/resources
-          npm install
-          popd
-          mvn clean install -DskipTests
-      - name: SDK Appium tests
-        run: |
-          echo "Starting SDK Appium tests."
-          echo $APPLITOOLS_REPORT_ID
-          mvn test -pl "eyes.appium.java" -e -X
-        #          working-directory: java
+
+      - name: Test
+        uses: ./github/actions/tests/
+        with:
+          working-directory: ""
+          shell: bash
+          module: "eyes.appium.java"
         env:
           APPLITOOLS_API_KEY: ${{ secrets.APPLITOOLS_API_KEY }}
           SAUCE_USERNAME: ${{ secrets.SAUCE_USERNAME }}
           SAUCE_ACCESS_KEY: ${{ secrets.SAUCE_ACCESS_KEY }}
-          APPLITOOLS_SERVER_URL: ${{ secrets.APPLITOOLS_SERVER_URL }}
 
   selenium-tests:
-    needs: build
-    concurrency: test_group_1
+    needs: setup
+    if: ${{ !(github.event_name == 'workflow_dispatch') || inputs.selenium_tests }}
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository and submodules
         uses: actions/checkout@v3
         with:
-          lfs: true # without this flag binaries won't be loaded
+          ref: ${{inputs.ref || github.ref}}
           submodules: recursive
           token: ${{ secrets.SUBMODULES_GA_TOKEN }}
+
       - name: Setup Node
         uses: actions/setup-node@v3
         with:
           node-version: 16
+
       - name: Setup Java
         uses: actions/setup-java@v3
         with:
           java-version: 8
           distribution: "temurin"
           cache: "maven"
-      - name: initialize
-        run: |
-          pushd eyes.ufg.java/src/main/resources
-          npm install
-          popd
-          mvn clean install -DskipTests
-      - uses: browser-actions/setup-chrome@latest
-      - run: |
-          chmod +x ./initChromeDriverGHA.sh && ./initChromeDriverGHA.sh
-          export DISPLAY=:99
-          chromedriver --url-base=/wd/hub &
-      - name: SDK Selenium tests
-        run: |
-          echo "Starting SDK Selenium tests."
-          echo $APPLITOOLS_REPORT_ID
-          mvn test -pl "eyes.selenium.java" -e -X
-        #          working-directory: java
+
+      - uses: ./.github/actions/drivers/
+        with:
+          chrome: true
+#          chrome-version:
+
+      - name: Test
+        uses: ./.github/actions/tests/
+        with:
+          working-directory: ""
+          shell: bash
+          module: "eyes.selenium.java"
         env:
           APPLITOOLS_API_KEY: ${{ secrets.APPLITOOLS_API_KEY }}
           APPLITOOLS_API_KEY_TEST_EYES: ${{ secrets.APPLITOOLS_API_KEY_TEST_EYES }}
           SAUCE_USERNAME: ${{ secrets.SAUCE_USERNAME }}
           SAUCE_ACCESS_KEY: ${{ secrets.SAUCE_ACCESS_KEY }}
           CHROME_DRIVER_PATH: "/usr/local/bin/chromedriver"
-          APPLITOOLS_SERVER_URL: ${{ secrets.APPLITOOLS_SERVER_URL }}
 
   playwright-tests:
-    needs: build
-    concurrency: test_group_5
+    needs: setup
+    if: ${{ !(github.event_name == 'workflow_dispatch') || inputs.playwright_tests }}
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository and submodules
         uses: actions/checkout@v3
         with:
-          lfs: true # without this flag binaries won't be loaded
+          ref: ${{inputs.ref || github.ref}}
           submodules: recursive
           token: ${{ secrets.SUBMODULES_GA_TOKEN }}
+
       - name: Setup Node
         uses: actions/setup-node@v3
         with:
           node-version: 16
+
       - name: Setup Java
         uses: actions/setup-java@v3
         with:
           java-version: 8
           distribution: "temurin"
           cache: "maven"
-      - name: initialize
-        run: |
-          pushd eyes.ufg.java/src/main/resources
-          npm install
-          popd
-          mvn clean install -DskipTests
-      - uses: browser-actions/setup-chrome@latest
-      - run: |
-          chmod +x ./initChromeDriverGHA.sh && ./initChromeDriverGHA.sh
-          export DISPLAY=:99
-          chromedriver --url-base=/wd/hub &
-      - name: SDK Playwright tests
-        run: |
-          echo "Starting SDK Playwright tests."
-          echo $APPLITOOLS_REPORT_ID
-          mvn test -pl "eyes.playwright.java" -e -X
-        #          working-directory: java
+
+      - uses: ./.github/actions/drivers/
+        with:
+          chrome: true
+#          chrome-version:
+
+      - name: Test
+        uses: ./.github/actions/tests/
+        with:
+          working-directory: ""
+          shell: bash
+          module: "eyes.playwright.java"
         env:
           APPLITOOLS_API_KEY: ${{ secrets.APPLITOOLS_API_KEY }}
           CHROME_DRIVER_PATH: "/usr/local/bin/chromedriver"
-          APPLITOOLS_SERVER_URL: ${{ secrets.APPLITOOLS_SERVER_URL }}
 
   arm64-tests:
     needs: build
+    if: ${{ !(github.event_name == 'workflow_dispatch') || inputs.arm64_tests }}
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository and submodules
         uses: actions/checkout@v3
         with:
-          lfs: true # without this flag binaries won't be loaded
+          ref: ${{inputs.ref || github.ref}}
           submodules: recursive
           token: ${{ secrets.SUBMODULES_GA_TOKEN }}
       - name: Setup Java
@@ -200,7 +243,7 @@ jobs:
           install: |
             set -e
             apt-get update
-            apt-get install --no-install-recommends -y ca-certificates maven
+            apt-get install --no-install-recommends -y ca-certificates maven 
           run: mvn clean install -DskipTests && mvn test -Dtest="TestLinuxArmArchitecture" -DfailIfNoTests=false
 
   #  alpine-tests:
@@ -242,120 +285,108 @@ jobs:
   #        env:
   #          APPLITOOLS_API_KEY: ${{ secrets.APPLITOOLS_API_KEY }}
 
-  specific-tests:
-    needs: build
+  other-tests:
+    needs: setup
+    if: ${{ !(github.event_name == 'workflow_dispatch') || inputs.other_tests }}
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository and submodules
         uses: actions/checkout@v3
         with:
-          lfs: true # without this flag binaries won't be loaded
+          ref: ${{inputs.ref || github.ref}}
           submodules: recursive
           token: ${{ secrets.SUBMODULES_GA_TOKEN }}
+
       - name: Setup Node
         uses: actions/setup-node@v3
         with:
           node-version: 16
+
       - name: Setup Java
         uses: actions/setup-java@v3
         with:
           java-version: 8
           distribution: "temurin"
           cache: "maven"
-      - name: initialize
-        run: |
-          pushd eyes.ufg.java/src/main/resources
-          npm install
-          popd
-          mvn clean install -DskipTests
-      - name: SDK Specific tests
-        run: |
-          echo "Starting SDK Specific tests."
-          echo $APPLITOOLS_REPORT_ID
-          mvn test -pl "selenium4" -e -X
-        #          working-directory: java
+
+      - name: Test
+        uses: ./.github/actions/tests/
+        with:
+          working-directory: ""
+          shell: bash
+          module: "selenium4"
         env:
           APPLITOOLS_API_KEY: ${{ secrets.APPLITOOLS_API_KEY }}
-          APPLITOOLS_SERVER_URL: ${{ secrets.APPLITOOLS_SERVER_URL }}
 
   images-tests:
-    needs: build
+    needs: setup
+    if: ${{ !(github.event_name == 'workflow_dispatch') || inputs.images_tests }}
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository and submodules
         uses: actions/checkout@v3
         with:
-          lfs: true # without this flag binaries won't be loaded
+          ref: ${{inputs.ref || github.ref}}
           submodules: recursive
           token: ${{ secrets.SUBMODULES_GA_TOKEN }}
+
       - name: Setup Node
         uses: actions/setup-node@v3
         with:
           node-version: 16
+
       - name: Setup Java
         uses: actions/setup-java@v3
         with:
           java-version: 8
           distribution: "temurin"
           cache: "maven"
-      - name: initialize
-        run: |
-          pushd eyes.ufg.java/src/main/resources
-          npm install
-          popd
-          mvn clean install -DskipTests
-      - name: SDK Images tests
-        run: |
-          echo "Starting SDK Images tests."
-          echo $APPLITOOLS_REPORT_ID
-          mvn test -pl "eyes.images.java" -e -X
-        #          working-directory: java
+
+      - name: Test
+        uses: ./.github/actions/tests/
+        with:
+          working-directory: ""
+          shell: bash
+          module: "eyes.images.java"
         env:
           APPLITOOLS_API_KEY: ${{ secrets.APPLITOOLS_API_KEY }}
           SAUCE_USERNAME: ${{ secrets.SAUCE_USERNAME }}
           SAUCE_ACCESS_KEY: ${{ secrets.SAUCE_ACCESS_KEY }}
-          APPLITOOLS_SERVER_URL: ${{ secrets.APPLITOOLS_SERVER_URL }}
 
   generic-tests-selenium:
-    needs: build
-    concurrency: test_group_2
+    needs: setup
+    if: ${{ !(github.event_name == 'workflow_dispatch') || inputs.generic_tests_selenium }}
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository and submodules
         uses: actions/checkout@v3
         with:
-          lfs: true # without this flag binaries won't be loaded
+          ref: ${{inputs.ref || github.ref}}
           submodules: recursive
           token: ${{ secrets.SUBMODULES_GA_TOKEN }}
+
       - name: Setup Node
         uses: actions/setup-node@v3
         with:
           node-version: 16
+
       - name: Setup Java
         uses: actions/setup-java@v3
         with:
           java-version: 8
           distribution: "temurin"
           cache: "maven"
-      - name: Setup firefox
-        uses: browser-actions/setup-firefox@latest
-      - name: initialize
-        run: |
-          pushd eyes.ufg.java/src/main/resources
-          npm install
-          popd
-          mvn clean install -DskipTests
-          chmod +x ./initGeckoDriverGHA.sh && ./initGeckoDriverGHA.sh
-          chmod +x ./initChromeDriverGHA.sh && ./initChromeDriverGHA.sh
-          export DISPLAY=:99
-          chromedriver --url-base=/wd/hub &
-      - name: SDK Generic tests
-        run: |
-          echo "Starting SDK Generic tests."
-          echo $APPLITOOLS_REPORT_ID
-          cd coverage-tests;
-          chmod +x ./generic_tests.sh && ./generic_tests.sh
-        #          working-directory: java
+
+      - uses: ./.github/actions/drivers/
+        with:
+          chrome: true
+          firefox: true
+#          chrome-version:
+
+      - name: Test
+        uses: ./.github/actions/tests/
+        with:
+          module: "coverage-selenium"
         env:
           APPLITOOLS_API_KEY: ${{ secrets.APPLITOOLS_API_KEY }}
           APPLITOOLS_API_KEY_READ: ${{ secrets.APPLITOOLS_API_KEY_READ }}
@@ -363,87 +394,37 @@ jobs:
           SAUCE_ACCESS_KEY: ${{ secrets.SAUCE_ACCESS_KEY }}
           CHROME_DRIVER_PATH: "/usr/local/bin/chromedriver"
           FIREFOX_DRIVER_PATH: "/usr/local/bin/geckodriver"
-          APPLITOOLS_SERVER_URL: ${{ secrets.APPLITOOLS_SERVER_URL }}
 
   generic-tests-playwright:
-    needs: build
-    concurrency: test_group_3
+    needs: setup
+    if: ${{ !(github.event_name == 'workflow_dispatch') || inputs.generic_tests_playwright }}
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository and submodules
         uses: actions/checkout@v3
         with:
-          lfs: true # without this flag binaries won't be loaded
+          ref: ${{inputs.ref || github.ref}}
           submodules: recursive
           token: ${{ secrets.SUBMODULES_GA_TOKEN }}
+
       - name: Setup Node
         uses: actions/setup-node@v3
         with:
           node-version: 16
+
       - name: Setup Java
         uses: actions/setup-java@v3
         with:
           java-version: 8
           distribution: "temurin"
           cache: "maven"
-      - name: Setup firefox
-        uses: browser-actions/setup-firefox@latest
-      - name: initialize
-        run: |
-          pushd eyes.ufg.java/src/main/resources
-          npm install
-          popd
-          mvn clean install -DskipTests
-          chmod +x ./initGeckoDriverGHA.sh && ./initGeckoDriverGHA.sh
-          chmod +x ./initChromeDriverGHA.sh && ./initChromeDriverGHA.sh
-          export DISPLAY=:99
-          chromedriver --url-base=/wd/hub &
-      - name: SDK Generic tests
-        run: |
-          echo "Starting SDK Generic tests."
-          echo $APPLITOOLS_REPORT_ID
-          cd coverage-tests;
-          chmod +x ./generic_tests.sh && ./generic_tests.sh "generate:playwright"
-        #          working-directory: java
-        env:
-          APPLITOOLS_API_KEY: ${{ secrets.APPLITOOLS_API_KEY }}
-          APPLITOOLS_API_KEY_READ: ${{ secrets.APPLITOOLS_API_KEY_READ }}
-          SAUCE_USERNAME: ${{ secrets.SAUCE_USERNAME }}
-          SAUCE_ACCESS_KEY: ${{ secrets.SAUCE_ACCESS_KEY }}
-          CHROME_DRIVER_PATH: "/usr/local/bin/chromedriver"
-          FIREFOX_DRIVER_PATH: "/usr/local/bin/geckodriver"
-          APPLITOOLS_SERVER_URL: ${{ secrets.APPLITOOLS_SERVER_URL }}
+      - uses: ./.github/actions/drivers/
+        with:
+          chrome: true
+          firefox: true
+      #          chrome-version:
 
-  #  support-tests:
-  #    needs:
-  #      - core-tests
-  #      - appium-tests
-  #      - selenium-tests
-  #      - specific-tests
-  #      - alpine-tests
-  #      - images-tests
-  #      - generic-tests
-  #    # Support workflow which will be run
-  #    uses: applitools/applitools_support_matrix/.github/workflows/java.yml@${GITHUB_REF##*/}
-  #    secrets:
-  #      APPLITOOLS_API_KEY: ${{ secrets.APPLITOOLS_API_KEY }}
-
-  deploy:
-    needs:
-      - build
-      - core-tests
-      - appium-tests
-      - selenium-tests
-      - specific-tests
-      - images-tests
-      - arm64-tests
-      - generic-tests-selenium
-      - generic-tests-playwright
-      - playwright-tests
-    #      - alpine-tests
-    #      - support-tests
-    runs-on: ubuntu-latest
-    name: Deploy
-    steps:
-      - run: |
-          echo "All tests finished successfuly"
+      - name: Test
+        uses: ./.github/actions/tests/
+        with:
+          module: "coverage-playwright"
