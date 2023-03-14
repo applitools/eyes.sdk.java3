@@ -1,0 +1,64 @@
+name: Java tests
+description: Run Java SDKs tests
+
+inputs:
+  working-directory:
+    description: the path to the directory from repository root
+    type: string
+    required: false
+  shell:
+    description: shell to use
+    type: string
+    default: bash
+    required: false
+  module:
+    description: module to test (core, appium, selenium, images, playwright, coverage-selenium, coverage-playwright)
+    type: string
+    required: true
+  eg:
+    description: Run on EG (Execution Cloud)
+    type: boolean
+    default: true
+    required: true
+  report:
+    description: report level
+    type: string
+    default: sandbox
+    required: false
+
+runs:
+  using: composite
+  steps:
+    - name: Install dependencies
+      working-directory: ${{inputs.working-directory}}
+      shell: ${{inputs.shell}}
+      run: |
+        mvn clean install -DskipTests
+        echo "UFG_ON_EG=false" >> $GITHUB_ENV
+
+    - name: Start EG
+      if: ${{ inputs.EG }}
+      working-directory: ${{inputs.working-directory}}
+      shell: ${{inputs.shell}}
+      run: |
+        echo "UFG_ON_EG=true" >> $GITHUB_ENV
+
+    - name: Test
+      shell: ${{inputs.shell}}
+      working-directory: ${{inputs.working-directory}}
+      run: |
+        echo "::group::Running tests"
+        if [[ ${{inputs.module}} == *"coverage-selenium"* ]]; then
+          cd coverage-tests;
+          chmod +x ./generic_tests.sh;
+          ./generic_tests.sh ${{ env.UFG_ON_EG }} "selenium" $APPLITOOLS_REPORT_ID
+        else
+          if [[ ${{inputs.module}} == *"coverage-playwright"* ]]; then        
+            cd coverage-tests;
+            chmod +x ./generic_tests.sh;
+            ./generic_tests.sh ${{ env.UFG_ON_EG }} "playwright" $APPLITOOLS_REPORT_ID
+          else
+            mvn test -pl ${{inputs.module}} -e -X
+          fi
+        fi
+        echo "::endgroup::"
