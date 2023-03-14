@@ -24,7 +24,7 @@ runs:
         chromeVersion=`google-chrome --product-version | sed 's/\..*//'`
         echo "chrome version: $chromeVersion"
         latestChromeDriverVersion=$(wget http://chromedriver.storage.googleapis.com/LATEST_RELEASE_$chromeVersion -q -O -)
-        if [ ! -z "${{inputs.chrome-version}} ] 
+        if [ ! -z "${{inputs.chrome-version}}" ] 
         then
           latestChromeDriverVersion=${{inputs.chrome-version}}
         fi

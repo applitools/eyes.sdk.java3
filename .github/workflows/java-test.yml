@@ -77,6 +77,7 @@ jobs:
       - name: Checkout repository and submodules
         uses: actions/checkout@v3
         with:
+          lfs: true
           ref: ${{inputs.ref || github.ref}}
           submodules: recursive
           token: ${{ secrets.SUBMODULES_GA_TOKEN }}
@@ -94,7 +95,7 @@ jobs:
           cache: "maven"
 
       - name: Test
-        uses: ./github/actions/tests/
+        uses: ./.github/actions/tests/
         with:
           working-directory: ""
           shell: bash
@@ -110,6 +111,7 @@ jobs:
       - name: Checkout repository and submodules
         uses: actions/checkout@v3
         with:
+          lfs: true
           ref: ${{inputs.ref || github.ref}}
           submodules: recursive
           token: ${{ secrets.SUBMODULES_GA_TOKEN }}
@@ -127,7 +129,7 @@ jobs:
           cache: "maven"
 
       - name: Test
-        uses: ./github/actions/tests/
+        uses: ./.github/actions/tests/
         with:
           working-directory: ""
           shell: bash
@@ -145,6 +147,7 @@ jobs:
       - name: Checkout repository and submodules
         uses: actions/checkout@v3
         with:
+          lfs: true
           ref: ${{inputs.ref || github.ref}}
           submodules: recursive
           token: ${{ secrets.SUBMODULES_GA_TOKEN }}
@@ -161,10 +164,11 @@ jobs:
           distribution: "temurin"
           cache: "maven"
 
-      - uses: ./.github/actions/drivers/
+      - name: Setup driver
+        uses: ./.github/actions/drivers/
         with:
           chrome: true
-#          chrome-version:
+      #          chrome-version:
 
       - name: Test
         uses: ./.github/actions/tests/
@@ -187,6 +191,7 @@ jobs:
       - name: Checkout repository and submodules
         uses: actions/checkout@v3
         with:
+          lfs: true
           ref: ${{inputs.ref || github.ref}}
           submodules: recursive
           token: ${{ secrets.SUBMODULES_GA_TOKEN }}
@@ -203,10 +208,11 @@ jobs:
           distribution: "temurin"
           cache: "maven"
 
-      - uses: ./.github/actions/drivers/
+      - name: Setup driver
+        uses: ./.github/actions/drivers/
         with:
           chrome: true
-#          chrome-version:
+      #          chrome-version:
 
       - name: Test
         uses: ./.github/actions/tests/
@@ -219,13 +225,14 @@ jobs:
           CHROME_DRIVER_PATH: "/usr/local/bin/chromedriver"
 
   arm64-tests:
-    needs: build
+    needs: setup
     if: ${{ !(github.event_name == 'workflow_dispatch') || inputs.arm64_tests }}
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository and submodules
         uses: actions/checkout@v3
         with:
+          lfs: true
           ref: ${{inputs.ref || github.ref}}
           submodules: recursive
           token: ${{ secrets.SUBMODULES_GA_TOKEN }}
@@ -243,11 +250,11 @@ jobs:
           install: |
             set -e
             apt-get update
-            apt-get install --no-install-recommends -y ca-certificates maven 
+            apt-get install --no-install-recommends -y ca-certificates maven
           run: mvn clean install -DskipTests && mvn test -Dtest="TestLinuxArmArchitecture" -DfailIfNoTests=false
 
   #  alpine-tests:
-  #    needs: build
+  #    needs: setup
   #    runs-on: ubuntu-20.04
   #    container: "alpine:latest"
   #    steps:
@@ -261,6 +268,7 @@ jobs:
   #      - name: Checkout repository and submodules
   #        uses: actions/checkout@v3
   #        with:
+  #          lfs: true
   #          submodules: recursive
   #          token: ${{ secrets.SUBMODULES_GA_TOKEN }}
   #      - name: Setup Node
@@ -293,6 +301,7 @@ jobs:
       - name: Checkout repository and submodules
         uses: actions/checkout@v3
         with:
+          lfs: true
           ref: ${{inputs.ref || github.ref}}
           submodules: recursive
           token: ${{ secrets.SUBMODULES_GA_TOKEN }}
@@ -326,6 +335,7 @@ jobs:
       - name: Checkout repository and submodules
         uses: actions/checkout@v3
         with:
+          lfs: true
           ref: ${{inputs.ref || github.ref}}
           submodules: recursive
           token: ${{ secrets.SUBMODULES_GA_TOKEN }}
@@ -361,6 +371,7 @@ jobs:
       - name: Checkout repository and submodules
         uses: actions/checkout@v3
         with:
+          lfs: true
           ref: ${{inputs.ref || github.ref}}
           submodules: recursive
           token: ${{ secrets.SUBMODULES_GA_TOKEN }}
@@ -377,11 +388,12 @@ jobs:
           distribution: "temurin"
           cache: "maven"
 
-      - uses: ./.github/actions/drivers/
+      - name: Setup driver
+        uses: ./.github/actions/drivers/
         with:
           chrome: true
           firefox: true
-#          chrome-version:
+      #          chrome-version:
 
       - name: Test
         uses: ./.github/actions/tests/
@@ -403,6 +415,7 @@ jobs:
       - name: Checkout repository and submodules
         uses: actions/checkout@v3
         with:
+          lfs: true
           ref: ${{inputs.ref || github.ref}}
           submodules: recursive
           token: ${{ secrets.SUBMODULES_GA_TOKEN }}
@@ -418,7 +431,9 @@ jobs:
           java-version: 8
           distribution: "temurin"
           cache: "maven"
-      - uses: ./.github/actions/drivers/
+
+      - name: Setup driver
+        uses: ./.github/actions/drivers/
         with:
           chrome: true
           firefox: true
