@@ -191,7 +191,7 @@ public class TestUtils {
         if (!directory.exists()) {
             success = directory.mkdirs();
             if (success) {
-                System.out.println("Test Report directory is created!");
+                System.out.printf("Test Report directory is created in %s%n", directory.getAbsolutePath());
             } else {
                 System.out.printf("Failed test Report directory %s%n", directory.getAbsolutePath());
             }
