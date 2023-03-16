@@ -7,109 +7,289 @@ on:
         description: Version to be set
         type: string
         required: true
-      ref:
-        description: Branch to be used
-        type: string
+      pull_request:
+        description: Is an open PR
+        type: boolean
         required: false
-  workflow_call:
-    inputs:
-      new_version:
-        description: Version to be set
-        type: string
-        required: true
+        default: true
+      EG:
+        description: Run on EG (Execution Cloud)
+        type: boolean
+        required: false
+        default: true
       ref:
         description: Branch to be used
         type: string
         required: false
 
+env:
+  RELEASE_TAG: RELEASE_CANDIDATE-${{inputs.new_version}}
+
 jobs:
-  build:
-    runs-on: ubuntu-20.04
+  debug:
+    runs-on: ubuntu-latest
     steps:
       - name: debug
         run: |
-          echo "PR head repo name ${{ github.event.pull_request.head.repo.name }}"
           echo "Repo name ${{ github.repository }}"
           echo "is not fork ${{github.event.pull_request.head.repo.fork == false }}"
           echo "is dispatch ${{ github.event_name == 'workflow_dispatch' }}"
+          echo "release tag: $RELEASE_TAG"
 
-  deploy:
-    needs: build
-    if: ${{ (github.event.pull_request.head.repo.name == github.repository && github.event.pull_request.head.repo.fork == false) || github.event_name == 'workflow_dispatch' }}
-    runs-on: ubuntu-20.04
-
+  generic-tests-selenium:
+    needs: debug
+    runs-on: ubuntu-latest
+    concurrency: group_1
     steps:
       - name: Checkout repository and submodules
         uses: actions/checkout@v3
         with:
           ref: ${{inputs.ref || github.ref}}
+          lfs: true # without this flag binaries won't be loaded
+          submodules: recursive
+          token: ${{ secrets.SUBMODULES_GA_TOKEN }}
+      - name: Setup Node
+        uses: actions/setup-node@v3
+        with:
+          node-version: 16
+
+      - name: Setup Java
+        uses: actions/setup-java@v3
+        with:
+          java-version: 8
+          distribution: "temurin"
+          cache: "maven"
+
+      - name: Setup driver
+        uses: ./.github/actions/drivers/
+        with:
+          chrome: true
+          chrome-version: ${{ inputs.chromedriver-version }}
+          firefox: true
+
+      - name: Test
+        uses: ./.github/actions/tests/
+        with:
+          module: "coverage-selenium"
+          eg: ${{ inputs.EG }}
+        env:
+          APPLITOOLS_API_KEY: ${{ secrets.APPLITOOLS_API_KEY }}
+          APPLITOOLS_API_KEY_READ: ${{ secrets.APPLITOOLS_API_KEY_READ }}
+          SAUCE_USERNAME: ${{ secrets.SAUCE_USERNAME }}
+          SAUCE_ACCESS_KEY: ${{ secrets.SAUCE_ACCESS_KEY }}
+          CHROME_DRIVER_PATH: "/usr/local/bin/chromedriver"
+          FIREFOX_DRIVER_PATH: "/usr/local/bin/geckodriver"
+
+  generic-tests-playwright:
+    needs: debug
+    runs-on: ubuntu-latest
+    concurrency: group_2
+    steps:
+      - name: Checkout repository and submodules
+        uses: actions/checkout@v3
+        with:
+          ref: ${{inputs.ref || github.ref}}
+          lfs: true # without this flag binaries won't be loaded
+          submodules: recursive
+          token: ${{ secrets.SUBMODULES_GA_TOKEN }}
+      - name: Setup Node
+        uses: actions/setup-node@v3
+        with:
+          node-version: 16
+      - name: Setup Java
+        uses: actions/setup-java@v3
+        with:
+          java-version: 8
+          distribution: "temurin"
+          cache: "maven"
+
+      - name: Setup driver
+        uses: ./.github/actions/drivers/
+        with:
+          chrome: true
+          chrome-version: ${{ inputs.chromedriver-version }}
+          firefox: true
+
+      - name: Test
+        uses: ./.github/actions/tests/
+        with:
+          module: "coverage-playwright"
+          eg: ${{ inputs.EG }}
+        env:
+          APPLITOOLS_API_KEY: ${{ secrets.APPLITOOLS_API_KEY }}
+          APPLITOOLS_API_KEY_READ: ${{ secrets.APPLITOOLS_API_KEY_READ }}
+          SAUCE_USERNAME: ${{ secrets.SAUCE_USERNAME }}
+          SAUCE_ACCESS_KEY: ${{ secrets.SAUCE_ACCESS_KEY }}
+          CHROME_DRIVER_PATH: "/usr/local/bin/chromedriver"
+          FIREFOX_DRIVER_PATH: "/usr/local/bin/geckodriver"
+
+  prepare-deployment:
+    needs:
+      - generic-tests-selenium
+      - generic-tests-playwright
+    if: success()
+    runs-on: ubuntu-latest
+    outputs:
+      APPLITOOLS_REPORT_ID: ${{ needs.report.outputs.APPLITOOLS_REPORT_ID }}
+    steps:
+      - name: Checkout repository and submodules
+        uses: actions/checkout@v3
+        with:
+          ref: ${{inputs.ref || github.ref}}
+          lfs: true # without this flag binaries won't be loaded
           submodules: recursive
           token: ${{ secrets.SUBMODULES_GA_TOKEN }}
 
-      - name: Set versions
-        run: mvn versions:set -DnewVersion=${{ inputs.new_version }}
-
-      - name: Debug submodule names
+      - name: Check for an open pull request on ref
+        if: ${{ inputs.pull_request }}
         run: |
-          git submodule --quiet foreach 'echo submodule: $path'
+          REF=${{inputs.ref || github.ref}}
+          BRANCH_NAME=${REF##*/}
+          IS_PR_OPEN=$(curl "https://api.github.com/repos/applitools/eyes.sdk.java3/pulls?state=open" | jq --arg ref "$BRANCH_NAME" '.[] | select(.head.ref == $ref)')
+          if [ -z "$IS_PR_OPEN" ]; then
+            echo "no open PR for ref $BRANCH_NAME"
+            exit 1
+          else
+            echo "open PR found for ref $BRANCH_NAME"
+          fi
+
+      - id: report
+        name: Report ID
+        run: echo "APPLITOOLS_REPORT_ID=$(git rev-parse HEAD)" >> $GITHUB_OUTPUT
+
+      - name: Install gpg secret key
+        run: |
+          cat <(echo -e "${{ secrets.GPG_PRIVATE_KEY }}") | gpg --batch --import
+          gpg --list-secret-keys --keyid-format LONG
+          which gpg
+          gpg --version
+
+      - name: Build project
+        run: mvn clean install -DskipTests
+
+      - name: Set version
+        run: mvn versions:set-property -Dproperty=revision -DnewVersion=${{ inputs.new_version }}
 
       - name: Commit version changes
         run: |
           git config --global user.email "action@github.com"
           git config --global user.name "GitHub Actions"
-          git submodule --quiet foreach 'if [ $path == "eyes.common.java" ]; then git add eyes.common.java/pom.xml; else git add pom.xml; fi'
-          git add pom.xml eyes.common.java eyes.ufg.java
+          git add pom.xml
           git commit -m "Version up ${{ inputs.new_version }}"
 
       - name: Tag and push
         run: |
-          TAG="RELEASE_CANDIDATE-${{inputs.new_version}}"
-          git tag $TAG
-          git push origin ${{ inputs.ref || github.ref }} $TAG
+          git tag $RELEASE_TAG
+          git push origin ${{ inputs.ref || github.ref }} $RELEASE_TAG
 
-      - name: Build project
-        run: mvn clean install -P local-build -DskipTests
+      - name: Package project
+        run: mvn clean package -P local-build -DskipTests
 
       - name: Replace UFG sources
+        shell: 'script -q -e -c "bash {0}"'
         run: |
           cd eyes.ufg.java/target
-          echo "NA" > na.txt
-          SOURCES="eyes-ufg-java-${{inputs.new_version}}-sources.jar"
+          SOURCES="eyes-ufg-java5-${{inputs.new_version}}-sources.jar"
           rm -f $SOURCES
+          echo "NA" > na.txt
           zip $SOURCES na.txt
-          gpg -s --armor -u ${{ secrets.GPG_KEY_ID }} --passphrase "${{ secrets.GPG_KEY_SECRET }}" $SOURCES 
+          gpg -s --armor -u "$GPG_KEY_EMAIL" --pinentry-mode loopback --passphrase "$GPG_KEY_PASSPHRASE" $SOURCES 
           rm -f na.txt
+          CONTENTS=$(jar tf $SOURCES)
+          if [ "$CONTENTS" != "na.txt" ]; then
+            echo "The JAR file does not contain only na.txt."
+            exit 1
+          fi
+        env:
+          GPG_KEY_EMAIL: ${{ secrets.GPG_KEY_EMAIL }}
+          GPG_KEY_PASSPHRASE: ${{ secrets.GPG_KEY_PASSPHRASE }}
 
       - name: Replace Core sources
+        shell: 'script -q -e -c "bash {0}"'
         run: |
           cd eyes-universal-core/target
-          echo "NA" > na.txt
           SOURCES="eyes-universal-core-${{inputs.new_version}}-sources.jar"
           rm -f $SOURCES
+          echo "NA" > na.txt
           zip $SOURCES na.txt
-          gpg -s --armor -u ${{ secrets.GPG_KEY_ID }} --passphrase "${{ secrets.GPG_KEY_SECRET }}" $SOURCES 
+          gpg -s --armor -u "$GPG_KEY_EMAIL" --pinentry-mode loopback --passphrase "$GPG_KEY_PASSPHRASE" $SOURCES
           rm -f na.txt
+          CONTENTS=$(jar tf $SOURCES)
+          if [ "$CONTENTS" != "na.txt" ]; then
+            echo "The JAR file does not contain only na.txt."
+            exit 1
+          fi
+        env:
+          GPG_KEY_EMAIL: ${{ secrets.GPG_KEY_EMAIL }}
+          GPG_KEY_PASSPHRASE: ${{ secrets.GPG_KEY_PASSPHRASE }}
 
-  regression-mail:
-    needs: deploy
-    runs-on: ubuntu-20.04
-
+  fake-deploy:
+    needs:
+      - prepare-deployment
+    if: success()
+    runs-on: ubuntu-latest
+    outputs:
+      APPLITOOLS_REPORT_ID: ${{ needs.prepare-deployment.outputs.APPLITOOLS_REPORT_ID }}
     steps:
+      - name: deploy will be here
+        run: echo "fake deploy"
+
+  fake-merge-to-master:
+    needs:
+      - fake-deploy
+    runs-on: ubuntu-latest
+    steps:
+      - name: merge to master will be here
+        if: ${{inputs.pull_request}}
+        run: echo "fake merge to master"
+
+  release-mail:
+    needs:
+      - fake-deploy
+    runs-on: ubuntu-latest
+    env:
+      APPLITOOLS_REPORT_ID: ${{ needs.fake-deploy.outputs.APPLITOOLS_REPORT_ID }}
+    steps:
+      - name: Debug report id & tag
+        run: |
+          echo "env report id: $REPORT_ID"
+          echo "env tag: $RELEASE_TAG"
       - name: Checkout repository and submodules
         uses: actions/checkout@v3
         with:
           ref: ${{inputs.ref || github.ref}}
+          lfs: true # without this flag binaries won't be loaded
           submodules: recursive
           token: ${{ secrets.SUBMODULES_GA_TOKEN }}
 
-      - name: Send regression mail
+      - name: Selenium release mail
         run: |
-          SDK_VERSION="test-deploy-gh"
+          export APPLITOOLS_REPORT_ID=$APPLITOOLS_REPORT_ID-selenium;
+          echo "APPLITOOLS_REPORT_ID=$APPLITOOLS_REPORT_ID";
+          SDK_VERSION=${{inputs.new_version}};
           chmod +x ./extractChangeLog.sh;
           TMP_CHANGELOG=$(./extractChangeLog.sh "$SDK_VERSION" "CHANGELOG.md");
           CHANGELOG=$([ -z "$TMP_CHANGELOG" ] && echo "There is no change log for version $SDK_VERSION"; echo "$TMP_CHANGELOG");
           echo $CHANGELOG;
           chmod +x ./sendMail.sh;
           TEST_COVERAGE_GAP=$(cat testCoverageGap.txt);
-          TAG="RELEASE_CANDIDATE-${{inputs.new_version}}";
-          ./sendMail.sh "Java" $TAG "$CHANGELOG" "$TEST_COVERAGE_GAP";
+          SELENIUM_JAVA="eyes-selenium-java5@${{inputs.new_version}}";
+          APPIUM_JAVA="eyes-appium-java5@${{inputs.new_version}}";
+          IMAGES_JAVA="eyes-images-java5@${{inputs.new_version}}";
+          VERSION="$RELEASE_TAG;$SELENIUM_JAVA;$APPIUM_JAVA;$IMAGES_JAVA"
+          ./sendMail.sh "java" $VERSION "$CHANGELOG" "$TEST_COVERAGE_GAP" "ido.elmaleh@applitools.com";
+
+      - name: Playwright release mail
+        run: |
+          export APPLITOOLS_REPORT_ID=$APPLITOOLS_REPORT_ID-playwright;
+          echo "APPLITOOLS_REPORT_ID=$APPLITOOLS_REPORT_ID";
+          SDK_VERSION=${{inputs.new_version}};
+          chmod +x ./extractChangeLog.sh;
+          TMP_CHANGELOG=$(./extractChangeLog.sh "$SDK_VERSION" "CHANGELOG.md");
+          CHANGELOG=$([ -z "$TMP_CHANGELOG" ] && echo "There is no change log for version $SDK_VERSION"; echo "$TMP_CHANGELOG");
+          echo $CHANGELOG;
+          chmod +x ./sendMail.sh;
+          TEST_COVERAGE_GAP=$(cat testCoverageGap.txt);
+          PLAYWRIGHT_JAVA="eyes-playwright-java5@${{inputs.new_version}}";
+          VERSION="$RELEASE_TAG;$PLAYWRIGHT_JAVA"
+          ./sendMail.sh "java_playwright" $VERSION "$CHANGELOG" "$TEST_COVERAGE_GAP" "ido.elmaleh@applitools.com";

@@ -8,7 +8,7 @@ send_test_results() {
       -d @- http://applitools-quality-server.herokuapp.com/result
 }
 
-cd "$TRAVIS_BUILD_DIR/report" || exit
+cd "$BUILD_DIR/report" || exit
 
 groups=$(for file in *.json; do echo "${file%_*.json}"; done | sort -u)
 for group in $groups; do
