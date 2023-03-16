@@ -979,6 +979,18 @@ public class Configuration implements IConfiguration {
 
         return this;
     }
+    public Configuration addMobileDevice(IosDeviceInfo iosDeviceInfo, String version) {
+        RenderBrowserInfo renderBrowserInfo = new RenderBrowserInfo(version, iosDeviceInfo);
+        this.browsersInfo.add(renderBrowserInfo);
+        return this;
+    }
+
+    public Configuration addMobileDevice(AndroidDeviceInfo androidDeviceInfo, String version) {
+        RenderBrowserInfo renderBrowserInfo = new RenderBrowserInfo(version, androidDeviceInfo);
+        this.browsersInfo.add(renderBrowserInfo);
+        return this;
+    }
+
 
     public Configuration addMobileDevice(AndroidDeviceInfo androidDeviceInfo) {
         RenderBrowserInfo renderBrowserInfo = new RenderBrowserInfo(androidDeviceInfo);
