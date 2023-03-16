@@ -25,10 +25,10 @@ inputs:
     type: string
     default: sandbox
     required: false
-  report-id:
-    description: report id
+  report-dir:
+    description: report directory
     type: string
-    default: sandbox
+    default: java_sdk
     required: false
 
 runs:
@@ -68,6 +68,8 @@ runs:
             mvn test -pl ${{inputs.module}} -e -X
           fi
         fi
+      env:
+        BUILD_DIR: ${{ inputs.report-dir }}
 
     - name: Report
       shell: ${{inputs.shell}}
@@ -90,7 +92,7 @@ runs:
               yarn report:playwright;
             fi
           else
-            if [ -d "/report" ]; then
+            if [ -d "${{inputs.report-dir}}/report" ]; then
               sh sendTestResults.sh
             else
               echo "No report was created"
@@ -98,5 +100,5 @@ runs:
           fi
         fi
       env:
-        BUILD_DIR: ${{ inputs.working-directory }}
-        APPLITOOLS_REPORT_ID: ${{ inputs.report-id || env.APPLITOOLS_REPORT_ID }}
+        BUILD_DIR: ${{ inputs.report-dir }}
+        APPLITOOLS_REPORT_ID: ${{ env.APPLITOOLS_REPORT_ID }}
