@@ -248,7 +248,9 @@ jobs:
       - name: Installing dependencies
         run: |
           apk add git
+          apk add git-lfs
           apk add maven
+          apk add --no-cache openjdk8
           apk add --no-cache libstdc++
       - name: Checkout repository and submodules
         uses: actions/checkout@v3
@@ -256,18 +258,19 @@ jobs:
           lfs: true
           submodules: recursive
           token: ${{ secrets.SUBMODULES_GA_TOKEN }}
+
+      - name: Set Java path
+        run: echo "JAVA_HOME=$(readlink -f /usr/bin/javac | sed 's:/bin/javac::')" >> $GITHUB_ENV
+
       - name: Setup Node
         uses: actions/setup-node@v3
         with:
           node-version: 16
-      - name: Setup Java
-        uses: actions/setup-java@v3
-        with:
-          java-version: 8
-          distribution: "temurin"
-          cache: "maven"
+
       - name: Test
         run: mvn clean install -DskipTests && mvn test -Dtest="TestAlpineContainer" -DfailIfNoTests=false
+        env:
+          JAVA_HOME: ${{ env.JAVA_HOME }}
 
 
   other-tests:
