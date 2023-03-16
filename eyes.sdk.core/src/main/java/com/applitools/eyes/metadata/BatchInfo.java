@@ -88,16 +88,14 @@ public class BatchInfo {
         this.properties = properties;
     }
 
-    public Boolean getCompleted() {
-        return isCompleted;
-    }
-
-    public void setCompleted(Boolean completed) {
-        isCompleted = completed;
-    }
-
+    @JsonProperty("isCompleted")
     public boolean getIsCompleted() {
         return isCompleted;
+    }
+
+    @JsonProperty("isCompleted")
+    public void setIsCompleted(Boolean isCompleted) {
+        this.isCompleted = isCompleted;
     }
 
     public String getPointerId() {

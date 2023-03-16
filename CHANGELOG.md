@@ -1,3 +1,11 @@
+## [vNext] - dNext
+### Updated
+- Updated core binaries to `2.4.0`.
+### Added
+- Added support for `StitchOverlap`. [Trello 3160](https://trello.com/c/aSKNDUjn/3160)
+### Fixed
+- Improve dom-snapshot result handling in Eyes Playwright. [Trello 3166](https://trello.com/c/zKPDp8L5)
+
 ## [5.44.0] - 2023-02-17
 ### Updated
 - Update core binaries to version `2.3.10`.

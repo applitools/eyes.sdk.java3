@@ -32,9 +32,7 @@ public class ImagesCheckSettingsMapper {
         checkSettingsDto.setStitchMode(config.getStitchMode() == null ? null : config.getStitchMode().getName());
         checkSettingsDto.setHideScrollbars(config.getHideScrollbars());
         checkSettingsDto.setHideCaret(config.getHideCaret());
-        ImageCropRectDto overlap = new ImageCropRectDto();
-        overlap.setBottom(config.getStitchOverlap());
-        checkSettingsDto.setOverlap(config.getStitchOverlap() == null ? null : overlap);
+        checkSettingsDto.setOverlap(config.getOverlap());
         checkSettingsDto.setWaitBeforeCapture(imagesCheckSettings.getWaitBeforeCapture());
         checkSettingsDto.setLazyLoad(imagesCheckSettings.getLazyLoadOptions());
         checkSettingsDto.setIgnoreDisplacements(imagesCheckSettings.isIgnoreDisplacements());

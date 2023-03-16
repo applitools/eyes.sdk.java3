@@ -24,7 +24,7 @@ public class CheckSettings implements ICheckSettings, ICheckSettingsInternal {
     private StitchMode stitchMode = StitchMode.CSS; // "CSS" | "Scroll"
     private Boolean hideScrollBars;
     private Boolean hideCaret;
-    private Integer overlap;
+    private StitchOverlap overlap;
     private Integer waitBeforeCapture;
     private LazyLoadOptions lazyLoadOptions;
     protected Boolean ignoreDisplacements;
@@ -495,6 +495,7 @@ public class CheckSettings implements ICheckSettings, ICheckSettingsInternal {
         clone.waitBeforeCapture = this.waitBeforeCapture;
         clone.lazyLoadOptions = this.lazyLoadOptions;
         clone.densityMetrics = this.densityMetrics;
+        clone.overlap = this.overlap;
     }
 
     public void setStitchContent(boolean stitchContent) {
@@ -729,12 +730,24 @@ public class CheckSettings implements ICheckSettings, ICheckSettingsInternal {
     }
 
     public Integer getOverlap() {
-        return overlap;
+        return overlap.getBottom();
     }
 
     public ICheckSettings setOverlap(Integer overlap) {
         CheckSettings clone = this.clone();
-        clone.overlap = overlap;
+        clone.overlap = new StitchOverlap().bottom(overlap);
+        return clone;
+    }
+
+    public ICheckSettings stitchOverlap(Integer overlap) {
+        CheckSettings clone = this.clone();
+        clone.overlap = new StitchOverlap().bottom(overlap);
+        return clone;
+    }
+
+    public ICheckSettings stitchOverlap(StitchOverlap stitchOverlap) {
+        CheckSettings clone = this.clone();
+        clone.overlap = stitchOverlap;
         return clone;
     }
 

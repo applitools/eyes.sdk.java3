@@ -40,6 +40,7 @@ public class RenderBrowserInfoMapper {
       iosDevice.setDeviceName(iosDeviceInfo.getDeviceName());
       iosDevice.setScreenOrientation(iosDeviceInfo.getScreenOrientation() == null ? null : iosDeviceInfo.getScreenOrientation().getOrientation());
       iosDevice.setVersion(iosDeviceInfo.getVersion() == null ? null : iosDeviceInfo.getVersion().getVersion());
+      iosDevice.setVersion(renderBrowserInfo.getDeviceVersion() == null ? iosDevice.getVersion() : renderBrowserInfo.getDeviceVersion());
       iosRenderer.setIosDeviceInfo(iosDevice);
       return iosRenderer;
     } else if (renderBrowserInfo.getAndroidDeviceInfo() != null) {
@@ -50,6 +51,7 @@ public class RenderBrowserInfoMapper {
       androidDevice.setScreenOrientation(androidDeviceInfo.getScreenOrientation() == null ? null :
           androidDeviceInfo.getScreenOrientation().getOrientation());
       androidDevice.setVersion(androidDeviceInfo.getVersion() == null ? null : androidDeviceInfo.getVersion().getVersion());
+      androidDevice.setVersion(renderBrowserInfo.getDeviceVersion() == null ? androidDevice.getVersion() : renderBrowserInfo.getDeviceVersion());
       androidDeviceRenderer.setAndroidDeviceInfo(androidDevice);
       return androidDeviceRenderer;
     }

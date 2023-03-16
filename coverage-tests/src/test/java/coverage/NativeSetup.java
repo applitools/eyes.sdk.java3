@@ -38,6 +38,7 @@ public class NativeSetup extends GlobalSetup {
     }
 
     // Eyes configuration
+    public void setForceFullPageScreenshot(Boolean forceFullPageScreenshot) { eyes.setForceFullPageScreenshot(false); }
 
     public void setStitchOverlap(Integer overlap) { eyes.setStitchOverlap(overlap); }
 

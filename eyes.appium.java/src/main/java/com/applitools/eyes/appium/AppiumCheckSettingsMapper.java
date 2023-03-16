@@ -4,7 +4,6 @@ import com.applitools.ICheckSettings;
 import com.applitools.eyes.config.Configuration;
 import com.applitools.eyes.universal.ManagerType;
 import com.applitools.eyes.universal.dto.CheckSettingsDto;
-import com.applitools.eyes.universal.dto.ImageCropRectDto;
 import com.applitools.eyes.universal.mapper.AccessibilitySettingsMapper;
 import com.applitools.eyes.universal.mapper.NMGOptionsMapper;
 import com.applitools.eyes.universal.mapper.ProxyMapper;
@@ -30,9 +29,7 @@ public class AppiumCheckSettingsMapper {
         checkSettingsDto.setStitchMode(config.getStitchMode() == null ? null : config.getStitchMode().getName());
         checkSettingsDto.setHideScrollbars(config.getHideScrollbars());
         checkSettingsDto.setHideCaret(config.getHideCaret());
-        ImageCropRectDto overlap = new ImageCropRectDto();
-        overlap.setBottom(config.getStitchOverlap());
-        checkSettingsDto.setOverlap(config.getStitchOverlap() == null ? null : overlap);
+        checkSettingsDto.setOverlap(config.getOverlap());
         checkSettingsDto.setWaitBeforeCapture(appiumCheckSettings.getWaitBeforeCapture());
         checkSettingsDto.setLazyLoad(appiumCheckSettings.getLazyLoadOptions());
         checkSettingsDto.setIgnoreDisplacements(appiumCheckSettings.isIgnoreDisplacements());

@@ -175,7 +175,7 @@ public class SpecDriverPlaywright implements ISpecDriver {
         List<Cookie> cookies = ctx.context().cookies();
 
         return cookies.stream()
-                .map(cookie -> new TCookie(cookie.name, cookie.value))
+                .map(TCookie::new)
                 .collect(Collectors.toList());
     }
 
@@ -228,7 +228,7 @@ public class SpecDriverPlaywright implements ISpecDriver {
             type = matcher.group(0).toLowerCase();
         }
 
-        if (type.contains("array")) {
+        if (type.matches("array\\(\\d+\\)")) {
             Map<String, JSHandle> map = jsHandle.getProperties();
             List<Object> arrayValues = new ArrayList<>();
             for (JSHandle jsHandle1: map.values()) {
