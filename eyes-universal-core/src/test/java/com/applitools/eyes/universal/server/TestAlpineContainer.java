@@ -1,5 +1,6 @@
 package com.applitools.eyes.universal.server;
 
+import com.applitools.eyes.universal.utils.SystemInfo;
 import com.applitools.utils.GeneralUtils;
 import org.testng.Assert;
 import org.testng.annotations.Test;
@@ -14,14 +15,14 @@ public class TestAlpineContainer {
      */
     @Test
     public void testAlpineContainer() {
+        SystemInfo systemInfo = SystemInfo.getSystemInfo();
+        Assert.assertEquals(systemInfo.getOs(), "linux-x64");
+        Assert.assertEquals(systemInfo.getSuffix(), "alpine");
+
         UniversalSdkNativeLoader.start();
         Integer port = UniversalSdkNativeLoader.getPort();
         Assert.assertNotNull(port);
         System.out.println("Universal port for alpine container: " + port);
-
-        String osVersion = GeneralUtils.getPropertyString("os.name").toLowerCase();
-        Assert.assertTrue(osVersion.contains("linux"));
-        Assert.assertTrue(Files.exists(Paths.get("/etc/alpine-release")));
     }
 
 }

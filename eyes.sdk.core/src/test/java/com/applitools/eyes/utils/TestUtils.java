@@ -31,7 +31,7 @@ public class TestUtils {
     public final static String logsPath = System.getenv("APPLITOOLS_LOGS_PATH");
     public final static SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy_MM_dd_HH_mm_ss_SSS");
     public final static boolean verboseLogs = !runOnCI || "true".equalsIgnoreCase(System.getenv("APPLITOOLS_VERBOSE_LOGS"));
-    public final static String REPORTING_DIR = System.getenv("TRAVIS_BUILD_DIR") + "/report/";
+    public final static String REPORTING_DIR = System.getenv("BUILD_DIR") + "/report/";
 
     public static String initLogPath() {
         return initLogPath(Thread.currentThread().getStackTrace()[2].getMethodName());

@@ -1,20 +1,33 @@
 #!/bin/bash
+# Inputs:
+#   - EG [boolean] ; should run tests on Execution Cloud
+#   - SDK name [string] ; the sdk name used in generating generics
+
 RESULT=0
 MESSAGE=""
+
 yarn install
 if [ "$?" -ne 0 ]; then
     ((RESULT+=1))
     MESSAGE+=$'\n npm install have failed'
     echo "${MESSAGE}"
-
 fi
 
-#export UFG_ON_EG=true
-if [ -n "$1" ]; then
-  yarn "$1"
-else
+# Run UFG tests on EC
+if [[ "$1" == "true" ]]; then
+  export UFG_ON_EG=true
+fi
+
+if [[ "$2" == "selenium" ]]; then
   yarn generate
+else
+  if [[ "$2" == "playwright" ]]; then
+  yarn generate:playwright
+  else
+    exit 1
+  fi
 fi
+
 if [ "$?" -ne 0 ]; then
     ((RESULT+=1))
     MESSAGE+=$'\n unable to generate tests'
@@ -22,11 +35,12 @@ if [ "$?" -ne 0 ]; then
 fi
 
 # start eg client and save process id
-# commented out if need eg client logs
-export APPLITOOLS_SHOW_LOGS=true
-yarn universal:eg &
-EG_PID="$!"
-export EXECUTION_GRID_URL=http://localhost:8080
+if [[ "$1" == "true" ]]; then
+  export APPLITOOLS_SHOW_LOGS=true
+  yarn universal:eg &
+  EG_PID="$!"
+  export EXECUTION_GRID_URL=http://localhost:8080
+fi
 
 mvn clean test
 if [ "$?" -ne 0 ]; then
@@ -36,19 +50,9 @@ if [ "$?" -ne 0 ]; then
 fi
 
 # Kill eg client by the process id
-echo $EG_PID
-kill $EG_PID
-
-
-if [[ $TRAVIS_TAG =~ ^RELEASE_CANDIDATE ]]; then
-          yarn report:prod;
-          else
-          yarn report;
-fi
-if [ "$?" -ne 0 ]; then
-    ((RESULT+=1))
-    MESSAGE+=$'\nError occurred during send report action'
-    echo "${MESSAGE}"
+if [[ "$1" == "true" ]]; then
+  echo $EG_PID
+  kill $EG_PID
 fi
 
 echo "RESULT = ${RESULT}"
