@@ -1,4 +1,4 @@
-## [vNext] - dNext
+## [5.45.0] - 2023-03-18
 ### Updated
 - Updated core binaries to `2.4.0`.
 ### Added
