@@ -1,12 +1,20 @@
-<!DOCTYPE suite SYSTEM "https://testng.org/testng-1.0.dtd" >
+<!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd" >
 
-<suite name="java_coverage_tests" verbose="1" parallel="classes" thread-count="8">
+<suite name="java_coverage_tests" verbose="1" parallel="classes">
     <listeners>
         <listener class-name="org.testng.reporters.JUnitXMLReporter" />
     </listeners>
-    <test name="coverage-test-report">
+
+    <test name="coverage-tests-selenium" parallel="methods" thread-count="8">
         <packages>
-            <package name="coverage.generic" />
+            <package name="coverage.generic" >
+                <exclude name="playwright/*"/>
+            </package>
+        </packages>
+    </test>
+
+    <test name="coverage-tests-playwright" parallel="methods" thread-count="8">
+        <packages>
             <package name="coverage.generic.playwright" />
         </packages>
     </test>
