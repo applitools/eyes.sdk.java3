@@ -388,6 +388,7 @@ jobs:
           FIREFOX_DRIVER_PATH: "/usr/local/bin/geckodriver"
 
       - name: Save testing artifacts
+        if: always()
         uses: actions/upload-artifact@v3
         with:
           name: artifacts-selenium
@@ -442,6 +443,7 @@ jobs:
           FIREFOX_DRIVER_PATH: "/usr/local/bin/geckodriver"
 
       - name: Save testing artifacts
+        if: always()
         uses: actions/upload-artifact@v3
         with:
           name: artifacts-playwright
