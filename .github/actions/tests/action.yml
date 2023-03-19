@@ -48,57 +48,54 @@ runs:
       run: |
         echo "UFG_ON_EG=true" >> $GITHUB_ENV
 
-    - name: Test
+    - name: Test and Report
       shell: ${{inputs.shell}}
       working-directory: ${{inputs.working-directory}}
       run: |
+        echo "::group::Test"
         if [[ ${{inputs.module}} == *"coverage-selenium"* ]]; then
           cd coverage-tests;
-          echo "APPLITOOLS_REPORT_ID=$(git rev-parse HEAD)-selenium" >> $GITHUB_ENV
+          export APPLITOOLS_REPORT_ID="$(git rev-parse HEAD)-selenium"
           chmod +x ./generic_tests.sh;
           ./generic_tests.sh ${{ env.UFG_ON_EG }} "selenium"
-        else
-          if [[ ${{inputs.module}} == *"coverage-playwright"* ]]; then        
-            cd coverage-tests;
-            echo "APPLITOOLS_REPORT_ID=$(git rev-parse HEAD)-playwright" >> $GITHUB_ENV
-            chmod +x ./generic_tests.sh;
-            ./generic_tests.sh ${{ env.UFG_ON_EG }} "playwright"
-          else
-            echo "APPLITOOLS_REPORT_ID=$(git rev-parse HEAD)-java" >> $GITHUB_ENV
-            mvn test -pl ${{inputs.module}} -e -X
-          fi
-        fi
-      env:
-        BUILD_DIR: ${{ inputs.report-dir }}
-
-    - name: Report
-      shell: ${{inputs.shell}}
-      working-directory: ${{inputs.working-directory}}
-      run: |
-        if [[ ${{inputs.module}} == *"coverage-selenium"* ]]; then
-          cd coverage-tests;
+        
+          echo "::group::Report"
           if [[ ${{inputs.report}} == "deploy" ]]; then
             yarn report:prod-selenium;
           else
             yarn report:selenium;
           fi
-          "$(git rev-parse HEAD)"
+          echo "::endgroup::"
+        
         else
-          if [[ ${{inputs.module}} == *"coverage-playwright"* ]]; then
+          if [[ ${{inputs.module}} == *"coverage-playwright"* ]]; then        
             cd coverage-tests;
+            export APPLITOOLS_REPORT_ID="$(git rev-parse HEAD)-playwright"
+            chmod +x ./generic_tests.sh;
+            ./generic_tests.sh ${{ env.UFG_ON_EG }} "playwright"
+            
+            echo "::group::Report"
             if [[ ${{inputs.report}} == "deploy" ]]; then
               yarn report:prod-playwright;
             else
               yarn report:playwright;
             fi
+            echo "::endgroup::"
+        
           else
+            export APPLITOOLS_REPORT_ID="$(git rev-parse HEAD)-java"
+            mvn test -pl ${{inputs.module}} -e -X
+            
+            echo "::group::Report"
             if [ -d "${{inputs.report-dir}}/report" ]; then
               sh sendTestResults.sh
             else
               echo "No report was created"
             fi
+            echo "::endgroup::"
+        
           fi
         fi
+        echo "::endgroup::Test"
       env:
         BUILD_DIR: ${{ inputs.report-dir }}
-        APPLITOOLS_REPORT_ID: ${{ env.APPLITOOLS_REPORT_ID }}
