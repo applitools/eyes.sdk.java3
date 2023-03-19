@@ -87,7 +87,7 @@ runs:
             mvn test -pl ${{inputs.module}} -e -X
             
             echo "::group::Report"
-            cd ${{input.module}}
+            cd ${{inputs.module}}
             if [ -d "${{inputs.report-dir}}/report" ]; then
               sh ./../sendTestResults.sh
             else
