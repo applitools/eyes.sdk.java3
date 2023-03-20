@@ -150,16 +150,16 @@ jobs:
           which gpg
           gpg --version
 
+      - name: Branch out
+        run: |
+          git checkout -b "v${{inputs.new_version}}"
+          git submodule foreach 'git checkout -b "v${{inputs.new_version}}"'
+
       - name: Build project
         run: mvn clean install -DskipTests
 
       - name: Set version
         run: mvn versions:set-property -Dproperty=revision -DnewVersion=${{ inputs.new_version }}
-
-      - name: Branch out
-        run: |
-          git checkout -b "v${{inputs.new_version}}"
-          git submodule foreach 'git checkout -b "v${{inputs.new_version}}"'
 
       - name: Commit version changes
         run: |
