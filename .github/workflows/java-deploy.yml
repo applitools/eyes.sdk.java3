@@ -21,6 +21,10 @@ on:
         description: Branch to be used
         type: string
         required: false
+      chromedriver-version:
+        description: Chromedriver version
+        type: string
+        required: false
 
 env:
   RELEASE_TAG: RELEASE_CANDIDATE-${{inputs.new_version}}
@@ -36,18 +40,34 @@ jobs:
           echo "is dispatch ${{ github.event_name == 'workflow_dispatch' }}"
           echo "release tag: $RELEASE_TAG"
 
-  generic-tests-selenium:
+  tests:
     needs: debug
+    strategy:
+      matrix:
+        module:
+          - eyes.sdk.core
+          - eyes.images.java
+          - eyes.selenium.java
+          - coverage-selenium
+          - eyes.playwright.java
+          - coverage-playwright
+        include:
+          - driver: none
+            module: [eyes.sdk.core, eyes.images.java]
+          - report-id: java_playwright
+            module: [eyes.playwright.java, coverage-playwright]
+          - report-id: java_selenium
+            module: [eyes.selenium.java, coverage-selenium]
     runs-on: ubuntu-latest
-    concurrency: group_1
     steps:
       - name: Checkout repository and submodules
         uses: actions/checkout@v3
         with:
+          lfs: true
           ref: ${{inputs.ref || github.ref}}
-          lfs: true # without this flag binaries won't be loaded
           submodules: recursive
           token: ${{ secrets.SUBMODULES_GA_TOKEN }}
+
       - name: Setup Node
         uses: actions/setup-node@v3
         with:
@@ -61,6 +81,7 @@ jobs:
           cache: "maven"
 
       - name: Setup driver
+        if: ${{ !matrix.driver }}
         uses: ./.github/actions/drivers/
         with:
           chrome: true
@@ -70,8 +91,9 @@ jobs:
       - name: Test
         uses: ./.github/actions/tests/
         with:
-          module: "coverage-selenium"
+          module: ${{ matrix.module }}
           eg: ${{ inputs.EG }}
+          report-id: ${{ matrix.report-id }}
         env:
           APPLITOOLS_API_KEY: ${{ secrets.APPLITOOLS_API_KEY }}
           APPLITOOLS_API_KEY_READ: ${{ secrets.APPLITOOLS_API_KEY_READ }}
@@ -80,53 +102,9 @@ jobs:
           CHROME_DRIVER_PATH: "/usr/local/bin/chromedriver"
           FIREFOX_DRIVER_PATH: "/usr/local/bin/geckodriver"
 
-  generic-tests-playwright:
-    needs: debug
-    runs-on: ubuntu-latest
-    concurrency: group_2
-    steps:
-      - name: Checkout repository and submodules
-        uses: actions/checkout@v3
-        with:
-          ref: ${{inputs.ref || github.ref}}
-          lfs: true # without this flag binaries won't be loaded
-          submodules: recursive
-          token: ${{ secrets.SUBMODULES_GA_TOKEN }}
-      - name: Setup Node
-        uses: actions/setup-node@v3
-        with:
-          node-version: 16
-      - name: Setup Java
-        uses: actions/setup-java@v3
-        with:
-          java-version: 8
-          distribution: "temurin"
-          cache: "maven"
-
-      - name: Setup driver
-        uses: ./.github/actions/drivers/
-        with:
-          chrome: true
-          chrome-version: ${{ inputs.chromedriver-version }}
-          firefox: true
-
-      - name: Test
-        uses: ./.github/actions/tests/
-        with:
-          module: "coverage-playwright"
-          eg: ${{ inputs.EG }}
-        env:
-          APPLITOOLS_API_KEY: ${{ secrets.APPLITOOLS_API_KEY }}
-          APPLITOOLS_API_KEY_READ: ${{ secrets.APPLITOOLS_API_KEY_READ }}
-          SAUCE_USERNAME: ${{ secrets.SAUCE_USERNAME }}
-          SAUCE_ACCESS_KEY: ${{ secrets.SAUCE_ACCESS_KEY }}
-          CHROME_DRIVER_PATH: "/usr/local/bin/chromedriver"
-          FIREFOX_DRIVER_PATH: "/usr/local/bin/geckodriver"
-
-  prepare-deployment:
+  deploy:
     needs:
-      - generic-tests-selenium
-      - generic-tests-playwright
+      - tests
     if: success()
     runs-on: ubuntu-latest
     outputs:
@@ -136,7 +114,7 @@ jobs:
         uses: actions/checkout@v3
         with:
           ref: ${{inputs.ref || github.ref}}
-          lfs: true # without this flag binaries won't be loaded
+          lfs: true
           submodules: recursive
           token: ${{ secrets.SUBMODULES_GA_TOKEN }}
 
@@ -170,6 +148,11 @@ jobs:
       - name: Set version
         run: mvn versions:set-property -Dproperty=revision -DnewVersion=${{ inputs.new_version }}
 
+      - name: Branch out
+        run: |
+          git checkout -b "v${{inputs.new_version}}"
+          git submodule foreach 'git checkout -b "v${{inputs.new_version}}"'
+
       - name: Commit version changes
         run: |
           git config --global user.email "action@github.com"
@@ -180,7 +163,7 @@ jobs:
       - name: Tag and push
         run: |
           git tag $RELEASE_TAG
-          git push origin ${{ inputs.ref || github.ref }} $RELEASE_TAG
+          git push origin "v${{inputs.new_version}}" $RELEASE_TAG
 
       - name: Package project
         run: mvn clean package -P local-build -DskipTests
@@ -223,20 +206,14 @@ jobs:
           GPG_KEY_EMAIL: ${{ secrets.GPG_KEY_EMAIL }}
           GPG_KEY_PASSPHRASE: ${{ secrets.GPG_KEY_PASSPHRASE }}
 
-  fake-deploy:
-    needs:
-      - prepare-deployment
-    if: success()
-    runs-on: ubuntu-latest
-    outputs:
-      APPLITOOLS_REPORT_ID: ${{ needs.prepare-deployment.outputs.APPLITOOLS_REPORT_ID }}
-    steps:
-      - name: deploy will be here
-        run: echo "fake deploy"
+      - name: Publish
+        if: success()
+        run: |
+          echo "deploy maven package here"
 
   fake-merge-to-master:
     needs:
-      - fake-deploy
+      - deploy
     runs-on: ubuntu-latest
     steps:
       - name: merge to master will be here
@@ -245,26 +222,26 @@ jobs:
 
   release-mail:
     needs:
-      - fake-deploy
+      - deploy
     runs-on: ubuntu-latest
     env:
-      APPLITOOLS_REPORT_ID: ${{ needs.fake-deploy.outputs.APPLITOOLS_REPORT_ID }}
+      APPLITOOLS_REPORT_ID: ${{ needs.deploy.outputs.APPLITOOLS_REPORT_ID }}
     steps:
       - name: Debug report id & tag
         run: |
-          echo "env report id: $REPORT_ID"
+          echo "env report id: APPLITOOLS_REPORT_ID"
           echo "env tag: $RELEASE_TAG"
       - name: Checkout repository and submodules
         uses: actions/checkout@v3
         with:
           ref: ${{inputs.ref || github.ref}}
-          lfs: true # without this flag binaries won't be loaded
+          lfs: true
           submodules: recursive
           token: ${{ secrets.SUBMODULES_GA_TOKEN }}
 
       - name: Selenium release mail
         run: |
-          export APPLITOOLS_REPORT_ID=$APPLITOOLS_REPORT_ID-selenium;
+          export APPLITOOLS_REPORT_ID=$APPLITOOLS_REPORT_ID-java_selenium;
           echo "APPLITOOLS_REPORT_ID=$APPLITOOLS_REPORT_ID";
           SDK_VERSION=${{inputs.new_version}};
           chmod +x ./extractChangeLog.sh;
@@ -281,7 +258,7 @@ jobs:
 
       - name: Playwright release mail
         run: |
-          export APPLITOOLS_REPORT_ID=$APPLITOOLS_REPORT_ID-playwright;
+          export APPLITOOLS_REPORT_ID=$APPLITOOLS_REPORT_ID-java_playwright;
           echo "APPLITOOLS_REPORT_ID=$APPLITOOLS_REPORT_ID";
           SDK_VERSION=${{inputs.new_version}};
           chmod +x ./extractChangeLog.sh;
