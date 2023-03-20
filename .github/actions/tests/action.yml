@@ -56,7 +56,7 @@ runs:
       shell: ${{inputs.shell}}
       working-directory: ${{inputs.working-directory}}
       run: |
-        if [[ -z ${{inputs.report-id}} ]]; then
+        if [[ ! -z "${{inputs.report-id}}" ]]; then
           echo APPLITOOLS_REPORT_ID="$(git rev-parse HEAD)-${{inputs.report-id}}" >> $GITHUB_ENV   
         else
           if [[ ${{inputs.module}} == *"coverage-selenium"* ]]; then
