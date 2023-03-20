@@ -27,6 +27,10 @@ public abstract class ReportingTestSuite {
         this.reportSummary.setGroup(groupName);
     }
 
+    protected void setSdkName(String sdkName) {
+        this.reportSummary.setSdkName(sdkName);
+    }
+
     protected void addSuiteArg(String key, Object value) {
         this.suiteArgs.put(key, value);
     }
