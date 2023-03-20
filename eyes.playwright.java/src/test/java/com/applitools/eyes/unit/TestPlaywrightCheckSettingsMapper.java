@@ -15,7 +15,7 @@ public class TestPlaywrightCheckSettingsMapper extends ReportingTestSuite {
 
     @BeforeClass
     public void setup() {
-        super.setGroupName("playwright");
+        super.setGroupName("selenium");
         super.setSdkName("java_playwright");
     }
 

@@ -35,7 +35,7 @@ public class PlaywrightTestSetup extends ReportingTestSuite implements ITest {
 
     @BeforeSuite
     public void beforeSuite() {
-        super.setGroupName("playwright");
+        super.setGroupName("selenium");
         super.setSdkName("java_playwright");
 
         String name = System.getenv("APPLITOOLS_BATCH_NAME");
