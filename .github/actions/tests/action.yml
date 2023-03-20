@@ -120,4 +120,5 @@ runs:
           fi
         fi
       env:
+        BUILD_DIR: ${{ inputs.report-dir }}
         APPLITOOLS_REPORT_ID: ${{ env.APPLITOOLS_REPORT_ID }}
