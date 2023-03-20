@@ -43,21 +43,28 @@ jobs:
   tests:
     needs: debug
     strategy:
+      fail-fast: false
       matrix:
-        module:
-          - eyes.sdk.core
-          - eyes.images.java
-          - eyes.selenium.java
-          - coverage-selenium
-          - eyes.playwright.java
-          - coverage-playwright
         include:
-          - driver: none
-            module: [eyes.sdk.core, eyes.images.java]
-          - report-id: java_playwright
-            module: [eyes.playwright.java, coverage-playwright]
-          - report-id: java_selenium
-            module: [eyes.selenium.java, coverage-selenium]
+          - module: eyes.sdk.core
+          - module: eyes.images.java
+
+          - module: eyes.selenium.java
+            driver: web
+            report-id: java_selenium
+
+          - module: coverage-selenium
+            driver: web
+            report-id: java_selenium
+
+          - module: eyes.playwright.java
+            driver: web
+            report-id: java_playwright
+
+          - module: coverage-playwright
+            driver: web
+            report-id: java_playwright
+
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository and submodules
@@ -81,7 +88,7 @@ jobs:
           cache: "maven"
 
       - name: Setup driver
-        if: ${{ !matrix.driver }}
+        if: ${{ matrix.driver }}
         uses: ./.github/actions/drivers/
         with:
           chrome: true
