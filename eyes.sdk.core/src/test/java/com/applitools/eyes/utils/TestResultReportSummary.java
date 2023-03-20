@@ -14,9 +14,15 @@ public class TestResultReportSummary {
     private String id = null;
 
     @JsonProperty("sdk")
+    private String sdk = "java";
+
+    @JsonProperty("sdk")
     public String getSdkName() {
-        return "java";
+        return sdk;
     }
+
+    @JsonProperty("sdk")
+    public void setSdkName(String sdk) { this.sdk = sdk; }
 
     @JsonProperty("id")
     public String getId() {
