@@ -19,7 +19,7 @@ inputs:
     description: Run on EG (Execution Cloud)
     type: boolean
     default: true
-    required: true
+    required: false
   report-id:
     description: report id
     type: string
@@ -82,7 +82,7 @@ runs:
           if [[ ${{inputs.module}} == *"coverage-playwright"* ]]; then        
             cd coverage-tests;
             chmod +x ./generic_tests.sh;
-            ./generic_tests.sh ${{ env.UFG_ON_EG }} "playwright"
+            ./generic_tests.sh false "playwright"
           else
             mvn test -pl ${{inputs.module}} -e -X        
           fi
