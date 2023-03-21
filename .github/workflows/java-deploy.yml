@@ -101,6 +101,7 @@ jobs:
           module: ${{ matrix.module }}
           eg: ${{ inputs.EG }}
           report-id: ${{ matrix.report-id }}
+          report-level: deploy
         env:
           APPLITOOLS_API_KEY: ${{ secrets.APPLITOOLS_API_KEY }}
           APPLITOOLS_API_KEY_READ: ${{ secrets.APPLITOOLS_API_KEY_READ }}
@@ -116,7 +117,7 @@ jobs:
     if: success()
     runs-on: ubuntu-latest
     outputs:
-      APPLITOOLS_REPORT_ID: ${{ needs.report.outputs.APPLITOOLS_REPORT_ID }}
+      APPLITOOLS_REPORT_ID: ${{ steps.report.outputs.APPLITOOLS_REPORT_ID }}
     steps:
       - name: Checkout repository and submodules
         uses: actions/checkout@v3
