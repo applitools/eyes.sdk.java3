@@ -15,9 +15,9 @@ sh ./../initGeckoDriver.sh;
 export FIREFOX_DRIVER_PATH="/usr/local/bin/geckodriver";
 
 # Setup test type
-IFS=' ' read -ra TEST_TYPE_ARRAY <<< "$TEST_TYPE"
+TEST_TYPE_ARRAY=$(echo "$TEST_TYPE" | jq --raw-input -r 'split(" ")')
 
-function parse_type() {
+parse_type() {
   case $1 in
     unit) echo "unitTestsSuite.xml";;
     it) echo "integrationTestsSuite.xml";;
@@ -36,12 +36,12 @@ if (( ${#TEST_TYPE_ARRAY[@]} > 1 )); then
   done
 else
   # the input is a single value
-  type=$(parse_type "$value")
-  ACTUAL_TEST_TYPE+="$type,"
+  type=$(parse_type "$TEST_TYPE")
+  ACTUAL_TEST_TYPE="$type"
 fi
 
 echo "Test type: $ACTUAL_TEST_TYPE"
-if [[ -z $ACTUAL_TEST_TYPE ]]; then
+if [[ -z "$ACTUAL_TEST_TYPE" ]]; then
   # Run the default suite file
   mvn test -e -X
 else
