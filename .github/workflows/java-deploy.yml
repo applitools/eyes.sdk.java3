@@ -7,22 +7,8 @@ on:
         description: Version to be set
         type: string
         required: true
-      pull_request:
-        description: Is an open PR
-        type: boolean
-        required: false
-        default: true
-      EG:
-        description: Run on EG (Execution Cloud)
-        type: boolean
-        required: false
-        default: true
       ref:
         description: Branch to be used
-        type: string
-        required: false
-      chromedriver-version:
-        description: Chromedriver version
         type: string
         required: false
 
@@ -46,24 +32,30 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - module: eyes.sdk.core
-          - module: eyes.images.java
+          - working-directory: eyes.sdk.core
+          - working-directory: selenium4
 
-          - module: eyes.selenium.java
-            driver: web
+          - working-directory: eyes.images.java
             report-id: java_selenium
 
-          - module: coverage-selenium
-            driver: web
+          - working-directory: eyes.appium.java
             report-id: java_selenium
 
-          - module: eyes.playwright.java
-            driver: web
-            report-id: java_playwright
+          - working-directory: eyes.selenium.java
+            report-id: java_selenium
+            test-type: unit,it,e2e
 
-          - module: coverage-playwright
-            driver: web
+          - working-directory: eyes.selenium.java
+            report-id: java_selenium
+            test-type: coverage
+
+          - working-directory: eyes.playwright.java
             report-id: java_playwright
+            test-type: unit,it,e2e
+
+          - working-directory: eyes.playwright.java
+            report-id: java_playwright
+            test-type: coverage
 
     runs-on: ubuntu-latest
     steps:
@@ -80,40 +72,85 @@ jobs:
         with:
           node-version: 16
 
-      - name: Setup Java
-        uses: actions/setup-java@v3
-        with:
-          java-version: 8
-          distribution: "temurin"
-          cache: "maven"
-
-      - name: Setup driver
-        if: ${{ matrix.driver }}
-        uses: ./.github/actions/drivers/
-        with:
-          chrome: true
-          chrome-version: ${{ inputs.chromedriver-version }}
-          firefox: true
-
       - name: Test
-        uses: ./.github/actions/tests/
+        uses: ./.github/act          ions/tests/
         with:
-          module: ${{ matrix.module }}
-          eg: ${{ inputs.EG }}
+          working-directory: ${{ matrix.working-directory }}
+          test-type: ${{ matrix.test-type }}
           report-id: ${{ matrix.report-id }}
-          report-level: deploy
+          report: deploy
         env:
           APPLITOOLS_API_KEY: ${{ secrets.APPLITOOLS_API_KEY }}
           APPLITOOLS_API_KEY_READ: ${{ secrets.APPLITOOLS_API_KEY_READ }}
           APPLITOOLS_API_KEY_TEST_EYES: ${{ secrets.APPLITOOLS_API_KEY_TEST_EYES }}
           SAUCE_USERNAME: ${{ secrets.SAUCE_USERNAME }}
           SAUCE_ACCESS_KEY: ${{ secrets.SAUCE_ACCESS_KEY }}
-          CHROME_DRIVER_PATH: "/usr/local/bin/chromedriver"
-          FIREFOX_DRIVER_PATH: "/usr/local/bin/geckodriver"
+
+  arm64-tests:
+    needs: setup
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository and submodules
+        uses: actions/checkout@v3
+        with:
+          lfs: true
+          ref: ${{inputs.ref || github.ref}}
+          submodules: recursive
+          token: ${{ secrets.SUBMODULES_GA_TOKEN }}
+      - name: Setup Java
+        uses: actions/setup-java@v3
+        with:
+          java-version: 8
+          distribution: "temurin"
+          cache: "maven"
+      - uses: uraimo/run-on-arch-action@v2
+        with:
+          arch: aarch64
+          distro: ubuntu18.04
+          githubToken: ${{ github.token }}
+          install: |
+            set -e
+            apt-get update
+            apt-get install --no-install-recommends -y ca-certificates maven
+          run: mvn clean install -DskipTests && mvn test -Dtest="TestLinuxArmArchitecture" -DfailIfNoTests=false
+
+  alpine-tests:
+    needs: setup
+    runs-on: ubuntu-latest
+    container: "alpine:latest"
+    steps:
+      - name: Installing dependencies
+        run: |
+          apk add git
+          apk add git-lfs
+          apk add maven
+          apk add --no-cache openjdk8
+          apk add --no-cache libstdc++
+      - name: Checkout repository and submodules
+        uses: actions/checkout@v3
+        with:
+          lfs: true
+          submodules: recursive
+          token: ${{ secrets.SUBMODULES_GA_TOKEN }}
+
+      - name: Set Java path
+        run: echo "JAVA_HOME=$(readlink -f /usr/bin/javac | sed 's:/bin/javac::')" >> $GITHUB_ENV
+
+      - name: Setup Node
+        uses: actions/setup-node@v3
+        with:
+          node-version: 16
+
+      - name: Test
+        run: mvn clean install -DskipTests && mvn test -Dtest="TestAlpineContainer" -DfailIfNoTests=false
+        env:
+          JAVA_HOME: ${{ env.JAVA_HOME }}
 
   deploy:
     needs:
       - tests
+      - arm64-tests
+      - alpine-tests
     if: success()
     runs-on: ubuntu-latest
     outputs:
@@ -126,19 +163,6 @@ jobs:
           lfs: true
           submodules: recursive
           token: ${{ secrets.SUBMODULES_GA_TOKEN }}
-
-      - name: Check for an open pull request on ref
-        if: ${{ inputs.pull_request }}
-        run: |
-          REF=${{inputs.ref || github.ref}}
-          BRANCH_NAME=${REF##*/}
-          IS_PR_OPEN=$(curl "https://api.github.com/repos/applitools/eyes.sdk.java3/pulls?state=open" | jq --arg ref "$BRANCH_NAME" '.[] | select(.head.ref == $ref)')
-          if [ -z "$IS_PR_OPEN" ]; then
-            echo "no open PR for ref $BRANCH_NAME"
-            exit 1
-          else
-            echo "open PR found for ref $BRANCH_NAME"
-          fi
 
       - id: report
         name: Report ID
@@ -220,15 +244,6 @@ jobs:
         run: |
           echo "deploy maven package here"
 
-  fake-merge-to-master:
-    needs:
-      - deploy
-    runs-on: ubuntu-latest
-    steps:
-      - name: merge to master will be here
-        if: ${{inputs.pull_request}}
-        run: echo "fake merge to master"
-
   release-mail:
     needs:
       - deploy
@@ -238,7 +253,7 @@ jobs:
     steps:
       - name: Debug report id & tag
         run: |
-          echo "env report id: APPLITOOLS_REPORT_ID"
+          echo "env report id: $APPLITOOLS_REPORT_ID"
           echo "env tag: $RELEASE_TAG"
       - name: Checkout repository and submodules
         uses: actions/checkout@v3

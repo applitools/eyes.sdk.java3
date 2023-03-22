@@ -6,28 +6,19 @@ inputs:
     description: the path to the directory from repository root
     type: string
     required: false
-  shell:
-    description: shell to use
+  test-type:
+    description: type of testing (unit, e2e, coverage)
     type: string
-    default: bash
+    default: all
     required: false
-  module:
-    description: module to test (core, appium, selenium, images, playwright, coverage-selenium, coverage-playwright)
+  report:
+    description: report level
     type: string
-    required: true
-  eg:
-    description: Run on EG (Execution Cloud)
-    type: boolean
-    default: true
+    default: sandbox
     required: false
   report-id:
     description: report id
     type: string
-    required: false
-  report-level:
-    description: report level
-    type: string
-    default: sandbox
     required: false
   report-dir:
     description: report directory
@@ -38,87 +29,37 @@ inputs:
 runs:
   using: composite
   steps:
+    - name: Setup Java
+      uses: actions/setup-java@v3
+      with:
+        java-version: 8
+        distribution: "temurin"
+        cache: "maven"
+
     - name: Install dependencies
       working-directory: ${{inputs.working-directory}}
-      shell: ${{inputs.shell}}
+      shell: bash
       run: |
         mvn clean install -DskipTests
-        echo "UFG_ON_EG=false" >> $GITHUB_ENV
 
-    - name: Start EG
-      if: ${{ inputs.eg }}
+    - name: Set environment variables
       working-directory: ${{inputs.working-directory}}
-      shell: ${{inputs.shell}}
-      run: |
-        echo "UFG_ON_EG=true" >> $GITHUB_ENV
-
-    - name: Set report id
-      shell: ${{inputs.shell}}
-      working-directory: ${{inputs.working-directory}}
+      shell: bash
       run: |
         if [[ ! -z "${{inputs.report-id}}" ]]; then
-          echo APPLITOOLS_REPORT_ID="$(git rev-parse HEAD)-${{inputs.report-id}}" >> $GITHUB_ENV   
+          echo APPLITOOLS_REPORT_ID="$(git rev-parse HEAD)-${{inputs.report-id}}" >> $GITHUB_ENV
         else
-          if [[ ${{inputs.module}} == *"coverage-selenium"* ]]; then
-            echo APPLITOOLS_REPORT_ID="$(git rev-parse HEAD)-java_selenium" >> $GITHUB_ENV
-          else
-            if [[ ${{inputs.module}} == *"coverage-playwright"* ]]; then        
-              echo APPLITOOLS_REPORT_ID="$(git rev-parse HEAD)-java_playwright" >> $GITHUB_ENV
-            else
-              echo APPLITOOLS_REPORT_ID="$(git rev-parse HEAD)-java_" >> $GITHUB_ENV
-            fi
-          fi
+          echo APPLITOOLS_REPORT_ID="$(git rev-parse HEAD)-java" >> $GITHUB_ENV
         fi
 
-    - name: Test
-      shell: ${{inputs.shell}}
+    - name: Test and report
       working-directory: ${{inputs.working-directory}}
+      shell: bash
       run: |
-        if [[ ${{inputs.module}} == *"coverage-selenium"* ]]; then
-          cd coverage-tests;
-          chmod +x ./generic_tests.sh;
-          ./generic_tests.sh ${{ env.UFG_ON_EG }} "selenium"
-        else
-          if [[ ${{inputs.module}} == *"coverage-playwright"* ]]; then        
-            cd coverage-tests;
-            chmod +x ./generic_tests.sh;
-            ./generic_tests.sh false "playwright"
-          else
-            mvn test -pl ${{inputs.module}} -e -X        
-          fi
-        fi
+        chmod +x runTests.sh;
+        runTests.sh;
       env:
-        BUILD_DIR: ${{ inputs.report-dir }}
-        APPLITOOLS_REPORT_ID: ${{ env.APPLITOOLS_REPORT_ID }}
-
-    - name: Report
-      shell: ${{inputs.shell}}
-      working-directory: ${{inputs.working-directory}}
-      run: |
-        if [[ ${{inputs.module}} == *"coverage-selenium"* ]]; then
-          cd coverage-tests;
-          if [[ ${{inputs.report-level}} == "deploy" ]]; then
-            yarn report:prod-selenium;
-          else
-            yarn report:selenium;
-          fi
-        else
-          if [[ ${{inputs.module}} == *"coverage-playwright"* ]]; then
-            cd coverage-tests;
-            if [[ ${{inputs.report-level}} == "deploy" ]]; then
-              yarn report:prod-playwright;
-            else
-              yarn report:playwright;
-            fi
-          else
-            cd ${{inputs.module}}
-            if [ -d "${{inputs.report-dir}}/report" ]; then
-              sh ./../sendTestResults.sh
-            else
-              echo "No report was created"
-            fi
-          fi
-        fi
-      env:
+        TEST_TYPE: ${{ inputs.test-type }}
+        REPORT_LEVEL: ${{ inputs.report }}
         BUILD_DIR: ${{ inputs.report-dir }}
         APPLITOOLS_REPORT_ID: ${{ env.APPLITOOLS_REPORT_ID }}

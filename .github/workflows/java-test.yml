@@ -40,15 +40,12 @@ on:
         type: boolean
         required: false
         default: false
-      EG:
-        description: Run on EG (Execution Cloud)
-        type: boolean
-        required: false
-        default: true
-      chromedriver-version:
-        description: Chromedriver version
-        type: string
-        required: false
+
+env:
+  APPLITOOLS_API_KEY: ${{ secrets.APPLITOOLS_API_KEY }}
+  APPLITOOLS_API_KEY_TEST_EYES: ${{ secrets.APPLITOOLS_API_KEY_TEST_EYES }}
+  SAUCE_USERNAME: ${{ secrets.SAUCE_USERNAME }}
+  SAUCE_ACCESS_KEY: ${{ secrets.SAUCE_ACCESS_KEY }}
 
 jobs:
   setup:
@@ -75,21 +72,10 @@ jobs:
         with:
           node-version: 16
 
-      - name: Setup Java
-        uses: actions/setup-java@v3
-        with:
-          java-version: 8
-          distribution: "temurin"
-          cache: "maven"
-
       - name: Test
         uses: ./.github/actions/tests/
         with:
-          working-directory: ""
-          shell: bash
-          module: "eyes.sdk.core"
-        env:
-          APPLITOOLS_API_KEY: ${{ secrets.APPLITOOLS_API_KEY }}
+          working-directory: eyes.sdk.core
 
   appium-tests:
     needs: setup
@@ -109,23 +95,10 @@ jobs:
         with:
           node-version: 16
 
-      - name: Setup Java
-        uses: actions/setup-java@v3
-        with:
-          java-version: 8
-          distribution: "temurin"
-          cache: "maven"
-
       - name: Test
         uses: ./.github/actions/tests/
         with:
-          working-directory: ""
-          shell: bash
-          module: "eyes.appium.java"
-        env:
-          APPLITOOLS_API_KEY: ${{ secrets.APPLITOOLS_API_KEY }}
-          SAUCE_USERNAME: ${{ secrets.SAUCE_USERNAME }}
-          SAUCE_ACCESS_KEY: ${{ secrets.SAUCE_ACCESS_KEY }}
+          working-directory: eyes.appium.java
 
   selenium-tests:
     needs: setup
@@ -145,31 +118,11 @@ jobs:
         with:
           node-version: 16
 
-      - name: Setup Java
-        uses: actions/setup-java@v3
-        with:
-          java-version: 8
-          distribution: "temurin"
-          cache: "maven"
-
-      - name: Setup driver
-        uses: ./.github/actions/drivers/
-        with:
-          chrome: true
-          chrome-version: ${{ inputs.chromedriver-version }}
-
       - name: Test
         uses: ./.github/actions/tests/
         with:
-          working-directory: ""
-          shell: bash
-          module: "eyes.selenium.java"
-        env:
-          APPLITOOLS_API_KEY: ${{ secrets.APPLITOOLS_API_KEY }}
-          APPLITOOLS_API_KEY_TEST_EYES: ${{ secrets.APPLITOOLS_API_KEY_TEST_EYES }}
-          SAUCE_USERNAME: ${{ secrets.SAUCE_USERNAME }}
-          SAUCE_ACCESS_KEY: ${{ secrets.SAUCE_ACCESS_KEY }}
-          CHROME_DRIVER_PATH: "/usr/local/bin/chromedriver"
+          working-directory: eyes.selenium.java
+          test-type: unit,it,e2e
 
   playwright-tests:
     needs: setup
@@ -189,28 +142,11 @@ jobs:
         with:
           node-version: 16
 
-      - name: Setup Java
-        uses: actions/setup-java@v3
-        with:
-          java-version: 8
-          distribution: "temurin"
-          cache: "maven"
-
-      - name: Setup driver
-        uses: ./.github/actions/drivers/
-        with:
-          chrome: true
-          chrome-version: ${{ inputs.chromedriver-version }}
-
       - name: Test
         uses: ./.github/actions/tests/
         with:
-          working-directory: ""
-          shell: bash
-          module: "eyes.playwright.java"
-        env:
-          APPLITOOLS_API_KEY: ${{ secrets.APPLITOOLS_API_KEY }}
-          CHROME_DRIVER_PATH: "/usr/local/bin/chromedriver"
+          working-directory: "eyes.playwright.java"
+          test-type: unit,it,e2e
 
   arm64-tests:
     needs: setup
@@ -272,7 +208,6 @@ jobs:
         env:
           JAVA_HOME: ${{ env.JAVA_HOME }}
 
-
   other-tests:
     needs: setup
     runs-on: ubuntu-latest
@@ -290,21 +225,10 @@ jobs:
         with:
           node-version: 16
 
-      - name: Setup Java
-        uses: actions/setup-java@v3
-        with:
-          java-version: 8
-          distribution: "temurin"
-          cache: "maven"
-
       - name: Test
         uses: ./.github/actions/tests/
         with:
-          working-directory: ""
-          shell: bash
-          module: "selenium4"
-        env:
-          APPLITOOLS_API_KEY: ${{ secrets.APPLITOOLS_API_KEY }}
+          working-directory: "selenium4"
 
   images-tests:
     needs: setup
@@ -324,23 +248,10 @@ jobs:
         with:
           node-version: 16
 
-      - name: Setup Java
-        uses: actions/setup-java@v3
-        with:
-          java-version: 8
-          distribution: "temurin"
-          cache: "maven"
-
       - name: Test
         uses: ./.github/actions/tests/
         with:
-          working-directory: ""
-          shell: bash
-          module: "eyes.images.java"
-        env:
-          APPLITOOLS_API_KEY: ${{ secrets.APPLITOOLS_API_KEY }}
-          SAUCE_USERNAME: ${{ secrets.SAUCE_USERNAME }}
-          SAUCE_ACCESS_KEY: ${{ secrets.SAUCE_ACCESS_KEY }}
+          working-directory: "eyes.images.java"
 
   generic-tests-selenium:
     needs: setup
@@ -360,32 +271,11 @@ jobs:
         with:
           node-version: 16
 
-      - name: Setup Java
-        uses: actions/setup-java@v3
-        with:
-          java-version: 8
-          distribution: "temurin"
-          cache: "maven"
-
-      - name: Setup driver
-        uses: ./.github/actions/drivers/
-        with:
-          chrome: true
-          chrome-version: ${{ inputs.chromedriver-version }}
-          firefox: true
-
       - name: Test
         uses: ./.github/actions/tests/
         with:
-          module: "coverage-selenium"
-          eg: ${{ inputs.EG }}
-        env:
-          APPLITOOLS_API_KEY: ${{ secrets.APPLITOOLS_API_KEY }}
-          APPLITOOLS_API_KEY_READ: ${{ secrets.APPLITOOLS_API_KEY_READ }}
-          SAUCE_USERNAME: ${{ secrets.SAUCE_USERNAME }}
-          SAUCE_ACCESS_KEY: ${{ secrets.SAUCE_ACCESS_KEY }}
-          CHROME_DRIVER_PATH: "/usr/local/bin/chromedriver"
-          FIREFOX_DRIVER_PATH: "/usr/local/bin/geckodriver"
+          working-directory: "eyes.selenium.java"
+          test-type: coverage
 
       - name: Save testing artifacts
         if: always()
@@ -415,32 +305,11 @@ jobs:
         with:
           node-version: 16
 
-      - name: Setup Java
-        uses: actions/setup-java@v3
-        with:
-          java-version: 8
-          distribution: "temurin"
-          cache: "maven"
-
-      - name: Setup driver
-        uses: ./.github/actions/drivers/
-        with:
-          chrome: true
-          chrome-version: ${{ inputs.chromedriver-version }}
-          firefox: true
-
       - name: Test
         uses: ./.github/actions/tests/
         with:
-          module: "coverage-playwright"
-          eg: ${{ inputs.EG }}
-        env:
-          APPLITOOLS_API_KEY: ${{ secrets.APPLITOOLS_API_KEY }}
-          APPLITOOLS_API_KEY_READ: ${{ secrets.APPLITOOLS_API_KEY_READ }}
-          SAUCE_USERNAME: ${{ secrets.SAUCE_USERNAME }}
-          SAUCE_ACCESS_KEY: ${{ secrets.SAUCE_ACCESS_KEY }}
-          CHROME_DRIVER_PATH: "/usr/local/bin/chromedriver"
-          FIREFOX_DRIVER_PATH: "/usr/local/bin/geckodriver"
+          working-directory: "eyes.playwright.java"
+          test-type: coverage
 
       - name: Save testing artifacts
         if: always()

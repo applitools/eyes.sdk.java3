@@ -1,0 +1,14 @@
+<!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd" >
+
+<suite name="Playwright E2E Tests" parallel="classes" verbose="1">
+    <listeners>
+        <listener class-name="com.applitools.eyes.utils.ReportingListener"/>
+    </listeners>
+
+    <test name="TestEyesPlaywrightAPI">
+        <classes>
+            <class name="com.applitools.eyes.e2e.TestLocators"/>
+        </classes>
+    </test>
+    
+</suite>
