@@ -2,19 +2,13 @@
 
 <!--TestNG will run all the methods in the same class in the same thread,
 but each class will be run in a separate thread.-->
-<suite name="Java Specific Tests" verbose="1" parallel="classes" thread-count="15">
+<suite name="Java Selenium SDK E2E Tests" verbose="1" parallel="classes" thread-count="15">
     <listeners>
         <listener class-name="com.applitools.eyes.utils.ReportingListener"/>
     </listeners>
 
-    <test name="TestProxy">
-        <classes>
-            <class name="com.applitools.eyes.selenium.TestProxy"/>
-        </classes>
-    </test>
     <test name="TestEyes">
         <classes>
-<!--            <class name="com.applitools.eyes.selenium.TestBatchAPI"/>-->
             <class name="com.applitools.eyes.AutProxyTest"/>
             <class name="com.applitools.eyes.selenium.TestCodedRegionPadding"/>
             <class name="com.applitools.eyes.TestMatchLevel"/>
@@ -22,10 +16,5 @@ but each class will be run in a separate thread.-->
             <class name="com.applitools.eyes.selenium.TestByAll"/>
             <class name="com.applitools.eyes.TestCloseBatch"/>
         </classes>
-    </test>
-    <test name="Unit">
-        <packages>
-            <package name="com.applitools.eyes.unit"/>
-        </packages>
     </test>
 </suite>
