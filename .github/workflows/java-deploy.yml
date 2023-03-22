@@ -43,7 +43,7 @@ jobs:
 
           - working-directory: eyes.selenium.java
             report-id: java_selenium
-            test-type: unit,it,e2e
+            test-type: unit it e2e
 
           - working-directory: eyes.selenium.java
             report-id: java_selenium
@@ -51,7 +51,7 @@ jobs:
 
           - working-directory: eyes.playwright.java
             report-id: java_playwright
-            test-type: unit,it,e2e
+            test-type: unit it e2e
 
           - working-directory: eyes.playwright.java
             report-id: java_playwright
@@ -73,7 +73,7 @@ jobs:
           node-version: 16
 
       - name: Test
-        uses: ./.github/act          ions/tests/
+        uses: ./.github/actions/tests/
         with:
           working-directory: ${{ matrix.working-directory }}
           test-type: ${{ matrix.test-type }}
