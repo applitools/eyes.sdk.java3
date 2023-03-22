@@ -5,13 +5,13 @@ set -e;
 
 # Setup web drivers
 echo "Chromedriver setup"
-chmod +x ./../initChromeDriverGHA.sh;
-sh ./../initChromeDriverGHA.sh;
+chmod +x ./../initChromeDriver.sh;
+sh ./../initChromeDriver.sh;
 export CHROME_DRIVER_PATH="/usr/local/bin/chromedriver";
 
 echo "Geckodriver setup"
-chmod +x ./../initGeckoDriverGHA.sh;
-sh ./../initGeckoDriverGHA.sh;
+chmod +x ./../initGeckoDriver.sh;
+sh ./../initGeckoDriver.sh;
 export FIREFOX_DRIVER_PATH="/usr/local/bin/geckodriver";
 
 # Setup test type
