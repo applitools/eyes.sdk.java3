@@ -4,10 +4,4 @@
     <listeners>
         <listener class-name="com.applitools.eyes.utils.ReportingListener"/>
     </listeners>
-
-    <test name="Unit">
-        <packages>
-            <package name="com.applitools.eyes.unit"/>
-        </packages>
-    </test>
 </suite>

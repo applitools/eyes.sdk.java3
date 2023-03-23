@@ -22,7 +22,7 @@ parse_type() {
   esac
 }
 
-if [[ $(echo $TEST_TYPE_ARRAY | jq length) -gt 1 ]]; then
+if [[ $(echo "$TEST_TYPE_ARRAY" | jq length) -gt 1 ]]; then
   # the input is an array
   for value in $(echo "$TEST_TYPE_ARRAY" | jq --raw-output '.[]'); do
     type=$(parse_type "$value")
@@ -34,7 +34,7 @@ else
   ACTUAL_TEST_TYPE="$type"
 fi
 
-if [[ -z "$ACTUAL_TEST_TYPE" ]]; then
+if [[ -z "$ACTUAL_TEST_TYPE" && "$TEST_TYPE" != *"coverage"* ]]; then
   # Run the default suite file
   mvn test -e -X
 else
@@ -49,14 +49,16 @@ else
   echo "Module report was not created. $BUILD_DIR/report doesn't exist"
 fi
 
-# Run coverage tests
-cd ../coverage-tests;
-chmod +x ./generic_tests.sh;
-sh ./generic_tests.sh false "playwright";
+if [[ "$TEST_TYPE" == *"coverage"* || "$TEST_TYPE" == "all" ]]; then
+  # Run coverage tests
+  cd ../coverage-tests;
+  chmod +x ./generic_tests.sh;
+  sh ./generic_tests.sh false "playwright";
 
-# Send coverage results
-if [[ $REPORT_LEVEL == "deploy" ]]; then
-  yarn report:prod-playwright;
-else
-  yarn report:playwright;
+  # Send coverage results
+  if [[ $REPORT_LEVEL == "deploy" ]]; then
+    yarn report:prod-playwright;
+  else
+    yarn report:playwright;
+  fi
 fi
