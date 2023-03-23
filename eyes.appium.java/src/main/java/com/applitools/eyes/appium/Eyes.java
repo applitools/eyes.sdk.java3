@@ -22,7 +22,6 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.remote.DesiredCapabilities;
 import java.lang.reflect.Method;
 import java.net.URI;
-import java.sql.Timestamp;
 import java.util.List;
 import java.util.Map;
 
@@ -111,9 +110,8 @@ public class Eyes implements IEyesBase {
      */
     public Eyes(EyesRunner runner0) {
         if (runner0 instanceof ClassicRunner) {
-            String warning = "eyes | " + new Timestamp(System.currentTimeMillis())
-                    + " | [warning] | " + "Using Eyes Appium with Eyes Selenium ClassicRunner. " +
-                    "Please use the recommended AppiumRunner for full compatibility.";
+            String warning = GeneralUtils.createEyesMessageWithLevel("Eyes Appium was run with ClassicRunner. " +
+                    "We recommend using AppiumRunner for full compatibility.", "warning");
             System.out.println(warning);
         }
         this.originEyes = new com.applitools.eyes.selenium.Eyes(runner0);
