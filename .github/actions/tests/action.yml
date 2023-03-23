@@ -56,7 +56,7 @@ runs:
       shell: bash
       run: |
         chmod +x runTests.sh;
-        sh ./runTests.sh;
+        ./runTests.sh;
       env:
         TEST_TYPE: ${{ inputs.test-type }}
         REPORT_LEVEL: ${{ inputs.report }}
