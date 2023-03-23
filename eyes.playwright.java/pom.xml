@@ -74,12 +74,6 @@
                     </suiteXmlFiles>
                     <useFile>false</useFile>
                     <trimStackTrace>false</trimStackTrace>
-                    <properties>
-                        <property>
-                            <name>suitethreadpoolsize</name>
-                            <value>3</value>
-                        </property>
-                    </properties>
                 </configuration>
             </plugin>
             <plugin>
