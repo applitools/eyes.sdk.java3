@@ -43,21 +43,22 @@ echo "Testing with type: $TEST_TYPE"
 if [[ ! "$TEST_TYPE" == *"coverage"* ]]; then
   # Run the default suite file
   mvn test -e -X
+
+  # Send module report
+  if [ -d "$BUILD_DIR/report" ]; then
+    chmod +x ./../sendTestResults.sh;
+    sh ./../sendTestResults.sh;
+  else
+    echo "Module report was not created. \"$BUILD_DIR/report\" doesn't exist"
+  fi
 fi
 
-# Send module report
-if [ -d "$BUILD_DIR/report" ]; then
-  chmod +x ./../sendTestResults.sh;
-  sh ./../sendTestResults.sh;
-else
-  echo "Module report was not created. \"$BUILD_DIR/report\" doesn't exist"
-fi
 
 if [[ "$TEST_TYPE" == *"coverage"* || "$TEST_TYPE" == *"all"* ]]; then
   # Run coverage tests
   cd ../coverage-tests;
   chmod +x ./generic_tests.sh;
-  sh ./generic_tests.sh true "selenium";
+  ./generic_tests.sh true "selenium";
 
   # Send coverage results
   if [[ $REPORT_LEVEL == "deploy" ]]; then
