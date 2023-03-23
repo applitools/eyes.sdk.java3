@@ -37,22 +37,26 @@ export CHROME_DRIVER_PATH="/usr/local/bin/chromedriver";
 echo "Testing with type: $TEST_TYPE"
 if [[ ! "$TEST_TYPE" == *"coverage"* ]]; then
   # Run the default suite file
+  echo "Running module specific tests!"
   mvn test -e -X
+
+  # Send module report
+  if [ -d "$BUILD_DIR/report" ]; then
+    chmod +x ./../sendTestResults.sh;
+    sh ./../sendTestResults.sh;
+  else
+    echo "Module report was not created. $BUILD_DIR/report doesn't exist"
+  fi
 fi
 
-# Send module report
-if [ -d "$BUILD_DIR/report" ]; then
-  chmod +x ./../sendTestResults.sh;
-  sh ./../sendTestResults.sh;
-else
-  echo "Module report was not created. $BUILD_DIR/report doesn't exist"
-fi
 
 if [[ "$TEST_TYPE" == *"coverage"* || "$TEST_TYPE" == *"all"* ]]; then
   # Run coverage tests
+  echo "Running coverage tests!"
+
   cd ../coverage-tests;
   chmod +x ./generic_tests.sh;
-  sh ./generic_tests.sh false "playwright";
+  ./generic_tests.sh false "playwright";
 
   # Send coverage results
   if [[ $REPORT_LEVEL == "deploy" ]]; then
