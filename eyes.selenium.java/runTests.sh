@@ -27,7 +27,7 @@ parse_type() {
   esac
 }
 
-if [[ $(echo $TEST_TYPE_ARRAY | jq length) -gt 1 ]]; then
+if [[ $(echo "$TEST_TYPE_ARRAY" | jq length) -gt 1 ]]; then
   # the input is an array
   for value in $(echo "$TEST_TYPE_ARRAY" | jq --raw-output '.[]'); do
     type=$(parse_type "$value")
@@ -39,7 +39,7 @@ else
   ACTUAL_TEST_TYPE="$type"
 fi
 
-if [[ -z "$ACTUAL_TEST_TYPE" ]]; then
+if [[ -z "$ACTUAL_TEST_TYPE" && "$TEST_TYPE" != *"coverage"* ]]; then
   # Run the default suite file
   mvn test -e -X
 else
