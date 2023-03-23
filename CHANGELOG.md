@@ -1,3 +1,10 @@
+## [vNext] - dNext
+### Updated
+- Updated core binaries to `2.4.3`. [Trello 3164](https://trello.com/c/9KdyrqwV)
+### Added
+- Print a warning message when using a ClassicRunner in Eyes Appium. [Trello 3159](https://trello.com/c/QiDD5TOD)
+### Fixed
+
 ## [5.45.0] - 2023-03-18
 ### Updated
 - Updated core binaries to `2.4.0`.
