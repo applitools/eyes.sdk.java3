@@ -41,7 +41,7 @@ public class ClassicRunner extends EyesRunner {
      */
     public ClassicRunner(String baseAgentId, String version) {
         super(baseAgentId, version, null, COMMANDS, listener);
-        managerRef = commandExecutor.coreMakeManager("classic", null, null, baseAgentId);
+        managerRef = commandExecutor.coreMakeManager("classic", null);
 
     }
 
