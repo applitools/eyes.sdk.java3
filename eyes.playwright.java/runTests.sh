@@ -11,6 +11,7 @@ export CHROME_DRIVER_PATH="/usr/local/bin/chromedriver";
 
 # Setup test type
 TEST_TYPE_ARRAY=$(echo "$TEST_TYPE" | jq --raw-input -r 'split(" ")')
+ACTUAL_TEST_TYPE=""
 
 parse_type() {
   case $1 in
@@ -21,11 +22,9 @@ parse_type() {
   esac
 }
 
-ACTUAL_TEST_TYPE=""
-
-if (( ${#TEST_TYPE_ARRAY[@]} > 1 )); then
+if [[ $(echo $TEST_TYPE_ARRAY | jq length) -gt 1 ]]; then
   # the input is an array
-  for value in "${TEST_TYPE_ARRAY[@]}"; do
+  for value in $(echo "$TEST_TYPE_ARRAY" | jq --raw-output '.[]'); do
     type=$(parse_type "$value")
     ACTUAL_TEST_TYPE+="$type,"
   done
@@ -35,7 +34,6 @@ else
   ACTUAL_TEST_TYPE="$type"
 fi
 
-echo "Test type: $ACTUAL_TEST_TYPE"
 if [[ -z "$ACTUAL_TEST_TYPE" ]]; then
   # Run the default suite file
   mvn test -e -X
