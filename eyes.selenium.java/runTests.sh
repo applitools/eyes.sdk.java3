@@ -15,35 +15,33 @@ sh ./../initGeckoDriver.sh;
 export FIREFOX_DRIVER_PATH="/usr/local/bin/geckodriver";
 
 # Setup test type
-TEST_TYPE_ARRAY=$(echo "$TEST_TYPE" | jq --raw-input -r 'split(" ")')
-ACTUAL_TEST_TYPE=""
+#TEST_TYPE_ARRAY=$(echo "$TEST_TYPE" | jq --raw-input -r 'split(" ")')
+#ACTUAL_TEST_TYPE=""
+#
+#parse_type() {
+#  case $1 in
+#    unit) echo "unitTestsSuite.xml";;
+#    it) echo "integrationTestsSuite.xml";;
+#    e2e) echo "e2eTestsSuite.xml";;
+#    *) :;;
+#  esac
+#}
+#
+#if [[ $(echo "$TEST_TYPE_ARRAY" | jq length) -gt 1 ]]; then
+#  # the input is an array
+#  for value in $(echo "$TEST_TYPE_ARRAY" | jq --raw-output '.[]'); do
+#    type=$(parse_type "$value")
+#    ACTUAL_TEST_TYPE+="$type,"
+#  done
+#else
+#  # the input is a single value
+#  type=$(parse_type "$TEST_TYPE")
+#  ACTUAL_TEST_TYPE="$type"
+#fi
 
-parse_type() {
-  case $1 in
-    unit) echo "unitTestsSuite.xml";;
-    it) echo "integrationTestsSuite.xml";;
-    e2e) echo "e2eTestsSuite.xml";;
-    *) :;;
-  esac
-}
-
-if [[ $(echo "$TEST_TYPE_ARRAY" | jq length) -gt 1 ]]; then
-  # the input is an array
-  for value in $(echo "$TEST_TYPE_ARRAY" | jq --raw-output '.[]'); do
-    type=$(parse_type "$value")
-    ACTUAL_TEST_TYPE+="$type,"
-  done
-else
-  # the input is a single value
-  type=$(parse_type "$TEST_TYPE")
-  ACTUAL_TEST_TYPE="$type"
-fi
-
-if [[ -z "$ACTUAL_TEST_TYPE" && "$TEST_TYPE" != *"coverage"* ]]; then
+if [[ "$TEST_TYPE" != *"coverage"* ]]; then
   # Run the default suite file
   mvn test -e -X
-else
-  mvn test -DsuiteFile="$ACTUAL_TEST_TYPE" -e -X
 fi
 
 # Send module report
