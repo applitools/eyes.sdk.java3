@@ -56,7 +56,7 @@ public class USDKListener extends AbstractSDKListener implements WebSocketListen
             switch (response.getName()) {
 
                 case "Core.makeManager":
-                case "Core.makeECClient":
+                case "Core.getECClient":
                 case "Core.locate":
                 case "Core.locateText":
                 case "Core.extractText":
