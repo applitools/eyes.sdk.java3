@@ -37,7 +37,6 @@ runs:
         cache: "maven"
 
     - name: Install dependencies
-      working-directory: ${{inputs.working-directory}}
       shell: bash
       run: |
         mvn clean install -DskipTests
