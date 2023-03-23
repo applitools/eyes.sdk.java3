@@ -8,6 +8,8 @@ echo "Chromedriver setup"
 chmod +x ./../initChromeDriver.sh;
 sh ./../initChromeDriver.sh;
 export CHROME_DRIVER_PATH="/usr/local/bin/chromedriver";
+export FIREFOX_DRIVER_PATH="/usr/local/bin/geckodriver";
+
 
 # Setup test type
 #TEST_TYPE_ARRAY=$(echo "$TEST_TYPE" | jq --raw-input -r 'split(" ")')
