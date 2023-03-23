@@ -34,7 +34,8 @@ export CHROME_DRIVER_PATH="/usr/local/bin/chromedriver";
 #  ACTUAL_TEST_TYPE="$type"
 #fi
 
-if [[ "$TEST_TYPE" != *"coverage"* ]]; then
+echo "Testing with type: $TEST_TYPE"
+if [[ ! "$TEST_TYPE" == *"coverage"* ]]; then
   # Run the default suite file
   mvn test -e -X
 fi
@@ -47,7 +48,7 @@ else
   echo "Module report was not created. $BUILD_DIR/report doesn't exist"
 fi
 
-if [[ "$TEST_TYPE" == *"coverage"* || "$TEST_TYPE" == "all" ]]; then
+if [[ "$TEST_TYPE" == *"coverage"* || "$TEST_TYPE" == *"all"* ]]; then
   # Run coverage tests
   cd ../coverage-tests;
   chmod +x ./generic_tests.sh;
