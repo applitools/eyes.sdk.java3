@@ -9,6 +9,7 @@ import com.applitools.eyes.locators.TextRegion;
 import com.applitools.eyes.locators.TextRegionSettings;
 import com.applitools.eyes.locators.VisualLocatorSettings;
 import com.applitools.eyes.positioning.PositionProvider;
+import com.applitools.eyes.selenium.ClassicRunner;
 import com.applitools.eyes.selenium.positioning.ImageRotation;
 import com.applitools.eyes.selenium.universal.dto.DriverTargetDto;
 import com.applitools.eyes.selenium.universal.mapper.DriverMapper;
@@ -21,6 +22,7 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.remote.DesiredCapabilities;
 import java.lang.reflect.Method;
 import java.net.URI;
+import java.sql.Timestamp;
 import java.util.List;
 import java.util.Map;
 
@@ -108,6 +110,12 @@ public class Eyes implements IEyesBase {
      * @param runner0 the runner
      */
     public Eyes(EyesRunner runner0) {
+        if (runner0 instanceof ClassicRunner) {
+            String warning = "eyes | " + new Timestamp(System.currentTimeMillis())
+                    + " | [warning] | " + "Using Eyes Appium with Eyes Selenium ClassicRunner. " +
+                    "Please use the recommended AppiumRunner for full compatibility.";
+            System.out.println(warning);
+        }
         this.originEyes = new com.applitools.eyes.selenium.Eyes(runner0);
     }
 
