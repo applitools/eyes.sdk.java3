@@ -11,6 +11,7 @@ import com.applitools.eyes.exceptions.NewTestException;
 import com.applitools.eyes.exceptions.StaleElementReferenceException;
 import com.applitools.eyes.exceptions.TestFailedException;
 import com.applitools.eyes.locators.TextRegion;
+import com.applitools.eyes.settings.EyesManagerSettings;
 import com.applitools.eyes.settings.GetResultsSettings;
 import com.applitools.eyes.universal.dto.*;
 import com.applitools.eyes.universal.dto.request.*;
@@ -55,7 +56,7 @@ public class CommandExecutor {
   public MakeECClientResponsePayload coreMakeECClient() {
     RequestDto<MakeECClient> request = new RequestDto<>();
     MakeECClient makeECClient = new MakeECClient();
-    request.setName("Core.makeECClient");
+    request.setName("Core.getECClient");
     request.setKey(UUID.randomUUID().toString());
     request.setPayload(makeECClient);
     SyncTaskListener syncTaskListener = checkedCommand(request);
@@ -69,11 +70,11 @@ public class CommandExecutor {
   }
 
   // TODO - agentId is currently null because this will set the agentID incorrectly in the dashboard/logs
-  public Reference coreMakeManager(String type, Integer concurrency, Integer legacyConcurrency, String agentId) {
+  public Reference coreMakeManager(String type, EyesManagerSettings settings) {
     RequestDto<MakeManager> request = new RequestDto<>();
     request.setName("Core.makeManager");
     request.setKey(UUID.randomUUID().toString());
-    request.setPayload(new MakeManager(type, concurrency, legacyConcurrency, null));
+    request.setPayload(new MakeManager(type, settings));
     SyncTaskListener syncTaskListener = checkedCommand(request);
 
     ResponseDto<Reference> makeManagerResponse = (ResponseDto<Reference>) syncTaskListener.get();

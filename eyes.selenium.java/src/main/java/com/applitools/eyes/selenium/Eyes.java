@@ -1322,8 +1322,8 @@ public class Eyes implements IEyesBase {
     }
 
     /**
-     * ﻿Forces a full page screenshot (by scrolling and stitching) if the
-     * browser only ﻿supports viewport screenshots).
+     * Forces a full page screenshot (by scrolling and stitching) if the
+     * browser only supports viewport screenshots).
      * @param shouldForce Whether to force a full page screenshot or not.
      */
     public void setForceFullPageScreenshot(boolean shouldForce) {

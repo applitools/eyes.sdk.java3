@@ -9,6 +9,7 @@ import com.applitools.eyes.locators.TextRegion;
 import com.applitools.eyes.locators.TextRegionSettings;
 import com.applitools.eyes.locators.VisualLocatorSettings;
 import com.applitools.eyes.positioning.PositionProvider;
+import com.applitools.eyes.selenium.ClassicRunner;
 import com.applitools.eyes.selenium.positioning.ImageRotation;
 import com.applitools.eyes.selenium.universal.dto.DriverTargetDto;
 import com.applitools.eyes.selenium.universal.mapper.DriverMapper;
@@ -108,6 +109,11 @@ public class Eyes implements IEyesBase {
      * @param runner0 the runner
      */
     public Eyes(EyesRunner runner0) {
+        if (runner0 instanceof ClassicRunner) {
+            String warning = GeneralUtils.createEyesMessageWithLevel("Eyes Appium was run with ClassicRunner. " +
+                    "We recommend using AppiumRunner for full compatibility.", "warning");
+            System.out.println(warning);
+        }
         this.originEyes = new com.applitools.eyes.selenium.Eyes(runner0);
     }
 

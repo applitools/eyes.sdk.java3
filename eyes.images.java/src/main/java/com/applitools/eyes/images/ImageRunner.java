@@ -3,6 +3,7 @@ package com.applitools.eyes.images;
 import com.applitools.eyes.EyesRunner;
 import com.applitools.eyes.exceptions.StaleElementReferenceException;
 import com.applitools.eyes.images.universal.mapper.ImageStaleElementReferenceException;
+import com.applitools.eyes.settings.EyesManagerSettings;
 import com.applitools.eyes.universal.ManagerType;
 import com.applitools.eyes.universal.USDKListener;
 import com.applitools.utils.ClassVersionGetter;
@@ -35,7 +36,7 @@ public class ImageRunner extends EyesRunner {
      */
     public ImageRunner(String baseAgentId, String version) {
         super(baseAgentId, version, listener);
-        managerRef = commandExecutor.coreMakeManager(ManagerType.CLASSIC.value, null, null, baseAgentId);
+        managerRef = commandExecutor.coreMakeManager(ManagerType.CLASSIC.value, null);
     }
 
     @Override

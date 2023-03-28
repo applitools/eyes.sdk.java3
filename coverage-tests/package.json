@@ -24,9 +24,9 @@
     "test": "yarn generate:eg && mvn test -DsuiteFile=EGSuite.xml",
     "test:local": "yarn generate && mvn test",
     "report:selenium": "yarn move:report-selenium && yarn rename:report-selenium && coverage-tests report ./configuration  --sandbox$( [ -z $APPLITOOLS_REPORT_ID ] || echo \" --reportId $APPLITOOLS_REPORT_ID\" )",
-    "report:playwright": "yarn move:report-playwright && yarn rename:report-playwright && coverage-tests report ./configuration  --sandbox$( [ -z $APPLITOOLS_REPORT_ID ] || echo \" --reportId $APPLITOOLS_REPORT_ID\" )",
+    "report:playwright": "yarn move:report-playwright && yarn rename:report-playwright && coverage-tests report ./configuration/playwright.js  --sandbox$( [ -z $APPLITOOLS_REPORT_ID ] || echo \" --reportId $APPLITOOLS_REPORT_ID\" )",
     "report:prod-selenium": "yarn move:report-selenium && yarn rename:report-selenium && coverage-tests report ./configuration --reportId $APPLITOOLS_REPORT_ID",
-    "report:prod-playwright": "yarn move:report-playwright && yarn rename:report-playwright && coverage-tests report ./configuration --reportId $APPLITOOLS_REPORT_ID",
+    "report:prod-playwright": "yarn move:report-playwright && yarn rename:report-playwright && coverage-tests report ./configuration/playwright.js --reportId $APPLITOOLS_REPORT_ID",
     "move:report-selenium": "mv ./target/surefire-reports/java_coverage_tests/coverage-tests-selenium.xml ./coverage-tests-selenium.xml",
     "move:report-playwright": "mv ./target/surefire-reports/java_coverage_tests/coverage-tests-playwright.xml ./coverage-tests-playwright.xml",
     "rename:report-selenium": "mv ./coverage-tests-selenium.xml ./coverage-test-report.xml",
@@ -36,7 +36,7 @@
     "universal:eg": "ec-client --port 8080"
   },
   "dependencies": {
-    "@applitools/sdk-coverage-tests": "^2.7.0",
+    "@applitools/sdk-coverage-tests": "2.7.12",
     "@applitools/ec-client": "^1.2.8"
   }
 }

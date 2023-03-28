@@ -1,0 +1,16 @@
+<!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd" >
+
+<!--TestNG will run all the methods in the same class in the same thread,
+but each class will be run in a separate thread.-->
+<suite name="Java Selenium SDK Unit Tests" verbose="1" parallel="classes" thread-count="15">
+    <listeners>
+        <listener class-name="com.applitools.eyes.utils.ReportingListener"/>
+    </listeners>
+
+    <test name="Unit">
+        <packages>
+            <package name="com.applitools.eyes.unit"/>
+        </packages>
+    </test>
+
+</suite>

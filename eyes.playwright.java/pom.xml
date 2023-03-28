@@ -12,7 +12,7 @@
     <parent>
         <artifactId>eyes-sdk-java5-parent</artifactId>
         <groupId>com.applitools</groupId>
-        <version>5.45.0</version>
+        <version>${revision}</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
 
@@ -25,7 +25,7 @@
         <dependency>
             <groupId>com.applitools</groupId>
             <artifactId>eyes-sdk-core-java5</artifactId>
-            <version>5.45.0</version>
+            <version>${project.version}</version>
             <exclusions>
                 <exclusion>
                     <groupId>com.applitools</groupId>
@@ -36,7 +36,14 @@
         <dependency>
             <groupId>com.applitools</groupId>
             <artifactId>eyes-connectivity-java5-jersey2x</artifactId>
-            <version>5.45.0</version>
+            <version>${project.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.applitools</groupId>
+            <artifactId>eyes-sdk-core-java5</artifactId>
+            <version>${project.version}</version>
+            <type>test-jar</type>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -45,15 +52,15 @@
             <version>31.1-jre</version>
             <scope>compile</scope>
         </dependency>
-        <!--    for sdk.core test sources    -->
-        <dependency>
-            <groupId>com.applitools</groupId>
-            <artifactId>eyes-sdk-core-java5</artifactId>
-            <version>5.45.0</version>
-            <type>test-jar</type>
-            <scope>test</scope>
-        </dependency>
     </dependencies>
+
+    <properties>
+        <unitSuiteFile>unitTestsSuite.xml</unitSuiteFile>
+        <e2eSuiteFile>e2eTestsSuite.xml</e2eSuiteFile>
+
+        <defaultSuiteFile>${unitSuiteFile},${e2eSuiteFile}</defaultSuiteFile>
+        <suiteFile>${defaultSuiteFile}</suiteFile>
+    </properties>
 
     <build>
         <plugins>
@@ -63,7 +70,7 @@
                 <version>2.22.0</version>
                 <configuration>
                     <suiteXmlFiles>
-                        <suiteXmlFile>playwrightTestSuite.xml</suiteXmlFile>
+                        <suiteXmlFile>${suiteFile}</suiteXmlFile>
                     </suiteXmlFiles>
                     <useFile>false</useFile>
                     <trimStackTrace>false</trimStackTrace>

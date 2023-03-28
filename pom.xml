@@ -6,7 +6,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.applitools</groupId>
     <artifactId>eyes-sdk-java5-parent</artifactId>
-    <version>5.45.0</version>
+    <version>${revision}</version>
     <packaging>pom</packaging>
     <name>eyes-sdk-java5-parent</name>
     <url>http://www.applitools.com</url>
@@ -36,6 +36,10 @@
             <timezone>+2</timezone>
         </developer>
     </developers>
+
+    <properties>
+        <revision>5.45.0</revision>
+    </properties>
 
     <dependencies>
         <dependency>
@@ -92,6 +96,31 @@
                     <target>1.7</target>
                 </configuration>
             </plugin>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>flatten-maven-plugin</artifactId>
+                <version>1.1.0</version>
+                <configuration>
+                    <updatePomFile>true</updatePomFile>
+                    <flattenMode>resolveCiFriendliesOnly</flattenMode>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>flatten</id>
+                        <phase>process-resources</phase>
+                        <goals>
+                            <goal>flatten</goal>
+                        </goals>
+                    </execution>
+                    <execution>
+                        <id>flatten.clean</id>
+                        <phase>clean</phase>
+                        <goals>
+                            <goal>clean</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
         </plugins>
     </build>
 
@@ -111,11 +140,6 @@
     </modules>
 
     <distributionManagement>
-<!--        <repository>-->
-<!--            <id>jfrog</id>-->
-<!--            <name>a0l3cvxwnhctv-artifactory-primary-0-releases</name>-->
-<!--            <url>https://applitools.jfrog.io/artifactory/java5canary</url>-->
-<!--        </repository>-->
         <snapshotRepository>
             <id>ossrh</id>
             <url>https://oss.sonatype.org/content/repositories/snapshots</url>
@@ -207,7 +231,7 @@
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-assembly-plugin</artifactId>
-                        <version>3.1.0</version>
+                        <version>3.3.0</version>
                         <configuration>
                             <descriptors>
                                 <descriptor>src/assembly/bin.xml</descriptor>

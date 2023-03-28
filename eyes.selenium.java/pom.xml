@@ -12,7 +12,7 @@
     <parent>
         <groupId>com.applitools</groupId>
         <artifactId>eyes-sdk-java5-parent</artifactId>
-        <version>5.45.0</version>
+        <version>${revision}</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
 
@@ -20,24 +20,24 @@
         <dependency>
             <groupId>com.applitools</groupId>
             <artifactId>eyes-common-java5</artifactId>
-            <version>5.45.0</version>
+            <version>${project.version}</version>
         </dependency>
         <dependency>
             <groupId>com.applitools</groupId>
             <artifactId>eyes-selenium-common-java5</artifactId>
-            <version>5.45.0</version>
+            <version>${project.version}</version>
         </dependency>
         <dependency>
             <groupId>com.applitools</groupId>
             <artifactId>eyes-sdk-core-java5</artifactId>
-            <version>5.45.0</version>
+            <version>${project.version}</version>
             <type>test-jar</type>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>com.applitools</groupId>
             <artifactId>eyes-universal-core</artifactId>
-            <version>5.45.0</version>
+            <version>${project.version}</version>
         </dependency>
         <dependency>
             <groupId>com.helger</groupId>
@@ -64,6 +64,15 @@
         </dependency>
     </dependencies>
 
+    <properties>
+        <unitSuiteFile>unitTestsSuite.xml</unitSuiteFile>
+        <integrationSuiteFile>integrationTestsSuite.xml</integrationSuiteFile>
+        <e2eSuiteFile>e2eTestsSuite.xml</e2eSuiteFile>
+
+        <defaultSuiteFile>${unitSuiteFile},${integrationSuiteFile},${e2eSuiteFile}</defaultSuiteFile>
+        <suiteFile>${defaultSuiteFile}</suiteFile>
+    </properties>
+
     <build>
         <plugins>
             <plugin>
@@ -72,7 +81,7 @@
                 <version>2.22.0</version>
                 <configuration>
                     <suiteXmlFiles>
-                        <suiteXmlFile>SpecificTestsSuite.xml</suiteXmlFile>
+                        <suiteXmlFile>${suiteFile}</suiteXmlFile>
                     </suiteXmlFiles>
                     <useFile>false</useFile>
                     <trimStackTrace>false</trimStackTrace>

@@ -1,5 +1,6 @@
 package com.applitools.eyes.universal.dto;
 
+import com.applitools.eyes.settings.EyesManagerSettings;
 import com.fasterxml.jackson.annotation.JsonInclude;
 
 /**
@@ -14,25 +15,13 @@ public class MakeManager {
   private String type;
 
   /**
-   * concurrency
+   * manager settings
    */
-  private Integer concurrency;
+  private EyesManagerSettings settings;
 
-  /**
-   * legacy concurrency
-   */
-  private Integer legacyConcurrency;
-
-  /**
-   * agent ID
-   */
-  private String agentId;
-
-  public MakeManager(String type, Integer concurrency, Integer legacyConcurrency, String agentId) {
+  public MakeManager(String type, EyesManagerSettings settings) {
     this.type = type;
-    this.concurrency = concurrency;
-    this.legacyConcurrency = legacyConcurrency;
-    this.agentId = agentId;
+    this.settings = settings;
   }
 
   public String getType() {
@@ -43,37 +32,19 @@ public class MakeManager {
     this.type = type;
   }
 
-  public Integer getConcurrency() {
-    return concurrency;
+  public EyesManagerSettings getSettings() {
+    return settings;
   }
 
-  public void setConcurrency(Integer concurrency) {
-    this.concurrency = concurrency;
-  }
-
-  public Integer getLegacyConcurrency() {
-    return legacyConcurrency;
-  }
-
-  public void setLegacyConcurrency(Integer legacyConcurrency) {
-    this.legacyConcurrency = legacyConcurrency;
-  }
-
-  public String getAgentId() {
-    return agentId;
-  }
-
-  public void setAgentId(String agentId) {
-    this.agentId = agentId;
+  public void setSettings(EyesManagerSettings settings) {
+    this.settings = settings;
   }
 
   @Override
   public String toString() {
     return "MakeManager{" +
         "type='" + type + '\'' +
-        ", concurrency=" + concurrency +
-        ", legacyConcurrency=" + legacyConcurrency +
-        ", agentId=" + agentId +
+        ", settings=" + settings +
         '}';
   }
 }

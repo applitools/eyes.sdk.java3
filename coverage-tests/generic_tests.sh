@@ -6,6 +6,7 @@
 RESULT=0
 MESSAGE=""
 
+mvn clean install -DskipTests
 yarn install
 if [ "$?" -ne 0 ]; then
     ((RESULT+=1))
@@ -37,9 +38,9 @@ fi
 # start eg client and save process id
 if [[ "$1" == "true" ]]; then
   export APPLITOOLS_SHOW_LOGS=true
+  export EXECUTION_GRID_URL=http://localhost:8080
   yarn universal:eg &
   EG_PID="$!"
-  export EXECUTION_GRID_URL=http://localhost:8080
 fi
 
 mvn clean test
