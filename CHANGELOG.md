@@ -1,6 +1,7 @@
 ## [vNext] - dNext
 ### Updated
 - Updated core binaries to `2.4.3`. [Trello 3164](https://trello.com/c/9KdyrqwV)
+- Updated Selenium to `4.8.3`.
 ### Added
 - Print a warning message when using a ClassicRunner in Eyes Appium. [Trello 3159](https://trello.com/c/QiDD5TOD)
 ### Fixed
