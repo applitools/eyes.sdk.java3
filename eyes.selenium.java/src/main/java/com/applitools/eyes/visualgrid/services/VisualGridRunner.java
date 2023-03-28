@@ -5,6 +5,7 @@ import com.applitools.eyes.AutProxySettings;
 import com.applitools.eyes.EyesRunner;
 import com.applitools.eyes.Logger;
 import com.applitools.eyes.selenium.exceptions.StaleElementReferenceException;
+import com.applitools.eyes.settings.EyesManagerSettings;
 import com.applitools.eyes.universal.ManagerType;
 import com.applitools.eyes.universal.USDKListener;
 import com.applitools.utils.ArgumentGuard;
@@ -49,7 +50,8 @@ public class VisualGridRunner extends EyesRunner {
     public VisualGridRunner(int testConcurrency, String suiteName) {
         super(BASE_AGENT_ID, VERSION, listener);
         this.runnerOptions = new RunnerOptions().testConcurrency(testConcurrency);
-        managerRef = commandExecutor.coreMakeManager(ManagerType.VISUAL_GRID.value, null, testConcurrency, BASE_AGENT_ID);
+        EyesManagerSettings managerSettings = new EyesManagerSettings(null, testConcurrency, null);
+        managerRef = commandExecutor.coreMakeManager(ManagerType.VISUAL_GRID.value, managerSettings);
     }
 
     public VisualGridRunner(RunnerOptions runnerOptions) {
@@ -60,19 +62,22 @@ public class VisualGridRunner extends EyesRunner {
         super(BASE_AGENT_ID, VERSION, runnerOptions, listener);
         this.runnerOptions = runnerOptions;
         int testConcurrency = runnerOptions.getTestConcurrency() == null ? DEFAULT_CONCURRENCY : runnerOptions.getTestConcurrency();
-        managerRef = commandExecutor.coreMakeManager(ManagerType.VISUAL_GRID.value, testConcurrency, null, BASE_AGENT_ID);
+        EyesManagerSettings managerSettings = new EyesManagerSettings(testConcurrency, null, null);
+        managerRef = commandExecutor.coreMakeManager(ManagerType.VISUAL_GRID.value, managerSettings);
     }
 
     protected VisualGridRunner(String baseAgentId, String version) {
         super(baseAgentId, version, listener);
         this.runnerOptions = new RunnerOptions().testConcurrency(DEFAULT_CONCURRENCY);
-        managerRef = commandExecutor.coreMakeManager(ManagerType.VISUAL_GRID.value, DEFAULT_CONCURRENCY, null, BASE_AGENT_ID);
+        EyesManagerSettings managerSettings = new EyesManagerSettings(DEFAULT_CONCURRENCY, null, null);
+        managerRef = commandExecutor.coreMakeManager(ManagerType.VISUAL_GRID.value, managerSettings);
     }
 
     protected VisualGridRunner(int testConcurrency, String baseAgentId, String version) {
         super(baseAgentId, version, listener);
         this.runnerOptions = new RunnerOptions().testConcurrency(testConcurrency);
-        managerRef = commandExecutor.coreMakeManager(ManagerType.VISUAL_GRID.value, null, testConcurrency, BASE_AGENT_ID);
+        EyesManagerSettings managerSettings = new EyesManagerSettings(null, testConcurrency, null);
+        managerRef = commandExecutor.coreMakeManager(ManagerType.VISUAL_GRID.value, managerSettings);
     }
 
     protected VisualGridRunner(RunnerOptions runnerOptions,  String baseAgentId, String version) {
@@ -80,7 +85,8 @@ public class VisualGridRunner extends EyesRunner {
         ArgumentGuard.notNull(runnerOptions, "runnerOptions");
         this.runnerOptions = runnerOptions;
         int testConcurrency = runnerOptions.getTestConcurrency() == null ? DEFAULT_CONCURRENCY : runnerOptions.getTestConcurrency();
-        managerRef = commandExecutor.coreMakeManager(ManagerType.VISUAL_GRID.value, testConcurrency, null, BASE_AGENT_ID);
+        EyesManagerSettings managerSettings = new EyesManagerSettings(testConcurrency, null, null);
+        managerRef = commandExecutor.coreMakeManager(ManagerType.VISUAL_GRID.value, managerSettings);
     }
 
     @Override

@@ -358,7 +358,6 @@ public class PSDKListener extends AbstractSDKListener {
                     break;
 
                 case "Core.makeManager":
-                case "Core.makeECClient":
                 case "Core.locate":
                 case "Core.locateText":
                 case "Core.extractText":
