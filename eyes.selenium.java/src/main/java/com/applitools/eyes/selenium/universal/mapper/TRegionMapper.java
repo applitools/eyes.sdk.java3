@@ -6,7 +6,7 @@ import java.util.stream.Collectors;
 
 import com.applitools.ICheckSettings;
 import com.applitools.eyes.Region;
-import com.applitools.eyes.fluent.GetSimpleRegion;
+import com.applitools.eyes.fluent.GetRegion;
 import com.applitools.eyes.fluent.SimpleRegionByRectangle;
 import com.applitools.eyes.selenium.TargetPathLocator;
 import com.applitools.eyes.selenium.fluent.SeleniumCheckSettings;
@@ -22,7 +22,7 @@ import org.openqa.selenium.WebElement;
  */
 public class TRegionMapper {
 
-  public static TRegion toTRegion(GetSimpleRegion getSimpleRegion) {
+  public static TRegion toTRegion(GetRegion getSimpleRegion) {
     if (getSimpleRegion == null) {
       return null;
     }
@@ -40,7 +40,7 @@ public class TRegionMapper {
     return null;
   }
 
-  public static List<TRegion> toTRegionList(List<GetSimpleRegion> getSimpleRegionList) {
+  public static List<TRegion> toTRegionList(List<GetRegion> getSimpleRegionList) {
     if (getSimpleRegionList == null || getSimpleRegionList.isEmpty()) {
       return null;
     }

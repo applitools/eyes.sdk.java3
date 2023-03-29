@@ -1,7 +1,6 @@
 package com.applitools.eyes.selenium;
 
 import com.applitools.ICheckSettings;
-import com.applitools.connectivity.ServerConnector;
 import com.applitools.eyes.*;
 import com.applitools.eyes.config.Configuration;
 import com.applitools.eyes.config.ConfigurationProvider;
@@ -11,21 +10,18 @@ import com.applitools.eyes.locators.*;
 import com.applitools.eyes.positioning.PositionProvider;
 import com.applitools.eyes.selenium.fluent.SeleniumCheckSettings;
 import com.applitools.eyes.selenium.fluent.Target;
-import com.applitools.eyes.selenium.frames.FrameChain;
 import com.applitools.eyes.selenium.positioning.ImageRotation;
 import com.applitools.eyes.selenium.universal.dto.DriverTargetDto;
 import com.applitools.eyes.selenium.universal.mapper.CheckSettingsMapper;
 import com.applitools.eyes.selenium.universal.mapper.DriverMapper;
 import com.applitools.eyes.selenium.universal.mapper.OCRExtractSettingsDtoMapper;
 import com.applitools.eyes.settings.GetResultsSettings;
-import com.applitools.eyes.triggers.MouseAction;
 import com.applitools.eyes.universal.CommandExecutor;
 import com.applitools.eyes.universal.Reference;
 import com.applitools.eyes.universal.dto.*;
 import com.applitools.eyes.universal.dto.response.CommandEyesGetResultsResponseDto;
 import com.applitools.eyes.universal.mapper.*;
 import com.applitools.eyes.visualgrid.model.IDebugResourceWriter;
-import com.applitools.eyes.visualgrid.model.RenderingInfo;
 import com.applitools.eyes.visualgrid.services.VisualGridRunner;
 import com.applitools.utils.ArgumentGuard;
 import org.openqa.selenium.By;
@@ -33,6 +29,7 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -470,7 +467,11 @@ public class Eyes implements IEyesBase {
      * @return the default server url
      */
     public static URI getDefaultServerUrl() {
-        return SeleniumEyes.getDefaultServerUrl();
+        try {
+            return new URI(IEyesBase.APPLITOOLS_PUBLIC_CLOUD_URL);
+        } catch (URISyntaxException ex) {
+            throw new EyesException(ex.getMessage(), ex);
+        }
     }
 
     /**
@@ -1231,43 +1232,6 @@ public class Eyes implements IEyesBase {
     }
 
     /**
-     * Adds a mouse trigger.
-     * @param action  Mouse action.
-     * @param control The control on which the trigger is activated (context relative coordinates).
-     * @param cursor  The cursor's position relative to the control.
-     */
-    public void addMouseTrigger(MouseAction action, Region control, Location cursor) {
-        //this.seleniumEyes.addMouseTrigger(action, control, cursor);
-    }
-
-    /**
-     * Adds a mouse trigger.
-     * @param action  Mouse action.
-     * @param element The WebElement on which the click was called.
-     */
-    public void addMouseTrigger(MouseAction action, WebElement element) {
-        //this.seleniumEyes.addMouseTrigger(action, element);
-    }
-
-    /**
-     * Adds a keyboard trigger.
-     * @param control The control's context-relative region.
-     * @param text    The trigger's text.
-     */
-    public void addTextTrigger(Region control, String text) {
-        //this.seleniumEyes.addTextTrigger(control, text);
-    }
-
-    /**
-     * Adds a keyboard trigger.
-     * @param element The element for which we sent keys.
-     * @param text    The trigger's text.
-     */
-    public void addTextTrigger(WebElement element, String text) {
-        //this.seleniumEyes.addTextTrigger(element, text);
-    }
-
-    /**
      * Use this method only if you made a previous call to {@link #open
      * (WebDriver, String, String)}*** or one of its variants.
      * <p>
@@ -1301,7 +1265,7 @@ public class Eyes implements IEyesBase {
      */
     public static void setViewportSize(WebDriver driver, RectangleSize size) {
         ArgumentGuard.notNull(driver, "driver");
-        EyesDriverUtils.setViewportSize(new Logger(), driver, size);
+//        EyesDriverUtils.setViewportSize(new Logger(), driver, size);
     }
 
     /**
@@ -1630,18 +1594,6 @@ public class Eyes implements IEyesBase {
     }
 
     /**
-     * Sets the server connector to use. MUST BE SET IN ORDER FOR THE EYES OBJECT TO WORK!
-     * @param serverConnector The server connector object to use.
-     */
-    public void setServerConnector(ServerConnector serverConnector) {
-//        this.seleniumEyes.setServerConnector(serverConnector);
-//        if (this.isVisualGridEyes) {
-//            this.visualGridEyes.setServerConnector(serverConnector);
-//        }
-    }
-
-
-    /**
      * Gets proxy.
      * @return The current proxy settings used by the server connector, or {@code null} if no proxy is set.
      */
@@ -1740,6 +1692,7 @@ public class Eyes implements IEyesBase {
      * Gets position provider.
      * @return The currently set position provider.
      */
+    @Deprecated
     public PositionProvider getPositionProvider() {
         return null;
     }
@@ -1748,6 +1701,7 @@ public class Eyes implements IEyesBase {
      * Sets position provider.
      * @param positionProvider The position provider to be used.
      */
+    @Deprecated
     public void setPositionProvider(PositionProvider positionProvider) {
         //this.seleniumEyes.setPositionProvider(positionProvider);
     }
@@ -1756,6 +1710,7 @@ public class Eyes implements IEyesBase {
      * Sets explicit viewport size.
      * @param explicitViewportSize sets the viewport
      */
+    @Deprecated
     public void setExplicitViewportSize(RectangleSize explicitViewportSize) {
         //this.seleniumEyes.setExplicitViewportSize(explicitViewportSize);
     }
@@ -1798,14 +1753,6 @@ public class Eyes implements IEyesBase {
      */
     public void setHostApp(String hostApp) {
         this.configuration.setHostApp(hostApp);
-    }
-
-    /**
-     * for internal usage
-     * @return rendering info
-     */
-    public RenderingInfo getRenderingInfo() {
-        return null;
     }
 
     /**
@@ -1865,6 +1812,7 @@ public class Eyes implements IEyesBase {
         return this.configuration.getIgnoreDisplacements();
     }
 
+    @Deprecated
     public void setDebugResourceWriter(IDebugResourceWriter debugResourceWriter) {
         this.configuration.setDebugResourceWriter(debugResourceWriter);
     }
@@ -1890,19 +1838,11 @@ public class Eyes implements IEyesBase {
     }
 
     /**
-     * Gets original fc.
-     * @return Original frame chain
-     */
-    public FrameChain getOriginalFC() {
-        return null;
-    }
-
-    /**
      * Gets current frame position provider.
      * @return get Current Frame Position Provider
      */
+    @Deprecated
     public PositionProvider getCurrentFramePositionProvider() {
-        //return this.seleniumEyes.getCurrentFramePositionProvider();
         return null;
     }
 
@@ -1910,6 +1850,7 @@ public class Eyes implements IEyesBase {
      * Gets region to check.
      * @return the region to check
      */
+    @Deprecated
     public Region getRegionToCheck() {
         return null;
     }
@@ -1918,23 +1859,16 @@ public class Eyes implements IEyesBase {
      * Sets region to check.
      * @param regionToCheck the region to check
      */
+    @Deprecated
     public void setRegionToCheck(Region regionToCheck) {
-
     }
 
     /**
      * Gets current frame scroll root element.
      * @return the current scroll root web element
      */
+    @Deprecated
     public WebElement getCurrentFrameScrollRootElement() {
-        return null;
-    }
-
-    /**
-     * Gets server connector.
-     * @return the server connector
-     */
-    public ServerConnector getServerConnector() {
         return null;
     }
 

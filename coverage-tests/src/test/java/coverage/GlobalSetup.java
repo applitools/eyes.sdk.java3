@@ -1,16 +1,11 @@
 package coverage;
 
 //import com.applitools.connectivity.RestClient;
-import com.applitools.connectivity.ServerConnector;
 import com.applitools.eyes.*;
 import coverage.exceptions.MissingEnvVarException;
 import org.openqa.selenium.WebDriver;
 import org.testng.annotations.AfterSuite;
 import org.testng.annotations.BeforeSuite;
-
-import javax.ws.rs.HttpMethod;
-import javax.ws.rs.core.UriBuilder;
-import java.net.URI;
 
 public class GlobalSetup {
 

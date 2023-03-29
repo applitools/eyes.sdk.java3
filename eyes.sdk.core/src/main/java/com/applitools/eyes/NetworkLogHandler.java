@@ -1,6 +1,5 @@
 package com.applitools.eyes;
 
-import com.applitools.connectivity.ServerConnector;
 import com.applitools.connectivity.api.AsyncRequestCallback;
 import com.applitools.connectivity.api.Response;
 import com.applitools.eyes.logging.ClientEvent;
@@ -18,10 +17,10 @@ public class NetworkLogHandler extends LogHandler {
 
     private static final int MAX_EVENTS_SIZE = 100;
 
-    private final ServerConnector serverConnector;
+    private final Object serverConnector;
     final LogSessionsClientEvents clientEvents;
 
-    protected NetworkLogHandler(ServerConnector serverConnector) {
+    protected NetworkLogHandler(Object serverConnector) {
         super(TraceLevel.Notice);
         ArgumentGuard.notNull(serverConnector, "serverConnector");
         this.serverConnector = serverConnector;
@@ -58,28 +57,13 @@ public class NetworkLogHandler extends LogHandler {
             }
 
             final SyncTaskListener<Void> listener = new SyncTaskListener<>(null, "sendLogs");
-            serverConnector.sendLogs(new AsyncRequestCallback() {
-                @Override
-                public void onComplete(Response response) {
-                    if (response.getStatusCode() != HttpStatus.SC_OK) {
-                        System.out.printf("Failed sending logs. Status code %d%n", response.getStatusCode());
-                    }
-                    listener.onComplete(null);
-                }
-
-                @Override
-                public void onFail(Throwable throwable) {
-                    System.out.printf("Failed sending logs: %s%n", throwable);
-                    listener.onComplete(null);
-                }
-            }, clientEvents);
 
            listener.get();
            clientEvents.clear();
         }
     }
 
-    public static void sendSingleLog(ServerConnector serverConnector, TraceLevel level, String message) {
+    public static void sendSingleLog(Object serverConnector, TraceLevel level, String message) {
         String currentTime = GeneralUtils.toISO8601DateTime(Calendar.getInstance(TimeZone.getTimeZone("UTC")));
         ClientEvent event = new ClientEvent(currentTime, message, level);
         NetworkLogHandler logHandler = new NetworkLogHandler(serverConnector);
@@ -89,12 +73,11 @@ public class NetworkLogHandler extends LogHandler {
 
     @Override
     public boolean equals(Object other) {
-        return other instanceof NetworkLogHandler &&
-                ((NetworkLogHandler) other).serverConnector.getServerUrl().equals(serverConnector.getServerUrl());
+        return other instanceof NetworkLogHandler;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(serverConnector.getServerUrl());
+        return Objects.hash(serverConnector);
     }
 }

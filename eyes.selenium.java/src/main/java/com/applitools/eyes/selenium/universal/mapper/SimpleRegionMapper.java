@@ -3,7 +3,7 @@ package com.applitools.eyes.selenium.universal.mapper;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import com.applitools.eyes.fluent.GetSimpleRegion;
+import com.applitools.eyes.fluent.GetRegion;
 import com.applitools.eyes.fluent.SimpleRegionByRectangle;
 import com.applitools.eyes.selenium.fluent.SimpleRegionByElement;
 import com.applitools.eyes.selenium.fluent.SimpleRegionBySelector;
@@ -15,7 +15,7 @@ import com.applitools.eyes.universal.mapper.RegionMapper;
  */
 public class SimpleRegionMapper {
 
-  public static SimpleRegionDto toSimpleRegionDto(GetSimpleRegion getSimpleRegion) {
+  public static SimpleRegionDto toSimpleRegionDto(GetRegion getSimpleRegion) {
     if (getSimpleRegion == null) {
       return null;
     }
@@ -33,7 +33,7 @@ public class SimpleRegionMapper {
     return simpleRegionDto;
   }
 
-  public static List<SimpleRegionDto> toSimpleRegionDtoList(List<GetSimpleRegion> getSimpleRegionList) {
+  public static List<SimpleRegionDto> toSimpleRegionDtoList(List<GetRegion> getSimpleRegionList) {
     return getSimpleRegionList.stream().map(SimpleRegionMapper::toSimpleRegionDto).collect(Collectors.toList());
   }
 

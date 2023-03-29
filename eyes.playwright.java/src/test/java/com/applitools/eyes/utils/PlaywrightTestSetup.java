@@ -1,7 +1,6 @@
 package com.applitools.eyes.utils;
 
 import com.applitools.connectivity.RestClient;
-import com.applitools.connectivity.ServerConnector;
 import com.applitools.eyes.*;
 import com.applitools.eyes.metadata.SessionResults;
 import com.applitools.eyes.playwright.ClassicRunner;
@@ -86,7 +85,7 @@ public class PlaywrightTestSetup extends ReportingTestSuite implements ITest {
                 .queryParam("apiKey", apiKey)
                 .build();
 
-        RestClient client = new RestClient(new Logger(new StdoutLogHandler()), apiSessionUri, ServerConnector.DEFAULT_CLIENT_TIMEOUT);
+        RestClient client = new RestClient(new Logger(new StdoutLogHandler()), apiSessionUri, TestUtils.DEFAULT_CLIENT_TIMEOUT);
         client.setAgentId(ClassVersionGetter.CURRENT_VERSION);
         if (System.getenv("APPLITOOLS_USE_PROXY") != null) {
             client.setProxy(new ProxySettings("http://127.0.0.1", 8888));

@@ -2,15 +2,12 @@ package com.applitools.eyes.api;
 
 import com.applitools.eyes.EyesRunner;
 import com.applitools.eyes.selenium.ClassicRunner;
-import com.applitools.eyes.visualgrid.services.EyesRunner0;
 import com.applitools.eyes.StdoutLogHandler;
 import com.applitools.eyes.config.Configuration;
-import com.applitools.eyes.selenium.ClassicRunner0;
 import com.applitools.eyes.selenium.Eyes;
 import com.applitools.eyes.selenium.TestDataProvider;
 import com.applitools.eyes.utils.ReportingTestSuite;
 import com.applitools.eyes.utils.SeleniumUtils;
-import com.applitools.eyes.triggers.VisualGridRunner0;
 import com.applitools.eyes.visualgrid.services.VisualGridRunner;
 import org.openqa.selenium.WebDriver;
 import org.testng.Assert;

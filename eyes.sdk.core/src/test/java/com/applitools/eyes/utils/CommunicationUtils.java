@@ -1,6 +1,5 @@
 package com.applitools.eyes.utils;
 
-import com.applitools.connectivity.ServerConnector;
 import com.applitools.connectivity.api.HttpClient;
 import com.applitools.connectivity.api.HttpClientImpl;
 import com.applitools.connectivity.api.Request;
@@ -19,7 +18,7 @@ import java.io.IOException;
 public class CommunicationUtils {
 
     private static HttpClient createClient(Logger logger) {
-        return new HttpClientImpl(logger, ServerConnector.DEFAULT_CLIENT_TIMEOUT, null);
+        return new HttpClientImpl(logger, TestUtils.DEFAULT_CLIENT_TIMEOUT, null);
     }
 
     public static <Tin> void jsonRequest(Logger logger, String url, Tin data, HttpAuth creds, String httpMethod) {

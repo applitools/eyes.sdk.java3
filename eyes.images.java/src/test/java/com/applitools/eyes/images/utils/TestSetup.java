@@ -1,22 +1,14 @@
 package com.applitools.eyes.images.utils;
 
-import com.applitools.connectivity.RestClient;
-import com.applitools.connectivity.ServerConnector;
 import com.applitools.eyes.*;
 import com.applitools.eyes.images.Eyes;
 import com.applitools.eyes.metadata.SessionResults;
 import com.applitools.eyes.utils.ReportingTestSuite;
-import com.applitools.utils.ClassVersionGetter;
-import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.testng.Assert;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeMethod;
 
-import javax.ws.rs.HttpMethod;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.UriBuilder;
-import java.net.URI;
+import static com.applitools.eyes.utils.TestUtils.getSessionResults;
 
 public class TestSetup extends ReportingTestSuite {
 
@@ -63,24 +55,4 @@ public class TestSetup extends ReportingTestSuite {
         return "Eyes Images SDK";
     }
 
-    private static SessionResults getSessionResults(String apiKey, TestResults results) throws java.io.IOException {
-        String apiSessionUrl = results.getApiUrls().getSession();
-        URI apiSessionUri = UriBuilder.fromUri(apiSessionUrl)
-                .queryParam("format", "json")
-                .queryParam("AccessToken", results.getSecretToken())
-                .queryParam("apiKey", apiKey)
-                .build();
-
-        RestClient client = new RestClient(new Logger(new StdoutLogHandler()), apiSessionUri, ServerConnector.DEFAULT_CLIENT_TIMEOUT);
-        client.setAgentId(ClassVersionGetter.CURRENT_VERSION);
-        if (System.getenv("APPLITOOLS_USE_PROXY") != null) {
-            client.setProxy(new ProxySettings("http://127.0.0.1", 8888));
-        }
-
-        String srStr = client.sendHttpRequest(apiSessionUri.toString(), HttpMethod.GET, MediaType.APPLICATION_JSON).getBodyString();
-        ObjectMapper jsonMapper = new ObjectMapper();
-        jsonMapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
-
-        return jsonMapper.readValue(srStr, SessionResults.class);
-    }
 }

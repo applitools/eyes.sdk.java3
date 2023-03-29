@@ -7,7 +7,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import java.util.ArrayList;
 import java.util.List;
 
-public class FloatingRegionByRectangle implements GetFloatingRegion {
+public class FloatingRegionByRectangle implements GetRegion {
     private final Region region;
     private final int maxUpOffset;
     private final int maxDownOffset;
@@ -25,15 +25,6 @@ public class FloatingRegionByRectangle implements GetFloatingRegion {
     @JsonProperty("region")
     public Region getRegion() {
         return region;
-    }
-
-    @Override
-    public List<FloatingMatchSettings> getRegions(EyesScreenshot screenshot) {
-        List<FloatingMatchSettings> value = new ArrayList<>();
-        value.add(new FloatingMatchSettings(
-                region.getLeft(), region.getTop(), region.getWidth(), region.getHeight(),
-                maxUpOffset, maxDownOffset, maxLeftOffset, maxRightOffset));
-        return value;
     }
 
     public int getMaxUpOffset() {

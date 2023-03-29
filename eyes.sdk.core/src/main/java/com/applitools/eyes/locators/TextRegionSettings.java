@@ -1,6 +1,5 @@
 package com.applitools.eyes.locators;
 
-import com.applitools.eyes.AppOutput;
 import com.applitools.utils.ArgumentGuard;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
@@ -12,7 +11,6 @@ import java.util.List;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class TextRegionSettings {
-    private AppOutput appOutput;
     @JsonIgnore
     private BufferedImage image;
     private final List<String> patterns;
@@ -67,14 +65,6 @@ public class TextRegionSettings {
 
     public String getLanguage() {
         return language;
-    }
-
-    public AppOutput getAppOutput() {
-        return appOutput;
-    }
-
-    public void setAppOutput(AppOutput appOutput) {
-        this.appOutput = appOutput;
     }
 
     public BufferedImage getImage() {

@@ -1,7 +1,7 @@
 package com.applitools.eyes.selenium.universal.mapper;
 
 import com.applitools.eyes.AccessibilityRegionByRectangle;
-import com.applitools.eyes.GetAccessibilityRegion;
+import com.applitools.eyes.fluent.GetRegion;
 import com.applitools.eyes.selenium.fluent.AccessibilityRegionByElement;
 import com.applitools.eyes.selenium.fluent.AccessibilityRegionBySelector;
 import com.applitools.eyes.selenium.universal.dto.AccessibilityRegionDto;
@@ -12,7 +12,7 @@ import com.applitools.eyes.universal.mapper.RegionMapper;
  */
 public class AccessibilityRegionMapper {
 
-  public static AccessibilityRegionDto toAccessibilityRegionDto(GetAccessibilityRegion getAccessibilityRegion) {
+  public static AccessibilityRegionDto toAccessibilityRegionDto(GetRegion getAccessibilityRegion) {
     if (getAccessibilityRegion == null) {
       return null;
     }

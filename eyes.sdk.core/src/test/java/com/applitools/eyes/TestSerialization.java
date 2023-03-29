@@ -267,29 +267,6 @@ public class TestSerialization extends ReportingTestSuite {
                 expectedSerialization, "ImageMatchSettings serialization does not match!");
     }
 
-    @Test(dataProvider = "four_booleans")
-    public void test_ImageMatchSettings_Serialization_Global(boolean ignoreCaret, boolean useDom, boolean enablePatterns, boolean ignoreDisplacements) throws JsonProcessingException {
-        super.addSuiteArg("ignoreCaret", ignoreCaret);
-        super.addSuiteArg("useDom", useDom);
-        super.addSuiteArg("enablePatterns", enablePatterns);
-        super.addSuiteArg("ignoreDisplacements", ignoreDisplacements);
-        ICheckSettings settings = new CheckSettings(0).fully().useDom(useDom).enablePatterns(enablePatterns).ignoreCaret(ignoreCaret);
-        TestEyes eyes = new TestEyes();
-        Configuration configuration = eyes.getConfigurationInstance();
-        configuration.setIgnoreDisplacements(ignoreDisplacements);
-        eyes.setConfiguration(configuration);
-        ImageMatchSettings imageMatchSettings = MatchWindowTask.createImageMatchSettings((ICheckSettingsInternal)settings, eyes);
-
-        String actualSerialization = jsonMapper.writeValueAsString(imageMatchSettings);
-
-        String expectedSerialization = String.format(
-                "{\"matchLevel\":\"STRICT\",\"exact\":null,\"ignoreCaret\":%s,\"useDom\":%s,\"enablePatterns\":%s,\"ignoreDisplacements\":%s,\"accessibility\":[],\"accessibilitySettings\":null,\"Ignore\":null,\"Layout\":null,\"Strict\":null,\"Content\":null,\"Floating\":null}",
-                ignoreCaret, useDom, enablePatterns, ignoreDisplacements);
-
-        Assert.assertEquals(actualSerialization,
-                expectedSerialization, "ImageMatchSettings serialization does not match!");
-    }
-
     @Test
     public void test_SessionStartInfo_Serialization() throws JsonProcessingException {
         ArrayList<PropertyData> properties = new ArrayList<>();

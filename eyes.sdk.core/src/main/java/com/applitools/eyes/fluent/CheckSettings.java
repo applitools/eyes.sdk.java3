@@ -6,7 +6,6 @@ import com.applitools.eyes.locators.BaseOcrRegion;
 import com.applitools.eyes.positioning.PositionProvider;
 import com.applitools.eyes.selenium.StitchMode;
 import com.applitools.eyes.visualgrid.model.VisualGridOption;
-import com.applitools.eyes.visualgrid.model.VisualGridSelector;
 import com.applitools.utils.ArgumentGuard;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
@@ -74,7 +73,7 @@ public class CheckSettings implements ICheckSettings, ICheckSettingsInternal {
         this.ignore_(new SimpleRegionByRectangle(region));
     }
 
-    protected void ignore_(GetSimpleRegion regionProvider) {
+    protected void ignore_(GetRegion regionProvider) {
         ignoreRegions.add(regionProvider);
     }
 
@@ -82,7 +81,7 @@ public class CheckSettings implements ICheckSettings, ICheckSettingsInternal {
         this.layout_(new SimpleRegionByRectangle(region));
     }
 
-    protected void layout_(GetSimpleRegion regionProvider) {
+    protected void layout_(GetRegion regionProvider) {
         layoutRegions.add(regionProvider);
     }
 
@@ -90,7 +89,7 @@ public class CheckSettings implements ICheckSettings, ICheckSettingsInternal {
         this.content_(new SimpleRegionByRectangle(region));
     }
 
-    protected void content_(GetSimpleRegion regionProvider) {
+    protected void content_(GetRegion regionProvider) {
         contentRegions.add(regionProvider);
     }
 
@@ -98,7 +97,7 @@ public class CheckSettings implements ICheckSettings, ICheckSettingsInternal {
         this.strict_(new SimpleRegionByRectangle(region));
     }
 
-    protected void strict_(GetSimpleRegion regionProvider) {
+    protected void strict_(GetRegion regionProvider) {
         strictRegions.add(regionProvider);
     }
 
@@ -108,7 +107,7 @@ public class CheckSettings implements ICheckSettings, ICheckSettingsInternal {
         );
     }
 
-    protected void floating(GetFloatingRegion regionProvider){
+    protected void floating(GetRegion regionProvider){
         this.floatingRegions.add(regionProvider);
     }
 
@@ -508,11 +507,6 @@ public class CheckSettings implements ICheckSettings, ICheckSettingsInternal {
     }
 
     @Override
-    public VisualGridSelector getVGTargetSelector() {
-        return null;
-    }
-
-    @Override
     public ICheckSettings enablePatterns(Boolean enablePatterns) {
         CheckSettings clone = this.clone();
         clone.enablePatterns = enablePatterns;
@@ -551,7 +545,7 @@ public class CheckSettings implements ICheckSettings, ICheckSettingsInternal {
         return this.ignoreDisplacements(true);
     }
 
-    protected void accessibility_(GetAccessibilityRegion accessibilityRegionProvider)
+    protected void accessibility_(GetRegion accessibilityRegionProvider)
     {
         this.accessibilityRegions.add(accessibilityRegionProvider);
     }
@@ -569,7 +563,7 @@ public class CheckSettings implements ICheckSettings, ICheckSettingsInternal {
         return clone;
     }
 
-    protected void accessibility(GetAccessibilityRegion accessibilityRegionProvider) {
+    protected void accessibility(GetRegion accessibilityRegionProvider) {
         accessibilityRegions.add(accessibilityRegionProvider);
     }
 
@@ -623,7 +617,7 @@ public class CheckSettings implements ICheckSettings, ICheckSettingsInternal {
 
     @Override
     public Boolean isCheckWindow() {
-        return getTargetRegion() == null && getVGTargetSelector() == null;
+        return getTargetRegion() == null;
     }
 
     @Override

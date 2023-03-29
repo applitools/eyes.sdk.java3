@@ -2,13 +2,10 @@ package com.applitools.eyes.demo;
 
 import com.applitools.eyes.*;
 import com.applitools.eyes.selenium.ClassicRunner;
-import com.applitools.eyes.selenium.ClassicRunner0;
 import com.applitools.eyes.selenium.Eyes;
 import com.applitools.eyes.utils.ReportingTestSuite;
 import com.applitools.eyes.utils.SeleniumUtils;
 import com.applitools.eyes.utils.TestUtils;
-import com.applitools.eyes.visualgrid.services.EyesRunner0;
-import com.applitools.eyes.triggers.VisualGridRunner0;
 import com.applitools.eyes.visualgrid.services.VisualGridRunner;
 import org.openqa.selenium.WebDriver;
 import org.testng.annotations.BeforeClass;
@@ -52,7 +49,7 @@ public class BasicDemo extends ReportingTestSuite {
         Eyes eyes = new Eyes(runner);
         eyes.setLogHandler(logger);
         eyes.setBatch(batch);
-        //eyes.setProxy(new ProxySettings("http://localhost:8888"));
+//        eyes.setProxy(new ProxySettings("http://localhost:8888"));
         try {
             eyes.open(driver, "Demo App", "BasicDemo" + suffix, new RectangleSize(800, 800));
             driver.get("https://applitools.github.io/demo/TestPages/FramesTestPage/");

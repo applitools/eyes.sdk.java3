@@ -64,7 +64,7 @@ public class Configuration implements IConfiguration {
     private Boolean useCookies;
     private Boolean captureStatusBar;
     @JsonIgnore
-    private IDebugResourceWriter debugResourceWriter = new NullDebugResourceWriter(); // FIXME do we need that true
+    private IDebugResourceWriter debugResourceWriter;
 
     //Rendering Configuration
     private Boolean isRenderingConfig;

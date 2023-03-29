@@ -1,6 +1,5 @@
 package com.applitools.eyes;
 
-import com.applitools.connectivity.ServerConnector;
 import com.applitools.eyes.universal.CommandExecutor;
 import com.applitools.eyes.universal.dto.DeleteTestSettingsDto;
 import com.applitools.eyes.universal.dto.ProxyDto;
@@ -50,7 +49,6 @@ public class TestResults {
     private SessionUrls appUrls;
     private SessionUrls apiUrls;
     private StepInfo[] stepsInfo;
-    private ServerConnector serverConnector;
     private SessionAccessibilityStatus accessibilityStatus;
     private String userTestId;
 
@@ -415,11 +413,6 @@ public class TestResults {
      */
     public void setStatus(TestResultsStatus status) {
         this.status = status;
-    }
-
-    public void setServerConnector(ServerConnector serverConnector)
-    {
-        this.serverConnector = serverConnector;
     }
 
     public void setAccessibilityStatus(SessionAccessibilityStatus accessibilityStatus) {

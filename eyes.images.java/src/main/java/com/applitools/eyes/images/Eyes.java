@@ -403,14 +403,6 @@ public class Eyes implements IEyesBase {
     }
 
     /**
-     * Get the screenshot.
-     * @return The screenshot.
-     */
-    public EyesScreenshot getScreenshot(Region targetRegion, ICheckSettingsInternal checkSettingsInternal) {
-        return null;
-    }
-
-    /**
      * Get the inferred environment.
      * @return Inferred environment.
      */

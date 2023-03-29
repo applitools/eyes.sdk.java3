@@ -2,13 +2,9 @@ package com.applitools.eyes.appium;
 
 import com.applitools.eyes.AccessibilityRegionType;
 import com.applitools.eyes.LazyLoadOptions;
-import com.applitools.eyes.Logger;
-import com.applitools.eyes.Padding;
 import com.applitools.eyes.Region;
 import com.applitools.eyes.selenium.fluent.*;
 import com.applitools.eyes.fluent.CheckSettings;
-import com.applitools.eyes.fluent.GetRegion;
-import com.applitools.eyes.selenium.wrappers.EyesWebDriver;
 import com.applitools.eyes.serializers.BySerializer;
 import com.applitools.eyes.serializers.WebElementSerializer;
 import com.applitools.eyes.visualgrid.model.NMGOptions;
@@ -21,7 +17,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-public class AppiumCheckSettings extends CheckSettings implements ImplicitInitiation {
+public class AppiumCheckSettings extends CheckSettings {
 
     @JsonSerialize(using = BySerializer.class)
     private By targetSelector;
@@ -65,25 +61,6 @@ public class AppiumCheckSettings extends CheckSettings implements ImplicitInitia
     protected AppiumCheckSettings(String webview) {
         this.webview = webview;
         this.isDefaultWebview = false;
-    }
-
-
-    @Override
-    public void init(Logger logger, EyesWebDriver driver) {
-        initGetRegions(logger, driver, ignoreRegions);
-        initGetRegions(logger, driver, layoutRegions);
-        initGetRegions(logger, driver, strictRegions);
-        initGetRegions(logger, driver, contentRegions);
-        initGetRegions(logger, driver, floatingRegions);
-        initGetRegions(logger, driver, accessibilityRegions);
-    }
-
-    private void initGetRegions(Logger logger, EyesWebDriver driver, List<? extends GetRegion> getRegions) {
-        for (GetRegion getRegion : getRegions) {
-            if (getRegion instanceof ImplicitInitiation) {
-                ((ImplicitInitiation) getRegion).init(logger, driver);
-            }
-        }
     }
 
     @Override

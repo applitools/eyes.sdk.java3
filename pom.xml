@@ -127,7 +127,6 @@
     <modules>
         <module>eyes.common.java/eyes.common.java</module>
         <module>eyes.common.java/eyes.connectivity.java</module>
-        <module>eyes.common.java/eyes.connectivity.java.jersey2x</module>
         <module>eyes.ufg.java</module>
         <module>eyes.sdk.core</module>
         <module>eyes.selenium.java</module>

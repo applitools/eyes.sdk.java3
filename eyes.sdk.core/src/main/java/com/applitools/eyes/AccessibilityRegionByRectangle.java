@@ -1,12 +1,10 @@
 package com.applitools.eyes;
 
+import com.applitools.eyes.fluent.GetRegion;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 
-import java.util.Collections;
-import java.util.List;
-
-public class AccessibilityRegionByRectangle implements GetAccessibilityRegion {
+public class AccessibilityRegionByRectangle implements GetRegion {
     @JsonInclude
     private int left;
     @JsonInclude
@@ -65,11 +63,6 @@ public class AccessibilityRegionByRectangle implements GetAccessibilityRegion {
 
     public AccessibilityRegionType getType() {
         return type;
-    }
-
-    @Override
-    public List<AccessibilityRegionByRectangle> getRegions(EyesScreenshot screenshot) {
-        return Collections.singletonList(this);
     }
 
     @Override

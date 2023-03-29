@@ -3,7 +3,6 @@ package com.applitools;
 import com.applitools.eyes.MatchLevel;
 import com.applitools.eyes.Region;
 import com.applitools.eyes.visualgrid.model.VisualGridOption;
-import com.applitools.eyes.visualgrid.model.VisualGridSelector;
 
 import java.util.List;
 import java.util.Map;
@@ -25,8 +24,6 @@ public interface ICheckSettingsInternal {
     Boolean isSendDom();
 
     Boolean isUseDom();
-
-    VisualGridSelector getVGTargetSelector();
 
     ICheckSettingsInternal clone();
 

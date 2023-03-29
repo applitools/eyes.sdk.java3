@@ -1,9 +1,6 @@
 package com.applitools.eyes.universal.mapper;
 
-import com.applitools.eyes.fluent.GetSimpleRegion;
-import com.applitools.eyes.fluent.SimpleRegionByRectangle;
 import com.applitools.eyes.universal.dto.CodedRegionReference;
-import com.applitools.eyes.universal.dto.RegionDto;
 import com.applitools.eyes.universal.dto.TRegion;
 
 import java.util.List;

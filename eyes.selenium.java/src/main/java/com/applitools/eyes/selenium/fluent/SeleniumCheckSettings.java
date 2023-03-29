@@ -2,18 +2,11 @@ package com.applitools.eyes.selenium.fluent;
 
 import com.applitools.eyes.*;
 import com.applitools.eyes.fluent.CheckSettings;
-import com.applitools.eyes.fluent.GetRegion;
 import com.applitools.eyes.fluent.ICheckSettingsInternal;
 import com.applitools.eyes.positioning.PositionProvider;
-import com.applitools.eyes.selenium.CheckState;
-import com.applitools.eyes.selenium.EyesSeleniumUtils;
 import com.applitools.eyes.selenium.TargetPathLocator;
-import com.applitools.eyes.selenium.positioning.CssTranslatePositionProvider;
-import com.applitools.eyes.selenium.wrappers.EyesSeleniumDriver;
-import com.applitools.eyes.selenium.wrappers.EyesWebDriver;
 import com.applitools.eyes.serializers.BySerializer;
 import com.applitools.eyes.serializers.WebElementSerializer;
-import com.applitools.eyes.visualgrid.model.VisualGridSelector;
 import com.applitools.utils.ArgumentGuard;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
@@ -40,9 +33,6 @@ public class SeleniumCheckSettings extends CheckSettings implements ISeleniumChe
     private WebElement scrollRootElement;
     @JsonSerialize(using = BySerializer.class)
     private By scrollRootSelector;
-    private VisualGridSelector selector;
-    private CheckState state;
-
     private Boolean isDefaultLayoutBreakpointsSet;
     private final List<Integer> layoutBreakpoints = new ArrayList<>();
 
@@ -62,24 +52,6 @@ public class SeleniumCheckSettings extends CheckSettings implements ISeleniumChe
     }
 
     @Override
-    public void init(Logger logger, EyesWebDriver driver) {
-        initGetRegions(logger, driver, ignoreRegions);
-        initGetRegions(logger, driver, layoutRegions);
-        initGetRegions(logger, driver, strictRegions);
-        initGetRegions(logger, driver, contentRegions);
-        initGetRegions(logger, driver, floatingRegions);
-        initGetRegions(logger, driver, accessibilityRegions);
-    }
-
-    private void initGetRegions(Logger logger, EyesWebDriver driver, List<? extends GetRegion> getRegions) {
-        for (GetRegion getRegion : getRegions) {
-            if (getRegion instanceof ImplicitInitiation) {
-                ((ImplicitInitiation) getRegion).init(logger, driver);
-            }
-        }
-    }
-
-    @Override
     public List<FrameLocator> getFrameChain() {
         return this.frameChain;
     }
@@ -93,7 +65,6 @@ public class SeleniumCheckSettings extends CheckSettings implements ISeleniumChe
         clone.frameChain.addAll(this.frameChain);
         clone.scrollRootElement = this.scrollRootElement;
         clone.scrollRootSelector = this.scrollRootSelector;
-        clone.selector = this.selector;
         clone.sendDom = this.sendDom;
         clone.isDefaultLayoutBreakpointsSet = this.isDefaultLayoutBreakpointsSet;
         clone.layoutBreakpoints.addAll(this.layoutBreakpoints);
@@ -934,7 +905,7 @@ public class SeleniumCheckSettings extends CheckSettings implements ISeleniumChe
         }
         Region region = checkSettingsInternal.getTargetRegion();
 
-        if (region == null && getVGTargetSelector() == null) {
+        if (region == null) {
             return stitchContent ? FULL_PAGE : VIEWPORT;
         } else if (region != null) {
             return REGION;
@@ -962,16 +933,6 @@ public class SeleniumCheckSettings extends CheckSettings implements ISeleniumChe
         clone.scriptHooks.put(BEFORE_CAPTURE_SCREENSHOT, hook);
         return clone;
     }
-
-    @Override
-    public VisualGridSelector getVGTargetSelector() {
-        return this.selector;
-    }
-
-    public void setTargetSelector(VisualGridSelector selector) {
-        this.selector = selector;
-    }
-
 
     public SeleniumCheckSettings ignoreDisplacements(boolean ignoreDisplacements) {
         SeleniumCheckSettings clone = this.clone();
@@ -1001,14 +962,6 @@ public class SeleniumCheckSettings extends CheckSettings implements ISeleniumChe
             clone.accessibility(new AccessibilityRegionByElement(element, regionType));
         }
         return clone;
-    }
-
-    public void setState(CheckState state){
-        this.state = state;
-    }
-
-    public CheckState getState(){
-        return this.state;
     }
 
     public SeleniumCheckSettings layoutBreakpoints(Boolean shouldSet) {
@@ -1043,9 +996,9 @@ public class SeleniumCheckSettings extends CheckSettings implements ISeleniumChe
 
 
     @Override
+    @Deprecated
     public PositionProvider getStepPositionProvider() {
-        return state != null && state.getStitchPositionProvider() != null
-                && state.getStitchPositionProvider() instanceof CssTranslatePositionProvider ? state.getStitchPositionProvider() : null;
+        return null;
     }
 
     @Override

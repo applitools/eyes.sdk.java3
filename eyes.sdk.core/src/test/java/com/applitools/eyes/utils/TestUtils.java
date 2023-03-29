@@ -1,7 +1,6 @@
 package com.applitools.eyes.utils;
 
 import com.applitools.connectivity.RestClient;
-import com.applitools.connectivity.ServerConnector;
 import com.applitools.eyes.*;
 import com.applitools.eyes.metadata.BatchInfo;
 import com.applitools.eyes.metadata.SessionResults;
@@ -32,6 +31,7 @@ public class TestUtils {
     public final static SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy_MM_dd_HH_mm_ss_SSS");
     public final static boolean verboseLogs = !runOnCI || "true".equalsIgnoreCase(System.getenv("APPLITOOLS_VERBOSE_LOGS"));
     public final static String REPORTING_DIR = System.getenv("BUILD_DIR") + "/report/";
+    public static final int DEFAULT_CLIENT_TIMEOUT = 1000 * 60 * 5; // 5 minutes
 
     public static String initLogPath() {
         return initLogPath(Thread.currentThread().getStackTrace()[2].getMethodName());
@@ -72,7 +72,7 @@ public class TestUtils {
                 .queryParam("apiKey", apiKey)
                 .build();
 
-        RestClient client = new RestClient(new Logger(new StdoutLogHandler()), apiSessionUri, ServerConnector.DEFAULT_CLIENT_TIMEOUT);
+        RestClient client = new RestClient(new Logger(new StdoutLogHandler()), apiSessionUri, TestUtils.DEFAULT_CLIENT_TIMEOUT);
         client.setAgentId(ClassVersionGetter.CURRENT_VERSION);
         if (System.getenv("APPLITOOLS_USE_PROXY") != null) {
             client.setProxy(new ProxySettings("http://127.0.0.1", 8888));
@@ -179,7 +179,7 @@ public class TestUtils {
                 .queryParam("apiKey", apiKey);
         if (accountId != null) builder.queryParam("accountId", accountId);
         URI apiSessionUri = builder.build();
-        RestClient client = new RestClient(logger, apiSessionUri, ServerConnector.DEFAULT_CLIENT_TIMEOUT);
+        RestClient client = new RestClient(logger, apiSessionUri, TestUtils.DEFAULT_CLIENT_TIMEOUT);
         ObjectMapper mapper = new ObjectMapper();
         String dom = client.sendHttpRequest(apiSessionUri.toString(), HttpMethod.GET, MediaType.APPLICATION_JSON).getBodyString();
         return mapper.readTree(dom);
@@ -207,7 +207,7 @@ public class TestUtils {
                 .queryParam("apiKey", apiKey)
                 .build();
 
-        RestClient client = new RestClient(new Logger(new StdoutLogHandler()), apiBatchUri, ServerConnector.DEFAULT_CLIENT_TIMEOUT);
+        RestClient client = new RestClient(new Logger(new StdoutLogHandler()), apiBatchUri, TestUtils.DEFAULT_CLIENT_TIMEOUT);
         client.setAgentId(ClassVersionGetter.CURRENT_VERSION);
         if (System.getenv("APPLITOOLS_USE_PROXY") != null) {
             client.setProxy(new ProxySettings("http://127.0.0.1", 8888));
