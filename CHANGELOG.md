@@ -1,3 +1,7 @@
+## [5.47.0] - 2023-04-05
+### Updated
+- Updated core binaries to `2.4.7`. 
+
 ## [5.46.0] - 2023-03-28
 ### Updated
 - Updated core binaries to `2.4.3`. [Trello 3164](https://trello.com/c/9KdyrqwV)
